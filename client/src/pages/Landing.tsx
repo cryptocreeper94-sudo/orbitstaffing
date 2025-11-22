@@ -57,7 +57,7 @@ export default function Landing() {
           </h1>
           
           <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
-            One platform to recruit, onboard, manage, and pay your workforce. Save up to 35% on staffing costs while maintaining quality and compliance.
+            <span className="text-primary font-semibold">Full-Cycle Staffing Operations</span> in one platform. From recruit to payroll to invoice—complete control, complete compliance. Save up to 35% on staffing costs.
           </p>
 
           <div className="flex flex-col md:flex-row gap-3 justify-center mb-8">
@@ -83,40 +83,40 @@ export default function Landing() {
       <section className="py-12 bg-card/30 backdrop-blur-sm border-y border-border/30">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold font-heading mb-2">Purpose-Built for Staffing</h2>
-            <p className="text-muted-foreground text-sm">Everything you need to run a modern staffing agency.</p>
+            <h2 className="text-3xl font-bold font-heading mb-2">End-to-End Staffing Lifecycle</h2>
+            <p className="text-muted-foreground text-sm">Complete control from recruitment through payroll and billing. No missing pieces.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <FeatureCard 
               icon={Users}
-              title="Talent Pool Management"
-              desc="Build, segment, and communicate with your workforce database instantly."
-            />
-            <FeatureCard 
-              icon={DollarSign}
-              title="Smart Pricing"
-              desc="Competitive rates (1.35x markup) undercut industry standard by 16%+."
+              title="Recruit & Source"
+              desc="Build talent pools, screen candidates, background checks, I-9 verification."
             />
             <FeatureCard 
               icon={Clock}
-              title="Fast Matching"
-              desc="Match workers to jobs in minutes, not hours. AI-powered suggestions."
+              title="Match & Place"
+              desc="Smart matching, client interviews, offer management, fast placement."
+            />
+            <FeatureCard 
+              icon={DollarSign}
+              title="Time & Payroll"
+              desc="Mobile timesheets, approvals, payroll processing, tax compliance."
             />
             <FeatureCard 
               icon={BarChart3}
-              title="Real-Time Analytics"
-              desc="Dashboard view of revenue, placements, attendance, and efficiency."
+              title="Billing & Revenue"
+              desc="Auto-invoicing, client billing, accounts receivable, analytics."
             />
             <FeatureCard 
               icon={Shield}
-              title="Compliance Ready"
-              desc="Gov job prevailing wage, I-9 verification, tax docs all handled."
+              title="Compliance & Risk"
+              desc="I-9, background checks, tax filings, workers' comp, audit-ready."
             />
             <FeatureCard 
               icon={Zap}
-              title="Automated Workflows"
-              desc="No manual data entry. Issues bubble up. Everything gets logged."
+              title="Full Automation"
+              desc="Zero manual data entry. Rules-based workflows. Everything logged."
             />
           </div>
         </div>
