@@ -625,6 +625,121 @@ TN, USA
 
 ---
 
+## 15. SYSTEM DISCLAIMER & HUMAN ENVIRONMENT
+
+### 15.1 Automated System with Human Management
+**ORBIT is a hybrid system - automated where possible, human-managed where necessary.**
+
+ORBIT Staffing OS operates as follows:
+- **Automated:** Scheduling, payroll calculations, invoicing generation, compliance tracking, GPS verification
+- **Human-Managed:** Invoice disputes, payment exceptions, worker complaints, compliance exceptions, fraud investigations
+- **Manager Approval:** Staffing Agency managers approve all assignments, invoices, and conversions
+
+### 15.2 Worker Integrity Dependency
+**This system depends on worker honesty and integrity:**
+
+Workers must:
+- ✓ Clock in/out honestly via GPS at job location
+- ✓ Report accurate hours worked
+- ✓ Not claim hours not actually worked
+- ✓ Not share GPS or login credentials
+- ✓ Report suspicious activity immediately
+- ✓ Maintain professional conduct with clients
+
+ORBIT provides tools (GPS, audit trails, timesheets), but **cannot guarantee compliance if workers act dishonestly**. System is only as good as worker integrity.
+
+### 15.3 Invoicing Dispute Resolution
+**What happens if there's a dispute about hours/work documented:**
+
+**Scenario 1: Worker claims 40 hours, GPS shows 25 hours**
+- GPS verification is authoritative source
+- Timesheet examined for discrepancies
+- Manager reviews assignment notes
+- **Resolution:** Payroll reflects GPS-verified hours
+- Worker can appeal if they believe GPS error occurred
+
+**Scenario 2: Client claims worker didn't show up, GPS shows worker present**
+- GPS data takes precedence
+- Client contact notes reviewed
+- Manager investigates with both parties
+- **Resolution:** Invoice generated based on GPS verification
+- If client disputes, arbitration required
+
+**Scenario 3: Technical glitch causes GPS error**
+- Workers and clients can report GPS outages
+- Manager reviews all available evidence (photos, client confirmation, worker statement)
+- ORBIT makes good-faith resolution
+- **ORBIT's commitment:** We will resolve disputes fairly and quickly (within 3 business days)
+
+### 15.4 ORBIT's Commitment
+**On our part:**
+
+✓ We will investigate all disputes thoroughly  
+✓ We will review GPS data, timesheets, and client notes  
+✓ We will make good-faith decisions based on available evidence  
+✓ We will not penalize workers or clients for honest disputes  
+✓ We will resolve disputed invoices within 3 business days  
+
+**However:**
+
+❌ We cannot compensate for lost revenue due to worker no-shows  
+❌ We cannot override GPS verification without overwhelming evidence  
+❌ We cannot refund invoices already paid without clear fraud  
+❌ We cannot guarantee 100% accuracy (this is human-dependent work)  
+
+### 15.5 Staffing Industry Reality
+**Understanding the nature of temporary workforce management:**
+
+Staffing is inherently unpredictable:
+- Workers sometimes call in sick or don't show
+- Clients sometimes cancel assignments last-minute
+- Hours sometimes vary day-to-day
+- Availability is fluid and changeable
+- Workers seek permanent positions and leave
+- Clients' needs fluctuate
+
+**ORBIT helps manage this chaos through:**
+- Real-time scheduling and availability tracking
+- GPS verification to prevent fraud
+- Automated backup worker notifications
+- Quick replacement assignment system
+- Fair dispute resolution process
+
+**ORBIT cannot eliminate this reality.** We provide the best tools and management, but staffing remains a dynamic, human-dependent business.
+
+### 15.6 Worker Employment Verification
+**ORBIT workers are temporary contractors, not employees.** This means:
+
+- ✓ Workers are free to work for other staffing agencies
+- ✓ Workers can decline assignments without penalty
+- ✓ No guaranteed minimum hours
+- ✓ No benefits (health insurance, 401k, PTO)
+- ✓ Can be removed from platform for misconduct
+
+**Workers should:**
+- Always verify they're communicating with legitimate ORBIT staff
+- Cross-reference manager names and contact info
+- Check email addresses (official: @orbitstaffing.net)
+- Never send payment upfront or provide personal financial info
+- Report suspicious requests to support@orbitstaffing.net
+
+### 15.7 System Managers & Escalation
+**For disputes or issues:**
+
+1. **First Level:** Assignment manager (handles scheduling, assignment issues)
+2. **Second Level:** Compliance manager (handles payment, invoicing disputes)
+3. **Third Level:** Operations director (handles major complaints, fraud)
+4. **Final Level:** CEO/Owner (handles legal disputes, policy decisions)
+
+**Manager limitations:**
+- Managers cannot change system code or architecture
+- Managers cannot override CEO decisions
+- Managers cannot create new pricing tiers
+- Managers cannot grant admin access (CEO only)
+- Managers enforce policy but don't create it
+
+---
+
 ## 16. ACCEPTANCE
 
 By using ORBIT Staffing OS, you accept these terms:
