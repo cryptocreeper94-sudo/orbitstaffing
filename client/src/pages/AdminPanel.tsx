@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   AlertTriangle, 
   Settings, 
@@ -11,7 +13,16 @@ import {
   Lock,
   Activity,
   DollarSign,
-  FileText
+  FileText,
+  Megaphone,
+  Mail,
+  MessageCircle,
+  Facebook,
+  Linkedin,
+  Globe,
+  Zap,
+  CheckCircle2,
+  LinkIcon
 } from "lucide-react";
 
 export default function AdminPanel() {
@@ -23,16 +34,137 @@ export default function AdminPanel() {
           <span className="text-sm font-bold text-red-500">ADMIN ONLY - RESTRICTED ACCESS</span>
         </div>
         <h1 className="text-3xl font-bold font-heading tracking-tight">Administrator Panel</h1>
-        <p className="text-muted-foreground">System configuration, security, and financial controls.</p>
+        <p className="text-muted-foreground">System configuration, security, marketing automation, and financial controls.</p>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="bg-card border border-border/50">
+        <TabsList className="bg-card border border-border/50 overflow-x-auto flex-nowrap">
           <TabsTrigger value="overview">System Overview</TabsTrigger>
+          <TabsTrigger value="marketing">Marketing Engine</TabsTrigger>
           <TabsTrigger value="security">Security & Billing</TabsTrigger>
           <TabsTrigger value="payroll">Payroll System</TabsTrigger>
           <TabsTrigger value="audit">Audit Log</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="marketing" className="space-y-6">
+          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="font-heading flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-primary" />
+                Automated Marketing Engine
+              </CardTitle>
+              <CardDescription>Connect channels and configure auto-campaigns for recruitment.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {/* Channel Integration */}
+              <div>
+                <h4 className="font-bold text-sm mb-4">Communication Channels</h4>
+                <div className="space-y-3">
+                  <ChannelCard 
+                    icon={Mail}
+                    name="Email Marketing"
+                    desc="SendGrid integration for batch campaigns"
+                    status="Connected"
+                    connected
+                  />
+                  <ChannelCard 
+                    icon={MessageCircle}
+                    name="SMS (Twilio)"
+                    desc="Automated text alerts & job notifications"
+                    status="Active"
+                    connected
+                  />
+                  <ChannelCard 
+                    icon={Facebook}
+                    name="Facebook Jobs"
+                    desc="Auto-post open positions to Facebook Careers"
+                    status="Ready to Connect"
+                  />
+                  <ChannelCard 
+                    icon={Linkedin}
+                    name="LinkedIn Recruiter"
+                    desc="Sync jobs to LinkedIn and receive applicants"
+                    status="Ready to Connect"
+                  />
+                </div>
+              </div>
+
+              {/* Partnership Links */}
+              <div>
+                <h4 className="font-bold text-sm mb-4">Strategic Partnerships</h4>
+                <p className="text-xs text-muted-foreground mb-3">Link to organizations that send you candidates or benefit your network.</p>
+                <div className="space-y-3">
+                  <PartnershipLink 
+                    name="Trade Schools Directory"
+                    url="https://www.iseek.org/careers/"
+                    desc="Links to TN trade schools & apprenticeships"
+                  />
+                  <PartnershipLink 
+                    name="Tennessee Colleges Work-Study"
+                    url="https://www.tn.gov/student/"
+                    desc="College partnership programs"
+                  />
+                  <PartnershipLink 
+                    name="Nashville Business Groups"
+                    url="https://nashvillegcc.com/"
+                    desc="Chamber of Commerce networking"
+                  />
+                  <PartnershipLink 
+                    name="Construction Industry Associations"
+                    url="https://www.agc.org/"
+                    desc="AGC & construction trade groups"
+                  />
+                </div>
+              </div>
+
+              {/* Campaign Templates */}
+              <div>
+                <h4 className="font-bold text-sm mb-4">Email & SMS Templates</h4>
+                <div className="space-y-3">
+                  <CampaignTemplate 
+                    title="New Job Alert"
+                    preview="We have 4 electricians needed tomorrow"
+                    channels={["Email", "SMS"]}
+                  />
+                  <CampaignTemplate 
+                    title="Weekly Opportunity Digest"
+                    preview="Here are jobs matching your skills"
+                    channels={["Email"]}
+                  />
+                  <CampaignTemplate 
+                    title="Urgent Shift Fill"
+                    preview="$22/hr, 8 hours, start in 2 hours"
+                    channels={["SMS", "Email"]}
+                  />
+                </div>
+              </div>
+
+              {/* Auto-Campaign Setup */}
+              <Card className="bg-background/50 border border-border/50">
+                <CardHeader>
+                  <CardTitle className="text-sm font-heading">Schedule Auto-Campaigns</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Send Job Alerts Every:</label>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1">Every Morning (7 AM)</Button>
+                      <Button variant="outline" size="sm" className="flex-1">Every Evening (4 PM)</Button>
+                      <Button variant="outline" size="sm" className="flex-1">Real-Time Urgent Only</Button>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Target Audience Tags</label>
+                    <Input placeholder="e.g., Electricians, Nashville, Available Tomorrow" />
+                  </div>
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Zap className="w-4 h-4 mr-2" /> Activate Auto-Campaign
+                  </Button>
+                </CardContent>
+              </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -258,6 +390,68 @@ function AuditEntry({ time, action, details, type }: any) {
         <span>{action}</span>
       </div>
       <div className="text-[10px] opacity-70 mt-1">{details}</div>
+    </div>
+  );
+}
+
+function ChannelCard({ icon: Icon, name, desc, status, connected }: any) {
+  return (
+    <div className={`p-4 rounded-lg border transition-all ${connected ? 'bg-green-500/5 border-green-500/30' : 'bg-background/50 border-border/50'}`}>
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-3">
+          <div className={`p-2 rounded ${connected ? 'bg-green-500/20 text-green-500' : 'bg-background/50 text-muted-foreground'}`}>
+            <Icon className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="font-bold text-sm">{name}</h4>
+            <p className="text-xs text-muted-foreground">{desc}</p>
+          </div>
+        </div>
+        <Badge variant="outline" className={connected ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"}>
+          {status}
+        </Badge>
+      </div>
+      {!connected && (
+        <Button size="sm" className="mt-3 w-full h-7 text-xs bg-primary text-primary-foreground hover:bg-primary/90">
+          <LinkIcon className="w-3 h-3 mr-1" /> Connect
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function PartnershipLink({ name, url, desc }: any) {
+  return (
+    <div className="p-3 rounded-lg bg-background/50 border border-border/50 hover:border-primary/30 transition-colors">
+      <div className="flex items-start gap-2 mb-2">
+        <Globe className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <h5 className="font-bold text-sm truncate">{name}</h5>
+          <p className="text-xs text-muted-foreground truncate">{url}</p>
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground mb-2">{desc}</p>
+      <Button size="sm" variant="outline" className="h-6 text-xs w-full">Visit</Button>
+    </div>
+  );
+}
+
+function CampaignTemplate({ title, preview, channels }: any) {
+  return (
+    <div className="p-4 rounded-lg bg-background/50 border border-border/50 hover:bg-white/5 transition-colors cursor-pointer group">
+      <div className="flex items-start justify-between mb-2">
+        <div>
+          <h5 className="font-bold text-sm group-hover:text-primary transition-colors">{title}</h5>
+          <p className="text-xs text-muted-foreground mt-1">{preview}</p>
+        </div>
+      </div>
+      <div className="flex gap-1">
+        {channels.map((ch) => (
+          <Badge key={ch} variant="outline" className="text-[10px] h-5 px-2 bg-primary/10 text-primary border-primary/20">
+            {ch}
+          </Badge>
+        ))}
+      </div>
     </div>
   );
 }
