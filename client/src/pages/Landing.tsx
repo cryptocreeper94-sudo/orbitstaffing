@@ -48,11 +48,13 @@ export default function Landing() {
         <div className="absolute top-10 right-10 w-60 h-60 bg-primary/10 rounded-full blur-3xl"></div>
         
         <div className="relative max-w-4xl mx-auto px-6 text-center">
-          <Badge className="mb-3 bg-primary/20 text-primary border-primary/30">
-            <Zap className="w-3 h-3 mr-1" /> Automate Your Workforce
-          </Badge>
+          <div className="mb-6 px-6 py-4 rounded-lg bg-primary/15 border border-primary/30 inline-block">
+            <Badge className="bg-primary/20 text-primary border-primary/30 text-sm">
+              <Zap className="w-4 h-4 mr-2" /> Automate Your Business
+            </Badge>
+          </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold font-heading mb-3 tracking-tight">
+          <h1 className="text-5xl md:text-7xl font-bold font-heading mb-4 tracking-tight">
             Staffing Reimagined
           </h1>
           
@@ -64,9 +66,11 @@ export default function Landing() {
             <Button className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               Request Demo <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button variant="outline" className="h-10 text-sm border-primary/30 hover:bg-primary/10">
-              View Pricing
-            </Button>
+            <Link href="/configure">
+              <a className="h-10 text-sm px-4 rounded-md border border-primary/30 hover:bg-primary/10 inline-flex items-center">
+                Configure for Your Industry
+              </a>
+            </Link>
           </div>
 
           {/* Stats */}
@@ -91,32 +95,32 @@ export default function Landing() {
             <FeatureCard 
               icon={Users}
               title="Recruit & Source"
-              desc="Build talent pools, screen candidates, background checks, I-9 verification."
+              desc="Multi-channel job posting, ATS, resume parsing, background checks, I-9 verification, reference checks, credential validation."
             />
             <FeatureCard 
               icon={Clock}
               title="Match & Place"
-              desc="Smart matching, client interviews, offer management, fast placement."
+              desc="Smart candidate matching, client interviews, offer negotiation, assignment tracking, fast fulfillment in minutes not hours."
             />
             <FeatureCard 
               icon={DollarSign}
               title="Time & Payroll"
-              desc="Mobile timesheets, approvals, payroll processing, tax compliance."
+              desc="Mobile timesheets, client approval workflows, payroll processing, tax withholding, W-2s, direct deposit, compliance reporting."
             />
             <FeatureCard 
               icon={BarChart3}
               title="Billing & Revenue"
-              desc="Auto-invoicing, client billing, accounts receivable, analytics."
+              desc="Automatic invoice generation, bill rate management, AR tracking, payment collections, P&L dashboards, margin analysis."
             />
             <FeatureCard 
               icon={Shield}
               title="Compliance & Risk"
-              desc="I-9, background checks, tax filings, workers' comp, audit-ready."
+              desc="I-9 management, E-Verify, background screening, prevailing wage, workers' comp, tax filings (941, W-2), OSHA safety."
             />
             <FeatureCard 
               icon={Zap}
               title="Full Automation"
-              desc="Zero manual data entry. Rules-based workflows. Everything logged."
+              desc="Zero manual entry. Rules-based workflows. Audit-ready. Everything logged. Multi-state tax handling. Real-time notifications."
             />
           </div>
         </div>

@@ -16,6 +16,9 @@ import Landing from "@/pages/Landing";
 import BusinessConfig from "@/pages/BusinessConfig";
 import WorkerConfig from "@/pages/WorkerConfig";
 import AdminPanel from "@/pages/AdminPanel";
+import Configuration from "@/pages/Configuration";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { AIChat } from "@/components/AIChat";
 
 function Router() {
   return (
@@ -28,6 +31,7 @@ function Router() {
       <Route path="/business-config" component={BusinessConfig} />
       <Route path="/worker-config" component={WorkerConfig} />
       <Route path="/admin" component={AdminPanel} />
+      <Route path="/configure" component={Configuration} />
       <Route path="/candidates" component={Candidates} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
@@ -44,6 +48,8 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <FeedbackWidget />
+        <AIChat />
       </TooltipProvider>
     </QueryClientProvider>
   );
