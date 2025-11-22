@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "ORBIT Staffing",
+    "slug": "orbit-staffing",
+    "version": "1.0.0",
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermissions": "Allow ORBIT to access your location for GPS check-in verification."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow ORBIT to use Face ID for biometric authentication."
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTabletMode": false,
+      "bundleIdentifier": "com.darkwavestudios.orbitstaffing",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ORBIT uses your location to verify GPS check-in at job sites.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "ORBIT uses your location to verify GPS check-in at job sites.",
+        "NSFaceIDUsageDescription": "Use Face ID to authenticate with ORBIT."
+      }
+    },
+    "android": {
+      "package": "com.darkwavestudios.orbitstaffing",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./mobile/assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.INTERNET"
+      ]
+    },
+    "web": {
+      "favicon": "./mobile/assets/favicon.png"
+    },
+    "splash": {
+      "image": "./mobile/assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "scheme": "orbit",
+    "extra": {
+      "apiUrl": "https://orbitstaffing.net/api",
+      "sandboxApiUrl": "https://sandbox.orbitstaffing.net/api"
+    }
+  }
+}
