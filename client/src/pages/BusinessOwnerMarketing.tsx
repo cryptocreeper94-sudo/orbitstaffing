@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Zap, Users, Clock, TrendingUp, Shield, MessageSquare, BarChart3, Send } from 'lucide-react';
+import { Zap, Users, Clock, TrendingUp, Shield, MessageSquare, BarChart3, Send, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import WorkflowDemo from '@/components/WorkflowDemo';
 import { toast } from 'sonner';
 
 export default function BusinessOwnerMarketing() {
@@ -13,6 +14,7 @@ export default function BusinessOwnerMarketing() {
     laborType: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWorkflowOpen, setIsWorkflowOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -59,12 +61,20 @@ export default function BusinessOwnerMarketing() {
             ORBIT automates end-to-end staffing. From day labor to permanent hires. 
             Your employees stay longer. Your costs drop. Your life gets simpler.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <Button className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-6" data-testid="button-get-started">
               Get Started Free
             </Button>
-            <Button variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white/10" data-testid="button-demo">
-              Request Demo
+            <Button 
+              onClick={() => setIsWorkflowOpen(true)}
+              className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 flex items-center gap-2" 
+              data-testid="button-see-demo"
+            >
+              <Play className="w-5 h-5" />
+              See It Work (90 seconds)
+            </Button>
+            <Button variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white/10" data-testid="button-request-demo">
+              Request Demo Call
             </Button>
           </div>
         </div>
@@ -516,6 +526,8 @@ export default function BusinessOwnerMarketing() {
           Start Your Free Trial
         </Button>
       </section>
+
+      <WorkflowDemo isOpen={isWorkflowOpen} onClose={() => setIsWorkflowOpen(false)} />
     </div>
   );
 }
