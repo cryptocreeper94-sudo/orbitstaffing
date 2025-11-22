@@ -15,6 +15,8 @@ import {
   insertTimeOffRequestSchema,
   insertStateComplianceSchema,
   insertUserFeedbackSchema,
+  insertLicenseSchema,
+  insertPaymentSchema,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -478,6 +480,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(history);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch billing history" });
+    }
+  });
+
+  // ========================
+  // LICENSES (Franchises & One-Off Sales)
+  // ========================
+  app.post("/api/licenses/create", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const parsed = insertLicenseSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid license data" });
+      }
+
+      const license = await storage.createLicense(parsed.data);
+      res.status(201).json(license);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create license" });
+    }
+  });
+
+  app.get("/api/licenses/company/:companyId", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const license = await storage.getCompanyLicense(companyId);
+      if (!license) {
+        return res.status(404).json({ error: "License not found" });
+      }
+      res.status(200).json(license);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch license" });
+    }
+  });
+
+  app.get("/api/licenses/:licenseId", async (req: Request, res: Response) => {
+    try {
+      const { licenseId } = req.params;
+      const license = await storage.getLicense(licenseId);
+      if (!license) {
+        return res.status(404).json({ error: "License not found" });
+      }
+      res.status(200).json(license);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch license" });
+    }
+  });
+
+  app.patch("/api/licenses/:licenseId", async (req: Request, res: Response) => {
+    try {
+      const { licenseId } = req.params;
+      const updates = req.body;
+
+      const license = await storage.updateLicense(licenseId, updates);
+      if (!license) {
+        return res.status(404).json({ error: "License not found" });
+      }
+      res.status(200).json(license);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update license" });
+    }
+  });
+
+  app.get("/api/licenses", async (req: Request, res: Response) => {
+    try {
+      const { status, type } = req.query;
+      const licenses = await storage.listLicenses({
+        status: status as string,
+        licenseType: type as string,
+      });
+      res.status(200).json(licenses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch licenses" });
+    }
+  });
+
+  // ========================
+  // PAYMENTS
+  // ========================
+  app.post("/api/payments/record", async (req: Request, res: Response) => {
+    try {
+      const { companyId, amount, description, method } = req.body;
+
+      if (!companyId || !amount || !method) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const payment = await storage.recordPayment(companyId, amount, description, method);
+      res.status(201).json(payment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to record payment" });
+    }
+  });
+
+  app.get("/api/payments/company/:companyId", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const payments = await storage.getCompanyPayments(companyId);
+      res.status(200).json(payments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch payments" });
+    }
+  });
+
+  app.get("/api/payments/:paymentId", async (req: Request, res: Response) => {
+    try {
+      const { paymentId } = req.params;
+      const payment = await storage.getPayment(paymentId);
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+      res.status(200).json(payment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch payment" });
+    }
+  });
+
+  app.patch("/api/payments/:paymentId", async (req: Request, res: Response) => {
+    try {
+      const { paymentId } = req.params;
+      const updates = req.body;
+
+      const payment = await storage.updatePayment(paymentId, updates);
+      if (!payment) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+      res.status(200).json(payment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update payment" });
     }
   });
 

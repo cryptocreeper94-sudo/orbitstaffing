@@ -622,3 +622,109 @@ export const insertUserFeedbackSchema = createInsertSchema(userFeedback).omit({
 
 export type InsertUserFeedback = z.infer<typeof insertUserFeedbackSchema>;
 export type UserFeedback = typeof userFeedback.$inferSelect;
+
+// ========================
+// Licenses (Franchise/One-Off Sales)
+// ========================
+export const licenses = pgTable(
+  "licenses",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+
+    // License Type
+    licenseType: varchar("license_type", { length: 50 }).notNull(), // "subscription", "franchise", "enterprise"
+    licenseTier: varchar("license_tier", { length: 50 }), // "startup", "growth", "enterprise", "custom"
+
+    // Pricing
+    oneTimeFee: decimal("one_time_fee", { precision: 10, scale: 2 }), // For franchise licenses
+    monthlyFee: decimal("monthly_fee", { precision: 10, scale: 2 }), // For subscriptions
+    revenueSharePercentage: decimal("revenue_share_percentage", { precision: 5, scale: 2 }),
+
+    // Capacity
+    maxWorkers: integer("max_workers").default(50),
+    maxClients: integer("max_clients").default(5),
+    maxEvents: integer("max_events").default(5),
+
+    // Status
+    status: varchar("status", { length: 50 }).notNull().default("active"), // active, paused, cancelled, expired
+    
+    // Duration
+    startDate: date("start_date"),
+    expiryDate: date("expiry_date"), // null for perpetual franchise licenses
+    autoRenew: boolean("auto_renew").default(true),
+
+    // Features
+    whiteLabel: boolean("white_label").default(false),
+    apiAccess: boolean("api_access").default(false),
+    dedicatedSupport: boolean("dedicated_support").default(false),
+    customBranding: boolean("custom_branding").default(false),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_licenses_company_id").on(table.companyId),
+    statusIdx: index("idx_licenses_status").on(table.status),
+  })
+);
+
+export const insertLicenseSchema = createInsertSchema(licenses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertLicense = z.infer<typeof insertLicenseSchema>;
+export type License = typeof licenses.$inferSelect;
+
+// ========================
+// Payments (Transaction History)
+// ========================
+export const payments = pgTable(
+  "payments",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+    licenseId: varchar("license_id").references(() => licenses.id),
+
+    // Payment Details
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    currency: varchar("currency", { length: 3 }).default("USD"),
+    description: text("description"),
+
+    // Payment Method
+    paymentMethod: varchar("payment_method", { length: 50 }), // "card", "bank_transfer", "check", "invoice"
+    stripePaymentIntentId: varchar("stripe_payment_intent_id"), // Stripe integration ID
+
+    // Status
+    status: varchar("status", { length: 50 }).notNull().default("pending"), // pending, processing, completed, failed, refunded
+    paymentDate: timestamp("payment_date"),
+    failureReason: text("failure_reason"),
+
+    // Invoice Reference
+    invoiceId: varchar("invoice_id").references(() => invoices.id),
+
+    // Metadata
+    notes: text("notes"),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_payments_company_id").on(table.companyId),
+    licenseIdx: index("idx_payments_license_id").on(table.licenseId),
+    statusIdx: index("idx_payments_status").on(table.status),
+    stripeIdx: index("idx_payments_stripe_id").on(table.stripePaymentIntentId),
+  })
+);
+
+export const insertPaymentSchema = createInsertSchema(payments).omit({
+  id: true,
+  paymentDate: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;

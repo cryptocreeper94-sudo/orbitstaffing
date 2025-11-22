@@ -15,6 +15,8 @@ import {
   stateCompliance,
   userFeedback,
   billingHistory,
+  licenses,
+  payments,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -43,6 +45,10 @@ import {
   type UserFeedback,
   type InsertBillingHistory,
   type BillingHistory,
+  type InsertLicense,
+  type License,
+  type InsertPayment,
+  type Payment,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -129,6 +135,20 @@ export interface IStorage {
     revenueSharePercentage?: number
   ): Promise<{ success: boolean; fee?: number; nextFreeChange?: Date }>;
   getBillingHistory(companyId: string): Promise<BillingHistory[]>;
+
+  // Licenses
+  createLicense(license: InsertLicense): Promise<License>;
+  getLicense(licenseId: string): Promise<License | undefined>;
+  getCompanyLicense(companyId: string): Promise<License | undefined>;
+  updateLicense(licenseId: string, data: Partial<InsertLicense>): Promise<License | undefined>;
+  listLicenses(filters?: { status?: string; licenseType?: string }): Promise<License[]>;
+
+  // Payments
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getPayment(paymentId: string): Promise<Payment | undefined>;
+  getCompanyPayments(companyId: string): Promise<Payment[]>;
+  updatePayment(paymentId: string, data: Partial<InsertPayment>): Promise<Payment | undefined>;
+  recordPayment(companyId: string, amount: number, description: string, method: string): Promise<Payment>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -485,6 +505,74 @@ export class DrizzleStorage implements IStorage {
       enterprise: 2000,
     };
     return amounts[tier] || 199;
+  }
+
+  // Licenses
+  async createLicense(license: InsertLicense): Promise<License> {
+    const result = await db.insert(licenses).values(license).returning();
+    return result[0];
+  }
+
+  async getLicense(licenseId: string): Promise<License | undefined> {
+    const result = await db.select().from(licenses).where(eq(licenses.id, licenseId));
+    return result[0];
+  }
+
+  async getCompanyLicense(companyId: string): Promise<License | undefined> {
+    const result = await db.select().from(licenses)
+      .where(eq(licenses.companyId, companyId))
+      .orderBy(desc(licenses.createdAt));
+    return result[0];
+  }
+
+  async updateLicense(licenseId: string, data: Partial<InsertLicense>): Promise<License | undefined> {
+    const result = await db.update(licenses).set(data).where(eq(licenses.id, licenseId)).returning();
+    return result[0];
+  }
+
+  async listLicenses(filters?: { status?: string; licenseType?: string }): Promise<License[]> {
+    let query = db.select().from(licenses);
+    
+    if (filters?.status) {
+      query = query.where(eq(licenses.status, filters.status));
+    }
+    if (filters?.licenseType) {
+      query = query.where(eq(licenses.licenseType, filters.licenseType));
+    }
+
+    return query;
+  }
+
+  // Payments
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    const result = await db.insert(payments).values(payment).returning();
+    return result[0];
+  }
+
+  async getPayment(paymentId: string): Promise<Payment | undefined> {
+    const result = await db.select().from(payments).where(eq(payments.id, paymentId));
+    return result[0];
+  }
+
+  async getCompanyPayments(companyId: string): Promise<Payment[]> {
+    return db.select().from(payments)
+      .where(eq(payments.companyId, companyId))
+      .orderBy(desc(payments.createdAt));
+  }
+
+  async updatePayment(paymentId: string, data: Partial<InsertPayment>): Promise<Payment | undefined> {
+    const result = await db.update(payments).set(data).where(eq(payments.id, paymentId)).returning();
+    return result[0];
+  }
+
+  async recordPayment(companyId: string, amount: number, description: string, method: string): Promise<Payment> {
+    return this.createPayment({
+      companyId,
+      amount: amount.toString() as any,
+      description,
+      paymentMethod: method,
+      status: "completed",
+    });
   }
 }
 
