@@ -12,22 +12,27 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { Link } from "wouter";
-import saturnLogo from "@assets/generated_images/aqua_saturn_planet_with_glowing_rings.png";
+import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
 
 export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* Saturn Watermark - Fixed Centered Background */}
+      {/* Saturn Watermark - Fixed Centered 3D Background */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        <img 
-          src={saturnLogo} 
-          alt="" 
-          className="w-[800px] h-[800px] opacity-15 object-contain"
-          style={{ 
-            filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 80px rgba(6, 182, 212, 0.2))',
-            willChange: 'transform'
-          }}
-        />
+        <div style={{
+          filter: 'drop-shadow(-20px -20px 40px rgba(0, 0, 0, 0.6)) drop-shadow(20px 20px 60px rgba(6, 182, 212, 0.3))',
+          transform: 'perspective(1200px) rotateX(5deg) rotateY(-5deg)',
+          willChange: 'transform'
+        }}>
+          <img 
+            src={saturnLogo} 
+            alt="" 
+            className="w-[800px] h-[800px] opacity-20 object-contain"
+            style={{ 
+              filter: 'drop-shadow(0 15px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 50px rgba(6, 182, 212, 0.5))',
+            }}
+          />
+        </div>
       </div>
 
       {/* Content Layer */}
