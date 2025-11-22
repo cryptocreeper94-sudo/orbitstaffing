@@ -26,6 +26,7 @@ import SmallBusinessPage from "@/pages/SmallBusinessPage";
 import LargeBusinessPage from "@/pages/LargeBusinessPage";
 import MultiAgencyHub from "@/pages/MultiAgencyHub";
 import ConversionManagement from "@/pages/ConversionManagement";
+import NDAAcceptance from "@/pages/NDAAcceptance";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/large-business" component={LargeBusinessPage} />
       <Route path="/hub" component={MultiAgencyHub} />
       <Route path="/conversions" component={ConversionManagement} />
+      <Route path="/nda" component={NDAAcceptance} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />
