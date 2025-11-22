@@ -34,6 +34,8 @@ import WorkOrders from "@/pages/WorkOrders";
 import ComingSoonApple from "@/pages/ComingSoonApple";
 import AdminIOSInterest from "@/pages/AdminIOSInterest";
 import IncidentReporting from "@/pages/IncidentReporting";
+import BusinessOwnerMarketing from "@/pages/BusinessOwnerMarketing";
+import MarketingDashboard from "@/pages/MarketingDashboard";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -67,6 +69,8 @@ function Router() {
       <Route path="/ios-coming-soon" component={ComingSoonApple} />
       <Route path="/admin/ios-interest" component={AdminIOSInterest} />
       <Route path="/incidents" component={IncidentReporting} />
+      <Route path="/business-owner" component={BusinessOwnerMarketing} />
+      <Route path="/marketing" component={MarketingDashboard} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

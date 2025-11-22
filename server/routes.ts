@@ -941,6 +941,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // LEAD MANAGEMENT (Business Owner Marketing)
+  // ========================
+  app.post("/api/leads", async (req: Request, res: Response) => {
+    try {
+      const { companyName, ownerName, email, phone, currentStaffing, laborType } = req.body;
+
+      if (!companyName || !email) {
+        return res.status(400).json({ error: "Company name and email required" });
+      }
+
+      const lead = {
+        id: crypto.randomUUID(),
+        companyName,
+        ownerName: ownerName || null,
+        email,
+        phone: phone || null,
+        currentStaffing: currentStaffing || null,
+        laborType: laborType || null,
+        createdAt: new Date(),
+        status: "new" as const,
+      };
+
+      // TODO: Save to leads table when created
+      console.log("New lead:", lead);
+
+      res.status(201).json({
+        success: true,
+        lead,
+        message: "Lead received. We'll contact you within 24 hours.",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit lead" });
+    }
+  });
+
+  app.get("/api/leads", async (req: Request, res: Response) => {
+    try {
+      // TODO: Fetch from database with filters
+      res.status(200).json({
+        leads: [],
+        total: 0,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch leads" });
+    }
+  });
+
+  app.patch("/api/leads/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      const validStatuses = ["new", "contacted", "demo_scheduled", "converted"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+
+      // TODO: Update lead status in database
+      console.log("Lead status updated:", id, status);
+
+      res.status(200).json({
+        success: true,
+        message: "Lead status updated",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update lead" });
+    }
+  });
+
+  // ========================
   // HEALTH CHECK
   // ========================
   app.get("/api/health", (req: Request, res: Response) => {
