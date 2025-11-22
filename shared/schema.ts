@@ -238,6 +238,88 @@ export type InsertWorker = z.infer<typeof insertWorkerSchema>;
 export type Worker = typeof workers.$inferSelect;
 
 // ========================
+// Worker Verification & Hallmark System
+// ========================
+export const workerVerification = pgTable(
+  "worker_verification",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Digital Hallmark/Seal
+    verificationCode: varchar("verification_code", { length: 50 }).unique(), // e.g., ORBIT-ABC123XYZ
+    qrCodeUrl: text("qr_code_url"), // URL to QR code image
+    qrCodeData: text("qr_code_data"), // Raw QR code data
+    
+    // Verification Status
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    expiresAt: timestamp("expires_at"), // Optional expiration
+  },
+  (table) => ({
+    workerIdx: index("idx_verification_worker_id").on(table.workerId),
+    companyIdx: index("idx_verification_company_id").on(table.companyId),
+    codeIdx: index("idx_verification_code").on(table.verificationCode),
+  })
+);
+
+export const insertWorkerVerificationSchema = createInsertSchema(workerVerification).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertWorkerVerification = z.infer<typeof insertWorkerVerificationSchema>;
+export type WorkerVerification = typeof workerVerification.$inferSelect;
+
+// ========================
+// Company News & Updates
+// ========================
+export const companyNews = pgTable(
+  "company_news",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // News Content
+    title: varchar("title", { length: 255 }).notNull(),
+    content: text("content").notNull(),
+    category: varchar("category", { length: 50 }), // "update", "announcement", "alert", "hiring", "policy"
+    
+    // Priority & Display
+    priority: varchar("priority", { length: 20 }).default("normal"), // "normal", "high", "urgent"
+    isPinned: boolean("is_pinned").default(false),
+    
+    // Visibility
+    visibleToWorkers: boolean("visible_to_workers").default(true),
+    visibleToClients: boolean("visible_to_clients").default(false),
+    visibleToPublic: boolean("visible_to_public").default(false),
+    
+    // Status
+    publishedAt: timestamp("published_at").default(sql`NOW()`),
+    expiresAt: timestamp("expires_at"), // Auto-hide after date
+    createdBy: varchar("created_by").references(() => users.id),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_news_company_id").on(table.companyId),
+    publishedIdx: index("idx_news_published_at").on(table.publishedAt),
+  })
+);
+
+export const insertCompanyNewsSchema = createInsertSchema(companyNews).omit({
+  id: true,
+  publishedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCompanyNews = z.infer<typeof insertCompanyNewsSchema>;
+export type CompanyNews = typeof companyNews.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
