@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { emailService } from "./email";
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -18,6 +19,7 @@ import {
   insertLicenseSchema,
   insertPaymentSchema,
   insertFeatureRequestSchema,
+  insertIosInterestSchema,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -680,6 +682,126 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(request);
     } catch (error) {
       res.status(500).json({ error: "Failed to update feature request" });
+    }
+  });
+
+  // ========================
+  // iOS INTEREST LIST
+  // ========================
+  app.post("/api/ios-interest", async (req: Request, res: Response) => {
+    try {
+      const parsed = insertIosInterestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid data", details: parsed.error.errors });
+      }
+
+      const interest = await storage.createIosInterest(parsed.data);
+      res.status(201).json(interest);
+    } catch (error: any) {
+      if (error.message.includes("duplicate key")) {
+        return res.status(409).json({ error: "Email already registered" });
+      }
+      res.status(500).json({ error: "Failed to save email" });
+    }
+  });
+
+  app.get("/api/admin/ios-interest", async (req: Request, res: Response) => {
+    try {
+      const notified = req.query.notified as string | undefined;
+      const source = req.query.source as string | undefined;
+
+      const filters: { notified?: boolean; source?: string } = {};
+      if (notified !== undefined) {
+        filters.notified = notified === "true";
+      }
+      if (source) {
+        filters.source = source;
+      }
+
+      const interests = await storage.listIosInterest(filters);
+      res.status(200).json(interests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch iOS interest list" });
+    }
+  });
+
+  app.post("/api/admin/ios-interest/:id/notify", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+
+      const interest = await storage.getIosInterest(id);
+      if (!interest) {
+        return res.status(404).json({ error: "Interest not found" });
+      }
+
+      // Send email
+      const emailResult = await emailService.send(emailService.getIOSLaunchEmail(interest.email));
+
+      // Mark as notified
+      const updated = await storage.markIosInterestNotified(id);
+
+      res.status(200).json({
+        success: emailResult.success,
+        interest: updated,
+        messageId: emailResult.messageId,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to send notification" });
+    }
+  });
+
+  app.post("/api/admin/ios-interest/notify-all", async (req: Request, res: Response) => {
+    try {
+      // Get all pending interests
+      const pendingInterests = await storage.listIosInterest({ notified: false });
+
+      if (pendingInterests.length === 0) {
+        return res.status(200).json({ success: true, notifiedCount: 0, message: "No pending users" });
+      }
+
+      // Send emails and mark as notified
+      let successCount = 0;
+      for (const interest of pendingInterests) {
+        try {
+          const emailResult = await emailService.send(emailService.getIOSLaunchEmail(interest.email));
+          if (emailResult.success) {
+            await storage.markIosInterestNotified(interest.id);
+            successCount++;
+          }
+        } catch (err) {
+          console.error(`Failed to notify ${interest.email}:`, err);
+        }
+      }
+
+      res.status(200).json({
+        success: true,
+        notifiedCount: successCount,
+        totalCount: pendingInterests.length,
+        message: `Notified ${successCount} of ${pendingInterests.length} users`,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to notify users" });
+    }
+  });
+
+  app.get("/api/admin/ios-interest/stats", async (req: Request, res: Response) => {
+    try {
+      const all = await storage.listIosInterest();
+      const notified = await storage.listIosInterest({ notified: true });
+      const pending = await storage.listIosInterest({ notified: false });
+
+      res.status(200).json({
+        total: all.length,
+        notified: notified.length,
+        pending: pending.length,
+        bySource: {
+          ios_coming_soon: all.filter((i) => i.source === "ios_coming_soon").length,
+          web: all.filter((i) => i.source === "web").length,
+          worker_signup: all.filter((i) => i.source === "worker_signup").length,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stats" });
     }
   });
 

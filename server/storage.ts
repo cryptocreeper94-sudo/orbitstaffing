@@ -18,6 +18,7 @@ import {
   licenses,
   payments,
   featureRequests,
+  iosInterestList,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -52,6 +53,8 @@ import {
   type Payment,
   type InsertFeatureRequest,
   type FeatureRequest,
+  type InsertIosInterest,
+  type IosInterest,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -159,6 +162,14 @@ export interface IStorage {
   getCompanyFeatureRequests(companyId: string): Promise<FeatureRequest[]>;
   getAllFeatureRequests(filters?: { status?: string; priority?: string }): Promise<FeatureRequest[]>;
   updateFeatureRequest(requestId: string, data: Partial<InsertFeatureRequest>): Promise<FeatureRequest | undefined>;
+
+  // iOS Interest List
+  createIosInterest(interest: InsertIosInterest): Promise<IosInterest>;
+  getIosInterest(id: string): Promise<IosInterest | undefined>;
+  listIosInterest(filters?: { notified?: boolean; source?: string }): Promise<IosInterest[]>;
+  updateIosInterest(id: string, data: Partial<InsertIosInterest>): Promise<IosInterest | undefined>;
+  markIosInterestNotified(id: string): Promise<IosInterest | undefined>;
+  markAllIosInterestNotified(): Promise<number>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -618,6 +629,58 @@ export class DrizzleStorage implements IStorage {
   async updateFeatureRequest(requestId: string, data: Partial<InsertFeatureRequest>): Promise<FeatureRequest | undefined> {
     const result = await db.update(featureRequests).set(data).where(eq(featureRequests.id, requestId)).returning();
     return result[0];
+  }
+
+  // iOS Interest List
+  async createIosInterest(interest: InsertIosInterest): Promise<IosInterest> {
+    const result = await db.insert(iosInterestList).values(interest).returning();
+    return result[0];
+  }
+
+  async getIosInterest(id: string): Promise<IosInterest | undefined> {
+    const result = await db.select().from(iosInterestList).where(eq(iosInterestList.id, id));
+    return result[0];
+  }
+
+  async listIosInterest(filters?: { notified?: boolean; source?: string }): Promise<IosInterest[]> {
+    let query = db.select().from(iosInterestList);
+
+    if (filters?.notified !== undefined) {
+      query = query.where(eq(iosInterestList.notified, filters.notified));
+    }
+    if (filters?.source) {
+      query = query.where(eq(iosInterestList.source, filters.source));
+    }
+
+    return query.orderBy(desc(iosInterestList.createdAt));
+  }
+
+  async updateIosInterest(id: string, data: Partial<InsertIosInterest>): Promise<IosInterest | undefined> {
+    const result = await db.update(iosInterestList).set(data).where(eq(iosInterestList.id, id)).returning();
+    return result[0];
+  }
+
+  async markIosInterestNotified(id: string): Promise<IosInterest | undefined> {
+    const result = await db
+      .update(iosInterestList)
+      .set({
+        notified: true,
+        notifiedAt: new Date(),
+      })
+      .where(eq(iosInterestList.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async markAllIosInterestNotified(): Promise<number> {
+    const result = await db
+      .update(iosInterestList)
+      .set({
+        notified: true,
+        notifiedAt: new Date(),
+      })
+      .where(eq(iosInterestList.notified, false));
+    return result.rowCount || 0;
   }
 }
 
