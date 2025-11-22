@@ -12,14 +12,22 @@ import Marketing from "@/pages/Marketing";
 import Sales from "@/pages/Sales";
 import WorkerPortal from "@/pages/WorkerPortal";
 import Operations from "@/pages/Operations";
+import Landing from "@/pages/Landing";
+import BusinessConfig from "@/pages/BusinessConfig";
+import WorkerConfig from "@/pages/WorkerConfig";
+import AdminPanel from "@/pages/AdminPanel";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={Landing} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/sales" component={Sales} />
       <Route path="/operations" component={Operations} />
       <Route path="/worker" component={WorkerPortal} />
+      <Route path="/business-config" component={BusinessConfig} />
+      <Route path="/worker-config" component={WorkerConfig} />
+      <Route path="/admin" component={AdminPanel} />
       <Route path="/candidates" component={Candidates} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
