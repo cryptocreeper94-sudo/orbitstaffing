@@ -21,7 +21,8 @@ import {
   FileSignature,
   ExternalLink,
   Calculator,
-  ArrowRight
+  ArrowRight,
+  Zap
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useState } from "react";
@@ -56,6 +57,7 @@ export default function Sales() {
       <Tabs defaultValue="leads" className="space-y-6" onValueChange={setActiveTab}>
         <TabsList className="bg-card border border-border/50">
           <TabsTrigger value="leads">Active Leads</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
           <TabsTrigger value="digital-card">My Digital Card</TabsTrigger>
           <TabsTrigger value="tools">Sales Tools & Calculator</TabsTrigger>
           <TabsTrigger value="csa">Digital CSA</TabsTrigger>
@@ -117,6 +119,108 @@ export default function Sales() {
                 nextAction="Initial Meeting"
               />
             </div>
+          </div>
+        </TabsContent>
+
+        {/* Integration Config Tab */}
+        <TabsContent value="integrations" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Google Calendar */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-blue-500" />
+                  Google Calendar Integration
+                </CardTitle>
+                <CardDescription>Auto-sync meetings and follow-ups</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">Automatically create calendar events for:</p>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li>✓ Client meetings and calls</li>
+                  <li>✓ Follow-up reminders</li>
+                  <li>✓ Quote deadlines</li>
+                  <li>✓ Assignment start dates</li>
+                </ul>
+                <Button className="w-full bg-blue-500/20 text-blue-600 hover:bg-blue-500/30 border border-blue-500/30">
+                  <ExternalLink className="w-4 h-4 mr-2" /> Connect to Google
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Outlook Calendar */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  Outlook/Microsoft 365
+                </CardTitle>
+                <CardDescription>For corporate calendar sync</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">Integrate with Microsoft ecosystem:</p>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li>✓ Outlook calendar sync</li>
+                  <li>✓ Teams notifications</li>
+                  <li>✓ Email integration</li>
+                  <li>✓ Shared calendar support</li>
+                </ul>
+                <Button variant="outline" className="w-full border-border/50">
+                  <ExternalLink className="w-4 h-4 mr-2" /> Connect to Outlook
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Slack Reminders */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-purple-500" />
+                  Slack Notifications
+                </CardTitle>
+                <CardDescription>Get reminders in Slack</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">Receive automated alerts:</p>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li>✓ Lead follow-up reminders</li>
+                  <li>✓ Quote approvals needed</li>
+                  <li>✓ Team mentions/tags</li>
+                  <li>✓ Daily summary reports</li>
+                </ul>
+                <Button className="w-full bg-purple-500/20 text-purple-600 hover:bg-purple-500/30 border border-purple-500/30">
+                  <ExternalLink className="w-4 h-4 mr-2" /> Connect Slack
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Email Reminders */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-red-500" />
+                  Email Reminders
+                </CardTitle>
+                <CardDescription>Built-in reminder system</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">Daily digest emails:</p>
+                <ul className="text-sm space-y-2 text-muted-foreground">
+                  <li>✓ Follow-up tasks due today</li>
+                  <li>✓ Leads needing attention</li>
+                  <li>✓ Custom reminder times</li>
+                  <li>✓ Weekly summary reports</li>
+                </ul>
+                <Button className="w-full bg-red-500/20 text-red-600 hover:bg-red-500/30 border border-red-500/30">
+                  <Mail className="w-4 h-4 mr-2" /> Configure Email
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm">
+            <p className="text-blue-600 font-semibold mb-2">✓ All integrations are secure</p>
+            <p className="text-xs text-blue-600/80">OAuth authentication. No password sharing. You control what data is shared.</p>
           </div>
         </TabsContent>
 

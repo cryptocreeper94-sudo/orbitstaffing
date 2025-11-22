@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import Candidates from "@/pages/Candidates";
+import Recruiting from "@/pages/Recruiting";
 import Clients from "@/pages/Clients";
 import Finance from "@/pages/Finance";
 import Marketing from "@/pages/Marketing";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/admin" component={AdminPanel} />
       <Route path="/configure" component={Configuration} />
       <Route path="/candidates" component={Candidates} />
+      <Route path="/recruiting" component={Recruiting} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />
