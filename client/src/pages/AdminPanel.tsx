@@ -1,455 +1,486 @@
-import { Shell } from "@/components/layout/Shell";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { 
-  AlertTriangle, 
-  Settings, 
-  Database, 
-  CreditCard, 
-  Lock,
-  Activity,
-  DollarSign,
-  FileText,
-  Megaphone,
-  Mail,
-  MessageCircle,
-  Facebook,
-  Linkedin,
-  Globe,
-  Zap,
-  CheckCircle2,
-  LinkIcon
-} from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
+
+type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
 export default function AdminPanel() {
-  return (
-    <Shell>
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
-          <Lock className="w-5 h-5 text-red-500" />
-          <span className="text-sm font-bold text-red-500">ADMIN ONLY - RESTRICTED ACCESS</span>
-        </div>
-        <h1 className="text-3xl font-bold font-heading tracking-tight">Administrator Panel</h1>
-        <p className="text-muted-foreground">System configuration, security, marketing automation, and financial controls.</p>
-      </div>
+  const [, setLocation] = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [role, setRole] = useState<AdminRole>(null);
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const [adminName, setAdminName] = useState('');
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="bg-card border border-border/50 overflow-x-auto flex-nowrap">
-          <TabsTrigger value="overview">System Overview</TabsTrigger>
-          <TabsTrigger value="marketing">Marketing Engine</TabsTrigger>
-          <TabsTrigger value="security">Security & Billing</TabsTrigger>
-          <TabsTrigger value="payroll">Payroll System</TabsTrigger>
-          <TabsTrigger value="audit">Audit Log</TabsTrigger>
-        </TabsList>
+  // Check if already authenticated
+  useEffect(() => {
+    const adminAuth = localStorage.getItem('adminAuthenticated');
+    const savedRole = localStorage.getItem('adminRole') as AdminRole;
+    const savedName = localStorage.getItem('adminName');
+    
+    if (adminAuth === 'true' && savedRole) {
+      setIsAuthenticated(true);
+      setRole(savedRole);
+      setAdminName(savedName || 'Admin');
+    }
+  }, []);
 
-        <TabsContent value="marketing" className="space-y-6">
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="font-heading flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-primary" />
-                Automated Marketing Engine
-              </CardTitle>
-              <CardDescription>Connect channels and configure auto-campaigns for recruitment.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Channel Integration */}
-              <div>
-                <h4 className="font-bold text-sm mb-4">Communication Channels</h4>
-                <div className="space-y-3">
-                  <ChannelCard 
-                    icon={Mail}
-                    name="Email Marketing"
-                    desc="SendGrid integration for batch campaigns"
-                    status="Connected"
-                    connected
-                  />
-                  <ChannelCard 
-                    icon={MessageCircle}
-                    name="SMS (Twilio)"
-                    desc="Automated text alerts & job notifications"
-                    status="Ready to Connect"
-                  />
-                  <ChannelCard 
-                    icon={Facebook}
-                    name="Facebook Jobs"
-                    desc="Auto-post open positions to Facebook Careers"
-                    status="Ready to Connect"
-                  />
-                  <ChannelCard 
-                    icon={Linkedin}
-                    name="LinkedIn Recruiter"
-                    desc="Sync jobs to LinkedIn and receive applicants"
-                    status="Ready to Connect"
-                  />
-                </div>
-              </div>
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-              {/* Partnership Links */}
-              <div>
-                <h4 className="font-bold text-sm mb-4">Strategic Partnerships</h4>
-                <p className="text-xs text-muted-foreground mb-3">Link to organizations that send you candidates or benefit your network.</p>
-                <div className="space-y-3">
-                  <PartnershipLink 
-                    name="Trade Schools Directory"
-                    url="https://www.iseek.org/careers/"
-                    desc="Links to TN trade schools & apprenticeships"
-                  />
-                  <PartnershipLink 
-                    name="Tennessee Colleges Work-Study"
-                    url="https://www.tn.gov/student/"
-                    desc="College partnership programs"
-                  />
-                  <PartnershipLink 
-                    name="Nashville Business Groups"
-                    url="https://nashvillegcc.com/"
-                    desc="Chamber of Commerce networking"
-                  />
-                  <PartnershipLink 
-                    name="Construction Industry Associations"
-                    url="https://www.agc.org/"
-                    desc="AGC & construction trade groups"
-                  />
-                </div>
-              </div>
+    if (pin.length !== 4) {
+      setError('PIN must be 4 digits');
+      return;
+    }
 
-              {/* Campaign Templates */}
-              <div>
-                <h4 className="font-bold text-sm mb-4">Email & SMS Templates</h4>
-                <div className="space-y-3">
-                  <CampaignTemplate 
-                    title="New Job Alert"
-                    preview="We have 4 electricians needed tomorrow"
-                    channels={["Email", "SMS"]}
-                  />
-                  <CampaignTemplate 
-                    title="Weekly Opportunity Digest"
-                    preview="Here are jobs matching your skills"
-                    channels={["Email"]}
-                  />
-                  <CampaignTemplate 
-                    title="Urgent Shift Fill"
-                    preview="$22/hr, 8 hours, start in 2 hours"
-                    channels={["SMS", "Email"]}
-                  />
-                </div>
-              </div>
+    // Simple demo PIN validation (1234 for master admin)
+    if (pin === '1234') {
+      setIsAuthenticated(true);
+      setRole('master_admin');
+      setAdminName('Master Admin (System Owner)');
+      localStorage.setItem('adminAuthenticated', 'true');
+      localStorage.setItem('adminRole', 'master_admin');
+      localStorage.setItem('adminName', 'Master Admin (System Owner)');
+      setPin('');
+    } else {
+      setError('Invalid PIN. Use 1234 for demo.');
+      setPin('');
+    }
+  };
 
-              {/* Auto-Campaign Setup */}
-              <Card className="bg-background/50 border border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-sm font-heading">Schedule Auto-Campaigns</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Send Job Alerts Every:</label>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1">Every Morning (7 AM)</Button>
-                      <Button variant="outline" size="sm" className="flex-1">Every Evening (4 PM)</Button>
-                      <Button variant="outline" size="sm" className="flex-1">Real-Time Urgent Only</Button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Target Audience Tags</label>
-                    <Input placeholder="e.g., Electricians, Nashville, Available Tomorrow" />
-                  </div>
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                    <Zap className="w-4 h-4 mr-2" /> Activate Auto-Campaign
-                  </Button>
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
-        </TabsContent>
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setRole(null);
+    setPin('');
+    setError('');
+    localStorage.removeItem('adminAuthenticated');
+    localStorage.removeItem('adminRole');
+    localStorage.removeItem('adminName');
+  };
 
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AdminCard 
-              icon={Activity}
-              title="System Health"
-              desc="All systems operational"
-              status="good"
-            />
-            <AdminCard 
-              icon={Database}
-              title="Data Integrity"
-              desc="Last backup: 2 hours ago"
-              status="good"
-            />
-            <AdminCard 
-              icon={CreditCard}
-              title="Payment Processing"
-              desc="Stripe & Coinbase active"
-              status="good"
-            />
-            <AdminCard 
-              icon={AlertTriangle}
-              title="Compliance"
-              desc="All documents verified"
-              status="good"
-            />
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
+          <div className="flex items-center justify-center mb-6">
+            <Shield className="w-8 h-8 text-cyan-400 mr-3" />
+            <h1 className="text-2xl font-bold text-white">Admin Login</h1>
           </div>
 
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="font-heading">System Statistics</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-4 bg-background/50 rounded border border-border/50 text-center">
-                  <div className="text-2xl font-bold font-mono mb-1">1,284</div>
-                  <div className="text-xs text-muted-foreground">Active Workers</div>
-                </div>
-                <div className="p-4 bg-background/50 rounded border border-border/50 text-center">
-                  <div className="text-2xl font-bold font-mono mb-1">42</div>
-                  <div className="text-xs text-muted-foreground">Active Clients</div>
-                </div>
-                <div className="p-4 bg-background/50 rounded border border-border/50 text-center">
-                  <div className="text-2xl font-bold font-mono mb-1">$284.2K</div>
-                  <div className="text-xs text-muted-foreground">Monthly Revenue</div>
-                </div>
+          <p className="text-gray-400 text-sm mb-6 text-center">
+            Enter your 4-digit PIN to access the admin dashboard
+          </p>
+
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                PIN
+              </label>
+              <input
+                type="password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                maxLength={4}
+                placeholder="••••"
+                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-cyan-400"
+                autoFocus
+                data-testid="input-admin-pin"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <p className="text-sm text-red-200">{error}</p>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            )}
 
-        <TabsContent value="security" className="space-y-6">
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm border-red-500/30 bg-red-500/5">
-            <CardHeader>
-              <CardTitle className="font-heading flex items-center gap-2">
-                <Lock className="w-5 h-5 text-red-500" />
-                Security Configuration
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="p-4 bg-background/50 rounded border border-border/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h4 className="font-bold text-sm">Document Encryption</h4>
-                      <p className="text-xs text-muted-foreground">I-9 & sensitive docs</p>
-                    </div>
-                    <Badge className="bg-green-500/10 text-green-500 border-green-500/20">AES-256</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">All worker documents are encrypted with military-grade AES-256 encryption. Decryption keys are stored separately.</p>
-                </div>
+            <Button
+              type="submit"
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg"
+              data-testid="button-admin-login"
+            >
+              Login
+            </Button>
+          </form>
 
-                <div className="p-4 bg-background/50 rounded border border-border/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h4 className="font-bold text-sm">Admin Access Control</h4>
-                      <p className="text-xs text-muted-foreground">This panel</p>
-                    </div>
-                    <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">2FA Enabled</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Two-factor authentication required for all admin logins. Current user verified at 14:32 today.</p>
-                </div>
-
-                <div className="p-4 bg-background/50 rounded border border-border/50">
-                  <div className="flex justify-between items-center mb-2">
-                    <div>
-                      <h4 className="font-bold text-sm">API Keys & Integrations</h4>
-                      <p className="text-xs text-muted-foreground">Stripe, Coinbase, Payroll</p>
-                    </div>
-                    <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Rotated Weekly</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground">All API keys are rotated weekly and stored in encrypted vaults. Never exposed in code or logs.</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="font-heading">Billing & Subscription</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="p-4 bg-background/50 rounded border border-border/50">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold text-sm">Current Plan</span>
-                  <Badge className="bg-primary/20 text-primary border-primary/30">Growth ($299/mo)</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground">500 workers, Automated payroll, Gov job compliance</p>
-              </div>
-
-              <div className="p-4 bg-background/50 rounded border border-border/50">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-bold text-sm">Next Billing</span>
-                  <span className="font-mono text-sm">Dec 5, 2024</span>
-                </div>
-                <p className="text-xs text-muted-foreground">Stripe card ending in 4242</p>
-              </div>
-
-              <Button variant="outline" className="w-full">
-                Manage Subscription
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="payroll" className="space-y-6">
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="font-heading flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-primary" />
-                Payroll Processing
-              </CardTitle>
-              <CardDescription>Manage automated payroll cycles and payments.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-bold text-sm mb-3">Current Cycle</h4>
-                  <div className="p-4 bg-background/50 rounded border border-border/50">
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm">Week of Nov 18-24</span>
-                      <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20">In Progress</Badge>
-                    </div>
-                    <div className="text-xs text-muted-foreground mb-3">
-                      1,284 workers • 8,521 hours logged • $178,342 total payroll
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">Review Timesheets</Button>
-                      <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                        Process & Send to Bank
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-sm mb-3">Recent Cycles</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="p-3 bg-background/50 rounded flex justify-between">
-                      <span>Nov 11-17</span>
-                      <span className="text-green-500">✓ Paid (Nov 18)</span>
-                    </div>
-                    <div className="p-3 bg-background/50 rounded flex justify-between">
-                      <span>Nov 04-10</span>
-                      <span className="text-green-500">✓ Paid (Nov 11)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="audit" className="space-y-6">
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="font-heading flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
-                Audit Log
-              </CardTitle>
-              <CardDescription>Comprehensive system activity record (last 30 days).</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-xs font-mono">
-                <AuditEntry time="14:32" action="Admin login" details="2FA verified" type="info" />
-                <AuditEntry time="14:05" action="Payroll processed" details="1,284 workers, $178,342" type="success" />
-                <AuditEntry time="13:22" action="Document uploaded" details="Worker ID: W-4521" type="info" />
-                <AuditEntry time="13:15" action="Payment received" details="Client invoice INV-2024-042: $24,500" type="success" />
-                <AuditEntry time="12:45" action="API key rotated" details="Stripe integration" type="info" />
-                <AuditEntry time="11:30" action="Export data" details="Monthly report generated" type="info" />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </Shell>
-  );
-}
-
-function AdminCard({ icon: Icon, title, desc, status }: any) {
-  const statusColor = status === 'good' ? 'text-green-500' : 'text-red-500';
-  return (
-    <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <Icon className={`w-6 h-6 ${statusColor}`} />
-          <div className={`w-2 h-2 rounded-full ${statusColor === 'text-green-500' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+          <p className="text-xs text-gray-500 text-center mt-6">
+            Demo PIN: 1234
+          </p>
         </div>
-        <h3 className="font-bold text-sm mb-1">{title}</h3>
-        <p className="text-xs text-muted-foreground">{desc}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function AuditEntry({ time, action, details, type }: any) {
-  const typeColor = type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : 'text-muted-foreground';
-  return (
-    <div className={`p-3 rounded border border-border/50 ${typeColor}`}>
-      <div className="flex justify-between">
-        <span>{time}</span>
-        <span>{action}</span>
       </div>
-      <div className="text-[10px] opacity-70 mt-1">{details}</div>
-    </div>
-  );
-}
+    );
+  }
 
-function ChannelCard({ icon: Icon, name, desc, status, connected }: any) {
   return (
-    <div className={`p-4 rounded-lg border transition-all ${connected ? 'bg-green-500/5 border-green-500/30' : 'bg-background/50 border-border/50'}`}>
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <div className={`p-2 rounded ${connected ? 'bg-green-500/20 text-green-500' : 'bg-background/50 text-muted-foreground'}`}>
-            <Icon className="w-5 h-5" />
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-12">
           <div>
-            <h4 className="font-bold text-sm">{name}</h4>
-            <p className="text-xs text-muted-foreground">{desc}</p>
+            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-gray-400 flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              {adminName}
+            </p>
+          </div>
+          <Button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+            data-testid="button-admin-logout"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
+
+        {/* Role-Based Admin Views */}
+        {role === 'master_admin' && <MasterAdminDashboard />}
+        {role === 'franchise_admin' && <FranchiseAdminDashboard />}
+        {role === 'customer_admin' && <CustomerAdminDashboard />}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// MASTER ADMIN DASHBOARD (System Owner)
+// ==========================================
+function MasterAdminDashboard() {
+  const [checklist, setChecklist] = useState([
+    {
+      id: 'v1-complete',
+      category: '🚀 Version 1 - Launch Ready',
+      icon: '✅',
+      tasks: [
+        { id: 'web-platform', title: 'Web platform fully built', completed: true },
+        { id: 'mobile-app', title: 'Mobile app (iOS/Android) ready', completed: true },
+        { id: 'bonus-system', title: 'Dual-tier bonus system implemented', completed: true },
+        { id: 'gps-verification', title: 'GPS verification system working', completed: true },
+        { id: 'database', title: 'PostgreSQL database configured', completed: true },
+        { id: 'legal-docs', title: 'All legal documents completed (12)', completed: true },
+        { id: 'marketing-system', title: 'Marketing landing page + demo', completed: true },
+        { id: 'admin-login', title: 'Multi-tenant admin PIN login', completed: true },
+      ]
+    },
+    {
+      id: 'pre-launch',
+      category: '⚡ Pre-Launch Checklist',
+      icon: '📋',
+      tasks: [
+        { id: 'testing', title: 'End-to-end testing on real devices', completed: false },
+        { id: 'payment-integration', title: 'Wire Stripe integration', completed: false },
+        { id: 'coinbase-integration', title: 'Wire Coinbase integration', completed: false },
+        { id: 'google-play', title: 'Submit app to Google Play Store', completed: false },
+        { id: 'web-deployment', title: 'Deploy web platform to production', completed: false },
+        { id: 'database-backup', title: 'Set up automated database backups', completed: false },
+        { id: 'monitoring', title: 'Set up error monitoring & logging', completed: false },
+      ]
+    },
+    {
+      id: 'marketing-launch',
+      category: '📢 Marketing & Customer Acquisition',
+      icon: '🎯',
+      tasks: [
+        { id: 'case-study', title: 'Get case study from first customer', completed: false },
+        { id: 'press-release', title: 'Write and distribute press release', completed: false },
+        { id: 'franchise-outreach', title: 'Outreach to first 10 franchise prospects', completed: false },
+        { id: 'partnership-calls', title: 'Schedule calls with staffing associations', completed: false },
+      ]
+    },
+    {
+      id: 'v2-planning',
+      category: '🎨 Version 2 Planning',
+      icon: '🗺️',
+      tasks: [
+        { id: 'v2-roadmap', title: 'Complete V2 roadmap document', completed: true },
+        { id: 'feature-prioritization', title: 'Prioritize top 10 V2 features', completed: false },
+        { id: 'customer-feedback', title: 'Gather feedback from early customers', completed: false },
+      ]
+    }
+  ]);
+
+  const toggleTask = (categoryId: string, taskId: string) => {
+    setChecklist(prev => prev.map(cat =>
+      cat.id === categoryId
+        ? {
+            ...cat,
+            tasks: cat.tasks.map(task =>
+              task.id === taskId ? { ...task, completed: !task.completed } : task
+            )
+          }
+        : cat
+    ));
+  };
+
+  const getStats = () => {
+    const total = checklist.reduce((sum, cat) => sum + cat.tasks.length, 0);
+    const completed = checklist.reduce((sum, cat) => sum + cat.tasks.filter(t => t.completed).length, 0);
+    return { total, completed, percentage: Math.round((completed / total) * 100) };
+  };
+
+  const stats = getStats();
+
+  return (
+    <div className="space-y-8">
+      {/* System Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+          <div className="text-4xl font-bold text-cyan-400 mb-2">0</div>
+          <p className="text-gray-400 text-sm">Active Franchises</p>
+          <p className="text-xs text-gray-500 mt-2">Ready for first partners</p>
+        </div>
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+          <div className="text-4xl font-bold text-green-400 mb-2">0</div>
+          <p className="text-gray-400 text-sm">Monthly Customers</p>
+          <p className="text-xs text-gray-500 mt-2">Subscription subscribers</p>
+        </div>
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+          <div className="text-4xl font-bold text-yellow-400 mb-2">$0</div>
+          <p className="text-gray-400 text-sm">Monthly Revenue</p>
+          <p className="text-xs text-gray-500 mt-2">All sources combined</p>
+        </div>
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+          <div className="text-4xl font-bold text-purple-400 mb-2">{stats.percentage}%</div>
+          <p className="text-gray-400 text-sm">Launch Progress</p>
+          <p className="text-xs text-gray-500 mt-2">{stats.completed}/{stats.total} tasks</p>
+        </div>
+      </div>
+
+      {/* Master Admin Info */}
+      <div className="bg-cyan-900/20 border border-cyan-700/50 rounded-lg p-6">
+        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+          <Shield className="w-5 h-5" />
+          Master Admin Capabilities
+        </h2>
+        <p className="text-gray-300 mb-4">
+          As the system owner, you have full access to:
+        </p>
+        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            Create and manage franchises
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            Manage monthly customers
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            View all system analytics
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            Configure system settings
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            Manage licenses & billing
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+            Access all audit logs
+          </li>
+        </ul>
+      </div>
+
+      {/* Admin Checklist */}
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">Admin Checklist</h2>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-cyan-400">{stats.percentage}%</div>
+            <p className="text-xs text-gray-400">{stats.completed}/{stats.total} complete</p>
           </div>
         </div>
-        <Badge variant="outline" className={connected ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"}>
-          {status}
-        </Badge>
+
+        {/* Progress Bar */}
+        <div className="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+          <div
+            className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all"
+            style={{ width: `${stats.percentage}%` }}
+          />
+        </div>
+
+        {/* Checklist Items */}
+        {checklist.map(category => {
+          const categoryCompleted = category.tasks.filter(t => t.completed).length;
+          const categoryTotal = category.tasks.length;
+          const categoryPercentage = Math.round((categoryCompleted / categoryTotal) * 100);
+
+          return (
+            <div key={category.id} className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <span className="text-2xl">{category.icon}</span>
+                  {category.category}
+                </h3>
+                <span className="text-xs text-gray-400">
+                  {categoryCompleted}/{categoryTotal}
+                </span>
+              </div>
+
+              <div className="w-full bg-slate-700 rounded-full h-2 mb-6 overflow-hidden">
+                <div
+                  className="bg-cyan-500 h-full transition-all"
+                  style={{ width: `${categoryPercentage}%` }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                {category.tasks.map(task => (
+                  <button
+                    key={task.id}
+                    onClick={() => toggleTask(category.id, task.id)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
+                      task.completed
+                        ? 'bg-green-900/30 border border-green-700/50'
+                        : 'bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50'
+                    }`}
+                    data-testid={`task-${task.id}`}
+                  >
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                      task.completed
+                        ? 'bg-green-500 border-green-500'
+                        : 'border-gray-500'
+                    }`}>
+                      {task.completed && (
+                        <CheckCircle2 className="w-3 h-3 text-white" />
+                      )}
+                    </div>
+                    <span className={`flex-1 text-left text-sm font-medium ${
+                      task.completed ? 'text-green-200 line-through' : 'text-gray-200'
+                    }`}>
+                      {task.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
-      {!connected && (
-        <Button size="sm" className="mt-3 w-full h-7 text-xs bg-primary text-primary-foreground hover:bg-primary/90">
-          <LinkIcon className="w-3 h-3 mr-1" /> Connect
+
+      {/* Quick Links */}
+      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-create-franchise">
+            <Building2 className="w-4 h-4 mr-2" />
+            Create Franchise
+          </Button>
+          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-manage-customers">
+            <Users className="w-4 h-4 mr-2" />
+            Manage Customers
+          </Button>
+          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-view-analytics">
+            📊 View Analytics
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// FRANCHISE ADMIN DASHBOARD
+// ==========================================
+function FranchiseAdminDashboard() {
+  return (
+    <div className="space-y-8">
+      <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
+        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+          <Building2 className="w-5 h-5" />
+          Franchise Admin Dashboard
+        </h2>
+        <p className="text-gray-300 mb-4">
+          You have access to your franchise data only. Your workers, clients, assignments, and billing are isolated from other franchises.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-purple-400">0</div>
+            <p className="text-sm text-gray-400">Workers</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-purple-400">0</div>
+            <p className="text-sm text-gray-400">Clients</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-purple-400">0</div>
+            <p className="text-sm text-gray-400">Active Assignments</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-purple-400">$0</div>
+            <p className="text-sm text-gray-400">Monthly Revenue</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-workers">
+          <Users className="w-4 h-4 mr-2" />
+          Manage Workers
         </Button>
-      )}
+        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-clients">
+          <Building2 className="w-4 h-4 mr-2" />
+          Manage Clients
+        </Button>
+        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-franchise-settings">
+          ⚙️ Franchise Settings
+        </Button>
+      </div>
     </div>
   );
 }
 
-function PartnershipLink({ name, url, desc }: any) {
+// ==========================================
+// CUSTOMER ADMIN DASHBOARD (Monthly Subscription)
+// ==========================================
+function CustomerAdminDashboard() {
   return (
-    <div className="p-3 rounded-lg bg-background/50 border border-border/50 hover:border-primary/30 transition-colors">
-      <div className="flex items-start gap-2 mb-2">
-        <Globe className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <h5 className="font-bold text-sm truncate">{name}</h5>
-          <p className="text-xs text-muted-foreground truncate">{url}</p>
+    <div className="space-y-8">
+      <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-6">
+        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+          <Users className="w-5 h-5" />
+          Customer Admin Dashboard
+        </h2>
+        <p className="text-gray-300 mb-4">
+          You have access to your company data only. Your workers, clients, and assignments are isolated from other customers.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-blue-400">0</div>
+            <p className="text-sm text-gray-400">Workers</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-blue-400">0</div>
+            <p className="text-sm text-gray-400">Clients</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-blue-400">0</div>
+            <p className="text-sm text-gray-400">Active Assignments</p>
+          </div>
+          <div className="bg-slate-800 rounded-lg p-4">
+            <div className="text-3xl font-bold text-blue-400">$0</div>
+            <p className="text-sm text-gray-400">Monthly Bill</p>
+          </div>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground mb-2">{desc}</p>
-      <Button size="sm" variant="outline" className="h-6 text-xs w-full">Visit</Button>
-    </div>
-  );
-}
 
-function CampaignTemplate({ title, preview, channels }: any) {
-  return (
-    <div className="p-4 rounded-lg bg-background/50 border border-border/50 hover:bg-white/5 transition-colors cursor-pointer group">
-      <div className="flex items-start justify-between mb-2">
-        <div>
-          <h5 className="font-bold text-sm group-hover:text-primary transition-colors">{title}</h5>
-          <p className="text-xs text-muted-foreground mt-1">{preview}</p>
-        </div>
-      </div>
-      <div className="flex gap-1">
-        {channels.map((ch) => (
-          <Badge key={ch} variant="outline" className="text-[10px] h-5 px-2 bg-primary/10 text-primary border-primary/20">
-            {ch}
-          </Badge>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-workers">
+          <Users className="w-4 h-4 mr-2" />
+          Manage Workers
+        </Button>
+        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-clients">
+          <Building2 className="w-4 h-4 mr-2" />
+          Manage Clients
+        </Button>
+        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-billing">
+          💳 Billing & Subscription
+        </Button>
       </div>
     </div>
   );

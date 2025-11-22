@@ -23,8 +23,11 @@ export const users = pgTable(
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     email: varchar("email").notNull().unique(),
     passwordHash: text("password_hash").notNull(),
-    role: varchar("role", { length: 50 }).notNull().default("worker"), // worker, admin, manager, client
+    // Roles: master_admin (system owner), franchise_admin (franchise owner), customer_admin (monthly customer owner), manager, worker, client
+    role: varchar("role", { length: 50 }).notNull().default("worker"),
     companyId: varchar("company_id").references(() => companies.id),
+    franchiseId: varchar("franchise_id").references(() => franchises.id), // For franchise owners
+    adminPin: varchar("admin_pin", { length: 4 }), // 4-digit PIN for admin login
     fullName: varchar("full_name", { length: 255 }),
     phone: varchar("phone", { length: 20 }),
     verified: boolean("verified").default(false),
@@ -90,6 +93,57 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;
+
+// ========================
+// Franchises (White-Label Partners)
+// ========================
+export const franchises = pgTable(
+  "franchises",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: varchar("name", { length: 255 }).notNull(),
+    ownerId: varchar("owner_id").notNull().references(() => users.id),
+    
+    // Branding
+    logoUrl: varchar("logo_url", { length: 500 }),
+    customDomain: varchar("custom_domain", { length: 255 }),
+    brandColor: varchar("brand_color", { length: 7 }).default("#06B6D4"), // Aqua default
+    
+    // License
+    licenseId: varchar("license_id").references(() => licenses.id),
+    licenseStatus: varchar("license_status", { length: 50 }).default("active"), // active, paused, expired
+    licenseStartDate: date("license_start_date"),
+    licenseEndDate: date("license_end_date"),
+    supportEndDate: date("support_end_date"), // Warranty period
+    
+    // Capacity
+    maxWorkers: integer("max_workers").default(500),
+    maxClients: integer("max_clients").default(50),
+    
+    // Settings
+    billingModel: varchar("billing_model", { length: 50 }).default("fixed"), // fixed or revenue_share
+    monthlyFee: decimal("monthly_fee", { precision: 10, scale: 2 }),
+    revenueSharePercentage: decimal("revenue_share_percentage", { precision: 5, scale: 2 }),
+    
+    // Multi-Tenancy Data Isolation
+    dataIsolationLevel: varchar("data_isolation_level", { length: 50 }).default("strict"), // strict, shared, custom
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    ownerIdx: index("idx_franchises_owner_id").on(table.ownerId),
+  })
+);
+
+export const insertFranchiseSchema = createInsertSchema(franchises).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFranchise = z.infer<typeof insertFranchiseSchema>;
+export type Franchise = typeof franchises.$inferSelect;
 
 // ========================
 // State Compliance Configuration

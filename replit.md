@@ -14,7 +14,34 @@ ORBIT Staffing OS is a fully automated, white-label capable platform designed fo
 
 ## System Architecture
 
-The ORBIT Staffing OS is a full-stack application utilizing a modern web development stack.
+The ORBIT Staffing OS is a full-stack application utilizing a modern web development stack with **multi-tenant architecture** supporting three admin tiers:
+
+### Admin Roles & Data Isolation
+
+**Master Admin (System Owner - YOU)**
+- Full access to entire system
+- PIN login (4-digit code: 1234 for demo)
+- Can create franchises and manage customers
+- Sees all analytics and system metrics
+- Controls licenses, billing, and compliance settings
+
+**Franchise Admin (White-Label Partner)**
+- Owner of franchise license
+- PIN login to their own dashboard
+- Sees ONLY their franchise's workers, clients, and data
+- Complete data isolation from other franchises
+- Can customize branding, domain, and settings
+- Manages their own billing and support
+
+**Customer Admin (Monthly Subscriber)**
+- Owner of month-to-month subscription
+- PIN login to their own dashboard
+- Sees ONLY their company's workers, clients, and data
+- Complete data isolation from other customers
+- Self-service dashboard with workers/clients management
+- Billing tied to subscription tier
+
+Each admin role has its own dashboard, accessible via PIN-based login to `/admin`. Data isolation is enforced at the database query level.
 
 ### UI/UX Decisions
 
