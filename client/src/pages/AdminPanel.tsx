@@ -71,8 +71,7 @@ export default function AdminPanel() {
                     icon={MessageCircle}
                     name="SMS (Twilio)"
                     desc="Automated text alerts & job notifications"
-                    status="Active"
-                    connected
+                    status="Ready to Connect"
                   />
                   <ChannelCard 
                     icon={Facebook}
