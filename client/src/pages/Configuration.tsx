@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Stethoscope, UtensilsCrossed, Wrench, Calendar, Briefcase, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 const INDUSTRY_CONFIGS = {
   staffing: {
@@ -225,8 +226,8 @@ export default function Configuration() {
               </div>
 
               <div className="mt-8 flex gap-3">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-                  Save Configuration
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => toast.info("Configuration capture feature coming soon - currently in design phase")}>
+                  Save Configuration (Coming Soon)
                 </Button>
                 <Button variant="outline" onClick={() => { setSelectedIndustry(null); setConfig({}); }}>
                   Select Different Industry

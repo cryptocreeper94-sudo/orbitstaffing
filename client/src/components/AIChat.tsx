@@ -99,8 +99,8 @@ export function AIChat() {
           {/* Header */}
           <div className="flex justify-between items-center p-4 border-b border-border/50 bg-card/50">
             <div>
-              <h3 className="font-bold font-heading">ORBIT AI Assistant</h3>
-              <Badge className="mt-1 bg-green-500/20 text-green-600 text-xs">Online</Badge>
+              <h3 className="font-bold font-heading">ORBIT Assistant</h3>
+              <Badge className="mt-1 bg-blue-500/20 text-blue-600 text-xs">Knowledge Base</Badge>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
               <X className="w-5 h-5" />

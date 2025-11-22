@@ -74,8 +74,8 @@ export function FeedbackWidget() {
 
               {submitted ? (
                 <div className="text-center py-8">
-                  <Badge className="bg-green-500/20 text-green-600 mb-4">✓ Submitted</Badge>
-                  <p className="text-sm text-muted-foreground">Your feedback has been recorded and will help us improve ORBIT.</p>
+                  <Badge className="bg-green-500/20 text-green-600 mb-4">✓ Design Captured</Badge>
+                  <p className="text-sm text-muted-foreground">Your feedback has been captured for our development team. Thank you for helping shape ORBIT.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -88,7 +88,7 @@ export function FeedbackWidget() {
                       placeholder="you@company.com"
                       className="w-full bg-background border border-border/50 rounded-md px-3 py-2 text-sm"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">We verify customers to ensure quality feedback</p>
+                    <p className="text-xs text-muted-foreground mt-1">Early feedback helps us build better. This will be reviewed by our team.</p>
                   </div>
 
                   <div>
@@ -111,7 +111,7 @@ export function FeedbackWidget() {
                   </div>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Your feedback is secure and confidential
+                    Your insights help us build the right features
                   </p>
                 </div>
               )}
