@@ -7,7 +7,8 @@ import {
   Megaphone, 
   Settings,
   LogOut,
-  Menu
+  Menu,
+  ScanLine
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,7 @@ import { useState } from "react";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: ScanLine, label: "Sales Force", href: "/sales" },
   { icon: Users, label: "Candidates", href: "/candidates" },
   { icon: Building2, label: "Clients", href: "/clients" },
   { icon: Briefcase, label: "Placements", href: "/placements" },
