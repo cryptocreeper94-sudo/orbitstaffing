@@ -12,18 +12,21 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { Link } from "wouter";
-import orbitLogo from "@assets/generated_images/orbit_staffing_platform_logo.png";
+import saturnLogo from "@assets/generated_images/aqua_saturn_planet_with_glowing_rings.png";
 
 export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* Watermark Logo - Fixed Background */}
-      <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+      {/* Saturn Watermark - Fixed Centered Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
         <img 
-          src={orbitLogo} 
+          src={saturnLogo} 
           alt="" 
-          className="absolute top-12 left-12 w-96 h-96 opacity-10 object-contain filter blur-sm"
-          style={{ filter: 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.1))' }}
+          className="w-[800px] h-[800px] opacity-15 object-contain"
+          style={{ 
+            filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 80px rgba(6, 182, 212, 0.2))',
+            willChange: 'transform'
+          }}
         />
       </div>
 
@@ -210,7 +213,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
-              <img src={orbitLogo} alt="ORBIT logo" className="w-12 h-12" />
+              <img src={saturnLogo} alt="ORBIT Saturn" className="w-12 h-12" />
               <div>
                 <div className="font-heading font-bold text-lg text-white">ORBIT Staffing</div>
                 <div className="text-xs text-slate-400">Powered by DarkWave Studios</div>
