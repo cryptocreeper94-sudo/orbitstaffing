@@ -1,7 +1,86 @@
+import { useState } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Apple, Smartphone, Lock, CheckCircle, ArrowRight } from "lucide-react";
+import { Apple, Smartphone, Lock, CheckCircle, ArrowRight, Mail } from "lucide-react";
+
+function NotifyForm() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!email || !email.includes("@")) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/ios-interest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          source: "ios_coming_soon",
+          userType: "worker",
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        setEmail("");
+        setTimeout(() => setSubmitted(false), 5000);
+      } else {
+        alert("Error saving email. Please try again.");
+      }
+    } catch (error) {
+      alert("Error saving email. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-8 text-center mb-12">
+      <div className="flex justify-center mb-4">
+        <Mail className="w-8 h-8 text-primary" />
+      </div>
+      <h2 className="text-xl font-bold font-heading mb-3">Get Notified When iOS Launches</h2>
+      <p className="text-muted-foreground mb-6">
+        Leave your email to be first to know when ORBIT is available on the App Store
+      </p>
+
+      {submitted ? (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto mb-4">
+          <p className="text-green-700 font-semibold">✓ Email saved!</p>
+          <p className="text-sm text-green-600">We'll notify you as soon as the iOS app is ready.</p>
+        </div>
+      ) : (
+        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <input
+            type="email"
+            placeholder="your.email@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
+            className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            data-testid="input-email-notify"
+            disabled={loading}
+          />
+          <Button
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={handleSubmit}
+            disabled={loading}
+            data-testid="button-notify-me"
+          >
+            {loading ? "Saving..." : "Notify Me"}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ComingSoonApple() {
   return (
@@ -169,26 +248,7 @@ export default function ComingSoonApple() {
         </div>
 
         {/* Get Notified */}
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-8 text-center mb-12">
-          <h2 className="text-xl font-bold font-heading mb-3">Get Notified When iOS Launches</h2>
-          <p className="text-muted-foreground mb-6">
-            Leave your email to be first to know when ORBIT is available on the App Store
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="your.email@example.com"
-              className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              data-testid="input-email-notify"
-            />
-            <Button 
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-              data-testid="button-notify-me"
-            >
-              Notify Me
-            </Button>
-          </div>
-        </div>
+        <NotifyForm />
 
         {/* FAQ */}
         <div className="mb-12">

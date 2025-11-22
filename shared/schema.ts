@@ -656,6 +656,38 @@ export type InsertWorkOrder = z.infer<typeof insertWorkOrderSchema>;
 export type WorkOrder = typeof workOrders.$inferSelect;
 
 // ========================
+// iOS Interest List (Email capture for Coming Soon page)
+// ========================
+export const iosInterestList = pgTable(
+  "ios_interest_list",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    source: varchar("source", { length: 50 }).default("ios_coming_soon"),
+    userType: varchar("user_type", { length: 50 }),
+    notes: text("notes"),
+    notified: boolean("notified").default(false),
+    notifiedAt: timestamp("notified_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_ios_interest_email").on(table.email),
+    sourceIdx: index("idx_ios_interest_source").on(table.source),
+    notifiedIdx: index("idx_ios_interest_notified").on(table.notified),
+  })
+);
+
+export const insertIosInterestSchema = createInsertSchema(iosInterestList).omit({
+  id: true,
+  notified: true,
+  notifiedAt: true,
+  createdAt: true,
+});
+
+export type InsertIosInterest = z.infer<typeof insertIosInterestSchema>;
+export type IosInterest = typeof iosInterestList.$inferSelect;
+
+// ========================
 // Timesheets (GPS Clock-in/out)
 // ========================
 export const timesheets = pgTable(
