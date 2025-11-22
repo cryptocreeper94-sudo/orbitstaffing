@@ -123,7 +123,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold font-heading mb-4">Simple Pricing</h2>
-            <p className="text-muted-foreground text-lg">No hidden fees. No long contracts. Get started at orbitstaffing.io</p>
+            <p className="text-muted-foreground text-lg">No hidden fees. No long contracts. Get started at orbitstaffing.net</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
