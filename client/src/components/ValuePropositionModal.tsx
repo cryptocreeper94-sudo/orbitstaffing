@@ -30,8 +30,17 @@ interface Benefit {
 }
 
 export function ValuePropositionModal() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => {
+    // Only show on first visit
+    const hasSeenValueProp = localStorage.getItem("hasSeenValueProposition");
+    return !hasSeenValueProp;
+  });
   const [selected, setSelected] = useState<"small" | "large" | null>(null);
+
+  const handleClose = () => {
+    setOpen(false);
+    localStorage.setItem("hasSeenValueProposition", "true");
+  };
 
   const smallBusinessBenefits: Benefit[] = [
     {
@@ -102,7 +111,7 @@ export function ValuePropositionModal() {
   const benefits = selected === "small" ? smallBusinessBenefits : largeBusinessBenefits;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl border-border/50 bg-background">
         {!selected ? (
           <>

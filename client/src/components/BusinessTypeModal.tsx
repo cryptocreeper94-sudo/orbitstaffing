@@ -15,8 +15,15 @@ export function BusinessTypeModal({ isOpen, onClose }: BusinessTypeModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" data-testid="modal-business-type">
-      <Card className="max-w-2xl w-full border-primary/50 bg-background shadow-2xl">
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" 
+      data-testid="modal-business-type"
+      onClick={onClose}
+    >
+      <Card 
+        className="max-w-2xl w-full border-primary/50 bg-background shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
         <CardHeader className="border-b border-border/50 flex flex-row items-start justify-between">
           <div>
             <CardTitle className="text-2xl">Choose Your Business Type</CardTitle>
