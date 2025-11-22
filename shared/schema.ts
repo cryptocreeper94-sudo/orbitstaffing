@@ -246,6 +246,10 @@ export const jobs = pgTable(
     jobCategory: varchar("job_category", { length: 100 }),
     skillRequired: varchar("skill_required", { length: 100 }),
 
+    // External Reference Numbers (Non-conflicting with client systems)
+    clientJobReference: varchar("client_job_reference", { length: 100 }), // Their reference number (QuickBooks, ADP, etc.)
+    externalJobId: varchar("external_job_id", { length: 100 }), // ID from their system
+
     // Rates
     workerWage: decimal("worker_wage", { precision: 8, scale: 2 }),
     billRate: decimal("bill_rate", { precision: 8, scale: 2 }),
@@ -317,6 +321,10 @@ export const assignments = pgTable(
     checkedInAt: timestamp("checked_in_at"), // When worker GPS verified arrival
     checkedOutAt: timestamp("checked_out_at"), // When worker left job
     noShowStatus: varchar("no_show_status", { length: 50 }), // "show", "no_show", "late", "pending"
+
+    // External References (For client data sync)
+    externalAssignmentId: varchar("external_assignment_id", { length: 100 }), // From QuickBooks, ADP, UKG Pro
+    externalClientName: varchar("external_client_name", { length: 255 }), // Client's name in their system
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -438,6 +446,112 @@ export const insertAssignmentReminderSchema = createInsertSchema(assignmentRemin
 
 export type InsertAssignmentReminder = z.infer<typeof insertAssignmentReminderSchema>;
 export type AssignmentReminder = typeof assignmentReminders.$inferSelect;
+
+// ========================
+// External Integrations (QuickBooks, ADP, UKG Pro, etc.)
+// ========================
+export const externalIntegrations = pgTable(
+  "external_integrations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+
+    // Integration Type
+    integrationType: varchar("integration_type", { length: 100 }).notNull(), // "quickbooks", "adp", "ukgpro", "paylocity", etc.
+    displayName: varchar("display_name", { length: 255 }), // "QuickBooks Online", "ADP Workforce Now", etc.
+
+    // Authentication
+    apiKey: varchar("api_key", { length: 500 }), // Encrypted
+    apiSecret: varchar("api_secret", { length: 500 }), // Encrypted
+    oauthToken: text("oauth_token"), // For OAuth-based integrations
+    refreshToken: varchar("refresh_token", { length: 500 }), // For OAuth refresh
+    webhookSecret: varchar("webhook_secret", { length: 255 }), // For webhook validation
+
+    // Configuration
+    status: varchar("status", { length: 50 }).default("connected"), // connected, disconnected, error, pending
+    lastSyncAt: timestamp("last_sync_at"), // When we last pulled data
+    nextSyncAt: timestamp("next_sync_at"), // When we'll pull data next
+    syncFrequency: varchar("sync_frequency", { length: 50 }).default("daily"), // hourly, daily, weekly
+
+    // Data Mapping
+    fieldMapping: text("field_mapping"), // JSON: maps their fields to ours
+    testMode: boolean("test_mode").default(false), // Testing credentials?
+
+    // Error Tracking
+    lastError: text("last_error"),
+    errorCount: integer("error_count").default(0),
+
+    // Metadata
+    externalCompanyId: varchar("external_company_id", { length: 255 }), // Their company ID
+    externalUserId: varchar("external_user_id", { length: 255 }), // Their user ID
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_integrations_company_id").on(table.companyId),
+    typeIdx: index("idx_integrations_type").on(table.integrationType),
+    statusIdx: index("idx_integrations_status").on(table.status),
+  })
+);
+
+export const insertExternalIntegrationSchema = createInsertSchema(externalIntegrations).omit({
+  id: true,
+  lastSyncAt: true,
+  nextSyncAt: true,
+  lastError: true,
+  errorCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertExternalIntegration = z.infer<typeof insertExternalIntegrationSchema>;
+export type ExternalIntegration = typeof externalIntegrations.$inferSelect;
+
+// ========================
+// Sync Logs (Track data migrations from external systems)
+// ========================
+export const syncLogs = pgTable(
+  "sync_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+    integrationId: varchar("integration_id").references(() => externalIntegrations.id),
+
+    // Sync Details
+    syncType: varchar("sync_type", { length: 100 }).notNull(), // "initial_import", "incremental", "manual"
+    status: varchar("status", { length: 50 }).default("running"), // running, completed, failed, partially_completed
+    
+    // Data Summary
+    recordsAttempted: integer("records_attempted").default(0),
+    recordsSucceeded: integer("records_succeeded").default(0),
+    recordsFailed: integer("records_failed").default(0),
+    
+    // Details
+    errorLog: text("error_log"), // JSON with errors
+    summary: text("summary"), // Human-readable summary
+    
+    startedAt: timestamp("started_at").default(sql`NOW()`),
+    completedAt: timestamp("completed_at"),
+    duration: integer("duration"), // milliseconds
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_sync_logs_company_id").on(table.companyId),
+    integrationIdx: index("idx_sync_logs_integration_id").on(table.integrationId),
+    statusIdx: index("idx_sync_logs_status").on(table.status),
+  })
+);
+
+export const insertSyncLogSchema = createInsertSchema(syncLogs).omit({
+  id: true,
+  startedAt: true,
+  createdAt: true,
+});
+
+export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
+export type SyncLog = typeof syncLogs.$inferSelect;
 
 // ========================
 // Timesheets (GPS Clock-in/out)
