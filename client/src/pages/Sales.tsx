@@ -2,7 +2,7 @@ import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -17,20 +17,31 @@ import {
   CheckCircle2,
   Briefcase,
   User,
-  Save
+  Save,
+  FileSignature,
+  ExternalLink,
+  Calculator,
+  ArrowRight
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useState } from "react";
 
 export default function Sales() {
   const [activeTab, setActiveTab] = useState("leads");
+  const [hourlyWage, setHourlyWage] = useState(20);
+  const [competitorMarkup, setCompetitorMarkup] = useState(1.6);
+  const [darkwaveMarkup, setDarkwaveMarkup] = useState(1.35);
+
+  const competitorBill = hourlyWage * competitorMarkup;
+  const darkwaveBill = hourlyWage * darkwaveMarkup;
+  const savings = competitorBill - darkwaveBill;
 
   return (
     <Shell>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold font-heading tracking-tight">Sales Force CRM</h1>
-          <p className="text-muted-foreground">Lead management, outreach tools, and digital identity.</p>
+          <p className="text-muted-foreground">Lead management, digital CSAs, and cost analysis.</p>
         </div>
         <div className="flex gap-2">
            <Button variant="outline" className="border-primary/20 hover:bg-primary/10 text-primary">
@@ -46,9 +57,11 @@ export default function Sales() {
         <TabsList className="bg-card border border-border/50">
           <TabsTrigger value="leads">Active Leads</TabsTrigger>
           <TabsTrigger value="digital-card">My Digital Card</TabsTrigger>
-          <TabsTrigger value="tools">Sales Tools</TabsTrigger>
+          <TabsTrigger value="tools">Sales Tools & Calculator</TabsTrigger>
+          <TabsTrigger value="csa">Digital CSA</TabsTrigger>
         </TabsList>
 
+        {/* ... Leads Content ... */}
         <TabsContent value="leads" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Quick Add / Scratchpad */}
@@ -107,6 +120,7 @@ export default function Sales() {
           </div>
         </TabsContent>
 
+        {/* ... Digital Card Content (Previous Implementation) ... */}
         <TabsContent value="digital-card" className="flex flex-col items-center justify-center py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-4xl">
              {/* The Card */}
@@ -169,62 +183,130 @@ export default function Sales() {
         </TabsContent>
 
         <TabsContent value="tools">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
                <CardHeader>
-                 <CardTitle className="font-heading">Availability Checker</CardTitle>
-                 <CardDescription>Instant answers for client questions.</CardDescription>
+                 <CardTitle className="font-heading flex items-center gap-2">
+                   <Calculator className="w-5 h-5 text-primary" />
+                   Competitive Savings Calculator
+                 </CardTitle>
+                 <CardDescription>Show clients exactly how much they save with DarkWave.</CardDescription>
                </CardHeader>
-               <CardContent className="space-y-4">
+               <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Trade / Skill</label>
-                    <Input placeholder="e.g. General Labor, Electrician" />
+                    <label className="text-sm font-medium">Worker Hourly Wage ($)</label>
+                    <Input 
+                      type="number" 
+                      value={hourlyWage} 
+                      onChange={(e) => setHourlyWage(parseFloat(e.target.value))}
+                      className="text-lg font-mono"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Date Needed</label>
-                    <div className="flex gap-2">
-                       <Button variant="outline" className="flex-1">Tomorrow</Button>
-                       <Button variant="outline" className="flex-1">Next Week</Button>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="p-4 rounded-lg bg-background/50 border border-border/50">
+                      <div className="text-sm text-muted-foreground mb-2">Standard Agency (1.6x)</div>
+                      <div className="text-2xl font-bold font-mono text-muted-foreground">${competitorBill.toFixed(2)}<span className="text-sm font-normal">/hr</span></div>
+                    </div>
+                    <div className="p-4 rounded-lg bg-primary/10 border border-primary/30 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-bl">DARKWAVE</div>
+                      <div className="text-sm text-primary mb-2 font-bold">DarkWave (1.35x)</div>
+                      <div className="text-2xl font-bold font-mono text-foreground">${darkwaveBill.toFixed(2)}<span className="text-sm font-normal text-muted-foreground">/hr</span></div>
                     </div>
                   </div>
-                  <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                    <div className="flex items-center gap-2 text-green-500 mb-1">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span className="font-bold">Available</span>
+
+                  <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-medium text-green-500">Client Savings Per Hour</div>
+                      <div className="text-xs text-green-500/70">Per worker</div>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      We have <span className="text-foreground font-bold">14</span> General Laborers available for tomorrow.
-                    </p>
+                    <div className="text-3xl font-bold font-mono text-green-500">${savings.toFixed(2)}</div>
+                  </div>
+                  
+                  <div className="text-xs text-center text-muted-foreground">
+                    *Annual savings for 10 workers: <span className="text-foreground font-bold">${(savings * 40 * 52 * 10).toLocaleString()}</span>
                   </div>
                </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-               <CardHeader>
-                 <CardTitle className="font-heading">Rate Calculator</CardTitle>
-                 <CardDescription>Generate quick estimates on the spot.</CardDescription>
-               </CardHeader>
-               <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6">
+              <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
+                 <CardHeader>
+                   <CardTitle className="font-heading">Availability Checker</CardTitle>
+                   <CardDescription>Real-time database query.</CardDescription>
+                 </CardHeader>
+                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Hourly Wage</label>
-                      <Input type="number" placeholder="$20.00" />
+                      <label className="text-sm font-medium">Trade / Skill</label>
+                      <Input placeholder="e.g. General Labor, Electrician" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Markup %</label>
-                      <Input type="number" placeholder="45%" />
+                      <label className="text-sm font-medium">Date Needed</label>
+                      <div className="flex gap-2">
+                         <Button variant="outline" className="flex-1">Tomorrow</Button>
+                         <Button variant="outline" className="flex-1">Next Week</Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="pt-4 border-t border-border/30 flex justify-between items-end">
-                    <div>
-                      <div className="text-xs text-muted-foreground">Bill Rate</div>
-                      <div className="text-2xl font-bold font-heading text-primary">$29.00<span className="text-sm text-muted-foreground font-normal">/hr</span></div>
+                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                      <div className="flex items-center gap-2 text-blue-500 mb-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span className="font-bold">Ready to Deploy</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        We have <span className="text-foreground font-bold">14</span> General Laborers available for tomorrow.
+                      </p>
                     </div>
-                    <Button size="sm">Create Quote</Button>
-                  </div>
-               </CardContent>
-            </Card>
+                 </CardContent>
+              </Card>
+            </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="csa">
+           <Card className="max-w-2xl mx-auto bg-card border-border">
+              <CardHeader className="text-center border-b border-border/50 pb-8">
+                <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 text-primary">
+                  <FileSignature className="w-6 h-6" />
+                </div>
+                <CardTitle className="text-2xl font-heading">Client Service Agreement</CardTitle>
+                <CardDescription>Generate a digital agreement for immediate approval.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-8">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Client Company Name</label>
+                    <Input placeholder="e.g. TechCorp Industries" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Authorized Rep</label>
+                    <Input placeholder="e.g. John Smith" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium">Rep Email</label>
+                    <Input type="email" placeholder="john@techcorp.com" />
+                </div>
+                
+                <div className="p-4 bg-background/50 rounded-lg border border-border/50 text-sm text-muted-foreground">
+                  <p className="mb-2 font-bold text-foreground">Terms Summary:</p>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li>Net 30 Payment Terms</li>
+                    <li>4-hour minimum per worker</li>
+                    <li>DarkWave handles all insurance & payroll</li>
+                    <li>Client provides site safety equipment (unless requested)</li>
+                  </ul>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-lg">
+                    Generate & Send for Signature <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <Button variant="outline" className="w-full">
+                    <ExternalLink className="w-4 h-4 mr-2" /> Preview Agreement
+                  </Button>
+                </div>
+              </CardContent>
+           </Card>
         </TabsContent>
       </Tabs>
     </Shell>
