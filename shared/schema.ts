@@ -251,6 +251,12 @@ export const jobs = pgTable(
     billRate: decimal("bill_rate", { precision: 8, scale: 2 }),
     markupMultiplier: decimal("markup_multiplier", { precision: 5, scale: 2 }).default("1.35"),
 
+    // Location
+    latitude: decimal("latitude", { precision: 9, scale: 6 }), // Job site GPS location
+    longitude: decimal("longitude", { precision: 9, scale: 6 }), // Job site GPS location
+    locationName: varchar("location_name", { length: 255 }), // "Nissan Stadium", "Downtown Project", etc.
+    address: varchar("address", { length: 255 }),
+
     // Schedule
     startDate: date("start_date"),
     endDate: date("end_date"),
@@ -306,6 +312,11 @@ export const assignments = pgTable(
     // Rates
     workerRate: decimal("worker_rate", { precision: 8, scale: 2 }),
     billRate: decimal("bill_rate", { precision: 8, scale: 2 }),
+
+    // Check-in Tracking
+    checkedInAt: timestamp("checked_in_at"), // When worker GPS verified arrival
+    checkedOutAt: timestamp("checked_out_at"), // When worker left job
+    noShowStatus: varchar("no_show_status", { length: 50 }), // "show", "no_show", "late", "pending"
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -383,6 +394,50 @@ export const insertWorkerConversionSchema = createInsertSchema(workerConversions
 
 export type InsertWorkerConversion = z.infer<typeof insertWorkerConversionSchema>;
 export type WorkerConversion = typeof workerConversions.$inferSelect;
+
+// ========================
+// Assignment Reminders & Notifications
+// ========================
+export const assignmentReminders = pgTable(
+  "assignment_reminders",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    assignmentId: varchar("assignment_id").references(() => assignments.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+
+    // Reminder Schedule
+    remindBefore: integer("remind_before"), // Hours before (e.g., 24, 5, 1)
+    scheduledAt: timestamp("scheduled_at"), // When reminder should be sent
+    sentAt: timestamp("sent_at"), // When reminder was actually sent
+    sentVia: varchar("sent_via", { length: 50 }).default("push"), // push, email, sms, all
+
+    // Reminder Content
+    title: varchar("title", { length: 255 }),
+    message: text("message"),
+    jobNumber: varchar("job_number", { length: 100 }), // Reference for worker
+
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, sent, delivered, read, clicked
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    assignmentIdx: index("idx_reminders_assignment_id").on(table.assignmentId),
+    workerIdx: index("idx_reminders_worker_id").on(table.workerId),
+    statusIdx: index("idx_reminders_status").on(table.status),
+  })
+);
+
+export const insertAssignmentReminderSchema = createInsertSchema(assignmentReminders).omit({
+  id: true,
+  sentAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAssignmentReminder = z.infer<typeof insertAssignmentReminderSchema>;
+export type AssignmentReminder = typeof assignmentReminders.$inferSelect;
 
 // ========================
 // Timesheets (GPS Clock-in/out)
