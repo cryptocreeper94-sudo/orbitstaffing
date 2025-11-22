@@ -16,7 +16,10 @@ import {
   LogOut,
   Send,
   MessageSquare,
-  Reply
+  Reply,
+  Zap,
+  TrendingUp,
+  Star
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -91,6 +94,7 @@ export default function EmployeeApp() {
           <TabsList className="bg-card border border-border/50 w-full">
             <TabsTrigger value="home" className="flex-1">Home</TabsTrigger>
             <TabsTrigger value="jobs" className="flex-1">Jobs</TabsTrigger>
+            <TabsTrigger value="bonuses" className="flex-1">Bonuses</TabsTrigger>
             <TabsTrigger value="messages" className="flex-1">Messages</TabsTrigger>
             <TabsTrigger value="pay" className="flex-1">Pay</TabsTrigger>
           </TabsList>
@@ -248,6 +252,147 @@ export default function EmployeeApp() {
                     <span>This Month: 18 jobs assigned</span>
                     <Badge>144 hours</Badge>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bonuses Tab */}
+          <TabsContent value="bonuses" className="space-y-4 mt-6">
+            {/* Weekly Bonus */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-amber-500" />
+                  Weekly Performance Bonus
+                </CardTitle>
+                <CardDescription>Current week on extended assignment</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                  <div className="text-center">
+                    <div className="text-sm text-muted-foreground mb-1">This Week Bonus</div>
+                    <div className="text-4xl font-bold text-amber-500">$35.00</div>
+                    <p className="text-xs text-muted-foreground mt-2">Earned for perfect attendance this week</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Perfect Days</span>
+                    <Badge className="bg-green-500/20 text-green-600">5 / 5 ✓</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Streak Status</span>
+                    <Badge className="bg-blue-500/20 text-blue-600">On Track</Badge>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Assignment Duration</span>
+                    <Badge variant="outline">Week 3 of 12</Badge>
+                  </div>
+                </div>
+
+                <Button className="w-full bg-amber-500/20 text-amber-600 hover:bg-amber-500/30 border border-amber-500/30">
+                  <TrendingUp className="w-4 h-4 mr-2" /> View Bonus History
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Loyalty Score */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5 text-purple-500" />
+                  Loyalty Score (12-Month)
+                </CardTitle>
+                <CardDescription>Your overall reliability & availability rating</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                  <div className="text-center mb-4">
+                    <div className="text-5xl font-bold text-purple-500">96%</div>
+                    <p className="text-sm text-muted-foreground mt-1">Loyalty Score</p>
+                  </div>
+                  
+                  <div className="w-full bg-background rounded-full h-2 mb-4 overflow-hidden">
+                    <div className="bg-purple-500 h-full" style={{width: "96%"}}></div>
+                  </div>
+
+                  <div className="bg-background/50 rounded-lg p-3 text-center">
+                    <div className="text-sm font-bold text-purple-600 mb-1">TIER 2 - GROWTH</div>
+                    <p className="text-xs text-muted-foreground">5 days paid time off</p>
+                    <p className="text-xs text-muted-foreground">+$1,200-2,000 annual bonus</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Availability Score</span>
+                    <span className="font-bold">95%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Reliability Score</span>
+                    <span className="font-bold">98%</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-2">
+                    Calculated as: (Availability × 60%) + (Reliability × 40%)
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="bg-background/50 rounded p-3 text-center">
+                    <div className="font-bold text-green-600">90 days</div>
+                    <div className="text-muted-foreground">Perfect attendance streak</div>
+                  </div>
+                  <div className="bg-background/50 rounded p-3 text-center">
+                    <div className="font-bold text-blue-600">1 tardy</div>
+                    <div className="text-muted-foreground">Minor impact on score</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tier Progression */}
+            <Card className="bg-card/50 border-border/50">
+              <CardHeader>
+                <CardTitle className="text-base">Tier Progression</CardTitle>
+                <CardDescription>Your path to higher bonuses</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="space-y-2">
+                  {[
+                    {tier: "Tier 1", score: "90-94%", bonus: "2 days off", current: false},
+                    {tier: "Tier 2", score: "95-97%", bonus: "5 days off / $1,200+", current: true},
+                    {tier: "Tier 3", score: "98-99%", bonus: "1 week off / $2,400+", current: false},
+                    {tier: "Tier 4", score: "100%", bonus: "1 week + recognition / $2,400+", current: false},
+                  ].map((item, i) => (
+                    <div key={i} className={`p-3 rounded-lg border transition-all ${
+                      item.current 
+                        ? "bg-purple-500/10 border-purple-500/30" 
+                        : "bg-background/50 border-border/50 opacity-60"
+                    }`}>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="font-bold text-sm">{item.tier}</div>
+                          <div className="text-xs text-muted-foreground">{item.score}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs font-bold text-purple-500">{item.bonus}</div>
+                          {item.current && <Badge className="mt-1 bg-green-500/20 text-green-600">Current</Badge>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-xs text-muted-foreground bg-background/50 rounded p-3">
+                  <p className="mb-2"><strong>How to improve:</strong></p>
+                  <ul className="space-y-1">
+                    <li>✓ Accept more shift offers (boost Availability)</li>
+                    <li>✓ Never no-show (boost Reliability)</li>
+                    <li>✓ Always arrive on-time (maintain score)</li>
+                    <li>✓ Complete full shifts (maximize Reliability)</li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>
