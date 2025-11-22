@@ -1,38 +1,405 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import { eq, and, desc, gte, lte } from "drizzle-orm";
+import {
+  users,
+  companies,
+  workers,
+  clients,
+  jobs,
+  assignments,
+  timesheets,
+  payroll,
+  invoices,
+  messages,
+  timeOffRequests,
+  stateCompliance,
+  userFeedback,
+  type InsertUser,
+  type User,
+  type InsertCompany,
+  type Company,
+  type InsertWorker,
+  type Worker,
+  type InsertClient,
+  type Client,
+  type InsertJob,
+  type Job,
+  type InsertAssignment,
+  type Assignment,
+  type InsertTimesheet,
+  type Timesheet,
+  type InsertPayroll,
+  type Payroll,
+  type InsertInvoice,
+  type Invoice,
+  type InsertMessage,
+  type Message,
+  type InsertTimeOffRequest,
+  type TimeOffRequest,
+  type InsertStateCompliance,
+  type StateCompliance,
+  type InsertUserFeedback,
+  type UserFeedback,
+} from "@shared/schema";
 
 export interface IStorage {
+  // Users
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined>;
+
+  // Companies
+  getCompany(id: string): Promise<Company | undefined>;
+  createCompany(company: InsertCompany): Promise<Company>;
+  updateCompany(id: string, company: Partial<InsertCompany>): Promise<Company | undefined>;
+
+  // Workers
+  getWorker(id: string): Promise<Worker | undefined>;
+  listWorkers(companyId: string): Promise<Worker[]>;
+  createWorker(worker: InsertWorker): Promise<Worker>;
+  updateWorker(id: string, worker: Partial<InsertWorker>): Promise<Worker | undefined>;
+
+  // Clients
+  getClient(id: string): Promise<Client | undefined>;
+  listClients(companyId: string): Promise<Client[]>;
+  createClient(client: InsertClient): Promise<Client>;
+  updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined>;
+
+  // Jobs
+  getJob(id: string): Promise<Job | undefined>;
+  listJobs(companyId: string): Promise<Job[]>;
+  createJob(job: InsertJob): Promise<Job>;
+  updateJob(id: string, job: Partial<InsertJob>): Promise<Job | undefined>;
+
+  // Assignments
+  getAssignment(id: string): Promise<Assignment | undefined>;
+  listAssignments(companyId: string): Promise<Assignment[]>;
+  listAssignmentsByWorker(workerId: string): Promise<Assignment[]>;
+  createAssignment(assignment: InsertAssignment): Promise<Assignment>;
+  updateAssignment(id: string, assignment: Partial<InsertAssignment>): Promise<Assignment | undefined>;
+
+  // Timesheets
+  getTimesheet(id: string): Promise<Timesheet | undefined>;
+  listTimesheets(companyId: string): Promise<Timesheet[]>;
+  listTimesheetsByWorker(workerId: string): Promise<Timesheet[]>;
+  createTimesheet(timesheet: InsertTimesheet): Promise<Timesheet>;
+  updateTimesheet(id: string, timesheet: Partial<InsertTimesheet>): Promise<Timesheet | undefined>;
+  clockIn(assignmentId: string, latitude: number, longitude: number): Promise<Timesheet>;
+  clockOut(timesheetId: string, latitude: number, longitude: number): Promise<Timesheet | undefined>;
+
+  // Payroll
+  getPayroll(id: string): Promise<Payroll | undefined>;
+  listPayroll(companyId: string): Promise<Payroll[]>;
+  createPayroll(payroll: InsertPayroll): Promise<Payroll>;
+  updatePayroll(id: string, payroll: Partial<InsertPayroll>): Promise<Payroll | undefined>;
+
+  // Invoices
+  getInvoice(id: string): Promise<Invoice | undefined>;
+  listInvoices(companyId: string): Promise<Invoice[]>;
+  createInvoice(invoice: InsertInvoice): Promise<Invoice>;
+  updateInvoice(id: string, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined>;
+
+  // Messages
+  listMessages(recipientId: string): Promise<Message[]>;
+  createMessage(message: InsertMessage): Promise<Message>;
+  markMessageAsRead(id: string): Promise<Message | undefined>;
+
+  // Time Off Requests
+  listTimeOffRequests(workerId: string): Promise<TimeOffRequest[]>;
+  createTimeOffRequest(request: InsertTimeOffRequest): Promise<TimeOffRequest>;
+  updateTimeOffRequest(id: string, request: Partial<InsertTimeOffRequest>): Promise<TimeOffRequest | undefined>;
+
+  // State Compliance
+  getStateCompliance(stateCode: string): Promise<StateCompliance | undefined>;
+  listStateCompliance(): Promise<StateCompliance[]>;
+  updateStateCompliance(stateCode: string, data: Partial<InsertStateCompliance>): Promise<StateCompliance | undefined>;
+
+  // Feedback
+  createFeedback(feedback: InsertUserFeedback): Promise<UserFeedback>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
-  }
-
+export class DrizzleStorage implements IStorage {
+  // Users
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.email, email));
+    return result[0];
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async createUser(user: InsertUser): Promise<User> {
+    const result = await db.insert(users).values(user).returning();
+    return result[0];
+  }
+
+  async updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined> {
+    const result = await db.update(users).set(user).where(eq(users.id, id)).returning();
+    return result[0];
+  }
+
+  // Companies
+  async getCompany(id: string): Promise<Company | undefined> {
+    const result = await db.select().from(companies).where(eq(companies.id, id));
+    return result[0];
+  }
+
+  async createCompany(company: InsertCompany): Promise<Company> {
+    const result = await db.insert(companies).values(company).returning();
+    return result[0];
+  }
+
+  async updateCompany(id: string, company: Partial<InsertCompany>): Promise<Company | undefined> {
+    const result = await db.update(companies).set(company).where(eq(companies.id, id)).returning();
+    return result[0];
+  }
+
+  // Workers
+  async getWorker(id: string): Promise<Worker | undefined> {
+    const result = await db.select().from(workers).where(eq(workers.id, id));
+    return result[0];
+  }
+
+  async listWorkers(companyId: string): Promise<Worker[]> {
+    return db.select().from(workers).where(eq(workers.companyId, companyId));
+  }
+
+  async createWorker(worker: InsertWorker): Promise<Worker> {
+    const result = await db.insert(workers).values(worker).returning();
+    return result[0];
+  }
+
+  async updateWorker(id: string, worker: Partial<InsertWorker>): Promise<Worker | undefined> {
+    const result = await db.update(workers).set(worker).where(eq(workers.id, id)).returning();
+    return result[0];
+  }
+
+  // Clients
+  async getClient(id: string): Promise<Client | undefined> {
+    const result = await db.select().from(clients).where(eq(clients.id, id));
+    return result[0];
+  }
+
+  async listClients(companyId: string): Promise<Client[]> {
+    return db.select().from(clients).where(eq(clients.companyId, companyId));
+  }
+
+  async createClient(client: InsertClient): Promise<Client> {
+    const result = await db.insert(clients).values(client).returning();
+    return result[0];
+  }
+
+  async updateClient(id: string, client: Partial<InsertClient>): Promise<Client | undefined> {
+    const result = await db.update(clients).set(client).where(eq(clients.id, id)).returning();
+    return result[0];
+  }
+
+  // Jobs
+  async getJob(id: string): Promise<Job | undefined> {
+    const result = await db.select().from(jobs).where(eq(jobs.id, id));
+    return result[0];
+  }
+
+  async listJobs(companyId: string): Promise<Job[]> {
+    return db.select().from(jobs).where(eq(jobs.companyId, companyId));
+  }
+
+  async createJob(job: InsertJob): Promise<Job> {
+    const result = await db.insert(jobs).values(job).returning();
+    return result[0];
+  }
+
+  async updateJob(id: string, job: Partial<InsertJob>): Promise<Job | undefined> {
+    const result = await db.update(jobs).set(job).where(eq(jobs.id, id)).returning();
+    return result[0];
+  }
+
+  // Assignments
+  async getAssignment(id: string): Promise<Assignment | undefined> {
+    const result = await db.select().from(assignments).where(eq(assignments.id, id));
+    return result[0];
+  }
+
+  async listAssignments(companyId: string): Promise<Assignment[]> {
+    return db.select().from(assignments).where(eq(assignments.companyId, companyId));
+  }
+
+  async listAssignmentsByWorker(workerId: string): Promise<Assignment[]> {
+    return db.select().from(assignments).where(eq(assignments.workerId, workerId));
+  }
+
+  async createAssignment(assignment: InsertAssignment): Promise<Assignment> {
+    const result = await db.insert(assignments).values(assignment).returning();
+    return result[0];
+  }
+
+  async updateAssignment(id: string, assignment: Partial<InsertAssignment>): Promise<Assignment | undefined> {
+    const result = await db.update(assignments).set(assignment).where(eq(assignments.id, id)).returning();
+    return result[0];
+  }
+
+  // Timesheets
+  async getTimesheet(id: string): Promise<Timesheet | undefined> {
+    const result = await db.select().from(timesheets).where(eq(timesheets.id, id));
+    return result[0];
+  }
+
+  async listTimesheets(companyId: string): Promise<Timesheet[]> {
+    return db.select().from(timesheets).where(eq(timesheets.companyId, companyId));
+  }
+
+  async listTimesheetsByWorker(workerId: string): Promise<Timesheet[]> {
+    return db.select().from(timesheets).where(eq(timesheets.workerId, workerId));
+  }
+
+  async createTimesheet(timesheet: InsertTimesheet): Promise<Timesheet> {
+    const result = await db.insert(timesheets).values(timesheet).returning();
+    return result[0];
+  }
+
+  async updateTimesheet(id: string, timesheet: Partial<InsertTimesheet>): Promise<Timesheet | undefined> {
+    const result = await db.update(timesheets).set(timesheet).where(eq(timesheets.id, id)).returning();
+    return result[0];
+  }
+
+  async clockIn(assignmentId: string, latitude: number, longitude: number): Promise<Timesheet> {
+    const result = await db
+      .insert(timesheets)
+      .values({
+        assignmentId,
+        clockInTime: new Date(),
+        clockInLatitude: latitude.toString() as any,
+        clockInLongitude: longitude.toString() as any,
+        clockInVerified: true,
+        status: "draft",
+      })
+      .returning();
+    return result[0];
+  }
+
+  async clockOut(timesheetId: string, latitude: number, longitude: number): Promise<Timesheet | undefined> {
+    const timesheet = await this.getTimesheet(timesheetId);
+    if (!timesheet || !timesheet.clockInTime) {
+      return undefined;
+    }
+
+    const clockOutTime = new Date();
+    const clockInTime = new Date(timesheet.clockInTime);
+    const totalMinutes = (clockOutTime.getTime() - clockInTime.getTime()) / (1000 * 60);
+    const totalHours = (totalMinutes / 60).toFixed(2);
+
+    const result = await db
+      .update(timesheets)
+      .set({
+        clockOutTime,
+        clockOutLatitude: latitude.toString() as any,
+        clockOutLongitude: longitude.toString() as any,
+        clockOutVerified: true,
+        totalHoursWorked: totalHours as any,
+        billableHours: totalHours as any,
+      })
+      .where(eq(timesheets.id, timesheetId))
+      .returning();
+    return result[0];
+  }
+
+  // Payroll
+  async getPayroll(id: string): Promise<Payroll | undefined> {
+    const result = await db.select().from(payroll).where(eq(payroll.id, id));
+    return result[0];
+  }
+
+  async listPayroll(companyId: string): Promise<Payroll[]> {
+    return db.select().from(payroll).where(eq(payroll.companyId, companyId));
+  }
+
+  async createPayroll(payrollData: InsertPayroll): Promise<Payroll> {
+    const result = await db.insert(payroll).values(payrollData).returning();
+    return result[0];
+  }
+
+  async updatePayroll(id: string, payrollData: Partial<InsertPayroll>): Promise<Payroll | undefined> {
+    const result = await db.update(payroll).set(payrollData).where(eq(payroll.id, id)).returning();
+    return result[0];
+  }
+
+  // Invoices
+  async getInvoice(id: string): Promise<Invoice | undefined> {
+    const result = await db.select().from(invoices).where(eq(invoices.id, id));
+    return result[0];
+  }
+
+  async listInvoices(companyId: string): Promise<Invoice[]> {
+    return db.select().from(invoices).where(eq(invoices.companyId, companyId));
+  }
+
+  async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
+    const result = await db.insert(invoices).values(invoice).returning();
+    return result[0];
+  }
+
+  async updateInvoice(id: string, invoice: Partial<InsertInvoice>): Promise<Invoice | undefined> {
+    const result = await db.update(invoices).set(invoice).where(eq(invoices.id, id)).returning();
+    return result[0];
+  }
+
+  // Messages
+  async listMessages(recipientId: string): Promise<Message[]> {
+    return db.select().from(messages).where(eq(messages.recipientId, recipientId)).orderBy(desc(messages.createdAt));
+  }
+
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const result = await db.insert(messages).values(message).returning();
+    return result[0];
+  }
+
+  async markMessageAsRead(id: string): Promise<Message | undefined> {
+    const result = await db
+      .update(messages)
+      .set({ read: true, readAt: new Date() })
+      .where(eq(messages.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Time Off Requests
+  async listTimeOffRequests(workerId: string): Promise<TimeOffRequest[]> {
+    return db.select().from(timeOffRequests).where(eq(timeOffRequests.workerId, workerId));
+  }
+
+  async createTimeOffRequest(request: InsertTimeOffRequest): Promise<TimeOffRequest> {
+    const result = await db.insert(timeOffRequests).values(request).returning();
+    return result[0];
+  }
+
+  async updateTimeOffRequest(id: string, request: Partial<InsertTimeOffRequest>): Promise<TimeOffRequest | undefined> {
+    const result = await db.update(timeOffRequests).set(request).where(eq(timeOffRequests.id, id)).returning();
+    return result[0];
+  }
+
+  // State Compliance
+  async getStateCompliance(stateCode: string): Promise<StateCompliance | undefined> {
+    const result = await db.select().from(stateCompliance).where(eq(stateCompliance.stateCode, stateCode));
+    return result[0];
+  }
+
+  async listStateCompliance(): Promise<StateCompliance[]> {
+    return db.select().from(stateCompliance);
+  }
+
+  async updateStateCompliance(stateCode: string, data: Partial<InsertStateCompliance>): Promise<StateCompliance | undefined> {
+    const result = await db.update(stateCompliance).set(data).where(eq(stateCompliance.stateCode, stateCode)).returning();
+    return result[0];
+  }
+
+  // Feedback
+  async createFeedback(feedback: InsertUserFeedback): Promise<UserFeedback> {
+    const result = await db.insert(userFeedback).values(feedback).returning();
+    return result[0];
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DrizzleStorage();
