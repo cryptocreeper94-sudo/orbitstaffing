@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, Building2, DollarSign, FileText, AlertCircle, CheckCircle2, TrendingUp, Send } from 'lucide-react';
+import { WeatherWidget } from '@/components/WeatherWidget';
 
 interface ConnectedCustomer {
   id: string;
@@ -90,8 +91,12 @@ export default function PartnerAgencyDashboard() {
         <p className="text-muted-foreground">Manage connected customers, employees, and payroll in one place.</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      {/* Weather Widget + Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+        <div className="lg:col-span-1">
+          <WeatherWidget />
+        </div>
+        <div className="lg:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="bg-card/50 border-border/50">
           <CardContent className="p-6">
             <div className="flex justify-between items-start">
@@ -136,6 +141,7 @@ export default function PartnerAgencyDashboard() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
 
       {/* Main Tabs */}
