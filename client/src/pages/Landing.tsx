@@ -16,16 +16,26 @@ import orbitLogo from "@assets/generated_images/orbit_staffing_platform_logo.png
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Watermark Logo - Fixed Background */}
+      <div className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+        <img 
+          src={orbitLogo} 
+          alt="" 
+          className="absolute top-12 left-12 w-96 h-96 opacity-10 object-contain filter blur-sm"
+          style={{ filter: 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.1))' }}
+        />
+      </div>
+
+      {/* Content Layer */}
+      <div className="relative z-10">
+      
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src={orbitLogo} alt="ORBIT logo" className="w-8 h-8" />
-            <div className="font-heading font-bold text-lg tracking-wider">
-              ORBIT
-              <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
-            </div>
+          <div className="font-heading font-bold text-lg tracking-wider">
+            ORBIT
+            <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
           </div>
           <div className="flex gap-2">
             <Link href="/login">
@@ -217,6 +227,8 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      </div>
     </div>
   );
 }
