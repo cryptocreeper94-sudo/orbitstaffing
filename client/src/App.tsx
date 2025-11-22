@@ -38,6 +38,9 @@ import BusinessOwnerMarketing from "@/pages/BusinessOwnerMarketing";
 import MarketingDashboard from "@/pages/MarketingDashboard";
 import WorkflowDemoPage from "@/pages/WorkflowDemoPage";
 import EmployeeNewsPortal from "@/pages/EmployeeNewsPortal";
+import StaffingPartnerHub from "@/pages/StaffingPartnerHub";
+import PartnerVerification from "@/pages/PartnerVerification";
+import PartnerAgencyDashboard from "@/pages/PartnerAgencyDashboard";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -75,6 +78,10 @@ function Router() {
       <Route path="/marketing" component={MarketingDashboard} />
       <Route path="/workflow-demo" component={WorkflowDemoPage} />
       <Route path="/employee-news" component={EmployeeNewsPortal} />
+      <Route path="/partner-hub" component={StaffingPartnerHub} />
+      <Route path="/partner-verify/:token" component={PartnerVerification} />
+      <Route path="/partner-verify" component={PartnerVerification} />
+      <Route path="/partner-agency" component={PartnerAgencyDashboard} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

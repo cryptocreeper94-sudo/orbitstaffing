@@ -320,6 +320,121 @@ export type InsertCompanyNews = z.infer<typeof insertCompanyNewsSchema>;
 export type CompanyNews = typeof companyNews.$inferSelect;
 
 // ========================
+// Staffing Partner Integrations (Multi-Provider)
+// ========================
+export const staffingPartners = pgTable(
+  "staffing_partners",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Customer who owns the connection
+    customerId: varchar("customer_id").notNull().references(() => companies.id),
+    
+    // Partner/Provider Info
+    partnerCompanyId: varchar("partner_company_id").references(() => companies.id), // If partner is also on ORBIT
+    partnerName: varchar("partner_name", { length: 255 }).notNull(), // e.g., "Pro Staffing", "ABC Staffing"
+    partnerLogoUrl: varchar("partner_logo_url", { length: 500 }),
+    
+    // Integration Type
+    integrationType: varchar("integration_type", { length: 50 }), // "orbit_native", "api_webhook", "manual_import"
+    
+    // Connection Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, verified, active, paused, expired
+    verifiedAt: timestamp("verified_at"),
+    
+    // Integration Link & Verification
+    integrationToken: varchar("integration_token", { length: 100 }).unique(), // Used in shareable link
+    integratedAt: timestamp("integrated_at"),
+    
+    // Contact
+    partnerContactEmail: varchar("partner_contact_email", { length: 255 }),
+    partnerContactPerson: varchar("partner_contact_person", { length: 255 }),
+    
+    // Settings
+    dataVisibility: varchar("data_visibility", { length: 50 }).default("shared"), // shared, read_only, full
+    syncAutomatically: boolean("sync_automatically").default(true),
+    
+    // Stats
+    employeeCount: integer("employee_count").default(0),
+    assignmentCount: integer("assignment_count").default(0),
+    lastSyncAt: timestamp("last_sync_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    customerIdx: index("idx_staffing_partners_customer_id").on(table.customerId),
+    tokenIdx: index("idx_staffing_partners_token").on(table.integrationToken),
+    statusIdx: index("idx_staffing_partners_status").on(table.status),
+  })
+);
+
+export const insertStaffingPartnerSchema = createInsertSchema(staffingPartners).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  verifiedAt: true,
+  integratedAt: true,
+  lastSyncAt: true,
+});
+
+export type InsertStaffingPartner = z.infer<typeof insertStaffingPartnerSchema>;
+export type StaffingPartner = typeof staffingPartners.$inferSelect;
+
+// ========================
+// Partner Employees (Aggregated from Partners)
+// ========================
+export const partnerEmployees = pgTable(
+  "partner_employees",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Link to connection
+    staffingPartnerId: varchar("staffing_partner_id").notNull().references(() => staffingPartners.id),
+    customerId: varchar("customer_id").notNull().references(() => companies.id),
+    
+    // If partner is on ORBIT, link to their worker
+    orbitWorkerId: varchar("orbit_worker_id").references(() => workers.id),
+    
+    // External System Reference
+    partnerSystemId: varchar("partner_system_id", { length: 100 }), // Partner's ID for this worker
+    
+    // Employee Info
+    firstName: varchar("first_name", { length: 100 }).notNull(),
+    lastName: varchar("last_name", { length: 100 }).notNull(),
+    email: varchar("email", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    
+    // Work Info
+    skills: jsonb("skills"), // Array of skills
+    hourlyRate: decimal("hourly_rate", { precision: 8, scale: 2 }),
+    availabilityStatus: varchar("availability_status", { length: 50 }).default("available"),
+    
+    // Sync Status
+    syncedAt: timestamp("synced_at").default(sql`NOW()`),
+    isActive: boolean("is_active").default(true),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    partnerIdx: index("idx_partner_employees_partner_id").on(table.staffingPartnerId),
+    customerIdx: index("idx_partner_employees_customer_id").on(table.customerId),
+    partnerSystemIdx: index("idx_partner_employees_partner_system_id").on(table.partnerSystemId),
+  })
+);
+
+export const insertPartnerEmployeeSchema = createInsertSchema(partnerEmployees).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  syncedAt: true,
+});
+
+export type InsertPartnerEmployee = z.infer<typeof insertPartnerEmployeeSchema>;
+export type PartnerEmployee = typeof partnerEmployees.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
