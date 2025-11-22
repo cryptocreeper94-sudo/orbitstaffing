@@ -15,10 +15,12 @@ import {
 import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
+import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
+  const [selectedBenefit, setSelectedBenefit] = useState<string | null>(null);
 
   useEffect(() => {
     // Show modal on first visit
@@ -36,6 +38,13 @@ export default function Landing() {
       
       {/* Business Type Modal */}
       <BusinessTypeModal isOpen={showModal} onClose={() => setShowModal(false)} />
+
+      {/* Benefit Details Modal */}
+      <BenefitDetailsModal 
+        isOpen={!!selectedBenefit} 
+        benefitId={selectedBenefit}
+        onClose={() => setSelectedBenefit(null)}
+      />
 
       {/* Saturn Watermark - Fixed Centered 3D Background */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
@@ -100,7 +109,7 @@ export default function Landing() {
             <span className="text-primary font-semibold">Full-Cycle Staffing Operations</span> in one platform. From recruit to payroll to invoice—complete control, complete compliance. Save up to 35% on staffing costs.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-3 justify-center mb-8">
+          <div className="flex flex-col md:flex-row gap-3 justify-center mb-12">
             <Button className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               Request Demo <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -109,6 +118,34 @@ export default function Landing() {
                 Configure for Your Industry
               </a>
             </Link>
+          </div>
+
+          {/* Benefit Cards - Tap for Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <BenefitCard 
+              icon="⚡"
+              title="Automate Everything"
+              brief="Zero manual entry"
+              onClick={() => setSelectedBenefit("automate")}
+            />
+            <BenefitCard 
+              icon="👥"
+              title="Keep Workers Longer"
+              brief="3x longer retention"
+              onClick={() => setSelectedBenefit("workers")}
+            />
+            <BenefitCard 
+              icon="💰"
+              title="Save Real Money"
+              brief="35% cost reduction"
+              onClick={() => setSelectedBenefit("money")}
+            />
+            <BenefitCard 
+              icon="📈"
+              title="Scale Without Limits"
+              brief="10x more capacity"
+              onClick={() => setSelectedBenefit("scale")}
+            />
           </div>
 
           {/* Stats */}
@@ -322,6 +359,23 @@ function FeatureCard({ icon: Icon, title, desc }: any) {
         <p className="text-xs text-muted-foreground">{desc}</p>
       </CardContent>
     </Card>
+  );
+}
+
+function BenefitCard({ icon, title, brief, onClick }: any) {
+  return (
+    <button
+      onClick={onClick}
+      className="p-6 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all group cursor-pointer text-left"
+      data-testid={`benefit-card-${title.toLowerCase().replace(/\s+/g, '-')}`}
+    >
+      <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{icon}</div>
+      <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{title}</h3>
+      <p className="text-xs text-muted-foreground mb-3">{brief}</p>
+      <div className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+        Tap to learn more →
+      </div>
+    </button>
   );
 }
 
