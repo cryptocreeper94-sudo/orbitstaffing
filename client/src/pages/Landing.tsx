@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
+import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
 
 export default function Landing() {
@@ -30,6 +31,9 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Value Proposition Modal */}
+      <ValuePropositionModal />
+      
       {/* Business Type Modal */}
       <BusinessTypeModal isOpen={showModal} onClose={() => setShowModal(false)} />
 
