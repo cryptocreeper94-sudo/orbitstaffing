@@ -17,6 +17,7 @@ import {
   insertUserFeedbackSchema,
   insertLicenseSchema,
   insertPaymentSchema,
+  insertFeatureRequestSchema,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -609,6 +610,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(payment);
     } catch (error) {
       res.status(500).json({ error: "Failed to update payment" });
+    }
+  });
+
+  // ========================
+  // FEATURE REQUESTS
+  // ========================
+  app.post("/api/feature-requests/create", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const parsed = insertFeatureRequestSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid feature request data" });
+      }
+
+      const request = await storage.createFeatureRequest(parsed.data);
+      res.status(201).json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create feature request" });
+    }
+  });
+
+  app.get("/api/feature-requests/company/:companyId", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const requests = await storage.getCompanyFeatureRequests(companyId);
+      res.status(200).json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature requests" });
+    }
+  });
+
+  app.get("/api/feature-requests", async (req: Request, res: Response) => {
+    try {
+      const { status, priority } = req.query;
+      const requests = await storage.getAllFeatureRequests({
+        status: status as string,
+        priority: priority as string,
+      });
+      res.status(200).json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature requests" });
+    }
+  });
+
+  app.get("/api/feature-requests/:requestId", async (req: Request, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const request = await storage.getFeatureRequest(requestId);
+      if (!request) {
+        return res.status(404).json({ error: "Feature request not found" });
+      }
+      res.status(200).json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature request" });
+    }
+  });
+
+  app.patch("/api/feature-requests/:requestId", async (req: Request, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const updates = req.body;
+
+      const request = await storage.updateFeatureRequest(requestId, updates);
+      if (!request) {
+        return res.status(404).json({ error: "Feature request not found" });
+      }
+      res.status(200).json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update feature request" });
     }
   });
 

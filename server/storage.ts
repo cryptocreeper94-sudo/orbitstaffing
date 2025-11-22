@@ -17,6 +17,7 @@ import {
   billingHistory,
   licenses,
   payments,
+  featureRequests,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -49,6 +50,8 @@ import {
   type License,
   type InsertPayment,
   type Payment,
+  type InsertFeatureRequest,
+  type FeatureRequest,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -149,6 +152,13 @@ export interface IStorage {
   getCompanyPayments(companyId: string): Promise<Payment[]>;
   updatePayment(paymentId: string, data: Partial<InsertPayment>): Promise<Payment | undefined>;
   recordPayment(companyId: string, amount: number, description: string, method: string): Promise<Payment>;
+
+  // Feature Requests
+  createFeatureRequest(request: InsertFeatureRequest): Promise<FeatureRequest>;
+  getFeatureRequest(requestId: string): Promise<FeatureRequest | undefined>;
+  getCompanyFeatureRequests(companyId: string): Promise<FeatureRequest[]>;
+  getAllFeatureRequests(filters?: { status?: string; priority?: string }): Promise<FeatureRequest[]>;
+  updateFeatureRequest(requestId: string, data: Partial<InsertFeatureRequest>): Promise<FeatureRequest | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -573,6 +583,41 @@ export class DrizzleStorage implements IStorage {
       paymentMethod: method,
       status: "completed",
     });
+  }
+
+  // Feature Requests
+  async createFeatureRequest(request: InsertFeatureRequest): Promise<FeatureRequest> {
+    const result = await db.insert(featureRequests).values(request).returning();
+    return result[0];
+  }
+
+  async getFeatureRequest(requestId: string): Promise<FeatureRequest | undefined> {
+    const result = await db.select().from(featureRequests).where(eq(featureRequests.id, requestId));
+    return result[0];
+  }
+
+  async getCompanyFeatureRequests(companyId: string): Promise<FeatureRequest[]> {
+    return db.select().from(featureRequests)
+      .where(eq(featureRequests.companyId, companyId))
+      .orderBy(desc(featureRequests.createdAt));
+  }
+
+  async getAllFeatureRequests(filters?: { status?: string; priority?: string }): Promise<FeatureRequest[]> {
+    let query = db.select().from(featureRequests);
+
+    if (filters?.status) {
+      query = query.where(eq(featureRequests.status, filters.status));
+    }
+    if (filters?.priority) {
+      query = query.where(eq(featureRequests.priority, filters.priority));
+    }
+
+    return query.orderBy(desc(featureRequests.createdAt));
+  }
+
+  async updateFeatureRequest(requestId: string, data: Partial<InsertFeatureRequest>): Promise<FeatureRequest | undefined> {
+    const result = await db.update(featureRequests).set(data).where(eq(featureRequests.id, requestId)).returning();
+    return result[0];
   }
 }
 

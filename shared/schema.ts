@@ -654,6 +654,11 @@ export const licenses = pgTable(
     expiryDate: date("expiry_date"), // null for perpetual franchise licenses
     autoRenew: boolean("auto_renew").default(true),
 
+    // Support/Warranty Period
+    supportStartDate: date("support_start_date"),
+    supportEndDate: date("support_end_date"), // Warranty period end
+    customizationIncluded: boolean("customization_included").default(true), // Can we customize for them?
+
     // Features
     whiteLabel: boolean("white_label").default(false),
     apiAccess: boolean("api_access").default(false),
@@ -677,6 +682,55 @@ export const insertLicenseSchema = createInsertSchema(licenses).omit({
 
 export type InsertLicense = z.infer<typeof insertLicenseSchema>;
 export type License = typeof licenses.$inferSelect;
+
+// ========================
+// Feature Requests (Customer Feedback)
+// ========================
+export const featureRequests = pgTable(
+  "feature_requests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+    licenseId: varchar("license_id").references(() => licenses.id),
+
+    // Request Details
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    category: varchar("category", { length: 100 }), // "automation", "integration", "reporting", "ui", "other"
+    priority: varchar("priority", { length: 50 }).default("medium"), // "low", "medium", "high", "critical"
+
+    // Status
+    status: varchar("status", { length: 50 }).notNull().default("open"), // "open", "in-review", "planned", "in-progress", "completed", "declined"
+    
+    // Tracking
+    submittedBy: varchar("submitted_by").references(() => users.id),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    completedAt: timestamp("completed_at"),
+
+    // Implementation Notes
+    notes: text("notes"),
+    estimatedImplementation: date("estimated_implementation"),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_feature_requests_company_id").on(table.companyId),
+    licenseIdx: index("idx_feature_requests_license_id").on(table.licenseId),
+    statusIdx: index("idx_feature_requests_status").on(table.status),
+  })
+);
+
+export const insertFeatureRequestSchema = createInsertSchema(featureRequests).omit({
+  id: true,
+  reviewedBy: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFeatureRequest = z.infer<typeof insertFeatureRequestSchema>;
+export type FeatureRequest = typeof featureRequests.$inferSelect;
 
 // ========================
 // Payments (Transaction History)
