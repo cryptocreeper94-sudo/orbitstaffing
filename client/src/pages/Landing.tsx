@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +13,26 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { Link } from "wouter";
+import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
 
 export default function Landing() {
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // Show modal on first visit
+    const hasSeenModal = localStorage.getItem("hasSeenBusinessTypeModal");
+    if (!hasSeenModal) {
+      setShowModal(true);
+      localStorage.setItem("hasSeenBusinessTypeModal", "true");
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Business Type Modal */}
+      <BusinessTypeModal isOpen={showModal} onClose={() => setShowModal(false)} />
+
       {/* Saturn Watermark - Fixed Centered 3D Background */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
         <div style={{
