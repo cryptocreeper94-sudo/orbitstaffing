@@ -298,6 +298,11 @@ export const assignments = pgTable(
     confirmedByWorker: boolean("confirmed_by_worker").default(false),
     confirmedAt: timestamp("confirmed_at"),
 
+    // Arrangement Type & Conversion Tracking
+    arrangementType: varchar("arrangement_type", { length: 50 }).default("day_labor"), // day_labor, weekly, part_time, semi_permanent, permanent
+    isConversionEligible: boolean("is_conversion_eligible").default(false), // Can this be converted to full-time?
+    totalHoursWorked: decimal("total_hours_worked", { precision: 10, scale: 2 }).default("0"), // Cumulative hours for conversion tracking
+
     // Rates
     workerRate: decimal("worker_rate", { precision: 8, scale: 2 }),
     billRate: decimal("bill_rate", { precision: 8, scale: 2 }),
@@ -322,6 +327,62 @@ export const insertAssignmentSchema = createInsertSchema(assignments).omit({
 
 export type InsertAssignment = z.infer<typeof insertAssignmentSchema>;
 export type Assignment = typeof assignments.$inferSelect;
+
+// ========================
+// Worker Conversions (Temp to Full-Time Hiring)
+// ========================
+export const workerConversions = pgTable(
+  "worker_conversions",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    clientId: varchar("client_id").references(() => clients.id),
+
+    // Conversion Details
+    totalHoursWorked: decimal("total_hours_worked", { precision: 10, scale: 2 }).notNull(),
+    conversionDate: timestamp("conversion_date"), // When worker becomes full-time
+    conversionStatus: varchar("conversion_status", { length: 50 }).default("pending"), // pending, approved, completed, declined, cancelled
+    buyoutFeeRequired: decimal("buyout_fee_required", { precision: 10, scale: 2 }).default("0"), // 0, 2000, or 4000
+    buyoutFeePaid: boolean("buyout_fee_paid").default(false),
+    buyoutPaymentDate: timestamp("buyout_payment_date"),
+
+    // Worker & Client Approval
+    workerApproved: boolean("worker_approved").default(false),
+    workerApprovedAt: timestamp("worker_approved_at"),
+    clientApproved: boolean("client_approved").default(false),
+    clientApprovedAt: timestamp("client_approved_at"),
+    orbitApproved: boolean("orbit_approved").default(false),
+    orbitApprovedAt: timestamp("orbit_approved_at"),
+
+    // Notes
+    conversionNotes: text("conversion_notes"),
+    declineReason: varchar("decline_reason", { length: 255 }),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_conversions_company_id").on(table.companyId),
+    workerIdx: index("idx_conversions_worker_id").on(table.workerId),
+    clientIdx: index("idx_conversions_client_id").on(table.clientId),
+    statusIdx: index("idx_conversions_status").on(table.conversionStatus),
+  })
+);
+
+export const insertWorkerConversionSchema = createInsertSchema(workerConversions).omit({
+  id: true,
+  conversionDate: true,
+  workerApprovedAt: true,
+  clientApprovedAt: true,
+  orbitApprovedAt: true,
+  buyoutPaymentDate: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerConversion = z.infer<typeof insertWorkerConversionSchema>;
+export type WorkerConversion = typeof workerConversions.$inferSelect;
 
 // ========================
 // Timesheets (GPS Clock-in/out)

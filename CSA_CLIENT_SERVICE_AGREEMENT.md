@@ -389,7 +389,177 @@ Either party can pursue claims under $5,000 in small claims court.
 
 ---
 
-## 13. MULTI-AGENCY & ENTERPRISE ADDENDUM
+## 13. WORKER CONVERSION & BUYOUT POLICY
+
+### 13.1 Worker Arrangement Types
+ORBIT supports flexible engagement models to accommodate diverse staffing needs:
+
+| Arrangement Type | Definition | Duration | Typical Use |
+|------------------|-----------|----------|-------------|
+| **Day Labor** | Single-day assignments, no commitment | 1 day | Event staffing, emergency fill-ins |
+| **Weekly** | Recurring assignments, week-to-week | 7 days (repeating) | Regular but flexible positions |
+| **Part-Time** | 3-5 days/week ongoing | Ongoing | Semi-regular workforce |
+| **Semi-Permanent** | 6+ months intended tenure, no conversion plan | 6+ months | Long-term temp workforce |
+| **Permanent** | Intended path to full-time employment | Until conversion | Pipeline for permanent hiring |
+
+**Worker Status Definition:**
+- Each assignment is tagged with an arrangement type
+- Worker can have multiple arrangement types with different clients simultaneously
+- Arrangement type determines conversion eligibility and buyout policies
+
+### 13.2 Permanent Conversion Policy (Full-Time Hiring)
+
+**Industry Standard - Modified for ORBIT:**
+
+When a Client intends to hire a Worker as a **full-time permanent employee**, the following buyout policy applies:
+
+#### **Payment Requirement BEFORE Direct Hire:**
+- **Less than 480 hours:** No ORBIT buyout fee (Client can hire directly)
+- **480-960 hours (6-12 months):** $2,000 buyout fee required to ORBIT
+- **960+ hours (12+ months):** $4,000 buyout fee required to ORBIT
+
+**Hours Calculation:**
+- Count all hours worked through ORBIT for ANY Client, regardless of assignment type
+- Minimum wage = 1 hour
+- Exclude unpaid break time
+
+**Example 1 - Mike's Agency:**
+- Worker: "Jake"
+- Total ORBIT hours: 420 hours (4 months)
+- Direct hire request from Client A: **NO FEE** (under 480 hours)
+- ORBIT: Acknowledges, removes worker from system, no payment required
+
+**Example 2 - Mike's Agency:**
+- Worker: "Sarah"
+- Total ORBIT hours: 650 hours (8 months)
+- Direct hire request from Client B: **$2,000 BUYOUT** required
+- Process: Client B sends buyout fee to ORBIT, Sarah transitions to full-time employee
+- ORBIT: Receives payment, releases worker, updates records
+
+**Example 3 - Mike's Agency:**
+- Worker: "Marcus"
+- Total ORBIT hours: 1,200 hours (15 months, semi-permanent)
+- Client C wants to hire Marcus full-time: **$4,000 BUYOUT** required
+- Justification: Marcus has deep knowledge of Client C's operations; long-term relationship
+
+#### **Why This Structure:**
+✓ **Protects ORBIT:** Compensation for losing recurring revenue stream  
+✓ **Protects Client:** Clear, predictable costs for converting temps to full-time  
+✓ **Protects Worker:** Ensures they transition to stable employment with proper vetting  
+✓ **Incentivizes Permanent Assignments:** Clients can commit longer = better for all parties  
+
+### 13.3 Conversion Restrictions & Conditions
+
+**Clients CANNOT bypass this policy by:**
+- Hiring worker for "personal services" outside ORBIT system
+- Creating fake "break" periods to reset hour counters
+- Using contractor classification to avoid conversion fees
+- Direct solicitation of workers without approval
+
+**Penalties for Violation:**
+- First violation: Warning + $5,000 penalty
+- Second violation: Automatic account suspension
+- Third violation: Permanent account termination + legal action
+
+**ORBIT Enforcement:**
+- GPS verification data proves hours actually worked
+- Audit trails show all hour calculations
+- Regular compliance checks for large clients
+- Workers can report unreported violations
+
+### 13.4 Worker Conversion Workflow
+
+**Step 1: Client Intent**
+- Client notifies ORBIT: "We want to hire [Worker] full-time"
+- ORBIT pulls total hours, conversion status, fee (if applicable)
+
+**Step 2: Worker Approval**
+- Worker must explicitly consent to conversion
+- Worker can decline (remains on ORBIT or leaves)
+- ORBIT confirms worker wants full-time role
+
+**Step 3: Management Approval**
+- For "Permanent" arrangement type: ORBIT approves (automated)
+- For other types: Client's ORBIT administrator confirms worker eligible
+- ORBIT checks for contractual restrictions
+
+**Step 4: Fee Payment (if required)**
+- Client pays buyout fee directly to ORBIT (invoice issued)
+- Payment must clear before conversion is final
+- ORBIT sends confirmation, worker released
+
+**Step 5: Final Release**
+- Worker removed from ORBIT system
+- Client receives offboarding documentation
+- Worker's data archived (7-year retention)
+
+### 13.5 Semi-Permanent & No-Conversion Arrangements
+
+**Semi-Permanent Workers (No Conversion Path):**
+- Worker explicitly classified as temporary indefinitely
+- No buyout applies if direct hire attempted
+- Client can hire directly anytime without ORBIT fee
+- **Use Case:** Seasonal workers, event staff, specific short-term needs
+
+**Restriction:** If Client uses "Semi-Permanent" to avoid conversion fees, ORBIT can:
+- Reclassify to "Permanent" after 12 months
+- Apply retroactive buyout fees ($4,000)
+- Charge late fees (1% per month)
+
+**Worker Protection:** Semi-Permanent workers told upfront—no path to full-time employment through ORBIT.
+
+### 13.6 Competing Offers & Multiple Clients
+
+**If Worker Gets Job Offers From Multiple Clients:**
+
+Client A offers $18/hour full-time (480 hours worked)  
+Client B offers $20/hour full-time (600 hours worked)
+
+**Scenario:**
+- Worker wants to work for Client B (higher pay)
+- Client B pays $2,000 buyout (for 600 hours)
+- Worker releases from Client A, starts Client B
+- Fair process, no disputes
+
+**ORBIT Role:**
+- Don't referee; process whichever conversion comes first
+- Once converted, worker cannot re-enter ORBIT for that Client
+- Worker can work for different Client through ORBIT if needed
+
+### 13.7 Client Liability for Bypass Attempts
+
+If Client attempts to hire Worker outside ORBIT system without:
+1. Obtaining ORBIT approval, OR
+2. Paying required buyout fee
+
+**Client is liable for:**
+- $5,000 penalty (first offense) + buyout fee owed
+- $10,000 penalty (second offense) + legal fees
+- Account termination (third offense)
+- Damages to ORBIT platform (lost recurring revenue)
+
+**ORBIT's Right to Pursue:**
+- Pursue claim in arbitration (per Section 12)
+- Workers can testify re: unreported hours/work
+- GPS data and timesheets are admissible evidence
+
+### 13.8 Worker Protections During Conversion
+
+**Workers Cannot Be Penalized For:**
+- Requesting conversion to full-time employment
+- Declining a direct hire offer
+- Remaining on ORBIT longer than expected
+- Reporting conversion violations
+
+**Workers ARE Protected:**
+- All hours worked count toward conversion (no hour "forgetting")
+- Overtime, bonuses, commissions count as hours worked
+- Conversion fees don't come out of worker pay
+- Worker remains on ORBIT until final approval
+
+---
+
+## 14. MULTI-AGENCY & ENTERPRISE ADDENDUM
 
 ### 13.1 Hub Consolidation
 When Client consolidates multiple staffing agencies:
@@ -438,7 +608,7 @@ If consolidated but wanting separate invoices:
 
 ---
 
-## 14. CONTACT & SUPPORT
+## 15. CONTACT & SUPPORT
 
 **ORBIT Staffing OS Support**  
 Email: support@orbitstaffing.net  
@@ -455,7 +625,7 @@ TN, USA
 
 ---
 
-## 15. ACCEPTANCE
+## 16. ACCEPTANCE
 
 By using ORBIT Staffing OS, you accept these terms:
 - Check the box during signup acknowledging CSA
