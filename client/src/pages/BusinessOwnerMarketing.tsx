@@ -428,15 +428,15 @@ export default function BusinessOwnerMarketing() {
             Schedule a free 15-minute call. See how other agencies freed up 15+ hours/week.
           </p>
 
-          <form onSubmit={handleSubmit} className="bg-slate-800/50 rounded-lg p-8 space-y-6">
-            <div className="grid md:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="bg-slate-800/50 rounded-lg p-4 sm:p-8 space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <input
                 type="text"
                 name="companyName"
                 placeholder="Company Name *"
                 value={formData.companyName}
                 onChange={handleChange}
-                className="px-4 py-3 rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
+                className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
                 required
               />
               <input
@@ -445,18 +445,18 @@ export default function BusinessOwnerMarketing() {
                 placeholder="Your Name"
                 value={formData.ownerName}
                 onChange={handleChange}
-                className="px-4 py-3 rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
+                className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <input
                 type="email"
                 name="email"
                 placeholder="Email Address *"
                 value={formData.email}
                 onChange={handleChange}
-                className="px-4 py-3 rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
+                className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
                 required
               />
               <input
@@ -465,16 +465,16 @@ export default function BusinessOwnerMarketing() {
                 placeholder="Phone Number"
                 value={formData.phone}
                 onChange={handleChange}
-                className="px-4 py-3 rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
+                className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <select
                 name="currentStaffing"
                 value={formData.currentStaffing}
                 onChange={handleChange}
-                className="px-4 py-3 rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
+                className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
               >
                 <option value="">Current Staffing Volume</option>
                 <option value="1-50">1-50 placements/month</option>
@@ -486,7 +486,7 @@ export default function BusinessOwnerMarketing() {
                 name="laborType"
                 value={formData.laborType}
                 onChange={handleChange}
-                className="px-4 py-3 rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
+                className="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded bg-slate-700 border border-slate-600 focus:border-blue-400 focus:outline-none"
               >
                 <option value="">Primary Labor Type</option>
                 <option value="skilled_trades">Skilled Trades</option>
@@ -500,14 +500,14 @@ export default function BusinessOwnerMarketing() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3 font-bold flex items-center justify-center gap-2"
-              data-testid="button-request-demo"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-base sm:text-lg py-2 sm:py-3 font-bold flex items-center justify-center gap-2"
+              data-testid="button-submit-demo"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-4 h-4 sm:w-5 sm:h-5" />
               {isSubmitting ? 'Submitting...' : 'Get Your Free Demo'}
             </Button>
 
-            <p className="text-center text-gray-400 text-sm">
+            <p className="text-center text-gray-400 text-xs sm:text-sm">
               We'll call within 24 hours. No pressure, no commitment.
             </p>
           </form>

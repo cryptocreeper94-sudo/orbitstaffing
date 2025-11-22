@@ -204,57 +204,65 @@ export default function WorkflowDemo({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+      data-testid="modal-backdrop"
+    >
+      <div 
+        className="bg-white rounded-lg w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold">How ORBIT Works</h2>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:p-6 py-4 flex justify-between items-center gap-4">
+          <h2 className="text-lg sm:text-2xl font-bold flex-1">How ORBIT Works</h2>
           <button
             onClick={onClose}
-            className="hover:bg-blue-800 p-2 rounded transition"
+            className="hover:bg-blue-800 p-2 rounded transition flex-shrink-0"
             data-testid="button-close-demo"
+            aria-label="Close demo"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Flow Toggle */}
-        <div className="bg-gray-100 p-4 flex gap-4 justify-center border-b">
+        <div className="bg-gray-100 p-3 sm:p-4 flex gap-2 sm:gap-4 justify-center border-b flex-wrap">
           <button
             onClick={() => handleFlowChange('employee')}
-            className={`px-6 py-2 rounded-lg font-medium transition ${
+            className={`px-3 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition ${
               flow === 'employee'
                 ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
             data-testid="button-flow-employee"
           >
-            👷 I'm a Worker
+            👷 Worker
           </button>
           <button
             onClick={() => handleFlowChange('owner')}
-            className={`px-6 py-2 rounded-lg font-medium transition ${
+            className={`px-3 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition ${
               flow === 'owner'
                 ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
             data-testid="button-flow-owner"
           >
-            🏢 I'm an Owner
+            🏢 Owner
           </button>
         </div>
 
         {/* Slide Content */}
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="text-6xl mb-6">{slide.icon}</div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-blue-600 mb-2">
+        <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 overflow-y-auto">
+          <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">{slide.icon}</div>
+          <div className="text-center max-w-sm sm:max-w-md">
+            <p className="text-xs sm:text-sm font-medium text-blue-600 mb-2">
               Step {slide.step} of {slides.length}
             </p>
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">{slide.title}</h3>
-            <p className="text-lg text-gray-700 mb-4 max-w-md">{slide.description}</p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 inline-block">
-              <p className="text-blue-900 font-semibold">{slide.highlight}</p>
+            <h3 className="text-xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{slide.title}</h3>
+            <p className="text-sm sm:text-lg text-gray-700 mb-3 sm:mb-4 leading-relaxed">{slide.description}</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 inline-block">
+              <p className="text-blue-900 font-semibold text-xs sm:text-sm">{slide.highlight}</p>
             </div>
           </div>
         </div>
@@ -268,30 +276,32 @@ export default function WorkflowDemo({
         </div>
 
         {/* Navigation */}
-        <div className="bg-gray-50 p-6 flex justify-between items-center gap-4">
+        <div className="bg-gray-50 p-3 sm:p-6 flex justify-between items-center gap-2 sm:gap-4 flex-wrap">
           <button
             onClick={handlePrev}
             disabled={currentSlide === 0}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
+            className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition ${
               currentSlide === 0
                 ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                 : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
             }`}
             data-testid="button-prev-slide"
           >
-            <ChevronLeft className="w-5 h-5" />
-            Previous
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Previous</span>
+            <span className="sm:hidden">Back</span>
           </button>
 
-          <div className="flex gap-2">
+          <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
             {slides.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
                 className={`w-2 h-2 rounded-full transition ${
-                  idx === currentSlide ? 'bg-blue-600 w-8' : 'bg-gray-300'
+                  idx === currentSlide ? 'bg-blue-600 w-6 sm:w-8' : 'bg-gray-300'
                 }`}
                 data-testid={`button-dot-${idx}`}
+                aria-label={`Go to slide ${idx + 1}`}
               />
             ))}
           </div>
@@ -299,15 +309,16 @@ export default function WorkflowDemo({
           <button
             onClick={handleNext}
             disabled={currentSlide === slides.length - 1}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
+            className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base transition ${
               currentSlide === slides.length - 1
                 ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
             data-testid="button-next-slide"
           >
-            Next
-            <ChevronRight className="w-5 h-5" />
+            <span className="hidden sm:inline">Next</span>
+            <span className="sm:hidden">Next</span>
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
