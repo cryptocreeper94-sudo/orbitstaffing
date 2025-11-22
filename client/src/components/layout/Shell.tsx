@@ -42,10 +42,10 @@ export function Sidebar() {
         {!collapsed && (
           <div className="flex flex-col">
             <div className="font-heading font-bold text-xl text-sidebar-primary tracking-wider">
-              NEXUS
+              ORBIT
             </div>
             <div className="text-[10px] text-sidebar-foreground/50 tracking-widest">
-              WORKFORCE OS
+              STAFFING OS
             </div>
           </div>
         )}

@@ -20,8 +20,8 @@ export default function Landing() {
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="font-heading font-bold text-xl tracking-wider">
-            NEXUS
-            <div className="text-[10px] text-muted-foreground tracking-widest">WORKFORCE OS</div>
+            ORBIT
+            <div className="text-[10px] text-muted-foreground tracking-widest">STAFFING OS</div>
           </div>
           <div className="flex gap-3">
             <Link href="/login">
@@ -123,7 +123,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold font-heading mb-4">Simple Pricing</h2>
-            <p className="text-muted-foreground text-lg">No hidden fees. No long contracts.</p>
+            <p className="text-muted-foreground text-lg">No hidden fees. No long contracts. Get started at orbitstaffing.io</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -190,7 +190,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t border-border/50 py-8 bg-card/50">
         <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted-foreground">
-          <p className="mb-2">© 2024 NEXUS. All rights reserved.</p>
+          <p className="mb-2">© 2024 ORBIT Staffing. All rights reserved.</p>
           <p>Powered by <span className="text-foreground font-bold">DarkWave Studios</span></p>
         </div>
       </footer>
