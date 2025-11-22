@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 5.0.0"
+  },
+  "build": {
+    "production": {
+      "node": "18.13.0",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "development": {
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m1"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccount": "google-play-service-account.json",
+        "track": "production"
+      }
+    }
+  }
+}
