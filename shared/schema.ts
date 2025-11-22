@@ -659,6 +659,12 @@ export const licenses = pgTable(
     supportEndDate: date("support_end_date"), // Warranty period end
     customizationIncluded: boolean("customization_included").default(true), // Can we customize for them?
 
+    // Multi-Agency Hub (Enterprise)
+    parentCompanyId: varchar("parent_company_id").references(() => companies.id), // For child agencies
+    isHub: boolean("is_hub").default(false), // This is a hub managing multiple agencies
+    hubName: varchar("hub_name", { length: 255 }), // Name for the consolidated view
+    managedAgencyCount: integer("managed_agency_count").default(0), // How many child agencies
+
     // Features
     whiteLabel: boolean("white_label").default(false),
     apiAccess: boolean("api_access").default(false),

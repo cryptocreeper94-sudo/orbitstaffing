@@ -24,6 +24,7 @@ import BillingSettings from "@/pages/BillingSettings";
 import FeatureRequests from "@/pages/FeatureRequests";
 import SmallBusinessPage from "@/pages/SmallBusinessPage";
 import LargeBusinessPage from "@/pages/LargeBusinessPage";
+import MultiAgencyHub from "@/pages/MultiAgencyHub";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -47,6 +48,7 @@ function Router() {
       <Route path="/feature-requests" component={FeatureRequests} />
       <Route path="/small-business" component={SmallBusinessPage} />
       <Route path="/large-business" component={LargeBusinessPage} />
+      <Route path="/hub" component={MultiAgencyHub} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />
