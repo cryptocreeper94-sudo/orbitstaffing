@@ -112,7 +112,7 @@ export function ValuePropositionModal() {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl border-border/50 bg-background">
+      <DialogContent className="max-w-4xl border-border/50 bg-background max-h-[90vh] overflow-y-auto">
         {!selected ? (
           <>
             <DialogHeader className="text-center">
