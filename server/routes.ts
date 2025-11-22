@@ -806,6 +806,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // INCIDENT REPORTING
+  // ========================
+  app.post("/api/incidents", async (req: Request, res: Response) => {
+    try {
+      const {
+        incidentType,
+        severity,
+        workerName,
+        workerEmail,
+        incidentDate,
+        incidentTime,
+        location,
+        description,
+        witnesses,
+        actionTaken,
+      } = req.body;
+
+      if (!incidentType || !description || !location) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Store incident in database (create incidents table if needed)
+      const incident = {
+        id: crypto.randomUUID(),
+        incidentType,
+        severity: severity || "medium",
+        workerName: workerName || null,
+        workerEmail: workerEmail || null,
+        incidentDate,
+        incidentTime,
+        location,
+        description,
+        witnesses: witnesses || null,
+        actionTaken: actionTaken || null,
+        createdAt: new Date(),
+        reportedAt: new Date(),
+      };
+
+      // TODO: Save to database when incidents table is created
+      console.log("Incident reported:", incident);
+
+      res.status(201).json({
+        success: true,
+        incident,
+        message: "Incident reported successfully. Management will review.",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to report incident" });
+    }
+  });
+
+  app.get("/api/incidents", async (req: Request, res: Response) => {
+    try {
+      // TODO: Fetch from database with filters and pagination
+      res.status(200).json({
+        incidents: [],
+        total: 0,
+        message: "No incidents reported yet",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch incidents" });
+    }
+  });
+
+  // ========================
+  // FEEDBACK & SUPPORT
+  // ========================
+  app.post("/api/feedback", async (req: Request, res: Response) => {
+    try {
+      const { message, type } = req.body;
+
+      if (!message || !message.trim()) {
+        return res.status(400).json({ error: "Feedback message required" });
+      }
+
+      const feedback = {
+        id: crypto.randomUUID(),
+        message: message.trim(),
+        type: type || "worker_feedback",
+        createdAt: new Date(),
+        status: "received",
+      };
+
+      // TODO: Save to database when feedback table is created
+      console.log("Feedback received:", feedback);
+
+      res.status(201).json({
+        success: true,
+        feedback,
+        message: "Thank you! Your feedback helps us improve.",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit feedback" });
+    }
+  });
+
+  // ========================
+  // PAYMENT METHODS
+  // ========================
+  app.post("/api/payment-method", async (req: Request, res: Response) => {
+    try {
+      const { method } = req.body;
+
+      const validMethods = ["stripe_card", "direct_deposit", "crypto", "check"];
+      if (!validMethods.includes(method)) {
+        return res.status(400).json({ error: "Invalid payment method" });
+      }
+
+      // TODO: Update worker payment method in database
+      console.log("Payment method updated:", method);
+
+      res.status(200).json({
+        success: true,
+        method,
+        message: `Payment method set to ${method}`,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update payment method" });
+    }
+  });
+
+  app.get("/api/payment-method", async (req: Request, res: Response) => {
+    try {
+      // TODO: Fetch current worker payment method
+      res.status(200).json({
+        method: "stripe_card",
+        available: ["stripe_card", "direct_deposit", "check"],
+        cryptoComingSoon: true,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch payment method" });
+    }
+  });
+
+  // ========================
   // HEALTH CHECK
   // ========================
   app.get("/api/health", (req: Request, res: Response) => {
