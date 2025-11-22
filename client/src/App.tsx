@@ -20,6 +20,7 @@ import AdminPanel from "@/pages/AdminPanel";
 import Configuration from "@/pages/Configuration";
 import EmployeeApp from "@/pages/EmployeeApp";
 import BusinessFinance from "@/pages/BusinessFinance";
+import BillingSettings from "@/pages/BillingSettings";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/recruiting" component={Recruiting} />
       <Route path="/employee-app" component={EmployeeApp} />
       <Route path="/finance" component={BusinessFinance} />
+      <Route path="/billing" component={BillingSettings} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

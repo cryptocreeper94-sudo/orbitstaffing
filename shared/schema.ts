@@ -65,6 +65,18 @@ export const companies = pgTable(
     state: varchar("state", { length: 2 }),
     zipCode: varchar("zip_code", { length: 10 }),
     ownerId: varchar("owner_id").references(() => users.id),
+
+    // Billing Model
+    billingModel: varchar("billing_model", { length: 50 }).default("fixed"), // "fixed" or "revenue_share"
+    billingTier: varchar("billing_tier", { length: 50 }).default("startup"), // "startup", "growth", "enterprise"
+    revenueSharePercentage: decimal("revenue_share_percentage", { precision: 5, scale: 2 }).default("2.00"), // 2% default
+    monthlyBillingAmount: decimal("monthly_billing_amount", { precision: 10, scale: 2 }), // for fixed plan
+    
+    // Billing Transitions
+    lastBillingModelChange: timestamp("last_billing_model_change"),
+    nextBillingModelChangeAvailable: timestamp("next_billing_model_change_available"),
+    billingModelChangeCount: integer("billing_model_change_count").default(0),
+
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   }
@@ -541,6 +553,44 @@ export const insertTimeOffRequestSchema = createInsertSchema(timeOffRequests).om
 
 export type InsertTimeOffRequest = z.infer<typeof insertTimeOffRequestSchema>;
 export type TimeOffRequest = typeof timeOffRequests.$inferSelect;
+
+// ========================
+// Billing History
+// ========================
+export const billingHistory = pgTable(
+  "billing_history",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+
+    // Change details
+    previousModel: varchar("previous_model", { length: 50 }),
+    newModel: varchar("new_model", { length: 50 }),
+    previousTier: varchar("previous_tier", { length: 50 }),
+    newTier: varchar("new_tier", { length: 50 }),
+    reason: varchar("reason", { length: 255 }),
+
+    // Cost tracking
+    changeFee: decimal("change_fee", { precision: 10, scale: 2 }), // null for free changes
+    effectiveDate: date("effective_date"),
+
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, approved, completed
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_billing_history_company_id").on(table.companyId),
+  })
+);
+
+export const insertBillingHistorySchema = createInsertSchema(billingHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertBillingHistory = z.infer<typeof insertBillingHistorySchema>;
+export type BillingHistory = typeof billingHistory.$inferSelect;
 
 // ========================
 // Feedback

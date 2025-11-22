@@ -445,6 +445,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // BILLING ROUTES
+  // ========================
+  app.post("/api/billing/change-model", async (req: Request, res: Response) => {
+    try {
+      const { companyId, newModel, newTier, revenueSharePercentage } = req.body;
+
+      if (!companyId || !newModel) {
+        return res.status(400).json({ error: "companyId and newModel required" });
+      }
+
+      const result = await storage.changeBillingModel(
+        companyId,
+        newModel,
+        newTier,
+        revenueSharePercentage
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to change billing model" });
+    }
+  });
+
+  app.get("/api/billing/history", async (req: Request, res: Response) => {
+    try {
+      const companyId = req.query.companyId as string;
+      if (!companyId) {
+        return res.status(400).json({ error: "Company ID required" });
+      }
+
+      const history = await storage.getBillingHistory(companyId);
+      res.status(200).json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch billing history" });
+    }
+  });
+
+  // ========================
   // HEALTH CHECK
   // ========================
   app.get("/api/health", (req: Request, res: Response) => {

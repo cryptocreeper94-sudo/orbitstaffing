@@ -14,6 +14,7 @@ import {
   timeOffRequests,
   stateCompliance,
   userFeedback,
+  billingHistory,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -40,6 +41,8 @@ import {
   type StateCompliance,
   type InsertUserFeedback,
   type UserFeedback,
+  type InsertBillingHistory,
+  type BillingHistory,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -117,6 +120,15 @@ export interface IStorage {
 
   // Feedback
   createFeedback(feedback: InsertUserFeedback): Promise<UserFeedback>;
+
+  // Billing
+  changeBillingModel(
+    companyId: string,
+    newModel: "fixed" | "revenue_share",
+    newTier?: string,
+    revenueSharePercentage?: number
+  ): Promise<{ success: boolean; fee?: number; nextFreeChange?: Date }>;
+  getBillingHistory(companyId: string): Promise<BillingHistory[]>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -399,6 +411,80 @@ export class DrizzleStorage implements IStorage {
   async createFeedback(feedback: InsertUserFeedback): Promise<UserFeedback> {
     const result = await db.insert(userFeedback).values(feedback).returning();
     return result[0];
+  }
+
+  // Billing
+  async changeBillingModel(
+    companyId: string,
+    newModel: "fixed" | "revenue_share",
+    newTier: string = "startup",
+    revenueSharePercentage: number = 2.0
+  ): Promise<{ success: boolean; fee?: number; nextFreeChange?: Date }> {
+    const company = await this.getCompany(companyId);
+    if (!company) {
+      throw new Error("Company not found");
+    }
+
+    const now = new Date();
+    const lastChange = company.lastBillingModelChange ? new Date(company.lastBillingModelChange) : null;
+    const nextFreeChange = company.nextBillingModelChangeAvailable ? new Date(company.nextBillingModelChangeAvailable) : null;
+
+    // Check if free change is available
+    let fee = 0;
+    let nextFreeChangeDate = null;
+
+    if (lastChange && nextFreeChange && now < nextFreeChange) {
+      // Not the first change and free change not available
+      fee = 299; // $299 for extra switches
+    } else {
+      // Free change, set next free change 6 months from now
+      nextFreeChangeDate = new Date(now);
+      nextFreeChangeDate.setMonth(nextFreeChangeDate.getMonth() + 6);
+    }
+
+    // Record the billing history
+    await db.insert(billingHistory).values({
+      companyId,
+      previousModel: company.billingModel as any,
+      newModel: newModel as any,
+      previousTier: company.billingTier,
+      newTier: newTier as any,
+      changeFee: fee > 0 ? fee.toString() as any : null,
+      effectiveDate: new Date(),
+      status: "completed" as any,
+    });
+
+    // Update company billing settings
+    const monthlyAmount = newModel === "fixed" ? this.getMonthlyAmount(newTier) : null;
+
+    await db.update(companies).set({
+      billingModel: newModel,
+      billingTier: newTier,
+      revenueSharePercentage: newModel === "revenue_share" ? revenueSharePercentage.toString() as any : null,
+      monthlyBillingAmount: monthlyAmount ? monthlyAmount.toString() as any : null,
+      lastBillingModelChange: now,
+      nextBillingModelChangeAvailable: nextFreeChangeDate,
+      billingModelChangeCount: company.billingModelChangeCount ? company.billingModelChangeCount + 1 : 1,
+    }).where(eq(companies.id, companyId));
+
+    return {
+      success: true,
+      fee: fee > 0 ? fee : undefined,
+      nextFreeChange: nextFreeChangeDate || undefined,
+    };
+  }
+
+  async getBillingHistory(companyId: string): Promise<BillingHistory[]> {
+    return db.select().from(billingHistory).where(eq(billingHistory.companyId, companyId)).orderBy(desc(billingHistory.createdAt));
+  }
+
+  private getMonthlyAmount(tier: string): number {
+    const amounts: Record<string, number> = {
+      startup: 199,
+      growth: 599,
+      enterprise: 2000,
+    };
+    return amounts[tier] || 199;
   }
 }
 
