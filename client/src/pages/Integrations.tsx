@@ -30,38 +30,94 @@ interface Integration {
 }
 
 const AVAILABLE_INTEGRATIONS = [
-  {
-    type: "quickbooks",
-    name: "QuickBooks Online",
-    description: "Sync clients, invoices, payments, and billing data",
-    icon: "💼",
-    category: "accounting",
-  },
+  // Payroll Systems
   {
     type: "adp",
     name: "ADP Workforce Now",
-    description: "Sync employees, pay rates, payroll, and hours",
+    description: "Enterprise payroll, HR, compliance automation",
     icon: "👥",
     category: "payroll",
   },
   {
-    type: "ukgpro",
-    name: "UKG Pro (Kronos)",
-    description: "Sync schedules, availability, and timesheet data",
-    icon: "📅",
-    category: "scheduling",
+    type: "paychex",
+    name: "Paychex Flex",
+    description: "Small-to-mid business payroll with tax automation",
+    icon: "💼",
+    category: "payroll",
+  },
+  {
+    type: "gusto",
+    name: "Gusto",
+    description: "Simple payroll, benefits, and HR for small businesses",
+    icon: "⚡",
+    category: "payroll",
+  },
+  {
+    type: "rippling",
+    name: "Rippling",
+    description: "All-in-one HR, payroll, IT, and benefits platform",
+    icon: "🔗",
+    category: "payroll",
+  },
+  {
+    type: "workday",
+    name: "Workday",
+    description: "Enterprise payroll and HCM with AI-powered analytics",
+    icon: "🌐",
+    category: "payroll",
   },
   {
     type: "paylocity",
     name: "Paylocity",
-    description: "Sync payroll, HR, benefits, and employee data",
+    description: "HCM platform with payroll, benefits, and analytics",
     icon: "💰",
     category: "payroll",
   },
   {
+    type: "quickbooks",
+    name: "QuickBooks Payroll",
+    description: "Accounting + payroll integration for small businesses",
+    icon: "📊",
+    category: "accounting",
+  },
+  {
+    type: "onpay",
+    name: "OnPay",
+    description: "Affordable payroll with tax filing and contractor payments",
+    icon: "✅",
+    category: "payroll",
+  },
+
+  // Staffing-Specific
+  {
+    type: "bullhorn",
+    name: "Bullhorn",
+    description: "All-in-one staffing platform (ATS, CRM, payroll)",
+    icon: "🎯",
+    category: "staffing",
+  },
+  {
+    type: "wurknow",
+    name: "WurkNow",
+    description: "Staffing payroll built for high-volume temp workers",
+    icon: "⏱️",
+    category: "staffing",
+  },
+
+  // Scheduling & Time Tracking
+  {
+    type: "ukgpro",
+    name: "UKG Pro (Kronos)",
+    description: "Workforce scheduling, availability, and timesheet data",
+    icon: "📅",
+    category: "scheduling",
+  },
+
+  // HR & Benefits
+  {
     type: "bamboohr",
     name: "BambooHR",
-    description: "Sync employee records, documents, and leave tracking",
+    description: "HR management, employee records, and leave tracking",
     icon: "🌳",
     category: "hr",
   },
@@ -214,49 +270,158 @@ export default function Integrations() {
         </div>
       </div>
 
+      {/* Top Payroll Systems */}
+      <div className="mt-8 space-y-4">
+        <h2 className="text-xl font-bold font-heading">Top Payroll Systems We Support</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          ORBIT integrates with the top 5 payroll systems (95% market coverage) so you can consolidate your entire staffing operation
+        </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">👥</span> ADP Workforce Now
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">#1 Market Leader</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Employees & pay rates</div>
+              <div>✓ Payroll runs & tax info</div>
+              <div>✓ Timesheets & compliance</div>
+              <div className="text-xs text-primary font-semibold mt-2">Enterprise-grade</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">💼</span> Paychex Flex
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">#2 Market Leader</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Payroll & tax automation</div>
+              <div>✓ Employee data & rates</div>
+              <div>✓ Multi-state compliance</div>
+              <div className="text-xs text-primary font-semibold mt-2">Small-to-mid agencies</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">⚡</span> Gusto
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">Most Popular for Small Business</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Payroll & benefits</div>
+              <div>✓ Employee self-service</div>
+              <div>✓ Contractors & temps</div>
+              <div className="text-xs text-primary font-semibold mt-2">Simple & affordable</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">🔗</span> Rippling
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">Modern All-in-One</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ HR + Payroll + IT</div>
+              <div>✓ Benefits & compliance</div>
+              <div>✓ Unified platform</div>
+              <div className="text-xs text-primary font-semibold mt-2">Tech-forward companies</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">🌐</span> Workday
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">Enterprise Solution</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Advanced analytics</div>
+              <div>✓ AI-powered compliance</div>
+              <div>✓ Global payroll</div>
+              <div className="text-xs text-primary font-semibold mt-2">Large enterprises</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">💰</span> Paylocity
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">HCM Platform</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Payroll & HR</div>
+              <div>✓ Benefits & compliance</div>
+              <div>✓ Analytics dashboard</div>
+              <div className="text-xs text-primary font-semibold mt-2">Scaling agencies</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* What Gets Synced */}
       <div className="mt-8 space-y-4">
         <h2 className="text-xl font-bold font-heading">What Gets Synced</h2>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <span>💼</span> QuickBooks
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">📊</span> Accounting
               </CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
               <div>✓ Clients & customers</div>
               <div>✓ Invoices & payments</div>
-              <div>✓ Billing info</div>
-              <div>✓ Payment history</div>
+              <div>✓ Expenses & billing</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <span>👥</span> ADP Workforce
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">👥</span> Payroll
               </CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ Employee directory</div>
-              <div>✓ Pay rates & codes</div>
-              <div>✓ Payroll runs</div>
-              <div>✓ Tax info & history</div>
+              <div>✓ Employees & rates</div>
+              <div>✓ Pay runs & taxes</div>
+              <div>✓ Deductions & benefits</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <span>📅</span> UKG Pro
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">📅</span> Scheduling
               </CardTitle>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
               <div>✓ Master schedules</div>
-              <div>✓ Worker availability</div>
+              <div>✓ Availability & shifts</div>
               <div>✓ Time entries</div>
-              <div>✓ Shift patterns</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">🏢</span> HR & Compliance
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Employee records</div>
+              <div>✓ Tax withholdings</div>
+              <div>✓ Benefits & leave</div>
             </CardContent>
           </Card>
         </div>

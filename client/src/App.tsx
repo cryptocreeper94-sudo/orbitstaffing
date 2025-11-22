@@ -30,6 +30,7 @@ import NDAAcceptance from "@/pages/NDAAcceptance";
 import AIAssistant from "@/pages/AIAssistant";
 import WorkerAssignments from "@/pages/WorkerAssignments";
 import Integrations from "@/pages/Integrations";
+import WorkOrders from "@/pages/WorkOrders";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -59,6 +60,7 @@ function Router() {
       <Route path="/ai" component={AIAssistant} />
       <Route path="/my-assignments" component={WorkerAssignments} />
       <Route path="/integrations" component={Integrations} />
+      <Route path="/work-orders" component={WorkOrders} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

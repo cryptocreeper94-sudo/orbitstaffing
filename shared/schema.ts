@@ -554,6 +554,108 @@ export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
 export type SyncLog = typeof syncLogs.$inferSelect;
 
 // ========================
+// Work Orders (Customer-facing job specifications)
+// ========================
+export const workOrders = pgTable(
+  "work_orders",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").references(() => companies.id),
+    clientId: varchar("client_id").references(() => clients.id),
+
+    // Header
+    referenceNumber: varchar("reference_number", { length: 100 }).unique(), // WO-2024-11-001
+    clientContactName: varchar("client_contact_name", { length: 255 }),
+    clientContactPhone: varchar("client_contact_phone", { length: 20 }),
+    clientLocation: varchar("client_location", { length: 255 }),
+
+    // Job Details
+    positionTitle: varchar("position_title", { length: 255 }).notNull(),
+    jobCategory: varchar("job_category", { length: 100 }), // skilled_trades, hospitality, general, admin, healthcare, manufacturing, custom
+    jobDescription: text("job_description"),
+    skillsRequired: text("skills_required"), // JSON array
+    industryRequirements: text("industry_requirements"), // JSON array
+    certificationsNeeded: text("certifications_needed"), // JSON array
+
+    // Assignment Dates & Schedule
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date"), // nullable for ongoing
+    durationType: varchar("duration_type", { length: 50 }), // one_time, temporary, long_term, ongoing
+    dailyHours: integer("daily_hours"),
+    daysPerWeek: integer("days_per_week"),
+    schedulePattern: varchar("schedule_pattern", { length: 255 }), // "Monday-Friday", "Rotating", etc.
+
+    // Location
+    jobSiteAddress: varchar("job_site_address", { length: 255 }),
+    jobSiteLatitude: decimal("job_site_latitude", { precision: 9, scale: 6 }),
+    jobSiteLongitude: decimal("job_site_longitude", { precision: 9, scale: 6 }),
+    jobSiteContactName: varchar("job_site_contact_name", { length: 255 }),
+    jobSiteContactPhone: varchar("job_site_contact_phone", { length: 20 }),
+    accessInstructions: text("access_instructions"),
+
+    // Pay & Terms
+    hourlyRate: decimal("hourly_rate", { precision: 8, scale: 2 }),
+    paymentFrequency: varchar("payment_frequency", { length: 50 }), // weekly, biweekly, monthly
+    overtimePolicy: varchar("overtime_policy", { length: 255 }), // "after 40h/week", "after 8h/day"
+    shiftDifferentials: text("shift_differentials"), // JSON for night/weekend premium
+
+    // Staffing Request
+    workersNeeded: integer("workers_needed"),
+    canFillPartial: boolean("can_fill_partial").default(true),
+    backupAvailabilityNeeded: boolean("backup_availability_needed").default(false),
+
+    // Special Requirements
+    safetyRequirements: text("safety_requirements"), // JSON array
+    equipmentProvided: text("equipment_provided"), // JSON array
+    uniformsRequired: varchar("uniforms_required", { length: 255 }),
+    ppeProvided: varchar("ppe_provided", { length: 255 }),
+
+    // Sourcing Strategy
+    sourcingStrategy: text("sourcing_strategy"), // JSON: ["orbit_pool", "indeed", "linkedin"]
+
+    // Terms & Conditions
+    replacementHours: integer("replacement_hours"), // hours to replace no-show
+    cancellationNotice: integer("cancellation_notice"), // days notice required
+    gpsVerificationRequired: boolean("gps_verification_required").default(false),
+
+    // Invoice Details
+    invoiceFrequency: varchar("invoice_frequency", { length: 50 }), // weekly, biweekly, upon_completion
+    paymentTerms: integer("payment_terms"), // days (e.g., 30 for Net 30)
+    poNumberRequired: boolean("po_number_required").default(false),
+    costCenter: varchar("cost_center", { length: 100 }),
+
+    // Status
+    status: varchar("status", { length: 50 }).default("draft"), // draft, submitted, under_review, approved, active, completed, cancelled
+
+    // Metadata
+    submittedAt: timestamp("submitted_at"),
+    approvedAt: timestamp("approved_at"),
+    completedAt: timestamp("completed_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_work_orders_company_id").on(table.companyId),
+    clientIdx: index("idx_work_orders_client_id").on(table.clientId),
+    statusIdx: index("idx_work_orders_status").on(table.status),
+    startDateIdx: index("idx_work_orders_start_date").on(table.startDate),
+  })
+);
+
+export const insertWorkOrderSchema = createInsertSchema(workOrders).omit({
+  id: true,
+  referenceNumber: true,
+  submittedAt: true,
+  approvedAt: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkOrder = z.infer<typeof insertWorkOrderSchema>;
+export type WorkOrder = typeof workOrders.$inferSelect;
+
+// ========================
 // Timesheets (GPS Clock-in/out)
 // ========================
 export const timesheets = pgTable(

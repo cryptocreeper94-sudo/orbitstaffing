@@ -80,6 +80,64 @@ Worker {
 
 ### **Phase 1: Immediate (Most Common)**
 
+This includes the top payroll systems that most staffing agencies use, plus scheduling and HR platforms.
+
+#### **ADP Workforce Now** (Priority #1)
+- **What:** #1 payroll system in the market
+- **Market:** Medium to enterprise-level companies
+- **Sync:** Employees, pay rates, payroll runs, tax info, timesheets
+- **Method:** API + OAuth
+- **Why:** Dominant market leader, deepest compliance expertise
+
+#### **Paychex Flex** (Priority #2)
+- **What:** Second-largest payroll provider
+- **Market:** Small-to-mid-size businesses
+- **Sync:** Employees, pay rates, tax calculations, payment info
+- **Method:** API
+- **Why:** #2 market leader, strong with small agencies
+
+#### **Gusto** (Priority #2)
+- **What:** Most popular payroll for small businesses
+- **Market:** Startups and small agencies
+- **Sync:** Employees, pay rates, benefits, tax documents
+- **Method:** API + OAuth
+- **Why:** Simple, affordable, built for temp/contractor workers
+
+#### **Rippling** (Priority #3)
+- **What:** Modern unified HR + payroll platform
+- **Market:** Tech-forward companies of all sizes
+- **Sync:** Employees, payroll, benefits, IT provisioning
+- **Method:** API
+- **Why:** Growing fast, integrates HR and payroll seamlessly
+
+#### **Workday** (Priority #3)
+- **What:** Enterprise HCM with advanced payroll
+- **Market:** Large enterprises (250+ employees)
+- **Sync:** Employees, payroll runs, benefits, analytics
+- **Method:** API
+- **Why:** Enterprise-grade, AI-powered compliance
+
+#### **Paylocity** (Priority #3)
+- **What:** Mid-to-large HCM platform
+- **Market:** Mid-size to enterprise companies
+- **Sync:** Payroll, HR, benefits, analytics, compliance
+- **Method:** API
+- **Why:** Strong market position, good for scaling agencies
+
+#### **QuickBooks Payroll** (Priority #2)
+- **What:** Accounting + payroll integration
+- **Market:** Small-to-mid businesses with QuickBooks
+- **Sync:** Clients, invoices, payroll, payments
+- **Method:** API
+- **Why:** Direct integration with accounting = automatic invoicing
+
+#### **OnPay** (Priority #4)
+- **What:** Budget-friendly payroll solution
+- **Market:** Very small businesses, freelancers
+- **Sync:** Employees, contractors, tax documents
+- **Method:** API
+- **Why:** Affordable alternative for cost-conscious agencies
+
 #### **QuickBooks Online**
 - **What:** Accounting & invoicing system
 - **Sync:** Clients, invoices, payments, expenses
@@ -139,12 +197,15 @@ Worker {
 
 ### **Phase 2: Extended (Q1 2026)**
 
-- Gusto (payroll)
-- OnPay (payroll)
-- Namely (HR)
+- Bullhorn (staffing-specific ATS + payroll)
+- WurkNow (staffing payroll for high-volume temp workers)
+- Everee (instant/same-day pay for staffing)
+- Avionté (comprehensive staffing suite)
+- Paycom (AI-driven self-service payroll)
+- Namely (HR + payroll)
 - Slack (notifications)
 - Stripe (payments)
-- Sagemaker (invoicing)
+- SageMaker (invoicing)
 
 ---
 
