@@ -550,7 +550,7 @@ export default function EmployeePreApplication() {
 
             {/* Buttons */}
             <div className="flex gap-2 pt-4 border-t border-slate-600">
-              {step !== 'info' && step !== 'success' && (
+              {step !== 'info' && (
                 <Button
                   onClick={handleBack}
                   variant="outline"

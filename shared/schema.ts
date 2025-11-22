@@ -519,6 +519,130 @@ export type InsertEmployeePreApplication = z.infer<typeof insertEmployeePreAppli
 export type EmployeePreApplication = typeof employeePreApplications.$inferSelect;
 
 // ========================
+// Background Checks
+// ========================
+export const backgroundChecks = pgTable(
+  "background_checks",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Application Reference
+    preApplicationId: varchar("pre_application_id").references(() => employeePreApplications.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    
+    // Check Type & Request
+    checkType: varchar("check_type", { length: 50 }).notNull(), // minimal, full
+    requestedBy: varchar("requested_by").references(() => users.id),
+    requestedAt: timestamp("requested_at").default(sql`NOW()`),
+    
+    // Results
+    status: varchar("status", { length: 50 }).default("pending"), // pending, in_progress, completed, flagged
+    completedAt: timestamp("completed_at"),
+    
+    // Findings
+    clearanceStatus: varchar("clearance_status", { length: 50 }).default("pending"), // clear, flagged, denied
+    flaggedIssues: jsonb("flagged_issues"), // Array of issues found
+    summary: text("summary"),
+    
+    // Criminal Records
+    hasCriminalRecord: boolean("has_criminal_record").default(false),
+    criminalDetails: text("criminal_details"),
+    
+    // Employment Verification
+    employmentVerified: boolean("employment_verified").default(false),
+    
+    // Audit
+    reportUrl: varchar("report_url", { length: 500 }),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    preAppIdx: index("idx_bg_check_pre_app_id").on(table.preApplicationId),
+    workerIdx: index("idx_bg_check_worker_id").on(table.workerId),
+    statusIdx: index("idx_bg_check_status").on(table.status),
+  })
+);
+
+export const insertBackgroundCheckSchema = createInsertSchema(backgroundChecks).omit({
+  id: true,
+  requestedAt: true,
+  completedAt: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertBackgroundCheck = z.infer<typeof insertBackgroundCheckSchema>;
+export type BackgroundCheck = typeof backgroundChecks.$inferSelect;
+
+// ========================
+// Drug Tests
+// ========================
+export const drugTests = pgTable(
+  "drug_tests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Application Reference
+    preApplicationId: varchar("pre_application_id").references(() => employeePreApplications.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    clientId: varchar("client_id").references(() => clients.id),
+    
+    // Test Request
+    testType: varchar("test_type", { length: 50 }).notNull(), // 5_panel, 10_panel, 14_panel, hair_sample
+    requestedBy: varchar("requested_by").references(() => users.id),
+    requestedAt: timestamp("requested_at").default(sql`NOW()`),
+    reason: varchar("reason", { length: 100 }), // pre_employment, random, post_incident, workman_comp
+    
+    // Test Scheduling & Location
+    testingFacility: varchar("testing_facility", { length: 255 }),
+    scheduledDate: timestamp("scheduled_date"),
+    completedAt: timestamp("completed_at"),
+    
+    // GPS Tracking (Similar to Check-in)
+    testLocationLatitude: decimal("test_location_latitude", { precision: 9, scale: 6 }),
+    testLocationLongitude: decimal("test_location_longitude", { precision: 9, scale: 6 }),
+    verifiedAtFacility: boolean("verified_at_facility").default(false),
+    
+    // Results
+    status: varchar("status", { length: 50 }).default("pending"), // pending, scheduled, completed, passed, failed
+    result: varchar("result", { length: 50 }), // passed, failed, inconclusive
+    
+    // Detailed Results
+    substancesDetected: jsonb("substances_detected"), // Array of substances
+    summary: text("summary"),
+    
+    // Compliance
+    resultsCertified: boolean("results_certified").default(false),
+    certifiedBy: varchar("certified_by").references(() => users.id),
+    reportUrl: varchar("report_url", { length: 500 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    preAppIdx: index("idx_drug_test_pre_app_id").on(table.preApplicationId),
+    workerIdx: index("idx_drug_test_worker_id").on(table.workerId),
+    clientIdx: index("idx_drug_test_client_id").on(table.clientId),
+    statusIdx: index("idx_drug_test_status").on(table.status),
+  })
+);
+
+export const insertDrugTestSchema = createInsertSchema(drugTests).omit({
+  id: true,
+  requestedAt: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDrugTest = z.infer<typeof insertDrugTestSchema>;
+export type DrugTest = typeof drugTests.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
