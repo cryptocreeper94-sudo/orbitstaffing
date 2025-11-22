@@ -168,56 +168,97 @@ export default function Landing() {
       <section className="py-12">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold font-heading mb-2">Simple Pricing</h2>
-            <p className="text-muted-foreground text-sm">No hidden fees. No long contracts. Get started at orbitstaffing.net</p>
+            <h2 className="text-3xl font-bold font-heading mb-2">Flexible Pricing for Every Staffing Model</h2>
+            <p className="text-muted-foreground text-sm">Pay only for what you use. Fixed monthly, revenue-share, or white-label franchise options available.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <PricingCard 
-              tier="Startup"
-              price="$99"
+              tier="Solo/Micro"
+              price="$199"
               period="/month"
-              desc="Perfect for small agencies"
-              workers="Up to 50 workers"
+              desc="Just starting out"
+              workers="1-25 workers"
               features={[
                 "Job posting & matching",
-                "Basic payroll (via CSV export)",
-                "5 active clients",
+                "Mobile time tracking",
+                "1-2 active clients",
+                "Basic payroll export",
                 "Email support"
               ]}
-              cta="Get Started"
+              cta="Get Started Free"
             />
             <PricingCard 
-              tier="Growth"
-              price="$299"
+              tier="Small Agency"
+              price="$499"
               period="/month"
-              desc="For scaling teams"
-              workers="Up to 500 workers"
+              desc="Like Superior Staffing"
+              workers="25-150 workers"
               features={[
-                "Everything in Startup",
-                "Automated payroll integration",
+                "Everything in Solo",
                 "Unlimited clients",
-                "Gov job compliance",
-                "Priority support"
+                "Full payroll automation",
+                "GPS verification",
+                "Compliance reports",
+                "Priority email support"
               ]}
               cta="Start Free Trial"
               featured
             />
             <PricingCard 
+              tier="Growth Agency"
+              price="$999"
+              period="/month"
+              desc="Multi-location scaling"
+              workers="150-500 workers"
+              features={[
+                "Everything in Small",
+                "Multi-location management",
+                "Advanced analytics",
+                "Custom integrations",
+                "Dedicated support",
+                "API access"
+              ]}
+              cta="Schedule Demo"
+            />
+            <PricingCard 
               tier="Enterprise"
               price="Custom"
               period="pricing"
-              desc="For large operations"
-              workers="1000+ workers"
+              desc="White-label & franchises"
+              workers="500+ workers"
               features={[
                 "Everything in Growth",
-                "Custom integrations",
-                "White-label options",
-                "Dedicated account manager",
+                "White-label platform",
+                "Custom branding",
+                "Multi-tenant support",
+                "Account manager",
                 "24/7 phone support"
               ]}
               cta="Contact Sales"
             />
+          </div>
+
+          {/* Pricing Info */}
+          <div className="grid md:grid-cols-2 gap-6 mt-12">
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="pt-6">
+                <h3 className="font-bold text-lg mb-3">💰 Fixed Monthly</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Predictable monthly fee based on worker volume. Best for established agencies with stable staffing.
+                </p>
+                <p className="text-xs text-primary font-medium">No per-placement fees. No variable costs.</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="pt-6">
+                <h3 className="font-bold text-lg mb-3">📈 Revenue Share</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Pay 3-6% of total placements. Perfect for franchises and scaling. You only pay when you earn.
+                </p>
+                <p className="text-xs text-primary font-medium">Scale without upfront costs. Aligned incentives.</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
