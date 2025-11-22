@@ -41,6 +41,7 @@ import EmployeeNewsPortal from "@/pages/EmployeeNewsPortal";
 import StaffingPartnerHub from "@/pages/StaffingPartnerHub";
 import PartnerVerification from "@/pages/PartnerVerification";
 import PartnerAgencyDashboard from "@/pages/PartnerAgencyDashboard";
+import EmployeePreApplication from "@/pages/EmployeePreApplication";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -82,6 +83,7 @@ function Router() {
       <Route path="/partner-verify/:token" component={PartnerVerification} />
       <Route path="/partner-verify" component={PartnerVerification} />
       <Route path="/partner-agency" component={PartnerAgencyDashboard} />
+      <Route path="/pre-apply" component={EmployeePreApplication} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

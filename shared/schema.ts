@@ -435,6 +435,90 @@ export type InsertPartnerEmployee = z.infer<typeof insertPartnerEmployeeSchema>;
 export type PartnerEmployee = typeof partnerEmployees.$inferSelect;
 
 // ========================
+// Employee Pre-Applications (Intake Forms)
+// ========================
+export const employeePreApplications = pgTable(
+  "employee_pre_applications",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Company/Agency Reference
+    companyId: varchar("company_id").references(() => companies.id),
+    staffingPartnerId: varchar("staffing_partner_id").references(() => staffingPartners.id),
+    
+    // Personal Info
+    firstName: varchar("first_name", { length: 100 }).notNull(),
+    lastName: varchar("last_name", { length: 100 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 20 }).notNull(),
+    dateOfBirth: date("date_of_birth"),
+    
+    // Address
+    addressLine1: varchar("address_line1", { length: 255 }),
+    addressLine2: varchar("address_line2", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    
+    // Work Info
+    skills: jsonb("skills"), // Array of skills
+    desiredRoles: jsonb("desired_roles"), // Array of job types
+    availabilityStatus: varchar("availability_status", { length: 50 }).default("available"), // available, limited, unavailable
+    hourlyRateExpectation: decimal("hourly_rate_expectation", { precision: 8, scale: 2 }),
+    experienceYears: integer("experience_years"),
+    
+    // Tax & Legal
+    ssn: varchar("ssn", { length: 11 }), // Encrypted in production
+    i9Status: varchar("i9_status", { length: 50 }).default("not_started"), // not_started, pending, verified, expired
+    backgroundCheckConsent: boolean("background_check_consent").default(false),
+    backgroundCheckStatus: varchar("background_check_status", { length: 50 }).default("pending"),
+    
+    // Payment Info
+    bankAccountHolderName: varchar("bank_account_holder_name", { length: 255 }),
+    bankRoutingNumber: varchar("bank_routing_number", { length: 9 }),
+    bankAccountNumber: varchar("bank_account_number", { length: 17 }),
+    bankAccountType: varchar("bank_account_type", { length: 20 }), // checking, savings
+    
+    // Emergency Contact
+    emergencyContactName: varchar("emergency_contact_name", { length: 255 }),
+    emergencyContactPhone: varchar("emergency_contact_phone", { length: 20 }),
+    emergencyContactRelation: varchar("emergency_contact_relation", { length: 50 }),
+    
+    // Status & Tracking
+    status: varchar("status", { length: 50 }).default("pending"), // pending, reviewing, approved, rejected
+    submittedAt: timestamp("submitted_at").default(sql`NOW()`),
+    reviewedAt: timestamp("reviewed_at"),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    notes: text("notes"),
+    
+    // Conversion
+    convertedToWorkerId: varchar("converted_to_worker_id").references(() => workers.id),
+    convertedAt: timestamp("converted_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_pre_app_company_id").on(table.companyId),
+    emailIdx: index("idx_pre_app_email").on(table.email),
+    statusIdx: index("idx_pre_app_status").on(table.status),
+    partnerIdx: index("idx_pre_app_partner_id").on(table.staffingPartnerId),
+  })
+);
+
+export const insertEmployeePreApplicationSchema = createInsertSchema(employeePreApplications).omit({
+  id: true,
+  submittedAt: true,
+  createdAt: true,
+  updatedAt: true,
+  reviewedAt: true,
+  convertedAt: true,
+});
+
+export type InsertEmployeePreApplication = z.infer<typeof insertEmployeePreApplicationSchema>;
+export type EmployeePreApplication = typeof employeePreApplications.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
