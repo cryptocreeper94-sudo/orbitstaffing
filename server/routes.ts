@@ -23,6 +23,7 @@ import {
   insertWorkerDNRSchema,
   insertPaymentMethodSchema,
   insertCollectionSchema,
+  insertOrbitAssetSchema,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -1259,6 +1260,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json({ success: true, message: "Services restored", companyId });
     } catch (error) {
       res.status(500).json({ error: "Failed to restore services" });
+    }
+  });
+
+  // ========================
+  // ORBIT HALLMARK ASSET REGISTRY
+  // ========================
+  
+  // Register a new ORBIT asset (hallmark, watermark, button, etc.)
+  app.post("/api/assets/register", async (req: Request, res: Response) => {
+    try {
+      const assetData = req.body;
+
+      const parsed = insertOrbitAssetSchema.safeParse(assetData);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid asset data", details: parsed.error });
+      }
+
+      const asset = await storage.registerAsset(parsed.data);
+      res.status(201).json({
+        success: true,
+        message: "Asset registered",
+        assetNumber: asset.assetNumber,
+        asset,
+      });
+    } catch (error) {
+      console.error("Asset registration error:", error);
+      res.status(500).json({ error: "Failed to register asset" });
+    }
+  });
+
+  // Get a specific asset by asset number
+  app.get("/api/assets/:assetNumber", async (req: Request, res: Response) => {
+    try {
+      const { assetNumber } = req.params;
+      const asset = await storage.getAsset(assetNumber);
+
+      if (!asset) {
+        return res.status(404).json({ error: "Asset not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        asset,
+        verified: asset.status === "active",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch asset" });
+    }
+  });
+
+  // List all assets with optional filters
+  app.get("/api/assets", async (req: Request, res: Response) => {
+    try {
+      const { franchiseeId, customerId, status, type } = req.query;
+
+      const assets = await storage.listAssets({
+        franchiseeId: franchiseeId as string,
+        customerId: customerId as string,
+        status: status as string,
+        type: type as string,
+      });
+
+      res.status(200).json({
+        success: true,
+        count: assets.length,
+        assets,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch assets" });
+    }
+  });
+
+  // Get all assets (admin only)
+  app.get("/api/assets/admin/all", async (req: Request, res: Response) => {
+    try {
+      const assets = await storage.getAllAssets();
+      const stats = await storage.getAssetStats();
+
+      res.status(200).json({
+        success: true,
+        stats,
+        totalAssets: assets.length,
+        assets,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch assets" });
+    }
+  });
+
+  // Get asset registry statistics
+  app.get("/api/assets/stats", async (req: Request, res: Response) => {
+    try {
+      const stats = await storage.getAssetStats();
+      res.status(200).json({
+        success: true,
+        stats,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch asset statistics" });
+    }
+  });
+
+  // Verify an asset (check if legitimate)
+  app.get("/api/assets/verify/:assetNumber", async (req: Request, res: Response) => {
+    try {
+      const { assetNumber } = req.params;
+      const asset = await storage.getAsset(assetNumber);
+
+      if (!asset) {
+        return res.status(404).json({
+          verified: false,
+          message: "Asset not found",
+        });
+      }
+
+      res.status(200).json({
+        verified: asset.status === "active",
+        assetNumber: asset.assetNumber,
+        type: asset.type,
+        createdAt: asset.createdAt,
+        status: asset.status,
+        message: asset.status === "active" ? "✓ Legitimate ORBIT asset" : `✗ Asset status: ${asset.status}`,
+      });
+    } catch (error) {
+      res.status(500).json({
+        verified: false,
+        message: "Verification failed",
+      });
+    }
+  });
+
+  // Revoke an asset (admin only)
+  app.post("/api/assets/:assetNumber/revoke", async (req: Request, res: Response) => {
+    try {
+      const { assetNumber } = req.params;
+      const { revokedBy, reason } = req.body;
+
+      if (!revokedBy) {
+        return res.status(400).json({ error: "Admin ID (revokedBy) required" });
+      }
+
+      const asset = await storage.revokeAsset(assetNumber, revokedBy, reason);
+
+      if (!asset) {
+        return res.status(404).json({ error: "Asset not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Asset revoked",
+        asset,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to revoke asset" });
     }
   });
 

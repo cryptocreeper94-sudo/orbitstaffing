@@ -2236,3 +2236,46 @@ export const insertWorkerDNRSchema = createInsertSchema(workerDNR).omit({
 
 export type InsertWorkerDNR = z.infer<typeof insertWorkerDNRSchema>;
 export type WorkerDNR = typeof workerDNR.$inferSelect;
+
+// ========================
+// ORBIT Hallmark Asset Registry
+// ========================
+export const orbitAssets = pgTable(
+  "orbit_assets",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    assetNumber: varchar("asset_number", { length: 50 }).notNull().unique(), // ORBIT-ASSET-XXXXXXXX-XXXXXX
+    
+    // Asset Type & Location
+    type: varchar("type", { length: 50 }).notNull(), // "powered_by_button", "hallmark_watermark", "landing_page", etc.
+    franchiseeId: varchar("franchisee_id").references(() => franchises.id),
+    customerId: varchar("customer_id").references(() => companies.id),
+    
+    // Metadata
+    metadata: jsonb("metadata"), // domain, location, customizations, etc.
+    
+    // Status & Lifecycle
+    status: varchar("status", { length: 50 }).default("active"), // "active", "archived", "revoked"
+    expiresAt: timestamp("expires_at"), // Optional expiration date
+    
+    // Tracking
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    revokedAt: timestamp("revoked_at"), // When/if asset was revoked
+    revokedBy: varchar("revoked_by").references(() => users.id), // Who revoked it
+  },
+  (table) => ({
+    assetNumberIdx: index("idx_assets_number").on(table.assetNumber),
+    franchiseeIdx: index("idx_assets_franchisee").on(table.franchiseeId),
+    customerIdx: index("idx_assets_customer").on(table.customerId),
+    statusIdx: index("idx_assets_status").on(table.status),
+  })
+);
+
+export const insertOrbitAssetSchema = createInsertSchema(orbitAssets).omit({
+  id: true,
+  createdAt: true,
+  revokedAt: true,
+});
+
+export type InsertOrbitAsset = z.infer<typeof insertOrbitAssetSchema>;
+export type OrbitAsset = typeof orbitAssets.$inferSelect;

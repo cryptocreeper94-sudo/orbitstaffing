@@ -22,6 +22,7 @@ import {
   workerDNR,
   paymentMethods,
   collections,
+  orbitAssets,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -64,6 +65,8 @@ import {
   type PaymentMethod,
   type InsertCollection,
   type Collection,
+  type InsertOrbitAsset,
+  type OrbitAsset,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -858,6 +861,71 @@ export class DrizzleStorage implements IStorage {
         suspendedAt: null,
       })
       .where(eq(companies.id, companyId));
+  }
+
+  // ORBIT Hallmark Asset Registry
+  async registerAsset(asset: InsertOrbitAsset): Promise<OrbitAsset> {
+    const result = await db.insert(orbitAssets).values(asset).returning();
+    return result[0];
+  }
+
+  async getAsset(assetNumber: string): Promise<OrbitAsset | undefined> {
+    const result = await db.select().from(orbitAssets).where(eq(orbitAssets.assetNumber, assetNumber));
+    return result[0];
+  }
+
+  async listAssets(filters?: { franchiseeId?: string; customerId?: string; status?: string; type?: string }): Promise<OrbitAsset[]> {
+    let query = db.select().from(orbitAssets);
+
+    if (filters?.franchiseeId) {
+      query = query.where(eq(orbitAssets.franchiseeId, filters.franchiseeId));
+    }
+    if (filters?.customerId) {
+      query = query.where(eq(orbitAssets.customerId, filters.customerId));
+    }
+    if (filters?.status) {
+      query = query.where(eq(orbitAssets.status, filters.status));
+    }
+    if (filters?.type) {
+      query = query.where(eq(orbitAssets.type, filters.type));
+    }
+
+    return query.orderBy(desc(orbitAssets.createdAt));
+  }
+
+  async getAllAssets(): Promise<OrbitAsset[]> {
+    return db.select().from(orbitAssets).orderBy(desc(orbitAssets.createdAt));
+  }
+
+  async updateAsset(assetNumber: string, data: Partial<InsertOrbitAsset>): Promise<OrbitAsset | undefined> {
+    const result = await db.update(orbitAssets).set(data).where(eq(orbitAssets.assetNumber, assetNumber)).returning();
+    return result[0];
+  }
+
+  async revokeAsset(assetNumber: string, revokedBy: string, reason?: string): Promise<OrbitAsset | undefined> {
+    const result = await db
+      .update(orbitAssets)
+      .set({
+        status: "revoked",
+        revokedAt: new Date(),
+        revokedBy,
+        metadata: { reason },
+      })
+      .where(eq(orbitAssets.assetNumber, assetNumber))
+      .returning();
+    return result[0];
+  }
+
+  async getAssetStats(): Promise<{ total: number; active: number; revoked: number; byType: Record<string, number> }> {
+    const assets = await db.select().from(orbitAssets);
+    const total = assets.length;
+    const active = assets.filter((a) => a.status === "active").length;
+    const revoked = assets.filter((a) => a.status === "revoked").length;
+    const byType: Record<string, number> = {};
+    assets.forEach((a) => {
+      byType[a.type] = (byType[a.type] || 0) + 1;
+    });
+    return { total, active, revoked, byType };
   }
 }
 

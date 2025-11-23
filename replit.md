@@ -72,6 +72,14 @@ The ORBIT Staffing OS is a **unified, multi-tenant white-label platform** where 
 - **Complete data isolation**: Multi-tenant security at database level
 - **Scalable**: From 1 franchise to 1000+ franchises, all on same infrastructure
 
+### ORBIT Hallmark Asset System
+- **Required Element**: Every franchisee deployment includes a "Powered by ORBIT" button with Saturn watermark
+- **Non-removable**: This is a hardcoded, required asset per franchise agreement
+- **Unique Hallmark Numbers**: Each asset receives a unique ORBIT-ASSET-XXXX-XXXX number
+- **Asset Registry**: All deployed assets tracked in a running database with timestamps, franchisee info, and metadata
+- **Lead Generation**: Franchisee customers can click the button to discover ORBIT
+- **Compliance**: Removal of the hallmark asset violates franchise agreement terms
+
 ### UI/UX Decisions
 
 -   **Aesthetic:** Dark industrial theme with an "aqua Saturn 3D watermark."
