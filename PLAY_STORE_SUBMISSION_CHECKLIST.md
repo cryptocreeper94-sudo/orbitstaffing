@@ -1,4 +1,4 @@
-# ORBIT - Google Play Store Submission Checklist
+# ORBIT Staffing - Google Play Store Submission Checklist
 **Status**: READY FOR SUBMISSION  
 **Date**: November 23, 2025  
 **Target**: Submit THIS WEEKEND  
@@ -15,7 +15,7 @@
 
 ### App Listing Creation
 - [ ] Click "Create new app"
-- [ ] App name: "ORBIT"
+- [ ] App name: "ORBIT Staffing"
 - [ ] Category: **Business**
 - [ ] Pick content rating questionnaire option
 
@@ -67,7 +67,7 @@
 
 ### App Configuration
 - [x] Package name: `com.darkwavestudios.orbitstaffing`
-- [x] App name: "ORBIT"
+- [x] App name: "ORBIT Staffing"
 - [x] Version: 1.0.0
 - [x] Version code: 1
 - [x] Min API: 21 (Android 5.0)

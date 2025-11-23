@@ -60,7 +60,7 @@ export default function LoginScreen({ navigation }: any) {
           {/* Logo Section */}
           <View style={styles.logoSection}>
             <Text style={styles.logo}>🪐</Text>
-            <Text style={styles.title}>ORBIT</Text>
+            <Text style={styles.title}>ORBIT Staffing</Text>
             <Text style={styles.subtitle}>Worker App</Text>
           </View>
 

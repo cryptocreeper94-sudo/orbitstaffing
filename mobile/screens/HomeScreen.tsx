@@ -32,7 +32,7 @@ export default function HomeScreen({ navigation }: any) {
             <Text style={styles.greeting}>
               Welcome, {user?.firstName || 'Worker'}
             </Text>
-            <Text style={styles.subtitle}>ORBIT</Text>
+            <Text style={styles.subtitle}>ORBIT Staffing</Text>
           </View>
           {sandboxMode === 'sandbox' && (
             <View style={styles.sandboxBadge}>
