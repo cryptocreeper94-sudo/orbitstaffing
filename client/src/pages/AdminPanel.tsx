@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -221,14 +221,32 @@ export default function AdminPanel() {
               {adminName}
             </p>
           </div>
-          <Button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-            data-testid="button-admin-logout"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setLocation('/')}
+              className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
+              data-testid="button-admin-to-dev"
+            >
+              <Code className="w-4 h-4" />
+              Developer
+            </Button>
+            <Button
+              onClick={() => setLocation('/dashboard')}
+              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+              data-testid="button-admin-to-app"
+            >
+              <Eye className="w-4 h-4" />
+              Main App
+            </Button>
+            <Button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              data-testid="button-admin-logout"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Role-Based Admin Views */}

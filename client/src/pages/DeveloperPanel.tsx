@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -39,15 +39,18 @@ export default function DeveloperPanel() {
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setPin('');
-    setError('');
+    setLocation('/');
+    localStorage.removeItem('developerAuthenticated');
   };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopied(id);
     setTimeout(() => setCopied(''), 2000);
+  };
+
+  const navigateTo = (path: string) => {
+    setLocation(path);
   };
 
   if (!isAuthenticated) {
@@ -114,14 +117,32 @@ export default function DeveloperPanel() {
             </h1>
             <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
           </div>
-          <Button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-            data-testid="button-developer-logout"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigateTo('/admin')}
+              className="bg-cyan-600 hover:bg-cyan-700 flex items-center gap-2"
+              data-testid="button-dev-to-admin"
+            >
+              <Shield className="w-4 h-4" />
+              Admin Panel
+            </Button>
+            <Button
+              onClick={() => navigateTo('/dashboard')}
+              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+              data-testid="button-dev-to-app"
+            >
+              <BarChart3 className="w-4 h-4" />
+              Main App
+            </Button>
+            <Button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              data-testid="button-developer-logout"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}

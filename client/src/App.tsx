@@ -52,28 +52,34 @@ import AdminLanding from "@/pages/AdminLanding";
 import OwnerPitch from "@/pages/OwnerPitch";
 import DigitalHallmark from "@/pages/DigitalHallmark";
 import DeveloperPanel from "@/pages/DeveloperPanel";
+import DeveloperLanding from "@/pages/DeveloperLanding";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
 function RootPage() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isDev, setIsDev] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const adminAuth = localStorage.getItem('adminAuthenticated') === 'true';
-    setIsAdmin(adminAuth);
+    const devAuth = localStorage.getItem('developerAuthenticated') === 'true';
+    setIsDev(devAuth);
     setLoading(false);
   }, []);
 
   if (loading) return null;
 
-  return isAdmin ? <AdminLanding /> : <Landing />;
+  // First check if developer/admin is authenticated
+  if (isDev) return <DeveloperLanding />;
+  
+  // Otherwise show landing page
+  return <Landing />;
 }
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={RootPage} />
+      <Route path="/dev-landing" component={DeveloperLanding} />
       <Route path="/home" component={Landing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/sales" component={Sales} />
@@ -120,7 +126,6 @@ function Router() {
       <Route path="/developer" component={DeveloperPanel} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
-      <Route path="/marketing" component={Marketing} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>
