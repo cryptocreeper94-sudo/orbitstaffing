@@ -2247,12 +2247,15 @@ export const orbitAssets = pgTable(
     assetNumber: varchar("asset_number", { length: 50 }).notNull().unique(), // ORBIT-ASSET-XXXXXXXX-XXXXXX
     
     // Asset Type & Location
-    type: varchar("type", { length: 50 }).notNull(), // "powered_by_button", "hallmark_watermark", "landing_page", etc.
+    type: varchar("type", { length: 50 }).notNull(), // "powered_by_button", "invoice", "paystub", "contract", "report", "deployment", "certification", "document", etc.
     franchiseeId: varchar("franchisee_id").references(() => franchises.id),
     customerId: varchar("customer_id").references(() => companies.id),
     
+    // Document/Output Reference
+    documentId: varchar("document_id", { length: 255 }), // ID of the actual document/output being stamped
+    
     // Metadata
-    metadata: jsonb("metadata"), // domain, location, customizations, etc.
+    metadata: jsonb("metadata"), // domain, location, documentType, amount, recipient, etc.
     
     // Status & Lifecycle
     status: varchar("status", { length: 50 }).default("active"), // "active", "archived", "revoked"
@@ -2268,6 +2271,7 @@ export const orbitAssets = pgTable(
     franchiseeIdx: index("idx_assets_franchisee").on(table.franchiseeId),
     customerIdx: index("idx_assets_customer").on(table.customerId),
     statusIdx: index("idx_assets_status").on(table.status),
+    documentIdx: index("idx_assets_document").on(table.documentId),
   })
 );
 

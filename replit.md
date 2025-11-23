@@ -75,10 +75,13 @@ The ORBIT Staffing OS is a **unified, multi-tenant white-label platform** where 
 ### ORBIT Hallmark Asset System
 - **Required Element**: Every franchisee deployment includes a "Powered by ORBIT" button with Saturn watermark
 - **Non-removable**: This is a hardcoded, required asset per franchise agreement
-- **Unique Hallmark Numbers**: Each asset receives a unique ORBIT-ASSET-XXXX-XXXX number
+- **Unique Hallmark Numbers**: Each asset receives a unique ORBIT-ASSET-XXXXXX-XXXXXX number
 - **Asset Registry**: All deployed assets tracked in a running database with timestamps, franchisee info, and metadata
 - **Lead Generation**: Franchisee customers can click the button to discover ORBIT
 - **Compliance**: Removal of the hallmark asset violates franchise agreement terms
+- **Asset Stamping**: Any tangible output (invoices, paystubs, contracts, reports, certifications, deployments) automatically gets stamped with hallmark + QR code
+- **Verification**: Every asset verifiable at `/verify/{assetNumber}` with proof of legitimacy
+- **Blockchain Ready**: Foundation for future tokenization - every asset is trackable, auditable, and verifiable
 
 ### UI/UX Decisions
 
