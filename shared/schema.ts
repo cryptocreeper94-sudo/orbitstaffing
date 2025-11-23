@@ -852,6 +852,155 @@ export type InsertResultDelivery = z.infer<typeof insertResultDeliverySchema>;
 export type ResultDelivery = typeof resultDeliveries.$inferSelect;
 
 // ========================
+// Drug Test Clinic Providers (Multi-Provider Network)
+// ========================
+export const clinicProviders = pgTable(
+  "clinic_providers",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Provider Info
+    providerName: varchar("provider_name", { length: 255 }).notNull(), // Concentra, Fast Pace, Busy Bee, etc.
+    providerType: varchar("provider_type", { length: 50 }).notNull(), // clinic, hospital, lab
+    website: varchar("website", { length: 500 }),
+    
+    // Facility Details
+    facilityName: varchar("facility_name", { length: 255 }),
+    addressLine1: varchar("address_line1", { length: 255 }),
+    addressLine2: varchar("address_line2", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    latitude: decimal("latitude", { precision: 9, scale: 6 }),
+    longitude: decimal("longitude", { precision: 9, scale: 6 }),
+    
+    // Contact
+    phone: varchar("phone", { length: 20 }),
+    email: varchar("email", { length: 255 }),
+    
+    // Hours
+    hoursMonday: varchar("hours_monday", { length: 100 }),
+    hoursTuesday: varchar("hours_tuesday", { length: 100 }),
+    hoursWednesday: varchar("hours_wednesday", { length: 100 }),
+    hoursThursday: varchar("hours_thursday", { length: 100 }),
+    hoursFriday: varchar("hours_friday", { length: 100 }),
+    hoursSaturday: varchar("hours_saturday", { length: 100 }),
+    hoursSunday: varchar("hours_sunday", { length: 100 }),
+    
+    // Services
+    servicesOffered: jsonb("services_offered"), // ['5-panel', '10-panel', '14-panel', 'hair-sample']
+    acceptsWalkIns: boolean("accepts_walk_ins").default(false),
+    
+    // Integration
+    hasApiIntegration: boolean("has_api_integration").default(false),
+    apiProvider: varchar("api_provider", { length: 50 }), // concentra, custom, manual
+    apiKey: varchar("api_key", { length: 255 }), // Encrypted
+    
+    isActive: boolean("is_active").default(true),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    zipIdx: index("idx_clinic_providers_zip_code").on(table.zipCode),
+    cityStateIdx: index("idx_clinic_providers_city_state").on(table.city),
+    activeIdx: index("idx_clinic_providers_active").on(table.isActive),
+  })
+);
+
+export const insertClinicProviderSchema = createInsertSchema(clinicProviders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertClinicProvider = z.infer<typeof insertClinicProviderSchema>;
+export type ClinicProvider = typeof clinicProviders.$inferSelect;
+
+// ========================
+// Incident Reports (Workman's Comp)
+// ========================
+export const incidentReports = pgTable(
+  "incident_reports",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Company & Employee
+    companyId: varchar("company_id").references(() => companies.id),
+    clientId: varchar("client_id").references(() => clients.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    
+    // Incident Details
+    incidentDate: timestamp("incident_date").notNull(),
+    incidentType: varchar("incident_type", { length: 100 }).notNull(), // injury, illness, near-miss
+    incidentLocation: varchar("incident_location", { length: 255 }),
+    incidentDescription: text("incident_description"),
+    
+    // Injury Details
+    injuryType: varchar("injury_type", { length: 100 }), // burn, cut, fracture, etc.
+    injuryBodyPart: varchar("injury_body_part", { length: 100 }),
+    severityLevel: varchar("severity_level", { length: 50 }), // minor, moderate, severe
+    requiresHospitalization: boolean("requires_hospitalization").default(false),
+    
+    // Witnesses
+    witnessNames: jsonb("witness_names"), // Array of witness names
+    witnessStatements: jsonb("witness_statements"), // Array of statements
+    
+    // Reporting
+    reportedBy: varchar("reported_by", { length: 255 }),
+    reportedAt: timestamp("reported_at").default(sql`NOW()`),
+    reportedByUserId: varchar("reported_by_user_id").references(() => users.id),
+    
+    // Workman's Comp
+    workCompClaimFiled: boolean("work_comp_claim_filed").default(false),
+    workCompClaimNumber: varchar("work_comp_claim_number", { length: 100 }),
+    workCompCarrier: varchar("work_comp_carrier", { length: 255 }),
+    workCompCarrierPhone: varchar("work_comp_carrier_phone", { length: 20 }),
+    
+    // Drug Test (Immediate Response)
+    drugsTestRequested: boolean("drugs_test_requested").default(false),
+    drugTestId: varchar("drug_test_id").references(() => drugTests.id),
+    nearestClinicUsed: varchar("nearest_clinic_used", { length: 255 }),
+    
+    // Medical Treatment
+    treatedAt: varchar("treated_at", { length: 255 }),
+    medicalProvider: varchar("medical_provider", { length: 255 }),
+    medicalNotes: text("medical_notes"),
+    
+    // Investigation
+    investigationStatus: varchar("investigation_status", { length: 50 }).default("pending"), // pending, in_progress, completed
+    rootCause: text("root_cause"),
+    preventionMeasures: text("prevention_measures"),
+    
+    // Documentation
+    attachments: jsonb("attachments"), // Array of file URLs/references
+    photos: jsonb("photos"), // Scene photos
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("open"), // open, under_review, resolved, closed
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_incident_company_id").on(table.companyId),
+    workerIdx: index("idx_incident_worker_id").on(table.workerId),
+    statusIdx: index("idx_incident_status").on(table.status),
+    workCompIdx: index("idx_incident_work_comp_claim").on(table.workCompClaimFiled),
+  })
+);
+
+export const insertIncidentReportSchema = createInsertSchema(incidentReports).omit({
+  id: true,
+  reportedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertIncidentReport = z.infer<typeof insertIncidentReportSchema>;
+export type IncidentReport = typeof incidentReports.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
