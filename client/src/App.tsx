@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useEffect, useState } from "react";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import Candidates from "@/pages/Candidates";
@@ -52,10 +53,25 @@ import OwnerPitch from "@/pages/OwnerPitch";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
+function RootPage() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const adminAuth = localStorage.getItem('adminAuthenticated') === 'true';
+    setIsAdmin(adminAuth);
+    setLoading(false);
+  }, []);
+
+  if (loading) return null;
+
+  return isAdmin ? <AdminLanding /> : <Landing />;
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={AdminLanding} />
+      <Route path="/" component={RootPage} />
       <Route path="/home" component={Landing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/sales" component={Sales} />
