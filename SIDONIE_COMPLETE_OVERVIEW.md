@@ -1,5 +1,5 @@
 # ORBIT Staffing OS - Complete Feature Overview
-## For Sid: Full Platform Walkthrough
+## For Sidonie: Full Platform Walkthrough
 
 ---
 
@@ -380,7 +380,7 @@ Payment Collection
 
 ---
 
-## 📊 **SANDBOX TESTING GUIDE FOR SID**
+## 📊 **SANDBOX TESTING GUIDE FOR SIDONIE**
 
 ### **Step 1: Login & Overview**
 - PIN: 4444 (Your personal sandbox PIN)

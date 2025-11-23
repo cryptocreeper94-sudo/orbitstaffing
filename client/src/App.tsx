@@ -53,6 +53,7 @@ import OwnerPitch from "@/pages/OwnerPitch";
 import DigitalHallmark from "@/pages/DigitalHallmark";
 import DeveloperPanel from "@/pages/DeveloperPanel";
 import DeveloperLanding from "@/pages/DeveloperLanding";
+import SecureSandbox from "@/pages/SecureSandbox";
 import EmblemDownload from "@/pages/EmblemDownload";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
@@ -75,6 +76,7 @@ function Router() {
     <Switch>
       <Route path="/" component={RootPage} />
       <Route path="/dev-landing" component={DeveloperLanding} />
+      <Route path="/sandbox-secure" component={SecureSandbox} />
       <Route path="/home" component={Landing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/sales" component={Sales} />
