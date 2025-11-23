@@ -8,6 +8,7 @@ import { Code, Shield, LogOut, Zap, BarChart3, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { SystemHealthCheck } from '@/components/SystemHealthCheck';
+import { SystemArchitectureInfo } from '@/components/SystemArchitectureInfo';
 import { AlertCircle } from 'lucide-react';
 
 export default function DeveloperLanding() {
@@ -134,7 +135,12 @@ export default function DeveloperLanding() {
           </Button>
         </div>
 
-        {/* System Health Check - Top Priority */}
+        {/* System Architecture Overview */}
+        <div className="mb-12">
+          <SystemArchitectureInfo />
+        </div>
+
+        {/* System Health Check */}
         <div className="mb-12">
           <SystemHealthCheck />
         </div>

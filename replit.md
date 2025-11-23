@@ -14,34 +14,45 @@ ORBIT Staffing OS is a fully automated, white-label capable platform designed fo
 
 ## System Architecture
 
-The ORBIT Staffing OS is a full-stack application utilizing a modern web development stack with **multi-tenant architecture** supporting three admin tiers:
+The ORBIT Staffing OS is a full-stack application utilizing a modern web development stack with **three-tier multi-tenant architecture**:
 
-### Admin Roles & Data Isolation
+### Three-Tier Admin Structure
 
-**Master Admin (System Owner - YOU)**
+**Tier 1: Master Admin (System Owner - YOU)**
+- Entry point: System Control Panel (PIN login)
 - Full access to entire system
-- PIN login (4-digit code: 1234 for demo)
-- Can create franchises and manage customers
-- Sees all analytics and system metrics
-- Controls licenses, billing, and compliance settings
+- Can create/delegate to admins with specific roles
+- Sees all franchises, customers, analytics, and system metrics
+- Controls system health, licenses, billing, and compliance
+- Dashboard includes system health monitoring and admin management
 
-**Franchise Admin (White-Label Partner)**
-- Owner of franchise license
-- PIN login to their own dashboard
-- Sees ONLY their franchise's workers, clients, and data
-- Complete data isolation from other franchises
-- Can customize branding, domain, and settings
-- Manages their own billing and support
+**Tier 2: Assigned Admins (Your Team)**
+- Entry point: Admin Panel (PIN login)
+- Role-based access with specific permissions:
+  - **Franchise Admin**: Full control of assigned franchise(s)
+  - **Customer Admin**: Full control of assigned customer(s)
+  - **Staff Admin**: Worker & client management, assignments
+  - **Finance Admin**: Billing, payments, collections only
+  - **Operations Admin**: Scheduling & assignments only
+- Each role sees ONLY data for their assigned organization
+- Complete data isolation from other franchises/customers
+- Cannot create other admins (delegation only to Master)
 
-**Customer Admin (Monthly Subscriber)**
-- Owner of month-to-month subscription
-- PIN login to their own dashboard
-- Sees ONLY their company's workers, clients, and data
-- Complete data isolation from other customers
-- Self-service dashboard with workers/clients management
-- Billing tied to subscription tier
+**Tier 3: End Users (Business Owners/Franchisees)**
+- Entry point: Main App (their front-facing application)
+- Full control of their own company data
+- Can configure their own admin roles within their instance
+- See their workers, clients, assignments, payroll, invoicing
+- Industry-specific feature configuration (skilled trades, hospitality, general labor)
+- Direct communication channel with ORBIT (messaging, feature requests)
+- Complete data isolation - zero visibility into other businesses or system administration
 
-Each admin role has its own dashboard, accessible via PIN-based login to `/admin`. Data isolation is enforced at the database query level.
+### Data Isolation Principle
+- Master Admin (Tier 1): Sees all data across all organizations
+- Assigned Admins (Tier 2): Only see their assigned org's data
+- End Users (Tier 3): Only see their own company's data
+- All isolation enforced at database query level
+- Each instance (end user) has configurable features based on industry/needs
 
 ### UI/UX Decisions
 
