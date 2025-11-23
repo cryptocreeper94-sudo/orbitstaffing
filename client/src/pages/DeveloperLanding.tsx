@@ -155,7 +155,7 @@ export default function DeveloperLanding() {
         {/* Sandbox Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Admin Sandbox */}
-          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-cyan-500 transition-all">
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-cyan-500 transition-all flex flex-col h-full">
             <div className="flex items-center justify-center mb-4">
               <Shield className="w-8 h-8 text-cyan-400" />
             </div>
@@ -163,10 +163,10 @@ export default function DeveloperLanding() {
               Admin Sandbox
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
-              Sidonie's view - Monitor all companies, workers, and system metrics in real-time
+              Monitor all companies, workers, and system metrics in real-time
             </p>
 
-            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded">
+            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <span className="text-cyan-400">✓</span>
                 Real-time dashboard & analytics
@@ -188,7 +188,7 @@ export default function DeveloperLanding() {
             <Button
               onClick={() => handleJoinSandbox('admin')}
               disabled={loginMutation.isPending}
-              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg"
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg mb-3"
               data-testid="button-join-admin-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'admin'
@@ -196,13 +196,13 @@ export default function DeveloperLanding() {
                 : 'Join as Admin (PIN: 4444)'}
             </Button>
 
-            <p className="text-xs text-gray-500 text-center mt-3">
+            <p className="text-xs text-gray-500 text-center">
               Email: sidonie@orbitstaffing.net
             </p>
           </div>
 
           {/* Owner Sandbox */}
-          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-green-500 transition-all">
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-green-500 transition-all flex flex-col h-full">
             <div className="flex items-center justify-center mb-4">
               <Users className="w-8 h-8 text-green-400" />
             </div>
@@ -210,10 +210,10 @@ export default function DeveloperLanding() {
               Owner Sandbox
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
-              Your view - Create jobs, assign workers, process payroll instantly
+              Create jobs, assign workers, process payroll instantly
             </p>
 
-            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded">
+            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <span className="text-green-400">✓</span>
                 Create & manage jobs
@@ -235,7 +235,7 @@ export default function DeveloperLanding() {
             <Button
               onClick={() => handleJoinSandbox('owner')}
               disabled={loginMutation.isPending}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 font-bold text-lg"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 font-bold text-lg mb-3"
               data-testid="button-join-owner-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'owner'
@@ -243,7 +243,7 @@ export default function DeveloperLanding() {
                 : 'Join as Owner (PIN: 4444)'}
             </Button>
 
-            <p className="text-xs text-gray-500 text-center mt-3">
+            <p className="text-xs text-gray-500 text-center">
               Email: owner@superiostaffing.com
             </p>
           </div>
