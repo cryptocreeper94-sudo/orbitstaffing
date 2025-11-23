@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ORBIT Staffing",
-    "slug": "orbit-staffing",
+    "name": "ORBIT",
+    "slug": "orbit",
     "version": "1.0.0",
     "assetBundlePatterns": ["**/*"],
     "plugins": [
