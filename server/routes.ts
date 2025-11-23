@@ -68,7 +68,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
-      const { email, password } = req.body;
+      const { email, password, pin } = req.body;
+
+      // Special test login for Sidonie with PIN 4444
+      if (pin === "4444") {
+        const testUser = {
+          id: "sidonie-test-001",
+          email: "sidonie@orbitstaffing.net",
+          firstName: "Sidonie",
+          lastName: "Expert Tester",
+          role: "admin",
+          companyId: "test-company",
+          isFirstLogin: true,
+          welcomeMessage: "Hey Sid, I know you are an expert on all this, so give me your honest opinion. Let's partner up and make this happen! 🚀"
+        };
+        return res.status(200).json(testUser);
+      }
 
       if (!email || !password) {
         return res.status(400).json({ error: "Email and password required" });

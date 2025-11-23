@@ -19,17 +19,24 @@ export default function AdminPanel() {
   const [showDeveloperPin, setShowDeveloperPin] = useState(false);
   const [developerPin, setDeveloperPin] = useState('');
   const [developerError, setDeveloperError] = useState('');
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
 
   // Check if already authenticated
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuthenticated');
     const savedRole = localStorage.getItem('adminRole') as AdminRole;
     const savedName = localStorage.getItem('adminName');
+    const hasWelcomeMessage = localStorage.getItem('showWelcomeMessage') === 'true';
     
     if (adminAuth === 'true' && savedRole) {
       setIsAuthenticated(true);
       setRole(savedRole);
       setAdminName(savedName || 'Admin');
+      
+      if (hasWelcomeMessage && savedName === 'Sidonie') {
+        setShowWelcomeMessage(true);
+        localStorage.removeItem('showWelcomeMessage');
+      }
     }
   }, []);
 
@@ -39,6 +46,20 @@ export default function AdminPanel() {
 
     if (pin.length !== 4) {
       setError('PIN must be 4 digits');
+      return;
+    }
+
+    // Special test PIN for Sidonie (expert tester)
+    if (pin === '4444') {
+      setIsAuthenticated(true);
+      setRole('master_admin');
+      setAdminName('Sidonie');
+      localStorage.setItem('adminAuthenticated', 'true');
+      localStorage.setItem('adminRole', 'master_admin');
+      localStorage.setItem('adminName', 'Sidonie');
+      localStorage.setItem('isSidonieTestLogin', 'true');
+      localStorage.setItem('showWelcomeMessage', 'true');
+      setPin('');
       return;
     }
 
@@ -214,6 +235,40 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      {/* Welcome Modal for Sidonie */}
+      {showWelcomeMessage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-lg w-full border border-cyan-500/30 p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="text-4xl">🎯</div>
+              <h2 className="text-2xl font-bold text-cyan-400">Hey Sid! 👋</h2>
+            </div>
+            
+            <p className="text-gray-200 mb-6 text-lg leading-relaxed">
+              I know you are an expert on all this, so give me your honest opinion. 
+            </p>
+            
+            <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 mb-6">
+              <p className="text-cyan-300 font-semibold text-lg">
+                Let's partner up and make this happen! 🚀
+              </p>
+            </div>
+            
+            <p className="text-gray-400 text-sm mb-8">
+              You now have full access to the admin dashboard. Review everything, test it out, and let me know what you think. All features are ready for testing.
+            </p>
+            
+            <Button
+              onClick={() => setShowWelcomeMessage(false)}
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 text-lg"
+              data-testid="button-sidonie-welcome-close"
+            >
+              Got it, let's go! 💪
+            </Button>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-12">
