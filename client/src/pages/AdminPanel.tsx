@@ -35,8 +35,9 @@ export default function AdminPanel() {
       return;
     }
 
-    // Simple demo PIN validation (1234 for master admin)
-    if (pin === '1234') {
+    // Validate against ADMIN_PIN environment secret
+    const correctPin = process.env.VITE_ADMIN_PIN || '0000';
+    if (pin === correctPin) {
       setIsAuthenticated(true);
       setRole('master_admin');
       setAdminName('Master Admin (System Owner)');
@@ -45,7 +46,7 @@ export default function AdminPanel() {
       localStorage.setItem('adminName', 'Master Admin (System Owner)');
       setPin('');
     } else {
-      setError('Invalid PIN. Use 1234 for demo.');
+      setError('Invalid PIN.');
       setPin('');
     }
   };
@@ -107,7 +108,7 @@ export default function AdminPanel() {
           </form>
 
           <p className="text-xs text-gray-500 text-center mt-6">
-            Demo PIN: 1234
+            Enter your admin PIN
           </p>
         </div>
       </div>
