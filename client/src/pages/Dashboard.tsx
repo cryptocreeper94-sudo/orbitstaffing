@@ -1,6 +1,7 @@
 import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PoweredByOrbit } from "@/components/PoweredByOrbit";
 import { 
   Users, 
   DollarSign, 
@@ -140,6 +141,11 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Powered by ORBIT Footer Button */}
+      <div className="flex justify-center mt-16 pt-8 border-t border-border/30">
+        <PoweredByOrbit />
       </div>
     </Shell>
   );
