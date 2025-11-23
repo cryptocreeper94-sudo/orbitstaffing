@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
+import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
+import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -12,6 +14,10 @@ export default function AdminPanel() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [adminName, setAdminName] = useState('');
+  const [showExamples, setShowExamples] = useState(false);
+  const [showDeveloperPin, setShowDeveloperPin] = useState(false);
+  const [developerPin, setDeveloperPin] = useState('');
+  const [developerError, setDeveloperError] = useState('');
 
   // Check if already authenticated
   useEffect(() => {
@@ -61,6 +67,26 @@ export default function AdminPanel() {
     localStorage.removeItem('adminName');
   };
 
+  const handleDeveloperPinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setDeveloperError('');
+
+    if (developerPin.length !== 4) {
+      setDeveloperError('PIN must be 4 digits');
+      return;
+    }
+
+    // Same PIN for now, can be different later
+    const correctPin = process.env.VITE_ADMIN_PIN || '0000';
+    if (developerPin === correctPin) {
+      // Redirect to developer page
+      setLocation('/developer');
+    } else {
+      setDeveloperError('Invalid PIN.');
+      setDeveloperPin('');
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
@@ -74,42 +100,110 @@ export default function AdminPanel() {
             Enter your 4-digit PIN to access the admin dashboard
           </p>
 
-          <form onSubmit={handlePinSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                PIN
-              </label>
-              <input
-                type="password"
-                value={pin}
-                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                maxLength={4}
-                placeholder="••••"
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-cyan-400"
-                autoFocus
-                data-testid="input-admin-pin"
-              />
-            </div>
+          {!showDeveloperPin ? (
+            <>
+              <form onSubmit={handlePinSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    PIN
+                  </label>
+                  <input
+                    type="password"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    maxLength={4}
+                    placeholder="••••"
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-cyan-400"
+                    autoFocus
+                    data-testid="input-admin-pin"
+                  />
+                </div>
 
-            {error && (
-              <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-red-400" />
-                <p className="text-sm text-red-200">{error}</p>
-              </div>
-            )}
+                {error && (
+                  <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400" />
+                    <p className="text-sm text-red-200">{error}</p>
+                  </div>
+                )}
 
-            <Button
-              type="submit"
-              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg"
-              data-testid="button-admin-login"
-            >
-              Login
-            </Button>
-          </form>
+                <Button
+                  type="submit"
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg"
+                  data-testid="button-admin-login"
+                >
+                  Login to Admin
+                </Button>
+              </form>
 
-          <p className="text-xs text-gray-500 text-center mt-6">
-            Enter your admin PIN
-          </p>
+              {/* Developer Access Button */}
+              <button
+                onClick={() => setShowDeveloperPin(true)}
+                className="w-full mt-4 px-4 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-600 rounded-lg text-purple-300 font-bold text-sm transition-all"
+                data-testid="button-developer-access"
+              >
+                🔧 Developer Access
+              </button>
+
+              <p className="text-xs text-gray-500 text-center mt-6">
+                Enter your admin PIN
+              </p>
+            </>
+          ) : (
+            <>
+              <form onSubmit={handleDeveloperPinSubmit} className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeveloperPin(false);
+                      setDeveloperPin('');
+                      setDeveloperError('');
+                    }}
+                    className="text-gray-400 hover:text-gray-300"
+                    data-testid="button-back-to-admin"
+                  >
+                    ← Back
+                  </button>
+                  <h2 className="text-sm font-bold text-purple-400">Developer Panel</h2>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Developer PIN
+                  </label>
+                  <input
+                    type="password"
+                    value={developerPin}
+                    onChange={(e) => setDeveloperPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    maxLength={4}
+                    placeholder="••••"
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
+                    autoFocus
+                    data-testid="input-developer-pin"
+                  />
+                </div>
+
+                {developerError && (
+                  <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-400" />
+                    <p className="text-sm text-red-200">{developerError}</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg"
+                  data-testid="button-developer-login"
+                >
+                  Access Developer Panel
+                </Button>
+              </form>
+
+              <p className="text-xs text-gray-500 text-center mt-6">
+                For technical team and integrations
+              </p>
+            </>
+          )}
         </div>
       </div>
     );

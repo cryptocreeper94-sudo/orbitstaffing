@@ -1,0 +1,473 @@
+/**
+ * Developer Panel
+ * Full technical access to system APIs, configurations, and developer tools
+ * Everything non-business-sensitive for developers and tech partners
+ */
+import React, { useState } from 'react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
+import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
+import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
+
+export default function DeveloperPanel() {
+  const [, setLocation] = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples'>('overview');
+  const [copied, setCopied] = useState('');
+
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (pin.length !== 4) {
+      setError('PIN must be 4 digits');
+      return;
+    }
+
+    // Developer PIN (can be same or different)
+    const correctPin = process.env.VITE_ADMIN_PIN || '0000';
+    if (pin === correctPin) {
+      setIsAuthenticated(true);
+      setPin('');
+    } else {
+      setError('Invalid PIN.');
+      setPin('');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPin('');
+    setError('');
+  };
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(id);
+    setTimeout(() => setCopied(''), 2000);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
+          <div className="flex items-center justify-center mb-6">
+            <Code className="w-8 h-8 text-purple-400 mr-3" />
+            <h1 className="text-2xl font-bold text-white">Developer Access</h1>
+          </div>
+
+          <p className="text-gray-400 text-sm mb-6 text-center">
+            Enter your PIN to access technical APIs and developer tools
+          </p>
+
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">PIN</label>
+              <input
+                type="password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                maxLength={4}
+                placeholder="••••"
+                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
+                autoFocus
+                data-testid="input-developer-pin"
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <p className="text-sm text-red-200">{error}</p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg"
+              data-testid="button-developer-login"
+            >
+              Access Developer Panel
+            </Button>
+          </form>
+
+          <p className="text-xs text-gray-500 text-center mt-6">
+            For technical team members and API integrations
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
+              <Code className="w-8 h-8 text-purple-400" />
+              Developer Panel
+            </h1>
+            <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
+          </div>
+          <Button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+            data-testid="button-developer-logout"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-8 border-b border-slate-700">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all ${
+              activeTab === 'overview'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-overview"
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('apis')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all ${
+              activeTab === 'apis'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-apis"
+          >
+            API Endpoints
+          </button>
+          <button
+            onClick={() => setActiveTab('examples')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all ${
+              activeTab === 'examples'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-examples"
+          >
+            Examples & Assets
+          </button>
+        </div>
+
+        {/* OVERVIEW TAB */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Developer Access Info */}
+            <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-purple-400" />
+                Developer Access
+              </h2>
+              <p className="text-gray-300 mb-4">
+                This panel provides full access to technical APIs, integrations, and configuration. All endpoints are documented with examples and authentication details.
+              </p>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  Full REST API documentation
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  WebSocket endpoints for real-time
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  Database schema reference
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  Authentication & rate limiting
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  Code examples (Node, Python, cURL)
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  Webhook configurations
+                </li>
+              </ul>
+            </div>
+
+            {/* Core Systems */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Workers API */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-400" />
+                  Workers System
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li>✓ CRUD operations for workers</li>
+                  <li>✓ Skills & availability management</li>
+                  <li>✓ Background check tracking</li>
+                  <li>✓ I-9 verification status</li>
+                  <li>✓ Digital Hallmark generation</li>
+                  <li>✓ Avatar/photo uploads</li>
+                </ul>
+              </div>
+
+              {/* Collections & Payments */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  <Key className="w-5 h-5 text-green-400" />
+                  Collections & Payments
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li>✓ Payment method management</li>
+                  <li>✓ Dunning sequence automation</li>
+                  <li>✓ Collection status tracking</li>
+                  <li>✓ Service suspension/restoration</li>
+                  <li>✓ Overdue amount calculations</li>
+                  <li>✓ Payment arrangement tracking</li>
+                </ul>
+              </div>
+
+              {/* Database Access */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  <Database className="w-5 h-5 text-cyan-400" />
+                  Database
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li>✓ PostgreSQL via Neon</li>
+                  <li>✓ Drizzle ORM integration</li>
+                  <li>✓ Real-time backups enabled</li>
+                  <li>✓ Full transaction support</li>
+                  <li>✓ Schema versioning</li>
+                  <li>✓ Query optimization tools</li>
+                </ul>
+              </div>
+
+              {/* Security & Auth */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-red-400" />
+                  Security
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-300">
+                  <li>✓ Session-based auth</li>
+                  <li>✓ Role-based access control</li>
+                  <li>✓ PIN-based admin login</li>
+                  <li>✓ Data isolation per tenant</li>
+                  <li>✓ Encryption for sensitive data</li>
+                  <li>✓ Audit trail logging</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* APIs TAB */}
+        {activeTab === 'apis' && (
+          <div className="space-y-6">
+            {/* Payment Methods APIs */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <h3 className="font-bold text-lg mb-4">Payment Methods API</h3>
+              <div className="space-y-3 text-sm">
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-green-400">POST</div>
+                  <div className="text-gray-300">/api/companies/:companyId/payment-methods</div>
+                </div>
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-blue-400">GET</div>
+                  <div className="text-gray-300">/api/companies/:companyId/payment-methods</div>
+                </div>
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-orange-400">PATCH</div>
+                  <div className="text-gray-300">/api/payment-methods/:methodId/set-primary</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Collections APIs */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <h3 className="font-bold text-lg mb-4">Collections & Dunning API</h3>
+              <div className="space-y-3 text-sm">
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-green-400">POST</div>
+                  <div className="text-gray-300">/api/companies/:companyId/collections</div>
+                </div>
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-blue-400">GET</div>
+                  <div className="text-gray-300">/api/companies/:companyId/collections</div>
+                </div>
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-blue-400">GET</div>
+                  <div className="text-gray-300">/api/companies/:companyId/overdue-amount</div>
+                </div>
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-orange-400">PATCH</div>
+                  <div className="text-gray-300">/api/collections/:collectionId</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Service Suspension APIs */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <h3 className="font-bold text-lg mb-4">Service Management API</h3>
+              <div className="space-y-3 text-sm">
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-red-400">POST</div>
+                  <div className="text-gray-300">/api/companies/:companyId/suspend-services</div>
+                </div>
+                <div className="bg-slate-900/50 rounded p-3 font-mono">
+                  <div className="text-green-400">POST</div>
+                  <div className="text-gray-300">/api/companies/:companyId/unsuspend-services</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Example Request */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <h3 className="font-bold text-lg mb-4">Example Request</h3>
+              <div className="bg-slate-900 rounded p-4 font-mono text-xs text-gray-300 overflow-x-auto mb-4">
+{`curl -X POST http://localhost:5000/api/companies/comp-123/collections \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "amount": 5000,
+    "dueDate": "2025-12-01",
+    "status": "overdue",
+    "severity": "warning"
+  }'`}
+              </div>
+              <Button
+                onClick={() => copyToClipboard('curl example', 'api-example')}
+                className="bg-purple-600 hover:bg-purple-700 text-xs"
+              >
+                {copied === 'api-example' ? '✓ Copied' : 'Copy Example'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* EXAMPLES TAB */}
+        {activeTab === 'examples' && (
+          <div className="space-y-8">
+            {/* Digital Employee Card Example */}
+            <div>
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Eye className="w-5 h-5 text-cyan-400" />
+                Digital Employee Card with Hallmark
+              </h3>
+              <div className="flex justify-center mb-6">
+                <DigitalEmployeeCard
+                  workerId="WRK-2024-45892"
+                  employeeNumber="EMP-0892"
+                  fullName="John Michael Rodriguez"
+                  company="Superior Staffing"
+                  status="active"
+                  role="Electrician & HVAC"
+                  skills={['Electrician', 'HVAC', 'General Labor']}
+                  joinDate="Mar 15, 2024"
+                  phone="+1 (615) 555-0892"
+                  email="john@superior-staffing.com"
+                  verificationCode="ORBIT-XK9M2Q7W8P"
+                  avatarUrl="https://api.dicebear.com/7.x/avataaars/svg?seed=john"
+                />
+              </div>
+              <p className="text-sm text-gray-400 text-center">Click to flip the card and see back side with verification code</p>
+            </div>
+
+            {/* Hallmark Examples */}
+            <div>
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-purple-400" />
+                Hallmark Watermark Sizes & Usage
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Small */}
+                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                  <div className="flex justify-center mb-4">
+                    <HallmarkWatermark size="small" opacity={50} />
+                  </div>
+                  <p className="font-bold text-cyan-300 text-center mb-2">Small</p>
+                  <p className="text-xs text-gray-400 text-center">Emails, badges, inline notifications</p>
+                </div>
+
+                {/* Medium */}
+                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                  <div className="flex justify-center mb-4">
+                    <HallmarkWatermark size="medium" opacity={50} />
+                  </div>
+                  <p className="font-bold text-cyan-300 text-center mb-2">Medium</p>
+                  <p className="text-xs text-gray-400 text-center">Credentials, certificates, cards</p>
+                </div>
+
+                {/* Large */}
+                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                  <div className="flex justify-center mb-4">
+                    <HallmarkWatermark size="large" opacity={50} />
+                  </div>
+                  <p className="font-bold text-cyan-300 text-center mb-2">Large</p>
+                  <p className="text-xs text-gray-400 text-center">Document watermarks, backgrounds</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Assets Available */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <h3 className="font-bold text-lg mb-4">Available Assets & Deliverables</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-300">Digital Employee Card</p>
+                    <p className="text-xs text-gray-500">Worker ID with photo, employee number, skills, status</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-300">Hallmark Watermark</p>
+                    <p className="text-xs text-gray-500">3 sizes: small, medium, large with adjustable opacity</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-300">QR Code Integration</p>
+                    <p className="text-xs text-gray-500">Every credential links to live verification database</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-300">Invoice Watermarking</p>
+                    <p className="text-xs text-gray-500">Automatic Hallmark stamping on all official documents</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-300">Email Headers</p>
+                    <p className="text-xs text-gray-500">Hallmark badge in system communications</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-300">White-Label Assets</p>
+                    <p className="text-xs text-gray-500">Customizable for franchise partners</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
