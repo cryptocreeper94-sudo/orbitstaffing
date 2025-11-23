@@ -82,12 +82,10 @@ export function BusinessTypeModal({ isOpen, onClose }: BusinessTypeModalProps) {
           {/* Action Buttons */}
           <div className="flex gap-3">
             {selected && (
-              <Link href={selected === "small" ? "/small-business" : "/large-business"}>
-                <a className="flex-1">
-                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-continue">
-                    Continue to {selected === "small" ? "Small Business" : "Enterprise"} Plan
-                  </Button>
-                </a>
+              <Link href={selected === "small" ? "/small-business" : "/large-business"} className="flex-1">
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-continue">
+                  Continue to {selected === "small" ? "Small Business" : "Enterprise"} Plan
+                </Button>
               </Link>
             )}
             {!selected && (
