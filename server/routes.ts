@@ -21,6 +21,8 @@ import {
   insertFeatureRequestSchema,
   insertIosInterestSchema,
   insertWorkerDNRSchema,
+  insertPaymentMethodSchema,
+  insertCollectionSchema,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -1105,6 +1107,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json({ success: true, message: "DNR record removed", dnr });
     } catch (error) {
       res.status(500).json({ error: "Failed to remove DNR record" });
+    }
+  });
+
+  // ========================
+  // PAYMENT METHODS (Primary & Backup)
+  // ========================
+  app.post("/api/companies/:companyId/payment-methods", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const methodData = { ...req.body, companyId };
+
+      const parsed = insertPaymentMethodSchema.safeParse(methodData);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid payment method data" });
+      }
+
+      const method = await storage.createPaymentMethod(parsed.data);
+      res.status(201).json(method);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create payment method" });
+    }
+  });
+
+  app.get("/api/companies/:companyId/payment-methods", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const { activeOnly } = req.query;
+
+      const methods = await storage.listCompanyPaymentMethods(companyId, activeOnly !== "false");
+      res.status(200).json(methods);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch payment methods" });
+    }
+  });
+
+  app.patch("/api/payment-methods/:methodId/set-primary", async (req: Request, res: Response) => {
+    try {
+      const { methodId } = req.params;
+      const { companyId } = req.body;
+
+      if (!companyId) {
+        return res.status(400).json({ error: "Company ID required" });
+      }
+
+      await storage.setPrimaryPaymentMethod(companyId, methodId);
+      res.status(200).json({ success: true, message: "Primary payment method updated" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to set primary payment method" });
+    }
+  });
+
+  app.patch("/api/payment-methods/:methodId/set-backup", async (req: Request, res: Response) => {
+    try {
+      const { methodId } = req.params;
+      const { companyId } = req.body;
+
+      if (!companyId) {
+        return res.status(400).json({ error: "Company ID required" });
+      }
+
+      await storage.setBackupPaymentMethod(companyId, methodId);
+      res.status(200).json({ success: true, message: "Backup payment method updated" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to set backup payment method" });
+    }
+  });
+
+  // ========================
+  // COLLECTIONS / DUNNING
+  // ========================
+  app.post("/api/companies/:companyId/collections", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const collectionData = { ...req.body, companyId };
+
+      const parsed = insertCollectionSchema.safeParse(collectionData);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid collection data" });
+      }
+
+      const collection = await storage.createCollection(parsed.data);
+      res.status(201).json(collection);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create collection record" });
+    }
+  });
+
+  app.get("/api/companies/:companyId/collections", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const { status, severity } = req.query;
+
+      const collections = await storage.listCompanyCollections(companyId, {
+        status: status as string,
+        severity: severity as string,
+      });
+      res.status(200).json(collections);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch collections" });
+    }
+  });
+
+  app.get("/api/companies/:companyId/overdue-amount", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const amount = await storage.getOverdueAmount(companyId);
+      res.status(200).json({ companyId, overdueAmount: amount });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch overdue amount" });
+    }
+  });
+
+  app.patch("/api/collections/:collectionId", async (req: Request, res: Response) => {
+    try {
+      const { collectionId } = req.params;
+      const updates = req.body;
+
+      const collection = await storage.updateCollection(collectionId, updates);
+      if (!collection) {
+        return res.status(404).json({ error: "Collection record not found" });
+      }
+
+      res.status(200).json(collection);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update collection" });
+    }
+  });
+
+  app.post("/api/companies/:companyId/suspend-services", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const { reason } = req.body;
+
+      if (!reason) {
+        return res.status(400).json({ error: "Suspension reason required" });
+      }
+
+      await storage.suspendCompanyServices(companyId, reason);
+      res.status(200).json({ success: true, message: "Services suspended", companyId, reason });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to suspend services" });
+    }
+  });
+
+  app.post("/api/companies/:companyId/unsuspend-services", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+
+      await storage.unsuspendCompanyServices(companyId);
+      res.status(200).json({ success: true, message: "Services restored", companyId });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to restore services" });
     }
   });
 

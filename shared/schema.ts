@@ -80,6 +80,13 @@ export const companies = pgTable(
     nextBillingModelChangeAvailable: timestamp("next_billing_model_change_available"),
     billingModelChangeCount: integer("billing_model_change_count").default(0),
 
+    // Payment & Collections Status
+    paymentStatus: varchar("payment_status", { length: 50 }).default("active"), // active, overdue, suspended, cancelled
+    suspensionReason: varchar("suspension_reason", { length: 255 }), // Why service is suspended
+    suspendedAt: timestamp("suspended_at"), // When service was suspended
+    daysOverdue: integer("days_overdue").default(0), // Days past due date
+    totalOutstanding: decimal("total_outstanding", { precision: 10, scale: 2 }).default("0"), // Total unpaid amount
+
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   }
@@ -2040,6 +2047,137 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
 
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
+
+// ========================
+// Payment Methods (Primary & Backup)
+// ========================
+export const paymentMethods = pgTable(
+  "payment_methods",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Method Details
+    methodType: varchar("method_type", { length: 50 }).notNull(), // "stripe_card", "bank_account", "check"
+    methodName: varchar("method_name", { length: 100 }), // e.g., "Visa ending in 4242"
+    
+    // Primary vs Backup
+    isPrimary: boolean("is_primary").default(true),
+    isBackup: boolean("is_backup").default(false),
+    
+    // Stripe Integration
+    stripePaymentMethodId: varchar("stripe_payment_method_id", { length: 255 }), // Stripe PM ID
+    
+    // Bank Account (if applicable)
+    bankAccountLast4: varchar("bank_account_last4", { length: 4 }), // Last 4 digits
+    bankRoutingNumber: varchar("bank_routing_number", { length: 9 }), // Encrypted
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    failureCount: integer("failure_count").default(0), // How many times this failed
+    lastFailedAt: timestamp("last_failed_at"),
+    lastFailureReason: text("last_failure_reason"),
+    
+    // Metadata
+    expiresAt: timestamp("expires_at"), // For cards that expire
+    verifiedAt: timestamp("verified_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_payment_methods_company_id").on(table.companyId),
+    primaryIdx: index("idx_payment_methods_primary").on(table.isPrimary),
+    backupIdx: index("idx_payment_methods_backup").on(table.isBackup),
+  })
+);
+
+export const insertPaymentMethodSchema = createInsertSchema(paymentMethods).omit({
+  id: true,
+  failureCount: true,
+  lastFailedAt: true,
+  verifiedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPaymentMethod = z.infer<typeof insertPaymentMethodSchema>;
+export type PaymentMethod = typeof paymentMethods.$inferSelect;
+
+// ========================
+// Collections / Dunning Tracking
+// ========================
+export const collections = pgTable(
+  "collections",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    licenseId: varchar("license_id").references(() => licenses.id),
+    
+    // Invoice/Amount
+    invoiceId: varchar("invoice_id").references(() => invoices.id),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    amountRemaining: decimal("amount_remaining", { precision: 10, scale: 2 }),
+    
+    // Status
+    status: varchar("status", { length: 50 }).notNull().default("overdue"), // overdue, in_collection, payment_arranged, resolved, written_off
+    severity: varchar("severity", { length: 50 }).default("warning"), // warning, critical, final_notice
+    
+    // Timeline
+    dueDate: date("due_date").notNull(),
+    overdueDate: timestamp("overdue_date"), // When it became overdue
+    daysSinceDue: integer("days_since_due").default(0),
+    
+    // Collection Attempts
+    attemptCount: integer("attempt_count").default(0),
+    lastAttemptAt: timestamp("last_attempt_at"),
+    lastAttemptMethod: varchar("last_attempt_method", { length: 50 }), // email, phone, suspension
+    
+    // Payment Arrangements
+    paymentArrangementDate: date("payment_arrangement_date"), // Date customer agreed to pay
+    paymentArrangementAmount: decimal("payment_arrangement_amount", { precision: 10, scale: 2 }), // How much they'll pay
+    arrangementMissedPayments: integer("arrangement_missed_payments").default(0),
+    
+    // Service Status
+    servicesSuspended: boolean("services_suspended").default(false),
+    suspendedAt: timestamp("suspended_at"),
+    suspensionNotificationSent: boolean("suspension_notification_sent").default(false),
+    
+    // Escalation
+    escalatedToLegal: boolean("escalated_to_legal").default(false),
+    escalatedAt: timestamp("escalated_at"),
+    legalNotes: text("legal_notes"),
+    
+    // Resolution
+    resolvedAt: timestamp("resolved_at"),
+    resolutionMethod: varchar("resolution_method", { length: 50 }), // full_payment, partial_payment, written_off, payment_plan
+    resolutionNotes: text("resolution_notes"),
+    
+    // Tracking
+    notes: text("notes"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_collections_company_id").on(table.companyId),
+    statusIdx: index("idx_collections_status").on(table.status),
+    severityIdx: index("idx_collections_severity").on(table.severity),
+  })
+);
+
+export const insertCollectionSchema = createInsertSchema(collections).omit({
+  id: true,
+  overdueDate: true,
+  lastAttemptAt: true,
+  suspendedAt: true,
+  escalatedAt: true,
+  resolvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCollection = z.infer<typeof insertCollectionSchema>;
+export type Collection = typeof collections.$inferSelect;
 
 // ========================
 // DNR (Do Not Return/Rehire) - Fired Workers

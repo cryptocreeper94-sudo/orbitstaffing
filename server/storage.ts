@@ -20,6 +20,8 @@ import {
   featureRequests,
   iosInterestList,
   workerDNR,
+  paymentMethods,
+  collections,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -58,6 +60,10 @@ import {
   type IosInterest,
   type InsertWorkerDNR,
   type WorkerDNR,
+  type InsertPaymentMethod,
+  type PaymentMethod,
+  type InsertCollection,
+  type Collection,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -181,6 +187,23 @@ export interface IStorage {
   listCompanyDNR(companyId: string, activeOnly?: boolean): Promise<WorkerDNR[]>;
   updateWorkerDNR(id: string, data: Partial<InsertWorkerDNR>): Promise<WorkerDNR | undefined>;
   removeWorkerDNR(id: string): Promise<WorkerDNR | undefined>;
+
+  // Payment Methods (Primary & Backup)
+  createPaymentMethod(method: InsertPaymentMethod): Promise<PaymentMethod>;
+  getPaymentMethod(id: string): Promise<PaymentMethod | undefined>;
+  listCompanyPaymentMethods(companyId: string, activeOnly?: boolean): Promise<PaymentMethod[]>;
+  updatePaymentMethod(id: string, data: Partial<InsertPaymentMethod>): Promise<PaymentMethod | undefined>;
+  setPrimaryPaymentMethod(companyId: string, methodId: string): Promise<void>;
+  setBackupPaymentMethod(companyId: string, methodId: string): Promise<void>;
+
+  // Collections / Dunning
+  createCollection(collection: InsertCollection): Promise<Collection>;
+  getCollection(id: string): Promise<Collection | undefined>;
+  listCompanyCollections(companyId: string, filters?: { status?: string; severity?: string }): Promise<Collection[]>;
+  updateCollection(id: string, data: Partial<InsertCollection>): Promise<Collection | undefined>;
+  getOverdueAmount(companyId: string): Promise<number>;
+  suspendCompanyServices(companyId: string, reason: string): Promise<void>;
+  unsuspendCompanyServices(companyId: string): Promise<void>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -739,6 +762,102 @@ export class DrizzleStorage implements IStorage {
       .where(eq(workerDNR.id, id))
       .returning();
     return result[0];
+  }
+
+  // Payment Methods
+  async createPaymentMethod(method: InsertPaymentMethod): Promise<PaymentMethod> {
+    const result = await db.insert(paymentMethods).values(method).returning();
+    return result[0];
+  }
+
+  async getPaymentMethod(id: string): Promise<PaymentMethod | undefined> {
+    const result = await db.select().from(paymentMethods).where(eq(paymentMethods.id, id));
+    return result[0];
+  }
+
+  async listCompanyPaymentMethods(companyId: string, activeOnly = true): Promise<PaymentMethod[]> {
+    let query = db.select().from(paymentMethods).where(eq(paymentMethods.companyId, companyId));
+    if (activeOnly) {
+      query = query.where(eq(paymentMethods.isActive, true));
+    }
+    return query;
+  }
+
+  async updatePaymentMethod(id: string, data: Partial<InsertPaymentMethod>): Promise<PaymentMethod | undefined> {
+    const result = await db.update(paymentMethods).set(data).where(eq(paymentMethods.id, id)).returning();
+    return result[0];
+  }
+
+  async setPrimaryPaymentMethod(companyId: string, methodId: string): Promise<void> {
+    // Set all others to non-primary
+    await db.update(paymentMethods).set({ isPrimary: false }).where(eq(paymentMethods.companyId, companyId));
+    // Set this one as primary
+    await db.update(paymentMethods).set({ isPrimary: true }).where(eq(paymentMethods.id, methodId));
+  }
+
+  async setBackupPaymentMethod(companyId: string, methodId: string): Promise<void> {
+    // Set all others to non-backup
+    await db.update(paymentMethods).set({ isBackup: false }).where(eq(paymentMethods.companyId, companyId));
+    // Set this one as backup
+    await db.update(paymentMethods).set({ isBackup: true }).where(eq(paymentMethods.id, methodId));
+  }
+
+  // Collections / Dunning
+  async createCollection(collection: InsertCollection): Promise<Collection> {
+    const result = await db.insert(collections).values(collection).returning();
+    return result[0];
+  }
+
+  async getCollection(id: string): Promise<Collection | undefined> {
+    const result = await db.select().from(collections).where(eq(collections.id, id));
+    return result[0];
+  }
+
+  async listCompanyCollections(companyId: string, filters?: { status?: string; severity?: string }): Promise<Collection[]> {
+    let query = db.select().from(collections).where(eq(collections.companyId, companyId));
+    if (filters?.status) {
+      query = query.where(eq(collections.status, filters.status));
+    }
+    if (filters?.severity) {
+      query = query.where(eq(collections.severity, filters.severity));
+    }
+    return query.orderBy(desc(collections.createdAt));
+  }
+
+  async updateCollection(id: string, data: Partial<InsertCollection>): Promise<Collection | undefined> {
+    const result = await db.update(collections).set(data).where(eq(collections.id, id)).returning();
+    return result[0];
+  }
+
+  async getOverdueAmount(companyId: string): Promise<number> {
+    const result = await db
+      .select()
+      .from(collections)
+      .where(and(eq(collections.companyId, companyId), eq(collections.status, "overdue")));
+    const total = result.reduce((sum, col) => sum + Number(col.amount), 0);
+    return total;
+  }
+
+  async suspendCompanyServices(companyId: string, reason: string): Promise<void> {
+    await db
+      .update(companies)
+      .set({
+        paymentStatus: "suspended",
+        suspensionReason: reason,
+        suspendedAt: new Date(),
+      })
+      .where(eq(companies.id, companyId));
+  }
+
+  async unsuspendCompanyServices(companyId: string): Promise<void> {
+    await db
+      .update(companies)
+      .set({
+        paymentStatus: "active",
+        suspensionReason: null,
+        suspendedAt: null,
+      })
+      .where(eq(companies.id, companyId));
   }
 }
 
