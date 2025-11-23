@@ -19,6 +19,7 @@ import {
   payments,
   featureRequests,
   iosInterestList,
+  workerDNR,
   type InsertUser,
   type User,
   type InsertCompany,
@@ -55,6 +56,8 @@ import {
   type FeatureRequest,
   type InsertIosInterest,
   type IosInterest,
+  type InsertWorkerDNR,
+  type WorkerDNR,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -170,6 +173,14 @@ export interface IStorage {
   updateIosInterest(id: string, data: Partial<InsertIosInterest>): Promise<IosInterest | undefined>;
   markIosInterestNotified(id: string): Promise<IosInterest | undefined>;
   markAllIosInterestNotified(): Promise<number>;
+
+  // DNR (Do Not Return/Rehire)
+  createWorkerDNR(dnr: InsertWorkerDNR): Promise<WorkerDNR>;
+  getWorkerDNR(id: string): Promise<WorkerDNR | undefined>;
+  getWorkerDNRByWorkerId(workerId: string, companyId: string): Promise<WorkerDNR | undefined>;
+  listCompanyDNR(companyId: string, activeOnly?: boolean): Promise<WorkerDNR[]>;
+  updateWorkerDNR(id: string, data: Partial<InsertWorkerDNR>): Promise<WorkerDNR | undefined>;
+  removeWorkerDNR(id: string): Promise<WorkerDNR | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -681,6 +692,53 @@ export class DrizzleStorage implements IStorage {
       })
       .where(eq(iosInterestList.notified, false));
     return result.rowCount || 0;
+  }
+
+  // DNR (Do Not Return/Rehire)
+  async createWorkerDNR(dnr: InsertWorkerDNR): Promise<WorkerDNR> {
+    const result = await db.insert(workerDNR).values(dnr).returning();
+    return result[0];
+  }
+
+  async getWorkerDNR(id: string): Promise<WorkerDNR | undefined> {
+    const result = await db.select().from(workerDNR).where(eq(workerDNR.id, id));
+    return result[0];
+  }
+
+  async getWorkerDNRByWorkerId(workerId: string, companyId: string): Promise<WorkerDNR | undefined> {
+    const result = await db
+      .select()
+      .from(workerDNR)
+      .where(and(eq(workerDNR.workerId, workerId), eq(workerDNR.companyId, companyId), eq(workerDNR.isActive, true)));
+    return result[0];
+  }
+
+  async listCompanyDNR(companyId: string, activeOnly = true): Promise<WorkerDNR[]> {
+    let query = db.select().from(workerDNR).where(eq(workerDNR.companyId, companyId));
+    
+    if (activeOnly) {
+      query = query.where(eq(workerDNR.isActive, true));
+    }
+    
+    return query.orderBy(desc(workerDNR.markedAt));
+  }
+
+  async updateWorkerDNR(id: string, data: Partial<InsertWorkerDNR>): Promise<WorkerDNR | undefined> {
+    const result = await db.update(workerDNR).set(data).where(eq(workerDNR.id, id)).returning();
+    return result[0];
+  }
+
+  async removeWorkerDNR(id: string): Promise<WorkerDNR | undefined> {
+    // Set isActive to false instead of deleting
+    const result = await db
+      .update(workerDNR)
+      .set({
+        isActive: false,
+        unmakedAt: new Date(),
+      })
+      .where(eq(workerDNR.id, id))
+      .returning();
+    return result[0];
   }
 }
 

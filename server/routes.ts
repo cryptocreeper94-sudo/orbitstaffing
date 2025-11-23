@@ -20,6 +20,7 @@ import {
   insertPaymentSchema,
   insertFeatureRequestSchema,
   insertIosInterestSchema,
+  insertWorkerDNRSchema,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -1007,6 +1008,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to update lead" });
+    }
+  });
+
+  // ========================
+  // DNR (DO NOT RETURN/REHIRE)
+  // ========================
+  app.post("/api/workers/:workerId/dnr", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const { companyId, reason, reasonCategory, description, markedBy } = req.body;
+
+      if (!companyId || !reason || !reasonCategory) {
+        return res.status(400).json({ error: "Company ID, reason, and reason category required" });
+      }
+
+      const dnrData = {
+        workerId,
+        companyId,
+        reason,
+        reasonCategory,
+        description: description || null,
+        markedBy: markedBy || null,
+        isActive: true,
+      };
+
+      const parsed = insertWorkerDNRSchema.safeParse(dnrData);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid DNR data" });
+      }
+
+      const dnr = await storage.createWorkerDNR(parsed.data);
+      res.status(201).json(dnr);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark worker as DNR" });
+    }
+  });
+
+  app.get("/api/workers/:workerId/dnr", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const { companyId } = req.query as { companyId: string };
+
+      if (!companyId) {
+        return res.status(400).json({ error: "Company ID required" });
+      }
+
+      const dnr = await storage.getWorkerDNRByWorkerId(workerId, companyId);
+      if (!dnr) {
+        return res.status(404).json({ error: "No DNR record found" });
+      }
+
+      res.status(200).json(dnr);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch DNR record" });
+    }
+  });
+
+  app.get("/api/companies/:companyId/dnr", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const { activeOnly } = req.query;
+
+      const dnrList = await storage.listCompanyDNR(companyId, activeOnly !== "false");
+      res.status(200).json(dnrList);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch DNR list" });
+    }
+  });
+
+  app.patch("/api/dnr/:dnrId", async (req: Request, res: Response) => {
+    try {
+      const { dnrId } = req.params;
+      const updates = req.body;
+
+      const dnr = await storage.updateWorkerDNR(dnrId, updates);
+      if (!dnr) {
+        return res.status(404).json({ error: "DNR record not found" });
+      }
+
+      res.status(200).json(dnr);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update DNR record" });
+    }
+  });
+
+  app.delete("/api/dnr/:dnrId", async (req: Request, res: Response) => {
+    try {
+      const { dnrId } = req.params;
+
+      const dnr = await storage.removeWorkerDNR(dnrId);
+      if (!dnr) {
+        return res.status(404).json({ error: "DNR record not found" });
+      }
+
+      res.status(200).json({ success: true, message: "DNR record removed", dnr });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove DNR record" });
     }
   });
 

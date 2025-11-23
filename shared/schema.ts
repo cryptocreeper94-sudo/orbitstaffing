@@ -2040,3 +2040,57 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
 
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
+
+// ========================
+// DNR (Do Not Return/Rehire) - Fired Workers
+// ========================
+export const workerDNR = pgTable(
+  "worker_dnr",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // DNR Details
+    reason: text("reason").notNull(), // "policy_violation", "no_show", "poor_performance", "misconduct", "theft", "attendance", "other"
+    reasonCategory: varchar("reason_category", { length: 100 }).notNull(), // Type of violation
+    description: text("description"), // Detailed explanation
+    
+    // Tracking
+    markedBy: varchar("marked_by").references(() => users.id), // Admin who marked DNR
+    markedAt: timestamp("marked_at").default(sql`NOW()`),
+    
+    // Status
+    isActive: boolean("is_active").default(true), // Can be unmarked if appeal is successful
+    unmakedAt: timestamp("unmarked_at"), // When DNR was lifted (if applicable)
+    unmaredBy: varchar("unmarked_by").references(() => users.id),
+    unmareReason: text("unmake_reason"),
+    
+    // Appeals/Notes
+    hasAppealed: boolean("has_appealed").default(false),
+    appealReason: text("appeal_reason"),
+    appealDecision: varchar("appeal_decision", { length: 50 }), // "pending", "approved", "denied"
+    appealDecidedBy: varchar("appeal_decided_by").references(() => users.id),
+    appealDecidedAt: timestamp("appeal_decided_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_dnr_worker_id").on(table.workerId),
+    companyIdx: index("idx_dnr_company_id").on(table.companyId),
+    activeIdx: index("idx_dnr_is_active").on(table.isActive),
+  })
+);
+
+export const insertWorkerDNRSchema = createInsertSchema(workerDNR).omit({
+  id: true,
+  markedAt: true,
+  unmakedAt: true,
+  appealDecidedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerDNR = z.infer<typeof insertWorkerDNRSchema>;
+export type WorkerDNR = typeof workerDNR.$inferSelect;

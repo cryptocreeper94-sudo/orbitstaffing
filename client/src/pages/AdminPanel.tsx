@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 
@@ -381,6 +381,9 @@ function MasterAdminDashboard() {
           </Button>
         </div>
       </div>
+
+      {/* DNR Management */}
+      <DNRManagement />
     </div>
   );
 }
@@ -419,7 +422,7 @@ function FranchiseAdminDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-workers">
           <Users className="w-4 h-4 mr-2" />
           Manage Workers
@@ -432,6 +435,9 @@ function FranchiseAdminDashboard() {
           ⚙️ Franchise Settings
         </Button>
       </div>
+
+      {/* DNR Management */}
+      <DNRManagement />
     </div>
   );
 }
@@ -483,6 +489,156 @@ function CustomerAdminDashboard() {
           💳 Billing & Subscription
         </Button>
       </div>
+    </div>
+  );
+}
+
+// ==========================================
+// DNR (DO NOT RETURN) MANAGEMENT
+// ==========================================
+function DNRManagement() {
+  const [dnrList, setDnrList] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [newDNR, setNewDNR] = useState({
+    reasonCategory: 'no_show',
+    description: '',
+  });
+
+  const dnrReasons = [
+    { value: 'no_show', label: 'No Show / No Call' },
+    { value: 'policy_violation', label: 'Policy Violation' },
+    { value: 'poor_performance', label: 'Poor Performance' },
+    { value: 'misconduct', label: 'Misconduct' },
+    { value: 'theft', label: 'Theft' },
+    { value: 'attendance', label: 'Attendance Issues' },
+    { value: 'other', label: 'Other' },
+  ];
+
+  // Mock data for demo
+  useEffect(() => {
+    setDnrList([
+      {
+        id: '1',
+        workerId: 'w123',
+        reasonCategory: 'no_show',
+        description: 'Missed 3 consecutive shifts without notice',
+        markedAt: new Date().toISOString(),
+        isActive: true,
+      },
+      {
+        id: '2',
+        workerId: 'w456',
+        reasonCategory: 'policy_violation',
+        description: 'Arrived intoxicated to job site',
+        markedAt: new Date().toISOString(),
+        isActive: true,
+      },
+    ]);
+  }, []);
+
+  return (
+    <div className="bg-red-900/10 border border-red-700/50 rounded-lg p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5 text-red-400" />
+          DNR (Do Not Return) List
+        </h2>
+        <Button
+          className="bg-red-600 hover:bg-red-700 text-white"
+          onClick={() => setShowForm(!showForm)}
+          data-testid="button-add-dnr"
+        >
+          + Add to DNR
+        </Button>
+      </div>
+
+      {showForm && (
+        <div className="bg-slate-800 rounded-lg p-4 mb-6 border border-red-700">
+          <h3 className="text-lg font-bold mb-4">Mark Worker as DNR</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Reason for DNR
+              </label>
+              <select
+                value={newDNR.reasonCategory}
+                onChange={(e) => setNewDNR({ ...newDNR, reasonCategory: e.target.value })}
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-red-400"
+                data-testid="select-dnr-reason"
+              >
+                {dnrReasons.map((reason) => (
+                  <option key={reason.value} value={reason.value}>
+                    {reason.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Details
+              </label>
+              <textarea
+                value={newDNR.description}
+                onChange={(e) => setNewDNR({ ...newDNR, description: e.target.value })}
+                placeholder="Describe the incident or reason for DNR..."
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-red-400 resize-none h-24"
+                data-testid="textarea-dnr-description"
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                className="bg-gray-600 hover:bg-gray-700"
+                onClick={() => setShowForm(false)}
+                data-testid="button-cancel-dnr"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700"
+                data-testid="button-submit-dnr"
+              >
+                Mark as DNR
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {dnrList.length === 0 ? (
+          <p className="text-gray-400 text-center py-4">No workers on DNR list</p>
+        ) : (
+          dnrList.map((dnr) => (
+            <div
+              key={dnr.id}
+              className="bg-slate-800/50 rounded-lg p-4 border border-red-700/30 flex items-center justify-between"
+              data-testid={`dnr-item-${dnr.id}`}
+            >
+              <div>
+                <p className="font-bold text-red-300">Worker ID: {dnr.workerId}</p>
+                <p className="text-sm text-gray-400 capitalize">{dnr.reasonCategory.replace(/_/g, ' ')}</p>
+                {dnr.description && (
+                  <p className="text-sm text-gray-300 mt-1">{dnr.description}</p>
+                )}
+              </div>
+              <Button
+                className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-600/50"
+                onClick={() => setDnrList(dnrList.filter((d) => d.id !== dnr.id))}
+                data-testid={`button-remove-dnr-${dnr.id}`}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))
+        )}
+      </div>
+
+      <p className="text-xs text-gray-500 mt-6 p-3 bg-slate-800 rounded">
+        ⚠️ DNR List is used to prevent accidental rehiring of workers who have been fired or terminated. 
+        Always check this list before offering new assignments.
+      </p>
     </div>
   );
 }
