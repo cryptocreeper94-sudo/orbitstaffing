@@ -4,7 +4,19 @@
  * This tracks all ORBIT-branded assets in franchisee deployments
  */
 
-export type AssetType = 'powered_by_button' | 'hallmark_watermark' | 'digital_card' | 'landing_page' | 'other';
+export type AssetType = 
+  | 'powered_by_button' 
+  | 'hallmark_watermark' 
+  | 'invoice' 
+  | 'paystub' 
+  | 'contract' 
+  | 'report' 
+  | 'certification' 
+  | 'deployment' 
+  | 'document' 
+  | 'digital_card' 
+  | 'landing_page' 
+  | 'other';
 export type AssetStatus = 'active' | 'archived' | 'revoked';
 
 export interface OrbitAsset {

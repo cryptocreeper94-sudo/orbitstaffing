@@ -75,15 +75,11 @@ export default function Landing() {
             <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
           </div>
           <div className="flex gap-2">
-            <Link href="/login">
-              <a className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors">
-                Login
-              </a>
+            <Link href="/login" className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors inline-block">
+              Login
             </Link>
-            <Link href="/dashboard">
-              <a className="px-3 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90">
-                Dashboard
-              </a>
+            <Link href="/dashboard" className="px-3 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-block">
+              Dashboard
             </Link>
           </div>
         </div>
@@ -113,10 +109,8 @@ export default function Landing() {
             <Button className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
               Request Demo <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Link href="/configure">
-              <a className="h-10 text-sm px-4 rounded-md border border-primary/30 hover:bg-primary/10 inline-flex items-center">
-                Configure for Your Industry
-              </a>
+            <Link href="/configure" className="h-10 text-sm px-4 rounded-md border border-primary/30 hover:bg-primary/10 inline-flex items-center">
+              Configure for Your Industry
             </Link>
           </div>
 
