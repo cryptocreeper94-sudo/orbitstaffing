@@ -224,6 +224,10 @@ export const workers = pgTable(
     backgroundCheckDate: timestamp("background_check_date"),
     eVerifyStatus: varchar("e_verify_status", { length: 50 }),
 
+    // Profile & Digital Hallmark
+    avatarUrl: text("avatar_url"), // Worker's headshot/profile photo for employee card
+    employeeNumber: varchar("employee_number", { length: 50 }).unique(), // Formatted: EMP-XXXX or based on company preference
+
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
