@@ -49,6 +49,9 @@ export default function DeveloperLanding() {
     setPin('');
     setError('');
     localStorage.removeItem('developerAuthenticated');
+    localStorage.removeItem('adminAuthenticated');
+    localStorage.removeItem('adminRole');
+    localStorage.removeItem('adminName');
   };
 
   const navigateTo = (path: string) => {
