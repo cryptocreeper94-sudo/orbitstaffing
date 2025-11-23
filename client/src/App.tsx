@@ -47,13 +47,15 @@ import DrugTestScheduling from "@/pages/DrugTestScheduling";
 import IncidentReportingApp from "@/pages/IncidentReportingApp";
 import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import DrugTestBilling from "@/pages/DrugTestBilling";
+import AdminLanding from "@/pages/AdminLanding";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Landing} />
+      <Route path="/" component={AdminLanding} />
+      <Route path="/home" component={Landing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/sales" component={Sales} />
       <Route path="/operations" component={Operations} />

@@ -370,6 +370,156 @@
 **Note:** These are one-time + recurring costs. As revenue grows, compliance investment grows (e.g., SOC 2 at $10K+/year when enterprise sales begin).
 
 ---
+
+## ADDITIONAL REVENUE STREAMS (Growth Opportunities)
+
+### 1. Partnership & Integration Revenue (15-20% of revenue by Year 3)
+
+**White-Label Licensing**
+- License ORBIT platform to other staffing software companies
+- Fee: $10K-$50K upfront + 10-15% revenue share
+- Example partners: Staffing.com, ZipRecruiter, LinkedIn for staffing
+
+**API Partnerships**
+- Partner with payroll processors (ADP, Paychex, Gusto)
+- Revenue share on integrated services
+- Potential: $50K-$500K/year at scale
+
+**Staffing Association Partnerships**
+- Partner with ASA (American Staffing Association)
+- Co-marketing agreements, affiliate commissions
+- Potential: $20K-$100K/year
+
+### 2. Mobile App Monetization ($50K-$500K/year potential)
+
+**App Store Revenue (Google Play + Apple)**
+- Launch both Android (Google Play) and iOS (Apple App Store)
+- Premium tier: In-app purchases ($4.99-$9.99/month for advanced features)
+- Sponsored job feeds (employers pay to feature jobs)
+- Mobile app revenue potential: $50K-$500K/year at scale
+
+**Features to Monetize:**
+- Advanced GPS analytics & heatmaps
+- Predictive job matching (AI-powered)
+- Career development tools
+- Preferred access to high-paying assignments
+
+### 3. Training & Certification Programs ($100K-$500K/year potential)
+
+**Compliance Certification Courses**
+- Online training courses ($99-$299 per person)
+- Topics: Drug testing, background checks, GPS verification, workers comp
+- Target audience: HR managers, staffing supervisors, franchise owners
+- Potential: 100+ people/year × $200 = $20K/year (starting), scaling to $200K+
+
+**Staffing Agency Management Bootcamp**
+- 4-week intensive program for franchise owners
+- Price: $2,000-$5,000 per person
+- Content: Operations, staffing best practices, compliance, growth strategies
+- Potential: 10-20 franchisees/year × $3,000 = $30K-$100K/year
+
+**Certification Renewal Program**
+- Annual recertification for workers ($49/year)
+- Keeps them on "certified" status for premium assignments
+- Potential: 1,000+ workers × $49 = $50K+/year
+
+### 4. Data & Intelligence Marketplace ($50K-$200K/year potential)
+
+**Aggregated Labor Market Insights** (Anonymized, non-PII data)
+- Staffing trends, wage insights, skill demand
+- Target: Staffing consultants, HR departments, industry analysts
+- Reports available via subscription ($500-$2,000/month)
+- Potential: $50K-$200K/year
+
+**Important Compliance Rules:**
+- ✅ ONLY anonymized, aggregated data (no personal info)
+- ✅ GDPR/CCPA compliant
+- ✅ Explicit consent from workers for data usage
+- ✅ Separate data handling procedures
+- ❌ NO sharing PII with third parties
+- ❌ NO selling individual worker data
+
+### 5. Crypto & Blockchain Opportunities (Future, Requires Legal Review)
+
+**ORBIT Loyalty Token** (NOT a security, just points/rewards)
+- Workers earn tokens for completed assignments (non-transferable initially)
+- Redeem for: Bonus pay, premium features, training credits
+- NOT an ICO (Initial Coin Offering) - avoid securities law issues
+- Use: Solana or Polygon for low-cost blockchain layer
+
+**Key Legal Requirements:**
+- ⚠️ Consult securities attorney before launch
+- ⚠️ Ensure token is NOT a security (use Howey test)
+- ⚠️ Register as money services business if needed
+- ⚠️ Comply with state money transmission laws
+
+**Blockchain Credential Verification**
+- Immutable proof of worker qualifications on blockchain
+- Workers own their credentials across platforms
+- Differentiator vs. competitors
+- Potential: $20K-$100K/year in enterprise licensing
+
+**DAO-Style Governance** (Long-term)
+- Workers vote on feature requests
+- Franchisees have voting shares
+- Community-driven roadmap
+- Attracts web3-focused investors and partners
+
+### 6. Enterprise Add-Ons ($10K-$50K per customer)
+
+**White-Glove Setup & Integration Services**
+- Custom Stripe setup, integration with customer's ATS
+- Premium support, dedicated account manager
+- Price: $5,000-$25,000 per engagement
+- Potential: 5-10 engagements/year = $50K-$200K
+
+**Advanced Analytics & Custom Reporting**
+- Real-time dashboards, predictive analytics
+- Custom compliance reports for audits
+- Price: $1,000-$5,000/month premium tier
+- Potential: 5-20 customers/year = $50K-$500K/year
+
+---
+
+## UPDATED FINANCIAL PROJECTIONS (with Additional Streams)
+
+| Year | SaaS | Partnerships | Mobile App | Training | Data | **Total Revenue** |
+|------|------|--------------|-----------|----------|------|---------|
+| 1 | $200K | $0 | $0 | $5K | $0 | **$205K** |
+| 2 | $750K | $50K | $10K | $30K | $5K | **$845K** |
+| 3 | $2.2M | $300K | $50K | $100K | $30K | **$2.68M** |
+| 4 | $5.5M | $1M | $150K | $250K | $100K | **$7M** |
+| 5 | $10M | $2M | $300K | $500K | $200K | **$13M** |
+
+**Notes:**
+- Partnership revenue assumes integration deals close
+- Mobile app revenue assumes 50K+ active users by Year 3
+- Training assumes 100-200 certifications/year by Year 3
+- Data marketplace assumes B2B subscription model
+- Crypto assumes full legal compliance, conservative launch
+
+---
+
+## INVESTOR PITCH SUMMARY
+
+**The ORBIT Opportunity:**
+
+1. **Market**: $150B+ US staffing market, <30% tech penetration
+2. **Product**: Only platform combining GPS + compliance + franchise model
+3. **Revenue**: Multiple streams ($205K → $13M ARR in 5 years)
+4. **Unit Economics**: 40-50% gross margin, 6-9 month payback
+5. **Scalability**: Each franchisee is a revenue multiplier
+6. **Defensibility**: Proprietary GPS + chain of custody + compliance
+7. **Exit**: $25-50M acquisition by ADP, Workday, or Staffing360
+
+**Ask: $500K seed round** (18-24 month runway)
+**Use of funds:**
+- Product development (mobile apps, API) - $200K
+- Sales & marketing - $150K
+- Team (CTO, VP Sales) - $100K
+- Operations & compliance - $50K
+
+---
 - Gross margin: 75%+
 
 ---
