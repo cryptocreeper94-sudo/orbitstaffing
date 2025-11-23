@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
+import { sql } from "drizzle-orm";
 import { storage } from "./storage";
 import { emailService } from "./email";
 import {
@@ -24,6 +25,8 @@ import {
   insertPaymentMethodSchema,
   insertCollectionSchema,
   insertOrbitAssetSchema,
+  franchises,
+  companies,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -1525,6 +1528,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Support ticket submission error:", error);
       res.status(500).json({ error: "Failed to submit support ticket" });
+    }
+  });
+
+  // ========================
+  // FRANCHISES (Franchise Management)
+  // ========================
+  app.post("/api/franchises", async (req: Request, res: Response) => {
+    try {
+      const {
+        name,
+        ownerId,
+        logoUrl,
+        customDomain,
+        brandColor,
+        billingModel,
+        monthlyFee,
+        maxWorkers,
+        maxClients,
+        licenseStatus,
+      } = req.body;
+
+      if (!name || !ownerId) {
+        return res.status(400).json({ error: "Name and ownerId required" });
+      }
+
+      // Create franchise
+      const franchise = await storage.db.insert(franchises).values({
+        name,
+        ownerId,
+        logoUrl,
+        customDomain,
+        brandColor: brandColor || "#06B6D4",
+        billingModel: billingModel || "fixed",
+        monthlyFee: monthlyFee ? parseFloat(monthlyFee.toString()) : undefined,
+        maxWorkers: maxWorkers || 500,
+        maxClients: maxClients || 50,
+        licenseStatus: licenseStatus || "active",
+        dataIsolationLevel: "strict",
+      }).returning();
+
+      res.status(201).json({
+        success: true,
+        franchise: franchise[0],
+        message: `Franchise ${name} created successfully`,
+      });
+    } catch (error) {
+      console.error("Create franchise error:", error);
+      res.status(500).json({ error: "Failed to create franchise" });
+    }
+  });
+
+  app.get("/api/franchises", async (req: Request, res: Response) => {
+    try {
+      const allFranchises = await storage.db.select().from(franchises);
+      res.status(200).json({
+        success: true,
+        count: allFranchises.length,
+        franchises: allFranchises,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch franchises" });
+    }
+  });
+
+  app.get("/api/franchises/:franchiseId", async (req: Request, res: Response) => {
+    try {
+      const { franchiseId } = req.params;
+      const franchise = await storage.db
+        .select()
+        .from(franchises)
+        .where(sql`id = ${franchiseId}`)
+        .limit(1);
+
+      if (!franchise.length) {
+        return res.status(404).json({ error: "Franchise not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        franchise: franchise[0],
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch franchise" });
+    }
+  });
+
+  app.patch("/api/franchises/:franchiseId", async (req: Request, res: Response) => {
+    try {
+      const { franchiseId } = req.params;
+      const { brandColor, maxWorkers, maxClients, billingModel, monthlyFee, licenseStatus } = req.body;
+
+      const updated = await storage.db
+        .update(franchises)
+        .set({
+          brandColor,
+          maxWorkers,
+          maxClients,
+          billingModel,
+          monthlyFee: monthlyFee ? parseFloat(monthlyFee.toString()) : undefined,
+          licenseStatus,
+          updatedAt: new Date(),
+        })
+        .where(sql`id = ${franchiseId}`)
+        .returning();
+
+      if (!updated.length) {
+        return res.status(404).json({ error: "Franchise not found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        franchise: updated[0],
+        message: "Franchise updated successfully",
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update franchise" });
+    }
+  });
+
+  // Get franchisee's isolated company data
+  app.get("/api/franchises/:franchiseId/company", async (req: Request, res: Response) => {
+    try {
+      const { franchiseId } = req.params;
+
+      // Get franchise to verify it exists
+      const franchise = await storage.db
+        .select()
+        .from(franchises)
+        .where(sql`id = ${franchiseId}`)
+        .limit(1);
+
+      if (!franchise.length) {
+        return res.status(404).json({ error: "Franchise not found" });
+      }
+
+      // Get companies for this franchise owner
+      const companyList = await storage.db
+        .select()
+        .from(companies)
+        .where(sql`owner_id = ${franchise[0].ownerId}`);
+
+      res.status(200).json({
+        success: true,
+        franchiseId,
+        companies: companyList,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch franchise company data" });
     }
   });
 
