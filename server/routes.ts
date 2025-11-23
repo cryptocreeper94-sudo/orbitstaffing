@@ -80,7 +80,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: "admin",
           companyId: "test-company",
           isFirstLogin: true,
-          welcomeMessage: "Hey Sid, I know you are an expert on all this, so give me your honest opinion. Let's partner up and make this happen! 🚀"
+          welcomeMessage: "Hey Sid, I know you are an expert on all this, so give me your honest opinion. Let's partner up and make this happen! 🚀",
+          needsPasswordReset: true,
         };
         return res.status(200).json(testUser);
       }
@@ -98,6 +99,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Password reset endpoint
+  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
+    try {
+      const { email, newPassword } = req.body;
+
+      if (!email || !newPassword) {
+        return res.status(400).json({ error: "Email and new password required" });
+      }
+
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // TODO: Hash password
+      const updatedUser = await storage.updateUser(user.id, {
+        passwordHash: newPassword, // In production, hash this
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Password reset successfully",
+        user: updatedUser,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Password reset failed" });
     }
   });
 
