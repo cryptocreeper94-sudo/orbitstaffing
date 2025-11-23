@@ -48,6 +48,7 @@ import IncidentReportingApp from "@/pages/IncidentReportingApp";
 import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import DrugTestBilling from "@/pages/DrugTestBilling";
 import AdminLanding from "@/pages/AdminLanding";
+import OwnerPitch from "@/pages/OwnerPitch";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -96,6 +97,7 @@ function Router() {
       <Route path="/incident-reporting" component={IncidentReportingApp} />
       <Route path="/workers-comp-admin" component={WorkersCompAdmin} />
       <Route path="/drug-test-billing" component={DrugTestBilling} />
+      <Route path="/owner-pitch" component={OwnerPitch} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

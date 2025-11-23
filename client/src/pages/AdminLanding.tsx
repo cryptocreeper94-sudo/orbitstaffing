@@ -12,14 +12,16 @@ import {
   Settings,
   Users,
   Zap,
+  Share2,
 } from 'lucide-react';
 
 export default function AdminLanding() {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     compliance: false,
     revenue: false,
-    operations: false,
+    blockchain: false,
     learning: false,
+    pitch: false,
   });
 
   const toggleSection = (section: string) => {
@@ -80,6 +82,92 @@ export default function AdminLanding() {
         </Button>
       </div>
 
+      {/* Investor Pitch Section */}
+      <Card className="border-border/50 mb-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-700/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <TrendingUp className="w-5 h-5 text-blue-400" />
+              Investor Pitch & Stats
+            </CardTitle>
+            <ChevronDown
+              className={`w-5 h-5 transition-transform ${expandedSections.pitch ? 'rotate-180' : ''}`}
+              onClick={() => toggleSection('pitch')}
+              style={{ cursor: 'pointer' }}
+            />
+          </div>
+        </CardHeader>
+
+        {expandedSections.pitch && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="text-xs text-gray-400 mb-2"><strong>Market Opportunity</strong></p>
+                <ul className="text-xs text-gray-300 space-y-1">
+                  <li>✓ TAM: $150B+ US staffing market</li>
+                  <li>✓ SAM: $2-5B digital staffing solutions</li>
+                  <li>✓ Tech penetration: &lt;30% (huge gap)</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="text-xs text-gray-400 mb-2"><strong>Financial Projections</strong></p>
+                <ul className="text-xs text-gray-300 space-y-1">
+                  <li>✓ Year 1: $205K ARR</li>
+                  <li>✓ Year 3: $2.68M ARR (13x growth)</li>
+                  <li>✓ Year 5: $13M ARR (63x growth)</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="text-xs text-gray-400 mb-2"><strong>Unit Economics</strong></p>
+                <ul className="text-xs text-gray-300 space-y-1">
+                  <li>✓ Gross margin: 40-50%</li>
+                  <li>✓ CAC: $3,000-$5,000</li>
+                  <li>✓ Payback period: 6-9 months</li>
+                  <li>✓ Churn: &lt;3% monthly</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="text-xs text-gray-400 mb-2"><strong>Revenue Streams</strong></p>
+                <ul className="text-xs text-gray-300 space-y-1">
+                  <li>✓ SaaS subscriptions (60%)</li>
+                  <li>✓ Partnerships & API (15%)</li>
+                  <li>✓ Training & certifications (10%)</li>
+                  <li>✓ Data marketplace, mobile, add-ons (15%)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-blue-900/10 border border-blue-700/50 rounded-lg p-4">
+              <p className="text-sm text-blue-300 font-bold mb-2">🎯 Investment Ask: $500K Seed</p>
+              <ul className="text-xs text-blue-300 space-y-1">
+                <li>Product development (mobile, API) - $200K</li>
+                <li>Sales & marketing - $150K</li>
+                <li>Team (CTO, VP Sales) - $100K</li>
+                <li>Operations & compliance - $50K</li>
+              </ul>
+            </div>
+
+            <div className="bg-green-900/10 border border-green-700/50 rounded-lg p-4">
+              <p className="text-sm text-green-300 font-bold mb-2">💰 Exit Potential: $25-50M+</p>
+              <p className="text-xs text-green-300">
+                Acquisition targets: ADP ($15-30M), Workday ($20-40M), Staffing360 ($10-25M)
+              </p>
+            </div>
+
+            <Button
+              onClick={() => window.location.href = '/owner-pitch'}
+              className="w-full bg-primary hover:bg-primary/90"
+              data-testid="button-view-owner-pitch"
+            >
+              View Owner/Customer Pitch
+            </Button>
+          </CardContent>
+        )}
+      </Card>
+
       {/* Knowledge Base - Collapsible Sections */}
       <div className="space-y-4">
         <h2 className="text-2xl font-bold mb-4">Knowledge Base & Business Materials</h2>
@@ -135,29 +223,12 @@ export default function AdminLanding() {
                     <li className="text-gray-500 text-xs">💰 Cost: $3,000-$8,000</li>
                   </ul>
                 </div>
-
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-blue-300 mb-2">🔐 Phase 4: Data & Security (Months 4-8)</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Privacy Policy & Terms of Service</li>
-                    <li>✓ HIPAA Compliance</li>
-                    <li>✓ SOC 2 Type II Certification</li>
-                    <li>✓ PCI-DSS Compliance</li>
-                    <li className="text-gray-500 text-xs">💰 Cost: $2,000-$5,000 (SOC 2 is $10K+/year)</li>
-                  </ul>
-                </div>
-
-                <div className="bg-green-900/10 border border-green-700/50 rounded-lg p-3">
-                  <p className="text-xs text-green-300 font-bold mb-1">
-                    💡 Strategy: Phase 1-3 before first customer, Phase 4 before enterprise sales
-                  </p>
-                </div>
               </div>
             </CardContent>
           )}
         </Card>
 
-        {/* Revenue Models & Expansion */}
+        {/* Revenue Models */}
         <Card
           className="border-border/50 cursor-pointer hover:bg-card/50 transition"
           onClick={() => toggleSection('revenue')}
@@ -179,69 +250,40 @@ export default function AdminLanding() {
             <CardContent className="space-y-4">
               <div className="space-y-3 text-sm">
                 <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-green-300 mb-2">💳 Drug Test Billing (Current)</p>
+                  <p className="font-bold text-green-300 mb-2">💳 Drug Test Billing</p>
                   <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Pre-employment tests: Employer pays ($50-$150/test)</li>
-                    <li>✓ Incident tests: ORBIT covers (operational expense)</li>
-                    <li>✓ Stripe + Invoice payment options</li>
-                    <li className="text-gray-500 text-xs">💰 Profit margin: $20-$80 per test</li>
+                    <li>✓ Pre-employment: Employer pays ($50-$150)</li>
+                    <li>✓ Incidents: ORBIT covers</li>
+                    <li>✓ Profit margin: $20-$80 per test</li>
                   </ul>
                 </div>
 
                 <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-green-300 mb-2">🤝 Partnership Revenue</p>
+                  <p className="font-bold text-green-300 mb-2">🤝 Partnerships</p>
                   <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ White-label licensing to other platforms</li>
-                    <li>✓ API partnerships with staffing networks</li>
-                    <li>✓ Payroll processor integrations (ADP, Paychex)</li>
-                    <li className="text-gray-500 text-xs">💰 Potential: 10-20% of revenue by Year 3</li>
+                    <li>✓ White-label licensing ($10K-$50K + revenue share)</li>
+                    <li>✓ API partnerships (ADP, Paychex, Gusto)</li>
+                    <li>✓ Potential: 10-20% of revenue by Year 3</li>
                   </ul>
                 </div>
 
                 <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-green-300 mb-2">📱 Mobile App Revenue</p>
+                  <p className="font-bold text-green-300 mb-2">📱 Mobile App & Training</p>
                   <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Google Play Store + Apple App Store</li>
-                    <li>✓ Premium tier: In-app purchases, advanced features</li>
-                    <li>✓ Sponsored content (job alerts, training)</li>
-                    <li className="text-gray-500 text-xs">💰 Potential: $50K-$500K/year at scale</li>
+                    <li>✓ Google Play + Apple App Store ($50K-$500K/year)</li>
+                    <li>✓ Compliance certification ($99-$299/person)</li>
+                    <li>✓ Bootcamp programs ($2K-$5K per person)</li>
                   </ul>
-                </div>
-
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-green-300 mb-2">🎓 SaaS Training & Certification</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Compliance certification courses ($99-$299/person)</li>
-                    <li>✓ Drug testing procedures, GPS verification training</li>
-                    <li>✓ Staffing agency management bootcamp</li>
-                    <li className="text-gray-500 text-xs">💰 Potential: $100K-$500K/year</li>
-                  </ul>
-                </div>
-
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-green-300 mb-2">🏪 Data Marketplace</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Anonymized staffing trends (aggregated, non-PII)</li>
-                    <li>✓ Labor market insights for staffing consultants</li>
-                    <li>✓ Compliance intelligence reports</li>
-                    <li className="text-gray-500 text-xs">💰 Potential: $50K-$200K/year</li>
-                  </ul>
-                </div>
-
-                <div className="bg-yellow-900/10 border border-yellow-700/50 rounded-lg p-3">
-                  <p className="text-xs text-yellow-300 mb-2">
-                    <strong>⚠️ Data Marketplace Rules:</strong> Only anonymized, aggregated data. No personal info. GDPR/CCPA compliant.
-                  </p>
                 </div>
               </div>
             </CardContent>
           )}
         </Card>
 
-        {/* Crypto & Blockchain Opportunities */}
+        {/* Blockchain */}
         <Card
           className="border-border/50 cursor-pointer hover:bg-card/50 transition border-purple-700/30 bg-purple-900/5"
-          onClick={() => toggleSection('operations')}
+          onClick={() => toggleSection('blockchain')}
           data-testid="card-blockchain"
         >
           <CardHeader className="pb-3">
@@ -251,57 +293,29 @@ export default function AdminLanding() {
                 Blockchain & Crypto Opportunities
               </CardTitle>
               <ChevronDown
-                className={`w-5 h-5 transition-transform ${expandedSections.operations ? 'rotate-180' : ''}`}
+                className={`w-5 h-5 transition-transform ${expandedSections.blockchain ? 'rotate-180' : ''}`}
               />
             </div>
           </CardHeader>
 
-          {expandedSections.operations && (
-            <CardContent className="space-y-4">
-              <div className="space-y-3 text-sm">
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-purple-300 mb-2">⚠️ IMPORTANT: Legal & Regulatory</p>
-                  <p className="text-xs text-gray-400 ml-3 mb-2">
-                    Any token offering requires SEC registration or exemption (Reg A+, Reg D, etc.). Consult attorney before proceeding.
-                  </p>
-                </div>
+          {expandedSections.blockchain && (
+            <CardContent className="space-y-3 text-sm">
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="font-bold text-purple-300 mb-2">🪙 ORBIT Loyalty Token</p>
+                <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                  <li>✓ Workers earn for assignments (Solana/Polygon)</li>
+                  <li>✓ Redeem for pay, features, training</li>
+                  <li>⚠️ Requires legal review (NOT a security)</li>
+                </ul>
+              </div>
 
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-purple-300 mb-2">🪙 Loyalty Token (ORBIT Coin)</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Workers earn ORBIT coins for completed assignments</li>
-                    <li>✓ Redeem for: Bonus pay, premium benefits, app features</li>
-                    <li>✓ Could create secondary marketplace</li>
-                    <li>✓ Uses: Solana, Polygon (low-cost blockchains)</li>
-                    <li className="text-gray-500 text-xs">⚠️ Requires: Careful legal review, maybe not coin = tokenomics</li>
-                  </ul>
-                </div>
-
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-purple-300 mb-2">🤝 DAO-Style Governance</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Workers vote on feature requests, platform changes</li>
-                    <li>✓ Franchise owners have voting shares</li>
-                    <li>✓ Community-driven development</li>
-                    <li className="text-gray-500 text-xs">💰 Potential: Attracts web3-focused investors</li>
-                  </ul>
-                </div>
-
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-purple-300 mb-2">📜 Smart Contracts (Verification)</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Blockchain-verified credentials (background checks, certifications)</li>
-                    <li>✓ Immutable proof of skill/experience</li>
-                    <li>✓ Workers own their credentials across platforms</li>
-                    <li className="text-gray-500 text-xs">💰 Potential: Differentiator vs competitors</li>
-                  </ul>
-                </div>
-
-                <div className="bg-purple-900/10 border border-purple-700/50 rounded-lg p-3">
-                  <p className="text-xs text-purple-300 font-bold mb-1">
-                    💡 Recommended: Start with non-token approach (points/loyalty) → Add blockchain credentials later if market develops
-                  </p>
-                </div>
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="font-bold text-purple-300 mb-2">📜 Blockchain Credentials</p>
+                <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                  <li>✓ Immutable proof of qualifications</li>
+                  <li>✓ Workers own across platforms</li>
+                  <li>✓ $20K-$100K/year licensing potential</li>
+                </ul>
               </div>
             </CardContent>
           )}
@@ -326,43 +340,23 @@ export default function AdminLanding() {
           </CardHeader>
 
           {expandedSections.learning && (
-            <CardContent className="space-y-4">
-              <div className="space-y-3 text-sm">
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-cyan-300 mb-2">📖 ORBIT Platform Documentation</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ <a href="/docs/user-guide" className="text-cyan-400 hover:underline">User Guide</a> - How to use platform</li>
-                    <li>✓ <a href="/docs/admin-guide" className="text-cyan-400 hover:underline">Admin Guide</a> - Manage your franchise</li>
-                    <li>✓ <a href="/docs/api" className="text-cyan-400 hover:underline">API Documentation</a> - Integrations</li>
-                    <li>✓ <a href="/docs/faq" className="text-cyan-400 hover:underline">FAQ</a> - Common questions</li>
-                  </ul>
-                </div>
+            <CardContent className="space-y-3 text-sm">
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="font-bold text-cyan-300 mb-2">📖 Platform Documentation</p>
+                <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                  <li>✓ User Guide & Admin Guide</li>
+                  <li>✓ API Documentation</li>
+                  <li>✓ FAQ & Training Materials</li>
+                </ul>
+              </div>
 
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-cyan-300 mb-2">📊 Business Strategy Resources</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ ORBIT Business Plan (see Compliance section below)</li>
-                    <li>✓ Revenue Model Playbook</li>
-                    <li>✓ Franchise Partner Onboarding Guide</li>
-                    <li>✓ Customer Case Studies</li>
-                  </ul>
-                </div>
-
-                <div className="bg-slate-700/30 rounded-lg p-3">
-                  <p className="font-bold text-cyan-300 mb-2">🎓 Compliance Training</p>
-                  <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                    <li>✓ Drug Testing Best Practices</li>
-                    <li>✓ Chain of Custody Procedures</li>
-                    <li>✓ Workers Comp Compliance</li>
-                    <li>✓ Background Check Legal Requirements</li>
-                  </ul>
-                </div>
-
-                <div className="bg-blue-900/10 border border-blue-700/50 rounded-lg p-3">
-                  <p className="text-xs text-blue-300">
-                    💡 All materials available in shared `/docs` folder (read-only access to preserve integrity)
-                  </p>
-                </div>
+              <div className="bg-slate-700/30 rounded-lg p-3">
+                <p className="font-bold text-cyan-300 mb-2">🎓 Compliance Training</p>
+                <ul className="text-xs text-gray-400 space-y-1 ml-3">
+                  <li>✓ Drug Testing Best Practices</li>
+                  <li>✓ Chain of Custody Procedures</li>
+                  <li>✓ Workers Comp Compliance</li>
+                </ul>
               </div>
             </CardContent>
           )}
