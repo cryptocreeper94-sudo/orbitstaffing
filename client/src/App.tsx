@@ -53,6 +53,7 @@ import OwnerPitch from "@/pages/OwnerPitch";
 import DigitalHallmark from "@/pages/DigitalHallmark";
 import DeveloperPanel from "@/pages/DeveloperPanel";
 import DeveloperLanding from "@/pages/DeveloperLanding";
+import EmblemDownload from "@/pages/EmblemDownload";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -118,6 +119,7 @@ function Router() {
       <Route path="/owner-pitch" component={OwnerPitch} />
       <Route path="/digital-hallmark" component={DigitalHallmark} />
       <Route path="/developer" component={DeveloperPanel} />
+      <Route path="/emblem" component={EmblemDownload} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       {/* Fallback to 404 */}
