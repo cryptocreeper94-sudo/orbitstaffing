@@ -1,9 +1,8 @@
 /**
- * Main App - End User Facing Application
- * This is what franchisees and monthly customers see
- * - Fully configurable based on their industry/needs
- - Built-in admin delegation system
- - Direct communication channel with ORBIT
+ * Main App - ORBIT for Franchisees & Customers
+ * White-label version of the same ORBIT platform
+ * "Superior Staffing powered by ORBIT" style branding
+ * Fully configurable based on their industry, company size, and needs
  */
 import React, { useState } from 'react';
 import { BarChart3, Settings, Users, MessageSquare, Shield, Lock } from 'lucide-react';
@@ -54,10 +53,10 @@ export function MainAppInfo() {
           <div className="bg-green-900/20 border border-green-700 rounded-lg p-6">
             <h2 className="text-2xl font-bold mb-3 flex items-center gap-2">
               <BarChart3 className="w-6 h-6 text-green-400" />
-              End User Dashboard (Franchisee/Customer)
+              ORBIT for Franchisees & Customers
             </h2>
             <p className="text-gray-300 mb-4">
-              This is the front-facing application your customers see. It's fully configurable based on their industry, company size, and specific needs.
+              The same ORBIT platform, white-labeled for their business. They get all ORBIT features and can configure it for their industry, company size, and specific needs.
             </p>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>✓ Dashboard with operational metrics</li>

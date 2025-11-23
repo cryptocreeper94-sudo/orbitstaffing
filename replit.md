@@ -14,45 +14,63 @@ ORBIT Staffing OS is a fully automated, white-label capable platform designed fo
 
 ## System Architecture
 
-The ORBIT Staffing OS is a full-stack application utilizing a modern web development stack with **three-tier multi-tenant architecture**:
+The ORBIT Staffing OS is a **unified, multi-tenant white-label platform** where all users access the same ORBIT technology with appropriate access levels and branding:
 
-### Three-Tier Admin Structure
+### Three-Tier Access Model (One Platform, Different Views)
 
 **Tier 1: Master Admin (System Owner - YOU)**
 - Entry point: System Control Panel (PIN login)
-- Full access to entire system
-- Can create/delegate to admins with specific roles
-- Sees all franchises, customers, analytics, and system metrics
-- Controls system health, licenses, billing, and compliance
-- Dashboard includes system health monitoring and admin management
+- Full access to entire ORBIT ecosystem
+- Manage all franchises, customers, and admins
+- System health monitoring and configuration
+- Create & delegate admin roles to your team
+- Set rules, compliance policies, and system-wide settings
+- View all analytics and metrics
 
 **Tier 2: Assigned Admins (Your Team)**
-- Entry point: Admin Panel (PIN login)
-- Role-based access with specific permissions:
-  - **Franchise Admin**: Full control of assigned franchise(s)
-  - **Customer Admin**: Full control of assigned customer(s)
-  - **Staff Admin**: Worker & client management, assignments
-  - **Finance Admin**: Billing, payments, collections only
-  - **Operations Admin**: Scheduling & assignments only
-- Each role sees ONLY data for their assigned organization
+- Entry point: Admin Panel (PIN login)  
+- Role-based access with specific responsibilities:
+  - **Franchise Admin**: Oversee franchise operations
+  - **Customer Admin**: Manage monthly subscriptions
+  - **Staff Admin**: Worker & client management
+  - **Finance Admin**: Billing, payments, collections
+  - **Operations Admin**: Scheduling & assignments
+- Only see data for their assigned organization
 - Complete data isolation from other franchises/customers
-- Cannot create other admins (delegation only to Master)
+- Enforce policies and manage their scope
 
-**Tier 3: End Users (Business Owners/Franchisees)**
-- Entry point: Main App (their front-facing application)
-- Full control of their own company data
-- Can configure their own admin roles within their instance
-- See their workers, clients, assignments, payroll, invoicing
-- Industry-specific feature configuration (skilled trades, hospitality, general labor)
-- Direct communication channel with ORBIT (messaging, feature requests)
-- Complete data isolation - zero visibility into other businesses or system administration
+**Tier 3: End Users (Business Owners - Franchisees/Customers)**
+- Entry point: ORBIT Main App (branded with their company name)
+- **"Superior Staffing powered by ORBIT"** style branding
+- Full ORBIT functionality for their business:
+  - Worker & client management
+  - Real-time scheduling & assignments
+  - Payroll & invoicing
+  - GPS verification & mobile apps
+  - Collections & compliance
+- **Configurable Admin System** (delegated by us):
+  - They can assign team members to admin roles we define for them
+  - The available roles & permissions are determined by:
+    - Their industry type (skilled trades, hospitality, general labor)
+    - Their company size & business needs
+    - Their billing tier and payment model
+    - Jurisdiction compliance requirements (TN, KY, etc)
+  - They control WHO gets WHAT ROLE, we control WHAT ROLES EXIST
+  - Common pre-configured roles: Owner, Manager, Finance, Operations, HR, etc.
+- Direct communication with ORBIT
+  - Support messaging
+  - Feature requests & feedback loop
+  - Issue reporting
+  - Direct line during onboarding & setup
+- Complete data isolation - zero visibility into other businesses
 
-### Data Isolation Principle
-- Master Admin (Tier 1): Sees all data across all organizations
-- Assigned Admins (Tier 2): Only see their assigned org's data
-- End Users (Tier 3): Only see their own company's data
-- All isolation enforced at database query level
-- Each instance (end user) has configurable features based on industry/needs
+### The ORBIT Brand Promise
+- **Same core platform**: All tiers use identical ORBIT technology and features
+- **White-label capability**: Franchisee branding on top (company name, logo, colors)
+- **Industry-specific configurations**: One ORBIT app, adapted for their vertical
+- **Unified quality**: No "lesser" or "different" product - same ORBIT excellence
+- **Complete data isolation**: Multi-tenant security at database level
+- **Scalable**: From 1 franchise to 1000+ franchises, all on same infrastructure
 
 ### UI/UX Decisions
 
