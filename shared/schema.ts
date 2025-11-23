@@ -2283,3 +2283,53 @@ export const insertOrbitAssetSchema = createInsertSchema(orbitAssets).omit({
 
 export type InsertOrbitAsset = z.infer<typeof insertOrbitAssetSchema>;
 export type OrbitAsset = typeof orbitAssets.$inferSelect;
+
+// ========================
+// Support Tickets
+// ========================
+export const supportTickets = pgTable(
+  "support_tickets",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Contact Info
+    email: varchar("email", { length: 255 }).notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 20 }),
+    
+    // Ticket Details
+    subject: varchar("subject", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    category: varchar("category", { length: 50 }).default("general"), // "general", "bug", "feature_request", "billing", "technical", "partnership"
+    priority: varchar("priority", { length: 20 }).default("normal"), // "low", "normal", "high", "urgent"
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("open"), // "open", "in_progress", "resolved", "closed"
+    assignedTo: varchar("assigned_to").references(() => users.id),
+    
+    // Response
+    responseMessage: text("response_message"),
+    respondedBy: varchar("responded_by").references(() => users.id),
+    respondedAt: timestamp("responded_at"),
+    
+    // Tracking
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_tickets_email").on(table.email),
+    statusIdx: index("idx_tickets_status").on(table.status),
+    categoryIdx: index("idx_tickets_category").on(table.category),
+  })
+);
+
+export const insertSupportTicketSchema = createInsertSchema(supportTickets).omit({
+  id: true,
+  status: true,
+  respondedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSupportTicket = z.infer<typeof insertSupportTicketSchema>;
+export type SupportTicket = typeof supportTickets.$inferSelect;

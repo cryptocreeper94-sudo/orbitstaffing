@@ -1433,6 +1433,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // SUPPORT TICKETS
+  // ========================
+  app.post("/api/support/submit", async (req: Request, res: Response) => {
+    try {
+      const { email, name, phone, subject, message, category, priority } = req.body;
+
+      if (!email || !name || !subject || !message) {
+        return res.status(400).json({ error: "Email, name, subject, and message required" });
+      }
+
+      // In production, this would save to database
+      // For now, we'll just send the auto-response email
+      const ticketId = Math.random().toString(36).substr(2, 9).toUpperCase();
+
+      // Send automatic confirmation email
+      await emailService.send(
+        emailService.getSupportTicketConfirmationEmail(email, ticketId, subject)
+      );
+
+      console.log(`✓ Support ticket #${ticketId} created and confirmation sent to ${email}`);
+
+      res.status(201).json({
+        success: true,
+        ticketId,
+        message: "Support ticket submitted. Confirmation email sent.",
+      });
+    } catch (error) {
+      console.error("Support ticket submission error:", error);
+      res.status(500).json({ error: "Failed to submit support ticket" });
+    }
+  });
+
+  // ========================
   // HEALTH CHECK
   // ========================
   app.get("/api/health", (req: Request, res: Response) => {

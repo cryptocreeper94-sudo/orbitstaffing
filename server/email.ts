@@ -147,6 +147,58 @@ class EmailService {
       `,
     };
   }
+
+  /**
+   * Email template: Support ticket confirmation (auto-response)
+   */
+  getSupportTicketConfirmationEmail(email: string, ticketId: string, subject: string): EmailOptions {
+    return {
+      to: email,
+      subject: `Support Ticket Received - #${ticketId} ✅`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #000000 0%, #1f2937 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">🪐 ORBIT Support</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">We Received Your Message</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #000; margin-top: 0;">Thank you for contacting ORBIT!</h2>
+            
+            <p style="color: #333; line-height: 1.6;">
+              We've received your support request and our team is looking into it. Here's your ticket information:
+            </p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+              <p style="margin: 0 0 10px 0; color: #666;">
+                <strong>Ticket ID:</strong> <code style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px;">#${ticketId}</code>
+              </p>
+              <p style="margin: 0; color: #666;">
+                <strong>Subject:</strong> ${subject}
+              </p>
+            </div>
+            
+            <p style="color: #333; line-height: 1.6;">
+              A member of our support team will respond to your inquiry shortly. We typically respond within 24 hours during business hours.
+            </p>
+            
+            <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+              <p style="margin: 0; color: #0c4a6e; font-size: 14px;">
+                <strong>Need immediate help?</strong><br>
+                Contact us directly at support@orbitstaffing.net
+              </p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              ORBIT Staffing Platform | 24/7 Support Available
+            </p>
+          </div>
+        </div>
+      `,
+    };
+  }
 }
 
 // Singleton instance
