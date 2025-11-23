@@ -78,11 +78,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: "sidonie-test-001",
             email: "sidonie@orbitstaffing.net",
             firstName: "Sidonie",
-            lastName: "Expert Tester",
+            lastName: "ORBIT Admin",
             role: "admin",
             companyId: "test-company",
             isFirstLogin: true,
-            welcomeMessage: "Hey Sid, I know you are an expert on all this, so give me your honest opinion. Let's partner up and make this happen! 🚀",
+            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nYou are the ORBIT System Admin representing our organization. This sandbox mirrors the full ORBIT system and interfaces only with the business owner's main account (Superior Staffing). You can:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ Test system stability and security\n✓ Provide honest feedback on functionality\n\nYour role: System oversight and quality assurance. This is our permanent testing environment for joint demos and validation.",
             needsPasswordReset: true,
           };
           return res.status(200).json(adminUser);
@@ -94,11 +94,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: "owner-test-001",
             email: "owner@superiostaffing.com",
             firstName: "You",
-            lastName: "The Owner",
+            lastName: "Business Owner",
             role: "owner",
             companyId: "superior-staffing",
             isFirstLogin: true,
-            welcomeMessage: "Welcome to ORBIT! You're the owner of Superior Staffing. Create jobs, assign workers, and manage operations.",
+            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nWelcome to ORBIT! You're logged in as the owner of Superior Staffing. This is our shared sandbox environment where we run complete operational cycles together. You have full control to:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nUse this environment to test workflows end-to-end with Sidonie as the admin observer.",
             needsPasswordReset: true,
           };
           return res.status(200).json(ownerUser);
