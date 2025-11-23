@@ -68,10 +68,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
-      const { email, password, pin } = req.body;
+      const { email, password, pin, sandboxRole } = req.body;
 
-      // Special test login for Sidonie with PIN 4444
+      // PIN 4444 - Sandbox login (either admin or owner)
       if (pin === "4444") {
+        // Admin sandbox
+        if (sandboxRole === "admin") {
+          const adminUser = {
+            id: "sidonie-test-001",
+            email: "sidonie@orbitstaffing.net",
+            firstName: "Sidonie",
+            lastName: "Expert Tester",
+            role: "admin",
+            companyId: "test-company",
+            isFirstLogin: true,
+            welcomeMessage: "Hey Sid, I know you are an expert on all this, so give me your honest opinion. Let's partner up and make this happen! 🚀",
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(adminUser);
+        }
+        
+        // Owner sandbox
+        if (sandboxRole === "owner") {
+          const ownerUser = {
+            id: "owner-test-001",
+            email: "owner@superiostaffing.com",
+            firstName: "You",
+            lastName: "The Owner",
+            role: "owner",
+            companyId: "superior-staffing",
+            isFirstLogin: true,
+            welcomeMessage: "Welcome to ORBIT! You're the owner of Superior Staffing. Create jobs, assign workers, and manage operations.",
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(ownerUser);
+        }
+
+        // Default to admin if no role specified
         const testUser = {
           id: "sidonie-test-001",
           email: "sidonie@orbitstaffing.net",

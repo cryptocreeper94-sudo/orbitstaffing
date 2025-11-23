@@ -1,235 +1,262 @@
 /**
  * Developer Landing Page
- * Entry point for all authenticated users with system health check
- * Navigate to Admin Panel or Main App from here
+ * Sandbox entry point - join as Admin or Owner with PIN 4444
  */
-import React, { useState, useEffect } from 'react';
-import { Code, Shield, LogOut, Zap, BarChart3, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { Code, Shield, Users, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
-import { SystemHealthCheck } from '@/components/SystemHealthCheck';
-import { SystemArchitectureInfo } from '@/components/SystemArchitectureInfo';
+import { useMutation } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
 
 export default function DeveloperLanding() {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pin, setPin] = useState('');
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [pinInput, setPinInput] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | null>(null);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Check if already authenticated
-    const devAuth = localStorage.getItem('developerAuthenticated') === 'true';
-    if (devAuth) {
+  const loginMutation = useMutation({
+    mutationFn: async (sandboxRole: 'admin' | 'owner') => {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pin: '4444',
+          sandboxRole: sandboxRole,
+        }),
+      });
+      if (!res.ok) throw new Error('Login failed');
+      return res.json();
+    },
+    onSuccess: (user, sandboxRole) => {
+      setCurrentUser(user);
       setIsAuthenticated(true);
-    }
-  }, []);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('userRole', user.role);
+      
+      // Navigate to appropriate dashboard
+      if (sandboxRole === 'admin') {
+        setLocation('/admin');
+      } else {
+        setLocation('/dashboard');
+      }
+    },
+    onError: () => {
+      setError('Failed to join sandbox. Please try again.');
+      setPinInput('');
+      setSelectedRole(null);
+    },
+  });
 
-  const handlePinSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleJoinSandbox = (role: 'admin' | 'owner') => {
+    setSelectedRole(role);
     setError('');
-
-    if (pin.length !== 4) {
-      setError('PIN must be 4 digits');
-      return;
-    }
-
-    const correctPin = process.env.VITE_ADMIN_PIN || '0000';
-    if (pin === correctPin) {
-      setIsAuthenticated(true);
-      localStorage.setItem('developerAuthenticated', 'true');
-      setPin('');
-    } else {
-      setError('Invalid PIN.');
-      setPin('');
-    }
+    loginMutation.mutate(role);
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setPin('');
+    setCurrentUser(null);
+    setPinInput('');
+    setSelectedRole(null);
     setError('');
-    localStorage.removeItem('developerAuthenticated');
-    localStorage.removeItem('adminAuthenticated');
-    localStorage.removeItem('adminRole');
-    localStorage.removeItem('adminName');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userRole');
   };
 
-  const navigateTo = (path: string) => {
-    setLocation(path);
-  };
-
-  // Login Screen
-  if (!isAuthenticated) {
+  // Authenticated state - show user dashboard
+  if (isAuthenticated && currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-        <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
-          <div className="flex items-center justify-center mb-6">
-            <Code className="w-8 h-8 text-purple-400 mr-3" />
-            <h1 className="text-2xl font-bold text-white">ORBIT System</h1>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
+                <Code className="w-8 h-8 text-purple-400" />
+                ORBIT Sandbox
+              </h1>
+              <p className="text-gray-400">
+                Logged in as {currentUser.firstName} ({currentUser.role})
+              </p>
+            </div>
+            <Button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              data-testid="button-sandbox-logout"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
           </div>
 
-          <p className="text-gray-400 text-sm mb-6 text-center">
-            Enter your 4-digit PIN to access the system
-          </p>
-
-          <form onSubmit={handlePinSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">PIN</label>
-              <input
-                type="password"
-                value={pin}
-                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                maxLength={4}
-                placeholder="••••"
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
-                autoFocus
-                data-testid="input-system-pin"
-              />
-            </div>
-
-            {error && (
-              <div className="bg-red-900/20 border border-red-700 rounded-lg p-3 flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-red-400" />
-                <p className="text-sm text-red-200">{error}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {currentUser.role === 'admin' && (
+              <div
+                onClick={() => setLocation('/admin')}
+                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-cyan-500 transition-all group"
+              >
+                <Shield className="w-8 h-8 text-cyan-400 mb-4" />
+                <h2 className="text-2xl font-bold mb-2">Admin Dashboard</h2>
+                <p className="text-gray-400 text-sm mb-4">
+                  View all companies, workers, and system metrics
+                </p>
+                <Button className="w-full bg-cyan-600 hover:bg-cyan-700">
+                  Go to Admin →
+                </Button>
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg"
-              data-testid="button-system-login"
-            >
-              Login
-            </Button>
-          </form>
-
-          <p className="text-xs text-gray-500 text-center mt-6">
-            ORBIT Staffing OS - System Control Panel
-          </p>
+            {currentUser.role === 'owner' && (
+              <div
+                onClick={() => setLocation('/dashboard')}
+                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-green-500 transition-all group"
+              >
+                <Users className="w-8 h-8 text-green-400 mb-4" />
+                <h2 className="text-2xl font-bold mb-2">Owner Dashboard</h2>
+                <p className="text-gray-400 text-sm mb-4">
+                  Manage jobs, assignments, and payroll for Superior Staffing
+                </p>
+                <Button className="w-full bg-green-600 hover:bg-green-700">
+                  Go to Dashboard →
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   }
 
-  // Authenticated Dashboard
+  // Unauthenticated - show sandbox join options
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
-              <Code className="w-8 h-8 text-purple-400" />
-              System Control Panel
-            </h1>
-            <p className="text-gray-400">Developer access - system health & navigation</p>
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center mb-4">
+            <Code className="w-10 h-10 text-purple-400 mr-3" />
+            <h1 className="text-4xl font-bold text-white">ORBIT Staffing OS</h1>
           </div>
-          <Button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-            data-testid="button-system-logout"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <p className="text-gray-300 text-lg">
+            Complete Staffing Platform Demo - PIN: 4444
+          </p>
         </div>
 
-        {/* System Architecture Overview */}
-        <div className="mb-12">
-          <SystemArchitectureInfo />
-        </div>
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 flex items-center gap-3 mb-8">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <p className="text-red-200">{error}</p>
+          </div>
+        )}
 
-        {/* System Health Check */}
-        <div className="mb-12">
-          <SystemHealthCheck />
-        </div>
+        {/* Sandbox Options */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Admin Sandbox */}
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-cyan-500 transition-all">
+            <div className="flex items-center justify-center mb-4">
+              <Shield className="w-8 h-8 text-cyan-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">
+              Admin Sandbox
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 text-center">
+              Sidonie's view - Monitor all companies, workers, and system metrics in real-time
+            </p>
 
-        {/* Quick Navigation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {/* Admin Panel Card */}
-          <div
-            onClick={() => navigateTo('/admin')}
-            className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-cyan-500 transition-all group"
-            data-testid="card-navigate-admin"
-          >
-            <div className="flex items-start gap-4">
-              <Shield className="w-8 h-8 text-cyan-400 group-hover:scale-110 transition-transform" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-2">Admin Panel</h2>
-                <p className="text-gray-400 text-sm mb-4">
-                  Manage franchises, customers, billing, and system configuration
-                </p>
-                <ul className="text-xs text-gray-500 space-y-1">
-                  <li>✓ Create & manage franchises</li>
-                  <li>✓ Manage monthly customers</li>
-                  <li>✓ View system analytics</li>
-                  <li>✓ Delegate admin responsibilities</li>
-                </ul>
+            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-cyan-400">✓</span>
+                Real-time dashboard & analytics
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-cyan-400">✓</span>
+                GPS verification & audit trails
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-cyan-400">✓</span>
+                System-wide monitoring
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-cyan-400">✓</span>
+                Compliance & reporting
               </div>
             </div>
-            <Button className="w-full mt-6 bg-cyan-600 hover:bg-cyan-700" data-testid="button-go-admin">
-              Open Admin Panel →
+
+            <Button
+              onClick={() => handleJoinSandbox('admin')}
+              disabled={loginMutation.isPending}
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg"
+              data-testid="button-join-admin-sandbox"
+            >
+              {loginMutation.isPending && selectedRole === 'admin'
+                ? 'Joining...'
+                : 'Join as Admin (PIN: 4444)'}
             </Button>
+
+            <p className="text-xs text-gray-500 text-center mt-3">
+              Email: sidonie@orbitstaffing.net
+            </p>
           </div>
 
-          {/* Main App Card */}
-          <div
-            onClick={() => navigateTo('/dashboard')}
-            className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-green-500 transition-all group"
-            data-testid="card-navigate-app"
-          >
-            <div className="flex items-start gap-4">
-              <BarChart3 className="w-8 h-8 text-green-400 group-hover:scale-110 transition-transform" />
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold mb-2">Main Application</h2>
-                <p className="text-gray-400 text-sm mb-4">
-                  Access workers, assignments, scheduling, and operational dashboard
-                </p>
-                <ul className="text-xs text-gray-500 space-y-1">
-                  <li>✓ Worker & client management</li>
-                  <li>✓ Job assignments & scheduling</li>
-                  <li>✓ Real-time dashboard</li>
-                  <li>✓ Payroll & invoicing</li>
-                </ul>
+          {/* Owner Sandbox */}
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-green-500 transition-all">
+            <div className="flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-green-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">
+              Owner Sandbox
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 text-center">
+              Your view - Create jobs, assign workers, process payroll instantly
+            </p>
+
+            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-green-400">✓</span>
+                Create & manage jobs
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-green-400">✓</span>
+                Assign workers instantly
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-green-400">✓</span>
+                Automatic payroll processing
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-green-400">✓</span>
+                Real-time earnings tracking
               </div>
             </div>
-            <Button className="w-full mt-6 bg-green-600 hover:bg-green-700" data-testid="button-go-app">
-              Open Main App →
+
+            <Button
+              onClick={() => handleJoinSandbox('owner')}
+              disabled={loginMutation.isPending}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 font-bold text-lg"
+              data-testid="button-join-owner-sandbox"
+            >
+              {loginMutation.isPending && selectedRole === 'owner'
+                ? 'Joining...'
+                : 'Join as Owner (PIN: 4444)'}
             </Button>
+
+            <p className="text-xs text-gray-500 text-center mt-3">
+              Email: owner@superiostaffing.com
+            </p>
           </div>
         </div>
 
-        {/* Developer Tools */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* APIs & Documentation */}
-          <div
-            onClick={() => navigateTo('/developer')}
-            className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 cursor-pointer hover:border-purple-500 transition-all"
-            data-testid="card-dev-apis"
-          >
-            <Code className="w-6 h-6 text-purple-400 mb-3" />
-            <h3 className="font-bold text-lg mb-2">APIs & Documentation</h3>
-            <p className="text-sm text-gray-400">REST APIs, WebSocket endpoints, code examples</p>
-          </div>
-
-          {/* System Configuration */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 cursor-pointer hover:border-yellow-500 transition-all group"
-            data-testid="card-dev-config"
-          >
-            <Settings className="w-6 h-6 text-yellow-400 mb-3 group-hover:rotate-12 transition-transform" />
-            <h3 className="font-bold text-lg mb-2">Configuration</h3>
-            <p className="text-sm text-gray-400">Database, environment, settings management</p>
-          </div>
-
-          {/* Error Monitoring */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 cursor-pointer hover:border-red-500 transition-all"
-            data-testid="card-dev-monitoring"
-          >
-            <Zap className="w-6 h-6 text-red-400 mb-3" />
-            <h3 className="font-bold text-lg mb-2">Monitoring & Logs</h3>
-            <p className="text-sm text-gray-400">Error logs, performance metrics, debugging</p>
-          </div>
+        {/* Footer */}
+        <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 text-center">
+          <p className="text-gray-400 text-sm mb-2">
+            Complete demo environment ready for production testing
+          </p>
+          <p className="text-xs text-gray-500">
+            Both PIN: <span className="text-yellow-400 font-mono">4444</span> • Complete sandbox access
+          </p>
         </div>
       </div>
     </div>

@@ -57,22 +57,16 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
 function RootPage() {
-  const [isDev, setIsDev] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const devAuth = localStorage.getItem('developerAuthenticated') === 'true';
-    setIsDev(devAuth);
     setLoading(false);
   }, []);
 
   if (loading) return null;
 
-  // First check if developer/admin is authenticated
-  if (isDev) return <DeveloperLanding />;
-  
-  // Otherwise show landing page
-  return <Landing />;
+  // Always land on developer/sandbox page
+  return <DeveloperLanding />;
 }
 
 function Router() {
