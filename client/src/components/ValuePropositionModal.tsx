@@ -116,8 +116,15 @@ export function ValuePropositionModal() {
         {!selected ? (
           <>
             <DialogHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <img 
+                  src="/assets/3d_saturn_with_dark_outline_and_shadow_depth.png" 
+                  alt="ORBIT Logo" 
+                  className="h-12 w-12"
+                />
+              </div>
               <DialogTitle className="text-3xl font-heading mb-2">
-                🪐 Welcome to ORBIT
+                Welcome to ORBIT
               </DialogTitle>
               <DialogDescription className="text-lg text-foreground/80">
                 The staffing platform that actually works. Designed for your business size.
