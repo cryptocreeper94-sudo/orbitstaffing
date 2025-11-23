@@ -1,11 +1,11 @@
 /**
  * Secure Sandbox - Hidden PIN 4444 Access
+ * Access all three sandboxes: Owner, Admin, Employee
  * Only accessible via /sandbox-secure (not publicly visible)
- * Personalized for User and Sidonie
- * Read-only for Sidonie, Full control for User
+ * Both users can access all views - Sidonie read-only, You full control
  */
 import React, { useState } from 'react';
-import { Code, Shield, Users, LogOut, Lock } from 'lucide-react';
+import { Code, Shield, Users, LogOut, Lock, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -15,11 +15,11 @@ export default function SecureSandbox() {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | null>(null);
+  const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | 'employee' | null>(null);
   const [error, setError] = useState('');
 
   const loginMutation = useMutation({
-    mutationFn: async (sandboxRole: 'admin' | 'owner') => {
+    mutationFn: async (sandboxRole: 'admin' | 'owner' | 'employee') => {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,11 +36,14 @@ export default function SecureSandbox() {
       setIsAuthenticated(true);
       localStorage.setItem('currentUser', JSON.stringify(user));
       localStorage.setItem('userRole', user.role);
+      localStorage.setItem('isReadOnly', user.isReadOnly || false);
       localStorage.setItem('sandboxSecure', 'true');
 
       // Navigate to appropriate dashboard
       if (sandboxRole === 'admin') {
         setLocation('/admin');
+      } else if (sandboxRole === 'employee') {
+        setLocation('/employee-app');
       } else {
         setLocation('/dashboard');
       }
@@ -51,7 +54,7 @@ export default function SecureSandbox() {
     },
   });
 
-  const handleJoinSandbox = (role: 'admin' | 'owner') => {
+  const handleJoinSandbox = (role: 'admin' | 'owner' | 'employee') => {
     setSelectedRole(role);
     setError('');
     loginMutation.mutate(role);
@@ -64,6 +67,7 @@ export default function SecureSandbox() {
     setError('');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('isReadOnly');
     localStorage.removeItem('sandboxSecure');
   };
 
@@ -76,10 +80,11 @@ export default function SecureSandbox() {
             <div>
               <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
                 <Lock className="w-8 h-8 text-purple-400" />
-                ORBIT Secure Sandbox
+                ORBIT Sandbox Portal
               </h1>
               <p className="text-gray-400">
-                Private access for {currentUser.firstName} ({currentUser.role})
+                Access as {currentUser.firstName} ({currentUser.role})
+                {currentUser.isReadOnly && <span className="text-yellow-400 ml-2">[READ-ONLY]</span>}
               </p>
             </div>
             <Button
@@ -92,47 +97,87 @@ export default function SecureSandbox() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Admin Dashboard */}
+            <div
+              onClick={() => handleLogout() || setIsAuthenticated(false)}
+              className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-cyan-500 transition-all group"
+            >
+              <Shield className="w-8 h-8 text-cyan-400 mb-4" />
+              <h2 className="text-xl font-bold mb-2">Back to Sandbox</h2>
+              <p className="text-gray-400 text-sm mb-4">
+                Return to sandbox selection
+              </p>
+              <Button className="w-full bg-slate-600 hover:bg-slate-700">
+                Go Back
+              </Button>
+            </div>
+
+            {/* Admin View */}
             {currentUser.role === 'admin' && (
               <div
                 onClick={() => setLocation('/admin')}
                 className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-cyan-500 transition-all group"
               >
                 <Shield className="w-8 h-8 text-cyan-400 mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Admin Dashboard</h2>
+                <h2 className="text-xl font-bold mb-2">Admin Dashboard</h2>
                 <p className="text-gray-400 text-sm mb-4">
-                  System overview - Read-only monitoring access
+                  System overview - Complete visibility
                 </p>
                 <ul className="text-xs text-gray-500 space-y-1 mb-4">
-                  <li>✓ View all companies and workers</li>
-                  <li>✓ Monitor all operations in real-time</li>
-                  <li>✓ Access complete audit trails</li>
-                  <li>✓ No modifications allowed (read-only)</li>
+                  <li>✓ All companies & workers</li>
+                  <li>✓ Real-time operations</li>
+                  <li>✓ Complete audit trails</li>
+                  {currentUser.isReadOnly && <li>✓ Read-only mode</li>}
                 </ul>
                 <Button className="w-full bg-cyan-600 hover:bg-cyan-700">
-                  Go to Admin →
+                  Open Admin →
                 </Button>
               </div>
             )}
 
+            {/* Owner View */}
             {currentUser.role === 'owner' && (
               <div
                 onClick={() => setLocation('/dashboard')}
                 className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-green-500 transition-all group"
               >
-                <Users className="w-8 h-8 text-green-400 mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Owner Dashboard</h2>
+                <Briefcase className="w-8 h-8 text-green-400 mb-4" />
+                <h2 className="text-xl font-bold mb-2">Owner Dashboard</h2>
                 <p className="text-gray-400 text-sm mb-4">
-                  Full operational control - Superior Staffing sandbox
+                  Full operational control
                 </p>
                 <ul className="text-xs text-gray-500 space-y-1 mb-4">
-                  <li>✓ Create and manage jobs</li>
-                  <li>✓ Assign workers to assignments</li>
+                  <li>✓ Create & manage jobs</li>
+                  <li>✓ Assign workers</li>
                   <li>✓ Process payroll</li>
                   <li>✓ Generate invoices</li>
                 </ul>
                 <Button className="w-full bg-green-600 hover:bg-green-700">
-                  Go to Dashboard →
+                  Open Owner →
+                </Button>
+              </div>
+            )}
+
+            {/* Worker/Employee View */}
+            {currentUser.role === 'worker' && (
+              <div
+                onClick={() => setLocation('/employee-app')}
+                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-purple-500 transition-all group"
+              >
+                <Users className="w-8 h-8 text-purple-400 mb-4" />
+                <h2 className="text-xl font-bold mb-2">Employee App</h2>
+                <p className="text-gray-400 text-sm mb-4">
+                  Worker experience view
+                </p>
+                <ul className="text-xs text-gray-500 space-y-1 mb-4">
+                  <li>✓ View assignments</li>
+                  <li>✓ GPS clock-in/out</li>
+                  <li>✓ Track earnings</li>
+                  <li>✓ View bonuses</li>
+                </ul>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                  Open Worker App →
                 </Button>
               </div>
             )}
@@ -141,7 +186,7 @@ export default function SecureSandbox() {
           <div className="mt-8 bg-slate-800/30 border border-slate-700 rounded-lg p-6">
             <p className="text-gray-400 text-sm">
               <Lock className="w-4 h-4 inline mr-2 text-purple-400" />
-              Secure sandbox - Private access only. PIN 4444 is restricted to authorized users.
+              You are in PIN 4444 sandbox mode. You can switch between Admin, Owner, and Employee views.
             </p>
           </div>
         </div>
@@ -149,10 +194,10 @@ export default function SecureSandbox() {
     );
   }
 
-  // Unauthenticated - Show secure login
+  // Unauthenticated - Show three sandbox options
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
+      <div className="max-w-4xl w-full">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
@@ -160,10 +205,10 @@ export default function SecureSandbox() {
             <h1 className="text-4xl font-bold text-white">Secure Sandbox</h1>
           </div>
           <p className="text-gray-300 text-lg">
-            Private testing environment - PIN 4444
+            Complete testing environment - PIN 4444
           </p>
           <p className="text-gray-500 text-xs mt-2">
-            This is a restricted access area
+            Test all three views: Admin, Owner, Employee
           </p>
         </div>
 
@@ -175,21 +220,25 @@ export default function SecureSandbox() {
           </div>
         )}
 
-        {/* Login Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Sidonie's Admin Access */}
+        {/* Three Sandbox Options */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Admin Sandbox */}
           <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-cyan-500 transition-all flex flex-col h-full">
             <div className="flex items-center justify-center mb-4">
               <Shield className="w-8 h-8 text-cyan-400" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-3 text-center">
-              Admin Access
+              Admin Sandbox
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
-              System monitoring & oversight - Read-only access
+              Complete system overview & control
             </p>
 
             <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-cyan-400">✓</span>
+                View all companies & workers
+              </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <span className="text-cyan-400">✓</span>
                 Real-time dashboard & analytics
@@ -206,38 +255,34 @@ export default function SecureSandbox() {
                 <span className="text-cyan-400">✓</span>
                 Compliance & reporting
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-cyan-400">✓</span>
-                Read-only (no modifications)
-              </div>
             </div>
 
             <Button
               onClick={() => handleJoinSandbox('admin')}
               disabled={loginMutation.isPending}
               className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg mb-3"
-              data-testid="button-secure-admin"
+              data-testid="button-admin-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'admin'
                 ? 'Joining...'
-                : 'Join as Admin'}
+                : 'Join Admin (PIN: 4444)'}
             </Button>
 
             <p className="text-xs text-gray-500 text-center">
-              Email: sidonie@orbitstaffing.net
+              System monitoring & oversight
             </p>
           </div>
 
-          {/* Your Owner Access */}
+          {/* Owner Sandbox */}
           <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-green-500 transition-all flex flex-col h-full">
             <div className="flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-green-400" />
+              <Briefcase className="w-8 h-8 text-green-400" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-3 text-center">
-              Owner Access
+              Owner Sandbox
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
-              Full operational control - Superior Staffing
+              Full operational control
             </p>
 
             <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
@@ -259,7 +304,7 @@ export default function SecureSandbox() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <span className="text-green-400">✓</span>
-                Full dashboard control
+                Invoice generation
               </div>
             </div>
 
@@ -267,15 +312,66 @@ export default function SecureSandbox() {
               onClick={() => handleJoinSandbox('owner')}
               disabled={loginMutation.isPending}
               className="w-full bg-green-600 hover:bg-green-700 text-white py-3 font-bold text-lg mb-3"
-              data-testid="button-secure-owner"
+              data-testid="button-owner-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'owner'
                 ? 'Joining...'
-                : 'Join as Owner'}
+                : 'Join Owner (PIN: 4444)'}
             </Button>
 
             <p className="text-xs text-gray-500 text-center">
-              Email: owner@superiostaffing.com
+              Full business operations
+            </p>
+          </div>
+
+          {/* Employee Sandbox */}
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-purple-500 transition-all flex flex-col h-full">
+            <div className="flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-purple-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">
+              Employee Sandbox
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 text-center">
+              Worker app experience
+            </p>
+
+            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                View assigned jobs
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                GPS clock-in/out
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                Real-time earnings
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                Track bonuses
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                Payment history
+              </div>
+            </div>
+
+            <Button
+              onClick={() => handleJoinSandbox('employee')}
+              disabled={loginMutation.isPending}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg mb-3"
+              data-testid="button-employee-sandbox"
+            >
+              {loginMutation.isPending && selectedRole === 'employee'
+                ? 'Joining...'
+                : 'Join Employee (PIN: 4444)'}
+            </Button>
+
+            <p className="text-xs text-gray-500 text-center">
+              Worker view experience
             </p>
           </div>
         </div>
@@ -284,7 +380,7 @@ export default function SecureSandbox() {
         <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 text-center">
           <Lock className="w-5 h-5 inline text-purple-400 mr-2" />
           <p className="text-gray-400 text-sm">
-            This is a restricted access sandbox environment for authorized testing only.
+            Restricted access sandbox. PIN 4444 provides complete access to all three views.
           </p>
         </div>
       </div>

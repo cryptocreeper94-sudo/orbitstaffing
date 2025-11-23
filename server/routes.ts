@@ -73,7 +73,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password, pin, sandboxRole } = req.body;
 
-      // PIN 4444 - Sandbox login (either admin or owner)
+      // PIN 4444 - Sandbox login (admin, owner, or employee)
       if (pin === "4444") {
         // Admin sandbox
         if (sandboxRole === "admin") {
@@ -85,7 +85,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: "admin",
             companyId: "test-company",
             isFirstLogin: true,
-            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nYou are the ORBIT System Admin representing our organization. This sandbox mirrors the full ORBIT system and interfaces only with the business owner's main account (Superior Staffing). You can:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ Test system stability and security\n✓ Provide honest feedback on functionality\n\nYour role: System oversight and quality assurance. This is our permanent testing environment for joint demos and validation.",
+            isReadOnly: true,
+            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
             needsPasswordReset: true,
           };
           return res.status(200).json(adminUser);
@@ -101,10 +102,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: "owner",
             companyId: "superior-staffing",
             isFirstLogin: true,
-            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nWelcome to ORBIT! You're logged in as the owner of Superior Staffing. This is our shared sandbox environment where we run complete operational cycles together. You have full control to:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nUse this environment to test workflows end-to-end with Sidonie as the admin observer.",
+            isReadOnly: false,
+            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nWelcome to ORBIT! You're logged in as the owner of Superior Staffing. This is your complete operational sandbox where you have full control:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nSwitch between Owner, Admin, and Employee views anytime using PIN 4444.",
             needsPasswordReset: true,
           };
           return res.status(200).json(ownerUser);
+        }
+
+        // Employee sandbox
+        if (sandboxRole === "employee") {
+          const employeeUser = {
+            id: "worker-test-001",
+            email: "worker@orbitstaffing.net",
+            firstName: "Demo",
+            lastName: "Worker",
+            role: "worker",
+            companyId: "superior-staffing",
+            isFirstLogin: true,
+            isReadOnly: true,
+            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nWelcome to the ORBIT Worker App! This is the employee experience sandbox. You can:\n\n✓ View assigned jobs\n✓ Clock in/out with GPS verification\n✓ Track your earnings in real-time\n✓ See your bonus calculations\n✓ View payment history\n✓ Manage time-off requests\n\nSwitch between Owner, Admin, and Employee views anytime using PIN 4444.",
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(employeeUser);
         }
 
         // Default to admin if no role specified
@@ -112,11 +131,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: "sidonie-test-001",
           email: "sidonie@orbitstaffing.net",
           firstName: "Sidonie",
-          lastName: "Expert Tester",
+          lastName: "ORBIT Admin",
           role: "admin",
           companyId: "test-company",
           isFirstLogin: true,
-          welcomeMessage: "Hey Sid, I know you are an expert on all this, so give me your honest opinion. Let's partner up and make this happen! 🚀",
+          isReadOnly: true,
+          welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
           needsPasswordReset: true,
         };
         return res.status(200).json(testUser);
