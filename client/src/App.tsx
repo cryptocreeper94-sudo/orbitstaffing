@@ -50,6 +50,7 @@ import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import DrugTestBilling from "@/pages/DrugTestBilling";
 import AdminLanding from "@/pages/AdminLanding";
 import OwnerPitch from "@/pages/OwnerPitch";
+import DigitalHallmark from "@/pages/DigitalHallmark";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -114,6 +115,7 @@ function Router() {
       <Route path="/workers-comp-admin" component={WorkersCompAdmin} />
       <Route path="/drug-test-billing" component={DrugTestBilling} />
       <Route path="/owner-pitch" component={OwnerPitch} />
+      <Route path="/digital-hallmark" component={DigitalHallmark} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />
