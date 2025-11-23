@@ -67,6 +67,9 @@ import {
   type Collection,
   type InsertOrbitAsset,
   type OrbitAsset,
+  supportTickets,
+  type InsertSupportTicket,
+  type SupportTicket,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -207,6 +210,12 @@ export interface IStorage {
   getOverdueAmount(companyId: string): Promise<number>;
   suspendCompanyServices(companyId: string, reason: string): Promise<void>;
   unsuspendCompanyServices(companyId: string): Promise<void>;
+
+  // Support Tickets
+  createSupportTicket(ticket: InsertSupportTicket): Promise<SupportTicket>;
+  getSupportTicket(id: string): Promise<SupportTicket | undefined>;
+  listSupportTickets(filters?: { status?: string; category?: string }): Promise<SupportTicket[]>;
+  updateSupportTicket(id: string, data: Partial<InsertSupportTicket>): Promise<SupportTicket | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -926,6 +935,33 @@ export class DrizzleStorage implements IStorage {
       byType[a.type] = (byType[a.type] || 0) + 1;
     });
     return { total, active, revoked, byType };
+  }
+
+  // Support Tickets
+  async createSupportTicket(ticket: InsertSupportTicket): Promise<SupportTicket> {
+    const result = await db.insert(supportTickets).values(ticket).returning();
+    return result[0];
+  }
+
+  async getSupportTicket(id: string): Promise<SupportTicket | undefined> {
+    const result = await db.select().from(supportTickets).where(eq(supportTickets.id, id));
+    return result[0];
+  }
+
+  async listSupportTickets(filters?: { status?: string; category?: string }): Promise<SupportTicket[]> {
+    let query = db.select().from(supportTickets);
+    if (filters?.status) {
+      query = query.where(eq(supportTickets.status, filters.status));
+    }
+    if (filters?.category) {
+      query = query.where(eq(supportTickets.category, filters.category));
+    }
+    return query.orderBy(desc(supportTickets.createdAt));
+  }
+
+  async updateSupportTicket(id: string, data: Partial<InsertSupportTicket>): Promise<SupportTicket | undefined> {
+    const result = await db.update(supportTickets).set(data).where(eq(supportTickets.id, id)).returning();
+    return result[0];
   }
 }
 
