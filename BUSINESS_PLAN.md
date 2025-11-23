@@ -123,6 +123,253 @@
 - Customer acquisition cost (CAC): $3,000-$5,000
 - Payback period: 6-9 months
 - Monthly churn: 2-3% (healthy for SaaS)
+
+---
+
+## DRUG TEST PAYMENT MODEL (Revenue Strategy)
+
+### Payment Responsibility by Scenario
+
+**1. Pre-Employment Testing (Employer Pays)**
+- Who: Customer/employer requiring drug test before hiring
+- Cost: $50-$150 per test (varies by panel type)
+- Payment method: Stripe (immediate) or Monthly Invoice (Net 30)
+- ORBIT profit: Full amount minus clinic cost (~$30-$80)
+- Collection rate target: 100% (required before test)
+
+**2. Workman's Comp Incidents (ORBIT Covers)**
+- Who: ORBIT absorbs cost when employee injured on-site
+- Cost: $50-$150 per test
+- Payment method: ORBIT internal operations account
+- Business justification: Compliance expense, reduces liability, worker protection
+- Annual budget allocation: $10,000-$50,000 (scaled by customer base)
+
+**3. Random/Ongoing Testing (Negotiated Split)**
+- Who: Employer-initiated compliance programs
+- Cost: Shared or employer-paid per contract
+- Payment method: Monthly invoice or tiered bundling
+- ORBIT profit: 50/50 split or full pass-through
+
+### Key Revenue Rules
+
+✅ **Employees NEVER pay** - Competitive advantage, builds worker trust  
+✅ **Pre-employment = customer pays** - Employer responsibility, documented policy  
+✅ **Incidents = ORBIT covers** - Reduces liability, ensures compliance  
+✅ **Transparency = required** - All payment responsibility documented in contract  
+
+### Payment Processing
+
+**Stripe Integration (Immediate)**
+- Used for: Pre-employment tests, upfront payment
+- Fee: 2.9% + $0.30 per transaction
+- Speed: Instant authorization
+- Chargeback: Standard Stripe dispute process
+
+**Monthly Invoicing (Net 30)**
+- Used for: Volume customers, recurring tests
+- Payment methods: ACH, wire transfer, credit card
+- Delivery: 1st of month for previous month tests
+- Tracking: Detailed line-item billing
+
+**ORBIT Operations Account (Internal)**
+- Used for: Workman's comp, emergency tests
+- Budget: Managed as compliance/operational expense
+- Tracking: Monthly reconciliation report
+- Tax deduction: Fully deductible as business expense
+
+---
+
+## BUSINESS COMPLIANCE ROADMAP
+
+### Phase 1: Foundation (Months 1-2) - Initial Registrations
+**Cost estimate: $2,000-$5,000**
+
+- [ ] **Register Business Entity**
+  - Form LLC or C-Corp (recommended: C-Corp for venture scaling)
+  - State of incorporation: Recommended Delaware or Tennessee
+  - Estimated cost: $500-$1,500
+  - Timeline: 1-2 weeks
+
+- [ ] **FEIN/Tax ID**
+  - Obtain Federal Employer Identification Number from IRS
+  - Free via IRS.gov
+  - Timeline: Instant online
+  - Needed for: Payroll, contractor payments, loan applications
+
+- [ ] **Business Bank Account**
+  - Open dedicated business account (not personal)
+  - Establishes separation for accounting/legal protection
+  - Cost: Free-$30/month depending on bank
+  - Required for: Stripe integration, invoice payments
+
+### Phase 2: Basic Compliance (Months 2-4) - Operating Licenses
+**Cost estimate: $500-$2,000**
+
+- [ ] **DBA/Business License**
+  - Register "Doing Business As" at county/state level
+  - Tennessee: $159 (state) + $100-$200 (county)
+  - Timeline: 1-2 weeks
+  - Renewal: Annually
+
+- [ ] **Sales Tax Permit** (if applicable)
+  - For: SaaS subscription services, add-on services
+  - Tennessee: Free via TN Department of Revenue
+  - Timeline: 1-2 days online
+  - Compliance: Collect and remit monthly/quarterly
+
+- [ ] **Insurance Setup**
+  - General Liability: $500-$1,500/year
+  - Professional Liability: $1,000-$3,000/year
+  - Cyber Liability: $1,000-$2,000/year
+  - Workers Comp: Variable (once employees hired)
+  - Recommended carriers: Hiscox, Travelers, CHUBB
+
+### Phase 3: Industry-Specific (Months 3-6) - Professional Certifications
+**Cost estimate: $3,000-$8,000**
+
+- [ ] **Better Business Bureau (BBB)**
+  - Free membership (optional paid upgrade: $300-$500/year)
+  - Builds credibility and trust
+  - Provides ratings/reviews profile
+  - Timeline: 1 week
+  - Ongoing: Respond to customer reviews
+
+- [ ] **OSHA Compliance Setup**
+  - Register at OSHA.gov (free)
+  - Obtain OSHA-related certifications
+  - Drug testing compliance: Must follow OSHA guidelines
+  - Timeline: 2-3 weeks
+  - Training cost: $500-$1,000 for staff
+  - Annual reporting: Required
+
+- [ ] **Drug Testing Program Compliance**
+  - DOT/FMCSA regulations (if applicable)
+  - HHS/SAMHSA certification for labs
+  - MRO (Medical Review Officer) setup
+  - Cost: Handled by clinic partners (Concentra, etc.)
+  - Documentation: Chain of custody training
+  - Timeline: 1-2 weeks
+
+- [ ] **Chamber of Commerce Membership**
+  - Nashville Chamber of Commerce (if TN-based): $200-$500/year
+  - Local visibility and networking
+  - Member directory listing
+  - Timeline: 1 week
+  - Benefits: Marketing, referrals, events
+
+### Phase 4: Data & Security (Months 4-8) - Privacy Compliance
+**Cost estimate: $2,000-$5,000**
+
+- [ ] **Privacy Policy & Terms of Service**
+  - Document data collection/usage
+  - GDPR compliance (if EU users)
+  - CCPA compliance (if CA users)
+  - Cost: $500-$2,000 (attorney review)
+  - Tool: Termly.io ($99-$299/year) or custom
+
+- [ ] **HIPAA Compliance** (Healthcare Data)
+  - Since handling drug test results, may require HIPAA
+  - Business Associate Agreements (BAAs) with clinics
+  - Encryption standards for medical data
+  - Cost: $2,000-$5,000 for setup + training
+  - Annual audit: Required
+
+- [ ] **SOC 2 Type II Certification**
+  - For enterprise customers (Fortune 500 requirement)
+  - Third-party audit of security controls
+  - Cost: $10,000-$30,000 annually
+  - Timeline: 6-9 months for first audit
+  - Adds significant credibility
+
+- [ ] **PCI-DSS Compliance** (Payment Processing)
+  - Since processing payments (Stripe)
+  - Stripe handles most PCI compliance
+  - Your responsibility: Secure data handling
+  - Cost: $0 (Stripe handles) - $5,000 (Level 1 certification if needed)
+  - Annual attestation: Required
+
+### Phase 5: Franchise/Legal (Months 6-12) - Franchise Registration
+**Cost estimate: $5,000-$15,000**
+
+- [ ] **Franchise Disclosure Document (FDD)**
+  - Required for any franchise offering
+  - Federal Trade Commission (FTC) Item 23
+  - Attorney fees: $3,000-$8,000
+  - Timeline: 4-8 weeks with attorney
+  - Required disclosure states: 14 states have franchise laws
+
+- [ ] **State Franchise Registration**
+  - Registered states: CA, NY, TX, IL, MI, MN, etc.
+  - Cost per state: $250-$500
+  - Timeline: 2-4 weeks per state
+  - Ongoing: Annual renewals
+
+- [ ] **Franchise Agreement**
+  - Standardized agreement with franchisees
+  - Attorney fees: $2,000-$5,000
+  - Covers: Territory, royalties, support, non-compete
+  - Timeline: 2-3 weeks
+
+### Phase 6: Accounting & HR (Months 6+ ongoing)
+
+- [ ] **Tax Accounting Setup**
+  - Hire CPA for bookkeeping/taxes
+  - Cost: $1,500-$3,000/year (startup)
+  - Quarterly estimated tax payments
+  - Annual 1040 or 1120-S filing
+
+- [ ] **Payroll Processing**
+  - Once hiring employees
+  - ADP, Gusto, or QuickBooks Payroll: $100-$500/month
+  - Workers comp insurance: Variable
+  - E&O insurance: $1,000+/year
+
+- [ ] **HR Policies & Handbook**
+  - Employee handbook with anti-discrimination policies
+  - FMLA, ADA compliance documentation
+  - Cost: $500-$2,000
+  - Timeline: 2-3 weeks
+
+---
+
+## COMPLIANCE TIMELINE & CHECKLIST
+
+### Critical Path (Must-Do First)
+1. **Week 1-2:** Business entity, FEIN, bank account
+2. **Week 3-4:** DBA/Business license, insurance quotes
+3. **Week 5-8:** OSHA registration, BBB profile
+4. **Week 9-12:** Privacy policy, initial compliance docs
+
+### Nice-To-Have (Before Scaling)
+- SOC 2 Type II (before enterprise sales)
+- Franchise FDD (before first franchisee)
+- Chamber membership (for networking)
+- State franchise registrations (per state requirements)
+
+### Annual/Ongoing
+- Renew business license, insurance, registrations
+- OSHA reporting
+- Tax filings, payroll reconciliation
+- Chamber membership renewal
+- SOC 2 audit (annual)
+
+---
+
+## COST SUMMARY BY YEAR
+
+| Category | Year 1 | Year 2 | Year 3+ |
+|----------|--------|--------|---------|
+| Business Registration | $2,000 | $500 | $500 |
+| Insurance | $3,000 | $3,500 | $4,000 |
+| Compliance/Legal | $3,000 | $2,000 | $2,000 |
+| Accounting/HR | $2,000 | $3,500 | $5,000 |
+| Certifications (OSHA, BBB, etc.) | $1,000 | $500 | $500 |
+| Franchise FDD (if pursuing) | $8,000 | $2,000 | $1,000 |
+| **Total Compliance Costs** | **$19,000** | **$12,000** | **$13,000** |
+
+**Note:** These are one-time + recurring costs. As revenue grows, compliance investment grows (e.g., SOC 2 at $10K+/year when enterprise sales begin).
+
+---
 - Gross margin: 75%+
 
 ---

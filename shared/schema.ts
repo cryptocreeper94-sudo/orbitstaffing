@@ -1001,6 +1001,77 @@ export type InsertIncidentReport = z.infer<typeof insertIncidentReportSchema>;
 export type IncidentReport = typeof incidentReports.$inferSelect;
 
 // ========================
+// Drug Test Billing & Payments
+// ========================
+export const drugTestBilling = pgTable(
+  "drug_test_billing",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Drug Test Reference
+    drugTestId: varchar("drug_test_id").notNull().references(() => drugTests.id),
+    
+    // Test Type & Reason (determines payment responsibility)
+    testReason: varchar("test_reason", { length: 50 }).notNull(), // pre_employment, workman_comp, random, post_incident
+    testType: varchar("test_type", { length: 50 }).notNull(), // 5_panel, 10_panel, 14_panel, hair_sample
+    
+    // Cost
+    estimatedCost: decimal("estimated_cost", { precision: 10, scale: 2 }),
+    actualCost: decimal("actual_cost", { precision: 10, scale: 2 }),
+    
+    // Payment Responsibility
+    paymentResponsibility: varchar("payment_responsibility", { length: 50 }).notNull(), // employer, orbit, employee
+    paymentReason: text("payment_reason"), // Policy explanation
+    
+    // Employer Billing (if employer pays)
+    billToClientId: varchar("bill_to_client_id").references(() => clients.id),
+    invoiceNumber: varchar("invoice_number", { length: 100 }),
+    
+    // Payment Method
+    paymentMethod: varchar("payment_method", { length: 50 }).default("stripe"), // stripe, bank_transfer, invoice
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
+    
+    // Payment Status
+    paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, processing, completed, failed, refunded
+    paidAt: timestamp("paid_at"),
+    paidAmount: decimal("paid_amount", { precision: 10, scale: 2 }),
+    
+    // ORBIT Account
+    orbitCovered: boolean("orbit_covered").default(false),
+    orbitCoverageReason: varchar("orbit_coverage_reason", { length: 255 }), // pre_employment_covered, workman_comp_covered, etc.
+    orbitInternalCost: decimal("orbit_internal_cost", { precision: 10, scale: 2 }),
+    orbitAccountCharged: boolean("orbit_account_charged").default(false),
+    
+    // Reconciliation
+    reconciled: boolean("reconciled").default(false),
+    reconciliedAt: timestamp("reconciled_at"),
+    
+    // Notes
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    drugTestIdx: index("idx_billing_drug_test_id").on(table.drugTestId),
+    clientIdx: index("idx_billing_client_id").on(table.billToClientId),
+    statusIdx: index("idx_billing_payment_status").on(table.paymentStatus),
+    reasonIdx: index("idx_billing_reason").on(table.testReason),
+  })
+);
+
+export const insertDrugTestBillingSchema = createInsertSchema(drugTestBilling).omit({
+  id: true,
+  paidAt: true,
+  reconciliedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDrugTestBilling = z.infer<typeof insertDrugTestBillingSchema>;
+export type DrugTestBilling = typeof drugTestBilling.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
