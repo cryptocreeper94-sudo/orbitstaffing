@@ -43,6 +43,7 @@ import PartnerVerification from "@/pages/PartnerVerification";
 import PartnerAgencyDashboard from "@/pages/PartnerAgencyDashboard";
 import EmployeePreApplication from "@/pages/EmployeePreApplication";
 import ComplianceVerification from "@/pages/ComplianceVerification";
+import DrugTestScheduling from "@/pages/DrugTestScheduling";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { AIChat } from "@/components/AIChat";
 
@@ -86,6 +87,7 @@ function Router() {
       <Route path="/partner-agency" component={PartnerAgencyDashboard} />
       <Route path="/pre-apply" component={EmployeePreApplication} />
       <Route path="/compliance" component={ComplianceVerification} />
+      <Route path="/drug-test-scheduling" component={DrugTestScheduling} />
       <Route path="/clients" component={Clients} />
       <Route path="/finance" component={Finance} />
       <Route path="/marketing" component={Marketing} />

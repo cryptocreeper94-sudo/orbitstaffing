@@ -643,6 +643,215 @@ export type InsertDrugTest = z.infer<typeof insertDrugTestSchema>;
 export type DrugTest = typeof drugTests.$inferSelect;
 
 // ========================
+// Concentra Integration (Third-Party Testing)
+// ========================
+export const concentraAppointments = pgTable(
+  "concentra_appointments",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Drug Test Reference
+    drugTestId: varchar("drug_test_id").notNull().references(() => drugTests.id),
+    
+    // Concentra Facility
+    facilityId: varchar("facility_id", { length: 100 }), // Concentra's facility ID
+    facilityName: varchar("facility_name", { length: 255 }),
+    facilityAddress: varchar("facility_address", { length: 255 }),
+    facilityCity: varchar("facility_city", { length: 100 }),
+    facilityState: varchar("facility_state", { length: 2 }),
+    facilityZipCode: varchar("facility_zip_code", { length: 10 }),
+    facilityPhone: varchar("facility_phone", { length: 20 }),
+    
+    // Appointment Details
+    concentraAppointmentId: varchar("concentra_appointment_id", { length: 100 }), // Concentra's booking ID
+    appointmentDateTime: timestamp("appointment_date_time"),
+    estimatedDuration: integer("estimated_duration"), // minutes
+    
+    // Booking Status
+    bookingStatus: varchar("booking_status", { length: 50 }).default("pending"), // pending, confirmed, in_progress, completed, cancelled
+    bookedAt: timestamp("booked_at"),
+    
+    // GPS Verification at Facility
+    facilityLatitude: decimal("facility_latitude", { precision: 9, scale: 6 }),
+    facilityLongitude: decimal("facility_longitude", { precision: 9, scale: 6 }),
+    geofenceRadiusFeet: integer("geofence_radius_feet").default(300),
+    employeeArrivedAt: timestamp("employee_arrived_at"),
+    employeeVerifiedAt: timestamp("employee_verified_at"),
+    employeeGpsLat: decimal("employee_gps_lat", { precision: 9, scale: 6 }),
+    employeeGpsLon: decimal("employee_gps_lon", { precision: 9, scale: 6 }),
+    gpsVerified: boolean("gps_verified").default(false),
+    
+    // Confirmation from Concentra
+    concentraConfirmed: boolean("concentra_confirmed").default(false),
+    confirmedAt: timestamp("confirmed_at"),
+    
+    // Employee Communication
+    appointmentReminderSent: boolean("appointment_reminder_sent").default(false),
+    locationLinkSent: boolean("location_link_sent").default(false),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    drugTestIdx: index("idx_concentra_appt_drug_test_id").on(table.drugTestId),
+    facilityIdx: index("idx_concentra_appt_facility_id").on(table.facilityId),
+    statusIdx: index("idx_concentra_appt_status").on(table.bookingStatus),
+  })
+);
+
+export const insertConcentraAppointmentSchema = createInsertSchema(concentraAppointments).omit({
+  id: true,
+  bookedAt: true,
+  employeeArrivedAt: true,
+  employeeVerifiedAt: true,
+  confirmedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertConcentraAppointment = z.infer<typeof insertConcentraAppointmentSchema>;
+export type ConcentraAppointment = typeof concentraAppointments.$inferSelect;
+
+// ========================
+// Chain of Custody (Drug Test Documentation)
+// ========================
+export const chainOfCustody = pgTable(
+  "chain_of_custody",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Drug Test Reference
+    drugTestId: varchar("drug_test_id").notNull().references(() => drugTests.id),
+    
+    // Collection Details
+    collectionDateTime: timestamp("collection_date_time"),
+    collectorName: varchar("collector_name", { length: 255 }),
+    collectorLicense: varchar("collector_license", { length: 100 }),
+    collectionFacility: varchar("collection_facility", { length: 255 }),
+    
+    // Specimen Details
+    specimenId: varchar("specimen_id", { length: 100 }), // Unique ID for tracking
+    specimenType: varchar("specimen_type", { length: 50 }), // urine, hair, blood
+    specimenBarcode: varchar("specimen_barcode", { length: 100 }), // Barcode for tracking
+    collectionMethod: varchar("collection_method", { length: 100 }), // Direct observation, etc.
+    
+    // Witness/Observer
+    witnessName: varchar("witness_name", { length: 255 }),
+    witnessSignature: varchar("witness_signature", { length: 500 }), // Base64 encoded signature
+    witnessDateTime: timestamp("witness_date_time"),
+    
+    // Chain Transfers
+    transfers: jsonb("transfers"), // Array of {from, to, timestamp, signature} transfers
+    
+    // Lab Information
+    labName: varchar("lab_name", { length: 255 }),
+    labAccreditation: varchar("lab_accreditation", { length: 100 }), // CLIA number, etc.
+    labReceiptDateTime: timestamp("lab_receipt_date_time"),
+    labReceivedBy: varchar("lab_received_by", { length: 255 }),
+    
+    // Results
+    resultsDateTime: timestamp("results_date_time"),
+    resultsReviewedBy: varchar("results_reviewed_by", { length: 255 }),
+    mlsId: varchar("mls_id", { length: 100 }), // Medical Review Officer ID
+    mlsVerified: boolean("mls_verified").default(false),
+    
+    // Custody Status
+    status: varchar("status", { length: 50 }).default("collected"), // collected, transferred, in_lab, analyzed, results_reviewed, delivered, archived
+    
+    // Secure Delivery
+    deliveryMethod: varchar("delivery_method", { length: 50 }), // encrypted_email, secure_portal, certified_mail
+    deliveredAt: timestamp("delivered_at"),
+    deliveredTo: varchar("delivered_to", { length: 255 }),
+    deliveryConfirmed: boolean("delivery_confirmed").default(false),
+    
+    // Audit Trail
+    auditLog: jsonb("audit_log"), // Full audit trail of all interactions
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    drugTestIdx: index("idx_coc_drug_test_id").on(table.drugTestId),
+    specimenIdx: index("idx_coc_specimen_id").on(table.specimenId),
+    statusIdx: index("idx_coc_status").on(table.status),
+  })
+);
+
+export const insertChainOfCustodySchema = createInsertSchema(chainOfCustody).omit({
+  id: true,
+  collectionDateTime: true,
+  witnessDateTime: true,
+  labReceiptDateTime: true,
+  resultsDateTime: true,
+  deliveredAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertChainOfCustody = z.infer<typeof insertChainOfCustodySchema>;
+export type ChainOfCustody = typeof chainOfCustody.$inferSelect;
+
+// ========================
+// Result Delivery (Secure, Encrypted)
+// ========================
+export const resultDeliveries = pgTable(
+  "result_deliveries",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Drug Test & Chain of Custody Reference
+    drugTestId: varchar("drug_test_id").notNull().references(() => drugTests.id),
+    chainOfCustodyId: varchar("chain_of_custody_id").references(() => chainOfCustody.id),
+    
+    // Recipients
+    recipientType: varchar("recipient_type", { length: 50 }).notNull(), // employee, employer, mro, third_party
+    recipientEmail: varchar("recipient_email", { length: 255 }),
+    recipientName: varchar("recipient_name", { length: 255 }),
+    
+    // Delivery Details
+    deliveryMethod: varchar("delivery_method", { length: 50 }).default("encrypted_email"), // encrypted_email, secure_portal, certified_mail, fax
+    deliveryStatus: varchar("delivery_status", { length: 50 }).default("pending"), // pending, sent, delivered, read, failed
+    sentAt: timestamp("sent_at"),
+    deliveredAt: timestamp("delivered_at"),
+    readAt: timestamp("read_at"),
+    
+    // Encrypted Content
+    resultSummary: text("result_summary"), // Encrypted
+    detailedReport: text("detailed_report"), // Encrypted
+    encryptionKey: varchar("encryption_key", { length: 500 }), // Encrypted key
+    
+    // Access Control
+    accessToken: varchar("access_token", { length: 100 }), // For secure portal access
+    accessExpires: timestamp("access_expires"),
+    accessLog: jsonb("access_log"), // Who accessed, when, from where
+    
+    // Audit Trail
+    auditLog: jsonb("audit_log"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    drugTestIdx: index("idx_result_delivery_drug_test_id").on(table.drugTestId),
+    recipientIdx: index("idx_result_delivery_recipient_type").on(table.recipientType),
+    statusIdx: index("idx_result_delivery_status").on(table.deliveryStatus),
+  })
+);
+
+export const insertResultDeliverySchema = createInsertSchema(resultDeliveries).omit({
+  id: true,
+  sentAt: true,
+  deliveredAt: true,
+  readAt: true,
+  accessExpires: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertResultDelivery = z.infer<typeof insertResultDeliverySchema>;
+export type ResultDelivery = typeof resultDeliveries.$inferSelect;
+
+// ========================
 // Clients (Company Customers)
 // ========================
 export const clients = pgTable(
