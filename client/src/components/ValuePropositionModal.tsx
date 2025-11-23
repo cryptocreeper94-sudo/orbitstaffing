@@ -118,7 +118,7 @@ export function ValuePropositionModal() {
             <DialogHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <img 
-                  src="/assets/3d_saturn_with_dark_outline_and_shadow_depth.png" 
+                  src="/orbit-logo.png" 
                   alt="ORBIT Logo" 
                   className="h-12 w-12"
                 />
