@@ -149,9 +149,9 @@ export default function UniversalEmployeeRegistry({
 
   if (selectedEmployee) {
     return (
-      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-hidden">
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto">
         {/* Full Screen Card View - Landscape Optimized */}
-        <div className="w-full h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8 flex flex-col">
+        <div className="w-full min-h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8 flex flex-col">
           {/* Header with Back Button */}
           <div className="flex items-center justify-between mb-4">
             <button
@@ -180,7 +180,7 @@ export default function UniversalEmployeeRegistry({
           </div>
 
           {/* Main Content - Landscape Layout */}
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 overflow-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
             {/* Left - Large Card Display */}
             <div className="lg:col-span-1 flex items-center justify-center">
               <div className="relative w-full max-w-sm h-80 rounded-lg shadow-2xl overflow-hidden border-2 border-cyan-400" style={{ backgroundColor: '#1e293b' }}>
