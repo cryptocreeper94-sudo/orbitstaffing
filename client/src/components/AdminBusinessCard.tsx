@@ -347,7 +347,7 @@ END:VCARD`;
           </div>
 
           {/* Left side - Photo (Square, constrained height, with QR space) */}
-          <div className="w-[80px] sm:w-[120px] h-[120px] sm:h-[140px] bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
+          <div className="w-[80px] sm:w-[120px] h-[120px] sm:h-[140px] bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 border-b-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
             {photoPreview ? (
               <>
                 <img src={photoPreview} alt={formData.fullName} className="w-full h-full object-cover" />
@@ -380,7 +380,7 @@ END:VCARD`;
           </div>
 
           {/* Bottom Left - Tiny QR Code */}
-          <div className="absolute bottom-1.5 left-1.5 p-1 rounded z-20" style={{ backgroundColor: formData.brandColor }}>
+          <div className="absolute bottom-1.5 left-1.5 p-1 rounded z-20 bg-gradient-to-b from-slate-800 to-slate-900">
             <QRCode value={vCardData} size={32} level="M" />
           </div>
         </div>
