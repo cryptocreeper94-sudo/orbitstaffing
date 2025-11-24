@@ -3731,3 +3731,109 @@ export const insertWorkerSmsConsentSchema = createInsertSchema(workerSmsConsent)
 
 export type InsertWorkerSmsConsent = z.infer<typeof insertWorkerSmsConsentSchema>;
 export type WorkerSmsConsent = typeof workerSmsConsent.$inferSelect;
+
+// ========================
+// Stripe Connect (Worker Payouts)
+// ========================
+export const stripeConnectAccounts = pgTable(
+  "stripe_connect_accounts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    stripeAccountId: varchar("stripe_account_id", { length: 255 }).notNull().unique(), // Stripe Connect Account ID
+    accountStatus: varchar("account_status", { length: 50 }).default("pending"), // pending, active, rejected, restricted
+    requirementsStatus: varchar("requirements_status", { length: 50 }), // currently_due, eventually_due, past_due
+    requirementsDue: jsonb("requirements_due"), // Array of required documents/info
+    chargesEnabled: boolean("charges_enabled").default(false),
+    payoutsEnabled: boolean("payouts_enabled").default(false),
+    defaultPayoutMethod: varchar("default_payout_method", { length: 50 }).default("instant"), // instant, standard
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_stripe_worker").on(table.workerId),
+    stripeAccountIdx: index("idx_stripe_account_id").on(table.stripeAccountId),
+    statusIdx: index("idx_stripe_status").on(table.accountStatus),
+  })
+);
+
+export const insertStripeConnectAccountSchema = createInsertSchema(stripeConnectAccounts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertStripeConnectAccount = z.infer<typeof insertStripeConnectAccountSchema>;
+export type StripeConnectAccount = typeof stripeConnectAccounts.$inferSelect;
+
+// ========================
+// Stripe Payouts
+// ========================
+export const stripePayouts = pgTable(
+  "stripe_payouts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    stripeConnectAccountId: varchar("stripe_connect_account_id").notNull().references(() => stripeConnectAccounts.id),
+    stripePayoutId: varchar("stripe_payout_id", { length: 255 }).notNull().unique(), // Stripe Payout ID
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // In cents
+    currency: varchar("currency", { length: 3 }).default("usd"),
+    status: varchar("status", { length: 50 }).default("pending"), // pending, in_transit, paid, failed, cancelled
+    payoutMethod: varchar("payout_method", { length: 50 }).default("standard"), // instant, standard
+    arrivalDate: timestamp("arrival_date"), // When funds will arrive
+    failureCode: varchar("failure_code", { length: 100 }), // If failed
+    failureMessage: text("failure_message"), // Failure reason
+    bankAccountLastFour: varchar("bank_account_last_four", { length: 4 }),
+    sourceType: varchar("source_type", { length: 50 }).default("balance"), // balance, card, etc
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_payout_worker").on(table.workerId),
+    stripePayoutIdx: index("idx_stripe_payout_id").on(table.stripePayoutId),
+    statusIdx: index("idx_payout_status").on(table.status),
+    createdIdx: index("idx_payout_created").on(table.createdAt),
+  })
+);
+
+export const insertStripePayoutSchema = createInsertSchema(stripePayouts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertStripePayout = z.infer<typeof insertStripePayoutSchema>;
+export type StripePayout = typeof stripePayouts.$inferSelect;
+
+// ========================
+// Stripe Webhook Events (Audit Trail)
+// ========================
+export const stripeWebhookEvents = pgTable(
+  "stripe_webhook_events",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    eventId: varchar("event_id", { length: 255 }).notNull().unique(), // Stripe Event ID
+    eventType: varchar("event_type", { length: 100 }).notNull(), // account.updated, payout.created, etc
+    resourceType: varchar("resource_type", { length: 50 }), // connect_account, payout
+    resourceId: varchar("resource_id", { length: 255 }), // Related resource ID
+    payload: jsonb("payload").notNull(), // Full event payload
+    processed: boolean("processed").default(false),
+    processedAt: timestamp("processed_at"),
+    error: text("error"), // If processing failed
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    eventIdIdx: index("idx_webhook_event_id").on(table.eventId),
+    typeIdx: index("idx_webhook_type").on(table.eventType),
+    processedIdx: index("idx_webhook_processed").on(table.processed),
+  })
+);
+
+export const insertStripeWebhookEventSchema = createInsertSchema(stripeWebhookEvents).omit({
+  id: true,
+  processedAt: true,
+  createdAt: true,
+});
+
+export type InsertStripeWebhookEvent = z.infer<typeof insertStripeWebhookEventSchema>;
+export type StripeWebhookEvent = typeof stripeWebhookEvents.$inferSelect;

@@ -3547,3 +3547,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
+
+// ========================
+// Stripe Connect Routes (Payouts 3/10 → COMPLETE)
+// ========================
+import stripeRoutes from "./stripe-routes";
+app.use("/api", stripeRoutes);
