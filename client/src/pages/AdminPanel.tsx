@@ -14,6 +14,7 @@ import WeatherNewsWidget from '@/components/WeatherNewsWidget';
 import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
+import { SidonieWelcomeModal } from '@/components/SidonieWelcomeModal';
 import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessionUtils';
 
 const ADMIN_SESSION_KEY = 'admin';
@@ -48,16 +49,16 @@ export default function AdminPanel() {
     const adminAuth = localStorage.getItem('adminAuthenticated');
     const savedRole = localStorage.getItem('adminRole') as AdminRole;
     const savedName = localStorage.getItem('adminName');
-    const hasWelcomeMessage = localStorage.getItem('showWelcomeMessage') === 'true';
+    const hasFirstLogin = localStorage.getItem('sidonieFirstLogin') === 'true';
     
     if (adminAuth === 'true' && savedRole) {
       setIsAuthenticated(true);
       setRole(savedRole);
       setAdminName(savedName || 'Admin');
       
-      if (hasWelcomeMessage && savedName === 'Sidonie') {
+      if (hasFirstLogin && savedName === 'Sidonie') {
         setShowWelcomeMessage(true);
-        localStorage.removeItem('showWelcomeMessage');
+        localStorage.removeItem('sidonieFirstLogin');
       }
     }
   }, []);
@@ -83,15 +84,17 @@ export default function AdminPanel() {
         setSessionWithExpiry(ADMIN_SESSION_KEY, { 
           authenticated: true, 
           role: 'master_admin',
-          name: 'System Owner'
+          name: 'Sidonie'
         });
         // Migrate old flags
         localStorage.setItem('adminAuthenticated', 'true');
         localStorage.setItem('adminRole', 'master_admin');
-        localStorage.setItem('adminName', 'System Owner');
+        localStorage.setItem('adminName', 'Sidonie');
+        localStorage.setItem('sidonieFirstLogin', 'true');
         setIsAuthenticated(true);
         setRole('master_admin');
-        setAdminName('System Owner');
+        setAdminName('Sidonie');
+        setShowWelcomeMessage(true);
         setPin('');
       } else {
         setError('Invalid PIN.');
@@ -281,39 +284,11 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-3 sm:p-6">
-      {/* Welcome Modal for Sidonie - Mobile Responsive */}
-      {showWelcomeMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-lg w-full border border-cyan-500/30 p-4 sm:p-8">
-            <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div className="text-3xl sm:text-4xl flex-shrink-0">🎯</div>
-              <h2 className="text-xl sm:text-2xl font-bold text-cyan-400 pt-1 sm:pt-0">Hey Sid! 👋</h2>
-            </div>
-            
-            <p className="text-gray-200 mb-4 sm:mb-6 text-sm sm:text-base leading-relaxed">
-              I know you are an expert on all this, so give me your honest opinion. 
-            </p>
-            
-            <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-              <p className="text-cyan-300 font-semibold text-sm sm:text-base">
-                Let's partner up and make this happen! 🚀
-              </p>
-            </div>
-            
-            <p className="text-gray-400 text-xs sm:text-sm mb-6 sm:mb-8">
-              You now have full access to the admin dashboard. Review everything, test it out, and let me know what you think. All features are ready for testing.
-            </p>
-            
-            <Button
-              onClick={() => setShowWelcomeMessage(false)}
-              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 sm:py-3 text-sm sm:text-base min-h-[44px]"
-              data-testid="button-sidonie-welcome-close"
-            >
-              Got it, let's go! 💪
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Sidonie Welcome Modal */}
+      <SidonieWelcomeModal 
+        isOpen={showWelcomeMessage} 
+        onClose={() => setShowWelcomeMessage(false)} 
+      />
       
       <div className="max-w-6xl mx-auto">
         {/* Header - Mobile Responsive */}
