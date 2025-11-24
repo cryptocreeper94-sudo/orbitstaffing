@@ -104,6 +104,10 @@ export default function Landing() {
           </div>
           
           <nav className="flex gap-1 bg-slate-800/50 backdrop-blur-sm px-2 sm:px-4 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600 flex-shrink-0 min-h-[44px] items-center">
+            <Link href="/hallmark-seal" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-amber-300 hover:text-amber-200 hover:bg-amber-900/30 rounded-md transition-all min-h-[40px] flex items-center" data-testid="link-hallmark-seal">
+              <span className="hidden sm:inline">✓ Hallmark</span>
+              <span className="sm:hidden">✓</span>
+            </Link>
             <Link href="/why-orbit" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all min-h-[40px] flex items-center">
               <span className="hidden sm:inline">Why ORBIT</span>
               <span className="sm:hidden">Why</span>
