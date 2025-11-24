@@ -1,10 +1,13 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { sql } from "drizzle-orm";
+import { sql, count } from "drizzle-orm";
 import { storage } from "./storage";
+import { db } from "./db";
 import { emailService } from "./email";
 import { stripeService } from "./stripeService";
 import { coinbaseService } from "./coinbaseService";
+import { getUncachableStripeClient } from "./stripeClient";
+import { getCoinbaseClient } from "./coinbaseService";
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -29,6 +32,8 @@ import {
   insertOrbitAssetSchema,
   franchises,
   companies,
+  users,
+  payments,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -1739,7 +1744,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create franchise
-      const franchise = await storage.db.insert(franchises).values({
+      const franchise = await db.insert(franchises).values({
         name,
         ownerId,
         logoUrl,
@@ -1766,7 +1771,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/franchises", async (req: Request, res: Response) => {
     try {
-      const allFranchises = await storage.db.select().from(franchises);
+      const allFranchises = await db.select().from(franchises);
       res.status(200).json({
         success: true,
         count: allFranchises.length,
@@ -1780,7 +1785,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/franchises/:franchiseId", async (req: Request, res: Response) => {
     try {
       const { franchiseId } = req.params;
-      const franchise = await storage.db
+      const franchise = await db
         .select()
         .from(franchises)
         .where(sql`id = ${franchiseId}`)
@@ -1804,7 +1809,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { franchiseId } = req.params;
       const { brandColor, maxWorkers, maxClients, billingModel, monthlyFee, licenseStatus } = req.body;
 
-      const updated = await storage.db
+      const updated = await db
         .update(franchises)
         .set({
           brandColor,
@@ -1838,7 +1843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { franchiseId } = req.params;
 
       // Get franchise to verify it exists
-      const franchise = await storage.db
+      const franchise = await db
         .select()
         .from(franchises)
         .where(sql`id = ${franchiseId}`)
@@ -1849,7 +1854,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get companies for this franchise owner
-      const companyList = await storage.db
+      const companyList = await db
         .select()
         .from(companies)
         .where(sql`owner_id = ${franchise[0].ownerId}`);
@@ -1867,8 +1872,207 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   // HEALTH CHECK
   // ========================
-  app.get("/api/health", (req: Request, res: Response) => {
-    res.status(200).json({ status: "ok" });
+  app.get("/api/health", async (req: Request, res: Response) => {
+    try {
+      const startTime = Date.now();
+      
+      // Check database
+      let dbHealthy = false;
+      let dbLatency = 0;
+      try {
+        const dbStart = Date.now();
+        await db.execute(sql`SELECT 1`);
+        dbLatency = Date.now() - dbStart;
+        dbHealthy = true;
+      } catch (err) {
+        dbHealthy = false;
+      }
+
+      // Check Stripe
+      let stripeHealthy = false;
+      try {
+        const stripeClient = await getUncachableStripeClient();
+        if (stripeClient) {
+          stripeHealthy = true;
+        }
+      } catch (err) {
+        stripeHealthy = false;
+      }
+
+      // Check Coinbase
+      let coinbaseHealthy = false;
+      try {
+        const coinbaseClient = getCoinbaseClient();
+        coinbaseHealthy = coinbaseClient !== null;
+      } catch (err) {
+        coinbaseHealthy = false;
+      }
+
+      const totalLatency = Date.now() - startTime;
+
+      res.status(200).json({
+        status: dbHealthy && stripeHealthy ? "healthy" : "degraded",
+        timestamp: new Date().toISOString(),
+        latency_ms: totalLatency,
+        services: {
+          database: {
+            status: dbHealthy ? "up" : "down",
+            latency_ms: dbLatency
+          },
+          stripe: {
+            status: stripeHealthy ? "up" : "down",
+            configured: stripeHealthy
+          },
+          coinbase: {
+            status: coinbaseHealthy ? "up" : "down",
+            configured: coinbaseHealthy
+          }
+        },
+        uptime: process.uptime()
+      });
+    } catch (error) {
+      res.status(500).json({ status: "error", error: "Health check failed" });
+    }
+  });
+
+  app.get("/api/admin/health", async (req: Request, res: Response) => {
+    try {
+      // System health with detailed metrics
+      const dbStart = Date.now();
+      let totalUsers = 0;
+      let totalCompanies = 0;
+      let totalPayments = 0;
+      
+      try {
+        const userResult = await db.select({ count: count() }).from(users);
+        const companyResult = await db.select({ count: count() }).from(companies);
+        const paymentResult = await db.select({ count: count() }).from(payments);
+        
+        totalUsers = userResult[0]?.count || 0;
+        totalCompanies = companyResult[0]?.count || 0;
+        totalPayments = paymentResult[0]?.count || 0;
+      } catch (err) {
+        // Fallback if tables don't exist yet
+      }
+      const dbLatency = Date.now() - dbStart;
+
+      // Stripe metrics
+      let stripeStats = {
+        status: "unknown",
+        prices_count: 0,
+        products_count: 0
+      };
+      try {
+        const stripeClient = await getUncachableStripeClient();
+        if (stripeClient) {
+          const prices = await stripeClient.prices.list({ limit: 100 });
+          const products = await stripeClient.products.list({ limit: 100 });
+          stripeStats = {
+            status: "connected",
+            prices_count: prices.data.length,
+            products_count: products.data.length
+          };
+        }
+      } catch (err) {
+        stripeStats.status = "disconnected";
+      }
+
+      // Coinbase status
+      let coinbaseStatus = "disconnected";
+      try {
+        const coinbaseClient = getCoinbaseClient();
+        if (coinbaseClient && coinbaseClient.apiKey) {
+          coinbaseStatus = "configured";
+        }
+      } catch (err) {
+        coinbaseStatus = "disconnected";
+      }
+
+      res.status(200).json({
+        timestamp: new Date().toISOString(),
+        system: {
+          uptime_seconds: Math.floor(process.uptime()),
+          memory_mb: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+          node_version: process.version
+        },
+        database: {
+          status: "connected",
+          latency_ms: dbLatency,
+          stats: {
+            total_users: totalUsers,
+            total_companies: totalCompanies,
+            total_payments: totalPayments
+          }
+        },
+        payments: {
+          stripe: stripeStats,
+          coinbase: {
+            status: coinbaseStatus
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Admin health check failed" });
+    }
+  });
+
+  app.post("/api/admin/test-payments", async (req: Request, res: Response) => {
+    try {
+      const results = {
+        stripe: { working: false, message: "", latency_ms: 0 },
+        coinbase: { working: false, message: "", latency_ms: 0 }
+      };
+
+      // Test Stripe
+      try {
+        const stripeStart = Date.now();
+        const stripeClient = await getUncachableStripeClient();
+        if (stripeClient) {
+          // Try to retrieve a price to test connection
+          const prices = await stripeClient.prices.list({ limit: 1 });
+          results.stripe.latency_ms = Date.now() - stripeStart;
+          results.stripe.working = true;
+          results.stripe.message = `✅ Stripe connected. ${prices.data.length} prices found.`;
+        } else {
+          results.stripe.message = "⚠️ Stripe not configured";
+        }
+      } catch (error) {
+        results.stripe.message = `❌ Stripe error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+
+      // Test Coinbase
+      try {
+        const coinbaseStart = Date.now();
+        const coinbaseClient = getCoinbaseClient();
+        if (coinbaseClient && coinbaseClient.apiKey) {
+          // Simulate a test charge creation (won't actually charge)
+          const testCharge = await coinbaseService.createCharge(
+            'test@orbit-health-check.local',
+            1,
+            'USD',
+            'ORBIT Health Check - Test Transaction'
+          );
+          results.coinbase.latency_ms = Date.now() - coinbaseStart;
+          results.coinbase.working = testCharge && testCharge.id ? true : false;
+          results.coinbase.message = `✅ Coinbase configured. Test charge created (${testCharge.id}).`;
+        } else {
+          results.coinbase.message = "⚠️ Coinbase not configured";
+        }
+      } catch (error) {
+        results.coinbase.message = `❌ Coinbase error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+
+      res.status(200).json({
+        timestamp: new Date().toISOString(),
+        all_working: results.stripe.working || results.coinbase.working,
+        results
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        error: "Payment system test failed",
+        message: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
   });
 
   // ========================

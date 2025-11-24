@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
 import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
 import { AdminManagement } from './AdminManagement';
+import { HealthDashboard } from '@/components/HealthDashboard';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -320,7 +321,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -433,11 +434,25 @@ function MasterAdminDashboard() {
         >
           Do Not Rehire
         </button>
+        <button
+          onClick={() => setActiveSection('health')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'health'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-health"
+        >
+          <Activity className="w-4 h-4 inline mr-2" />
+          System Health
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
 
       {activeSection === 'dnr' && <DNRSection />}
+
+      {activeSection === 'health' && <HealthDashboard />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">
