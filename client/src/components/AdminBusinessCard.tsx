@@ -346,8 +346,8 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Left side - Photo (Square) */}
-          <div className="w-[120px] h-full bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
+          {/* Left side - Photo (Square, constrained height) */}
+          <div className="w-[120px] h-[160px] bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
             {photoPreview ? (
               <>
                 <img src={photoPreview} alt={formData.fullName} className="w-full h-full object-cover" />
