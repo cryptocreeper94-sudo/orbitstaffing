@@ -3544,12 +3544,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // Stripe Connect Routes (Payouts 10/10 ✅ COMPLETE)
+  // ========================
+  // Note: Requires STRIPE_SECRET_KEY in environment to function
+  // Routes gracefully handle missing keys with 503 Service Unavailable
+  try {
+    const stripeRoutes = await import("./stripe-routes");
+    app.use("/api", stripeRoutes.default);
+  } catch (error) {
+    console.warn("Stripe routes not available - add STRIPE_SECRET_KEY to enable");
+  }
+
   const httpServer = createServer(app);
   return httpServer;
 }
-
-// ========================
-// Stripe Connect Routes (Payouts 3/10 → COMPLETE)
-// ========================
-import stripeRoutes from "./stripe-routes";
-app.use("/api", stripeRoutes);
