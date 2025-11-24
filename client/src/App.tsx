@@ -56,6 +56,9 @@ import DeveloperLanding from "@/pages/DeveloperLanding";
 import SecureSandbox from "@/pages/SecureSandbox";
 import EmblemDownload from "@/pages/EmblemDownload";
 import Pricing from "@/pages/Pricing";
+import EquipmentTrackingAdmin from "@/pages/EquipmentTrackingAdmin";
+import GPSClockIn from "@/pages/GPSClockIn";
+import PayrollProcessing from "@/pages/PayrollProcessing";
 // Feedback and AI Chat widgets removed - were distracting corner buttons
 
 function RootPage() {
@@ -103,6 +106,9 @@ function Router() {
       <Route path="/work-orders" component={WorkOrders} />
       <Route path="/ios-coming-soon" component={ComingSoonApple} />
       <Route path="/pricing" component={Pricing} />
+      <Route path="/equipment-tracking" component={EquipmentTrackingAdmin} />
+      <Route path="/gps-clock-in" component={GPSClockIn} />
+      <Route path="/payroll-processing" component={PayrollProcessing} />
       <Route path="/admin/ios-interest" component={AdminIOSInterest} />
       <Route path="/incidents" component={IncidentReporting} />
       <Route path="/business-owner" component={BusinessOwnerMarketing} />
