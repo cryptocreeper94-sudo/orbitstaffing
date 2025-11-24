@@ -33,6 +33,7 @@ import {
   adminDevOwnerMessages,
   employeeEmergencyMessages,
   adminPasswordResets,
+  employeePreApplications,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -95,6 +96,8 @@ import {
   type EmployeeEmergencyMessage,
   type InsertAdminPasswordReset,
   type AdminPasswordReset,
+  type InsertEmployeePreApplication,
+  type EmployeePreApplication,
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
@@ -1453,6 +1456,49 @@ export class DrizzleStorage implements IStorage {
       .where(eq(adminPasswordResets.targetUserId, targetUserId))
       .orderBy(desc(adminPasswordResets.resetAt));
     return result;
+  }
+
+  // ========================
+  // EMPLOYEE PRE-APPLICATIONS
+  // ========================
+  async createEmployeePreApplication(data: InsertEmployeePreApplication): Promise<EmployeePreApplication> {
+    const result = await db.insert(employeePreApplications).values(data).returning();
+    return result[0];
+  }
+
+  async getEmployeePreApplication(id: string): Promise<EmployeePreApplication | undefined> {
+    const result = await db.select().from(employeePreApplications)
+      .where(eq(employeePreApplications.id, id));
+    return result[0];
+  }
+
+  async getEmployeePreApplicationsByEmail(email: string): Promise<EmployeePreApplication[]> {
+    const result = await db.select().from(employeePreApplications)
+      .where(eq(employeePreApplications.email, email))
+      .orderBy(desc(employeePreApplications.createdAt));
+    return result;
+  }
+
+  async listEmployeePreApplications(companyId?: string, limit: number = 50, offset: number = 0): Promise<EmployeePreApplication[]> {
+    let query = db.select().from(employeePreApplications);
+    
+    if (companyId) {
+      query = query.where(eq(employeePreApplications.companyId, companyId));
+    }
+    
+    const result = await query
+      .orderBy(desc(employeePreApplications.submittedAt))
+      .limit(limit)
+      .offset(offset);
+    return result;
+  }
+
+  async updateEmployeePreApplication(id: string, data: Partial<InsertEmployeePreApplication>): Promise<EmployeePreApplication | undefined> {
+    const result = await db.update(employeePreApplications)
+      .set(data)
+      .where(eq(employeePreApplications.id, id))
+      .returning();
+    return result[0];
   }
 }
 

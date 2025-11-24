@@ -32,6 +32,7 @@ import {
   insertOrbitAssetSchema,
   insertAdminBusinessCardSchema,
   insertDeveloperContactMessageSchema,
+  insertEmployeePreApplicationSchema,
   franchises,
   companies,
   users,
@@ -2723,6 +2724,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to set owner admin:", error);
       res.status(500).json({ error: "Failed to set owner admin" });
+    }
+  });
+
+  // ========================
+  // EMPLOYEE PRE-APPLICATIONS
+  // ========================
+  app.post("/api/employee-pre-applications", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const parsed = insertEmployeePreApplicationSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid pre-application data", details: parsed.error.errors });
+      }
+
+      const preApp = await storage.createEmployeePreApplication(parsed.data);
+      res.json({
+        success: true,
+        message: "Pre-application submitted successfully",
+        preApplication: preApp
+      });
+    } catch (error) {
+      console.error("Failed to save pre-application:", error);
+      res.status(500).json({ error: "Failed to save pre-application" });
+    }
+  });
+
+  app.get("/api/employee-pre-applications/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const preApp = await storage.getEmployeePreApplication(id);
+      
+      if (!preApp) {
+        return res.status(404).json({ error: "Pre-application not found" });
+      }
+
+      res.json(preApp);
+    } catch (error) {
+      console.error("Failed to get pre-application:", error);
+      res.status(500).json({ error: "Failed to retrieve pre-application" });
+    }
+  });
+
+  app.get("/api/employee-pre-applications/email/:email", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.params;
+      const preApps = await storage.getEmployeePreApplicationsByEmail(email);
+      res.json(preApps);
+    } catch (error) {
+      console.error("Failed to get pre-applications by email:", error);
+      res.status(500).json({ error: "Failed to retrieve pre-applications" });
     }
   });
 

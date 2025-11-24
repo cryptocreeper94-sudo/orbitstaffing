@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function EmployeePreApplication() {
   const [step, setStep] = useState<'info' | 'work' | 'legal' | 'payment' | 'review' | 'success'>('info');
@@ -105,7 +106,7 @@ export default function EmployeePreApplication() {
     return true;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!validateStep(step)) return;
     
     const steps: (typeof step)[] = ['info', 'work', 'legal', 'payment', 'review'];
@@ -113,8 +114,54 @@ export default function EmployeePreApplication() {
     if (currentIdx < steps.length - 1) {
       setStep(steps[currentIdx + 1]);
     } else if (step === 'review') {
-      // Submit application
-      setStep('success');
+      // Submit application to database
+      try {
+        const response = await fetch('/api/employee-pre-applications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            dateOfBirth: formData.dateOfBirth || null,
+            addressLine1: formData.addressLine1 || null,
+            addressLine2: formData.addressLine2 || null,
+            city: formData.city || null,
+            state: formData.state || null,
+            zipCode: formData.zipCode || null,
+            skills: formData.skills,
+            desiredRoles: formData.desiredRoles,
+            availabilityStatus: formData.availabilityStatus,
+            hourlyRateExpectation: formData.hourlyRateExpectation ? parseFloat(formData.hourlyRateExpectation) : null,
+            experienceYears: formData.experienceYears ? parseInt(formData.experienceYears) : null,
+            ssn: formData.ssn,
+            backgroundCheckConsent: formData.backgroundCheckConsent,
+            bankAccountHolderName: formData.bankAccountHolderName || null,
+            bankRoutingNumber: formData.bankRoutingNumber || null,
+            bankAccountNumber: formData.bankAccountNumber || null,
+            bankAccountType: formData.bankAccountType || 'checking',
+            emergencyContactName: formData.emergencyContactName || null,
+            emergencyContactPhone: formData.emergencyContactPhone || null,
+            emergencyContactRelation: formData.emergencyContactRelation || null,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          setError(error.error || 'Failed to submit application');
+          toast.error('Application submission failed');
+          return;
+        }
+
+        const result = await response.json();
+        toast.success('Application submitted successfully!');
+        setStep('success');
+      } catch (err) {
+        console.error('Submission error:', err);
+        setError('Network error - please try again');
+        toast.error('Network error');
+      }
     }
   };
 
