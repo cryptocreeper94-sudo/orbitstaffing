@@ -6,6 +6,7 @@ import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark
 import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
 import { AdminManagement } from './AdminManagement';
 import { HealthDashboard } from '@/components/HealthDashboard';
+import { ContingencyManual } from '@/components/ContingencyManual';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -321,7 +322,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -446,6 +447,18 @@ function MasterAdminDashboard() {
           <Activity className="w-4 h-4 inline mr-2" />
           System Health
         </button>
+        <button
+          onClick={() => setActiveSection('contingency')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'contingency'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-contingency"
+        >
+          <AlertTriangle className="w-4 h-4 inline mr-2" />
+          Contingency
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -453,6 +466,8 @@ function MasterAdminDashboard() {
       {activeSection === 'dnr' && <DNRSection />}
 
       {activeSection === 'health' && <HealthDashboard />}
+
+      {activeSection === 'contingency' && <ContingencyManual />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">
