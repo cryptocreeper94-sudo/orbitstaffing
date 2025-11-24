@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -150,14 +150,14 @@ export default function AdminPanel() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
         <div className="absolute top-6 left-6">
-          <Button
+          <button
             onClick={() => setLocation('/')}
-            variant="outline"
-            className="text-cyan-400 border-cyan-400 hover:bg-cyan-400/10"
-            data-testid="button-back-home"
+            className="text-gray-400 hover:text-white transition-colors p-1"
+            data-testid="button-back-arrow"
+            title="Back"
           >
-            ← Back
-          </Button>
+            <ChevronLeft className="w-5 h-5" />
+          </button>
         </div>
         <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
           <div className="flex items-center justify-center mb-6">
@@ -228,10 +228,11 @@ export default function AdminPanel() {
                       setDeveloperPin('');
                       setDeveloperError('');
                     }}
-                    className="text-gray-400 hover:text-gray-300"
-                    data-testid="button-back-to-admin"
+                    className="text-gray-400 hover:text-white transition-colors p-1"
+                    data-testid="button-back-arrow"
+                    title="Back"
                   >
-                    ← Back
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
                   <h2 className="text-sm font-bold text-purple-400">Developer Panel</h2>
                 </div>

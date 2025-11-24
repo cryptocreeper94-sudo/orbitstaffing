@@ -5,7 +5,7 @@
  * Both users can access all views - Sidonie read-only, You full control
  */
 import React, { useState } from 'react';
-import { Code, Shield, Users, LogOut, Lock, Briefcase } from 'lucide-react';
+import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -283,14 +283,14 @@ export default function SecureSandbox() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="absolute top-6 left-6">
-        <Button
+        <button
           onClick={() => setLocation('/')}
-          variant="outline"
-          className="text-purple-400 border-purple-400 hover:bg-purple-400/10"
-          data-testid="button-back-home"
+          className="text-gray-400 hover:text-white transition-colors p-1"
+          data-testid="button-back-arrow"
+          title="Back"
         >
-          ← Back
-        </Button>
+          <ChevronLeft className="w-5 h-5" />
+        </button>
       </div>
       <div className="max-w-4xl w-full">
         {/* Header */}

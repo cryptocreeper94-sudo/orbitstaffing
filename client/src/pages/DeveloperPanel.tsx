@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -345,62 +345,77 @@ export default function DeveloperPanel() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
-              <Code className="w-8 h-8 text-purple-400" />
-              Developer Panel
-            </h1>
-            <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <button
+              onClick={() => setLocation('/')}
+              className="text-gray-400 hover:text-white transition-colors p-1"
+              data-testid="button-back-arrow"
+              title="Back"
+            >
+              <ArrowRight className="w-5 h-5 transform rotate-180" />
+            </button>
+            <div>
+              <h1 className="text-4xl font-bold flex items-center gap-2">
+                <Code className="w-8 h-8 text-purple-400" />
+                Developer Panel
+              </h1>
+              <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
+            </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+
+          {/* Navigation Buttons - Responsive */}
+          <div className="flex flex-wrap gap-2">
             <Button
               onClick={() => navigateTo('/incident-reporting')}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
               data-testid="button-dev-incident-report"
             >
-              <AlertTriangle className="w-4 h-4" />
-              Incidents
+              <AlertTriangle className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Incidents</span>
+              <span className="sm:hidden">Inc.</span>
             </Button>
             <Button
               onClick={() => navigateTo('/workers-comp-admin')}
-              className="bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              className="bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
               data-testid="button-dev-workers-comp"
             >
-              <Shield className="w-4 h-4" />
-              Workers Comp
+              <Shield className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Workers Comp</span>
+              <span className="sm:hidden">WC</span>
             </Button>
             <Button
               onClick={() => navigateTo('/admin')}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
               data-testid="button-dev-to-admin"
             >
-              <Shield className="w-4 h-4" />
-              Admin
+              <Shield className="w-3 h-3 md:w-4 md:h-4" />
+              <span>Admin</span>
             </Button>
             <Button
               onClick={() => navigateTo('/dashboard')}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
               data-testid="button-dev-to-app"
             >
-              <BarChart3 className="w-4 h-4" />
-              Main App
+              <BarChart3 className="w-3 h-3 md:w-4 md:h-4" />
+              <span>App</span>
             </Button>
             <Button
               onClick={() => setShowDeviceSettings(!showDeviceSettings)}
-              className="bg-slate-600 hover:bg-slate-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              className="bg-slate-600 hover:bg-slate-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
               data-testid="button-device-settings"
             >
-              <Key className="w-4 h-4" />
-              Device Settings
+              <Key className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden md:inline">Device Settings</span>
+              <span className="md:hidden">Settings</span>
             </Button>
             <Button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap ml-auto"
               data-testid="button-developer-logout"
             >
-              <LogOut className="w-4 h-4" />
-              Logout
+              <LogOut className="w-3 h-3 md:w-4 md:h-4" />
+              <span>Logout</span>
             </Button>
           </div>
         </div>

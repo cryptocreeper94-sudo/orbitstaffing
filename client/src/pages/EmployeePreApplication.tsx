@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AlertCircle, CheckCircle2, Save } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Save, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface WorkHistory {
@@ -911,14 +911,14 @@ export default function EmployeePreApplication() {
         {/* Navigation Buttons */}
         <div className="flex gap-4">
           {step !== 'info' && (
-            <Button
+            <button
               onClick={handleBack}
-              variant="outline"
-              className="text-gray-300 border-gray-600 hover:bg-slate-700"
-              data-testid="button-back"
+              className="text-gray-400 hover:text-white transition-colors p-1"
+              data-testid="button-back-arrow"
+              title="Back"
             >
-              ← Back
-            </Button>
+              <ChevronLeft className="w-5 h-5" />
+            </button>
           )}
           
           {step !== 'success' && step !== 'review' && (

@@ -3,21 +3,22 @@ import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, CheckCircle2, Users, TrendingUp, Share2 } from 'lucide-react';
+import { DollarSign, CheckCircle2, Users, TrendingUp, Share2, ChevronLeft } from 'lucide-react';
 
 export default function OwnerPitch() {
   return (
     <Shell>
       {/* Back Button */}
-      <Button
-        onClick={() => window.location.href = '/'}
-        variant="outline"
-        size="sm"
-        className="mb-6"
-        data-testid="button-back-admin"
-      >
-        ← Back to Admin
-      </Button>
+      <div className="mb-6">
+        <button
+          onClick={() => window.location.href = '/'}
+          className="text-gray-400 hover:text-white transition-colors p-1"
+          data-testid="button-back-arrow"
+          title="Back"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+      </div>
 
       {/* Header */}
       <div className="mb-8">
