@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Shell } from '@/components/layout/Shell';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, MapPin, Phone, Clock, CheckCircle2, FileText, Zap } from 'lucide-react';
+import { AlertCircle, MapPin, Phone, Clock, CheckCircle2, FileText, Zap, Camera, Video } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Clinic {
   id: string;
@@ -78,9 +79,15 @@ export default function IncidentReportingApp() {
     incidentLocation: '',
     timestamp: new Date().toISOString().slice(0, 16),
     witnesses: [] as string[],
+    photoEvidence: null as File | null,
+    videoEvidence: null as File | null,
   });
 
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
+  const videoElementRef = useRef<HTMLVideoElement>(null);
   const [reports, setReports] = useState<IncidentReport[]>([
     {
       id: '1',
@@ -94,6 +101,40 @@ export default function IncidentReportingApp() {
       nearestClinic: 'Concentra - Downtown Nashville'
     }
   ]);
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      cameraStreamRef.current = stream;
+      if (videoElementRef.current) {
+        videoElementRef.current.srcObject = stream;
+        toast.success('Camera active - position to capture incident scene');
+      }
+    } catch (err) {
+      toast.error('Camera access denied');
+      console.error('Camera error:', err);
+    }
+  };
+
+  const handlePhotoCapture = async () => {
+    if (videoElementRef.current && cameraStreamRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoElementRef.current.videoWidth;
+      canvas.height = videoElementRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(videoElementRef.current, 0, 0);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], 'incident-photo.jpg', { type: 'image/jpeg' });
+          setIncidentData({ ...incidentData, photoEvidence: file });
+          toast.success('Photo captured and attached to incident report');
+          // Stop camera
+          cameraStreamRef.current?.getTracks().forEach(track => track.stop());
+          if (videoElementRef.current) videoElementRef.current.srcObject = null;
+        }
+      }, 'image/jpeg');
+    }
+  };
 
   const handleReportIncident = () => {
     setStep('drugtest');
@@ -387,6 +428,82 @@ export default function IncidentReportingApp() {
                 className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-foreground h-24"
                 data-testid="textarea-incident-description"
               />
+            </div>
+
+            <div className="bg-purple-900/10 border border-purple-700/50 rounded-lg p-4">
+              <h4 className="text-sm font-bold text-purple-300 mb-3">📸 Evidence Collection (Optional but Recommended)</h4>
+              <div className="space-y-3">
+                <div>
+                  <Button
+                    onClick={handleCameraCapture}
+                    variant="outline"
+                    className="w-full mb-2 text-purple-300 border-purple-700"
+                    data-testid="button-camera-open"
+                  >
+                    <Camera className="w-4 h-4 mr-2" />
+                    Open Camera - Capture Scene Photos
+                  </Button>
+                  <video
+                    ref={videoElementRef}
+                    autoPlay
+                    playsInline
+                    className="w-full rounded-lg bg-black mb-2"
+                    style={{ display: cameraStreamRef.current ? 'block' : 'none' }}
+                  />
+                  {cameraStreamRef.current && (
+                    <Button
+                      onClick={handlePhotoCapture}
+                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      data-testid="button-capture-photo"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Capture Photo Now
+                    </Button>
+                  )}
+                  {incidentData.photoEvidence && (
+                    <p className="text-xs text-green-400 mt-1">✓ Photo attached to report</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 mb-2 block">Or Upload Photo/Video File:</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      ref={photoInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setIncidentData({ ...incidentData, photoEvidence: e.target.files?.[0] || null })}
+                      className="hidden"
+                      data-testid="input-photo-upload"
+                    />
+                    <Button
+                      onClick={() => photoInputRef.current?.click()}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      data-testid="button-upload-photo"
+                    >
+                      📷 Upload Photo
+                    </Button>
+                    <input
+                      ref={videoInputRef}
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => setIncidentData({ ...incidentData, videoEvidence: e.target.files?.[0] || null })}
+                      className="hidden"
+                      data-testid="input-video-upload"
+                    />
+                    <Button
+                      onClick={() => videoInputRef.current?.click()}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      data-testid="button-upload-video"
+                    >
+                      🎥 Upload Video
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="bg-blue-900/10 border border-blue-700/50 rounded-lg p-4">

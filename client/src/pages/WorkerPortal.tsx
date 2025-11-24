@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLocation } from 'wouter';
 import { 
   MessageSquare, 
   Clock, 
@@ -11,11 +12,13 @@ import {
   AlertTriangle, 
   CalendarX, 
   CheckCircle2,
-  Send
+  Send,
+  Camera
 } from "lucide-react";
 import { useState } from "react";
 
 export default function WorkerPortal() {
+  const [, setLocation] = useLocation();
   const [chatOpen, setChatOpen] = useState(false);
 
   return (
@@ -25,9 +28,19 @@ export default function WorkerPortal() {
           <h1 className="text-3xl font-bold font-heading tracking-tight">Worker Hub</h1>
           <p className="text-muted-foreground">Manage your shifts, report issues, and request gear.</p>
         </div>
-        <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 px-4 py-1">
-          Status: Active • On Site
-        </Badge>
+        <div className="flex gap-2 flex-wrap">
+          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 px-4 py-1">
+            Status: Active • On Site
+          </Badge>
+          <Button onClick={() => setLocation('/incident-reporting')} className="bg-red-600 hover:bg-red-700 text-xs" data-testid="button-worker-incident-report">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Report Incident
+          </Button>
+          <Button onClick={() => setLocation('/pre-apply')} variant="outline" className="text-xs" data-testid="button-worker-pre-apply">
+            <Camera className="w-3 h-3 mr-1" />
+            ID Verification
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

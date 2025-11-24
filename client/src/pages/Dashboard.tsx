@@ -2,13 +2,16 @@ import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PoweredByOrbit } from "@/components/PoweredByOrbit";
+import { useLocation } from 'wouter';
 import { 
   Users, 
   DollarSign, 
   Briefcase, 
   TrendingUp, 
   Activity,
-  AlertCircle
+  AlertCircle,
+  AlertTriangle,
+  Shield
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -33,6 +36,8 @@ const data = [
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
+
   return (
     <Shell>
       <div className="flex items-center justify-between mb-8">
@@ -40,10 +45,18 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-foreground font-heading tracking-tight">Command Center</h1>
           <p className="text-muted-foreground mt-1">System Status: <span className="text-primary font-mono">OPTIMAL</span></p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
           <Button variant="outline" className="border-primary/20 hover:bg-primary/10 text-primary">
             <Activity className="w-4 h-4 mr-2" />
             System Health
+          </Button>
+          <Button onClick={() => setLocation('/incident-reporting')} className="bg-red-600 hover:bg-red-700" data-testid="button-owner-incident-report">
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            Report Incident
+          </Button>
+          <Button onClick={() => setLocation('/workers-comp-admin')} className="bg-orange-600 hover:bg-orange-700" data-testid="button-owner-workers-comp">
+            <Shield className="w-4 h-4 mr-2" />
+            Workers Comp
           </Button>
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
             New Placement

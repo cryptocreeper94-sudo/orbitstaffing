@@ -26,6 +26,8 @@ export default function EmployeePreApplication() {
     hourlyRateExpectation: '',
     experienceYears: '',
     ssn: '',
+    idProofType: 'passport',
+    idProofFile: null as File | null,
     backgroundCheckConsent: false,
     bankAccountHolderName: '',
     bankRoutingNumber: '',
@@ -86,6 +88,14 @@ export default function EmployeePreApplication() {
     if (currentStep === 'legal') {
       if (!formData.ssn || formData.ssn.length < 9) {
         setError('Please enter a valid SSN');
+        return false;
+      }
+      if (!formData.idProofType) {
+        setError('Please select ID type');
+        return false;
+      }
+      if (!formData.idProofFile) {
+        setError('Please upload your ID document photo/scan');
         return false;
       }
       if (!formData.backgroundCheckConsent) {
@@ -450,6 +460,36 @@ export default function EmployeePreApplication() {
                     data-testid="input-ssn"
                   />
                   <p className="text-xs text-gray-500 mt-1">Your SSN is encrypted and secure</p>
+                </div>
+
+                <div className="border border-green-700/50 bg-green-900/10 rounded-lg p-4">
+                  <h4 className="text-sm font-bold text-foreground mb-3">Government-Issued Photo ID *</h4>
+                  <p className="text-xs text-gray-400 mb-3">Required for I-9 employment verification. Choose one:</p>
+                  <div className="space-y-3">
+                    <select
+                      value={formData.idProofType}
+                      onChange={(e) => handleInputChange('idProofType', e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-foreground text-sm"
+                      data-testid="select-id-type"
+                    >
+                      <option value="passport">Passport</option>
+                      <option value="birth_certificate">Birth Certificate</option>
+                      <option value="driver_license">Driver's License</option>
+                      <option value="state_id">State ID Card</option>
+                      <option value="military_id">Military ID</option>
+                    </select>
+                    <div>
+                      <label className="text-xs text-gray-400 mb-2 block">Upload Document Photo or Scan</label>
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={(e) => handleInputChange('idProofFile', e.target.files?.[0] || null)}
+                        className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-sm text-gray-300"
+                        data-testid="input-id-document"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Photos or PDF of your ID document for verification</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="border border-yellow-700/50 bg-yellow-900/10 rounded-lg p-4">

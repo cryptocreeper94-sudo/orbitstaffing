@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -243,7 +243,7 @@ export default function DeveloperPanel() {
             </h1>
             <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setShowChat(!showChat)}
               className="relative px-4 py-2 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold rounded-lg flex items-center gap-2 transition-all glow-cyan"
@@ -252,6 +252,22 @@ export default function DeveloperPanel() {
               <MessageCircle className="w-4 h-4" />
               Ask AI
             </button>
+            <Button
+              onClick={() => navigateTo('/incident-reporting')}
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              data-testid="button-dev-incident-report"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              Incident Reports
+            </Button>
+            <Button
+              onClick={() => navigateTo('/workers-comp-admin')}
+              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
+              data-testid="button-dev-workers-comp"
+            >
+              <Shield className="w-4 h-4" />
+              Workers Comp
+            </Button>
             <Button
               onClick={() => navigateTo('/admin')}
               className="bg-cyan-600 hover:bg-cyan-700 flex items-center gap-2"

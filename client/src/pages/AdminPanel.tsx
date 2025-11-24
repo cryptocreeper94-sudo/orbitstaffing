@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -287,7 +287,23 @@ export default function AdminPanel() {
               {adminName}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              onClick={() => setLocation('/incident-reporting')}
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              data-testid="button-admin-incident-report"
+            >
+              <AlertTriangle className="w-4 h-4" />
+              Incident Reports
+            </Button>
+            <Button
+              onClick={() => setLocation('/workers-comp-admin')}
+              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
+              data-testid="button-admin-workers-comp"
+            >
+              <Shield className="w-4 h-4" />
+              Workers Comp
+            </Button>
             <Button
               onClick={() => setLocation('/')}
               className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
