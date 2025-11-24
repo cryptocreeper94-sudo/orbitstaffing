@@ -20,6 +20,7 @@ import { WorkerAvailabilityCalendar } from "@/pages/WorkerAvailabilityCalendar";
 import { WorkerReferrals } from "@/pages/WorkerReferrals";
 import Roadmap from "@/pages/Roadmap";
 import PaymentPlans from "@/pages/PaymentPlans";
+import ValueProposition from "@/pages/ValueProposition";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/worker-referrals" component={WorkerReferrals} />
       <Route path="/roadmap" component={Roadmap} />
       <Route path="/payment-plans" component={PaymentPlans} />
+      <Route path="/why-orbit" component={ValueProposition} />
       <Route component={NotFound} />
     </Switch>
   );

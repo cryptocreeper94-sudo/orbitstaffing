@@ -20,6 +20,9 @@ interface PersonalCardData {
   photoUrl?: string;
   brandColor: string;
   assetNumber?: string;
+  stampColor?: string;
+  upcCode?: string;
+  serialNumber?: string;
 }
 
 interface PersonalCardGeneratorProps {
@@ -45,6 +48,9 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
     location: '',
     brandColor: '#06B6D4',
     assetNumber: userId === 'orbit-0001' ? 'ORBIT-0001' : userId === 'orbit-0002' ? 'ORBIT-0002' : `ORBIT-${userId}`,
+    stampColor: '#FFD700', // Gold
+    upcCode: '',
+    serialNumber: '',
   });
 
   useEffect(() => {
@@ -151,6 +157,60 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
     }
   };
 
+  const handleGenerateHallmark = () => {
+    // Generate unique hallmark with UPC and serial
+    const timestamp = Date.now().toString(36).toUpperCase().slice(-6);
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const hallmarkId = `ORBIT-ASSET-${timestamp}-${random}`;
+    const serialNumber = hallmarkId.replace('ORBIT-ASSET-', '');
+    
+    // Generate 12-digit UPC
+    const digits = [];
+    for (let i = 0; i < 11; i++) {
+      digits.push(Math.floor(Math.random() * 10));
+    }
+    let sum = 0;
+    for (let i = 0; i < 11; i++) {
+      sum += digits[i] * (i % 2 === 0 ? 1 : 3);
+    }
+    const checkDigit = (10 - (sum % 10)) % 10;
+    digits.push(checkDigit);
+    const upcCode = digits.join('');
+    
+    setCardData(prev => ({
+      ...prev,
+      assetNumber: hallmarkId,
+      serialNumber,
+      upcCode,
+    }));
+  };
+
+  const handleExportPDF = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: '#1e293b',
+        scale: 3,
+        logging: false,
+      });
+
+      // Use html2pdf library if available, otherwise use canvas
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = `${cardType}-card-${cardData.fullName.replace(/\s+/g, '-')}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert('Business card exported as image! For PDF printing, use your browser\'s Print to PDF feature.');
+    } catch (error) {
+      console.error('Failed to export card:', error);
+      alert('Failed to export card');
+    }
+  };
+
   const vCardData = `BEGIN:VCARD\nVERSION:3.0\nFN:${cardData.fullName}\nTITLE:${cardData.title}\nORG:${cardData.companyName}\nEMAIL:${cardData.email}\nTEL:${cardData.phone}\nADR:;;${cardData.location}\nEND:VCARD`;
 
   const FieldWithPopup = ({ label, value, icon: Icon }: any) => (
@@ -206,7 +266,7 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
 
           {/* Text Fields */}
           {Object.entries(cardData).map(([key, value]) => {
-            if (key === 'brandColor' || key === 'assetNumber' || typeof value !== 'string') return null;
+            if (key === 'brandColor' || key === 'stampColor' || key === 'assetNumber' || key === 'upcCode' || key === 'serialNumber' || typeof value !== 'string') return null;
             
             return (
               <div key={key}>
@@ -223,6 +283,29 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
               </div>
             );
           })}
+
+          {/* Stamp Color Picker */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Stamp Color:</label>
+            <div className="flex gap-2 flex-wrap">
+              {['#FFD700', '#00D9FF', '#FF6B6B', '#4ECB71', '#9B59B6'].map(color => (
+                <button
+                  key={color}
+                  onClick={() => setCardData({ ...cardData, stampColor: color })}
+                  className={`w-8 h-8 rounded border-2 transition-all ${cardData.stampColor === color ? 'border-white scale-110' : 'border-gray-600'}`}
+                  style={{ backgroundColor: color }}
+                  data-testid={`button-stamp-color-${color}`}
+                  title={color}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Hallmark Generation */}
+          <Button onClick={handleGenerateHallmark} className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-generate-hallmark">
+            <QrCode className="w-4 h-4 mr-2" />
+            Generate Hallmark (UPC & Serial)
+          </Button>
 
           <div className="flex gap-2">
             <Button onClick={handleSave} className="flex-1 bg-cyan-600 hover:bg-cyan-700" data-testid="button-save-personal-card">
@@ -293,20 +376,25 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
             </div>
           </div>
 
-          {/* QR Code Section */}
-          <div className="absolute bottom-2 left-2 flex flex-col items-center gap-1">
-            <div className="p-1 bg-white rounded-sm border-2 border-white" style={{ borderColor: 'white' }}>
-              <QRCode value={vCardData} size={40} level="H" margin={2} />
+          {/* QR Code Section (Bottom Left - Hallmark) */}
+          <div className="absolute bottom-2 left-2 flex flex-col items-center gap-0.5 p-1.5 rounded bg-black/40 border-2" style={{ borderColor: cardData.stampColor }}>
+            <div className="p-0.5 bg-white rounded-sm">
+              <QRCode value={vCardData} size={36} level="H" margin={1} />
             </div>
-            <span className="text-[5px] text-white opacity-75 font-mono">QR Code</span>
+            <span className="text-[5px] font-mono font-bold" style={{ color: cardData.stampColor }}>
+              {cardData.upcCode || 'UPC'}
+            </span>
+            <span className="text-[4px] text-gray-300">
+              {cardData.serialNumber ? cardData.serialNumber.slice(0, 8) : 'Serial'}
+            </span>
           </div>
 
-          {/* Asset Number Section */}
-          <div className="absolute bottom-3 right-3 text-center flex flex-col items-end gap-1">
-            <div className="text-[6px] font-bold text-white opacity-90 font-mono bg-slate-900/70 px-1.5 py-0.5 rounded border border-cyan-500/50">
+          {/* Asset Number & Brand (Bottom Right) */}
+          <div className="absolute bottom-2 right-2 text-right flex flex-col items-end gap-1">
+            <div className="text-[7px] font-bold text-white opacity-90 font-mono">
               {cardData.assetNumber}
             </div>
-            <span className="text-[4px] text-white opacity-60">Serial</span>
+            <span className="text-[5px] text-gray-400">Powered by ORBIT</span>
           </div>
 
           {/* Bottom Borders */}
@@ -324,6 +412,10 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
         <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700" data-testid="button-download-personal-card">
           <Download className="w-4 h-4 mr-2" />
           Download
+        </Button>
+        <Button onClick={handleExportPDF} className="bg-orange-600 hover:bg-orange-700" data-testid="button-export-pdf-card">
+          <Download className="w-4 h-4 mr-2" />
+          Export PDF
         </Button>
         <Button onClick={handleShare} className="bg-blue-600 hover:bg-blue-700" data-testid="button-share-personal-card">
           <Share2 className="w-4 h-4 mr-2" />
