@@ -657,15 +657,15 @@ function MasterAdminDashboard() {
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-create-franchise">
+          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-create-franchise" onClick={() => alert('Create franchise feature coming soon')}>
             <Building2 className="w-4 h-4 mr-2" />
             Create Franchise
           </Button>
-          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-manage-customers">
+          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-manage-customers" onClick={() => alert('Manage customers feature coming soon')}>
             <Users className="w-4 h-4 mr-2" />
             Manage Customers
           </Button>
-          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-view-analytics">
+          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-view-analytics" onClick={() => alert('View analytics feature coming soon')}>
             📊 View Analytics
           </Button>
         </div>
@@ -711,15 +711,15 @@ function FranchiseAdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-workers">
+        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-workers" onClick={() => alert('Manage workers feature coming soon')}>
           <Users className="w-4 h-4 mr-2" />
           Manage Workers
         </Button>
-        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-clients">
+        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-clients" onClick={() => alert('Manage clients feature coming soon')}>
           <Building2 className="w-4 h-4 mr-2" />
           Manage Clients
         </Button>
-        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-franchise-settings">
+        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-franchise-settings" onClick={() => alert('Franchise settings feature coming soon')}>
           ⚙️ Franchise Settings
         </Button>
       </div>
@@ -765,15 +765,15 @@ function CustomerAdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-workers">
+        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-workers" onClick={() => alert('Manage workers feature coming soon')}>
           <Users className="w-4 h-4 mr-2" />
           Manage Workers
         </Button>
-        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-clients">
+        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-clients" onClick={() => alert('Manage clients feature coming soon')}>
           <Building2 className="w-4 h-4 mr-2" />
           Manage Clients
         </Button>
-        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-billing">
+        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-billing" onClick={() => alert('Billing feature coming soon')}>
           💳 Billing & Subscription
         </Button>
       </div>

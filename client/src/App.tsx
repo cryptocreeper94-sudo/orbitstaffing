@@ -56,8 +56,7 @@ import DeveloperLanding from "@/pages/DeveloperLanding";
 import SecureSandbox from "@/pages/SecureSandbox";
 import EmblemDownload from "@/pages/EmblemDownload";
 import Pricing from "@/pages/Pricing";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
-import { AIChat } from "@/components/AIChat";
+// Feedback and AI Chat widgets removed - were distracting corner buttons
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -138,8 +137,6 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
-        <FeedbackWidget />
-        <AIChat />
       </TooltipProvider>
     </QueryClientProvider>
   );
