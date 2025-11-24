@@ -364,59 +364,67 @@ export default function DeveloperPanel() {
             </div>
           </div>
 
-          {/* Navigation Buttons - Responsive */}
-          <div className="flex flex-wrap gap-2">
-            <Button
+          {/* Navigation Buttons - Beautiful Grid with Hover Effects */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            {/* Incidents Button */}
+            <button
               onClick={() => navigateTo('/incident-reporting')}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-incident-report"
             >
-              <AlertTriangle className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">Incidents</span>
-              <span className="sm:hidden">Inc.</span>
-            </Button>
-            <Button
+              <AlertTriangle className="w-6 h-6 md:w-7 md:h-7 text-red-400 group-hover:text-red-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Incidents</span>
+            </button>
+
+            {/* Workers Comp Button */}
+            <button
               onClick={() => navigateTo('/workers-comp-admin')}
-              className="bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-orange-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-workers-comp"
             >
-              <Shield className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">Workers Comp</span>
-              <span className="sm:hidden">WC</span>
-            </Button>
-            <Button
+              <Shield className="w-6 h-6 md:w-7 md:h-7 text-orange-400 group-hover:text-orange-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Workers Comp</span>
+            </button>
+
+            {/* Admin Button */}
+            <button
               onClick={() => navigateTo('/admin')}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-cyan-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-to-admin"
             >
-              <Shield className="w-3 h-3 md:w-4 md:h-4" />
-              <span>Admin</span>
-            </Button>
-            <Button
+              <Shield className="w-6 h-6 md:w-7 md:h-7 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Admin</span>
+            </button>
+
+            {/* App Button */}
+            <button
               onClick={() => navigateTo('/dashboard')}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-green-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-to-app"
             >
-              <BarChart3 className="w-3 h-3 md:w-4 md:h-4" />
-              <span>App</span>
-            </Button>
-            <Button
+              <BarChart3 className="w-6 h-6 md:w-7 md:h-7 text-green-400 group-hover:text-green-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">App</span>
+            </button>
+
+            {/* Device Settings Button */}
+            <button
               onClick={() => setShowDeviceSettings(!showDeviceSettings)}
-              className="bg-slate-600 hover:bg-slate-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-purple-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-device-settings"
             >
-              <Key className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden md:inline">Device Settings</span>
-              <span className="md:hidden">Settings</span>
-            </Button>
-            <Button
+              <Key className="w-6 h-6 md:w-7 md:h-7 text-purple-400 group-hover:text-purple-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Settings</span>
+            </button>
+
+            {/* Logout Button */}
+            <button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-1 px-3 py-2 text-xs md:text-sm whitespace-nowrap ml-auto"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-developer-logout"
             >
-              <LogOut className="w-3 h-3 md:w-4 md:h-4" />
-              <span>Logout</span>
-            </Button>
+              <LogOut className="w-6 h-6 md:w-7 md:h-7 text-red-400 group-hover:text-red-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Logout</span>
+            </button>
           </div>
         </div>
 
