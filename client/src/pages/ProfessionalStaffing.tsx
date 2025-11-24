@@ -26,11 +26,11 @@ export default function ProfessionalStaffing() {
       {/* Tabs */}
       <div className="max-w-6xl mx-auto">
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-slate-800 border border-slate-700">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">Overview</TabsTrigger>
-            <TabsTrigger value="workflow" className="data-[state=active]:bg-purple-600">Workflow</TabsTrigger>
-            <TabsTrigger value="features" className="data-[state=active]:bg-purple-600">Features</TabsTrigger>
-            <TabsTrigger value="specs" className="data-[state=active]:bg-purple-600">Tech Specs</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8 bg-slate-800 border border-slate-700">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="workflow" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Workflow</TabsTrigger>
+            <TabsTrigger value="features" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Features</TabsTrigger>
+            <TabsTrigger value="specs" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Tech Specs</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
