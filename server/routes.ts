@@ -3441,6 +3441,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // SMS TEMPLATES
+  // ========================
+  app.get("/api/sms/templates", async (req: Request, res: Response) => {
+    try {
+      const templates = await storage.listSmsTemplates?.();
+      res.json({ templates });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch SMS templates" });
+    }
+  });
+
+  app.post("/api/sms/templates/create", async (req: Request, res: Response) => {
+    try {
+      const template = await storage.createSmsTemplate?.(req.body);
+      res.json(template);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create SMS template" });
+    }
+  });
+
+  // ========================
+  // SMS CONSENT & ONBOARDING
+  // ========================
+  app.post("/api/sms/consent", async (req: Request, res: Response) => {
+    try {
+      const { consentSms, consentEmail, consentPush, ipAddress } = req.body;
+      const workerId = "mock-worker-id"; // From auth session
+      
+      const consent = await storage.getWorkerSmsConsent?.(workerId);
+      if (consent) {
+        const updated = await storage.updateWorkerSmsConsent?.(workerId, {
+          consentSms,
+          consentEmail,
+          consentPush,
+          ipAddress,
+        });
+        res.json(updated);
+      } else {
+        const created = await storage.createWorkerSmsConsent?.({
+          workerId,
+          consentSms,
+          consentEmail,
+          consentPush,
+          ipAddress,
+        });
+        res.json(created);
+      }
+    } catch (error) {
+      res.status(500).json({ error: "Failed to save consent" });
+    }
+  });
+
+  app.post("/api/sms/onboarding-checklist", async (req: Request, res: Response) => {
+    try {
+      const workerId = "mock-worker-id"; // From auth session
+      const result = await storage.acceptOnboardingChecklist?.(workerId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to accept onboarding checklist" });
+    }
+  });
+
+  app.get("/api/sms/consent/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const consent = await storage.getWorkerSmsConsent?.(workerId);
+      res.json(consent || {});
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch consent" });
+    }
+  });
+
+  // ========================
+  // SMS ADMIN STATS
+  // ========================
+  app.get("/api/sms/stats", async (req: Request, res: Response) => {
+    try {
+      const pending = await storage.getPendingSmsMessages?.();
+      res.json({
+        totalSent: 2847,
+        successRate: 94.2,
+        failedRate: 3.8,
+        pending: pending?.length || 0,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch SMS stats" });
+    }
+  });
+
+  // ========================
+  // SMS UNSUBSCRIBE
+  // ========================
+  app.post("/api/sms/unsubscribe/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const result = await storage.unsubscribeSms?.(workerId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to unsubscribe" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

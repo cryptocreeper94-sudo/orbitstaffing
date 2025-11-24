@@ -3642,3 +3642,92 @@ export const insertInstantPayRequestSchema = createInsertSchema(instantPayReques
 
 export type InsertInstantPayRequest = z.infer<typeof insertInstantPayRequestSchema>;
 export type InstantPayRequest = typeof instantPayRequests.$inferSelect;
+
+// ========================
+// SMS Templates (Canned Messages)
+// ========================
+export const smsTemplates = pgTable(
+  "sms_templates",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Template Info
+    name: varchar("name", { length: 255 }).notNull().unique(), // e.g., "assignment_tomorrow"
+    messageType: varchar("message_type", { length: 50 }).notNull(), // shift_offer, confirmation, reminder, alert, bonus_update
+    category: varchar("category", { length: 100 }), // onboarding, assignment, payroll, safety
+    
+    // Message Template
+    template: text("template").notNull(), // e.g., "Hi {firstName}, your assignment starts {date} at {time}. Reply CONFIRM or DECLINE."
+    description: text("description"),
+    
+    // Variables Available
+    availableVariables: jsonb("available_variables"), // ["firstName", "date", "time", "clientName", etc.]
+    
+    // Status
+    enabled: boolean("enabled").default(true),
+    isDefault: boolean("is_default").default(false), // True for ORBIT defaults
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  }
+);
+
+export const insertSmsTemplateSchema = createInsertSchema(smsTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSmsTemplate = z.infer<typeof insertSmsTemplateSchema>;
+export type SmsTemplate = typeof smsTemplates.$inferSelect;
+
+// ========================
+// Worker SMS Consent & Preferences
+// ========================
+export const workerSmsConsent = pgTable(
+  "worker_sms_consent",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Consent Status
+    consentSms: boolean("consent_sms").default(false), // Opted in to SMS?
+    consentEmail: boolean("consent_email").default(false), // Opted in to email?
+    consentPush: boolean("consent_push").default(false), // Opted in to push notifications?
+    
+    // Agreement
+    agreementAcceptedAt: timestamp("agreement_accepted_at"),
+    agreementVersion: varchar("agreement_version", { length: 20 }), // e.g., "1.0"
+    ipAddress: varchar("ip_address", { length: 45 }), // For audit trail
+    
+    // Preferences
+    doNotDisturb: jsonb("do_not_disturb"), // {start: "22:00", end: "08:00", timezone: "America/Chicago"}
+    preferredContactMethod: varchar("preferred_contact_method", { length: 50 }), // sms, email, push
+    
+    // Onboarding Checklist Status
+    onboardingChecklistAccepted: boolean("onboarding_checklist_accepted").default(false),
+    onboardingChecklistAcceptedAt: timestamp("onboarding_checklist_accepted_at"),
+    
+    // Unsubscribe
+    unsubscribedAt: timestamp("unsubscribed_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_sms_consent_worker").on(table.workerId),
+    consentIdx: index("idx_sms_consent_active").on(table.consentSms),
+  })
+);
+
+export const insertWorkerSmsConsentSchema = createInsertSchema(workerSmsConsent).omit({
+  id: true,
+  agreementAcceptedAt: true,
+  onboardingChecklistAcceptedAt: true,
+  unsubscribedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerSmsConsent = z.infer<typeof insertWorkerSmsConsentSchema>;
+export type WorkerSmsConsent = typeof workerSmsConsent.$inferSelect;

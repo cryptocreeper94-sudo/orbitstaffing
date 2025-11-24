@@ -48,6 +48,8 @@ import {
   referralBonuses,
   featureFlags,
   smsQueue,
+  smsTemplates,
+  workerSmsConsent,
   workerSkillVerifications,
   workQualityAssurance,
   instantPayRequests,
@@ -141,6 +143,10 @@ import {
   type AssignmentAcceptance,
   type InsertReferralBonus,
   type ReferralBonus,
+  type InsertSmsTemplate,
+  type SmsTemplate,
+  type InsertWorkerSmsConsent,
+  type WorkerSmsConsent,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -1925,6 +1931,87 @@ export class DrizzleStorage implements IStorage {
 
   async getWorkerInstantPayRequests(workerId: string) {
     return db.select().from(instantPayRequests).where(eq(instantPayRequests.workerId, workerId));
+  }
+
+  // ========================
+  // SMS TEMPLATES
+  // ========================
+  async getSmsTemplate(id: string): Promise<SmsTemplate | undefined> {
+    const result = await db.select().from(smsTemplates).where(eq(smsTemplates.id, id));
+    return result[0];
+  }
+
+  async getSmsTemplateByName(name: string): Promise<SmsTemplate | undefined> {
+    const result = await db.select().from(smsTemplates).where(eq(smsTemplates.name, name));
+    return result[0];
+  }
+
+  async listSmsTemplates(): Promise<SmsTemplate[]> {
+    return db.select().from(smsTemplates).where(eq(smsTemplates.enabled, true));
+  }
+
+  async createSmsTemplate(data: InsertSmsTemplate): Promise<SmsTemplate> {
+    const result = await db.insert(smsTemplates).values(data).returning();
+    return result[0];
+  }
+
+  async updateSmsTemplate(id: string, data: Partial<InsertSmsTemplate>): Promise<SmsTemplate | undefined> {
+    const result = await db.update(smsTemplates).set(data).where(eq(smsTemplates.id, id)).returning();
+    return result[0];
+  }
+
+  // ========================
+  // WORKER SMS CONSENT
+  // ========================
+  async getWorkerSmsConsent(workerId: string): Promise<WorkerSmsConsent | undefined> {
+    const result = await db.select().from(workerSmsConsent).where(eq(workerSmsConsent.workerId, workerId));
+    return result[0];
+  }
+
+  async createWorkerSmsConsent(data: InsertWorkerSmsConsent): Promise<WorkerSmsConsent> {
+    const result = await db.insert(workerSmsConsent).values(data).returning();
+    return result[0];
+  }
+
+  async updateWorkerSmsConsent(workerId: string, data: Partial<InsertWorkerSmsConsent>): Promise<WorkerSmsConsent | undefined> {
+    const result = await db.update(workerSmsConsent).set(data).where(eq(workerSmsConsent.workerId, workerId)).returning();
+    return result[0];
+  }
+
+  async acceptSmsAgreement(workerId: string, ipAddress: string): Promise<WorkerSmsConsent | undefined> {
+    const result = await db.update(workerSmsConsent)
+      .set({
+        consentSms: true,
+        consentEmail: true,
+        agreementAcceptedAt: new Date(),
+        agreementVersion: "1.0",
+        ipAddress,
+      })
+      .where(eq(workerSmsConsent.workerId, workerId))
+      .returning();
+    return result[0];
+  }
+
+  async acceptOnboardingChecklist(workerId: string): Promise<WorkerSmsConsent | undefined> {
+    const result = await db.update(workerSmsConsent)
+      .set({
+        onboardingChecklistAccepted: true,
+        onboardingChecklistAcceptedAt: new Date(),
+      })
+      .where(eq(workerSmsConsent.workerId, workerId))
+      .returning();
+    return result[0];
+  }
+
+  async unsubscribeSms(workerId: string): Promise<WorkerSmsConsent | undefined> {
+    const result = await db.update(workerSmsConsent)
+      .set({
+        consentSms: false,
+        unsubscribedAt: new Date(),
+      })
+      .where(eq(workerSmsConsent.workerId, workerId))
+      .returning();
+    return result[0];
   }
 }
 

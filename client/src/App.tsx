@@ -22,6 +22,9 @@ import Roadmap from "@/pages/Roadmap";
 import PaymentPlans from "@/pages/PaymentPlans";
 import ValueProposition from "@/pages/ValueProposition";
 import ProfessionalStaffing from "@/pages/ProfessionalStaffing";
+import { SMSConsentPage } from "@/pages/SMSConsentPage";
+import { AdminSMSDashboard } from "@/pages/AdminSMSDashboard";
+import { DevSMSPanel } from "@/pages/DevSMSPanel";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -56,6 +59,9 @@ function Router() {
       <Route path="/payment-plans" component={PaymentPlans} />
       <Route path="/why-orbit" component={ValueProposition} />
       <Route path="/professional-staffing" component={ProfessionalStaffing} />
+      <Route path="/sms-consent" component={SMSConsentPage} />
+      <Route path="/admin-sms" component={AdminSMSDashboard} />
+      <Route path="/dev-sms" component={DevSMSPanel} />
       <Route component={NotFound} />
     </Switch>
   );
