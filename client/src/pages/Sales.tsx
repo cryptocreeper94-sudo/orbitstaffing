@@ -55,11 +55,28 @@ export default function Sales() {
         </div>
       </div>
 
+      {/* Business Card - Top of Page */}
+      <div className="mb-12 pb-8 border-b border-border/30">
+        <AdminBusinessCard
+          adminId="current-admin"
+          fullName="Your Name"
+          title="Sales Director"
+          companyName="ORBIT Staffing OS"
+          email="you@orbitstaffing.net"
+          phone="+1 (615) 555-0123"
+          location="Nashville, TN"
+          website="orbitstaffing.net"
+          brandColor="#06B6D4"
+          onSave={(card) => {
+            console.log('Business card saved:', card);
+          }}
+        />
+      </div>
+
       <Tabs defaultValue="leads" className="space-y-6" onValueChange={setActiveTab}>
         <TabsList className="bg-card border border-border/50">
           <TabsTrigger value="leads">Active Leads</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="digital-card">My Digital Card</TabsTrigger>
           <TabsTrigger value="tools">Sales Tools & Calculator</TabsTrigger>
           <TabsTrigger value="csa">Digital CSA</TabsTrigger>
         </TabsList>
@@ -223,24 +240,6 @@ export default function Sales() {
             <p className="text-blue-600 font-semibold mb-2">✓ All integrations are secure</p>
             <p className="text-xs text-blue-600/80">OAuth authentication. No password sharing. You control what data is shared.</p>
           </div>
-        </TabsContent>
-
-        {/* Admin Business Card */}
-        <TabsContent value="digital-card" className="py-8">
-          <AdminBusinessCard
-            adminId="current-admin"
-            fullName="Your Name"
-            title="Sales Director"
-            companyName="ORBIT Staffing OS"
-            email="you@orbitstaffing.net"
-            phone="+1 (615) 555-0123"
-            location="Nashville, TN"
-            website="orbitstaffing.net"
-            brandColor="#06B6D4"
-            onSave={(card) => {
-              console.log('Business card saved:', card);
-            }}
-          />
         </TabsContent>
 
         <TabsContent value="tools">
