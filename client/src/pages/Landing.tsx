@@ -10,7 +10,8 @@ import {
   DollarSign, 
   Users, 
   Shield,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from "lucide-react";
 import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
@@ -80,6 +81,10 @@ export default function Landing() {
             <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
           </div>
           <div className="flex gap-2">
+            <Link href="/admin" className="px-3 py-2 text-sm rounded-md border border-amber-600/50 hover:bg-amber-600/10 text-amber-400 hover:text-amber-300 transition-colors inline-block flex items-center gap-1" data-testid="link-admin-header">
+              <Lock className="w-3 h-3" />
+              Admin
+            </Link>
             <Link href="/login" className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors inline-block">
               Login
             </Link>
