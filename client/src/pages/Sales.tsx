@@ -46,10 +46,19 @@ export default function Sales() {
           <p className="text-muted-foreground">Lead management, digital CSAs, and cost analysis.</p>
         </div>
         <div className="flex gap-2">
-           <Button variant="outline" className="border-primary/20 hover:bg-primary/10 text-primary">
+           <Button 
+            variant="outline" 
+            className="border-primary/20 hover:bg-primary/10 text-primary"
+            onClick={() => alert('Business card scanner feature coming soon')}
+            data-testid="button-scan-card"
+          >
             <Scan className="w-4 h-4 mr-2" /> Scan Business Card
           </Button>
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+          <Button 
+            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+            onClick={() => alert('New lead form coming soon')}
+            data-testid="button-new-lead"
+          >
             <Plus className="w-4 h-4 mr-2" /> New Lead
           </Button>
         </div>

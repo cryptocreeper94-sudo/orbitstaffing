@@ -114,17 +114,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           {children}
         </div>
 
-        {/* Contact Developer Button - Fixed Bottom Right */}
-        <Button
-          onClick={() => setContactOpen(true)}
-          className="fixed bottom-8 right-8 z-40 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all bg-primary text-primary-foreground hover:bg-primary/90"
-          data-testid="button-contact-developer"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </Button>
-
-        {/* Contact Form Modal */}
-        <ContactForm open={contactOpen} onOpenChange={setContactOpen} />
+        {/* Contact Developer Button - REMOVED - will be added back in proper location */}
+        {/* Contact Form Modal - REMOVED */}
       </main>
     </div>
   );
