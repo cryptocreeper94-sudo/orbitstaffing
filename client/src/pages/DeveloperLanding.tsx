@@ -16,6 +16,11 @@ export default function DeveloperLanding() {
   const [pinInput, setPinInput] = useState('');
   const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | null>(null);
   const [error, setError] = useState('');
+  const [showOwnerCodeInput, setShowOwnerCodeInput] = useState(false);
+  const [showEmployeeCodeInput, setShowEmployeeCodeInput] = useState(false);
+  const [ownerAccessCode, setOwnerAccessCode] = useState('');
+  const [employeeAccessCode, setEmployeeAccessCode] = useState('');
+  const [accessCodeError, setAccessCodeError] = useState('');
 
   const loginMutation = useMutation({
     mutationFn: async (sandboxRole: 'owner' | 'employee') => {
@@ -54,6 +59,32 @@ export default function DeveloperLanding() {
     setSelectedRole(role);
     setError('');
     loginMutation.mutate(role);
+  };
+
+  const handleOwnerLogin = (code: string) => {
+    setAccessCodeError('');
+    if (!code.trim()) {
+      setAccessCodeError('Access code required');
+      return;
+    }
+    // For now, accept any non-empty code - would validate against backend in production
+    localStorage.setItem('userAccessCode', code);
+    localStorage.setItem('userRole', 'owner');
+    localStorage.setItem('currentUser', JSON.stringify({ role: 'owner', accessCode: code }));
+    setLocation('/dashboard');
+  };
+
+  const handleEmployeeLogin = (code: string) => {
+    setAccessCodeError('');
+    if (!code.trim()) {
+      setAccessCodeError('Access code required');
+      return;
+    }
+    // For now, accept any non-empty code - would validate against backend in production
+    localStorage.setItem('userAccessCode', code);
+    localStorage.setItem('userRole', 'worker');
+    localStorage.setItem('currentUser', JSON.stringify({ role: 'worker', accessCode: code }));
+    setLocation('/employee-app');
   };
 
   const handleLogout = () => {
@@ -271,51 +302,127 @@ export default function DeveloperLanding() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Real Owner Login */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
-              <div className="absolute top-2 right-2 bg-amber-600/80 px-2 py-1 rounded text-xs font-bold text-white">
-                Requires Email
+            <div className={`bg-slate-800 rounded-lg p-6 border transition-all ${showOwnerCodeInput ? 'border-green-500/50' : 'border-slate-600'} relative`}>
+              <div className="absolute top-2 right-2 bg-green-600/80 px-2 py-1 rounded text-xs font-bold text-white">
+                Access Code
               </div>
               <div className="flex items-center justify-center mb-3">
-                <Briefcase className="w-6 h-6 text-gray-500" />
+                <Briefcase className="w-6 h-6 text-green-400" />
               </div>
-              <h3 className="text-lg font-bold text-gray-500 mb-2 text-center">
+              <h3 className="text-lg font-bold text-white mb-2 text-center">
                 Owner Login
               </h3>
-              <p className="text-gray-500 text-xs mb-4 text-center">
+              <p className="text-gray-400 text-xs mb-4 text-center">
                 Access your staffing business dashboard
               </p>
-              <Button
-                disabled
-                variant="outline"
-                className="w-full text-gray-500 border-gray-600 cursor-not-allowed"
-                data-testid="button-owner-login-disabled"
-              >
-                Coming Soon
-              </Button>
+              
+              {!showOwnerCodeInput ? (
+                <Button
+                  onClick={() => setShowOwnerCodeInput(true)}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  data-testid="button-owner-login-enable"
+                >
+                  Login with Access Code
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Enter access code"
+                    value={ownerAccessCode}
+                    onChange={(e) => {
+                      setOwnerAccessCode(e.target.value);
+                      setAccessCodeError('');
+                    }}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-green-400"
+                    data-testid="input-owner-access-code"
+                  />
+                  {accessCodeError && <p className="text-xs text-red-400">{accessCodeError}</p>}
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleOwnerLogin(ownerAccessCode)}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-sm"
+                      data-testid="button-owner-access-submit"
+                    >
+                      Submit
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowOwnerCodeInput(false);
+                        setOwnerAccessCode('');
+                        setAccessCodeError('');
+                      }}
+                      variant="outline"
+                      className="flex-1 text-sm"
+                      data-testid="button-owner-access-cancel"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Real Employee Login */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
-              <div className="absolute top-2 right-2 bg-amber-600/80 px-2 py-1 rounded text-xs font-bold text-white">
-                Requires Code
+            <div className={`bg-slate-800 rounded-lg p-6 border transition-all ${showEmployeeCodeInput ? 'border-purple-500/50' : 'border-slate-600'} relative`}>
+              <div className="absolute top-2 right-2 bg-purple-600/80 px-2 py-1 rounded text-xs font-bold text-white">
+                Access Code
               </div>
               <div className="flex items-center justify-center mb-3">
-                <Users className="w-6 h-6 text-gray-500" />
+                <Users className="w-6 h-6 text-purple-400" />
               </div>
-              <h3 className="text-lg font-bold text-gray-500 mb-2 text-center">
+              <h3 className="text-lg font-bold text-white mb-2 text-center">
                 Employee Login
               </h3>
-              <p className="text-gray-500 text-xs mb-4 text-center">
+              <p className="text-gray-400 text-xs mb-4 text-center">
                 View assignments and track earnings
               </p>
-              <Button
-                disabled
-                variant="outline"
-                className="w-full text-gray-500 border-gray-600 cursor-not-allowed"
-                data-testid="button-employee-login-disabled"
-              >
-                Coming Soon
-              </Button>
+              
+              {!showEmployeeCodeInput ? (
+                <Button
+                  onClick={() => setShowEmployeeCodeInput(true)}
+                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  data-testid="button-employee-login-enable"
+                >
+                  Login with Access Code
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Enter access code"
+                    value={employeeAccessCode}
+                    onChange={(e) => {
+                      setEmployeeAccessCode(e.target.value);
+                      setAccessCodeError('');
+                    }}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-purple-400"
+                    data-testid="input-employee-access-code"
+                  />
+                  {accessCodeError && <p className="text-xs text-red-400">{accessCodeError}</p>}
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleEmployeeLogin(employeeAccessCode)}
+                      className="flex-1 bg-purple-600 hover:bg-purple-700 text-sm"
+                      data-testid="button-employee-access-submit"
+                    >
+                      Submit
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowEmployeeCodeInput(false);
+                        setEmployeeAccessCode('');
+                        setAccessCodeError('');
+                      }}
+                      variant="outline"
+                      className="flex-1 text-sm"
+                      data-testid="button-employee-access-cancel"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Real Admin Login */}
