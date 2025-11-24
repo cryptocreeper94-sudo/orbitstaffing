@@ -13,7 +13,11 @@ import {
   CalendarX, 
   CheckCircle2,
   Send,
-  Camera
+  Camera,
+  Calendar,
+  Zap,
+  Share2,
+  Gift
 } from "lucide-react";
 import { useState } from "react";
 import WeatherNewsWidget from '@/components/WeatherNewsWidget';
@@ -73,6 +77,52 @@ export default function WorkerPortal() {
               desc="Schedule future vacation."
               color="text-purple-500"
             />
+          </div>
+
+          <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-lg p-4">
+            <h3 className="font-bold text-white mb-4">Your Earnings & Opportunities</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Button 
+                onClick={() => setLocation('/worker-bonuses')}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                data-testid="button-worker-bonuses"
+              >
+                <Zap className="w-4 h-4 text-amber-500" />
+                <span>Bonuses</span>
+              </Button>
+              <Button 
+                onClick={() => setLocation('/worker-shifts')}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                data-testid="button-worker-shifts"
+              >
+                <Calendar className="w-4 h-4 text-blue-500" />
+                <span>Shifts</span>
+              </Button>
+              <Button 
+                onClick={() => setLocation('/worker-availability')}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                data-testid="button-worker-availability"
+              >
+                <Calendar className="w-4 h-4 text-purple-500" />
+                <span>Availability</span>
+              </Button>
+              <Button 
+                onClick={() => setLocation('/worker-referrals')}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                data-testid="button-worker-referrals"
+              >
+                <Share2 className="w-4 h-4 text-green-500" />
+                <span>Referrals</span>
+              </Button>
+            </div>
           </div>
 
           <Card className="bg-card/50 border-border/50 backdrop-blur-sm">

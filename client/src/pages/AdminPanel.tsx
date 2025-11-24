@@ -12,6 +12,7 @@ import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
 import WeatherNewsWidget from '@/components/WeatherNewsWidget';
 import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
+import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -520,6 +521,18 @@ function MasterAdminDashboard() {
           <MessageCircle className="w-4 h-4 inline mr-2" />
           Secure Messaging
         </button>
+        <button
+          onClick={() => setActiveSection('availability')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'availability'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-availability"
+        >
+          <Eye className="w-4 h-4 inline mr-2" />
+          Worker Availability
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -539,6 +552,12 @@ function MasterAdminDashboard() {
             currentUserName={adminName}
             currentUserRole="admin"
           />
+        </div>
+      )}
+
+      {activeSection === 'availability' && (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+          <AdminWorkerAvailabilityManager />
         </div>
       )}
 
