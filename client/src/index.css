@@ -112,32 +112,29 @@
 }
 
 /* Fix floating buttons positioning - bottom right corner */
-[role="toolbar"],
-[data-floating-buttons],
-.floating-buttons,
-.replit-floating-buttons {
+div[class*="button"],
+div[class*="floating"],
+.extracted-stack-files,
+.extracted-stack,
+[class*="extracted"] {
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
   left: auto !important;
+  top: auto !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 8px !important;
-  z-index: 50 !important;
-}
-
-/* Make individual buttons float with opacity */
-[role="toolbar"] button,
-[data-floating-buttons] button,
-.floating-buttons button,
-.replit-floating-buttons button {
+  z-index: 9999 !important;
   opacity: 0.5 !important;
   transition: opacity 0.2s ease !important;
 }
 
-[role="toolbar"] button:hover,
-[data-floating-buttons] button:hover,
-.floating-buttons button:hover,
-.replit-floating-buttons button:hover {
+/* Full opacity on hover */
+div[class*="button"]:hover,
+div[class*="floating"]:hover,
+.extracted-stack-files:hover,
+.extracted-stack:hover,
+[class*="extracted"]:hover {
   opacity: 1 !important;
 }
