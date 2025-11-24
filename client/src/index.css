@@ -114,10 +114,7 @@
 /* Hide Replit floating UI buttons */
 [class*="Toolbar"],
 [class*="toolbar"],
-[class*="floating"],
-[role="toolbar"],
-div[style*="position: fixed"],
-div[style*="bottom:"] {
+[class*="floating"] {
   display: none !important;
 }
 

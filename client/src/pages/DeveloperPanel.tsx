@@ -18,22 +18,31 @@ export default function DeveloperPanel() {
   const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples'>('overview');
   const [copied, setCopied] = useState('');
 
-  const handlePinSubmit = (e: React.FormEvent) => {
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (pin.length !== 4) {
-      setError('PIN must be 4 digits');
+    if (pin.length < 4) {
+      setError('PIN must be at least 4 digits');
       return;
     }
 
-    // Developer PIN (can be same or different)
-    const correctPin = process.env.VITE_ADMIN_PIN || '0000';
-    if (pin === correctPin) {
-      setIsAuthenticated(true);
-      setPin('');
-    } else {
-      setError('Invalid PIN.');
+    try {
+      const res = await fetch('/api/auth/verify-admin-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
+
+      if (res.ok) {
+        setIsAuthenticated(true);
+        setPin('');
+      } else {
+        setError('Invalid PIN.');
+        setPin('');
+      }
+    } catch (err) {
+      setError('Failed to verify PIN. Please try again.');
       setPin('');
     }
   };
