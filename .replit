@@ -23,6 +23,10 @@ localPort = 34265
 externalPort = 3001
 
 [[ports]]
+localPort = 37639
+externalPort = 5173
+
+[[ports]]
 localPort = 37979
 externalPort = 4200
 
@@ -64,4 +68,3 @@ waitForPort = 5000
 
 [agent]
 mockupState = "FULLSTACK"
-integrations = ["stripe:1.0.0"]

@@ -19,7 +19,7 @@ const PRICING_TIERS = [
       'Basic payroll export',
       'Email support'
     ],
-    priceId: 'price_solo_monthly', // Replace with real Stripe price ID
+    priceId: 'price_1SWpbXBJN5j7Sqn0zOGmvG8c', // Live Stripe price ID
   },
   {
     id: 'small',
@@ -36,7 +36,7 @@ const PRICING_TIERS = [
       'Compliance reports',
       'Priority email support'
     ],
-    priceId: 'price_small_monthly',
+    priceId: 'price_1SWpbXBJN5j7Sqn097nk0sua', // Live Stripe price ID
   },
   {
     id: 'growth',
@@ -52,7 +52,7 @@ const PRICING_TIERS = [
       'Dedicated support',
       'API access'
     ],
-    priceId: 'price_growth_monthly',
+    priceId: 'price_1SWpbXBJN5j7Sqn0iaE4uiPM', // Live Stripe price ID
   },
   {
     id: 'enterprise',
