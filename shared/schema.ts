@@ -2602,3 +2602,160 @@ export const insertOrbitAssetSchema = createInsertSchema(orbitAssets).omit({
 
 export type InsertOrbitAsset = z.infer<typeof insertOrbitAssetSchema>;
 export type OrbitAsset = typeof orbitAssets.$inferSelect;
+
+// ========================
+// Admin Personal Card Storage
+// ========================
+export const adminPersonalCards = pgTable(
+  "admin_personal_cards",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    adminId: varchar("admin_id").notNull().references(() => users.id),
+    
+    // Card Data
+    fullName: varchar("full_name", { length: 255 }),
+    title: varchar("title", { length: 255 }),
+    companyName: varchar("company_name", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    location: varchar("location", { length: 255 }),
+    photoUrl: text("photo_url"),
+    brandColor: varchar("brand_color", { length: 7 }).default("#06B6D4"),
+    assetNumber: varchar("asset_number", { length: 50 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    adminIdIdx: index("idx_admin_card_admin_id").on(table.adminId),
+  })
+);
+
+export const insertAdminPersonalCardSchema = createInsertSchema(adminPersonalCards).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAdminPersonalCard = z.infer<typeof insertAdminPersonalCardSchema>;
+export type AdminPersonalCard = typeof adminPersonalCards.$inferSelect;
+
+// ========================
+// Dev Personal Card Storage
+// ========================
+export const devPersonalCards = pgTable(
+  "dev_personal_cards",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    devId: varchar("dev_id").notNull().references(() => users.id),
+    
+    // Card Data
+    fullName: varchar("full_name", { length: 255 }),
+    title: varchar("title", { length: 255 }),
+    companyName: varchar("company_name", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    location: varchar("location", { length: 255 }),
+    photoUrl: text("photo_url"),
+    brandColor: varchar("brand_color", { length: 7 }).default("#06B6D4"),
+    assetNumber: varchar("asset_number", { length: 50 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    devIdIdx: index("idx_dev_card_dev_id").on(table.devId),
+  })
+);
+
+export const insertDevPersonalCardSchema = createInsertSchema(devPersonalCards).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDevPersonalCard = z.infer<typeof insertDevPersonalCardSchema>;
+export type DevPersonalCard = typeof devPersonalCards.$inferSelect;
+
+// ========================
+// Admin/Dev/Owner Messaging
+// ========================
+export const adminDevOwnerMessages = pgTable(
+  "admin_dev_owner_messages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    fromUserId: varchar("from_user_id").notNull().references(() => users.id),
+    toUserId: varchar("to_user_id").notNull().references(() => users.id),
+    
+    // Message
+    subject: varchar("subject", { length: 255 }),
+    message: text("message").notNull(),
+    
+    // Read Status
+    isRead: boolean("is_read").default(false),
+    readAt: timestamp("read_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    fromIdx: index("idx_msg_from").on(table.fromUserId),
+    toIdx: index("idx_msg_to").on(table.toUserId),
+    createdIdx: index("idx_msg_created").on(table.createdAt),
+  })
+);
+
+export const insertAdminDevOwnerMessageSchema = createInsertSchema(adminDevOwnerMessages).omit({
+  id: true,
+  readAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAdminDevOwnerMessage = z.infer<typeof insertAdminDevOwnerMessageSchema>;
+export type AdminDevOwnerMessage = typeof adminDevOwnerMessages.$inferSelect;
+
+// ========================
+// Employee Emergency Messaging
+// ========================
+export const employeeEmergencyMessages = pgTable(
+  "employee_emergency_messages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    employeeId: varchar("employee_id").notNull().references(() => users.id),
+    
+    // Message Content
+    message: text("message").notNull(),
+    
+    // Job Qualifier
+    jobId: varchar("job_id").references(() => jobs.id),
+    assignmentId: varchar("assignment_id").references(() => assignments.id),
+    isJobRelated: boolean("is_job_related").notNull(),
+    
+    // Qualifying Questions
+    qualifyingResponses: jsonb("qualifying_responses"), // {question: answer}
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, reviewed, resolved, escalated
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    employeeIdx: index("idx_emerg_employee").on(table.employeeId),
+    statusIdx: index("idx_emerg_status").on(table.status),
+    createdIdx: index("idx_emerg_created").on(table.createdAt),
+  })
+);
+
+export const insertEmployeeEmergencyMessageSchema = createInsertSchema(employeeEmergencyMessages).omit({
+  id: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEmployeeEmergencyMessage = z.infer<typeof insertEmployeeEmergencyMessageSchema>;
+export type EmployeeEmergencyMessage = typeof employeeEmergencyMessages.$inferSelect;

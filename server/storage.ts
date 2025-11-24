@@ -28,6 +28,10 @@ import {
   developerChat,
   adminBusinessCards,
   developerContactMessages,
+  adminPersonalCards,
+  devPersonalCards,
+  adminDevOwnerMessages,
+  employeeEmergencyMessages,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -80,6 +84,14 @@ import {
   type DeveloperChat,
   type InsertAdminBusinessCard,
   type AdminBusinessCard,
+  type InsertAdminPersonalCard,
+  type AdminPersonalCard,
+  type InsertDevPersonalCard,
+  type DevPersonalCard,
+  type InsertAdminDevOwnerMessage,
+  type AdminDevOwnerMessage,
+  type InsertEmployeeEmergencyMessage,
+  type EmployeeEmergencyMessage,
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
@@ -1235,6 +1247,112 @@ export class DrizzleStorage implements IStorage {
     const result = await db.update(developerContactMessages)
       .set({ status, respondedAt: new Date() })
       .where(eq(developerContactMessages.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Admin Personal Cards
+  async createOrUpdateAdminPersonalCard(data: InsertAdminPersonalCard): Promise<AdminPersonalCard> {
+    const existing = await db.select().from(adminPersonalCards)
+      .where(eq(adminPersonalCards.adminId, data.adminId));
+    
+    if (existing.length > 0) {
+      const result = await db.update(adminPersonalCards)
+        .set(data)
+        .where(eq(adminPersonalCards.adminId, data.adminId))
+        .returning();
+      return result[0];
+    }
+    
+    const result = await db.insert(adminPersonalCards).values(data).returning();
+    return result[0];
+  }
+
+  async getAdminPersonalCard(adminId: string): Promise<AdminPersonalCard | undefined> {
+    const result = await db.select().from(adminPersonalCards)
+      .where(eq(adminPersonalCards.adminId, adminId));
+    return result[0];
+  }
+
+  // Dev Personal Cards
+  async createOrUpdateDevPersonalCard(data: InsertDevPersonalCard): Promise<DevPersonalCard> {
+    const existing = await db.select().from(devPersonalCards)
+      .where(eq(devPersonalCards.devId, data.devId));
+    
+    if (existing.length > 0) {
+      const result = await db.update(devPersonalCards)
+        .set(data)
+        .where(eq(devPersonalCards.devId, data.devId))
+        .returning();
+      return result[0];
+    }
+    
+    const result = await db.insert(devPersonalCards).values(data).returning();
+    return result[0];
+  }
+
+  async getDevPersonalCard(devId: string): Promise<DevPersonalCard | undefined> {
+    const result = await db.select().from(devPersonalCards)
+      .where(eq(devPersonalCards.devId, devId));
+    return result[0];
+  }
+
+  // Admin/Dev/Owner Messages
+  async createMessage(data: InsertAdminDevOwnerMessage): Promise<AdminDevOwnerMessage> {
+    const result = await db.insert(adminDevOwnerMessages).values(data).returning();
+    return result[0];
+  }
+
+  async getMessagesBetween(userId1: string, userId2: string): Promise<AdminDevOwnerMessage[]> {
+    const result = await db.select().from(adminDevOwnerMessages)
+      .where(
+        and(
+          eq(adminDevOwnerMessages.fromUserId, userId1),
+          eq(adminDevOwnerMessages.toUserId, userId2)
+        )
+      )
+      .orderBy(desc(adminDevOwnerMessages.createdAt));
+    return result;
+  }
+
+  async getMessagesForUser(userId: string): Promise<AdminDevOwnerMessage[]> {
+    const result = await db.select().from(adminDevOwnerMessages)
+      .where(eq(adminDevOwnerMessages.toUserId, userId))
+      .orderBy(desc(adminDevOwnerMessages.createdAt));
+    return result;
+  }
+
+  async markMessageAsRead(messageId: string): Promise<AdminDevOwnerMessage | undefined> {
+    const result = await db.update(adminDevOwnerMessages)
+      .set({ isRead: true, readAt: new Date() })
+      .where(eq(adminDevOwnerMessages.id, messageId))
+      .returning();
+    return result[0];
+  }
+
+  // Employee Emergency Messages
+  async createEmergencyMessage(data: InsertEmployeeEmergencyMessage): Promise<EmployeeEmergencyMessage> {
+    const result = await db.insert(employeeEmergencyMessages).values(data).returning();
+    return result[0];
+  }
+
+  async getEmergencyMessagesByEmployee(employeeId: string): Promise<EmployeeEmergencyMessage[]> {
+    const result = await db.select().from(employeeEmergencyMessages)
+      .where(eq(employeeEmergencyMessages.employeeId, employeeId))
+      .orderBy(desc(employeeEmergencyMessages.createdAt));
+    return result;
+  }
+
+  async getAllEmergencyMessages(): Promise<EmployeeEmergencyMessage[]> {
+    const result = await db.select().from(employeeEmergencyMessages)
+      .orderBy(desc(employeeEmergencyMessages.createdAt));
+    return result;
+  }
+
+  async updateEmergencyMessageStatus(messageId: string, status: string, reviewedByUserId: string): Promise<EmployeeEmergencyMessage | undefined> {
+    const result = await db.update(employeeEmergencyMessages)
+      .set({ status, reviewedBy: reviewedByUserId, reviewedAt: new Date() })
+      .where(eq(employeeEmergencyMessages.id, messageId))
       .returning();
     return result[0];
   }

@@ -2485,6 +2485,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // ADMIN/DEV/OWNER MESSAGING ROUTES
+  // ========================
+  app.post("/api/messages", async (req: Request, res: Response) => {
+    try {
+      const { fromUserId, toUserId, subject, message } = req.body;
+      
+      if (!fromUserId || !toUserId || !message) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const newMessage = await storage.createMessage({
+        fromUserId,
+        toUserId,
+        subject,
+        message,
+      });
+
+      res.json(newMessage);
+    } catch (error) {
+      console.error("Failed to create message:", error);
+      res.status(500).json({ error: "Failed to send message" });
+    }
+  });
+
+  app.get("/api/messages/:userId", async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      const messages = await storage.getMessagesForUser(userId);
+      res.json({ messages });
+    } catch (error) {
+      console.error("Failed to get messages:", error);
+      res.status(500).json({ error: "Failed to retrieve messages" });
+    }
+  });
+
+  app.post("/api/messages/:messageId/read", async (req: Request, res: Response) => {
+    try {
+      const { messageId } = req.params;
+      const message = await storage.markMessageAsRead(messageId);
+      res.json(message);
+    } catch (error) {
+      console.error("Failed to mark message as read:", error);
+      res.status(500).json({ error: "Failed to update message" });
+    }
+  });
+
+  // ========================
+  // EMPLOYEE EMERGENCY MESSAGING ROUTES
+  // ========================
+  app.post("/api/employee/emergency-message", async (req: Request, res: Response) => {
+    try {
+      const { employeeId, message, isJobRelated, qualifyingResponses } = req.body;
+
+      if (!employeeId || !message) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const emergencyMessage = await storage.createEmergencyMessage({
+        employeeId,
+        message,
+        isJobRelated,
+        qualifyingResponses,
+      });
+
+      res.json(emergencyMessage);
+    } catch (error) {
+      console.error("Failed to create emergency message:", error);
+      res.status(500).json({ error: "Failed to submit emergency message" });
+    }
+  });
+
+  app.get("/api/emergency-messages", async (req: Request, res: Response) => {
+    try {
+      const messages = await storage.getAllEmergencyMessages();
+      res.json({ messages });
+    } catch (error) {
+      console.error("Failed to get emergency messages:", error);
+      res.status(500).json({ error: "Failed to retrieve emergency messages" });
+    }
+  });
+
+  app.post("/api/emergency-messages/:messageId/status", async (req: Request, res: Response) => {
+    try {
+      const { messageId } = req.params;
+      const { status, reviewedByUserId } = req.body;
+
+      if (!status || !reviewedByUserId) {
+        return res.status(400).json({ error: "Missing status or reviewedByUserId" });
+      }
+
+      const message = await storage.updateEmergencyMessageStatus(messageId, status, reviewedByUserId);
+      res.json(message);
+    } catch (error) {
+      console.error("Failed to update emergency message:", error);
+      res.status(500).json({ error: "Failed to update message status" });
+    }
+  });
+
+  // ========================
+  // ADMIN PERSONAL CARD ROUTES
+  // ========================
+  app.post("/api/admin/personal-card", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const card = await storage.createOrUpdateAdminPersonalCard(body);
+      res.json(card);
+    } catch (error) {
+      console.error("Failed to save admin card:", error);
+      res.status(500).json({ error: "Failed to save card" });
+    }
+  });
+
+  app.get("/api/admin/personal-card/:adminId", async (req: Request, res: Response) => {
+    try {
+      const { adminId } = req.params;
+      const card = await storage.getAdminPersonalCard(adminId);
+      res.json(card || {});
+    } catch (error) {
+      console.error("Failed to get admin card:", error);
+      res.status(500).json({ error: "Failed to retrieve card" });
+    }
+  });
+
+  // ========================
+  // DEV PERSONAL CARD ROUTES
+  // ========================
+  app.post("/api/dev/personal-card", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const card = await storage.createOrUpdateDevPersonalCard(body);
+      res.json(card);
+    } catch (error) {
+      console.error("Failed to save dev card:", error);
+      res.status(500).json({ error: "Failed to save card" });
+    }
+  });
+
+  app.get("/api/dev/personal-card/:devId", async (req: Request, res: Response) => {
+    try {
+      const { devId } = req.params;
+      const card = await storage.getDevPersonalCard(devId);
+      res.json(card || {});
+    } catch (error) {
+      console.error("Failed to get dev card:", error);
+      res.status(500).json({ error: "Failed to retrieve card" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -1,0 +1,303 @@
+/**
+ * Personal Card Generator
+ * For Admin and Dev personal business cards
+ * Separate from CRM, stored per account identity
+ */
+import React, { useState, useEffect, useRef } from 'react';
+import { Download, Edit2, Save, Mail, Phone, MapPin, QrCode, ZoomIn, Camera } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import QRCode from 'qrcode.react';
+import html2canvas from 'html2canvas';
+
+interface PersonalCardData {
+  fullName: string;
+  title: string;
+  companyName: string;
+  email: string;
+  phone: string;
+  location: string;
+  photoUrl?: string;
+  brandColor: string;
+  assetNumber?: string;
+}
+
+interface PersonalCardGeneratorProps {
+  userId: string;
+  userName: string;
+  cardType: 'admin' | 'dev';
+  onSave?: (card: PersonalCardData) => void;
+}
+
+export default function PersonalCardGenerator({ userId, userName, cardType, onSave }: PersonalCardGeneratorProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isEditing, setIsEditing] = useState(true);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [expandedField, setExpandedField] = useState<string | null>(null);
+  
+  const [cardData, setCardData] = useState<PersonalCardData>({
+    fullName: userName,
+    title: cardType === 'admin' ? 'Admin' : 'Developer',
+    companyName: 'ORBIT Staffing',
+    email: `${cardType}@orbitstaffing.net`,
+    phone: '',
+    location: '',
+    brandColor: '#06B6D4',
+    assetNumber: '',
+  });
+
+  useEffect(() => {
+    loadCard();
+  }, []);
+
+  const loadCard = async () => {
+    try {
+      const endpoint = cardType === 'admin' 
+        ? `/api/admin/personal-card/${userId}`
+        : `/api/dev/personal-card/${userId}`;
+      
+      const res = await fetch(endpoint);
+      if (res.ok) {
+        const card = await res.json();
+        if (card.id) {
+          setCardData(card);
+          setPhotoPreview(card.photoUrl || '');
+          setIsEditing(false);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load card:', error);
+    }
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setPhotoPreview(dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const endpoint = cardType === 'admin' ? '/api/admin/personal-card' : '/api/dev/personal-card';
+      const method = 'POST';
+      
+      const res = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          [`${cardType}Id`]: userId,
+          ...cardData,
+          photoUrl: photoPreview,
+        }),
+      });
+
+      if (res.ok) {
+        const saved = await res.json();
+        setCardData(saved);
+        setIsEditing(false);
+        if (onSave) onSave(saved);
+      }
+    } catch (error) {
+      console.error('Failed to save card:', error);
+      alert('Failed to save card');
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: '#1e293b',
+        scale: 2,
+      });
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `${cardType}-card-${cardData.fullName.replace(/\s+/g, '-')}.png`;
+      link.click();
+    } catch (error) {
+      console.error('Failed to download card:', error);
+      alert('Failed to download card');
+    }
+  };
+
+  const vCardData = `BEGIN:VCARD\nVERSION:3.0\nFN:${cardData.fullName}\nTITLE:${cardData.title}\nORG:${cardData.companyName}\nEMAIL:${cardData.email}\nTEL:${cardData.phone}\nADR:;;${cardData.location}\nEND:VCARD`;
+
+  const FieldWithPopup = ({ label, value, icon: Icon }: any) => (
+    <div className="relative group">
+      <div className="flex items-center gap-2">
+        <Icon className="w-3 h-3 text-cyan-400" />
+        <span className="text-[7px] text-gray-300 truncate">{value || label}</span>
+        <button
+          onClick={() => setExpandedField(expandedField === label ? null : label)}
+          className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+          data-testid={`popup-${label.toLowerCase()}`}
+        >
+          <ZoomIn className="w-3 h-3 text-cyan-400" />
+        </button>
+      </div>
+      
+      {expandedField === label && (
+        <div className="absolute bottom-full left-0 mb-2 bg-slate-900 border border-cyan-400 rounded p-2 whitespace-nowrap text-[8px] text-white z-50">
+          {value}
+        </div>
+      )}
+    </div>
+  );
+
+  if (isEditing) {
+    return (
+      <Card className="bg-slate-800 border-cyan-600 col-span-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Edit2 className="w-5 h-5" />
+            Edit {cardType.charAt(0).toUpperCase() + cardType.slice(1)} Card
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Photo Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Photo:</label>
+            <label className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg cursor-pointer hover:border-cyan-400 transition-colors">
+              <Camera className="w-4 h-4" />
+              Upload Photo
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+                data-testid="input-card-photo"
+              />
+            </label>
+            {photoPreview && (
+              <img src={photoPreview} alt="Preview" className="mt-2 h-20 rounded-lg" />
+            )}
+          </div>
+
+          {/* Text Fields */}
+          {Object.entries(cardData).map(([key, value]) => {
+            if (key === 'brandColor' || key === 'assetNumber' || typeof value !== 'string') return null;
+            
+            return (
+              <div key={key}>
+                <label className="block text-sm font-medium text-gray-300 mb-2 capitalize">
+                  {key === 'fullName' ? 'Full Name' : key === 'companyName' ? 'Company' : key}:
+                </label>
+                <input
+                  type="text"
+                  value={value}
+                  onChange={(e) => setCardData({ ...cardData, [key]: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
+                  data-testid={`input-card-${key}`}
+                />
+              </div>
+            );
+          })}
+
+          <div className="flex gap-2">
+            <Button onClick={handleSave} className="flex-1 bg-cyan-600 hover:bg-cyan-700" data-testid="button-save-personal-card">
+              <Save className="w-4 h-4 mr-2" />
+              Save Card
+            </Button>
+            <Button
+              onClick={() => setIsEditing(false)}
+              variant="outline"
+              className="flex-1"
+              data-testid="button-cancel-edit-personal-card"
+            >
+              Done
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Card Preview */}
+      <div className="flex justify-center">
+        <div
+          ref={cardRef}
+          className="w-full max-w-[350px] h-[200px] rounded-lg shadow-2xl overflow-hidden flex relative cursor-pointer group"
+          style={{ backgroundColor: cardData.brandColor + '15', border: `2px solid ${cardData.brandColor}` }}
+          onClick={() => photoPreview && setImageModalOpen(true)}
+          data-testid="card-personal-preview"
+        >
+          {/* Background */}
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+            <div className="text-center text-4xl font-bold text-cyan-400">ORBIT</div>
+          </div>
+
+          {/* Photo */}
+          <div
+            className="w-[120px] h-[140px] bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 border-b-2 relative z-10"
+            style={{ borderColor: cardData.brandColor }}
+          >
+            {photoPreview ? (
+              <>
+                <img src={photoPreview} alt={cardData.fullName} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center">
+                  <ZoomIn className="w-5 h-5 text-white" />
+                </div>
+              </>
+            ) : (
+              <Camera className="w-8 h-8 text-gray-500" />
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 p-3 flex flex-col justify-between text-white bg-gradient-to-br from-slate-900 to-slate-950 relative z-10">
+            <div>
+              <h3 className="font-bold text-sm leading-tight" style={{ color: cardData.brandColor }}>
+                {cardData.fullName}
+              </h3>
+              <p className="text-[10px] opacity-90">{cardData.title}</p>
+              <p className="text-[10px] opacity-75">{cardData.companyName}</p>
+            </div>
+
+            <div className="space-y-0 text-[8px]">
+              <FieldWithPopup label="Email" value={cardData.email} icon={Mail} />
+              <FieldWithPopup label="Phone" value={cardData.phone} icon={Phone} />
+              <FieldWithPopup label="Location" value={cardData.location} icon={MapPin} />
+            </div>
+          </div>
+
+          {/* QR */}
+          <div className="absolute bottom-1.5 left-1.5 p-1 bg-gradient-to-b from-slate-800 to-slate-900 border-2 rounded z-20" style={{ borderColor: cardData.brandColor }}>
+            <QRCode value={vCardData} size={32} level="M" />
+          </div>
+
+          {/* Asset Number */}
+          <div className="absolute bottom-1.5 right-1.5 text-[6px] text-white opacity-75 font-mono text-right z-20">
+            {cardData.assetNumber}
+          </div>
+
+          {/* Bottom Borders */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 z-10" style={{ backgroundColor: cardData.brandColor }} />
+          <div className="absolute bottom-0 right-0 h-1/2 w-0.5 z-10" style={{ backgroundColor: cardData.brandColor }} />
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 justify-center">
+        <Button onClick={() => setIsEditing(true)} className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-edit-personal-card">
+          <Edit2 className="w-4 h-4 mr-2" />
+          Edit
+        </Button>
+        <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700" data-testid="button-download-personal-card">
+          <Download className="w-4 h-4 mr-2" />
+          Download
+        </Button>
+      </div>
+    </div>
+  );
+}
