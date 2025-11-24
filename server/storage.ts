@@ -26,6 +26,7 @@ import {
   demoRegistrations,
   workerOnboardingChecklist,
   developerChat,
+  adminBusinessCards,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -76,6 +77,8 @@ import {
   type WorkerOnboardingChecklist,
   type InsertDeveloperChat,
   type DeveloperChat,
+  type InsertAdminBusinessCard,
+  type AdminBusinessCard,
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
@@ -1167,6 +1170,37 @@ export class DrizzleStorage implements IStorage {
       .orderBy(desc(developerChat.createdAt))
       .limit(limit);
     return result.reverse(); // Return oldest first
+  }
+
+  // Admin Business Cards
+  async createOrUpdateAdminBusinessCard(data: InsertAdminBusinessCard): Promise<AdminBusinessCard> {
+    const existing = await db.select().from(adminBusinessCards)
+      .where(eq(adminBusinessCards.adminId, data.adminId));
+    
+    if (existing.length > 0) {
+      const result = await db.update(adminBusinessCards)
+        .set(data)
+        .where(eq(adminBusinessCards.adminId, data.adminId))
+        .returning();
+      return result[0];
+    }
+    
+    const result = await db.insert(adminBusinessCards).values(data).returning();
+    return result[0];
+  }
+
+  async getAdminBusinessCard(adminId: string): Promise<AdminBusinessCard | undefined> {
+    const result = await db.select().from(adminBusinessCards)
+      .where(eq(adminBusinessCards.adminId, adminId));
+    return result[0];
+  }
+
+  async updateAdminBusinessCardPhoto(adminId: string, photoUrl: string): Promise<AdminBusinessCard | undefined> {
+    const result = await db.update(adminBusinessCards)
+      .set({ photoUrl, photoUploadedAt: new Date() })
+      .where(eq(adminBusinessCards.adminId, adminId))
+      .returning();
+    return result[0];
   }
 }
 

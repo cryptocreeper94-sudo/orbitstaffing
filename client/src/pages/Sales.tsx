@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { useState } from "react";
+import { AdminBusinessCard } from "@/components/AdminBusinessCard";
 
 export default function Sales() {
   const [activeTab, setActiveTab] = useState("leads");
@@ -224,66 +225,22 @@ export default function Sales() {
           </div>
         </TabsContent>
 
-        {/* ... Digital Card Content (Previous Implementation) ... */}
-        <TabsContent value="digital-card" className="flex flex-col items-center justify-center py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-4xl">
-             {/* The Card */}
-             <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative h-[240px] w-full bg-card border border-border/50 rounded-xl p-8 flex flex-col justify-between overflow-hidden">
-                   {/* Background Noise */}
-                   <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-overlay"></div>
-                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                   
-                   <div className="relative z-10">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h2 className="text-2xl font-bold font-heading tracking-wide text-foreground">JASON</h2>
-                          <p className="text-primary font-medium">DarkWave Studios</p>
-                        </div>
-                        <QrCode className="w-8 h-8 text-foreground/80" />
-                      </div>
-                   </div>
-
-                   <div className="relative z-10 space-y-2">
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <Mail className="w-4 h-4 text-primary" />
-                        cryptocreeper94@gmail.com
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                         <Phone className="w-4 h-4 text-primary" />
-                         +1 (615) 555-0123
-                      </div>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                         <MapPin className="w-4 h-4 text-primary" />
-                         Nashville, TN
-                      </div>
-                   </div>
-                </div>
-             </div>
-
-             {/* QR Code & Sharing */}
-             <div className="flex flex-col items-center justify-center space-y-6 bg-card/30 p-8 rounded-xl border border-border/30">
-                <div className="bg-white p-4 rounded-lg shadow-lg">
-                  <QRCode 
-                    value="BEGIN:VCARD\nVERSION:3.0\nFN:Jason\nORG:DarkWave Studios\nEMAIL:cryptocreeper94@gmail.com\nTEL:+16155550123\nADR:;;Nashville;TN;;;USA\nEND:VCARD" 
-                    size={180}
-                    level="M"
-                  />
-                </div>
-                <p className="text-center text-sm text-muted-foreground max-w-xs">
-                  Scan to add Jason to contacts directly.
-                </p>
-                <div className="flex gap-4 w-full">
-                  <Button className="flex-1 bg-background border border-border hover:bg-accent hover:text-accent-foreground">
-                    <Share2 className="w-4 h-4 mr-2" /> Share Link
-                  </Button>
-                  <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90">
-                    Download PNG
-                  </Button>
-                </div>
-             </div>
-          </div>
+        {/* Admin Business Card */}
+        <TabsContent value="digital-card" className="py-8">
+          <AdminBusinessCard
+            adminId="current-admin"
+            fullName="Your Name"
+            title="Sales Director"
+            companyName="ORBIT Staffing OS"
+            email="you@orbitstaffing.net"
+            phone="+1 (615) 555-0123"
+            location="Nashville, TN"
+            website="orbitstaffing.net"
+            brandColor="#06B6D4"
+            onSave={(card) => {
+              console.log('Business card saved:', card);
+            }}
+          />
         </TabsContent>
 
         <TabsContent value="tools">

@@ -30,6 +30,7 @@ import {
   insertPaymentMethodSchema,
   insertCollectionSchema,
   insertOrbitAssetSchema,
+  insertAdminBusinessCardSchema,
   franchises,
   companies,
   users,
@@ -2226,6 +2227,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: "Payment system test failed",
         message: error instanceof Error ? error.message : "Unknown error"
       });
+    }
+  });
+
+  // ========================
+  // ADMIN BUSINESS CARD ROUTES
+  // ========================
+  app.post("/api/admin/business-card", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const parsed = insertAdminBusinessCardSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid business card data", details: parsed.error.errors });
+      }
+
+      const card = await storage.createOrUpdateAdminBusinessCard(parsed.data);
+      res.json(card);
+    } catch (error) {
+      console.error("Business card save error:", error);
+      res.status(500).json({ error: "Failed to save business card" });
+    }
+  });
+
+  app.get("/api/admin/business-card/:adminId", async (req: Request, res: Response) => {
+    try {
+      const { adminId } = req.params;
+      const card = await storage.getAdminBusinessCard(adminId);
+      
+      if (!card) {
+        return res.status(404).json({ error: "Business card not found" });
+      }
+
+      res.json(card);
+    } catch (error) {
+      console.error("Failed to get business card:", error);
+      res.status(500).json({ error: "Failed to retrieve business card" });
+    }
+  });
+
+  app.post("/api/admin/business-card/:adminId/photo", async (req: Request, res: Response) => {
+    try {
+      const { adminId } = req.params;
+      const { photoUrl } = req.body;
+
+      if (!photoUrl) {
+        return res.status(400).json({ error: "Photo URL required" });
+      }
+
+      const card = await storage.updateAdminBusinessCardPhoto(adminId, photoUrl);
+      res.json(card);
+    } catch (error) {
+      console.error("Photo upload error:", error);
+      res.status(500).json({ error: "Failed to update photo" });
     }
   });
 

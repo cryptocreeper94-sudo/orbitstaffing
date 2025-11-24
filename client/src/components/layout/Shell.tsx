@@ -5,8 +5,6 @@ import {
   Briefcase, 
   CreditCard, 
   Megaphone, 
-  Settings,
-  LogOut,
   Menu,
   ScanLine,
   HardHat,
@@ -16,6 +14,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { HallmarkPageWatermark } from "@/components/HallmarkWatermark";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -83,27 +82,13 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-sidebar-border/50 space-y-2">
+      <div className="p-4 border-t border-sidebar-border/50">
         {!collapsed && (
-          <div className="mb-4 px-2">
+          <div className="px-2">
             <div className="text-[10px] text-sidebar-foreground/40 uppercase tracking-widest mb-1">Powered By</div>
             <div className="text-xs font-bold text-sidebar-foreground/60">DARKWAVE STUDIOS</div>
           </div>
         )}
-        <Link href="/settings">
-            <div className={cn(
-              "flex items-center px-3 py-2 rounded-md cursor-pointer text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors",
-            )}>
-              <Settings className="h-5 w-5" />
-              {!collapsed && <span className="ml-3 text-sm">Settings</span>}
-            </div>
-        </Link>
-        <div className={cn(
-          "flex items-center px-3 py-2 rounded-md cursor-pointer text-destructive hover:bg-destructive/10 transition-colors",
-        )}>
-          <LogOut className="h-5 w-5" />
-          {!collapsed && <span className="ml-3 text-sm">Logout</span>}
-        </div>
       </div>
     </aside>
   );
@@ -114,7 +99,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
       <Sidebar />
       <main className="flex-1 overflow-y-auto relative">
+        {/* Saturn Watermark Background */}
+        <HallmarkPageWatermark />
+        
+        {/* Noise overlay */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+        
+        {/* Content */}
         <div className="p-8 relative z-10 max-w-7xl mx-auto">
           {children}
         </div>

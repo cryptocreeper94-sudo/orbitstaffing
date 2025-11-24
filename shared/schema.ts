@@ -2481,3 +2481,61 @@ export const insertDeveloperChatSchema = createInsertSchema(developerChat).omit(
 
 export type InsertDeveloperChat = z.infer<typeof insertDeveloperChatSchema>;
 export type DeveloperChat = typeof developerChat.$inferSelect;
+
+// ========================
+// Admin Business Cards
+// ========================
+export const adminBusinessCards = pgTable(
+  "admin_business_cards",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Admin Info
+    adminId: varchar("admin_id").notNull().references(() => users.id),
+    companyId: varchar("company_id").references(() => companies.id), // For company-specific cards
+    franchiseId: varchar("franchise_id").references(() => franchises.id), // For franchise-specific cards
+    
+    // Card Content
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }), // e.g., "Operations Manager", "Finance Director"
+    companyName: varchar("company_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 20 }),
+    location: varchar("location", { length: 255 }), // City, State
+    website: varchar("website", { length: 255 }),
+    
+    // Photo & Design
+    photoUrl: text("photo_url"), // Profile photo
+    photoUploadedAt: timestamp("photo_uploaded_at"),
+    
+    // Branding
+    brandColor: varchar("brand_color", { length: 7 }).default("#06B6D4"), // Hex color
+    
+    // Download/Share
+    downloadCount: integer("download_count").default(0),
+    lastDownloadedAt: timestamp("last_downloaded_at"),
+    shareableLink: varchar("shareable_link", { length: 100 }), // Unique slug for sharing
+    
+    // Metadata
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    adminIdx: index("idx_bcard_admin_id").on(table.adminId),
+    companyIdx: index("idx_bcard_company_id").on(table.companyId),
+    franchiseIdx: index("idx_bcard_franchise_id").on(table.franchiseId),
+    linkIdx: index("idx_bcard_shareable_link").on(table.shareableLink),
+  })
+);
+
+export const insertAdminBusinessCardSchema = createInsertSchema(adminBusinessCards).omit({
+  id: true,
+  downloadCount: true,
+  lastDownloadedAt: true,
+  createdAt: true,
+  updatedAt: true,
+  photoUploadedAt: true,
+});
+
+export type InsertAdminBusinessCard = z.infer<typeof insertAdminBusinessCardSchema>;
+export type AdminBusinessCard = typeof adminBusinessCards.$inferSelect;
