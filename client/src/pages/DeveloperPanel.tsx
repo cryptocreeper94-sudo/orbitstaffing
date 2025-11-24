@@ -246,26 +246,18 @@ export default function DeveloperPanel() {
             </h1>
             <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setShowChat(!showChat)}
-              className="relative px-4 py-2 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold rounded-lg flex items-center gap-2 transition-all glow-cyan"
-              data-testid="button-ai-chat"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Ask AI
-            </button>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             <Button
               onClick={() => navigateTo('/incident-reporting')}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
               data-testid="button-dev-incident-report"
             >
               <AlertTriangle className="w-4 h-4" />
-              Incident Reports
+              Incidents
             </Button>
             <Button
               onClick={() => navigateTo('/workers-comp-admin')}
-              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
+              className="bg-orange-600 hover:bg-orange-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
               data-testid="button-dev-workers-comp"
             >
               <Shield className="w-4 h-4" />
@@ -273,15 +265,15 @@ export default function DeveloperPanel() {
             </Button>
             <Button
               onClick={() => navigateTo('/admin')}
-              className="bg-cyan-600 hover:bg-cyan-700 flex items-center gap-2"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
               data-testid="button-dev-to-admin"
             >
               <Shield className="w-4 h-4" />
-              Admin Panel
+              Admin
             </Button>
             <Button
               onClick={() => navigateTo('/dashboard')}
-              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
               data-testid="button-dev-to-app"
             >
               <BarChart3 className="w-4 h-4" />
@@ -289,7 +281,7 @@ export default function DeveloperPanel() {
             </Button>
             <Button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm md:col-span-2"
               data-testid="button-developer-logout"
             >
               <LogOut className="w-4 h-4" />
@@ -299,12 +291,12 @@ export default function DeveloperPanel() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-slate-700">
+        <div className="flex gap-4 mb-8 border-b border-slate-700 flex-wrap">
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-3 font-bold border-b-2 transition-all ${
               activeTab === 'overview'
-                ? 'border-purple-500 text-purple-400'
+                ? 'border-cyan-400 text-cyan-400'
                 : 'border-transparent text-gray-400 hover:text-gray-300'
             }`}
             data-testid="button-tab-dev-overview"
@@ -315,7 +307,7 @@ export default function DeveloperPanel() {
             onClick={() => setActiveTab('apis')}
             className={`px-4 py-3 font-bold border-b-2 transition-all ${
               activeTab === 'apis'
-                ? 'border-purple-500 text-purple-400'
+                ? 'border-cyan-400 text-cyan-400'
                 : 'border-transparent text-gray-400 hover:text-gray-300'
             }`}
             data-testid="button-tab-dev-apis"
@@ -326,7 +318,7 @@ export default function DeveloperPanel() {
             onClick={() => setActiveTab('examples')}
             className={`px-4 py-3 font-bold border-b-2 transition-all ${
               activeTab === 'examples'
-                ? 'border-purple-500 text-purple-400'
+                ? 'border-cyan-400 text-cyan-400'
                 : 'border-transparent text-gray-400 hover:text-gray-300'
             }`}
             data-testid="button-tab-dev-examples"
@@ -335,21 +327,51 @@ export default function DeveloperPanel() {
           </button>
           <button
             onClick={() => setActiveTab('messaging')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all ${
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
               activeTab === 'messaging'
-                ? 'border-purple-500 text-purple-400'
+                ? 'border-cyan-400 text-cyan-400'
                 : 'border-transparent text-gray-400 hover:text-gray-300'
             }`}
             data-testid="button-tab-dev-messaging"
           >
-            <MessageCircle className="w-4 h-4 inline mr-2" />
+            <MessageCircle className="w-4 h-4" />
             Secure Messaging
           </button>
+          <div className="ml-auto flex items-center">
+            <button
+              onClick={() => setShowChat(!showChat)}
+              className="px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded transition-all text-sm flex items-center gap-2"
+              data-testid="button-tab-ask-ai"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Ask AI
+            </button>
+          </div>
         </div>
 
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
+            {/* Widgets */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1">
+                <WeatherNewsWidget userRole="dev" zipCode="37201" />
+              </div>
+              <div className="lg:col-span-2">
+                <HourCounter userRole="dev" />
+              </div>
+            </div>
+
+            {/* Universal Employee Registry */}
+            <div className="mt-8">
+              <UniversalEmployeeRegistry userRole="dev" />
+            </div>
+          </div>
+        )}
+
+        {/* OVERVIEW TAB - OLD CONTENT */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6 hidden">
             {/* Quick Links Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Replit IDE Link */}
