@@ -25,7 +25,7 @@ const PRICING_TIERS = [
     id: 'small',
     name: 'Small Agency',
     price: 499,
-    description: 'Like Superior Staffing',
+    description: 'For established staffing agencies',
     workers: '25-150 workers',
     featured: true,
     features: [

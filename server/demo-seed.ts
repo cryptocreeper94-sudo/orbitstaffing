@@ -37,9 +37,9 @@ export async function seedDemoData() {
 
     // Create demo company
     const company = await db.insert(companies).values({
-      name: "Superior Staffing",
+      name: "Demo Staffing Company",
       industry: "staffing",
-      email: "info@superiostaffing.com",
+      email: "info@demostaffing.com",
       phone: "615-555-0100",
       addressLine1: "100 Main Street",
       city: "Nashville",

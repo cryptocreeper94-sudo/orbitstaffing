@@ -31,7 +31,7 @@ async function seedProducts() {
     console.log('Creating Small Agency plan...');
     const smallProduct = await stripe.products.create({
       name: 'ORBIT Small Agency',
-      description: 'Complete staffing platform for 25-150 workers. Like Superior Staffing.',
+      description: 'Complete staffing platform for 25-150 workers.',
       metadata: {
         tier: 'small',
         workers: '25-150',

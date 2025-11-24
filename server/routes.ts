@@ -213,10 +213,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: "You",
             lastName: "Business Owner",
             role: "owner",
-            companyId: "superior-staffing",
+            companyId: "sandbox-company",
             isFirstLogin: true,
             isReadOnly: false,
-            welcomeMessage: "SECURE SANDBOX LOGIN\n\nWelcome to ORBIT! You're logged in as the owner of Superior Staffing. This is your complete operational sandbox where you have full control:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nYou have a personal admin role to manage your workers and communicate directly with ORBIT support.",
+            welcomeMessage: "SECURE SANDBOX LOGIN\n\nWelcome to ORBIT! You're logged in as a business owner. This is your complete operational sandbox where you have full control:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nYou have a personal admin role to manage your workers and communicate directly with ORBIT support.",
             needsPasswordReset: true,
           };
           return res.status(200).json(ownerUser);
@@ -230,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             firstName: "Demo",
             lastName: "Worker",
             role: "worker",
-            companyId: "superior-staffing",
+            companyId: "sandbox-company",
             isFirstLogin: true,
             isReadOnly: true,
             welcomeMessage: "SECURE SANDBOX LOGIN\n\nWelcome to the ORBIT Worker App! This is the employee experience sandbox. You can:\n\n✓ View assigned jobs\n✓ Clock in/out with GPS verification\n✓ Track your earnings in real-time\n✓ See your bonus calculations\n✓ View payment history\n✓ Manage time-off requests",

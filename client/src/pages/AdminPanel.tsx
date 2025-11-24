@@ -350,14 +350,14 @@ function MasterAdminDashboard() {
       ]
     },
     {
-      id: 'superior-staffing',
-      category: '🎯 Superior Staffing (First Franchise)',
+      id: 'first-franchise',
+      category: '🎯 First Franchise Launch',
       icon: '🏆',
       tasks: [
-        { id: 'ss-launch', title: 'Launch production environment for Superior Staffing', completed: false },
-        { id: 'ss-data-migration', title: 'Migrate customer/worker data into platform', completed: false },
-        { id: 'ss-training', title: 'Train Superior Staffing team on platform', completed: false },
-        { id: 'ss-go-live', title: 'Go-live with first paying customer', completed: false },
+        { id: 'franchise-launch', title: 'Launch production environment for first franchise', completed: false },
+        { id: 'data-migration', title: 'Migrate customer/worker data into platform', completed: false },
+        { id: 'team-training', title: 'Train franchisee team on platform', completed: false },
+        { id: 'go-live', title: 'Go-live with first paying customer', completed: false },
         { id: 'franchise-deal', title: 'Finalize franchise agreement & licensing terms', completed: false },
       ]
     },

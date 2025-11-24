@@ -237,7 +237,7 @@ export default function Landing() {
               tier="Small Agency"
               price="$499"
               period="/month"
-              desc="Like Superior Staffing"
+              desc="For established staffing agencies"
               workers="25-150 workers"
               features={[
                 "Everything in Solo",
