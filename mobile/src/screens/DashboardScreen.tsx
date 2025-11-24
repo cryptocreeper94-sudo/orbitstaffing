@@ -48,6 +48,15 @@ export function DashboardScreen({ navigation }: any) {
 
   return (
     <ScrollView style={styles.container}>
+      {/* App Store Coming Soon Banner */}
+      <View style={styles.banner}>
+        <Text style={styles.bannerIcon}>📱</Text>
+        <View style={styles.bannerContent}>
+          <Text style={styles.bannerTitle}>Coming Soon to App Stores</Text>
+          <Text style={styles.bannerSubtitle}>Google Play Store & Apple App Store native apps</Text>
+        </View>
+      </View>
+
       {/* Header */}
       <View style={styles.header}>
         <View>
@@ -134,6 +143,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
+  },
+  banner: {
+    backgroundColor: 'rgba(6, 182, 212, 0.15)',
+    borderColor: '#06b6d4',
+    borderWidth: 2,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  bannerIcon: {
+    fontSize: 20,
+  },
+  bannerContent: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#06b6d4',
+  },
+  bannerSubtitle: {
+    fontSize: 10,
+    color: '#06b6d4',
+    opacity: 0.8,
+    marginTop: 2,
   },
   header: {
     flexDirection: 'row',

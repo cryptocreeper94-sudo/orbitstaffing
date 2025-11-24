@@ -103,6 +103,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
       <Sidebar />
       <main className="flex-1 overflow-y-auto relative">
+        {/* App Store Coming Soon Banner */}
+        <div className="sticky top-0 z-50 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b-2 border-cyan-500/50 backdrop-blur-sm">
+          <div className="px-8 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-xl">📱</div>
+              <div>
+                <div className="text-sm font-bold text-cyan-300">Coming Soon</div>
+                <div className="text-xs text-cyan-200/80">Google Play Store & Apple App Store Native Apps</div>
+              </div>
+            </div>
+            <div className="text-xs text-cyan-300/70">Get native mobile experience</div>
+          </div>
+        </div>
+
         {/* Saturn Watermark Background */}
         <HallmarkPageWatermark />
         

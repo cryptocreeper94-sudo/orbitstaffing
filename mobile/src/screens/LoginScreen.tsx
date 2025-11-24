@@ -43,6 +43,15 @@ export function LoginScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
+      {/* App Store Coming Soon Banner */}
+      <View style={styles.banner}>
+        <Text style={styles.bannerIcon}>📱</Text>
+        <View style={styles.bannerContent}>
+          <Text style={styles.bannerTitle}>Coming Soon to App Stores</Text>
+          <Text style={styles.bannerSubtitle}>Native iOS & Android apps launching now</Text>
+        </View>
+      </View>
+
       <Image source={require('../assets/orbit-logo.png')} style={styles.logo} />
       <Text style={styles.title}>ORBIT Staffing</Text>
       <Text style={styles.subtitle}>Worker Portal</Text>
@@ -95,6 +104,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#0f172a',
     paddingHorizontal: 20,
     justifyContent: 'center',
+  },
+  banner: {
+    backgroundColor: 'rgba(6, 182, 212, 0.15)',
+    borderColor: '#06b6d4',
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  bannerIcon: {
+    fontSize: 24,
+  },
+  bannerContent: {
+    flex: 1,
+  },
+  bannerTitle: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#06b6d4',
+  },
+  bannerSubtitle: {
+    fontSize: 11,
+    color: '#06b6d4',
+    opacity: 0.8,
+    marginTop: 2,
   },
   logo: {
     width: 120,
