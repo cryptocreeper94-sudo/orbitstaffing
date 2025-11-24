@@ -16,7 +16,12 @@ import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('developerAuthenticated') === 'true';
+    }
+    return false;
+  });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging'>('overview');
@@ -29,6 +34,12 @@ export default function DeveloperPanel() {
   const [chatLoading, setChatLoading] = useState(false);
   const [sessionId] = useState(() => `dev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.setItem('developerAuthenticated', 'true');
+    }
+  }, [isAuthenticated]);
 
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
