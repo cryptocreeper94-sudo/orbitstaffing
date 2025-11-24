@@ -18,7 +18,7 @@ import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
-import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
+import saturnLogo from "@assets/generated_images/aqua_saturn_planet_transparent_background.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
@@ -52,22 +52,16 @@ export default function Landing() {
       {/* Demo Request Form */}
       {showDemoForm && <DemoRequestForm onClose={() => setShowDemoForm(false)} />}
 
-      {/* Saturn Watermark - Fixed Centered 3D Background */}
+      {/* Saturn Watermark - Fixed Centered 3D Background - Transparent */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        <div style={{
-          filter: 'drop-shadow(-20px -20px 40px rgba(0, 0, 0, 0.6)) drop-shadow(20px 20px 60px rgba(6, 182, 212, 0.3))',
-          transform: 'perspective(1200px) rotateX(5deg) rotateY(-5deg)',
-          willChange: 'transform'
-        }}>
-          <img 
-            src={saturnLogo} 
-            alt="" 
-            className="w-[800px] h-[800px] opacity-20 object-contain"
-            style={{ 
-              filter: 'drop-shadow(0 15px 30px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 50px rgba(6, 182, 212, 0.5))',
-            }}
-          />
-        </div>
+        <img 
+          src={saturnLogo} 
+          alt="" 
+          className="w-[900px] h-[900px] opacity-25 object-contain"
+          style={{ 
+            filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.4))',
+          }}
+        />
       </div>
 
       {/* Content Layer */}
@@ -80,7 +74,7 @@ export default function Landing() {
             <img 
               src={saturnLogo} 
               alt="ORBIT" 
-              className="w-10 h-10 object-contain"
+              className="w-12 h-12 object-contain opacity-90"
             />
             <div className="font-heading font-bold text-lg tracking-wider">
               ORBIT
