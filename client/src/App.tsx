@@ -59,6 +59,10 @@ import Pricing from "@/pages/Pricing";
 import EquipmentTrackingAdmin from "@/pages/EquipmentTrackingAdmin";
 import GPSClockIn from "@/pages/GPSClockIn";
 import PayrollProcessing from "@/pages/PayrollProcessing";
+import { WorkerBonusTracker } from "@/pages/WorkerBonusTracker";
+import { WorkerShiftOffers } from "@/pages/WorkerShiftOffers";
+import { WorkerAvailabilityCalendar } from "@/pages/WorkerAvailabilityCalendar";
+import { WorkerReferrals } from "@/pages/WorkerReferrals";
 // Feedback and AI Chat widgets removed - were distracting corner buttons
 
 function RootPage() {
@@ -109,6 +113,10 @@ function Router() {
       <Route path="/equipment-tracking" component={EquipmentTrackingAdmin} />
       <Route path="/gps-clock-in" component={GPSClockIn} />
       <Route path="/payroll-processing" component={PayrollProcessing} />
+      <Route path="/worker-bonuses" component={WorkerBonusTracker} />
+      <Route path="/worker-shifts" component={WorkerShiftOffers} />
+      <Route path="/worker-availability" component={WorkerAvailabilityCalendar} />
+      <Route path="/worker-referrals" component={WorkerReferrals} />
       <Route path="/admin/ios-interest" component={AdminIOSInterest} />
       <Route path="/incidents" component={IncidentReporting} />
       <Route path="/business-owner" component={BusinessOwnerMarketing} />
