@@ -179,20 +179,20 @@ export default function PayrollProcessing() {
           <p className="text-gray-400">Manage timesheets, deductions, and generate paystubs with hallmark verification</p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-fit flex-wrap">
+        {/* Tab Navigation - Mobile Responsive */}
+        <div className="flex flex-wrap gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-full">
           <Button
             onClick={() => setView('timesheets')}
             variant={view === 'timesheets' ? 'default' : 'ghost'}
-            className="rounded text-xs sm:text-sm"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-timesheets"
           >
-            📋 Timesheets
+            📋 <span className="hidden sm:inline ml-1">Sheets</span>
           </Button>
           <Button
             onClick={() => setView('payroll')}
             variant={view === 'payroll' ? 'default' : 'ghost'}
-            className="rounded text-xs sm:text-sm"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-payroll"
           >
             💳 Generate Payroll

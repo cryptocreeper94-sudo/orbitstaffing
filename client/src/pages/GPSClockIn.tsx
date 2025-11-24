@@ -237,20 +237,20 @@ export default function GPSClockIn() {
           <p className="text-gray-400">Location-verified time tracking with geofencing</p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-fit">
+        {/* Tab Navigation - Mobile Responsive */}
+        <div className="flex flex-wrap gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-full">
           <Button
             onClick={() => setView('checkin')}
             variant={view === 'checkin' ? 'default' : 'ghost'}
-            className="rounded text-xs sm:text-sm"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-checkin"
           >
-            📍 Check In
+            📍 <span className="hidden sm:inline ml-1">Check In</span>
           </Button>
           <Button
             onClick={() => setView('active')}
             variant={view === 'active' ? 'default' : 'ghost'}
-            className="rounded text-xs sm:text-sm"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-active"
           >
             ⏱️ Active

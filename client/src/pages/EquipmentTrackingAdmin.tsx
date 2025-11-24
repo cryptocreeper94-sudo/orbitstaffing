@@ -191,31 +191,31 @@ export default function EquipmentTrackingAdmin() {
           <p className="text-gray-400">Manage PPE inventory, assignments, and returns</p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-fit">
+        {/* Tab Navigation - Mobile Responsive */}
+        <div className="flex flex-wrap gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg">
           <Button
             onClick={() => setView('inventory')}
             variant={view === 'inventory' ? 'default' : 'ghost'}
-            className="rounded"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-inventory"
           >
-            📦 Inventory
+            📦 <span className="hidden sm:inline ml-1">Inventory</span>
           </Button>
           <Button
             onClick={() => setView('loans')}
             variant={view === 'loans' ? 'default' : 'ghost'}
-            className="rounded"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-loans"
           >
-            📤 Active Loans
+            📤 <span className="hidden sm:inline ml-1">Loans</span>
           </Button>
           <Button
             onClick={() => setView('returns')}
             variant={view === 'returns' ? 'default' : 'ghost'}
-            className="rounded"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-returns"
           >
-            ✓ Returns & Deductions
+            ✓ <span className="hidden sm:inline ml-1">Returns</span>
           </Button>
         </div>
 
