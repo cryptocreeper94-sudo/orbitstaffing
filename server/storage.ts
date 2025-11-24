@@ -219,6 +219,11 @@ export interface IStorage {
   getSupportTicket(id: string): Promise<SupportTicket | undefined>;
   listSupportTickets(filters?: { status?: string; category?: string }): Promise<SupportTicket[]>;
   updateSupportTicket(id: string, data: Partial<InsertSupportTicket>): Promise<SupportTicket | undefined>;
+
+  // File Uploads
+  uploadWorkerFile(workerId: string, docType: string, fileData: string, fileName: string): Promise<{ url: string; fileSize: number }>;
+  updateWorkerAvatar(workerId: string, avatarUrl: string): Promise<Worker | undefined>;
+  updateWorkerDocuments(workerId: string, documents: any[]): Promise<Worker | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -964,6 +969,38 @@ export class DrizzleStorage implements IStorage {
 
   async updateSupportTicket(id: string, data: Partial<InsertSupportTicket>): Promise<SupportTicket | undefined> {
     const result = await db.update(supportTickets).set(data).where(eq(supportTickets.id, id)).returning();
+    return result[0];
+  }
+
+  // File Uploads
+  async uploadWorkerFile(workerId: string, docType: string, fileData: string, fileName: string): Promise<{ url: string; fileSize: number }> {
+    // For MVP: Store base64 data directly as a data URL
+    // In production, you would upload to S3, Cloudinary, or similar
+    const fileSize = fileData.length;
+    
+    // Create a data URL that represents the uploaded file
+    // The fileData is already base64 encoded from the client
+    const dataUrl = fileData; // Already in format: data:image/jpeg;base64,...
+    
+    return {
+      url: dataUrl,
+      fileSize: fileSize
+    };
+  }
+
+  async updateWorkerAvatar(workerId: string, avatarUrl: string): Promise<Worker | undefined> {
+    const result = await db.update(workers)
+      .set({ avatarUrl })
+      .where(eq(workers.id, workerId))
+      .returning();
+    return result[0];
+  }
+
+  async updateWorkerDocuments(workerId: string, documents: any[]): Promise<Worker | undefined> {
+    const result = await db.update(workers)
+      .set({ i9Documents: documents })
+      .where(eq(workers.id, workerId))
+      .returning();
     return result[0];
   }
 

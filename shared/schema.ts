@@ -258,6 +258,10 @@ export const workers = pgTable(
     // Profile & Digital Hallmark
     avatarUrl: text("avatar_url"), // Worker's headshot/profile photo for employee card
     employeeNumber: varchar("employee_number", { length: 50 }).unique(), // Formatted: EMP-XXXX or based on company preference
+    
+    // Document URLs (base64 encoded or paths)
+    i9Documents: jsonb("i9_documents"), // Array of {type, url, uploadedAt} for I-9 verification docs
+    
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),

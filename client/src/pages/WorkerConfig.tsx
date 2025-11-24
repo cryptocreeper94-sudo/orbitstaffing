@@ -13,9 +13,14 @@ import {
   Camera
 } from "lucide-react";
 import { useState } from "react";
+import { FileUploadHandler } from "@/components/FileUploadHandler";
 
 export default function WorkerConfig() {
   const [tab, setTab] = useState("profile");
+  const [workerId] = useState("demo-worker-id"); // In production, get from auth context
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [documents, setDocuments] = useState<Record<string, string>>({});
+  const [uploadErrors, setUploadErrors] = useState<Record<string, string>>({});
 
   return (
     <div className="min-h-screen bg-background text-foreground p-6">
@@ -48,6 +53,30 @@ export default function WorkerConfig() {
                 <CardDescription>This information is kept secure and used for legal/tax purposes.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                <div className="flex items-center gap-6 p-4 bg-card/30 rounded-lg border border-border/30">
+                  <div>
+                    <h4 className="font-bold text-sm mb-2">Profile Photo</h4>
+                    <p className="text-xs text-muted-foreground mb-3">Used on your digital employee ID card</p>
+                    <FileUploadHandler
+                      workerId={workerId}
+                      docType="avatar"
+                      title="Upload Photo"
+                      onUploadSuccess={(url) => {
+                        setProfilePhoto(url);
+                        setUploadErrors(prev => ({ ...prev, avatar: '' }));
+                      }}
+                      onError={(err) => {
+                        setUploadErrors(prev => ({ ...prev, avatar: err }));
+                      }}
+                    />
+                  </div>
+                  {profilePhoto && (
+                    <div className="w-24 h-24 rounded-lg border-2 border-cyan-400 overflow-hidden flex-shrink-0">
+                      <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">First Name *</label>
@@ -122,21 +151,62 @@ export default function WorkerConfig() {
                 </div>
 
                 <div className="space-y-4">
-                  <DocumentUpload 
-                    title="Government-Issued ID"
-                    desc="Driver's License, Passport, or State ID"
-                    uploaded={false}
-                  />
-                  <DocumentUpload 
-                    title="Social Security Card"
-                    desc="Clear photo of both sides"
-                    uploaded={false}
-                  />
-                  <DocumentUpload 
-                    title="Proof of Address"
-                    desc="Utility bill, lease, or bank statement (dated within 90 days)"
-                    uploaded={false}
-                  />
+                  <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div>
+                      <h4 className="font-bold text-sm mb-1">Government-Issued ID</h4>
+                      <p className="text-xs text-muted-foreground">Driver's License, Passport, or State ID</p>
+                    </div>
+                    <FileUploadHandler
+                      workerId={workerId}
+                      docType="i9_document"
+                      title="Upload ID"
+                      onUploadSuccess={(url) => {
+                        setDocuments(prev => ({ ...prev, government_id: url }));
+                        setUploadErrors(prev => ({ ...prev, government_id: '' }));
+                      }}
+                      onError={(err) => {
+                        setUploadErrors(prev => ({ ...prev, government_id: err }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div>
+                      <h4 className="font-bold text-sm mb-1">Social Security Card</h4>
+                      <p className="text-xs text-muted-foreground">Clear photo of both sides</p>
+                    </div>
+                    <FileUploadHandler
+                      workerId={workerId}
+                      docType="i9_document"
+                      title="Upload SSN Card"
+                      onUploadSuccess={(url) => {
+                        setDocuments(prev => ({ ...prev, ssn_card: url }));
+                        setUploadErrors(prev => ({ ...prev, ssn_card: '' }));
+                      }}
+                      onError={(err) => {
+                        setUploadErrors(prev => ({ ...prev, ssn_card: err }));
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div>
+                      <h4 className="font-bold text-sm mb-1">Proof of Address</h4>
+                      <p className="text-xs text-muted-foreground">Utility bill, lease, or bank statement (dated within 90 days)</p>
+                    </div>
+                    <FileUploadHandler
+                      workerId={workerId}
+                      docType="i9_document"
+                      title="Upload Proof"
+                      onUploadSuccess={(url) => {
+                        setDocuments(prev => ({ ...prev, proof_of_address: url }));
+                        setUploadErrors(prev => ({ ...prev, proof_of_address: '' }));
+                      }}
+                      onError={(err) => {
+                        setUploadErrors(prev => ({ ...prev, proof_of_address: err }));
+                      }}
+                    />
+                  </div>
                 </div>
 
                 <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg flex gap-3">
@@ -216,32 +286,3 @@ export default function WorkerConfig() {
   );
 }
 
-function DocumentUpload({ title, desc, uploaded }: any) {
-  return (
-    <div className={`p-4 border-2 border-dashed rounded-lg transition-colors ${uploaded ? "bg-green-500/10 border-green-500/30" : "border-border hover:border-primary/50 hover:bg-primary/5"}`}>
-      <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-lg ${uploaded ? "bg-green-500/20 text-green-500" : "bg-background/50 text-muted-foreground"}`}>
-          {uploaded ? (
-            <CheckCircle2 className="w-6 h-6" />
-          ) : (
-            <Upload className="w-6 h-6" />
-          )}
-        </div>
-        <div className="flex-1">
-          <h4 className="font-bold text-sm mb-1">{title}</h4>
-          <p className="text-xs text-muted-foreground mb-2">{desc}</p>
-          {!uploaded && (
-            <Button size="sm" variant="outline" className="h-7 text-xs">
-              <Camera className="w-3 h-3 mr-1" /> Upload Photo
-            </Button>
-          )}
-        </div>
-        {uploaded && (
-          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
-            Uploaded
-          </Badge>
-        )}
-      </div>
-    </div>
-  );
-}

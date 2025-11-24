@@ -358,6 +358,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // FILE UPLOAD ROUTES
+  // ========================
+  app.post("/api/upload", async (req: Request, res: Response) => {
+    try {
+      const { workerId, docType, fileData, fileName, fileSize, mimeType } = req.body;
+
+      if (!workerId || !docType || !fileData || !fileName) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Validate file size (10MB max)
+      if (fileSize > 10 * 1024 * 1024) {
+        return res.status(413).json({ error: "File too large (max 10MB)" });
+      }
+
+      // Upload file
+      const result = await storage.uploadWorkerFile(workerId, docType, fileData, fileName);
+
+      // If it's an avatar (profile photo), update worker's avatarUrl
+      if (docType === "avatar") {
+        await storage.updateWorkerAvatar(workerId, result.url);
+      }
+
+      res.status(200).json({
+        success: true,
+        url: result.url,
+        fileSize: result.fileSize
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({ error: "File upload failed" });
+    }
+  });
+
+  // ========================
   // WORKERS ROUTES
   // ========================
   app.get("/api/workers", async (req: Request, res: Response) => {
