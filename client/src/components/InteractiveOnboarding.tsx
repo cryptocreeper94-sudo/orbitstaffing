@@ -15,42 +15,42 @@ interface OnboardingStep {
 const ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 1,
-    title: "Welcome to Your Staffing Business",
-    description: "ORBIT makes it dead simple to run a staffing agency. In the next 2 minutes, you'll see how easy it is to hire workers and make money.",
+    title: "Your Personal Marketplace Platform",
+    description: "ORBIT is the infrastructure for ANY flexible labor or service business. Electricians. Cleaners. Tutors. Rides. Delivery. You choose. In 5 minutes, you'll understand how it works and why it could scale to millions.",
     icon: <Briefcase className="w-12 h-12 text-cyan-400" />,
     cta: "Show Me How",
     action: "next",
   },
   {
     id: 2,
-    title: "Step 1: Add Workers (30 seconds)",
-    description: "Import or create worker profiles. These are the people you'll assign to jobs. Add their skills, availability, and rates. That's it.",
+    title: "Step 1: Add Service Providers (1 minute)",
+    description: "Create profiles for people offering services. Name, skills, availability, rates. Could be electricians, cleaners, tutors - anything. No code needed. Pure simplicity.",
     icon: <Users className="w-12 h-12 text-green-400" />,
-    cta: "Create Worker",
+    cta: "Create Provider",
     action: "demo_worker",
   },
   {
     id: 3,
-    title: "Step 2: Post a Job (30 seconds)",
-    description: "Create a job listing for clients. Set the rate, location, skills needed, and when they need workers. Clients see available workers instantly.",
+    title: "Step 2: Post Demand (1 minute)",
+    description: "Someone needs a service? Create a posting. What's needed, rate offered, location, timing. Service providers see available work instantly. Done.",
     icon: <Briefcase className="w-12 h-12 text-purple-400" />,
-    cta: "Post Job",
+    cta: "Post Demand",
     action: "demo_job",
   },
   {
     id: 4,
-    title: "Step 3: Assign & Profit (Instant)",
-    description: "Match workers to jobs. ORBIT handles the rest: timesheets, payroll, invoicing to clients. You keep the difference.",
+    title: "Step 3: Match & Automate (Instant)",
+    description: "Match providers to demand. ORBIT handles everything: timesheets, payments, invoicing, compliance. You focus on growth. The system handles scale.",
     icon: <DollarSign className="w-12 h-12 text-amber-400" />,
     cta: "See Dashboard",
     action: "demo_assign",
   },
   {
     id: 5,
-    title: "That's It. You're a Staffing Business.",
-    description: "Scale from 1 worker to 1000. ORBIT handles payroll, compliance, and invoicing. Focus on growing. That's your job now.",
+    title: "Scale to Millions Without the Chaos",
+    description: "Start with 1 provider. Scale to 1,000. ORBIT scales with you - same simplicity at every level. GPS verification, instant payments, compliance built-in. This is what enterprise software should be.",
     icon: <Zap className="w-12 h-12 text-cyan-400" />,
-    cta: "Start Building",
+    cta: "Ready to Build?",
     action: "close",
   },
 ];
@@ -113,28 +113,30 @@ export function InteractiveOnboarding({ isOpen, onClose, userRole = 'owner' }: I
             <div className="bg-slate-950 p-4 rounded-lg border border-slate-700 space-y-3">
               {currentStep === 1 && (
                 <div className="space-y-2 text-sm text-slate-300">
-                  <p>✓ Name: John Smith</p>
-                  <p>✓ Skills: Electrician, 15 years experience</p>
+                  <p>✓ Name: John Smith (Electrician)</p>
+                  <p>✓ Skills: Residential electrical, 15 years</p>
                   <p>✓ Rate: $45/hour</p>
                   <p>✓ Available: Mon-Fri, 6am-6pm</p>
-                  <p className="text-green-400 font-semibold">→ Ready to assign!</p>
+                  <p className="text-green-400 font-semibold">→ Ready for assignments!</p>
                 </div>
               )}
               {currentStep === 2 && (
                 <div className="space-y-2 text-sm text-slate-300">
+                  <p>✓ Demand: 5 electricians needed</p>
                   <p>✓ Client: ABC Construction</p>
-                  <p>✓ Need: 5 electricians</p>
-                  <p>✓ Rate: $60/hour (you charge client)</p>
+                  <p>✓ Rate: $60/hour (you charge client this)</p>
                   <p>✓ Duration: Next 2 weeks</p>
-                  <p className="text-green-400 font-semibold">→ Posted! Workers can apply</p>
+                  <p className="text-green-400 font-semibold">→ Posted! Providers can apply</p>
                 </div>
               )}
               {currentStep === 3 && (
                 <div className="space-y-2 text-sm text-slate-300">
-                  <p>✓ Assigned: John to ABC Construction</p>
-                  <p>✓ He clocks in via app (GPS verified)</p>
-                  <p>✓ Client pays you $60/hr → You pay John $45/hr</p>
-                  <p className="text-amber-400 font-semibold">→ Your profit: $15/hr per worker</p>
+                  <p>✓ John matched to ABC Construction job</p>
+                  <p>✓ He clocks in via mobile app (GPS verified)</p>
+                  <p>✓ You invoice client: $60/hr × 40 hours = $2,400</p>
+                  <p>✓ ORBIT pays John: $45/hr × 40 hours = $1,800</p>
+                  <p className="text-amber-400 font-semibold">→ Your margin: $600 this week</p>
+                  <p className="text-cyan-400 font-semibold">→ Scale to 100 providers = $60k/week</p>
                 </div>
               )}
             </div>
@@ -181,7 +183,7 @@ export function InteractiveOnboarding({ isOpen, onClose, userRole = 'owner' }: I
               className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white flex items-center justify-center gap-2"
               data-testid="button-next-onboarding"
             >
-              {currentStep === ONBOARDING_STEPS.length - 1 ? 'Get Started!' : 'Next'}
+              {currentStep === ONBOARDING_STEPS.length - 1 ? 'Start Building!' : 'Next'}
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
