@@ -3,7 +3,7 @@
  * Public sandbox entry point - join as Owner or Employee with PIN 7777
  */
 import React, { useState } from 'react';
-import { Code, Shield, Users, LogOut } from 'lucide-react';
+import { Code, Shield, Users, LogOut, Lock, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -69,7 +69,18 @@ export default function DeveloperLanding() {
   // Authenticated state - show user dashboard
   if (isAuthenticated && currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 relative">
+        {/* Admin Button for logged in view */}
+        <div className="absolute top-6 right-6">
+          <Button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+            data-testid="button-sandbox-logout"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
+        </div>
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-start mb-8">
             <div>
@@ -131,7 +142,7 @@ export default function DeveloperLanding() {
 
   // Unauthenticated - show sandbox join options
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 relative">
       <div className="max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-12">
@@ -246,6 +257,89 @@ export default function DeveloperLanding() {
             <p className="text-xs text-gray-500 text-center">
               Worker experience sandbox
             </p>
+          </div>
+        </div>
+
+        {/* Real User Logins Section */}
+        <div className="mb-8">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-bold text-white mb-2">Production Access</h3>
+            <p className="text-gray-400 text-sm">
+              Sign in with your registered account or access code
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Real Owner Login */}
+            <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
+              <div className="absolute top-2 right-2 bg-amber-600/80 px-2 py-1 rounded text-xs font-bold text-white">
+                Requires Email
+              </div>
+              <div className="flex items-center justify-center mb-3">
+                <Briefcase className="w-6 h-6 text-gray-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-500 mb-2 text-center">
+                Owner Login
+              </h3>
+              <p className="text-gray-500 text-xs mb-4 text-center">
+                Access your staffing business dashboard
+              </p>
+              <Button
+                disabled
+                variant="outline"
+                className="w-full text-gray-500 border-gray-600 cursor-not-allowed"
+                data-testid="button-owner-login-disabled"
+              >
+                Coming Soon
+              </Button>
+            </div>
+
+            {/* Real Employee Login */}
+            <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
+              <div className="absolute top-2 right-2 bg-amber-600/80 px-2 py-1 rounded text-xs font-bold text-white">
+                Requires Code
+              </div>
+              <div className="flex items-center justify-center mb-3">
+                <Users className="w-6 h-6 text-gray-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-500 mb-2 text-center">
+                Employee Login
+              </h3>
+              <p className="text-gray-500 text-xs mb-4 text-center">
+                View assignments and track earnings
+              </p>
+              <Button
+                disabled
+                variant="outline"
+                className="w-full text-gray-500 border-gray-600 cursor-not-allowed"
+                data-testid="button-employee-login-disabled"
+              >
+                Coming Soon
+              </Button>
+            </div>
+
+            {/* Real Admin Login */}
+            <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
+              <div className="absolute top-2 right-2 bg-amber-600/80 px-2 py-1 rounded text-xs font-bold text-white">
+                Requires PIN
+              </div>
+              <div className="flex items-center justify-center mb-3">
+                <Shield className="w-6 h-6 text-gray-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-500 mb-2 text-center">
+                Admin Portal
+              </h3>
+              <p className="text-gray-500 text-xs mb-4 text-center">
+                System administration and oversight
+              </p>
+              <Button
+                onClick={() => setLocation('/admin')}
+                className="w-full bg-cyan-600 hover:bg-cyan-700"
+                data-testid="button-admin-login-section"
+              >
+                Admin Access
+              </Button>
+            </div>
           </div>
         </div>
 
