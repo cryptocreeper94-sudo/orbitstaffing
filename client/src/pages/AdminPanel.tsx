@@ -9,6 +9,9 @@ import { HealthDashboard } from '@/components/HealthDashboard';
 import { ContingencyManual } from '@/components/ContingencyManual';
 import { OnboardingTracker } from '@/components/OnboardingTracker';
 import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
+import WeatherNewsWidget from '@/components/WeatherNewsWidget';
+import HourCounter from '@/components/HourCounter';
+import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 

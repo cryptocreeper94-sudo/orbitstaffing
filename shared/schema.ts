@@ -2803,3 +2803,248 @@ export const insertEmployeeEmergencyMessageSchema = createInsertSchema(employeeE
 
 export type InsertEmployeeEmergencyMessage = z.infer<typeof insertEmployeeEmergencyMessageSchema>;
 export type EmployeeEmergencyMessage = typeof employeeEmergencyMessages.$inferSelect;
+
+// ========================
+// Hour Tracking
+// ========================
+export const hourTracking = pgTable(
+  "hour_tracking",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Weekly & All-Time Hours
+    weeklyHours: decimal("weekly_hours", { precision: 8, scale: 2 }).default("0"),
+    allTimeHours: decimal("all_time_hours", { precision: 8, scale: 2 }).default("0"),
+    
+    // Current Week Start (Monday)
+    weekStartDate: date("week_start_date").notNull(),
+    
+    // Edit Tracking
+    lastEditedBy: varchar("last_edited_by").references(() => users.id),
+    lastEditedAt: timestamp("last_edited_at"),
+    editNotes: text("edit_notes"),
+    
+    // Hallmark/Blockchain
+    hallmarkId: varchar("hallmark_id"), // Link to digital hallmark
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_hours_worker_id").on(table.workerId),
+    companyIdx: index("idx_hours_company_id").on(table.companyId),
+    weekIdx: index("idx_hours_week_start").on(table.weekStartDate),
+  })
+);
+
+export const insertHourTrackingSchema = createInsertSchema(hourTracking).omit({
+  id: true,
+  lastEditedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertHourTracking = z.infer<typeof insertHourTrackingSchema>;
+export type HourTracking = typeof hourTracking.$inferSelect;
+
+// ========================
+// Timecard Approvals & Sign-Off
+// ========================
+export const timecardApprovals = pgTable(
+  "timecard_approvals",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Timecard Period
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    totalHours: decimal("total_hours", { precision: 8, scale: 2 }).notNull(),
+    
+    // Payment Type
+    paymentType: varchar("payment_type", { length: 50 }).notNull(), // "weekly", "daily", "biweekly"
+    
+    // Supervisor Approval
+    supervisorId: varchar("supervisor_id").notNull().references(() => users.id), // Onsite supervisor
+    supervisorApprovedAt: timestamp("supervisor_approved_at"),
+    supervisorApprovedWith2FA: boolean("supervisor_approved_with_2fa").default(false),
+    
+    // Payroll Sign-Off
+    payrollAuthorizedBy: varchar("payroll_authorized_by").references(() => users.id), // Payroll person (Sidonie or dev)
+    payrollSignedAt: timestamp("payroll_signed_at"),
+    payrollSignedWith2FA: boolean("payroll_signed_with_2fa").default(false),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, supervisor_approved, payroll_approved, rejected
+    
+    // Digital Hallmark
+    hallmarkId: varchar("hallmark_id"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_approval_worker_id").on(table.workerId),
+    supervisorIdx: index("idx_approval_supervisor_id").on(table.supervisorId),
+    statusIdx: index("idx_approval_status").on(table.status),
+    periodIdx: index("idx_approval_period").on(table.startDate),
+  })
+);
+
+export const insertTimecardApprovalSchema = createInsertSchema(timecardApprovals).omit({
+  id: true,
+  supervisorApprovedAt: true,
+  payrollSignedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTimecardApproval = z.infer<typeof insertTimecardApprovalSchema>;
+export type TimecardApproval = typeof timecardApprovals.$inferSelect;
+
+// ========================
+// Universal Employee Registry
+// ========================
+export const universalEmployeeRegistry = pgTable(
+  "universal_employee_registry",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Key Dates
+    onboardCompletionDate: timestamp("onboard_completion_date"),
+    firstDispatchDate: timestamp("first_dispatch_date"),
+    
+    // Current Status
+    currentAssignmentId: varchar("current_assignment_id").references(() => assignments.id),
+    currentCustomerCode: varchar("current_customer_code"),
+    isActive: boolean("is_active").default(true),
+    lastDispatchedAt: timestamp("last_dispatched_at"),
+    
+    // Employee Info
+    skillSet: text("skill_set").array(), // Array of skills
+    image: text("image"), // Base64 or URL
+    i9DocumentUrl: text("i9_document_url"),
+    
+    // Contact Info
+    emergencyContactName: varchar("emergency_contact_name", { length: 255 }),
+    emergencyContactPhone: varchar("emergency_contact_phone", { length: 20 }),
+    emergencyContactRelationship: varchar("emergency_contact_relationship", { length: 100 }),
+    
+    // Assignment Info
+    assignmentAddress: text("assignment_address"),
+    onsiteContactName: varchar("onsite_contact_name", { length: 255 }),
+    onsiteContactPhone: varchar("onsite_contact_phone", { length: 20 }),
+    
+    // Notes
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_registry_worker_id").on(table.workerId),
+    companyIdx: index("idx_registry_company_id").on(table.companyId),
+    activeIdx: index("idx_registry_is_active").on(table.isActive),
+  })
+);
+
+export const insertUniversalEmployeeRegistrySchema = createInsertSchema(universalEmployeeRegistry).omit({
+  id: true,
+  lastDispatchedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUniversalEmployeeRegistry = z.infer<typeof insertUniversalEmployeeRegistrySchema>;
+export type UniversalEmployeeRegistry = typeof universalEmployeeRegistry.$inferSelect;
+
+// ========================
+// Incident Admin Notifications
+// ========================
+export const incidentAdminNotifications = pgTable(
+  "incident_admin_notifications",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    incidentReportId: varchar("incident_report_id").notNull().references(() => incidentReports.id),
+    
+    // Recipients (all admins and dev)
+    recipientAdminIds: text("recipient_admin_ids").array().notNull(), // Array of admin/dev user IDs
+    
+    // Notification Status
+    sentAt: timestamp("sent_at").default(sql`NOW()`),
+    readByAdminIds: text("read_by_admin_ids").array().default(sql`'{}'::text[]`),
+    
+    // Notification Content
+    title: varchar("title", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    priority: varchar("priority", { length: 50 }).default("high"), // critical, high, normal
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    incidentIdx: index("idx_notif_incident_id").on(table.incidentReportId),
+    sentIdx: index("idx_notif_sent_at").on(table.sentAt),
+  })
+);
+
+export const insertIncidentAdminNotificationSchema = createInsertSchema(incidentAdminNotifications).omit({
+  id: true,
+  sentAt: true,
+  createdAt: true,
+});
+
+export type InsertIncidentAdminNotification = z.infer<typeof insertIncidentAdminNotificationSchema>;
+export type IncidentAdminNotification = typeof incidentAdminNotifications.$inferSelect;
+
+// ========================
+// Digital Hallmark Transaction Log
+// ========================
+export const hallmarkTransactionLog = pgTable(
+  "hallmark_transaction_log",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Hallmark Info
+    hallmarkId: varchar("hallmark_id", { length: 100 }).notNull().unique(),
+    qrCode: text("qr_code"), // QR code data
+    
+    // Transaction Details
+    transactionType: varchar("transaction_type", { length: 100 }).notNull(), // "hour_edit", "timecard_approval", "incident_report", etc.
+    entityType: varchar("entity_type", { length: 100 }).notNull(), // "worker", "timecard", "incident", etc.
+    entityId: varchar("entity_id", { length: 255 }).notNull(),
+    
+    // Actor Info
+    actorId: varchar("actor_id").references(() => users.id), // Who performed the action
+    actorRole: varchar("actor_role", { length: 50 }), // Role of actor (dev, admin, payroll, etc.)
+    
+    // Change Details
+    changeDescription: text("change_description").notNull(),
+    previousValue: jsonb("previous_value"), // For edits: what changed
+    newValue: jsonb("new_value"),
+    
+    // Blockchain/Immutable Record
+    blockchainHash: varchar("blockchain_hash", { length: 255 }), // For future blockchain integration
+    
+    // Timestamp
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    hallmarkIdx: index("idx_hallmark_id").on(table.hallmarkId),
+    entityIdx: index("idx_hallmark_entity").on(table.entityId),
+    actorIdx: index("idx_hallmark_actor").on(table.actorId),
+    typeIdx: index("idx_hallmark_type").on(table.transactionType),
+  })
+);
+
+export const insertHallmarkTransactionLogSchema = createInsertSchema(hallmarkTransactionLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertHallmarkTransactionLog = z.infer<typeof insertHallmarkTransactionLogSchema>;
+export type HallmarkTransactionLog = typeof hallmarkTransactionLog.$inferSelect;

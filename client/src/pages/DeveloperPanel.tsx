@@ -10,6 +10,9 @@ import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
 import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
 import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
+import WeatherNewsWidget from '@/components/WeatherNewsWidget';
+import HourCounter from '@/components/HourCounter';
+import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();

@@ -34,6 +34,8 @@ const data = [
 ];
 
 import { cn } from "@/lib/utils";
+import WeatherNewsWidget from '@/components/WeatherNewsWidget';
+import HourCounter from '@/components/HourCounter';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();

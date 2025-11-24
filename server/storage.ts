@@ -34,6 +34,12 @@ import {
   employeeEmergencyMessages,
   adminPasswordResets,
   employeePreApplications,
+  hourTracking,
+  timecardApprovals,
+  universalEmployeeRegistry,
+  incidentAdminNotifications,
+  hallmarkTransactionLog,
+  incidentReports,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -101,6 +107,17 @@ import {
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
+  type InsertHourTracking,
+  type HourTracking,
+  type InsertTimecardApproval,
+  type TimecardApproval,
+  type InsertUniversalEmployeeRegistry,
+  type UniversalEmployeeRegistry,
+  type InsertIncidentAdminNotification,
+  type IncidentAdminNotification,
+  type InsertHallmarkTransactionLog,
+  type HallmarkTransactionLog,
+  type IncidentReport,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -1499,6 +1516,139 @@ export class DrizzleStorage implements IStorage {
       .where(eq(employeePreApplications.id, id))
       .returning();
     return result[0];
+  }
+
+  // ========================
+  // HOUR TRACKING
+  // ========================
+  async getHourTracking(workerId: string): Promise<HourTracking | undefined> {
+    const result = await db.select().from(hourTracking)
+      .where(eq(hourTracking.workerId, workerId));
+    return result[0];
+  }
+
+  async createHourTracking(data: InsertHourTracking): Promise<HourTracking> {
+    const result = await db.insert(hourTracking).values(data).returning();
+    return result[0];
+  }
+
+  async updateHourTracking(workerId: string, data: Partial<InsertHourTracking>): Promise<HourTracking | undefined> {
+    const result = await db.update(hourTracking)
+      .set(data)
+      .where(eq(hourTracking.workerId, workerId))
+      .returning();
+    return result[0];
+  }
+
+  // ========================
+  // TIMECARD APPROVALS
+  // ========================
+  async createTimecardApproval(data: InsertTimecardApproval): Promise<TimecardApproval> {
+    const result = await db.insert(timecardApprovals).values(data).returning();
+    return result[0];
+  }
+
+  async getTimecardApproval(id: string): Promise<TimecardApproval | undefined> {
+    const result = await db.select().from(timecardApprovals)
+      .where(eq(timecardApprovals.id, id));
+    return result[0];
+  }
+
+  async listTimecardApprovals(workerId: string): Promise<TimecardApproval[]> {
+    const result = await db.select().from(timecardApprovals)
+      .where(eq(timecardApprovals.workerId, workerId))
+      .orderBy(desc(timecardApprovals.startDate));
+    return result;
+  }
+
+  async updateTimecardApproval(id: string, data: Partial<InsertTimecardApproval>): Promise<TimecardApproval | undefined> {
+    const result = await db.update(timecardApprovals)
+      .set(data)
+      .where(eq(timecardApprovals.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // ========================
+  // UNIVERSAL EMPLOYEE REGISTRY
+  // ========================
+  async getUniversalEmployee(workerId: string): Promise<UniversalEmployeeRegistry | undefined> {
+    const result = await db.select().from(universalEmployeeRegistry)
+      .where(eq(universalEmployeeRegistry.workerId, workerId));
+    return result[0];
+  }
+
+  async listAllEmployees(companyId?: string): Promise<UniversalEmployeeRegistry[]> {
+    let query = db.select().from(universalEmployeeRegistry);
+    if (companyId) {
+      query = query.where(eq(universalEmployeeRegistry.companyId, companyId));
+    }
+    const result = await query.where(eq(universalEmployeeRegistry.isActive, true));
+    return result;
+  }
+
+  async createUniversalEmployee(data: InsertUniversalEmployeeRegistry): Promise<UniversalEmployeeRegistry> {
+    const result = await db.insert(universalEmployeeRegistry).values(data).returning();
+    return result[0];
+  }
+
+  async updateUniversalEmployee(workerId: string, data: Partial<InsertUniversalEmployeeRegistry>): Promise<UniversalEmployeeRegistry | undefined> {
+    const result = await db.update(universalEmployeeRegistry)
+      .set(data)
+      .where(eq(universalEmployeeRegistry.workerId, workerId))
+      .returning();
+    return result[0];
+  }
+
+  // ========================
+  // INCIDENT ADMIN NOTIFICATIONS
+  // ========================
+  async createIncidentNotification(data: InsertIncidentAdminNotification): Promise<IncidentAdminNotification> {
+    const result = await db.insert(incidentAdminNotifications).values(data).returning();
+    return result[0];
+  }
+
+  async getIncidentNotifications(incidentReportId: string): Promise<IncidentAdminNotification | undefined> {
+    const result = await db.select().from(incidentAdminNotifications)
+      .where(eq(incidentAdminNotifications.incidentReportId, incidentReportId));
+    return result[0];
+  }
+
+  async markNotificationAsRead(notificationId: string, adminId: string): Promise<IncidentAdminNotification | undefined> {
+    const notification = await this.getIncidentNotifications(notificationId);
+    if (!notification) return undefined;
+    
+    const readAdmins = notification.readByAdminIds || [];
+    if (!readAdmins.includes(adminId)) {
+      readAdmins.push(adminId);
+    }
+    
+    const result = await db.update(incidentAdminNotifications)
+      .set({ readByAdminIds: readAdmins })
+      .where(eq(incidentAdminNotifications.id, notificationId))
+      .returning();
+    return result[0];
+  }
+
+  // ========================
+  // DIGITAL HALLMARK TRANSACTION LOG
+  // ========================
+  async createHallmarkTransaction(data: InsertHallmarkTransactionLog): Promise<HallmarkTransactionLog> {
+    const result = await db.insert(hallmarkTransactionLog).values(data).returning();
+    return result[0];
+  }
+
+  async getHallmarkTransaction(hallmarkId: string): Promise<HallmarkTransactionLog | undefined> {
+    const result = await db.select().from(hallmarkTransactionLog)
+      .where(eq(hallmarkTransactionLog.hallmarkId, hallmarkId));
+    return result[0];
+  }
+
+  async listHallmarkTransactions(entityId: string): Promise<HallmarkTransactionLog[]> {
+    const result = await db.select().from(hallmarkTransactionLog)
+      .where(eq(hallmarkTransactionLog.entityId, entityId))
+      .orderBy(desc(hallmarkTransactionLog.createdAt));
+    return result;
   }
 }
 

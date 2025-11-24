@@ -16,6 +16,8 @@ import {
   Camera
 } from "lucide-react";
 import { useState } from "react";
+import WeatherNewsWidget from '@/components/WeatherNewsWidget';
+import HourCounter from '@/components/HourCounter';
 
 export default function WorkerPortal() {
   const [, setLocation] = useLocation();
