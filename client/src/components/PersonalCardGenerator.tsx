@@ -4,10 +4,10 @@
  * Separate from CRM, stored per account identity
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Download, Edit2, Save, Mail, Phone, MapPin, QrCode, ZoomIn, Camera } from 'lucide-react';
+import { Download, Edit2, Save, Mail, Phone, MapPin, QrCode, ZoomIn, Camera, Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import QRCode from 'qrcode.react';
+import QRCode from 'react-qr-code';
 import html2canvas from 'html2canvas';
 
 interface PersonalCardData {
@@ -44,7 +44,7 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
     phone: '',
     location: '',
     brandColor: '#06B6D4',
-    assetNumber: '',
+    assetNumber: userId === 'orbit-0001' ? 'ORBIT-0001' : userId === 'orbit-0002' ? 'ORBIT-0002' : `ORBIT-${userId}`,
   });
 
   useEffect(() => {
@@ -117,15 +117,37 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: '#1e293b',
         scale: 2,
+        logging: false,
       });
 
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
       link.download = `${cardType}-card-${cardData.fullName.replace(/\s+/g, '-')}.png`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Failed to download card:', error);
       alert('Failed to download card');
+    }
+  };
+
+  const handleShare = async () => {
+    const vcard = `${cardData.fullName}\n${cardData.title}\n${cardData.email}\n${cardData.phone}\n${cardData.assetNumber}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${cardData.fullName} - ${cardType} Card`,
+          text: vcard,
+        });
+      } catch (error) {
+        console.log('Share cancelled or failed');
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(vcard);
+      alert('Card details copied to clipboard!');
     }
   };
 
@@ -209,11 +231,11 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
             </Button>
             <Button
               onClick={() => setIsEditing(false)}
-              variant="outline"
-              className="flex-1"
+              className="flex-1 bg-red-600 hover:bg-red-700"
               data-testid="button-cancel-edit-personal-card"
             >
-              Done
+              <X className="w-4 h-4 mr-2" />
+              Close
             </Button>
           </div>
         </CardContent>
@@ -271,14 +293,20 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
             </div>
           </div>
 
-          {/* QR */}
-          <div className="absolute bottom-1.5 left-1.5 p-1 bg-gradient-to-b from-slate-800 to-slate-900 border-2 rounded z-20" style={{ borderColor: cardData.brandColor }}>
-            <QRCode value={vCardData} size={32} level="M" />
+          {/* QR Code Section */}
+          <div className="absolute bottom-2 left-2 flex flex-col items-center gap-1">
+            <div className="p-1 bg-white rounded-sm border-2 border-white" style={{ borderColor: 'white' }}>
+              <QRCode value={vCardData} size={40} level="H" margin={2} />
+            </div>
+            <span className="text-[5px] text-white opacity-75 font-mono">QR Code</span>
           </div>
 
-          {/* Asset Number */}
-          <div className="absolute bottom-1.5 right-1.5 text-[6px] text-white opacity-75 font-mono text-right z-20">
-            {cardData.assetNumber}
+          {/* Asset Number Section */}
+          <div className="absolute bottom-3 right-3 text-center flex flex-col items-end gap-1">
+            <div className="text-[6px] font-bold text-white opacity-90 font-mono bg-slate-900/70 px-1.5 py-0.5 rounded border border-cyan-500/50">
+              {cardData.assetNumber}
+            </div>
+            <span className="text-[4px] text-white opacity-60">Serial</span>
           </div>
 
           {/* Bottom Borders */}
@@ -288,7 +316,7 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 justify-center">
+      <div className="flex gap-2 justify-center flex-wrap mt-4">
         <Button onClick={() => setIsEditing(true)} className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-edit-personal-card">
           <Edit2 className="w-4 h-4 mr-2" />
           Edit
@@ -296,6 +324,10 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
         <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700" data-testid="button-download-personal-card">
           <Download className="w-4 h-4 mr-2" />
           Download
+        </Button>
+        <Button onClick={handleShare} className="bg-blue-600 hover:bg-blue-700" data-testid="button-share-personal-card">
+          <Share2 className="w-4 h-4 mr-2" />
+          Share
         </Button>
       </div>
     </div>

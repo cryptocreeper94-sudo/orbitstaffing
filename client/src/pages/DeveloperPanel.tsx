@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
 import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
+import PersonalCardGenerator from '@/components/PersonalCardGenerator';
 import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
 import WeatherNewsWidget from '@/components/WeatherNewsWidget';
 import HourCounter from '@/components/HourCounter';
@@ -702,6 +703,12 @@ export default function DeveloperPanel() {
                   <p className="text-xs text-gray-400 text-center">Document watermarks, backgrounds</p>
                 </div>
               </div>
+            </div>
+
+            {/* Developer Business Card */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 col-span-full">
+              <h3 className="font-bold text-lg mb-4">Developer Profile Card (ORBIT-0001)</h3>
+              <PersonalCardGenerator userId="orbit-0001" userName="Jason Andrews" cardType="dev" />
             </div>
 
             {/* Assets Available */}

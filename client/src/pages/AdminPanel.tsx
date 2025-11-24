@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
 import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
+import PersonalCardGenerator from '@/components/PersonalCardGenerator';
 import { AdminManagement } from './AdminManagement';
 import { HealthDashboard } from '@/components/HealthDashboard';
 import { ContingencyManual } from '@/components/ContingencyManual';
@@ -358,7 +359,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -1088,6 +1089,12 @@ function DNRSection() {
 
   return (
     <div className="space-y-6">
+      {/* Sidonia Admin Business Card */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+        <h3 className="font-bold text-lg mb-4">Admin Profile Card (ORBIT-0002)</h3>
+        <PersonalCardGenerator userId="orbit-0002" userName="Sidonia Summers" cardType="admin" />
+      </div>
+
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold">Do Not Rehire List</h2>
