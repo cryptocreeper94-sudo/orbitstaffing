@@ -52,14 +52,14 @@ export default function Landing() {
       {/* Demo Request Form */}
       {showDemoForm && <DemoRequestForm onClose={() => setShowDemoForm(false)} />}
 
-      {/* Saturn Watermark - Fixed Centered 3D Background - Transparent */}
+      {/* Saturn Watermark - Fixed Centered Background - Transparent */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
         <img 
           src={saturnLogo} 
           alt="" 
-          className="w-[800px] h-[800px] opacity-20"
+          className="w-[400px] h-[400px] opacity-15"
           style={{ 
-            filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.3))',
+            filter: 'drop-shadow(0 0 30px rgba(6, 182, 212, 0.25))',
           }}
         />
       </div>
@@ -136,26 +136,26 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {/* Business Owner Login */}
             <Link href="/admin" className="group">
-              <Card className="h-full border-2 border-amber-600/30 hover:border-amber-400/60 bg-gradient-to-br from-amber-900/20 to-amber-950/10 hover:from-amber-900/40 hover:to-amber-900/20 transition-all duration-300 cursor-pointer">
+              <Card className="h-full border-2 border-violet-400/40 hover:border-violet-300/70 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 hover:to-purple-400/15 transition-all duration-300 cursor-pointer">
                 <CardContent className="p-8 text-center">
                   <div className="text-6xl mb-4">🏢</div>
-                  <h3 className="text-xl font-bold text-amber-300 mb-2">Business Owner</h3>
+                  <h3 className="text-xl font-bold text-violet-300 mb-2">Business Owner</h3>
                   <p className="text-sm text-gray-400 mb-6">Manage your staffing operations, workers, clients, and billing all in one place</p>
                   <div className="space-y-2 mb-6">
                     <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                      <CheckCircle2 className="w-4 h-4 text-violet-400" />
                       Worker & client management
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                      <CheckCircle2 className="w-4 h-4 text-violet-400" />
                       Real-time scheduling
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                      <CheckCircle2 className="w-4 h-4 text-violet-400" />
                       Payroll & invoicing
                     </div>
                   </div>
-                  <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white" data-testid="button-owner-access">
+                  <Button className="w-full bg-violet-500 hover:bg-violet-600 text-white" data-testid="button-owner-access">
                     Owner Login <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </CardContent>
