@@ -3931,3 +3931,185 @@ export const insertCompanyHallmarkSchema = createInsertSchema(companyHallmarks).
 
 export type InsertCompanyHallmark = z.infer<typeof insertCompanyHallmarkSchema>;
 export type CompanyHallmark = typeof companyHallmarks.$inferSelect;
+
+// ========================
+// ORBIT Internal Staff (Separate from Franchisees)
+// ========================
+export const orbidStaffMembers = pgTable(
+  "orbid_staff_members",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().unique().references(() => users.id),
+    assetNumber: integer("asset_number").unique(), // #1 = Jason, #2 = Sidonie, etc.
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    role: varchar("role", { length: 50 }).notNull(), // "founder", "coo", "admin", "dev"
+    canManageFranchisees: boolean("can_manage_franchisees").default(false),
+    canAccessAllCRMs: boolean("can_access_all_crms").default(false), // Only superadmins
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    userIdx: index("idx_orbid_staff_user").on(table.userId),
+    assetIdx: index("idx_orbid_staff_asset").on(table.assetNumber),
+  })
+);
+
+export const insertOrbidStaffMemberSchema = createInsertSchema(orbidStaffMembers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertOrbidStaffMember = z.infer<typeof insertOrbidStaffMemberSchema>;
+export type OrbidStaffMember = typeof orbidStaffMembers.$inferSelect;
+
+// ========================
+// Franchisee CRM Access & Permissions
+// ========================
+export const franchiseeCrmAccess = pgTable(
+  "franchisee_crm_access",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    userId: varchar("user_id").notNull().references(() => users.id),
+    crmRole: varchar("crm_role", { length: 50 }).notNull(), // "owner", "admin", "sales", "dev"
+    canManageTeam: boolean("can_manage_team").default(false),
+    canEditCRM: boolean("can_edit_crm").default(true),
+    grantedBy: varchar("granted_by", { length: 255 }), // "Jason", "Sidonie", or owner
+    grantedAt: timestamp("granted_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_franchisee_crm_company").on(table.companyId),
+    userIdx: index("idx_franchisee_crm_user").on(table.userId),
+  })
+);
+
+export const insertFranchiseeCrmAccessSchema = createInsertSchema(franchiseeCrmAccess).omit({
+  id: true,
+  grantedAt: true,
+});
+
+export type InsertFranchiseeCrmAccess = z.infer<typeof insertFranchiseeCrmAccessSchema>;
+export type FranchiseeCrmAccess = typeof franchiseeCrmAccess.$inferSelect;
+
+// ========================
+// ORBIT Internal CRM (Private Admin Access)
+// ========================
+export const orbidAdminCrm = pgTable(
+  "orbid_admin_crm",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    staffMemberId: varchar("staff_member_id").notNull().references(() => orbidStaffMembers.id),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    businessCardImage: text("business_card_image"), // Base64 or URL
+    assetNumber: varchar("asset_number", { length: 50 }),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    staffMemberIdx: index("idx_orbid_admin_crm_staff").on(table.staffMemberId),
+    emailIdx: index("idx_orbid_admin_crm_email").on(table.email),
+  })
+);
+
+export const insertOrbidAdminCrmSchema = createInsertSchema(orbidAdminCrm).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertOrbidAdminCrm = z.infer<typeof insertOrbidAdminCrmSchema>;
+export type OrbidAdminCrm = typeof orbidAdminCrm.$inferSelect;
+
+// ========================
+// Franchisee Team CRM (Per Company)
+// ========================
+export const franchiseTeamCrm = pgTable(
+  "franchisee_team_crm",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    userId: varchar("user_id").notNull().references(() => users.id),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    businessCardImage: text("business_card_image"), // Base64 or URL
+    role: varchar("role", { length: 50 }).notNull(), // "owner", "admin", "sales", "dev"
+    isActive: boolean("is_active").default(true),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_franchisee_team_crm_company").on(table.companyId),
+    userIdx: index("idx_franchisee_team_crm_user").on(table.userId),
+    companyUserIdx: index("idx_franchisee_team_crm_company_user").on(table.companyId, table.userId),
+  })
+);
+
+export const insertFranchiseeTeamCrmSchema = createInsertSchema(franchiseTeamCrm).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFranchiseeTeamCrm = z.infer<typeof insertFranchiseeTeamCrmSchema>;
+export type FranchiseeTeamCrm = typeof franchiseTeamCrm.$inferSelect;
+
+// ========================
+// Scanned Contacts/Business Cards (OCR)
+// ========================
+export const scannedContacts = pgTable(
+  "scanned_contacts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    // For ORBIT CRM
+    staffMemberId: varchar("staff_member_id").references(() => orbidStaffMembers.id),
+    // For Franchisee CRM
+    franchiseTeamMemberId: varchar("franchise_team_member_id").references(() => franchiseTeamCrm.id),
+    companyId: varchar("company_id").references(() => companies.id),
+    
+    // Scanned data
+    scannedImageUrl: text("scanned_image_url"), // Original business card image
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    title: varchar("title", { length: 255 }),
+    email: varchar("email", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    company: varchar("company", { length: 255 }),
+    address: text("address"),
+    website: varchar("website", { length: 255 }),
+    linkedIn: varchar("linkedin", { length: 255 }),
+    
+    // OCR metadata
+    ocrConfidence: decimal("ocr_confidence", { precision: 3, scale: 2 }), // 0.00 to 1.00
+    rawOcrText: text("raw_ocr_text"), // Full OCR output for debugging
+    manuallyEdited: boolean("manually_edited").default(false),
+    editedAt: timestamp("edited_at"),
+    
+    // Linking
+    linkedToCrmId: varchar("linked_to_crm_id"), // Link to CRM record if matched
+    
+    scannedBy: varchar("scanned_by", { length: 255 }), // User who scanned
+    scannedAt: timestamp("scanned_at").default(sql`NOW()`),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    staffIdx: index("idx_scanned_staff").on(table.staffMemberId),
+    franchiseeIdx: index("idx_scanned_franchisee").on(table.franchiseTeamMemberId),
+    companyIdx: index("idx_scanned_company").on(table.companyId),
+    emailIdx: index("idx_scanned_email").on(table.email),
+    nameIdx: index("idx_scanned_name").on(table.fullName),
+  })
+);
+
+export const insertScannedContactSchema = createInsertSchema(scannedContacts).omit({
+  id: true,
+  scannedAt: true,
+  createdAt: true,
+});
+
+export type InsertScannedContact = z.infer<typeof insertScannedContactSchema>;
+export type ScannedContact = typeof scannedContacts.$inferSelect;
