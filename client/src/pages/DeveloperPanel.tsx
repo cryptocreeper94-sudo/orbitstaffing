@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3 } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -194,6 +194,62 @@ export default function DeveloperPanel() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
+            {/* Quick Links Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Replit IDE Link */}
+              <a 
+                href="https://replit.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-gradient-to-br from-purple-600 to-purple-800 border border-purple-500 rounded-lg p-6 hover:border-purple-400 transition-all flex items-start gap-4"
+                data-testid="link-replit-ide"
+              >
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <Code className="w-5 h-5" />
+                    Replit IDE
+                  </h3>
+                  <p className="text-purple-100 text-sm">Open the development environment</p>
+                </div>
+                <ExternalLink className="w-5 h-5 text-purple-200 flex-shrink-0 mt-1" />
+              </a>
+
+              {/* AI Agent Link */}
+              <a 
+                href="javascript:void(0)" 
+                onClick={() => {
+                  alert('AI Agent: Right-click on any page → "Ask AI" to open the chat interface. Or press the purple "Ask AI" button on the screen.');
+                }}
+                className="bg-gradient-to-br from-cyan-600 to-cyan-800 border border-cyan-500 rounded-lg p-6 hover:border-cyan-400 transition-all flex items-start gap-4 cursor-pointer"
+                data-testid="link-ai-agent"
+              >
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5" />
+                    AI Assistant
+                  </h3>
+                  <p className="text-cyan-100 text-sm">Chat for field support & debugging</p>
+                </div>
+                <ExternalLink className="w-5 h-5 text-cyan-200 flex-shrink-0 mt-1" />
+              </a>
+
+              {/* App Link */}
+              <a 
+                href="/" 
+                className="bg-gradient-to-br from-green-600 to-green-800 border border-green-500 rounded-lg p-6 hover:border-green-400 transition-all flex items-start gap-4"
+                data-testid="link-main-app"
+              >
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <Eye className="w-5 h-5" />
+                    Main App
+                  </h3>
+                  <p className="text-green-100 text-sm">View the staffing platform</p>
+                </div>
+                <ExternalLink className="w-5 h-5 text-green-200 flex-shrink-0 mt-1" />
+              </a>
+            </div>
+
             {/* Developer Access Info */}
             <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
