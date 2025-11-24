@@ -206,20 +206,38 @@ export default function ProfessionalStaffing() {
       {/* Timeline */}
       <div className="max-w-6xl mx-auto mt-12">
         <Card className="bg-slate-800 border-purple-600/50 p-8">
-          <h2 className="text-2xl font-bold mb-6 text-purple-300">V2 Timeline (Q3 2026)</h2>
+          <h2 className="text-2xl font-bold mb-6 text-purple-300">Feature Roadmap</h2>
           
           <div className="grid md:grid-cols-4 gap-4">
             {[
-              { month: 'Q2 2026', tasks: 'SMS Notifications, Instant Pay' },
+              { month: 'NOW 🚀', tasks: 'SMS Notifications (2-4 weeks), Pay Card Ready' },
+              { month: 'Q1 2026', tasks: 'Live for 50+ Person Companies' },
               { month: 'Q3 2026', tasks: 'Professional Division Alpha' },
-              { month: 'Q3 2026', tasks: 'Background Check Integration' },
               { month: 'Q4 2026', tasks: 'Contract Engine & AI Matching' },
             ].map(({ month, tasks }) => (
-              <div key={month} className="bg-gradient-to-br from-purple-900/30 to-slate-900/30 border border-purple-600/30 rounded-lg p-4">
-                <p className="font-semibold text-purple-300 mb-2">{month}</p>
+              <div key={month} className={`${month === 'NOW 🚀' ? 'bg-gradient-to-br from-green-900/40 to-slate-900/30 border-green-600/50' : 'bg-gradient-to-br from-purple-900/30 to-slate-900/30 border-purple-600/30'} border rounded-lg p-4`}>
+                <p className={`font-semibold mb-2 ${month === 'NOW 🚀' ? 'text-green-300' : 'text-purple-300'}`}>{month}</p>
                 <p className="text-sm text-gray-300">{tasks}</p>
               </div>
             ))}
+          </div>
+
+          {/* SMS & Pay Card Details */}
+          <div className="mt-8 pt-8 border-t border-slate-700">
+            <h3 className="text-lg font-semibold text-green-300 mb-4">Coming Very Soon</h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-green-900/10 border border-green-600/30 rounded-lg p-6">
+                <p className="font-semibold text-green-300 mb-2">📱 SMS Notifications</p>
+                <p className="text-sm text-gray-300 mb-3">Real-time SMS alerts for shift offers, confirmations, reminders, and bonus updates. Waiting for Twilio approval - should be live in 2-4 weeks.</p>
+                <p className="text-xs text-green-400">Status: Pending Twilio Integration</p>
+              </div>
+              <div className="bg-blue-900/10 border border-blue-600/30 rounded-lg p-6">
+                <p className="font-semibold text-blue-300 mb-2">💳 Instant Pay Card</p>
+                <p className="text-sm text-gray-300 mb-3">Fast worker payments via Stripe Connect. Workers can access earnings on-demand with minimal fees ($2.50 per transaction or 2.5%).</p>
+                <p className="text-xs text-blue-400">Status: Ready to integrate, depends on Stripe setup</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-4">Both features will be rolled out once ORBIT meets 100% compliance and security standards for small businesses (50 or fewer employees).</p>
           </div>
         </Card>
       </div>
