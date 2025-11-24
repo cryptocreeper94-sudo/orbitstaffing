@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Edit2, Download, Share2, Copy } from 'lucide-react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface AdminBusinessCardDisplayProps {
   assetNumber: number;
@@ -95,7 +95,7 @@ export function AdminBusinessCardDisplay({
                   
                   {/* QR Code */}
                   <div className="bg-white p-2 rounded">
-                    <QRCode
+                    <QRCodeSVG
                       id={`qr-${assetNumber}`}
                       value={JSON.stringify(qrData)}
                       size={64}

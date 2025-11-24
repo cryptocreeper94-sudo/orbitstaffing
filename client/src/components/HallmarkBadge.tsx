@@ -1,5 +1,5 @@
 import React from 'react';
-import { default as QRCode } from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface HallmarkBadgeProps {
   serialNumber?: string;
@@ -48,7 +48,7 @@ export function HallmarkBadge({
         
         {/* QR Code - centered */}
         <div className="relative z-10 flex flex-col items-center gap-1">
-          <QRCode
+          <QRCodeSVG
             value={verificationUrl}
             size={qr}
             level="H"

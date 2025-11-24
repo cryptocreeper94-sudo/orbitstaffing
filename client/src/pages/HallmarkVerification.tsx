@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Copy, CheckCircle2, ArrowLeft, Download, Share2 } from 'lucide-react';
 import { Link } from 'wouter';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 import saturnLogo from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
 export default function HallmarkVerification() {
@@ -108,7 +108,7 @@ export default function HallmarkVerification() {
               <div className="flex flex-col items-center">
                 {/* QR Code */}
                 <div className="bg-white p-6 rounded-2xl border-2 border-cyan-400/30 mb-8">
-                  <QRCode
+                  <QRCodeSVG
                     value={verificationUrl}
                     size={256}
                     level="H"
