@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -8,6 +8,7 @@ import { AdminManagement } from './AdminManagement';
 import { HealthDashboard } from '@/components/HealthDashboard';
 import { ContingencyManual } from '@/components/ContingencyManual';
 import { OnboardingTracker } from '@/components/OnboardingTracker';
+import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -327,7 +328,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -478,6 +479,18 @@ function MasterAdminDashboard() {
           <Users className="w-4 h-4 inline mr-2" />
           Onboarding
         </button>
+        <button
+          onClick={() => setActiveSection('messaging')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'messaging'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-messaging"
+        >
+          <MessageCircle className="w-4 h-4 inline mr-2" />
+          Secure Messaging
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -489,6 +502,16 @@ function MasterAdminDashboard() {
       {activeSection === 'contingency' && <ContingencyManual />}
 
       {activeSection === 'onboarding' && <OnboardingTracker />}
+
+      {activeSection === 'messaging' && (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+          <EnhancedAdminMessaging
+            currentUserId="admin-test-001"
+            currentUserName={adminName}
+            currentUserRole="admin"
+          />
+        </div>
+      )}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">

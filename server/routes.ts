@@ -2489,7 +2489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   // ADMIN/DEV/OWNER MESSAGING ROUTES (Multi-Recipient)
   // ========================
-  app.post("/api/messages", async (req: Request, res: Response) => {
+  app.post("/api/admin-messages", async (req: Request, res: Response) => {
     try {
       const { fromUserId, recipientUserIds, subject, message, isOfficial } = req.body;
       
@@ -2515,7 +2515,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/messages/:userId", async (req: Request, res: Response) => {
+  app.get("/api/admin-messages/:userId", async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
       const messages = await storage.getMessagesForUser(userId);
@@ -2526,7 +2526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/messages/:messageId/read", async (req: Request, res: Response) => {
+  app.post("/api/admin-messages/:messageId/read", async (req: Request, res: Response) => {
     try {
       const { messageId } = req.params;
       const { userId } = req.body;
@@ -2543,7 +2543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/messages/:messageId/delete", async (req: Request, res: Response) => {
+  app.post("/api/admin-messages/:messageId/delete", async (req: Request, res: Response) => {
     try {
       const { messageId } = req.params;
       const { deletingUserId } = req.body;
@@ -2566,7 +2566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Cleanup job for expired unofficial messages (run periodically)
-  app.post("/api/messages/cleanup/expired", async (req: Request, res: Response) => {
+  app.post("/api/admin-messages/cleanup/expired", async (req: Request, res: Response) => {
     try {
       const deleted = await storage.deleteUnofficialMessages();
       res.json({ success: true, deletedCount: deleted });

@@ -55,7 +55,7 @@ export default function EnhancedAdminMessaging({
 
   const loadMessages = async () => {
     try {
-      const res = await fetch(`/api/messages/${currentUserId}`);
+      const res = await fetch(`/api/admin-messages/${currentUserId}`);
       if (res.ok) {
         const data = await res.json();
         setMessages(data.messages || []);
@@ -90,7 +90,7 @@ export default function EnhancedAdminMessaging({
     }
 
     try {
-      const res = await fetch('/api/messages', {
+      const res = await fetch('/api/admin-messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,7 +117,7 @@ export default function EnhancedAdminMessaging({
 
   const handleMarkAsRead = async (messageId: string) => {
     try {
-      await fetch(`/api/messages/${messageId}/read`, {
+      await fetch(`/api/admin-messages/${messageId}/read`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUserId }),
@@ -132,7 +132,7 @@ export default function EnhancedAdminMessaging({
     if (!isOfficial || !window.confirm('Delete this message permanently?')) return;
 
     try {
-      const res = await fetch(`/api/messages/${messageId}/delete`, {
+      const res = await fetch(`/api/admin-messages/${messageId}/delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ deletingUserId: currentUserId }),

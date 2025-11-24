@@ -9,13 +9,14 @@ import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
 import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
+import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
 
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([
@@ -312,6 +313,18 @@ export default function DeveloperPanel() {
             data-testid="button-tab-dev-examples"
           >
             Examples & Assets
+          </button>
+          <button
+            onClick={() => setActiveTab('messaging')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all ${
+              activeTab === 'messaging'
+                ? 'border-purple-500 text-purple-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-messaging"
+          >
+            <MessageCircle className="w-4 h-4 inline mr-2" />
+            Secure Messaging
           </button>
         </div>
 
@@ -675,6 +688,17 @@ export default function DeveloperPanel() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* MESSAGING TAB */}
+        {activeTab === 'messaging' && (
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+            <EnhancedAdminMessaging
+              currentUserId="dev-master-001"
+              currentUserName="Dev Master"
+              currentUserRole="dev"
+            />
           </div>
         )}
       </div>
