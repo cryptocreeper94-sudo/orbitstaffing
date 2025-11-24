@@ -3271,10 +3271,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/sms/send", async (req: Request, res: Response) => {
     try {
       const { workerId, phoneNumber, message, messageType, referenceId } = req.body;
-      const sms = await storage.createSmsMessage?.({ workerId, phoneNumber, message, messageType, referenceId, status: "pending" });
-      res.json(sms);
+      
+      // Import here to avoid circular dependency
+      const { sendSMS } = await import("./twilioService");
+      
+      // Send SMS via Twilio (or queue if not configured)
+      const twilioResult = await sendSMS(phoneNumber, message, messageType);
+      
+      // Always save to database for audit trail
+      const sms = await storage.createSmsMessage?.({ 
+        workerId, 
+        phoneNumber, 
+        message, 
+        messageType, 
+        referenceId, 
+        status: twilioResult.success ? "sent" : "failed"
+      });
+      
+      res.json({ 
+        sms, 
+        twilio: twilioResult 
+      });
     } catch (error) {
-      res.status(500).json({ error: "Failed to queue SMS" });
+      res.status(500).json({ error: "Failed to send SMS" });
     }
   });
 
