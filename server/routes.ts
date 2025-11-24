@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { sql, count } from "drizzle-orm";
+import { sql, count, eq, desc } from "drizzle-orm";
 import { storage } from "./storage";
 import { db } from "./db";
 import { emailService } from "./email";
@@ -37,6 +37,8 @@ import {
   companies,
   users,
   payments,
+  hallmarks,
+  hallmarkAudit,
 } from "@shared/schema";
 
 // Middleware to parse JSON
@@ -3579,7 +3581,160 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // HALLMARK SYSTEM (Asset Tracking & Cataloging)
+  // ========================
+  app.post("/api/hallmarks/create", async (req: Request, res: Response) => {
+    try {
+      const { hallmarkNumber, assetType, recipientName, recipientRole, createdBy, contentHash, metadata, referenceId } = req.body;
+      
+      if (!hallmarkNumber || !assetType || !recipientName) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const searchTerms = [
+        hallmarkNumber,
+        assetType,
+        recipientName.toLowerCase(),
+        recipientRole,
+        createdBy?.toLowerCase(),
+        ...Object.values(metadata || {})
+          .filter(v => typeof v === 'string')
+          .map((v: any) => v.toLowerCase())
+      ].join(' ');
+
+      const hallmark = await db.insert(hallmarks).values({
+        hallmarkNumber,
+        assetType,
+        referenceId,
+        createdBy: createdBy || 'system',
+        recipientName,
+        recipientRole,
+        contentHash,
+        metadata,
+        searchTerms,
+      }).returning();
+
+      await db.insert(hallmarkAudit).values({
+        hallmarkId: hallmark[0].id,
+        action: 'created',
+        performedBy: createdBy || 'system',
+        notes: `${assetType} for ${recipientName}`,
+      });
+
+      res.json({ success: true, hallmark: hallmark[0] });
+    } catch (error: any) {
+      console.error("Hallmark creation error:", error);
+      res.status(500).json({ error: "Failed to create hallmark" });
+    }
+  });
+
+  app.get("/api/hallmarks/search", async (req: Request, res: Response) => {
+    try {
+      const q = req.query.q as string;
+      if (!q || q.length < 2) {
+        return res.status(400).json({ error: "Search query too short" });
+      }
+
+      const results = await db.select()
+        .from(hallmarks)
+        .where(sql`search_terms ILIKE ${`%${q}%`}`)
+        .limit(50);
+
+      res.json(results);
+    } catch (error) {
+      res.status(500).json({ error: "Search failed" });
+    }
+  });
+
+  app.get("/api/hallmarks/:hallmarkNumber", async (req: Request, res: Response) => {
+    try {
+      const { hallmarkNumber } = req.params;
+      const hallmark = await db.select()
+        .from(hallmarks)
+        .where(eq(hallmarks.hallmarkNumber, hallmarkNumber))
+        .limit(1);
+
+      if (!hallmark.length) {
+        return res.status(404).json({ error: "Hallmark not found" });
+      }
+
+      const audit = await db.select()
+        .from(hallmarkAudit)
+        .where(eq(hallmarkAudit.hallmarkId, hallmark[0].id))
+        .orderBy(desc(hallmarkAudit.createdAt));
+
+      res.json({ hallmark: hallmark[0], audit });
+    } catch (error) {
+      res.status(500).json({ error: "Lookup failed" });
+    }
+  });
+
+  app.get("/api/hallmarks/stats", async (req: Request, res: Response) => {
+    try {
+      const total = await db.select({ count: count() }).from(hallmarks);
+      const byType = await db.select({
+        assetType: hallmarks.assetType,
+        count: count()
+      }).from(hallmarks).groupBy(hallmarks.assetType);
+
+      res.json({
+        total: total[0]?.count || 0,
+        byType: byType.reduce((acc: any, row: any) => {
+          acc[row.assetType] = row.count;
+          return acc;
+        }, {})
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  app.get("/api/hallmarks/export", async (req: Request, res: Response) => {
+    try {
+      const records = await db.select().from(hallmarks).orderBy(desc(hallmarks.createdAt)).limit(10000);
+      
+      const csv = [
+        ["Hallmark Number", "Asset Type", "Recipient", "Role", "Created", "Status"].join(","),
+        ...records.map(r => [
+          r.hallmarkNumber,
+          r.assetType,
+          r.recipientName,
+          r.recipientRole,
+          new Date(r.createdAt).toISOString(),
+          r.verifiedAt ? "Verified" : "Active"
+        ].join(","))
+      ].join("\n");
+
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="hallmarks-${Date.now()}.csv"`);
+      res.send(csv);
+    } catch (error) {
+      res.status(500).json({ error: "Export failed" });
+    }
+  });
+
+  // ========================
+  // ASSET PROFILES (Business Cards, Asset #1 & #2)
+  // ========================
+  app.get("/api/assets/:assetNumber", async (req: Request, res: Response) => {
+    try {
+      const { assetNumber } = req.params;
+      const assets: any = {
+        1: { assetNumber: 1, name: 'Jason Summers', title: 'CEO & Owner', email: 'jason@orbitstaffing.net', phone: '(555) ORBIT-1', role: 'ceo' },
+        2: { assetNumber: 2, name: 'Sidonie Summers', title: 'Chief Operating Officer', email: 'sidonie@orbitstaffing.net', phone: '(555) ORBIT-2', role: 'coo' },
+      };
+
+      if (!assets[assetNumber]) {
+        return res.status(404).json({ error: "Asset not found" });
+      }
+
+      res.json(assets[assetNumber]);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch asset" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
-

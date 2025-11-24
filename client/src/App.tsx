@@ -25,6 +25,8 @@ import ProfessionalStaffing from "@/pages/ProfessionalStaffing";
 import { SMSConsentPage } from "@/pages/SMSConsentPage";
 import { AdminSMSDashboard } from "@/pages/AdminSMSDashboard";
 import { DevSMSPanel } from "@/pages/DevSMSPanel";
+import SendWelcomeLetters from "@/pages/SendWelcomeLetters";
+import HallmarkRegistry from "@/pages/HallmarkRegistry";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,8 @@ function Router() {
       <Route path="/sms-consent" component={SMSConsentPage} />
       <Route path="/admin-sms" component={AdminSMSDashboard} />
       <Route path="/dev-sms" component={DevSMSPanel} />
+      <Route path="/send-welcome-letters" component={SendWelcomeLetters} />
+      <Route path="/hallmark-registry" component={HallmarkRegistry} />
       <Route component={NotFound} />
     </Switch>
   );
