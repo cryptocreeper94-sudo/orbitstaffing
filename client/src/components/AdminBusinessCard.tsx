@@ -328,12 +328,12 @@ END:VCARD`;
 
   return (
     <div className="w-full space-y-6">
-      {/* Business Card Preview */}
+      {/* Business Card Preview - Responsive */}
       <div className="flex justify-center">
         <div
           ref={cardRef}
           id="business-card-print"
-          className="w-[350px] h-[200px] rounded-lg shadow-2xl overflow-hidden flex relative cursor-pointer group"
+          className="w-full max-w-[350px] sm:w-[350px] h-auto sm:h-[200px] aspect-video sm:aspect-auto rounded-lg shadow-2xl overflow-hidden flex relative cursor-pointer group"
           style={{ backgroundColor: formData.brandColor + '15', border: `2px solid ${formData.brandColor}` }}
           onClick={() => photoPreview && setImageModalOpen(true)}
           data-testid="card-business-preview"
@@ -346,8 +346,8 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Left side - Photo (Square, constrained height) */}
-          <div className="w-[120px] h-[160px] bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
+          {/* Left side - Photo (Square, constrained height, with QR space) */}
+          <div className="w-[80px] sm:w-[120px] h-[140px] sm:h-[160px] bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
             {photoPreview ? (
               <>
                 <img src={photoPreview} alt={formData.fullName} className="w-full h-full object-cover" />
@@ -363,24 +363,24 @@ END:VCARD`;
           </div>
 
           {/* Middle - Info */}
-          <div className="flex-1 p-3 flex flex-col justify-between text-white bg-gradient-to-br from-slate-900 to-slate-950 relative z-10">
+          <div className="flex-1 p-2 sm:p-3 flex flex-col justify-between text-white bg-gradient-to-br from-slate-900 to-slate-950 relative z-10">
             <div>
-              <h3 className="font-bold text-sm leading-tight" style={{ color: formData.brandColor }}>
+              <h3 className="font-bold text-xs sm:text-sm leading-tight" style={{ color: formData.brandColor }}>
                 {formData.fullName}
               </h3>
-              {formData.title && <p className="text-[10px] opacity-90 leading-tight">{formData.title}</p>}
-              <p className="text-[10px] opacity-75 mt-0.5">{formData.companyName}</p>
+              {formData.title && <p className="text-[8px] sm:text-[10px] opacity-90 leading-tight">{formData.title}</p>}
+              <p className="text-[8px] sm:text-[10px] opacity-75 mt-0.5">{formData.companyName}</p>
             </div>
 
-            <div className="space-y-0.5 text-[9px]">
-              <p>{formData.email}</p>
-              {formData.phone && <p>{formData.phone}</p>}
-              {formData.location && <p>{formData.location}</p>}
+            <div className="space-y-0 text-[7px] sm:text-[9px]">
+              <p className="truncate">{formData.email}</p>
+              {formData.phone && <p className="truncate">{formData.phone}</p>}
+              {formData.location && <p className="truncate">{formData.location}</p>}
             </div>
           </div>
 
-          {/* Bottom Left - Tiny QR Code */}
-          <div className="absolute bottom-1.5 left-1.5 bg-white p-0.5 rounded z-20">
+          {/* Bottom Left - Tiny QR Code, clear of photo */}
+          <div className="absolute bottom-1.5 left-[88px] sm:left-[128px] bg-white p-0.5 rounded z-20">
             <QRCode value={vCardData} size={32} level="M" />
           </div>
         </div>
