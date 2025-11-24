@@ -111,30 +111,3 @@
   }
 }
 
-/* Fix floating buttons positioning - bottom right corner */
-div[class*="button"],
-div[class*="floating"],
-.extracted-stack-files,
-.extracted-stack,
-[class*="extracted"] {
-  position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
-  left: auto !important;
-  top: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 8px !important;
-  z-index: 9999 !important;
-  opacity: 0.5 !important;
-  transition: opacity 0.2s ease !important;
-}
-
-/* Full opacity on hover */
-div[class*="button"]:hover,
-div[class*="floating"]:hover,
-.extracted-stack-files:hover,
-.extracted-stack:hover,
-[class*="extracted"]:hover {
-  opacity: 1 !important;
-}
