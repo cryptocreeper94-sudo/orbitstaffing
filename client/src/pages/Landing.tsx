@@ -80,7 +80,7 @@ export default function Landing() {
             <img 
               src={saturnLogo} 
               alt="ORBIT" 
-              className="w-10 h-10 object-contain hidden md:block"
+              className="w-10 h-10 object-contain"
             />
             <div className="font-heading font-bold text-lg tracking-wider">
               ORBIT
@@ -104,7 +104,7 @@ export default function Landing() {
       <section className="bg-slate-900/50 border-b border-cyan-500/20 py-8">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-cyan-300 mb-2">🎮 Try ORBIT Sandbox</h2>
+            <h2 className="text-2xl font-bold text-cyan-300 mb-2">Try ORBIT Sandbox</h2>
             <p className="text-sm text-muted-foreground">Play with live features risk-free before committing</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
