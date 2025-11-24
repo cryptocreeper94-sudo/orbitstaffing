@@ -41,6 +41,11 @@ import {
   hallmarkTransactionLog,
   incidentReports,
   employeeEquipmentLoaned,
+  workerBonuses,
+  workerRatings,
+  workerAvailability,
+  assignmentAcceptances,
+  referralBonuses,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -121,6 +126,16 @@ import {
   type IncidentReport,
   type InsertEmployeeEquipmentLoaned,
   type EmployeeEquipmentLoaned,
+  type InsertWorkerBonus,
+  type WorkerBonus,
+  type InsertWorkerRating,
+  type WorkerRating,
+  type InsertWorkerAvailability,
+  type WorkerAvailability,
+  type InsertAssignmentAcceptance,
+  type AssignmentAcceptance,
+  type InsertReferralBonus,
+  type ReferralBonus,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -293,6 +308,31 @@ export interface IStorage {
   createPaycheck?(data: any): Promise<any>;
   getPaycheck?(id: string): Promise<any>;
   getTimesheetsByStatus?(status: string): Promise<Timesheet[]>;
+
+  // Bonuses
+  createWorkerBonus?(bonus: InsertWorkerBonus): Promise<WorkerBonus>;
+  getWorkerBonus?(id: string): Promise<WorkerBonus | undefined>;
+  getWorkerBonusesForWeek?(workerId: string, weekStart: string): Promise<WorkerBonus[]>;
+
+  // Ratings
+  createWorkerRating?(rating: InsertWorkerRating): Promise<WorkerRating>;
+  getWorkerRatings?(workerId: string): Promise<WorkerRating[]>;
+  getAverageRating?(workerId: string): Promise<number>;
+
+  // Availability
+  createWorkerAvailability?(avail: InsertWorkerAvailability): Promise<WorkerAvailability>;
+  getWorkerAvailability?(workerId: string, date: string): Promise<WorkerAvailability[]>;
+  updateWorkerAvailability?(id: string, avail: Partial<InsertWorkerAvailability>): Promise<WorkerAvailability | undefined>;
+
+  // Assignment Acceptance
+  createAssignmentAcceptance?(acceptance: InsertAssignmentAcceptance): Promise<AssignmentAcceptance>;
+  updateAssignmentAcceptance?(id: string, acceptance: Partial<InsertAssignmentAcceptance>): Promise<AssignmentAcceptance | undefined>;
+  getPendingAssignmentAcceptances?(workerId: string): Promise<AssignmentAcceptance[]>;
+
+  // Referrals
+  createReferralBonus?(referral: InsertReferralBonus): Promise<ReferralBonus>;
+  getReferralBonuses?(workerId: string): Promise<ReferralBonus[]>;
+  getTotalReferralEarnings?(workerId: string): Promise<number>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -1707,6 +1747,96 @@ export class DrizzleStorage implements IStorage {
   async getPaycheck(id: string): Promise<any> {
     const result = await db.select().from(payroll).where(eq(payroll.id, id));
     return result[0];
+  }
+
+  // ========================
+  // BONUSES
+  // ========================
+  async createWorkerBonus(bonus: InsertWorkerBonus): Promise<WorkerBonus> {
+    const result = await db.insert(workerBonuses).values(bonus).returning();
+    return result[0];
+  }
+
+  async getWorkerBonus(id: string): Promise<WorkerBonus | undefined> {
+    const result = await db.select().from(workerBonuses).where(eq(workerBonuses.id, id));
+    return result[0];
+  }
+
+  async getWorkerBonusesForWeek(workerId: string, weekStart: string): Promise<WorkerBonus[]> {
+    return db.select().from(workerBonuses)
+      .where(and(eq(workerBonuses.workerId, workerId), eq(workerBonuses.weekStartDate, weekStart as any)));
+  }
+
+  // ========================
+  // RATINGS
+  // ========================
+  async createWorkerRating(rating: InsertWorkerRating): Promise<WorkerRating> {
+    const result = await db.insert(workerRatings).values(rating).returning();
+    return result[0];
+  }
+
+  async getWorkerRatings(workerId: string): Promise<WorkerRating[]> {
+    return db.select().from(workerRatings).where(eq(workerRatings.workerId, workerId));
+  }
+
+  async getAverageRating(workerId: string): Promise<number> {
+    const ratings = await this.getWorkerRatings(workerId);
+    if (ratings.length === 0) return 0;
+    const sum = ratings.reduce((acc, r) => acc + r.overallRating, 0);
+    return sum / ratings.length;
+  }
+
+  // ========================
+  // AVAILABILITY
+  // ========================
+  async createWorkerAvailability(avail: InsertWorkerAvailability): Promise<WorkerAvailability> {
+    const result = await db.insert(workerAvailability).values(avail).returning();
+    return result[0];
+  }
+
+  async getWorkerAvailability(workerId: string, date: string): Promise<WorkerAvailability[]> {
+    return db.select().from(workerAvailability)
+      .where(and(eq(workerAvailability.workerId, workerId), eq(workerAvailability.date, date as any)));
+  }
+
+  async updateWorkerAvailability(id: string, avail: Partial<InsertWorkerAvailability>): Promise<WorkerAvailability | undefined> {
+    const result = await db.update(workerAvailability).set(avail).where(eq(workerAvailability.id, id)).returning();
+    return result[0];
+  }
+
+  // ========================
+  // ASSIGNMENT ACCEPTANCE
+  // ========================
+  async createAssignmentAcceptance(acceptance: InsertAssignmentAcceptance): Promise<AssignmentAcceptance> {
+    const result = await db.insert(assignmentAcceptances).values(acceptance).returning();
+    return result[0];
+  }
+
+  async updateAssignmentAcceptance(id: string, acceptance: Partial<InsertAssignmentAcceptance>): Promise<AssignmentAcceptance | undefined> {
+    const result = await db.update(assignmentAcceptances).set(acceptance).where(eq(assignmentAcceptances.id, id)).returning();
+    return result[0];
+  }
+
+  async getPendingAssignmentAcceptances(workerId: string): Promise<AssignmentAcceptance[]> {
+    return db.select().from(assignmentAcceptances)
+      .where(and(eq(assignmentAcceptances.workerId, workerId), eq(assignmentAcceptances.status, "pending")));
+  }
+
+  // ========================
+  // REFERRALS
+  // ========================
+  async createReferralBonus(referral: InsertReferralBonus): Promise<ReferralBonus> {
+    const result = await db.insert(referralBonuses).values(referral).returning();
+    return result[0];
+  }
+
+  async getReferralBonuses(workerId: string): Promise<ReferralBonus[]> {
+    return db.select().from(referralBonuses).where(eq(referralBonuses.referrerId, workerId));
+  }
+
+  async getTotalReferralEarnings(workerId: string): Promise<number> {
+    const referrals = await this.getReferralBonuses(workerId);
+    return referrals.reduce((sum, r) => sum + (r.status === "paid" ? parseFloat(r.bonusAmount.toString()) : 0), 0);
   }
 }
 

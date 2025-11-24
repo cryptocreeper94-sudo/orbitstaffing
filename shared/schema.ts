@@ -3171,3 +3171,246 @@ export const insertHallmarkTransactionLogSchema = createInsertSchema(hallmarkTra
 
 export type InsertHallmarkTransactionLog = z.infer<typeof insertHallmarkTransactionLogSchema>;
 export type HallmarkTransactionLog = typeof hallmarkTransactionLog.$inferSelect;
+
+// ========================
+// Worker Bonuses
+// ========================
+export const workerBonuses = pgTable(
+  "worker_bonuses",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Bonus Period
+    weekStartDate: date("week_start_date").notNull(),
+    weekEndDate: date("week_end_date").notNull(),
+    
+    // Bonus Calculation
+    baseBonus: decimal("base_bonus", { precision: 10, scale: 2 }).default("0"), // Weekly performance
+    attendanceBonus: decimal("attendance_bonus", { precision: 10, scale: 2 }).default("0"), // Perfect attendance
+    hoursBonus: decimal("hours_bonus", { precision: 10, scale: 2 }).default("0"), // Milestone hours
+    referralBonus: decimal("referral_bonus", { precision: 10, scale: 2 }).default("0"), // New hire referrals
+    totalBonus: decimal("total_bonus", { precision: 10, scale: 2 }).default("0"),
+    
+    // Performance Metrics
+    attendanceStreak: integer("attendance_streak").default(0), // Days in a row
+    totalHoursWorked: decimal("total_hours_worked", { precision: 8, scale: 2 }).default("0"),
+    perfectDays: integer("perfect_days").default(0), // Days without tardiness
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, approved, paid
+    approvedBy: varchar("approved_by").references(() => users.id),
+    approvedAt: timestamp("approved_at"),
+    paidAt: timestamp("paid_at"),
+    
+    hallmarkId: varchar("hallmark_id"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_bonus_worker_id").on(table.workerId),
+    periodIdx: index("idx_bonus_period").on(table.weekStartDate),
+    statusIdx: index("idx_bonus_status").on(table.status),
+  })
+);
+
+export const insertWorkerBonusSchema = createInsertSchema(workerBonuses).omit({
+  id: true,
+  approvedAt: true,
+  paidAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerBonus = z.infer<typeof insertWorkerBonusSchema>;
+export type WorkerBonus = typeof workerBonuses.$inferSelect;
+
+// ========================
+// Worker Ratings
+// ========================
+export const workerRatings = pgTable(
+  "worker_ratings",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    clientId: varchar("client_id").notNull().references(() => clients.id),
+    assignmentId: varchar("assignment_id").references(() => assignments.id),
+    
+    // Rating Details
+    overallRating: integer("overall_rating").notNull(), // 1-5 stars
+    professionalism: integer("professionalism"), // 1-5
+    punctuality: integer("punctuality"), // 1-5
+    workQuality: integer("work_quality"), // 1-5
+    communication: integer("communication"), // 1-5
+    
+    // Feedback
+    reviewText: text("review_text"),
+    wouldRehire: boolean("would_rehire").default(true),
+    recommendToOthers: boolean("recommend_to_others").default(true),
+    
+    // Admin Review
+    ratedBy: varchar("rated_by").references(() => users.id), // Usually client contact
+    ratedAt: timestamp("rated_at").default(sql`NOW()`),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_rating_worker_id").on(table.workerId),
+    clientIdx: index("idx_rating_client_id").on(table.clientId),
+    overallIdx: index("idx_rating_overall").on(table.overallRating),
+  })
+);
+
+export const insertWorkerRatingSchema = createInsertSchema(workerRatings).omit({
+  id: true,
+  ratedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerRating = z.infer<typeof insertWorkerRatingSchema>;
+export type WorkerRating = typeof workerRatings.$inferSelect;
+
+// ========================
+// Worker Availability
+// ========================
+export const workerAvailability = pgTable(
+  "worker_availability",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Availability Date Range
+    date: date("date").notNull(), // Specific date
+    dayOfWeek: varchar("day_of_week", { length: 10 }), // Monday, Tuesday, etc.
+    
+    // Time Slots
+    timeSlot: varchar("time_slot", { length: 50 }).notNull(), // "morning", "afternoon", "evening", "night", "flexible"
+    startTime: varchar("start_time", { length: 10 }), // HH:mm
+    endTime: varchar("end_time", { length: 10 }), // HH:mm
+    
+    // Status
+    isAvailable: boolean("is_available").default(true),
+    
+    // Skills Available This Slot
+    skillsAvailable: text("skills_available").array(), // e.g., ['plumbing', 'hvac']
+    
+    // Notes
+    notes: text("notes"),
+    
+    // Recurring Availability
+    isRecurring: boolean("is_recurring").default(false),
+    recurrencePattern: varchar("recurrence_pattern", { length: 50 }), // "weekly", "biweekly", "monthly"
+    recurrenceEndDate: date("recurrence_end_date"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_avail_worker_id").on(table.workerId),
+    dateIdx: index("idx_avail_date").on(table.date),
+    availableIdx: index("idx_avail_available").on(table.isAvailable),
+  })
+);
+
+export const insertWorkerAvailabilitySchema = createInsertSchema(workerAvailability).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerAvailability = z.infer<typeof insertWorkerAvailabilitySchema>;
+export type WorkerAvailability = typeof workerAvailability.$inferSelect;
+
+// ========================
+// Assignment Acceptance
+// ========================
+export const assignmentAcceptances = pgTable(
+  "assignment_acceptances",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    assignmentId: varchar("assignment_id").notNull().references(() => assignments.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Acceptance Status
+    status: varchar("status", { length: 50 }).notNull(), // "pending", "accepted", "rejected", "expired"
+    acceptedAt: timestamp("accepted_at"),
+    rejectedAt: timestamp("rejected_at"),
+    rejectionReason: varchar("rejection_reason", { length: 255 }),
+    
+    // Expiration
+    expiresAt: timestamp("expires_at"), // Offer expires after X minutes
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    assignmentIdx: index("idx_accept_assignment_id").on(table.assignmentId),
+    workerIdx: index("idx_accept_worker_id").on(table.workerId),
+    statusIdx: index("idx_accept_status").on(table.status),
+  })
+);
+
+export const insertAssignmentAcceptanceSchema = createInsertSchema(assignmentAcceptances).omit({
+  id: true,
+  acceptedAt: true,
+  rejectedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAssignmentAcceptance = z.infer<typeof insertAssignmentAcceptanceSchema>;
+export type AssignmentAcceptance = typeof assignmentAcceptances.$inferSelect;
+
+// ========================
+// Referral Bonuses
+// ========================
+export const referralBonuses = pgTable(
+  "referral_bonuses",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    referrerId: varchar("referrer_id").notNull().references(() => workers.id), // Worker who referred
+    referredWorkerId: varchar("referred_worker_id").notNull().references(() => workers.id), // New worker
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Referral Status
+    referralDate: timestamp("referral_date").default(sql`NOW()`),
+    referredWorkerApprovedAt: timestamp("referred_worker_approved_at"), // When new worker was hired
+    
+    // Bonus Calculation
+    bonusAmount: decimal("bonus_amount", { precision: 10, scale: 2 }).default("50"), // Flat fee or percentage
+    bonusType: varchar("bonus_type", { length: 50 }).default("fixed"), // "fixed", "percentage"
+    
+    // Milestones
+    startDateMilestoneBonus: decimal("start_date_milestone_bonus", { precision: 10, scale: 2 }).default("0"), // Bonus if new worker stays 30 days
+    sixtyDayMilestoneBonus: decimal("sixty_day_milestone_bonus", { precision: 10, scale: 2 }).default("0"), // Bonus if stays 60 days
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // "pending", "earned", "paid"
+    paidAt: timestamp("paid_at"),
+    
+    hallmarkId: varchar("hallmark_id"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    referrerIdx: index("idx_referral_referrer_id").on(table.referrerId),
+    referredIdx: index("idx_referral_referred_id").on(table.referredWorkerId),
+    statusIdx: index("idx_referral_status").on(table.status),
+  })
+);
+
+export const insertReferralBonusSchema = createInsertSchema(referralBonuses).omit({
+  id: true,
+  referralDate: true,
+  paidAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertReferralBonus = z.infer<typeof insertReferralBonusSchema>;
+export type ReferralBonus = typeof referralBonuses.$inferSelect;

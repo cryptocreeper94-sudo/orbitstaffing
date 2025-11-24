@@ -3082,6 +3082,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // WORKER BONUSES
+  // ========================
+  app.post("/api/bonuses/create", async (req: Request, res: Response) => {
+    try {
+      const bonus = await storage.createWorkerBonus?.(req.body);
+      res.json(bonus);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create bonus" });
+    }
+  });
+
+  app.get("/api/bonuses/worker/:workerId/week/:weekStart", async (req: Request, res: Response) => {
+    try {
+      const { workerId, weekStart } = req.params;
+      const bonuses = await storage.getWorkerBonusesForWeek?.(workerId, weekStart) || [];
+      res.json(bonuses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch bonuses" });
+    }
+  });
+
+  // ========================
+  // WORKER RATINGS
+  // ========================
+  app.post("/api/ratings/create", async (req: Request, res: Response) => {
+    try {
+      const rating = await storage.createWorkerRating?.(req.body);
+      res.json(rating);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create rating" });
+    }
+  });
+
+  app.get("/api/ratings/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const ratings = await storage.getWorkerRatings?.(workerId) || [];
+      const average = await storage.getAverageRating?.(workerId) || 0;
+      res.json({ ratings, average });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch ratings" });
+    }
+  });
+
+  // ========================
+  // WORKER AVAILABILITY
+  // ========================
+  app.post("/api/availability/create", async (req: Request, res: Response) => {
+    try {
+      const avail = await storage.createWorkerAvailability?.(req.body);
+      res.json(avail);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create availability" });
+    }
+  });
+
+  app.get("/api/availability/worker/:workerId/date/:date", async (req: Request, res: Response) => {
+    try {
+      const { workerId, date } = req.params;
+      const availability = await storage.getWorkerAvailability?.(workerId, date) || [];
+      res.json(availability);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch availability" });
+    }
+  });
+
+  app.put("/api/availability/:availabilityId", async (req: Request, res: Response) => {
+    try {
+      const { availabilityId } = req.params;
+      const result = await storage.updateWorkerAvailability?.(availabilityId, req.body);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update availability" });
+    }
+  });
+
+  // ========================
+  // ASSIGNMENT ACCEPTANCE
+  // ========================
+  app.post("/api/assignments/accept/create", async (req: Request, res: Response) => {
+    try {
+      const acceptance = await storage.createAssignmentAcceptance?.(req.body);
+      res.json(acceptance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create acceptance offer" });
+    }
+  });
+
+  app.get("/api/assignments/pending/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const pending = await storage.getPendingAssignmentAcceptances?.(workerId) || [];
+      res.json(pending);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pending assignments" });
+    }
+  });
+
+  app.post("/api/assignments/accept/:acceptanceId", async (req: Request, res: Response) => {
+    try {
+      const { acceptanceId } = req.params;
+      const result = await storage.updateAssignmentAcceptance?.(acceptanceId, {
+        status: "accepted",
+        acceptedAt: new Date(),
+      });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to accept assignment" });
+    }
+  });
+
+  app.post("/api/assignments/reject/:acceptanceId", async (req: Request, res: Response) => {
+    try {
+      const { acceptanceId } = req.params;
+      const { reason } = req.body;
+      const result = await storage.updateAssignmentAcceptance?.(acceptanceId, {
+        status: "rejected",
+        rejectedAt: new Date(),
+        rejectionReason: reason,
+      });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject assignment" });
+    }
+  });
+
+  // ========================
+  // REFERRAL BONUSES
+  // ========================
+  app.post("/api/referrals/create", async (req: Request, res: Response) => {
+    try {
+      const referral = await storage.createReferralBonus?.(req.body);
+      res.json(referral);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create referral" });
+    }
+  });
+
+  app.get("/api/referrals/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const referrals = await storage.getReferralBonuses?.(workerId) || [];
+      const totalEarnings = await storage.getTotalReferralEarnings?.(workerId) || 0;
+      res.json({ referrals, totalEarnings });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch referrals" });
+    }
+  });
+
   app.get("/api/admin/password-reset-history/:userId", async (req: Request, res: Response) => {
     try {
       const { userId } = req.params;
