@@ -2230,6 +2230,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // DEVELOPER CHAT ROUTES
+  // ========================
+  app.post("/api/developer/chat", async (req: Request, res: Response) => {
+    try {
+      const { content, role, sessionId } = req.body;
+
+      if (!content || !role || !sessionId) {
+        return res.status(400).json({ error: "Missing content, role, or sessionId" });
+      }
+
+      // Save user message
+      const userMessage = await storage.createDeveloperChatMessage({
+        role: "user",
+        content,
+        sessionId,
+      });
+
+      // Simulate AI response
+      const aiResponse = `I understand: "${content}". I'm analyzing your request and will provide technical assistance. For complex issues, please provide more details about what you're working on.`;
+      
+      await storage.createDeveloperChatMessage({
+        role: "ai",
+        content: aiResponse,
+        sessionId,
+      });
+
+      res.json({ 
+        success: true,
+        userMessage,
+        aiMessage: aiResponse
+      });
+    } catch (error) {
+      console.error("Developer chat error:", error);
+      res.status(500).json({ error: "Failed to save message" });
+    }
+  });
+
+  app.get("/api/developer/chat/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+      const messages = await storage.getDeveloperChatHistory(sessionId);
+      res.json({ messages });
+    } catch (error) {
+      console.error("Failed to get chat history:", error);
+      res.status(500).json({ error: "Failed to retrieve chat history" });
+    }
+  });
+
+  // ========================
   // PAYMENT ROUTES (STRIPE & COINBASE)
   // ========================
   

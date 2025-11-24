@@ -3,7 +3,7 @@
  * Full technical access to system APIs, configurations, and developer tools
  * Everything non-business-sensitive for developers and tech partners
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
@@ -17,6 +17,14 @@ export default function DeveloperPanel() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples'>('overview');
   const [copied, setCopied] = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([
+    { role: 'ai', text: 'Hey! I\'m your AI assistant. What can I help you with?' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatLoading, setChatLoading] = useState(false);
+  const [sessionId] = useState(() => `dev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +69,43 @@ export default function DeveloperPanel() {
   const navigateTo = (path: string) => {
     setLocation(path);
   };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || chatLoading) return;
+    
+    const userMessage = chatInput;
+    setChatMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    setChatInput('');
+    setChatLoading(true);
+    
+    try {
+      const res = await fetch('/api/developer/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: userMessage,
+          role: 'user',
+          sessionId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setChatMessages(prev => [...prev, { role: 'ai', text: data.aiMessage }]);
+      } else {
+        setChatMessages(prev => [...prev, { role: 'ai', text: 'Sorry, I had trouble processing your message. Try again.' }]);
+      }
+    } catch (err) {
+      console.error('Chat error:', err);
+      setChatMessages(prev => [...prev, { role: 'ai', text: 'Connection error. Please try again.' }]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages]);
 
   if (!isAuthenticated) {
     return (
@@ -115,7 +160,78 @@ export default function DeveloperPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 relative">
+      {/* AI Chat Widget */}
+      {showChat && (
+        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-cyan-500 rounded-xl shadow-2xl flex flex-col z-50 glow-cyan">
+          {/* Chat Header */}
+          <div className="bg-gradient-to-r from-cyan-600 to-cyan-700 p-4 rounded-t-lg flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5" />
+              <h3 className="font-bold">AI Assistant</h3>
+            </div>
+            <button
+              onClick={() => setShowChat(false)}
+              className="text-cyan-100 hover:text-white text-xl"
+              data-testid="button-close-chat"
+            >
+              ✕
+            </button>
+          </div>
+          
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {chatMessages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                  msg.role === 'user'
+                    ? 'bg-cyan-600 text-white rounded-br-none'
+                    : 'bg-slate-700 text-gray-100 rounded-bl-none'
+                }`}>
+                  {msg.text}
+                </div>
+              </div>
+            ))}
+            {chatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-700 text-gray-100 rounded-lg rounded-bl-none px-3 py-2 text-sm">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+          
+          {/* Input Area */}
+          <div className="border-t border-slate-700 p-3 space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Ask me anything..."
+                className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-cyan-400"
+                data-testid="input-chat-message"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={chatLoading}
+                className="bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 px-3 py-2 rounded text-white font-bold text-sm transition-opacity"
+                data-testid="button-send-message"
+              >
+                {chatLoading ? '...' : 'Send'}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 text-center">Chat with AI for field support</p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
@@ -127,6 +243,14 @@ export default function DeveloperPanel() {
             <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={() => setShowChat(!showChat)}
+              className="relative px-4 py-2 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 text-white font-bold rounded-lg flex items-center gap-2 transition-all glow-cyan"
+              data-testid="button-ai-chat"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Ask AI
+            </button>
             <Button
               onClick={() => navigateTo('/admin')}
               className="bg-cyan-600 hover:bg-cyan-700 flex items-center gap-2"

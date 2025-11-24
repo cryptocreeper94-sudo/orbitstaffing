@@ -2449,3 +2449,35 @@ export const insertSupportTicketSchema = createInsertSchema(supportTickets).omit
 
 export type InsertSupportTicket = z.infer<typeof insertSupportTicketSchema>;
 export type SupportTicket = typeof supportTickets.$inferSelect;
+
+// ========================
+// Developer Chat
+// ========================
+export const developerChat = pgTable(
+  "developer_chat",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Message Content
+    role: varchar("role", { length: 20 }).notNull(), // "user" or "ai"
+    content: text("content").notNull(),
+    
+    // Context
+    sessionId: varchar("session_id", { length: 100 }), // Browser session identifier
+    
+    // Tracking
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    sessionIdx: index("idx_dev_chat_session").on(table.sessionId),
+    createdIdx: index("idx_dev_chat_created").on(table.createdAt),
+  })
+);
+
+export const insertDeveloperChatSchema = createInsertSchema(developerChat).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertDeveloperChat = z.infer<typeof insertDeveloperChatSchema>;
+export type DeveloperChat = typeof developerChat.$inferSelect;

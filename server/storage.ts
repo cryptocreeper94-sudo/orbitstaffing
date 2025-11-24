@@ -25,6 +25,7 @@ import {
   orbitAssets,
   demoRegistrations,
   workerOnboardingChecklist,
+  developerChat,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -73,6 +74,8 @@ import {
   type OrbitAsset,
   type InsertWorkerOnboardingChecklist,
   type WorkerOnboardingChecklist,
+  type InsertDeveloperChat,
+  type DeveloperChat,
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
@@ -1150,6 +1153,20 @@ export class DrizzleStorage implements IStorage {
       usedAt: new Date(),
     }).where(eq(demoRegistrations.demoCode, code)).returning();
     return result[0];
+  }
+
+  // Developer Chat
+  async createDeveloperChatMessage(data: InsertDeveloperChat): Promise<DeveloperChat> {
+    const result = await db.insert(developerChat).values(data).returning();
+    return result[0];
+  }
+
+  async getDeveloperChatHistory(sessionId: string, limit: number = 50): Promise<DeveloperChat[]> {
+    const result = await db.select().from(developerChat)
+      .where(eq(developerChat.sessionId, sessionId))
+      .orderBy(desc(developerChat.createdAt))
+      .limit(limit);
+    return result.reverse(); // Return oldest first
   }
 }
 
