@@ -1,4 +1,4 @@
-import saturnLogo from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
+import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
 
 interface LetterheadProps {
   withAddress?: boolean;

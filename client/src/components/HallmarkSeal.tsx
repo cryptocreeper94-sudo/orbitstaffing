@@ -1,4 +1,4 @@
-import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
+import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
 
 interface HallmarkSealProps {
   verificationCode?: string;

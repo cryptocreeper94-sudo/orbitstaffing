@@ -19,7 +19,7 @@ import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
-import saturnLogo from "@assets/generated_images/saturn_with_true_transparency.png";
+import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
@@ -90,13 +90,11 @@ export default function Landing() {
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center gap-3 sm:gap-8">
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 min-h-[44px]">
-            <div className="p-1 rounded">
-              <img 
-                src={saturnLogo} 
-                alt="ORBIT" 
-                className="w-8 sm:w-10 h-8 sm:h-10 flex-shrink-0 object-contain drop-shadow-lg"
-              />
-            </div>
+            <img 
+              src={saturnLogo} 
+              alt="ORBIT" 
+              className="w-8 sm:w-10 h-8 sm:h-10 flex-shrink-0"
+            />
             <div className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap">
               <span className="block sm:hidden">ORBIT</span>
               <span className="hidden sm:block">Why ORBIT Staffing OS</span>

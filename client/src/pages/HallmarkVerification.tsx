@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Copy, CheckCircle2, ArrowLeft, Download, Share2 } from 'lucide-react';
 import { Link } from 'wouter';
 import { QRCodeSVG } from 'qrcode.react';
-import saturnLogo from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
+import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
 
 export default function HallmarkVerification() {
   const [copied, setCopied] = useState(false);
