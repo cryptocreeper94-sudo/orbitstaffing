@@ -40,6 +40,7 @@ import {
   incidentAdminNotifications,
   hallmarkTransactionLog,
   incidentReports,
+  employeeEquipmentLoaned,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -118,6 +119,8 @@ import {
   type InsertHallmarkTransactionLog,
   type HallmarkTransactionLog,
   type IncidentReport,
+  type InsertEmployeeEquipmentLoaned,
+  type EmployeeEquipmentLoaned,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -278,6 +281,18 @@ export interface IStorage {
   approveWorkerOnboarding(workerId: string, adminId: string): Promise<Worker | undefined>;
   checkOnboardingCompletion(workerId: string): Promise<boolean>;
   listWorkersNeedingOnboarding(companyId: string): Promise<Worker[]>;
+
+  // Equipment Loans
+  getEquipmentLoans?(): Promise<EmployeeEquipmentLoaned[]>;
+  createEquipmentLoan?(loan: InsertEmployeeEquipmentLoaned): Promise<EmployeeEquipmentLoaned>;
+  updateEquipmentLoan?(id: string, updates: Partial<InsertEmployeeEquipmentLoaned>): Promise<EmployeeEquipmentLoaned | undefined>;
+  
+  // Clock-In/Out & Payroll
+  getActiveClockins?(): Promise<Timesheet[]>;
+  getHallmarkRecord?(hallmarkId: string): Promise<HallmarkTransactionLog | undefined>;
+  createPaycheck?(data: any): Promise<any>;
+  getPaycheck?(id: string): Promise<any>;
+  getTimesheetsByStatus?(status: string): Promise<Timesheet[]>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -1649,6 +1664,49 @@ export class DrizzleStorage implements IStorage {
       .where(eq(hallmarkTransactionLog.entityId, entityId))
       .orderBy(desc(hallmarkTransactionLog.createdAt));
     return result;
+  }
+
+  // ========================
+  // EQUIPMENT LOANS
+  // ========================
+  async getEquipmentLoans(): Promise<EmployeeEquipmentLoaned[]> {
+    return db.select().from(employeeEquipmentLoaned);
+  }
+
+  async createEquipmentLoan(loan: InsertEmployeeEquipmentLoaned): Promise<EmployeeEquipmentLoaned> {
+    const result = await db.insert(employeeEquipmentLoaned).values(loan).returning();
+    return result[0];
+  }
+
+  async updateEquipmentLoan(id: string, updates: Partial<InsertEmployeeEquipmentLoaned>): Promise<EmployeeEquipmentLoaned | undefined> {
+    const result = await db.update(employeeEquipmentLoaned).set(updates).where(eq(employeeEquipmentLoaned.id, id)).returning();
+    return result[0];
+  }
+
+  // ========================
+  // CLOCK-IN & PAYROLL
+  // ========================
+  async getActiveClockins(): Promise<Timesheet[]> {
+    return db.select().from(timesheets).where(eq(timesheets.status, "clocked_in"));
+  }
+
+  async getHallmarkRecord(hallmarkId: string): Promise<HallmarkTransactionLog | undefined> {
+    const result = await db.select().from(hallmarkTransactionLog).where(eq(hallmarkTransactionLog.hallmarkId, hallmarkId));
+    return result[0];
+  }
+
+  async getTimesheetsByStatus(status: string): Promise<Timesheet[]> {
+    return db.select().from(timesheets).where(eq(timesheets.status, status));
+  }
+
+  async createPaycheck(data: any): Promise<any> {
+    const result = await db.insert(payroll).values(data).returning();
+    return result[0];
+  }
+
+  async getPaycheck(id: string): Promise<any> {
+    const result = await db.select().from(payroll).where(eq(payroll.id, id));
+    return result[0];
   }
 }
 

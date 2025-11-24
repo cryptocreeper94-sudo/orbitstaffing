@@ -2873,18 +2873,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/equipment/assign", async (req: Request, res: Response) => {
     try {
       const { workerId, equipmentId, equipmentType, quantity, costPerUnit, dueDate } = req.body;
-      const loanId = `loan-${Date.now()}`;
-      res.json({
-        id: loanId,
+      const dueDate_dt = new Date(dueDate);
+      
+      const loan = await storage.createEquipmentLoan?.({
         workerId,
-        workerName: "Worker",
-        equipmentType,
+        equipmentItemId: equipmentId,
         quantity,
-        costPerUnit,
-        loanDate: new Date().toISOString(),
-        dueDate,
-        status: "active",
+        returnDeadlineAt: dueDate_dt,
+        isReturned: false,
+        isOverdue: false,
       });
+      
+      res.json(loan);
     } catch (error) {
       res.status(500).json({ error: "Failed to assign equipment" });
     }
@@ -2892,7 +2892,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/equipment/return/:loanId", async (req: Request, res: Response) => {
     try {
-      res.json({ success: true, message: "Return recorded" });
+      const { loanId } = req.params;
+      const result = await storage.updateEquipmentLoan?.(loanId, {
+        isReturned: true,
+        returnedAt: new Date(),
+      });
+      res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to record return" });
     }
@@ -2900,7 +2905,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/equipment/deduct/:loanId", async (req: Request, res: Response) => {
     try {
-      res.json({ success: true, message: "Deduction applied to paycheck" });
+      const { loanId } = req.params;
+      const result = await storage.updateEquipmentLoan?.(loanId, {
+        deductionApplied: true,
+        deductionAppliedAt: new Date(),
+      });
+      res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to apply deduction" });
     }
@@ -2938,25 +2948,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/clock-in", async (req: Request, res: Response) => {
     try {
       const { workerId, jobSiteId, latitude, longitude, accuracy, verified } = req.body;
-      res.json({
-        id: `clockin-${Date.now()}`,
+      const timesheet = await storage.createTimesheet?.({
         workerId,
-        workerName: "Worker",
-        jobSiteId,
-        jobSiteName: "Job Site",
-        clockInTime: new Date().toISOString(),
-        gpsAccuracy: accuracy,
-        verified,
         status: "clocked_in",
+        clockInTime: new Date(),
+        clockInLatitude: latitude,
+        clockInLongitude: longitude,
+        clockInGpsAccuracy: accuracy,
+        clockInVerified: verified,
       });
+      res.json(timesheet);
     } catch (error) {
       res.status(500).json({ error: "Failed to clock in" });
     }
   });
 
-  app.post("/api/clock-in/:clockInId/out", async (req: Request, res: Response) => {
+  app.post("/api/clock-in/:timesheetId/out", async (req: Request, res: Response) => {
     try {
-      res.json({ success: true, message: "Clocked out" });
+      const { timesheetId } = req.params;
+      const result = await storage.updateTimesheet?.(timesheetId, {
+        status: "clocked_out",
+        clockOutTime: new Date(),
+      });
+      res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to clock out" });
     }
@@ -2964,7 +2978,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/clock-in/active", async (req: Request, res: Response) => {
     try {
-      res.json(null);
+      const active = await storage.getActiveClockins?.() || [];
+      res.json(active[0] || null);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch active clock-in" });
     }
@@ -2975,7 +2990,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.get("/api/timesheets/pending-approval", async (req: Request, res: Response) => {
     try {
-      res.json([]);
+      const pending = await storage.getTimesheetsByStatus?.("pending") || [];
+      res.json(pending);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch timesheets" });
     }
@@ -2983,7 +2999,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/timesheets/:timesheetId/approve", async (req: Request, res: Response) => {
     try {
-      res.json({ success: true, message: "Timesheet approved" });
+      const { timesheetId } = req.params;
+      const result = await storage.updateTimesheet?.(timesheetId, {
+        status: "approved",
+      });
+      res.json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to approve timesheet" });
     }
@@ -2991,7 +3011,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/payroll/paychecks", async (req: Request, res: Response) => {
     try {
-      res.json([]);
+      const paychecks = await storage.listPayroll?.("") || [];
+      res.json(paychecks);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch paychecks" });
     }
@@ -2999,7 +3020,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/payroll/process", async (req: Request, res: Response) => {
     try {
-      res.json({ success: true, count: 0, paychecks: [] });
+      const approved = await storage.getTimesheetsByStatus?.("approved") || [];
+      const paychecks = [];
+      
+      for (const ts of approved) {
+        const hallmarkId = `ORBIT-PAYROLL-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const paycheck = await storage.createPaycheck?.({
+          workerId: ts.workerId,
+          status: "pending",
+          hallmarkId,
+        });
+        paychecks.push(paycheck);
+        
+        await storage.createHallmarkTransaction?.({
+          hallmarkId,
+          entityType: "paycheck",
+          entityId: paycheck?.id,
+          transactionType: "payroll_processed",
+          actorId: "admin",
+        });
+      }
+      
+      res.json({ success: true, count: paychecks.length, paychecks });
     } catch (error) {
       res.status(500).json({ error: "Failed to process payroll" });
     }
@@ -3007,7 +3049,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/payroll/:paycheckId/paystub", async (req: Request, res: Response) => {
     try {
-      res.json({ success: true, message: "Paystub generated" });
+      const { paycheckId } = req.params;
+      const paycheck = await storage.getPaycheck?.(paycheckId);
+      if (!paycheck) return res.status(404).json({ error: "Paycheck not found" });
+      
+      res.json({
+        paycheck,
+        hallmarkStamp: `ORBIT-ASSET-${paycheck.hallmarkId}`,
+        qrCodeUrl: `/verify/${paycheck.hallmarkId}`,
+        generatedAt: new Date().toISOString(),
+      });
     } catch (error) {
       res.status(500).json({ error: "Failed to generate paystub" });
     }
@@ -3016,12 +3067,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/verify/:hallmarkId", async (req: Request, res: Response) => {
     try {
       const { hallmarkId } = req.params;
+      const record = await storage.getHallmarkRecord?.(hallmarkId);
+      if (!record) return res.status(404).json({ error: "Hallmark not found" });
+      
       res.json({
         verified: true,
         hallmarkId,
-        entityType: "paycheck",
-        timestamp: new Date().toISOString(),
-        actor: "admin",
+        entityType: record.entityType,
+        timestamp: record.createdAt,
+        actor: record.actorId,
       });
     } catch (error) {
       res.status(500).json({ error: "Verification failed" });
