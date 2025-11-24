@@ -9,7 +9,7 @@ export default function ProfessionalStaffing() {
   const [selectedTab, setSelectedTab] = useState('overview');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
       {/* Back Button */}
       <div className="max-w-6xl mx-auto mb-4">
         <Link href="/">
