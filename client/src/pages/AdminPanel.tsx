@@ -89,22 +89,31 @@ export default function AdminPanel() {
     setLocation('/');
   };
 
-  const handleDeveloperPinSubmit = (e: React.FormEvent) => {
+  const handleDeveloperPinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setDeveloperError('');
 
-    if (developerPin.length !== 4) {
-      setDeveloperError('PIN must be 4 digits');
+    if (developerPin.length < 4) {
+      setDeveloperError('PIN must be at least 4 digits');
       return;
     }
 
-    // Accept common test PINs - no process.env access on frontend
-    const testPins = ['0000', '1234', '4444', '7777'];
-    if (testPins.includes(developerPin)) {
-      // Redirect to developer page
-      setLocation('/developer');
-    } else {
-      setDeveloperError('Invalid PIN.');
+    try {
+      const res = await fetch('/api/auth/verify-admin-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: developerPin }),
+      });
+
+      if (res.ok) {
+        // Redirect to developer page
+        setLocation('/developer');
+      } else {
+        setDeveloperError('Invalid PIN.');
+        setDeveloperPin('');
+      }
+    } catch (err) {
+      setDeveloperError('Failed to verify PIN. Please try again.');
       setDeveloperPin('');
     }
   };
