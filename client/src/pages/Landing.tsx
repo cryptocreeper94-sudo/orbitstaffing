@@ -81,19 +81,146 @@ export default function Landing() {
             <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
           </div>
           <div className="flex gap-2">
-            <Link href="/admin" className="px-3 py-2 text-sm rounded-md border border-amber-600/50 hover:bg-amber-600/10 text-amber-400 hover:text-amber-300 transition-colors inline-block flex items-center gap-1" data-testid="link-admin-header">
-              <Lock className="w-3 h-3" />
-              Admin
+            <Link href="/why-orbit" className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors inline-block">
+              Why ORBIT
             </Link>
-            <Link href="/login" className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors inline-block">
-              Login
+            <Link href="/professional-staffing" className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors inline-block">
+              Professional
             </Link>
-            <Link href="/dashboard" className="px-3 py-2 text-sm rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-block">
-              Dashboard
+            <Link href="/dev-landing" className="px-3 py-2 text-sm rounded-md border border-cyan-600/50 hover:bg-cyan-600/10 text-cyan-400 hover:text-cyan-300 transition-colors inline-block flex items-center gap-1" data-testid="link-dev-skip">
+              Dev
             </Link>
           </div>
         </div>
       </header>
+
+      {/* SANDBOX SHOWCASE SECTION - PLAY WITH FEATURES */}
+      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-cyan-300 mb-2">🎮 Try ORBIT Sandbox</h2>
+            <p className="text-sm text-muted-foreground">Play with live features risk-free before committing</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <Link href="/equipment-tracking" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
+              <div className="text-3xl mb-2">📦</div>
+              <div className="font-semibold text-white text-sm">Equipment Tracking</div>
+              <div className="text-xs text-gray-400">Manage worker gear</div>
+            </Link>
+            <Link href="/gps-clock-in" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
+              <div className="text-3xl mb-2">📍</div>
+              <div className="font-semibold text-white text-sm">GPS Clock-In</div>
+              <div className="text-xs text-gray-400">Verify worker location</div>
+            </Link>
+            <Link href="/payroll-processing" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
+              <div className="text-3xl mb-2">💰</div>
+              <div className="font-semibold text-white text-sm">Payroll Processing</div>
+              <div className="text-xs text-gray-400">Process payments & invoices</div>
+            </Link>
+            <Link href="/worker-availability" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
+              <div className="text-3xl mb-2">📅</div>
+              <div className="font-semibold text-white text-sm">Scheduling</div>
+              <div className="text-xs text-gray-400">Manage availability</div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ACCESS BOXES - OWNER / CUSTOMER / ADMIN */}
+      <section className="bg-gradient-to-b from-background to-slate-900/30 py-12">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-white mb-2">Get Started with ORBIT</h2>
+            <p className="text-muted-foreground">Choose your role to access the platform</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* Business Owner Login */}
+            <Link href="/admin" className="group">
+              <Card className="h-full border-2 border-amber-600/30 hover:border-amber-400/60 bg-gradient-to-br from-amber-900/20 to-amber-950/10 hover:from-amber-900/40 hover:to-amber-900/20 transition-all duration-300 cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <div className="text-6xl mb-4">🏢</div>
+                  <h3 className="text-xl font-bold text-amber-300 mb-2">Business Owner</h3>
+                  <p className="text-sm text-gray-400 mb-6">Manage your staffing operations, workers, clients, and billing all in one place</p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                      Worker & client management
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                      Real-time scheduling
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                      Payroll & invoicing
+                    </div>
+                  </div>
+                  <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white" data-testid="button-owner-access">
+                    Owner Login <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Customer/Client Login */}
+            <Link href="/worker" className="group">
+              <Card className="h-full border-2 border-blue-600/30 hover:border-blue-400/60 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <div className="text-6xl mb-4">👥</div>
+                  <h3 className="text-xl font-bold text-blue-300 mb-2">Customer/Client</h3>
+                  <p className="text-sm text-gray-400 mb-6">Submit staffing requests, manage assignments, and track worker performance</p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                      Request workers on-demand
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                      Track assignments & invoices
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-blue-400" />
+                      Rate workers & provide feedback
+                    </div>
+                  </div>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-customer-access">
+                    Customer Login <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* Admin Access */}
+            <Link href="/developer" className="group">
+              <Card className="h-full border-2 border-cyan-600/30 hover:border-cyan-400/60 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 hover:to-cyan-900/20 transition-all duration-300 cursor-pointer">
+                <CardContent className="p-8 text-center">
+                  <div className="text-6xl mb-4">⚙️</div>
+                  <h3 className="text-xl font-bold text-cyan-300 mb-2">System Admin</h3>
+                  <p className="text-sm text-gray-400 mb-6">Full platform control, employee registry, settings, and system-wide management tools</p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                      Universal employee registry
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                      Contact notes & history
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                      API testing & features
+                    </div>
+                  </div>
+                  <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" data-testid="button-admin-access">
+                    Admin Panel <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Hero */}
       <section className="relative py-12 md:py-20 overflow-hidden">

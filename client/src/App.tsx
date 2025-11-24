@@ -31,7 +31,8 @@ function RootPage() {
   }, []);
 
   if (loading) return null;
-  return <DeveloperLanding />;
+  // Main landing page for everyone - devs can go to /dev-landing to skip
+  return <Landing />;
 }
 
 function Router() {
