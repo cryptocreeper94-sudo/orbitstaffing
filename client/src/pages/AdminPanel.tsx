@@ -280,33 +280,33 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-      {/* Welcome Modal for Sidonie */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-3 sm:p-6">
+      {/* Welcome Modal for Sidonie - Mobile Responsive */}
       {showWelcomeMessage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-lg w-full border border-cyan-500/30 p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="text-4xl">🎯</div>
-              <h2 className="text-2xl font-bold text-cyan-400">Hey Sid! 👋</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-lg w-full border border-cyan-500/30 p-4 sm:p-8">
+            <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="text-3xl sm:text-4xl flex-shrink-0">🎯</div>
+              <h2 className="text-xl sm:text-2xl font-bold text-cyan-400 pt-1 sm:pt-0">Hey Sid! 👋</h2>
             </div>
             
-            <p className="text-gray-200 mb-6 text-lg leading-relaxed">
+            <p className="text-gray-200 mb-4 sm:mb-6 text-sm sm:text-base leading-relaxed">
               I know you are an expert on all this, so give me your honest opinion. 
             </p>
             
-            <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 mb-6">
-              <p className="text-cyan-300 font-semibold text-lg">
+            <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <p className="text-cyan-300 font-semibold text-sm sm:text-base">
                 Let's partner up and make this happen! 🚀
               </p>
             </div>
             
-            <p className="text-gray-400 text-sm mb-8">
+            <p className="text-gray-400 text-xs sm:text-sm mb-6 sm:mb-8">
               You now have full access to the admin dashboard. Review everything, test it out, and let me know what you think. All features are ready for testing.
             </p>
             
             <Button
               onClick={() => setShowWelcomeMessage(false)}
-              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 text-lg"
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 sm:py-3 text-sm sm:text-base min-h-[44px]"
               data-testid="button-sidonie-welcome-close"
             >
               Got it, let's go! 💪
@@ -316,54 +316,58 @@ export default function AdminPanel() {
       )}
       
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-12">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-            <p className="text-gray-400 flex items-center gap-2">
-              <Shield className="w-4 h-4" />
+        {/* Header - Mobile Responsive */}
+        <div className="mb-8 sm:mb-12">
+          <div className="mb-4">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">Admin Dashboard</h1>
+            <p className="text-xs sm:text-base text-gray-400 flex items-center gap-2">
+              <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
               {adminName}
             </p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="grid grid-cols-2 sm:flex gap-1 sm:gap-2 flex-wrap">
             <Button
               onClick={() => setLocation('/incident-reporting')}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
               data-testid="button-admin-incident-report"
             >
-              <AlertTriangle className="w-4 h-4" />
-              Incident Reports
+              <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Incident Reports</span>
+              <span className="sm:hidden">Incidents</span>
             </Button>
             <Button
               onClick={() => setLocation('/workers-comp-admin')}
-              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2"
+              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
               data-testid="button-admin-workers-comp"
             >
-              <Shield className="w-4 h-4" />
-              Workers Comp
+              <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Workers Comp</span>
+              <span className="sm:hidden">WC</span>
             </Button>
             <Button
               onClick={() => setLocation('/')}
-              className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
+              className="bg-purple-600 hover:bg-purple-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
               data-testid="button-admin-to-dev"
             >
-              <Code className="w-4 h-4" />
-              Developer
+              <Code className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Developer</span>
+              <span className="sm:hidden">Dev</span>
             </Button>
             <Button
               onClick={() => setLocation('/dashboard')}
-              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+              className="bg-green-600 hover:bg-green-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
               data-testid="button-admin-to-app"
             >
-              <Eye className="w-4 h-4" />
-              Main App
+              <Eye className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <span className="hidden sm:inline">Main App</span>
+              <span className="sm:hidden">App</span>
             </Button>
             <Button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4 col-span-2 sm:col-span-1"
               data-testid="button-admin-logout"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
               Logout
             </Button>
           </div>

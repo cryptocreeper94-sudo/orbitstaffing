@@ -103,30 +103,30 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-8 pb-12">
+    <div className="min-h-screen bg-background text-foreground pt-6 sm:pt-8 pb-12 px-3 sm:px-6">
       {/* Back Button */}
-      <div className="max-w-7xl mx-auto px-6 mb-4">
+      <div className="max-w-7xl mx-auto mb-4">
         <Link href="/">
-          <Button variant="ghost" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20" data-testid="button-back-home">
+          <Button variant="ghost" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20 min-h-[44px]" data-testid="button-back-home">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
         </Link>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold font-heading mb-4">
+        <div className="text-center mb-8 sm:mb-16">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading mb-3 sm:mb-4">
             Staffing Platform for Every Scale
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xs sm:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
             From solo operators to enterprise franchises. Flexible pricing that grows with you.
           </p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {/* Pricing Cards - Mobile Responsive */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-12">
           {PRICING_TIERS.map((tier) => (
             <Card
               key={tier.id}

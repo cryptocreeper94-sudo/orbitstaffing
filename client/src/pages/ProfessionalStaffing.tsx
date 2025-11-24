@@ -9,11 +9,11 @@ export default function ProfessionalStaffing() {
   const [selectedTab, setSelectedTab] = useState('overview');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-4 md:p-8">
       {/* Back Button */}
       <div className="max-w-6xl mx-auto mb-4">
         <Link href="/">
-          <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20" data-testid="button-back-home">
+          <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 min-h-[44px]" data-testid="button-back-home">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -21,12 +21,12 @@ export default function ProfessionalStaffing() {
       </div>
 
       {/* Header with Lock Badge */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <Lock className="w-6 h-6 text-purple-400" />
+      <div className="max-w-6xl mx-auto mb-8 px-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-6">
+          <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400 flex-shrink-0" />
           <div>
-            <h1 className="text-4xl font-bold text-white">Professional Staffing Division</h1>
-            <p className="text-sm text-purple-300 mt-1">Coming in Version 2 (Q3 2026) - Preview Mode</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Professional Staffing Division</h1>
+            <p className="text-xs sm:text-sm text-purple-300 mt-1">Coming in Version 2 (Q3 2026) - Preview Mode</p>
           </div>
         </div>
         <p className="text-gray-300 mb-6">
@@ -34,14 +34,14 @@ export default function ProfessionalStaffing() {
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="max-w-6xl mx-auto">
+      {/* Tabs - Mobile Responsive */}
+      <div className="max-w-6xl mx-auto px-1">
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8 bg-slate-800 border border-slate-700">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Overview</TabsTrigger>
-            <TabsTrigger value="workflow" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Workflow</TabsTrigger>
-            <TabsTrigger value="features" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Features</TabsTrigger>
-            <TabsTrigger value="specs" className="data-[state=active]:bg-purple-600 text-xs md:text-sm">Tech Specs</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8 bg-slate-800 border border-slate-700 p-1 gap-0">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Overview</TabsTrigger>
+            <TabsTrigger value="workflow" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Workflow</TabsTrigger>
+            <TabsTrigger value="features" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Features</TabsTrigger>
+            <TabsTrigger value="specs" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Tech Specs</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}

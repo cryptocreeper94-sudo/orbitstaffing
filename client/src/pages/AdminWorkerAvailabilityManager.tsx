@@ -25,13 +25,13 @@ export function AdminWorkerAvailabilityManager() {
   const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Worker Availability Management</h2>
-        <p className="text-muted-foreground">Monitor and manage worker availability across all time slots</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Worker Availability Management</h2>
+        <p className="text-xs sm:text-base text-muted-foreground">Monitor and manage worker availability across all time slots</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         <Card className="bg-card/50 border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
@@ -82,33 +82,33 @@ export function AdminWorkerAvailabilityManager() {
       </div>
 
       <Tabs defaultValue="workers" className="w-full">
-        <TabsList className="bg-slate-800/50 border border-slate-700/30">
-          <TabsTrigger value="workers">Worker List</TabsTrigger>
-          <TabsTrigger value="heatmap">Availability Heatmap</TabsTrigger>
-          <TabsTrigger value="scheduling">Smart Scheduling</TabsTrigger>
+        <TabsList className="bg-slate-800/50 border border-slate-700/30 grid w-full grid-cols-3 p-1">
+          <TabsTrigger value="workers" className="text-xs sm:text-sm min-h-[40px]">Worker List</TabsTrigger>
+          <TabsTrigger value="heatmap" className="text-xs sm:text-sm min-h-[40px]">Heatmap</TabsTrigger>
+          <TabsTrigger value="scheduling" className="text-xs sm:text-sm min-h-[40px]">Smart Scheduling</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="workers" className="space-y-4">
-          <div className="grid grid-cols-1 gap-3">
+        <TabsContent value="workers" className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 gap-2 sm:gap-3">
             {mockWorkers.map((worker) => (
               <Card 
                 key={worker.id}
                 className="bg-card/50 border-border/50 hover:border-blue-500/30 cursor-pointer transition-colors"
                 onClick={() => setSelectedWorker(worker.id)}
               >
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-center">
+                <CardContent className="pt-3 sm:pt-6 p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div>
-                      <p className="font-semibold text-white">{worker.name}</p>
-                      <p className="text-sm text-muted-foreground">{worker.slots} time slots available</p>
+                      <p className="font-semibold text-white text-sm sm:text-base">{worker.name}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{worker.slots} time slots available</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-emerald-400">{worker.availability}</p>
-                      <Badge className={
+                      <p className="text-base sm:text-lg font-bold text-emerald-400">{worker.availability}</p>
+                      <Badge className={`text-xs sm:text-sm ${
                         worker.status === "excellent" ? "bg-green-500/20 text-green-600" :
                         worker.status === "good" ? "bg-blue-500/20 text-blue-600" :
                         "bg-yellow-500/20 text-yellow-600"
-                      }>
+                      }`}>
                         {worker.status}
                       </Badge>
                     </div>

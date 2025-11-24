@@ -18,33 +18,33 @@ export default function ValueProposition() {
       </div>
 
       {/* Hero */}
-      <div className="relative overflow-hidden px-4 py-20">
+      <div className="relative overflow-hidden px-3 sm:px-4 py-12 sm:py-20">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-transparent to-purple-600 blur-3xl" />
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
             Why ORBIT Staffing OS
           </h1>
-          <p className="text-xl text-gray-300 mb-8">
+          <p className="text-sm sm:text-lg lg:text-xl text-gray-300 mb-6 sm:mb-8 px-2">
             A production-ready staffing platform that outpaces competitors like HubSpot, Guidepoint, and legacy systems
           </p>
         </div>
       </div>
 
       {/* Core Advantages */}
-      <div className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-12 text-center">7 Systems. Zero Competitors.</h2>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-12 text-center">7 Systems. Zero Competitors.</h2>
         
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          <Card className="bg-slate-800 border-cyan-600/50 p-6">
-            <div className="flex items-start gap-4">
-              <Zap className="w-8 h-8 text-cyan-400 flex-shrink-0 mt-1" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 mb-8 sm:mb-12">
+          <Card className="bg-slate-800 border-cyan-600/50 p-3 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <Zap className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">GPS-Verified Check-In</h3>
-                <p className="text-gray-300">300-foot geofencing + real-time location capture. No time theft. No guesswork. Complete audit trail.</p>
-                <p className="text-sm text-cyan-400 mt-2">✓ Prevents $2.2B annual US time theft</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-2">GPS-Verified Check-In</h3>
+                <p className="text-xs sm:text-base text-gray-300">300-foot geofencing + real-time location capture. No time theft. No guesswork. Complete audit trail.</p>
+                <p className="text-xs sm:text-sm text-cyan-400 mt-2">✓ Prevents $2.2B annual US time theft</p>
               </div>
             </div>
           </Card>

@@ -29,30 +29,32 @@ export default function WorkerPortal() {
 
   return (
     <Shell>
-      <div className="flex justify-between items-center mb-8">
+      <div className="space-y-4 sm:space-y-8 mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-heading tracking-tight">Worker Hub</h1>
-          <p className="text-muted-foreground">Manage your shifts, report issues, and request gear.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold font-heading tracking-tight">Worker Hub</h1>
+          <p className="text-xs sm:text-base text-muted-foreground">Manage your shifts, report issues, and request gear.</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 px-4 py-1">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 px-2 sm:px-4 py-1 text-[10px] sm:text-xs whitespace-nowrap">
             Status: Active • On Site
           </Badge>
-          <Button onClick={() => setLocation('/incident-reporting')} className="bg-red-600 hover:bg-red-700 text-xs" data-testid="button-worker-incident-report">
+          <Button onClick={() => setLocation('/incident-reporting')} className="bg-red-600 hover:bg-red-700 text-xs min-h-[40px]" data-testid="button-worker-incident-report">
             <AlertTriangle className="w-3 h-3 mr-1" />
-            Report Incident
+            <span className="hidden sm:inline">Report Incident</span>
+            <span className="sm:hidden">Incident</span>
           </Button>
-          <Button onClick={() => setLocation('/pre-apply')} variant="outline" className="text-xs" data-testid="button-worker-pre-apply">
+          <Button onClick={() => setLocation('/pre-apply')} variant="outline" className="text-xs min-h-[40px]" data-testid="button-worker-pre-apply">
             <Camera className="w-3 h-3 mr-1" />
-            ID Verification
+            <span className="hidden sm:inline">ID Verification</span>
+            <span className="sm:hidden">ID Check</span>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Quick Actions */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
             <ActionCard 
               icon={Clock} 
               title="Report Late / Absence" 
@@ -79,9 +81,9 @@ export default function WorkerPortal() {
             />
           </div>
 
-          <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-lg p-4">
-            <h3 className="font-bold text-white mb-4">Your Earnings & Opportunities</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-lg p-3 sm:p-4">
+            <h3 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">Your Earnings & Opportunities</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
               <Button 
                 onClick={() => setLocation('/worker-bonuses')}
                 variant="outline"

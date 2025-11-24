@@ -52,15 +52,27 @@ export function WorkerBonusTracker() {
   if (!currentBonus) return null;
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Bonus Tracker</h1>
-          <p className="text-gray-400">Real-time earnings and performance bonuses</p>
+        {/* Back Button */}
+        <div className="mb-4">
+          <button
+            onClick={() => window.history.back()}
+            className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 min-h-[44px] flex items-center"
+            data-testid="button-back"
+            title="Back"
+          >
+            ← Back
+          </button>
         </div>
 
-        {/* This Week Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Bonus Tracker</h1>
+          <p className="text-xs sm:text-base text-gray-400">Real-time earnings and performance bonuses</p>
+        </div>
+
+        {/* This Week Overview - Mobile Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-8">
           {/* Total Bonus */}
           <Card className="bg-card/50 border-border/50">
             <CardHeader className="pb-2">

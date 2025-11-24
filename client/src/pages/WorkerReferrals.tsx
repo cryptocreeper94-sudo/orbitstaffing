@@ -49,15 +49,27 @@ export function WorkerReferrals() {
   }, []);
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-6">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Referral Program</h1>
-          <p className="text-gray-400">Earn $100 for each qualified worker you refer</p>
+        {/* Back Button */}
+        <div className="mb-4">
+          <button
+            onClick={() => window.history.back()}
+            className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 min-h-[44px] flex items-center"
+            data-testid="button-back"
+            title="Back"
+          >
+            ← Back
+          </button>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Referral Program</h1>
+          <p className="text-xs sm:text-base text-gray-400">Earn $100 for each qualified worker you refer</p>
+        </div>
+
+        {/* Summary Cards - Mobile Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 mb-8">
           <Card className="bg-card/50 border-border/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -100,14 +112,14 @@ export function WorkerReferrals() {
 
         {/* Share Button */}
         <Card className="bg-card/50 border-border/50 mb-8 border-2 border-emerald-500/30">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <h3 className="font-semibold text-white mb-1">Refer a Friend</h3>
-                <p className="text-sm text-muted-foreground">Share your unique referral code to earn $100 per qualified hire</p>
+                <h3 className="font-semibold text-white mb-1 text-sm sm:text-base">Refer a Friend</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">Share your unique referral code to earn $100 per qualified hire</p>
               </div>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" data-testid="button-share-referral">
-                <Share2 className="w-4 h-4 mr-2" />
+              <Button className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm min-h-[44px] whitespace-nowrap" data-testid="button-share-referral">
+                <Share2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                 Share Code
               </Button>
             </div>

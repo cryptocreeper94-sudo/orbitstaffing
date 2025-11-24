@@ -68,11 +68,23 @@ export function WorkerShiftOffers() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-6">
       <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <div className="mb-4">
+          <button
+            onClick={() => window.history.back()}
+            className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 min-h-[44px] flex items-center"
+            data-testid="button-back"
+            title="Back"
+          >
+            ← Back
+          </button>
+        </div>
+
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Shift Offers</h1>
-          <p className="text-gray-400">Click ACCEPT to quickly grab available shifts</p>
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Shift Offers</h1>
+          <p className="text-xs sm:text-base text-gray-400">Click ACCEPT to quickly grab available shifts</p>
         </div>
 
         {offers.length === 0 ? (
@@ -100,18 +112,18 @@ export function WorkerShiftOffers() {
                       </div>
                     </div>
 
-                    {/* Key Details */}
-                    <div className="grid grid-cols-3 gap-4 text-sm">
+                    {/* Key Details - Mobile Responsive */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-blue-400" />
+                        <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
                         <span className="text-muted-foreground">{offer.startTime} - {offer.endTime}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-red-400" />
+                        <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-red-400 flex-shrink-0" />
                         <span className="text-muted-foreground">{offer.location}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">{offer.jobType}</Badge>
+                        <Badge variant="outline" className="text-[10px] sm:text-xs whitespace-nowrap">{offer.jobType}</Badge>
                       </div>
                     </div>
 
