@@ -107,15 +107,15 @@ export default function Landing() {
               <span className="sm:hidden">✓</span>
             </Link>
             <div className="h-6 w-px bg-slate-600/50 mx-0.5 sm:mx-1" />
-            <Link href="/why-orbit" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all min-h-[40px] flex items-center border border-slate-600/30 rounded-l-md" data-testid="link-why-orbit">
+            <Link href="/why-orbit" className="flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all h-[40px] flex items-center justify-center border border-slate-600/30 rounded-l-md" data-testid="link-why-orbit">
               <span className="hidden sm:inline">Why ORBIT</span>
               <span className="sm:hidden">Why</span>
             </Link>
             <div className="h-6 w-px bg-slate-600/50" />
-            <Link href="/professional-staffing" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all min-h-[40px] flex items-center border border-slate-600/30 rounded-r-md" data-testid="link-professional">
-              <div className="text-center">
-                <div className="hidden sm:block">Professional</div>
-                <div className="text-[10px] text-slate-400 hidden sm:block -mt-0.5">Division</div>
+            <Link href="/professional-staffing" className="flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all h-[40px] flex items-center justify-center border border-slate-600/30 rounded-r-md" data-testid="link-professional">
+              <div className="text-center leading-tight">
+                <div className="hidden sm:block text-xs sm:text-sm">Professional</div>
+                <div className="text-[9px] text-slate-400 hidden sm:block">Division</div>
                 <span className="sm:hidden text-xs">Pro</span>
               </div>
             </Link>
