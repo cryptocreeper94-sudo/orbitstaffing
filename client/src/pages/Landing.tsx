@@ -69,94 +69,101 @@ export default function Landing() {
       
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center gap-8">
-          <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center gap-3 sm:gap-8">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 min-h-[44px]">
             <img 
               src={saturnLogo} 
               alt="ORBIT" 
-              className="w-10 h-10 flex-shrink-0"
+              className="w-8 sm:w-10 h-8 sm:h-10 flex-shrink-0"
             />
-            <div className="font-heading font-bold text-lg tracking-wider text-white whitespace-nowrap">
-              Why ORBIT Staffing OS
+            <div className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap">
+              <span className="block sm:hidden">ORBIT</span>
+              <span className="hidden sm:block">Why ORBIT Staffing OS</span>
             </div>
           </div>
           
-          <nav className="flex gap-1 bg-slate-800/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600 flex-shrink-0">
-            <Link href="/why-orbit" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all">
-              Why ORBIT
+          <nav className="flex gap-1 bg-slate-800/50 backdrop-blur-sm px-2 sm:px-4 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600 flex-shrink-0 min-h-[44px] items-center">
+            <Link href="/why-orbit" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all min-h-[40px] flex items-center">
+              <span className="hidden sm:inline">Why ORBIT</span>
+              <span className="sm:hidden">Why</span>
             </Link>
-            <Link href="/professional-staffing" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all">
-              <div>Professional</div>
-              <div className="text-[10px] text-slate-400 -mt-0.5">Division</div>
+            <Link href="/professional-staffing" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all min-h-[40px] flex items-center">
+              <div className="text-center">
+                <div className="hidden sm:block">Professional</div>
+                <div className="text-[10px] text-slate-400 hidden sm:block -mt-0.5">Division</div>
+                <span className="sm:hidden text-xs">Pro</span>
+              </div>
             </Link>
           </nav>
         </div>
       </header>
 
       {/* SANDBOX SHOWCASE SECTION - PLAY WITH FEATURES */}
-      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-cyan-300 mb-2">Try ORBIT Sandbox</h2>
-            <p className="text-sm text-muted-foreground">Play with live features risk-free before committing</p>
+      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="text-center mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-cyan-300 mb-1 sm:mb-2">Try ORBIT Sandbox</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Play with live features risk-free before committing</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            <Link href="/equipment-tracking" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
-              <div className="text-3xl mb-2">📦</div>
-              <div className="font-semibold text-white text-sm">Equipment Tracking</div>
-              <div className="text-xs text-gray-400">Manage worker gear</div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+            <Link href="/equipment-tracking" className="p-2 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all min-h-[100px] sm:min-h-auto flex flex-col justify-center">
+              <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">📦</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Equipment</div>
+              <div className="text-[10px] sm:text-xs text-gray-400 hidden sm:block">Manage worker gear</div>
             </Link>
-            <Link href="/gps-clock-in" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
-              <div className="text-3xl mb-2">📍</div>
-              <div className="font-semibold text-white text-sm">GPS Clock-In</div>
-              <div className="text-xs text-gray-400">Verify worker location</div>
+            <Link href="/gps-clock-in" className="p-2 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all min-h-[100px] sm:min-h-auto flex flex-col justify-center">
+              <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">📍</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">GPS Clock</div>
+              <div className="text-[10px] sm:text-xs text-gray-400 hidden sm:block">Verify location</div>
             </Link>
-            <Link href="/payroll-processing" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
-              <div className="text-3xl mb-2">💰</div>
-              <div className="font-semibold text-white text-sm">Payroll Processing</div>
-              <div className="text-xs text-gray-400">Process payments & invoices</div>
+            <Link href="/payroll-processing" className="p-2 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all min-h-[100px] sm:min-h-auto flex flex-col justify-center">
+              <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">💰</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Payroll</div>
+              <div className="text-[10px] sm:text-xs text-gray-400 hidden sm:block">Process payments</div>
             </Link>
-            <Link href="/worker-availability" className="p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all">
-              <div className="text-3xl mb-2">📅</div>
-              <div className="font-semibold text-white text-sm">Scheduling</div>
-              <div className="text-xs text-gray-400">Manage availability</div>
+            <Link href="/worker-availability" className="p-2 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all min-h-[100px] sm:min-h-auto flex flex-col justify-center">
+              <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">📅</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Scheduling</div>
+              <div className="text-[10px] sm:text-xs text-gray-400 hidden sm:block">Manage availability</div>
             </Link>
           </div>
         </div>
       </section>
 
       {/* ACCESS BOXES - OWNER / CUSTOMER / ADMIN */}
-      <section className="bg-gradient-to-b from-background to-slate-900/30 py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Get Started with ORBIT</h2>
-            <p className="text-muted-foreground">Choose your role to access the platform</p>
+      <section className="bg-gradient-to-b from-background to-slate-900/30 py-8 sm:py-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="text-center mb-6 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">Get Started with ORBIT</h2>
+            <p className="text-xs sm:text-base text-muted-foreground">Choose your role to access the platform</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
             {/* Business Owner Login */}
             <Link href="/admin" className="group">
-              <Card className="h-full border-2 border-violet-400/40 hover:border-violet-300/70 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 hover:to-purple-400/15 transition-all duration-300 cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-4">🏢</div>
-                  <h3 className="text-xl font-bold text-violet-300 mb-2">Business Owner</h3>
-                  <p className="text-sm text-gray-400 mb-6">Manage your staffing operations, workers, clients, and billing all in one place</p>
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-violet-400" />
-                      Worker & client management
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-violet-400" />
-                      Real-time scheduling
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-violet-400" />
-                      Payroll & invoicing
+              <Card className="h-full border-2 border-violet-400/40 hover:border-violet-300/70 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 hover:to-purple-400/15 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto">
+                <CardContent className="p-4 sm:p-8 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                  <div>
+                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">🏢</div>
+                    <h3 className="text-lg sm:text-xl font-bold text-violet-300 mb-1 sm:mb-2">Business Owner</h3>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-6">Manage your staffing operations, workers, clients, and billing</p>
+                    <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400 flex-shrink-0" />
+                        <span>Worker & client management</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400 flex-shrink-0" />
+                        <span>Real-time scheduling</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400 flex-shrink-0" />
+                        <span>Payroll & invoicing</span>
+                      </div>
                     </div>
                   </div>
-                  <Button className="w-full bg-violet-500 hover:bg-violet-600 text-white" data-testid="button-owner-access">
-                    Owner Login <ArrowRight className="w-4 h-4 ml-2" />
+                  <Button className="w-full bg-violet-500 hover:bg-violet-600 text-white text-xs sm:text-sm min-h-[44px]" data-testid="button-owner-access">
+                    Owner Login <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
                   </Button>
                 </CardContent>
               </Card>
@@ -164,27 +171,29 @@ export default function Landing() {
 
             {/* Customer/Client Login */}
             <Link href="/worker" className="group">
-              <Card className="h-full border-2 border-blue-600/30 hover:border-blue-400/60 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-4">👥</div>
-                  <h3 className="text-xl font-bold text-blue-300 mb-2">Customer/Client</h3>
-                  <p className="text-sm text-gray-400 mb-6">Submit staffing requests, manage assignments, and track worker performance</p>
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                      Request workers on-demand
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                      Track assignments & invoices
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                      Rate workers & provide feedback
+              <Card className="h-full border-2 border-blue-600/30 hover:border-blue-400/60 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto">
+                <CardContent className="p-4 sm:p-8 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                  <div>
+                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">👥</div>
+                    <h3 className="text-lg sm:text-xl font-bold text-blue-300 mb-1 sm:mb-2">Customer/Client</h3>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-6">Submit staffing requests, manage assignments, and track performance</p>
+                    <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                        <span>Request workers on-demand</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                        <span>Track assignments</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                        <span>Rate workers</span>
+                      </div>
                     </div>
                   </div>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-customer-access">
-                    Customer Login <ArrowRight className="w-4 h-4 ml-2" />
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm min-h-[44px]" data-testid="button-customer-access">
+                    Customer Login <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
                   </Button>
                 </CardContent>
               </Card>
@@ -192,27 +201,29 @@ export default function Landing() {
 
             {/* Admin Access */}
             <Link href="/developer" className="group">
-              <Card className="h-full border-2 border-cyan-600/30 hover:border-cyan-400/60 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 hover:to-cyan-900/20 transition-all duration-300 cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <div className="text-6xl mb-4">⚙️</div>
-                  <h3 className="text-xl font-bold text-cyan-300 mb-2">System Admin</h3>
-                  <p className="text-sm text-gray-400 mb-6">Full platform control, employee registry, settings, and system-wide management tools</p>
-                  <div className="space-y-2 mb-6">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                      Universal employee registry
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                      Contact notes & history
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                      API testing & features
+              <Card className="h-full border-2 border-cyan-600/30 hover:border-cyan-400/60 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 hover:to-cyan-900/20 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto">
+                <CardContent className="p-4 sm:p-8 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                  <div>
+                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">⚙️</div>
+                    <h3 className="text-lg sm:text-xl font-bold text-cyan-300 mb-1 sm:mb-2">System Admin</h3>
+                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-6">Full platform control, employee registry, and settings</p>
+                    <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                        <span>Employee registry</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                        <span>Contact notes & history</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                        <span>API testing</span>
+                      </div>
                     </div>
                   </div>
-                  <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" data-testid="button-admin-access">
-                    Admin Panel <ArrowRight className="w-4 h-4 ml-2" />
+                  <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-xs sm:text-sm min-h-[44px]" data-testid="button-admin-access">
+                    Admin Panel <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
                   </Button>
                 </CardContent>
               </Card>
