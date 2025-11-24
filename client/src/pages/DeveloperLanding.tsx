@@ -230,7 +230,7 @@ export default function DeveloperLanding() {
             <Button
               onClick={() => handleJoinSandbox('owner')}
               disabled={loginMutation.isPending}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 font-bold text-lg mb-3"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg mb-3 font-bold glow-green"
               data-testid="button-join-owner-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'owner'
@@ -277,7 +277,7 @@ export default function DeveloperLanding() {
             <Button
               onClick={() => handleJoinSandbox('employee')}
               disabled={loginMutation.isPending}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg mb-3"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg mb-3 font-bold glow-purple"
               data-testid="button-join-employee-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'employee'
@@ -300,9 +300,9 @@ export default function DeveloperLanding() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Real Owner Login */}
-            <div className={`bg-slate-800 rounded-lg p-6 border transition-all ${showOwnerCodeInput ? 'border-green-500/50' : 'border-slate-600'} relative`}>
+            <div className={`glow-card bg-slate-800 rounded-lg p-6 border transition-all ${showOwnerCodeInput ? 'border-green-500/50 glow-button-green' : 'border-slate-600 hover:border-green-500/30'} relative backdrop-blur-sm`}>
               <div className="absolute top-2 right-2 bg-green-600/80 px-2 py-1 rounded text-xs font-bold text-white">
                 Access Code
               </div>
@@ -319,7 +319,7 @@ export default function DeveloperLanding() {
               {!showOwnerCodeInput ? (
                 <Button
                   onClick={() => setShowOwnerCodeInput(true)}
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 glow-green"
                   data-testid="button-owner-login-enable"
                 >
                   Login with Access Code
@@ -341,7 +341,7 @@ export default function DeveloperLanding() {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleOwnerLogin(ownerAccessCode)}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-sm"
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-sm py-2 glow-green"
                       data-testid="button-owner-access-submit"
                     >
                       Submit
@@ -353,7 +353,7 @@ export default function DeveloperLanding() {
                         setAccessCodeError('');
                       }}
                       variant="outline"
-                      className="flex-1 text-sm"
+                      className="flex-1 text-sm border-gray-500 text-gray-300 hover:bg-slate-700"
                       data-testid="button-owner-access-cancel"
                     >
                       Cancel
@@ -364,7 +364,7 @@ export default function DeveloperLanding() {
             </div>
 
             {/* Real Employee Login */}
-            <div className={`bg-slate-800 rounded-lg p-6 border transition-all ${showEmployeeCodeInput ? 'border-purple-500/50' : 'border-slate-600'} relative`}>
+            <div className={`glow-card bg-slate-800 rounded-lg p-6 border transition-all ${showEmployeeCodeInput ? 'border-purple-500/50 glow-button-purple' : 'border-slate-600 hover:border-purple-500/30'} relative backdrop-blur-sm`}>
               <div className="absolute top-2 right-2 bg-purple-600/80 px-2 py-1 rounded text-xs font-bold text-white">
                 Access Code
               </div>
@@ -381,7 +381,7 @@ export default function DeveloperLanding() {
               {!showEmployeeCodeInput ? (
                 <Button
                   onClick={() => setShowEmployeeCodeInput(true)}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 glow-purple"
                   data-testid="button-employee-login-enable"
                 >
                   Login with Access Code
@@ -403,7 +403,7 @@ export default function DeveloperLanding() {
                   <div className="flex gap-2">
                     <Button
                       onClick={() => handleEmployeeLogin(employeeAccessCode)}
-                      className="flex-1 bg-purple-600 hover:bg-purple-700 text-sm"
+                      className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm py-2 glow-purple"
                       data-testid="button-employee-access-submit"
                     >
                       Submit
@@ -415,7 +415,7 @@ export default function DeveloperLanding() {
                         setAccessCodeError('');
                       }}
                       variant="outline"
-                      className="flex-1 text-sm"
+                      className="flex-1 text-sm border-gray-500 text-gray-300 hover:bg-slate-700"
                       data-testid="button-employee-access-cancel"
                     >
                       Cancel
@@ -441,7 +441,7 @@ export default function DeveloperLanding() {
               </p>
               <Button
                 onClick={() => setLocation('/admin')}
-                className="w-full bg-cyan-600 hover:bg-cyan-700"
+                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold glow-cyan"
                 data-testid="button-admin-login-section"
               >
                 Admin Access
