@@ -24,6 +24,7 @@ import {
   collections,
   orbitAssets,
   demoRegistrations,
+  workerOnboardingChecklist,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -70,6 +71,8 @@ import {
   type Collection,
   type InsertOrbitAsset,
   type OrbitAsset,
+  type InsertWorkerOnboardingChecklist,
+  type WorkerOnboardingChecklist,
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
@@ -224,6 +227,15 @@ export interface IStorage {
   uploadWorkerFile(workerId: string, docType: string, fileData: string, fileName: string): Promise<{ url: string; fileSize: number }>;
   updateWorkerAvatar(workerId: string, avatarUrl: string): Promise<Worker | undefined>;
   updateWorkerDocuments(workerId: string, documents: any[]): Promise<Worker | undefined>;
+
+  // Onboarding Checklist
+  getWorkerOnboardingChecklist(workerId: string): Promise<WorkerOnboardingChecklist | undefined>;
+  createWorkerOnboardingChecklist(workerId: string, companyId: string): Promise<WorkerOnboardingChecklist>;
+  updateOnboardingProgress(workerId: string, progress: number): Promise<WorkerOnboardingChecklist | undefined>;
+  completeOnboardingStep(workerId: string, step: string): Promise<WorkerOnboardingChecklist | undefined>;
+  approveWorkerOnboarding(workerId: string, adminId: string): Promise<Worker | undefined>;
+  checkOnboardingCompletion(workerId: string): Promise<boolean>;
+  listWorkersNeedingOnboarding(companyId: string): Promise<Worker[]>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -1002,6 +1014,118 @@ export class DrizzleStorage implements IStorage {
       .where(eq(workers.id, workerId))
       .returning();
     return result[0];
+  }
+
+  // Onboarding Checklist
+  async getWorkerOnboardingChecklist(workerId: string): Promise<WorkerOnboardingChecklist | undefined> {
+    const result = await db.select().from(workerOnboardingChecklist).where(eq(workerOnboardingChecklist.workerId, workerId));
+    return result[0];
+  }
+
+  async createWorkerOnboardingChecklist(workerId: string, companyId: string): Promise<WorkerOnboardingChecklist> {
+    const result = await db.insert(workerOnboardingChecklist).values({
+      workerId,
+      companyId,
+      completionPercentage: 0,
+    }).returning();
+    return result[0];
+  }
+
+  async updateOnboardingProgress(workerId: string, progress: number): Promise<WorkerOnboardingChecklist | undefined> {
+    const result = await db.update(workerOnboardingChecklist)
+      .set({ completionPercentage: progress })
+      .where(eq(workerOnboardingChecklist.workerId, workerId))
+      .returning();
+    return result[0];
+  }
+
+  async completeOnboardingStep(workerId: string, step: string): Promise<WorkerOnboardingChecklist | undefined> {
+    const checklist = await this.getWorkerOnboardingChecklist(workerId);
+    if (!checklist) return undefined;
+
+    const updates: Partial<WorkerOnboardingChecklist> = {};
+    let newProgress = Math.floor((checklist.completionPercentage || 0) * 0.2); // Each step is ~20%
+
+    switch (step) {
+      case 'profilePhoto':
+        updates.profilePhotoUploaded = true;
+        updates.profilePhotoUploadedAt = new Date();
+        newProgress += 20;
+        break;
+      case 'i9Documents':
+        updates.i9DocumentsSubmitted = true;
+        updates.i9DocumentsSubmittedAt = new Date();
+        newProgress += 20;
+        break;
+      case 'backgroundCheck':
+        updates.backgroundCheckConsented = true;
+        updates.backgroundCheckConsentedAt = new Date();
+        newProgress += 20;
+        break;
+      case 'bankDetails':
+        updates.bankDetailsSubmitted = true;
+        updates.bankDetailsSubmittedAt = new Date();
+        newProgress += 20;
+        break;
+      case 'nda':
+        updates.nDAAccepted = true;
+        updates.nDAAcceptedAt = new Date();
+        newProgress = 100; // Final step
+        updates.completedAt = new Date();
+        break;
+    }
+
+    updates.completionPercentage = Math.min(newProgress, 100);
+
+    const result = await db.update(workerOnboardingChecklist)
+      .set(updates)
+      .where(eq(workerOnboardingChecklist.workerId, workerId))
+      .returning();
+    return result[0];
+  }
+
+  async approveWorkerOnboarding(workerId: string, adminId: string): Promise<Worker | undefined> {
+    // Mark as completed and activated
+    const now = new Date();
+    const employeeNumber = `EMP-${Date.now().toString().slice(-6)}`;
+    
+    const result = await db.update(workers)
+      .set({
+        onboardingStatus: 'completed',
+        isActivated: true,
+        onboardingCompletedAt: now,
+        activatedAt: now,
+        employeeNumber: employeeNumber,
+        employeeNumberAssignedAt: now,
+      })
+      .where(eq(workers.id, workerId))
+      .returning();
+
+    // Update checklist
+    await db.update(workerOnboardingChecklist)
+      .set({ 
+        completionPercentage: 100,
+        completedAt: now,
+        approvedByAdmin: adminId,
+        approvedByAdminAt: now,
+      })
+      .where(eq(workerOnboardingChecklist.workerId, workerId));
+
+    return result[0];
+  }
+
+  async checkOnboardingCompletion(workerId: string): Promise<boolean> {
+    const worker = await this.getWorker(workerId);
+    return worker?.isActivated === true && worker?.onboardingStatus === 'completed';
+  }
+
+  async listWorkersNeedingOnboarding(companyId: string): Promise<Worker[]> {
+    const result = await db.select().from(workers)
+      .where(and(
+        eq(workers.companyId, companyId),
+        eq(workers.isActivated, false)
+      ));
+    return result;
   }
 
   // Demo Registrations (Lead Capture)

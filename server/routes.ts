@@ -393,6 +393,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // ONBOARDING ROUTES
+  // ========================
+  app.post("/api/onboarding/check-status", async (req: Request, res: Response) => {
+    try {
+      const { workerId, assignmentStartDate } = req.body;
+      if (!workerId) {
+        return res.status(400).json({ error: "Worker ID required" });
+      }
+
+      const isComplete = await storage.checkOnboardingCompletion(workerId);
+      
+      if (!isComplete) {
+        const today = new Date();
+        const assignmentDate = new Date(assignmentStartDate);
+        const daysUntilAssignment = Math.ceil((assignmentDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        
+        return res.status(200).json({
+          complete: false,
+          daysUntil: daysUntilAssignment,
+          message: `Worker onboarding incomplete. ${daysUntilAssignment} days until assignment.`,
+        });
+      }
+
+      res.status(200).json({ complete: true, message: "Worker is fully onboarded" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check onboarding status" });
+    }
+  });
+
+  app.get("/api/admin/onboarding-tracker", async (req: Request, res: Response) => {
+    try {
+      const companyId = req.query.companyId as string || "demo-company"; // TODO: Get from session
+      
+      const workersNeeding = await storage.listWorkersNeedingOnboarding(companyId);
+      
+      const workersWithDetails = await Promise.all(
+        workersNeeding.map(async (worker) => {
+          const checklist = await storage.getWorkerOnboardingChecklist(worker.id);
+          return {
+            id: worker.id,
+            fullName: worker.userId ? `Worker ${worker.id.slice(0, 8)}` : "Unknown",
+            onboardingProgress: worker.onboardingProgress || 0,
+            createdAt: worker.createdAt,
+            checklist: checklist || {},
+          };
+        })
+      );
+
+      res.status(200).json(workersWithDetails);
+    } catch (error) {
+      console.error("Error fetching onboarding tracker:", error);
+      res.status(500).json({ error: "Failed to fetch onboarding data" });
+    }
+  });
+
+  app.post("/api/admin/approve-onboarding/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const adminId = req.query.adminId as string || "admin-system"; // TODO: Get from session
+
+      const worker = await storage.approveWorkerOnboarding(workerId, adminId);
+      res.status(200).json({
+        success: true,
+        message: `Worker ${worker?.employeeNumber} activated`,
+        worker,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve worker" });
+    }
+  });
+
+  app.post("/api/timeclock/validate-onboarding/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      
+      const isComplete = await storage.checkOnboardingCompletion(workerId);
+      
+      if (!isComplete) {
+        return res.status(403).json({
+          error: "Cannot clock in - onboarding incomplete",
+          message: "You must complete onboarding before accessing GPS time clock",
+        });
+      }
+
+      res.status(200).json({ authorized: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to validate onboarding for time clock" });
+    }
+  });
+
+  // ========================
   // WORKERS ROUTES
   // ========================
   app.get("/api/workers", async (req: Request, res: Response) => {

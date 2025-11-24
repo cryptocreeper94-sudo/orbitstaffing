@@ -7,6 +7,7 @@ import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
 import { AdminManagement } from './AdminManagement';
 import { HealthDashboard } from '@/components/HealthDashboard';
 import { ContingencyManual } from '@/components/ContingencyManual';
+import { OnboardingTracker } from '@/components/OnboardingTracker';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -459,6 +460,18 @@ function MasterAdminDashboard() {
           <AlertTriangle className="w-4 h-4 inline mr-2" />
           Contingency
         </button>
+        <button
+          onClick={() => setActiveSection('onboarding')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'onboarding'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-onboarding"
+        >
+          <Users className="w-4 h-4 inline mr-2" />
+          Onboarding
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -468,6 +481,8 @@ function MasterAdminDashboard() {
       {activeSection === 'health' && <HealthDashboard />}
 
       {activeSection === 'contingency' && <ContingencyManual />}
+
+      {activeSection === 'onboarding' && <OnboardingTracker />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">

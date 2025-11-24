@@ -262,6 +262,13 @@ export const workers = pgTable(
     // Document URLs (base64 encoded or paths)
     i9Documents: jsonb("i9_documents"), // Array of {type, url, uploadedAt} for I-9 verification docs
     
+    // Onboarding Status
+    onboardingStatus: varchar("onboarding_status", { length: 50 }).default("not_started"), // not_started, in_progress, completed, awaiting_approval
+    onboardingCompletedAt: timestamp("onboarding_completed_at"),
+    isActivated: boolean("is_activated").default(false), // Can't work until true
+    activatedAt: timestamp("activated_at"),
+    employeeNumberAssignedAt: timestamp("employee_number_assigned_at"),
+    onboardingProgress: integer("onboarding_progress").default(0), // 0-100%
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -276,12 +283,78 @@ export const insertWorkerSchema = createInsertSchema(workers).omit({
   id: true,
   i9VerifiedDate: true,
   backgroundCheckDate: true,
+  onboardingCompletedAt: true,
+  activatedAt: true,
+  employeeNumberAssignedAt: true,
   createdAt: true,
   updatedAt: true,
 });
 
 export type InsertWorker = z.infer<typeof insertWorkerSchema>;
 export type Worker = typeof workers.$inferSelect;
+
+// ========================
+// Worker Onboarding Checklist
+// ========================
+export const workerOnboardingChecklist = pgTable(
+  "worker_onboarding_checklist",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").references(() => companies.id),
+
+    // Checklist Items
+    profilePhotoUploaded: boolean("profile_photo_uploaded").default(false),
+    profilePhotoUploadedAt: timestamp("profile_photo_uploaded_at"),
+    
+    i9DocumentsSubmitted: boolean("i9_documents_submitted").default(false),
+    i9DocumentsSubmittedAt: timestamp("i9_documents_submitted_at"),
+    i9Verified: boolean("i9_verified").default(false),
+    i9VerifiedAt: timestamp("i9_verified_at"),
+    
+    backgroundCheckConsented: boolean("background_check_consented").default(false),
+    backgroundCheckConsentedAt: timestamp("background_check_consented_at"),
+    backgroundCheckCompleted: boolean("background_check_completed").default(false),
+    backgroundCheckCompletedAt: timestamp("background_check_completed_at"),
+    
+    bankDetailsSubmitted: boolean("bank_details_submitted").default(false),
+    bankDetailsSubmittedAt: timestamp("bank_details_submitted_at"),
+    
+    nDAAccepted: boolean("nda_accepted").default(false),
+    nDAAcceptedAt: timestamp("nda_accepted_at"),
+
+    // Overall Progress
+    completionPercentage: integer("completion_percentage").default(0), // 0-100
+    completedAt: timestamp("completed_at"),
+    approvedByAdminAt: timestamp("approved_by_admin_at"),
+    approvedByAdmin: varchar("approved_by_admin", { length: 255 }), // Admin ID/name
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_onboarding_checklist_worker_id").on(table.workerId),
+    companyIdx: index("idx_onboarding_checklist_company_id").on(table.companyId),
+  })
+);
+
+export const insertWorkerOnboardingChecklistSchema = createInsertSchema(workerOnboardingChecklist).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  profilePhotoUploadedAt: true,
+  i9DocumentsSubmittedAt: true,
+  i9VerifiedAt: true,
+  backgroundCheckConsentedAt: true,
+  backgroundCheckCompletedAt: true,
+  bankDetailsSubmittedAt: true,
+  nDAAcceptedAt: true,
+  completedAt: true,
+  approvedByAdminAt: true,
+});
+
+export type InsertWorkerOnboardingChecklist = z.infer<typeof insertWorkerOnboardingChecklistSchema>;
+export type WorkerOnboardingChecklist = typeof workerOnboardingChecklist.$inferSelect;
 
 // ========================
 // Worker Verification & Hallmark System
@@ -1255,6 +1328,14 @@ export const assignments = pgTable(
     checkedInAt: timestamp("checked_in_at"), // When worker GPS verified arrival
     checkedOutAt: timestamp("checked_out_at"), // When worker left job
     noShowStatus: varchar("no_show_status", { length: 50 }), // "show", "no_show", "late", "pending"
+
+    // Onboarding Validation
+    onboardingValidatedAt: timestamp("onboarding_validated_at"), // When worker's onboarding was validated
+    workerOnboardingCompleteAt24hWarning: timestamp("worker_onboarding_complete_at_24h"), // Deadline for completion (24h before shift)
+    onboardingWarning24hSentAt: timestamp("onboarding_warning_24h_sent_at"),
+    onboardingWarning3dSentAt: timestamp("onboarding_warning_3d_sent_at"),
+    onboardingWarning2dSentAt: timestamp("onboarding_warning_2d_sent_at"),
+    requirementsMissingCancelledAt: timestamp("requirements_missing_cancelled_at"), // When assignment was auto-cancelled
 
     // External References (For client data sync)
     externalAssignmentId: varchar("external_assignment_id", { length: 100 }), // From QuickBooks, ADP, UKG Pro
