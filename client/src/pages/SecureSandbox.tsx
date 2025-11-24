@@ -282,6 +282,16 @@ export default function SecureSandbox() {
   // Unauthenticated - Show three sandbox options
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="absolute top-6 left-6">
+        <Button
+          onClick={() => setLocation('/')}
+          variant="outline"
+          className="text-purple-400 border-purple-400 hover:bg-purple-400/10"
+          data-testid="button-back-home"
+        >
+          ← Back
+        </Button>
+      </div>
       <div className="max-w-4xl w-full">
         {/* Header */}
         <div className="text-center mb-12">

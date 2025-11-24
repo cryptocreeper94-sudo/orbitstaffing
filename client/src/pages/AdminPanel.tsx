@@ -125,6 +125,16 @@ export default function AdminPanel() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="absolute top-6 left-6">
+          <Button
+            onClick={() => setLocation('/')}
+            variant="outline"
+            className="text-cyan-400 border-cyan-400 hover:bg-cyan-400/10"
+            data-testid="button-back-home"
+          >
+            ← Back
+          </Button>
+        </div>
         <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
           <div className="flex items-center justify-center mb-6">
             <Shield className="w-8 h-8 text-cyan-400 mr-3" />
