@@ -16,6 +16,7 @@ import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
 import { SidonieWelcomeModal } from '@/components/SidonieWelcomeModal';
 import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessionUtils';
+import { AssetTracker } from '@/components/AssetTracker';
 
 const ADMIN_SESSION_KEY = 'admin';
 

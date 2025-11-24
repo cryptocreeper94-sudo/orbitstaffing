@@ -16,6 +16,7 @@ import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
 import { getValidSession, setSessionWithExpiry, clearSession, isMobileDevice, shouldBypassMobileLogin } from '@/lib/sessionUtils';
+import { AssetTracker } from '@/components/AssetTracker';
 import { shouldBypassDeveloperLogin, enableBypassOnThisDevice, disableBypassOnThisDevice, isBypassDeviceEnabled } from '@/lib/deviceFingerprint';
 
 const DEVELOPER_SESSION_KEY = 'developer';
@@ -49,7 +50,7 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([

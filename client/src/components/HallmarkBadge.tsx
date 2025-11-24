@@ -1,5 +1,5 @@
 import React from 'react';
-import QRCode from 'qrcode.react';
+import { default as QRCode } from 'qrcode.react';
 
 interface HallmarkBadgeProps {
   serialNumber?: string;

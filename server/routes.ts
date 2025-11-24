@@ -3736,5 +3736,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+
+  // ========================
+  // ASSET TRACKER - HALLMARK SEARCH
+  // ========================
+  app.get("/api/hallmarks/search", async (req: Request, res: Response) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ error: "Search query required" });
+      }
+      const result = await db.select().from(hallmarks).where(sql`${hallmarks.hallmarkNumber} ILIKE ${`%${q}%`}`).limit(1);
+      if (!result || result.length === 0) {
+        return res.status(404).json({ error: "Asset not found" });
+      }
+      res.json(result[0]);
+    } catch (error) {
+      console.error("Search error:", error);
+      res.status(500).json({ error: "Search failed" });
+    }
+  });
+
+  const httpServer = createServer(app);
   return httpServer;
 }
