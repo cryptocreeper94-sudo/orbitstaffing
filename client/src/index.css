@@ -110,15 +110,3 @@
     @apply font-heading font-medium tracking-tight;
   }
 }
-
-/* Hide Replit AI and feedback buttons */
-[data-testid="ai-button"],
-[data-testid="feedback-button"],
-.replit-ui-button,
-.replit-feedback,
-.replit-ai,
-button[aria-label*="AI"],
-button[aria-label*="Feedback"],
-button[aria-label*="feedback"] {
-  display: none !important;
-}
