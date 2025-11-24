@@ -76,9 +76,16 @@ export default function Landing() {
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="font-heading font-bold text-lg tracking-wider">
-            ORBIT
-            <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
+          <div className="flex items-center gap-2">
+            <img 
+              src={saturnLogo} 
+              alt="ORBIT" 
+              className="w-10 h-10 object-contain hidden md:block"
+            />
+            <div className="font-heading font-bold text-lg tracking-wider">
+              ORBIT
+              <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
+            </div>
           </div>
           
           <nav className="flex gap-1 bg-slate-800/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600">
@@ -86,7 +93,8 @@ export default function Landing() {
               Why ORBIT
             </Link>
             <Link href="/professional-staffing" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all">
-              Professional
+              <div>Professional</div>
+              <div className="text-[10px] text-slate-400 -mt-0.5">Division</div>
             </Link>
           </nav>
         </div>
