@@ -379,9 +379,9 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Bottom Right - Small QR Code */}
-          <div className="absolute bottom-2 left-2 w-24 h-24 bg-white p-1 rounded z-20">
-            <QRCode value={vCardData} size={80} level="M" />
+          {/* Bottom Left - Tiny QR Code */}
+          <div className="absolute bottom-1.5 left-1.5 bg-white p-0.5 rounded z-20">
+            <QRCode value={vCardData} size={32} level="M" />
           </div>
         </div>
       </div>
