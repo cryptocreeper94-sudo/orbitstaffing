@@ -38,6 +38,7 @@ function Router() {
     <Switch>
       <Route path="/" component={RootPage} />
       <Route path="/dev-landing" component={DeveloperLanding} />
+      <Route path="/developer" component={DeveloperPanel} />
       <Route path="/admin" component={AdminPanel} />
       <Route path="/worker" component={WorkerPortal} />
       <Route path="/home" component={Landing} />
