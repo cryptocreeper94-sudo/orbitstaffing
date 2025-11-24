@@ -23,8 +23,11 @@ import {
   paymentMethods,
   collections,
   orbitAssets,
+  demoRegistrations,
   type InsertUser,
   type User,
+  type InsertDemoRegistration,
+  type DemoRegistration,
   type InsertCompany,
   type Company,
   type InsertWorker,
@@ -961,6 +964,30 @@ export class DrizzleStorage implements IStorage {
 
   async updateSupportTicket(id: string, data: Partial<InsertSupportTicket>): Promise<SupportTicket | undefined> {
     const result = await db.update(supportTickets).set(data).where(eq(supportTickets.id, id)).returning();
+    return result[0];
+  }
+
+  // Demo Registrations (Lead Capture)
+  async createDemoRegistration(data: InsertDemoRegistration): Promise<DemoRegistration> {
+    const result = await db.insert(demoRegistrations).values(data).returning();
+    return result[0];
+  }
+
+  async getDemoRegistrationByCode(code: string): Promise<DemoRegistration | undefined> {
+    const result = await db.select().from(demoRegistrations).where(eq(demoRegistrations.demoCode, code));
+    return result[0];
+  }
+
+  async getDemoRegistrationByEmail(email: string): Promise<DemoRegistration | undefined> {
+    const result = await db.select().from(demoRegistrations).where(eq(demoRegistrations.email, email));
+    return result[0];
+  }
+
+  async markDemoAsUsed(code: string): Promise<DemoRegistration | undefined> {
+    const result = await db.update(demoRegistrations).set({
+      used: true,
+      usedAt: new Date(),
+    }).where(eq(demoRegistrations.demoCode, code)).returning();
     return result[0];
   }
 }

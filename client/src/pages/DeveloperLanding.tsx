@@ -140,7 +140,7 @@ export default function DeveloperLanding() {
             <h1 className="text-4xl font-bold text-white">ORBIT Staffing OS</h1>
           </div>
           <p className="text-gray-300 text-lg">
-            Complete Staffing Platform Demo - PIN: 7777
+            Complete Staffing Platform Demo
           </p>
         </div>
 
@@ -255,7 +255,7 @@ export default function DeveloperLanding() {
             Complete demo environment ready for production testing
           </p>
           <p className="text-xs text-gray-500">
-            PIN: <span className="text-yellow-400 font-mono">7777</span> • Complete sandbox access
+            Request a free demo to get your access code
           </p>
         </div>
       </div>

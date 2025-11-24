@@ -102,6 +102,37 @@ export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;
 
 // ========================
+// Demo Registrations (Lead Capture)
+// ========================
+export const demoRegistrations = pgTable(
+  "demo_registrations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    email: varchar("email").notNull().unique(),
+    name: varchar("name", { length: 255 }).notNull(),
+    demoCode: varchar("demo_code", { length: 6 }).notNull().unique(), // Random 6-char code
+    consentToEmails: boolean("consent_to_emails").default(true),
+    used: boolean("used").default(false),
+    usedAt: timestamp("used_at"),
+    expiresAt: timestamp("expires_at").notNull(), // 7 days from creation
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_demo_email").on(table.email),
+    codeIdx: index("idx_demo_code").on(table.demoCode),
+  })
+);
+
+export const insertDemoRegistrationSchema = createInsertSchema(demoRegistrations).omit({
+  id: true,
+  createdAt: true,
+  usedAt: true,
+});
+
+export type InsertDemoRegistration = z.infer<typeof insertDemoRegistrationSchema>;
+export type DemoRegistration = typeof demoRegistrations.$inferSelect;
+
+// ========================
 // Franchises (White-Label Partners)
 // ========================
 export const franchises = pgTable(

@@ -69,9 +69,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Demo Registration (Lead Capture)
+  app.post("/api/demo/request", async (req: Request, res: Response) => {
+    try {
+      const { email, name, consentToEmails } = req.body;
+      
+      if (!email || !name) {
+        return res.status(400).json({ error: "Email and name required" });
+      }
+
+      // Check if already registered
+      const existing = await storage.getDemoRegistrationByEmail(email);
+      if (existing && !existing.used) {
+        return res.status(409).json({ 
+          error: "Demo code already sent to this email",
+          code: existing.demoCode 
+        });
+      }
+
+      // Generate random 6-char alphanumeric code
+      const demoCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      // Create registration valid for 7 days
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      await storage.createDemoRegistration({
+        email: email.toLowerCase(),
+        name,
+        demoCode,
+        consentToEmails: consentToEmails || true,
+        expiresAt,
+      });
+
+      res.status(201).json({
+        success: true,
+        message: `Demo code sent to ${email}`,
+        email: email,
+        code: demoCode,
+      });
+    } catch (error) {
+      console.error("Demo registration error:", error);
+      res.status(500).json({ error: "Failed to request demo" });
+    }
+  });
+
   app.post("/api/auth/login", async (req: Request, res: Response) => {
     try {
       const { email, password, pin, sandboxRole } = req.body;
+
+      // Demo code - generated from demo request form (6-char alphanumeric, non-numeric)
+      if (pin && pin.length === 6 && !pin.match(/^\d+$/)) {
+        const demoCode = pin.toUpperCase();
+        const demoReg = await storage.getDemoRegistrationByCode(demoCode);
+        
+        if (!demoReg) {
+          return res.status(401).json({ error: "Invalid demo code" });
+        }
+
+        // Check if code is expired
+        if (new Date() > new Date(demoReg.expiresAt)) {
+          return res.status(401).json({ error: "Demo code has expired" });
+        }
+
+        // Only allow owner and employee with demo codes (no admin)
+        if (sandboxRole === "admin") {
+          return res.status(403).json({ error: "Admin access not available with demo code" });
+        }
+
+        // Mark as used
+        await storage.markDemoAsUsed(demoCode);
+
+        // Owner demo sandbox
+        if (sandboxRole === "owner") {
+          const firstName = demoReg.name.split(" ")[0];
+          const lastName = demoReg.name.split(" ").slice(1).join(" ") || "Demo";
+          const demoOwnerUser = {
+            id: "demo-owner-" + demoCode,
+            email: demoReg.email,
+            firstName,
+            lastName,
+            role: "owner",
+            companyId: "demo-company",
+            isFirstLogin: true,
+            isReadOnly: false,
+            welcomeMessage: `Welcome to ORBIT, ${firstName}!\n\nYour demo access is active for 7 days. Test drive the complete staffing platform:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nFor questions, contact support@orbitstaffing.net`,
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(demoOwnerUser);
+        }
+
+        // Employee demo sandbox
+        if (sandboxRole === "employee") {
+          const firstName = demoReg.name.split(" ")[0];
+          const lastName = demoReg.name.split(" ").slice(1).join(" ") || "Demo";
+          const demoEmployeeUser = {
+            id: "demo-worker-" + demoCode,
+            email: demoReg.email,
+            firstName,
+            lastName,
+            role: "worker",
+            companyId: "demo-company",
+            isFirstLogin: true,
+            isReadOnly: false,
+            welcomeMessage: `Welcome to ORBIT, ${firstName}!\n\nYour demo access is active for 7 days. Try the complete worker app:\n\n✓ View assigned jobs\n✓ Clock in/out with GPS verification\n✓ Track your earnings in real-time\n✓ See your bonus calculations\n✓ View payment history\n✓ Manage time-off requests\n\nFor questions, contact support@orbitstaffing.net`,
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(demoEmployeeUser);
+        }
+      }
 
       // PIN 4444 - Private sandbox for authorized users only (Admin, Owner, Employee)
       if (pin === "4444") {

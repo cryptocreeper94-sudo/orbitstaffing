@@ -16,10 +16,12 @@ import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
+import { DemoRequestForm } from "@/components/DemoRequestForm";
 import saturnLogo from "@assets/generated_images/3d_saturn_with_dark_outline_and_shadow_depth.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
+  const [showDemoForm, setShowDemoForm] = useState(false);
   const [selectedBenefit, setSelectedBenefit] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,6 +47,9 @@ export default function Landing() {
         benefitId={selectedBenefit}
         onClose={() => setSelectedBenefit(null)}
       />
+
+      {/* Demo Request Form */}
+      {showDemoForm && <DemoRequestForm onClose={() => setShowDemoForm(false)} />}
 
       {/* Saturn Watermark - Fixed Centered 3D Background */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
@@ -106,8 +111,12 @@ export default function Landing() {
           </p>
 
           <div className="flex flex-col md:flex-row gap-3 justify-center mb-12">
-            <Button className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-              Request Demo <ArrowRight className="w-4 h-4 ml-2" />
+            <Button 
+              onClick={() => setShowDemoForm(true)}
+              className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+              data-testid="button-landing-demo"
+            >
+              Request Free Demo <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <Link href="/configure" className="h-10 text-sm px-4 rounded-md border border-primary/30 hover:bg-primary/10 inline-flex items-center">
               Configure for Your Industry
