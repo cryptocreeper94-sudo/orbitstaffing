@@ -15,11 +15,20 @@ import WeatherNewsWidget from '@/components/WeatherNewsWidget';
 import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
+import { getValidSession, setSessionWithExpiry, clearSession, isMobileDevice, shouldBypassMobileLogin } from '@/lib/sessionUtils';
+
+const DEVELOPER_SESSION_KEY = 'developer';
 
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window !== 'undefined') {
+      // Check for valid persistent session (30 days)
+      const session = getValidSession(DEVELOPER_SESSION_KEY);
+      if (session?.authenticated) {
+        return true;
+      }
+      // Fallback to old localStorage flag for migration
       return localStorage.getItem('developerAuthenticated') === 'true';
     }
     return false;
@@ -39,7 +48,16 @@ export default function DeveloperPanel() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      localStorage.setItem('developerAuthenticated', 'true');
+      // Set 30-day persistent session
+      setSessionWithExpiry(DEVELOPER_SESSION_KEY, { authenticated: true });
+      localStorage.setItem('developerAuthenticated', 'true'); // Migrate old flag
+    }
+  }, [isAuthenticated]);
+
+  // Auto-bypass login on mobile if session exists
+  useEffect(() => {
+    if (shouldBypassMobileLogin(DEVELOPER_SESSION_KEY) && !isAuthenticated) {
+      setIsAuthenticated(true);
     }
   }, [isAuthenticated]);
 
@@ -60,7 +78,9 @@ export default function DeveloperPanel() {
       });
 
       if (res.ok) {
-        localStorage.setItem('developerAuthenticated', 'true');
+        // Set 30-day persistent session
+        setSessionWithExpiry(DEVELOPER_SESSION_KEY, { authenticated: true });
+        localStorage.setItem('developerAuthenticated', 'true'); // Migrate old flag
         setIsAuthenticated(true);
         setPin('');
       } else {
@@ -74,8 +94,11 @@ export default function DeveloperPanel() {
   };
 
   const handleLogout = () => {
-    setLocation('/');
+    // Clear both old and new session formats
+    clearSession(DEVELOPER_SESSION_KEY);
     localStorage.removeItem('developerAuthenticated');
+    setIsAuthenticated(false);
+    setLocation('/');
   };
 
   const copyToClipboard = (text: string, id: string) => {

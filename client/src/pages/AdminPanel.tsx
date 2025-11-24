@@ -14,6 +14,9 @@ import WeatherNewsWidget from '@/components/WeatherNewsWidget';
 import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
+import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessionUtils';
+
+const ADMIN_SESSION_KEY = 'admin';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
@@ -32,6 +35,16 @@ export default function AdminPanel() {
 
   // Check if already authenticated
   useEffect(() => {
+    // Check for valid persistent session (30 days)
+    const session = getValidSession(ADMIN_SESSION_KEY);
+    if (session?.authenticated && session.role) {
+      setIsAuthenticated(true);
+      setRole(session.role as AdminRole);
+      setAdminName(session.name || 'Admin');
+      return;
+    }
+    
+    // Fallback to old localStorage flags for migration
     const adminAuth = localStorage.getItem('adminAuthenticated');
     const savedRole = localStorage.getItem('adminRole') as AdminRole;
     const savedName = localStorage.getItem('adminName');
@@ -66,12 +79,19 @@ export default function AdminPanel() {
       });
 
       if (res.ok) {
-        setIsAuthenticated(true);
-        setRole('master_admin');
-        setAdminName('System Owner');
+        // Set 30-day persistent session
+        setSessionWithExpiry(ADMIN_SESSION_KEY, { 
+          authenticated: true, 
+          role: 'master_admin',
+          name: 'System Owner'
+        });
+        // Migrate old flags
         localStorage.setItem('adminAuthenticated', 'true');
         localStorage.setItem('adminRole', 'master_admin');
         localStorage.setItem('adminName', 'System Owner');
+        setIsAuthenticated(true);
+        setRole('master_admin');
+        setAdminName('System Owner');
         setPin('');
       } else {
         setError('Invalid PIN.');
@@ -84,13 +104,15 @@ export default function AdminPanel() {
   };
 
   const handleLogout = () => {
+    // Clear both old and new session formats
+    clearSession(ADMIN_SESSION_KEY);
+    localStorage.removeItem('adminAuthenticated');
+    localStorage.removeItem('adminRole');
+    localStorage.removeItem('adminName');
     setIsAuthenticated(false);
     setRole(null);
     setPin('');
     setError('');
-    localStorage.removeItem('adminAuthenticated');
-    localStorage.removeItem('adminRole');
-    localStorage.removeItem('adminName');
     // Redirect to home
     setLocation('/');
   };
