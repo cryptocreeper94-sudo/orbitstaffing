@@ -21,11 +21,11 @@ export function SMSConsentPage() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const handleConsentChange = (key: string) => {
+  const handleConsentChange = (key: "sms" | "email" | "push") => {
     setConsents((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleChecklistChange = (key: string) => {
+  const handleChecklistChange = (key: "phoneVerified" | "addressVerified" | "documentsReady" | "termsRead") => {
     setChecklist((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
