@@ -900,6 +900,13 @@ export class DrizzleStorage implements IStorage {
   }
 
   // ORBIT Hallmark Asset Registry
+  async getNextAssetNumber(): Promise<string> {
+    const result = await db.select({ max: sql<number>`MAX(CAST(SUBSTRING(asset_number, 15) AS INTEGER))` }).from(orbitAssets);
+    const maxSeq = result[0]?.max || 0;
+    const nextSeq = maxSeq + 1;
+    return `ORBIT-ASSET-${String(nextSeq).padStart(12, '0')}`;
+  }
+
   async registerAsset(asset: InsertOrbitAsset): Promise<OrbitAsset> {
     const result = await db.insert(orbitAssets).values(asset).returning();
     return result[0];

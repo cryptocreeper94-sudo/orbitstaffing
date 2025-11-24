@@ -2243,7 +2243,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid business card data", details: parsed.error.errors });
       }
 
-      const card = await storage.createOrUpdateAdminBusinessCard(parsed.data);
+      // Generate asset number if not already assigned
+      let assetNumber = parsed.data.assetNumber;
+      if (!assetNumber) {
+        assetNumber = await storage.getNextAssetNumber();
+      }
+
+      const cardData = {
+        ...parsed.data,
+        assetNumber
+      };
+
+      const card = await storage.createOrUpdateAdminBusinessCard(cardData);
       res.json(card);
     } catch (error) {
       console.error("Business card save error:", error);

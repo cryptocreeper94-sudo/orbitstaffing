@@ -23,6 +23,7 @@ interface AdminBusinessCardProps {
   website?: string;
   photoUrl?: string;
   brandColor?: string;
+  assetNumber?: string; // ORBIT-ASSET-000000000001
   onSave?: (data: any) => void;
 }
 
@@ -37,6 +38,7 @@ export function AdminBusinessCard({
   website,
   photoUrl,
   brandColor = '#06B6D4',
+  assetNumber = 'ORBIT-ASSET-000000000001',
   onSave,
 }: AdminBusinessCardProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -379,10 +381,18 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Bottom Left - Tiny QR Code */}
-          <div className="absolute bottom-1.5 left-1.5 p-1 rounded z-20 bg-gradient-to-b from-slate-800 to-slate-900">
+          {/* Bottom Left - Tiny QR Code with Cyan Border */}
+          <div className="absolute bottom-1.5 left-1.5 p-1 rounded z-20 bg-gradient-to-b from-slate-800 to-slate-900 border-2" style={{ borderColor: formData.brandColor }}>
             <QRCode value={vCardData} size={32} level="M" />
           </div>
+
+          {/* Bottom Right - Asset Number */}
+          <div className="absolute bottom-1.5 right-1.5 text-[6px] sm:text-[7px] text-white opacity-75 font-mono text-right z-20 max-w-20">
+            <div>{assetNumber}</div>
+          </div>
+
+          {/* Bottom Border - Cyan Frame Completion */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 z-10" style={{ backgroundColor: formData.brandColor }}></div>
         </div>
       </div>
 

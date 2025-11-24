@@ -2354,53 +2354,6 @@ export type InsertWorkerDNR = z.infer<typeof insertWorkerDNRSchema>;
 export type WorkerDNR = typeof workerDNR.$inferSelect;
 
 // ========================
-// ORBIT Hallmark Asset Registry
-// ========================
-export const orbitAssets = pgTable(
-  "orbit_assets",
-  {
-    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-    assetNumber: varchar("asset_number", { length: 50 }).notNull().unique(), // ORBIT-ASSET-XXXXXXXX-XXXXXX
-    
-    // Asset Type & Location
-    type: varchar("type", { length: 50 }).notNull(), // "powered_by_button", "invoice", "paystub", "contract", "report", "deployment", "certification", "document", etc.
-    franchiseeId: varchar("franchisee_id").references(() => franchises.id),
-    customerId: varchar("customer_id").references(() => companies.id),
-    
-    // Document/Output Reference
-    documentId: varchar("document_id", { length: 255 }), // ID of the actual document/output being stamped
-    
-    // Metadata
-    metadata: jsonb("metadata"), // domain, location, documentType, amount, recipient, etc.
-    
-    // Status & Lifecycle
-    status: varchar("status", { length: 50 }).default("active"), // "active", "archived", "revoked"
-    expiresAt: timestamp("expires_at"), // Optional expiration date
-    
-    // Tracking
-    createdAt: timestamp("created_at").default(sql`NOW()`),
-    revokedAt: timestamp("revoked_at"), // When/if asset was revoked
-    revokedBy: varchar("revoked_by").references(() => users.id), // Who revoked it
-  },
-  (table) => ({
-    assetNumberIdx: index("idx_assets_number").on(table.assetNumber),
-    franchiseeIdx: index("idx_assets_franchisee").on(table.franchiseeId),
-    customerIdx: index("idx_assets_customer").on(table.customerId),
-    statusIdx: index("idx_assets_status").on(table.status),
-    documentIdx: index("idx_assets_document").on(table.documentId),
-  })
-);
-
-export const insertOrbitAssetSchema = createInsertSchema(orbitAssets).omit({
-  id: true,
-  createdAt: true,
-  revokedAt: true,
-});
-
-export type InsertOrbitAsset = z.infer<typeof insertOrbitAssetSchema>;
-export type OrbitAsset = typeof orbitAssets.$inferSelect;
-
-// ========================
 // Support Tickets
 // ========================
 export const supportTickets = pgTable(
@@ -2511,6 +2464,9 @@ export const adminBusinessCards = pgTable(
     // Branding
     brandColor: varchar("brand_color", { length: 7 }).default("#06B6D4"), // Hex color
     
+    // Hallmark System
+    assetNumber: varchar("asset_number", { length: 50 }), // ORBIT-ASSET-000000000001
+    
     // Download/Share
     downloadCount: integer("download_count").default(0),
     lastDownloadedAt: timestamp("last_downloaded_at"),
@@ -2589,3 +2545,60 @@ export const insertDeveloperContactMessageSchema = createInsertSchema(developerC
 
 export type InsertDeveloperContactMessage = z.infer<typeof insertDeveloperContactMessageSchema>;
 export type DeveloperContactMessage = typeof developerContactMessages.$inferSelect;
+
+// ========================
+// ORBIT Asset Registry (Hallmark System)
+// ========================
+export const orbitAssets = pgTable(
+  "orbit_assets",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Asset Identity
+    assetNumber: varchar("asset_number", { length: 50 }).notNull().unique(), // ORBIT-ASSET-000000000001
+    sequenceNumber: integer("sequence_number").notNull().unique(), // Auto-increment for easy tracking
+    
+    // Asset Type & Owner
+    assetType: varchar("asset_type", { length: 50 }).notNull(), // business_card, paystub, invoice, contract, report, certification
+    ownerId: varchar("owner_id").notNull().references(() => users.id), // Who created/owns this asset
+    companyId: varchar("company_id").references(() => companies.id), // Company context (if applicable)
+    franchiseId: varchar("franchise_id").references(() => franchises.id), // Franchise context (if applicable)
+    
+    // QR Code & Verification
+    qrCodeData: text("qr_code_data").notNull(), // Encoded data (vCard, URL, JSON)
+    verificationUrl: varchar("verification_url", { length: 500 }), // URL to verify asset
+    
+    // Asset Content Metadata
+    contentMetadata: jsonb("content_metadata"), // Type-specific data: {fullName, title, email, etc. for cards}
+    
+    // Download/Share Stats
+    downloadCount: integer("download_count").default(0),
+    shareCount: integer("share_count").default(0),
+    verificationCount: integer("verification_count").default(0), // Times verified
+    
+    // Verification Proof
+    isVerified: boolean("is_verified").default(true),
+    verificationProof: jsonb("verification_proof"), // Digital signature, hash, etc.
+    
+    // Lifecycle
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    expiresAt: timestamp("expires_at"), // Optional expiration
+    archivedAt: timestamp("archived_at"),
+  },
+  (table) => ({
+    assetNumberIdx: index("idx_asset_number").on(table.assetNumber),
+    sequenceIdx: index("idx_asset_sequence").on(table.sequenceNumber),
+    ownerIdx: index("idx_asset_owner_id").on(table.ownerId),
+    typeIdx: index("idx_asset_type").on(table.assetType),
+    createdIdx: index("idx_asset_created").on(table.createdAt),
+  })
+);
+
+export const insertOrbitAssetSchema = createInsertSchema(orbitAssets).omit({
+  id: true,
+  createdAt: true,
+  archivedAt: true,
+});
+
+export type InsertOrbitAsset = z.infer<typeof insertOrbitAssetSchema>;
+export type OrbitAsset = typeof orbitAssets.$inferSelect;
