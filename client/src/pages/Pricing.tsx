@@ -19,7 +19,7 @@ const PRICING_TIERS = [
       'Basic payroll export',
       'Email support'
     ],
-    priceId: 'price_1SWpbXBJN5j7Sqn0zOGmvG8c', // Live Stripe price ID
+    priceId: 'price_1SWpbXBJN5j7Sqn0zOGmvG8c',
   },
   {
     id: 'small',
@@ -36,7 +36,7 @@ const PRICING_TIERS = [
       'Compliance reports',
       'Priority email support'
     ],
-    priceId: 'price_1SWpbXBJN5j7Sqn097nk0sua', // Live Stripe price ID
+    priceId: 'price_1SWpbXBJN5j7Sqn097nk0sua',
   },
   {
     id: 'growth',
@@ -52,7 +52,7 @@ const PRICING_TIERS = [
       'Dedicated support',
       'API access'
     ],
-    priceId: 'price_1SWpbXBJN5j7Sqn0iaE4uiPM', // Live Stripe price ID
+    priceId: 'price_1SWpbXBJN5j7Sqn0iaE4uiPM',
   },
   {
     id: 'enterprise',
@@ -160,10 +160,10 @@ export default function Pricing() {
                   ))}
                 </div>
 
-                {tier.price !== null ? (
+                {'priceId' in tier ? (
                   <div className="space-y-3">
                     <Button
-                      onClick={() => handleCheckout(tier.priceId!, 'stripe')}
+                      onClick={() => handleCheckout(tier.priceId, 'stripe')}
                       disabled={checkoutMutation.isPending}
                       className="w-full"
                       variant={tier.featured ? 'default' : 'outline'}
@@ -173,7 +173,7 @@ export default function Pricing() {
                       {checkoutMutation.isPending ? 'Processing...' : 'Pay with Card'}
                     </Button>
                     <Button
-                      onClick={() => handleCheckout(tier.priceId!, 'coinbase')}
+                      onClick={() => handleCheckout(tier.priceId, 'coinbase')}
                       disabled={checkoutMutation.isPending}
                       variant="outline"
                       className="w-full"
