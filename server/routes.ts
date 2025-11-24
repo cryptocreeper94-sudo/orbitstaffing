@@ -37,7 +37,9 @@ import {
   companies,
   users,
   payments,
+  companyHallmarks,
   hallmarks,
+  companyHallmarks,
   hallmarkAudit,
 } from "@shared/schema";
 
@@ -3735,25 +3737,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
+
 
   // ========================
-  // ASSET TRACKER - HALLMARK SEARCH
+  // COMPANY HALLMARKS (Multi-Tenant)
   // ========================
-  app.get("/api/hallmarks/search", async (req: Request, res: Response) => {
+  app.post("/api/company-hallmarks/initialize", async (req: Request, res: Response) => {
     try {
-      const { q } = req.query;
-      if (!q || typeof q !== 'string') {
-        return res.status(400).json({ error: "Search query required" });
+      const { companyId, companyName, brandColor } = req.body;
+      if (!companyId || !companyName) {
+        return res.status(400).json({ error: "Company ID and name required" });
       }
-      const result = await db.select().from(hallmarks).where(sql`${hallmarks.hallmarkNumber} ILIKE ${`%${q}%`}`).limit(1);
-      if (!result || result.length === 0) {
-        return res.status(404).json({ error: "Asset not found" });
-      }
-      res.json(result[0]);
+      const prefix = `${companyName.slice(0, 3).toUpperCase()}-${Date.now().toString(36).toUpperCase().slice(-3)}`;
+      const result = await db.insert(companyHallmarks).values({
+        companyId, hallmarkPrefix: prefix, brandColor: brandColor || "#06B6D4", nextSerialNumber: 1,
+      }).returning();
+      res.status(201).json(result[0]);
     } catch (error) {
-      console.error("Search error:", error);
-      res.status(500).json({ error: "Search failed" });
+      console.error("Initialize hallmark error:", error);
+      res.status(500).json({ error: "Failed to initialize hallmark" });
     }
   });
 

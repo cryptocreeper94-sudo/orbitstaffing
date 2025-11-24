@@ -17,6 +17,7 @@ import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager
 import { SidonieWelcomeModal } from '@/components/SidonieWelcomeModal';
 import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessionUtils';
 import { AssetTracker } from '@/components/AssetTracker';
+import { CompanyHallmarkManager } from '@/components/CompanyHallmarkManager';
 
 const ADMIN_SESSION_KEY = 'admin';
 

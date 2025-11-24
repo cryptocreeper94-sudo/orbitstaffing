@@ -3901,3 +3901,33 @@ export const insertHallmarkAuditSchema = createInsertSchema(hallmarkAudit).omit(
 
 export type InsertHallmarkAudit = z.infer<typeof insertHallmarkAuditSchema>;
 export type HallmarkAudit = typeof hallmarkAudit.$inferSelect;
+
+// ========================
+// Company Hallmark Configuration (Multi-Tenant)
+// ========================
+export const companyHallmarks = pgTable(
+  "company_hallmarks",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().unique().references(() => companies.id),
+    hallmarkPrefix: varchar("hallmark_prefix", { length: 20 }).notNull(),
+    nextSerialNumber: integer("next_serial_number").default(1),
+    brandColor: varchar("brand_color", { length: 7 }).default("#06B6D4"),
+    isActive: boolean("is_active").default(true),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_company_hallmarks_company").on(table.companyId),
+    prefixIdx: index("idx_company_hallmarks_prefix").on(table.hallmarkPrefix),
+  })
+);
+
+export const insertCompanyHallmarkSchema = createInsertSchema(companyHallmarks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCompanyHallmark = z.infer<typeof insertCompanyHallmarkSchema>;
+export type CompanyHallmark = typeof companyHallmarks.$inferSelect;
