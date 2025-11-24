@@ -87,9 +87,6 @@ export default function Landing() {
             <Link href="/professional-staffing" className="px-3 py-2 text-sm rounded-md border border-border/50 hover:bg-white/5 transition-colors inline-block">
               Professional
             </Link>
-            <Link href="/dev-landing" className="px-3 py-2 text-sm rounded-md border border-cyan-600/50 hover:bg-cyan-600/10 text-cyan-400 hover:text-cyan-300 transition-colors inline-block flex items-center gap-1" data-testid="link-dev-skip">
-              Dev
-            </Link>
           </div>
         </div>
       </header>
@@ -489,11 +486,16 @@ export default function Landing() {
             <div className="text-sm text-slate-400">
               <p>© 2025 ORBIT Staffing. All rights reserved.</p>
             </div>
-            <Link href="https://darkwavestudios.net" target="_blank">
-              <a className="text-primary hover:text-primary/80 transition-colors font-bold">
-                DarkWave Studios →
-              </a>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="https://darkwavestudios.net" target="_blank">
+                <a className="text-primary hover:text-primary/80 transition-colors font-bold">
+                  DarkWave Studios →
+                </a>
+              </Link>
+              <Link href="/developer" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                ⚙️
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
