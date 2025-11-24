@@ -605,6 +605,7 @@ export const employeePreApplications = pgTable(
     lastName: varchar("last_name", { length: 100 }).notNull(),
     email: varchar("email", { length: 255 }).notNull(),
     phone: varchar("phone", { length: 20 }).notNull(),
+    phone2: varchar("phone2", { length: 20 }),
     dateOfBirth: date("date_of_birth"),
     
     // Address
@@ -626,6 +627,24 @@ export const employeePreApplications = pgTable(
     i9Status: varchar("i9_status", { length: 50 }).default("not_started"), // not_started, pending, verified, expired
     backgroundCheckConsent: boolean("background_check_consent").default(false),
     backgroundCheckStatus: varchar("background_check_status", { length: 50 }).default("pending"),
+    
+    // Drug Testing & Health
+    drugTestConsent: boolean("drug_test_consent").default(false), // Pre-employment
+    accidentDrugTestConsent: boolean("accident_drug_test_consent").default(false), // For accidents
+    
+    // Work History & References
+    workHistory: jsonb("work_history"), // Array of {company, position, startDate, endDate, notes}
+    references: jsonb("references"), // Array of {name, phone, relationship, company}
+    
+    // Equipment Acknowledgment
+    equipmentAcknowledgmentConsent: boolean("equipment_acknowledgment_consent").default(false),
+    equipmentReturnTermsAccepted: boolean("equipment_return_terms_accepted").default(false),
+    
+    // Tennessee Right-to-Work
+    tennesseeRightToWorkAcknowledged: boolean("tennessee_right_to_work_acknowledged").default(false),
+    
+    // Progress Tracking
+    progressSavedAt: timestamp("progress_saved_at"),
     
     // Payment Info
     bankAccountHolderName: varchar("bank_account_holder_name", { length: 255 }),
@@ -671,6 +690,110 @@ export const insertEmployeePreApplicationSchema = createInsertSchema(employeePre
 
 export type InsertEmployeePreApplication = z.infer<typeof insertEmployeePreApplicationSchema>;
 export type EmployeePreApplication = typeof employeePreApplications.$inferSelect;
+
+// ========================
+// Equipment Items (PPE Catalog)
+// ========================
+export const equipmentItems = pgTable(
+  "equipment_items",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Item Info
+    name: varchar("name", { length: 255 }).notNull(), // e.g., "Hard Hat", "Reflective Vest"
+    category: varchar("category", { length: 100 }).notNull(), // "safety", "protective", "tools"
+    description: text("description"),
+    
+    // Inventory
+    quantity: integer("quantity").default(0),
+    cost: decimal("cost", { precision: 10, scale: 2 }), // Cost to replace
+    
+    // Options (for items with variants like vest sizes)
+    hasOptions: boolean("has_options").default(false),
+    options: jsonb("options"), // Array of {optionName, values: [small, medium, large]}
+    
+    // Return Policy
+    requiresReturn: boolean("requires_return").default(true),
+    returnDeadlineDays: integer("return_deadline_days").default(2), // Days to return before deduction
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    categoryIdx: index("idx_equipment_category").on(table.category),
+    activeIdx: index("idx_equipment_active").on(table.isActive),
+  })
+);
+
+export const insertEquipmentItemSchema = createInsertSchema(equipmentItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEquipmentItem = z.infer<typeof insertEquipmentItemSchema>;
+export type EquipmentItem = typeof equipmentItems.$inferSelect;
+
+// ========================
+// Employee Equipment Loaned
+// ========================
+export const employeeEquipmentLoaned = pgTable(
+  "employee_equipment_loaned",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // References
+    preApplicationId: varchar("pre_application_id").references(() => employeePreApplications.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    equipmentItemId: varchar("equipment_item_id").notNull().references(() => equipmentItems.id),
+    assignmentId: varchar("assignment_id").references(() => assignments.id),
+    
+    // Equipment Details
+    quantity: integer("quantity").notNull().default(1),
+    selectedOption: varchar("selected_option", { length: 100 }), // e.g., "Large" for vest size
+    
+    // Loan Status
+    loanedAt: timestamp("loaned_at").default(sql`NOW()`),
+    returnedAt: timestamp("returned_at"),
+    returnDeadlineAt: timestamp("return_deadline_at"),
+    
+    // Return Status
+    isReturned: boolean("is_returned").default(false),
+    isOverdue: boolean("is_overdue").default(false),
+    condition: varchar("condition", { length: 50 }), // good, damaged, missing
+    
+    // Deduction (if not returned)
+    deductionAmount: decimal("deduction_amount", { precision: 10, scale: 2 }).default("0"),
+    deductionApplied: boolean("deduction_applied").default(false),
+    deductionAppliedAt: timestamp("deduction_applied_at"),
+    
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    preAppIdx: index("idx_equip_loan_pre_app").on(table.preApplicationId),
+    workerIdx: index("idx_equip_loan_worker").on(table.workerId),
+    equipmentIdx: index("idx_equip_loan_equipment").on(table.equipmentItemId),
+    returnedIdx: index("idx_equip_loan_returned").on(table.isReturned),
+    overdueIdx: index("idx_equip_loan_overdue").on(table.isOverdue),
+  })
+);
+
+export const insertEmployeeEquipmentLoanedSchema = createInsertSchema(employeeEquipmentLoaned).omit({
+  id: true,
+  loanedAt: true,
+  deductionAppliedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEmployeeEquipmentLoaned = z.infer<typeof insertEmployeeEquipmentLoanedSchema>;
+export type EmployeeEquipmentLoaned = typeof employeeEquipmentLoaned.$inferSelect;
 
 // ========================
 // Background Checks

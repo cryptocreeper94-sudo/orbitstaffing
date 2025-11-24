@@ -2778,6 +2778,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save progress (auto-save)
+  app.post("/api/employee-pre-applications/save-progress", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      
+      // Find existing application by email or create new
+      const existing = await storage.getEmployeePreApplicationsByEmail(body.email);
+      const preApp = existing && existing.length > 0 
+        ? await storage.updateEmployeePreApplication(existing[0].id, {
+            ...body,
+            workHistory: body.workHistory,
+            references: body.references,
+            progressSavedAt: new Date(),
+          })
+        : await storage.createEmployeePreApplication({
+            ...body,
+            workHistory: body.workHistory,
+            references: body.references,
+            progressSavedAt: new Date(),
+          });
+
+      res.json({
+        success: true,
+        message: "Progress saved",
+        preApplication: preApp
+      });
+    } catch (error) {
+      console.error("Failed to save progress:", error);
+      res.status(500).json({ error: "Failed to save progress" });
+    }
+  });
+
   // ========================
   // SIDONIE PASSWORD RESET ROUTES
   // ========================
