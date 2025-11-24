@@ -58,6 +58,7 @@ export default function DeveloperPanel() {
       });
 
       if (res.ok) {
+        localStorage.setItem('developerAuthenticated', 'true');
         setIsAuthenticated(true);
         setPin('');
       } else {
