@@ -18,15 +18,28 @@ import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
+import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
 import saturnLogo from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
   const [showDemoForm, setShowDemoForm] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [selectedBenefit, setSelectedBenefit] = useState<string | null>(null);
 
   useEffect(() => {
-    // Show modal on first visit
+    // Show interactive onboarding for first-time visitors
+    const hasSeenOnboarding = localStorage.getItem("hasSeenInteractiveOnboarding");
+    if (!hasSeenOnboarding) {
+      // Delay slightly to let page render
+      const timer = setTimeout(() => {
+        setShowOnboarding(true);
+        localStorage.setItem("hasSeenInteractiveOnboarding", "true");
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    
+    // Then show business type modal on first visit
     const hasSeenModal = localStorage.getItem("hasSeenBusinessTypeModal");
     if (!hasSeenModal) {
       setShowModal(true);
@@ -36,6 +49,12 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Interactive Onboarding Tour */}
+      <InteractiveOnboarding 
+        isOpen={showOnboarding} 
+        onClose={() => setShowOnboarding(false)}
+      />
+
       {/* Value Proposition Modal */}
       <ValuePropositionModal />
       
