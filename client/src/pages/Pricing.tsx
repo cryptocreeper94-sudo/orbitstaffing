@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, CreditCard, Bitcoin } from 'lucide-react';
+import { Check, CreditCard, Bitcoin, ArrowLeft } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
+import { Link } from 'wouter';
 
 const PRICING_TIERS = [
   {
@@ -102,7 +103,17 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-20 pb-12">
+    <div className="min-h-screen bg-background text-foreground pt-8 pb-12">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-6 mb-4">
+        <Link href="/">
+          <Button variant="ghost" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20" data-testid="button-back-home">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </Link>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">

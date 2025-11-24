@@ -1,11 +1,22 @@
 import React from 'react';
-import { ArrowRight, CheckCircle, Globe, Users, Zap, Lock, TrendingUp, Cpu } from 'lucide-react';
+import { ArrowRight, CheckCircle, Globe, Users, Zap, Lock, TrendingUp, Cpu, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Link } from 'wouter';
 
 export default function ValueProposition() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+      {/* Back Button */}
+      <div className="px-4 py-4">
+        <Link href="/">
+          <Button variant="ghost" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20" data-testid="button-back-home">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </Link>
+      </div>
+
       {/* Hero */}
       <div className="relative overflow-hidden px-4 py-20">
         <div className="absolute inset-0 opacity-20">

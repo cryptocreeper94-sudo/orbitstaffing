@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { HardHat, Plus, Trash2, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { HardHat, Plus, Trash2, Clock, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { Link } from 'wouter';
 
 interface Equipment {
   id: string;
@@ -170,6 +171,16 @@ export default function EquipmentTrackingAdmin() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
+      {/* Back Button */}
+      <div className="max-w-6xl mx-auto mb-4">
+        <Link href="/">
+          <Button variant="ghost" className="text-yellow-500 hover:text-yellow-400 hover:bg-yellow-900/20" data-testid="button-back-home">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </Link>
+      </div>
+
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">

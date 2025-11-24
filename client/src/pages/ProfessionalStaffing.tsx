@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { Lock, Users, FileText, Calendar, CheckCircle, Briefcase, Award, MapPin, DollarSign } from 'lucide-react';
+import { Lock, Users, FileText, Calendar, CheckCircle, Briefcase, Award, MapPin, DollarSign, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Link } from 'wouter';
 
 export default function ProfessionalStaffing() {
   const [selectedTab, setSelectedTab] = useState('overview');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 p-4 md:p-8">
+      {/* Back Button */}
+      <div className="max-w-6xl mx-auto mb-4">
+        <Link href="/">
+          <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20" data-testid="button-back-home">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </Link>
+      </div>
+
       {/* Header with Lock Badge */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="flex items-center gap-3 mb-6">

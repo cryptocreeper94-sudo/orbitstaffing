@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle2, MapPin, Clock, AlertTriangle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, MapPin, Clock, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { Link } from 'wouter';
 
 interface JobSite {
   id: string;
@@ -216,6 +217,16 @@ export default function GPSClockIn() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
+      {/* Back Button */}
+      <div className="max-w-2xl mx-auto mb-4">
+        <Link href="/">
+          <Button variant="ghost" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20" data-testid="button-back-home">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+        </Link>
+      </div>
+
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
