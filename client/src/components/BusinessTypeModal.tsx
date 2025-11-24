@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Briefcase, X } from "lucide-react";
 import { Link } from "wouter";
+import saturnLogo from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
 interface BusinessTypeModalProps {
   isOpen: boolean;
@@ -24,10 +25,19 @@ export function BusinessTypeModal({ isOpen, onClose }: BusinessTypeModalProps) {
         className="max-w-2xl w-full border-primary/50 bg-background shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        <CardHeader className="border-b border-border/50 flex flex-row items-start justify-between">
-          <div>
-            <CardTitle className="text-2xl">Choose Your Business Type</CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">Select which best describes your staffing operation</p>
+        <CardHeader className="border-b border-border/50 flex flex-row items-start justify-between bg-gradient-to-r from-slate-900 to-black">
+          <div className="flex items-center gap-4">
+            <div className="bg-black p-3 rounded-lg">
+              <img 
+                src={saturnLogo} 
+                alt="ORBIT" 
+                className="w-10 h-10"
+              />
+            </div>
+            <div>
+              <CardTitle className="text-2xl">Choose Your Business Type</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">Select which best describes your staffing operation</p>
+            </div>
           </div>
           <Button
             variant="ghost"
