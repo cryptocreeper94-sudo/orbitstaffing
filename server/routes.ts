@@ -2245,6 +2245,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // EMERGENCY PASSWORD OVERRIDE (MASTER ADMIN ONLY)
+  // ========================
+  app.post("/api/admin/emergency-override", async (req: Request, res: Response) => {
+    try {
+      const { adminPin, targetUserId, newPassword } = req.body;
+
+      // Master admin PIN check (your override PIN)
+      if (adminPin !== "9999") {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      if (!targetUserId || !newPassword) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Update user password (in production, hash this)
+      const user = await storage.updateUser(targetUserId, {
+        passwordHash: newPassword, // TODO: Hash password properly
+      });
+
+      res.json({
+        success: true,
+        message: `Password reset for ${user?.fullName || targetUserId}`,
+        user
+      });
+    } catch (error) {
+      console.error("Override error:", error);
+      res.status(500).json({ error: "Override failed" });
+    }
+  });
+
+  // ========================
   // ADMIN BUSINESS CARD ROUTES
   // ========================
   app.post("/api/admin/business-card", async (req: Request, res: Response) => {

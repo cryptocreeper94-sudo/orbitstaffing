@@ -17,6 +17,9 @@ export default function SecureSandbox() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | 'employee' | null>(null);
   const [error, setError] = useState('');
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const loginMutation = useMutation({
     mutationFn: async (sandboxRole: 'admin' | 'owner' | 'employee') => {
@@ -39,13 +42,18 @@ export default function SecureSandbox() {
       localStorage.setItem('isReadOnly', user.isReadOnly || false);
       localStorage.setItem('sandboxSecure', 'true');
 
-      // Navigate to appropriate dashboard
-      if (sandboxRole === 'admin') {
-        setLocation('/admin');
-      } else if (sandboxRole === 'employee') {
-        setLocation('/employee-app');
+      // If user requires password change, show password modal
+      if (user.requiresPasswordChange || user.needsPasswordReset) {
+        setShowPasswordChange(true);
       } else {
-        setLocation('/dashboard');
+        // Navigate to appropriate dashboard
+        if (sandboxRole === 'admin') {
+          setLocation('/admin');
+        } else if (sandboxRole === 'employee') {
+          setLocation('/employee-app');
+        } else {
+          setLocation('/dashboard');
+        }
       }
     },
     onError: () => {
@@ -70,6 +78,83 @@ export default function SecureSandbox() {
     localStorage.removeItem('isReadOnly');
     localStorage.removeItem('sandboxSecure');
   };
+
+  const handlePasswordChange = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newPassword || !confirmPassword) {
+      alert('Please fill in all fields');
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      alert('Password must be at least 8 characters');
+      return;
+    }
+
+    // Save password (in production, would send to server)
+    localStorage.setItem(`${currentUser.id}_password`, newPassword);
+    setShowPasswordChange(false);
+    
+    // Navigate to dashboard
+    if (currentUser.role === 'admin') {
+      setLocation('/admin');
+    } else if (currentUser.role === 'worker') {
+      setLocation('/employee-app');
+    } else {
+      setLocation('/dashboard');
+    }
+  };
+
+  // Password change modal
+  if (isAuthenticated && currentUser && showPasswordChange) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
+          <h1 className="text-2xl font-bold text-white mb-2">{currentUser.greeting || `Welcome, ${currentUser.firstName}!`}</h1>
+          <p className="text-gray-400 text-sm mb-6">
+            Please set a new password to secure your account
+          </p>
+
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Minimum 8 characters"
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter password"
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 font-bold"
+            >
+              Set Password & Continue
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   // Authenticated state
   if (isAuthenticated && currentUser) {
