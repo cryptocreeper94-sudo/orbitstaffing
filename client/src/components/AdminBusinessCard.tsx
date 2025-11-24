@@ -7,7 +7,7 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Share2, Upload, Edit2, Save, X } from 'lucide-react';
+import { Download, Share2, Upload, Edit2, Save, X, Shield } from 'lucide-react';
 import QRCode from 'react-qr-code';
 
 interface AdminBusinessCardProps {
@@ -86,17 +86,7 @@ export function AdminBusinessCard({
   };
 
   const handleDownload = () => {
-    const element = document.getElementById('business-card-print');
-    if (element) {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        canvas.width = 1050; // 3.5" at 300 DPI
-        canvas.height = 600;  // 2" at 300 DPI
-        // Basic PNG export - in production, use html2canvas or similar
-        window.print();
-      }
-    }
+    window.print();
   };
 
   // vCard format for QR code
@@ -113,7 +103,7 @@ END:VCARD`;
 
   if (isEditing) {
     return (
-      <Card className="w-full max-w-2xl mx-auto bg-card/50 border-border/50">
+      <Card className="w-full max-w-4xl mx-auto bg-card/50 border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Edit Business Card</span>
@@ -123,60 +113,53 @@ END:VCARD`;
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Photo Upload */}
-          <div className="space-y-3">
-            <label className="text-sm font-medium">Photo</label>
-            <div className="flex gap-4 items-start">
-              <div className="w-24 h-32 rounded-lg border-2 border-dashed border-border flex items-center justify-center overflow-hidden bg-background/50">
-                {photoPreview ? (
-                  <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center text-xs text-muted-foreground">No photo</div>
-                )}
-              </div>
-              <div className="flex-1 space-y-2">
-                <p className="text-sm text-muted-foreground">Upload a professional headshot (recommended: 300x400px)</p>
-                <Button
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full"
-                  data-testid="button-upload-photo"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Choose Photo
-                </Button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  data-testid="input-photo-file"
-                />
-              </div>
+          {/* Photo Upload - Square */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Photo (Square)</label>
+            <div className="w-32 h-32 rounded-lg border-2 border-dashed border-border flex items-center justify-center overflow-hidden bg-background/50 cursor-pointer hover:border-primary transition-colors"
+              onClick={() => fileInputRef.current?.click()}>
+              {photoPreview ? (
+                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-center text-xs text-muted-foreground">
+                  <Upload className="w-6 h-6 mx-auto mb-1 opacity-50" />
+                  Click to upload
+                </div>
+              )}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              className="hidden"
+              data-testid="input-photo-file"
+            />
           </div>
 
           {/* Form Fields */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Full Name</label>
-              <Input
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                data-testid="input-fullname"
-              />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Full Name</label>
+                <Input
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  data-testid="input-fullname"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Title</label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  placeholder="e.g., Operations Manager"
+                  data-testid="input-title"
+                />
+              </div>
             </div>
+
             <div className="space-y-2">
-              <label className="text-sm font-medium">Title</label>
-              <Input
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g., Operations Manager"
-                data-testid="input-title"
-              />
-            </div>
-            <div className="col-span-2 space-y-2">
               <label className="text-sm font-medium">Company Name</label>
               <Input
                 value={formData.companyName}
@@ -184,45 +167,52 @@ END:VCARD`;
                 data-testid="input-company"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
-              <Input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                data-testid="input-email"
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  data-testid="input-email"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Phone</label>
+                <Input
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+1 (615) 555-0123"
+                  data-testid="input-phone"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Phone</label>
-              <Input
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+1 (615) 555-0123"
-                data-testid="input-phone"
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Location</label>
+                <Input
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  placeholder="Nashville, TN"
+                  data-testid="input-location"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Website</label>
+                <Input
+                  value={formData.website}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  placeholder="www.example.com"
+                  data-testid="input-website"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Location</label>
-              <Input
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Nashville, TN"
-                data-testid="input-location"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Website</label>
-              <Input
-                value={formData.website}
-                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                placeholder="www.example.com"
-                data-testid="input-website"
-              />
-            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Brand Color</label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <input
                   type="color"
                   value={formData.brandColor}
@@ -262,84 +252,87 @@ END:VCARD`;
 
   return (
     <div className="w-full space-y-6">
-      {/* Business Card Preview - Actual 3.5" x 2" ratio */}
+      {/* Business Card Preview - Actual 3.5" x 2" ratio with QR code */}
       <div className="flex justify-center">
         <div
           id="business-card-print"
-          className="w-[350px] h-[200px] rounded-lg shadow-2xl overflow-hidden flex"
+          className="w-[350px] h-[200px] rounded-lg shadow-2xl overflow-hidden flex relative"
           style={{ backgroundColor: formData.brandColor + '15', border: `2px solid ${formData.brandColor}` }}
           data-testid="card-business-preview"
         >
-          {/* Left side - Photo */}
-          <div className="w-[120px] h-full bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2" style={{ borderColor: formData.brandColor }}>
+          {/* Background Logo - ORBIT */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+            <div className="text-center">
+              <Shield className="w-32 h-32 text-cyan-400 mx-auto" />
+              <div className="text-4xl font-bold text-cyan-400">ORBIT</div>
+            </div>
+          </div>
+
+          {/* Left side - Photo (Square) */}
+          <div className="w-[120px] h-full bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10" style={{ borderColor: formData.brandColor }}>
             {photoPreview ? (
               <img src={photoPreview} alt={formData.fullName} className="w-full h-full object-cover" />
             ) : (
-              <div className="text-xs text-gray-500 text-center px-2">Add Photo</div>
+              <div className="text-xs text-gray-500 text-center px-2">Photo</div>
             )}
           </div>
 
-          {/* Right side - Info */}
-          <div className="flex-1 p-4 flex flex-col justify-between text-white bg-gradient-to-br from-slate-900 to-slate-950">
+          {/* Middle - Info */}
+          <div className="flex-1 p-3 flex flex-col justify-between text-white bg-gradient-to-br from-slate-900 to-slate-950 relative z-10">
             <div>
-              <h3 className="font-bold text-base leading-tight" style={{ color: formData.brandColor }}>
+              <h3 className="font-bold text-sm leading-tight" style={{ color: formData.brandColor }}>
                 {formData.fullName}
               </h3>
-              {formData.title && <p className="text-xs opacity-90 leading-tight">{formData.title}</p>}
-              <p className="text-xs opacity-75 mt-1">{formData.companyName}</p>
+              {formData.title && <p className="text-[10px] opacity-90 leading-tight">{formData.title}</p>}
+              <p className="text-[10px] opacity-75 mt-0.5">{formData.companyName}</p>
             </div>
 
-            <div className="space-y-0.5 text-xs">
+            <div className="space-y-0.5 text-[9px]">
               <p>{formData.email}</p>
               {formData.phone && <p>{formData.phone}</p>}
               {formData.location && <p>{formData.location}</p>}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* QR Code & Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* QR Code */}
-        <div className="flex flex-col items-center space-y-4 bg-card/30 p-6 rounded-lg border border-border/30">
-          <div className="bg-white p-3 rounded-lg">
-            <QRCode value={vCardData} size={140} level="M" />
+          {/* Right side - QR Code */}
+          <div className="w-[100px] h-full flex items-center justify-center bg-white p-1 relative z-10">
+            <QRCode value={vCardData} size={90} level="M" />
           </div>
-          <p className="text-xs text-muted-foreground text-center">Scan to save contact</p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col gap-3 justify-center">
-          <Button
-            onClick={() => setIsEditing(true)}
-            className="w-full"
-            variant="outline"
-            data-testid="button-edit-card"
-          >
-            <Edit2 className="w-4 h-4 mr-2" />
-            Edit Card
-          </Button>
-          <Button
-            onClick={handleDownload}
-            className="w-full"
-            data-testid="button-download-card"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Download PNG
-          </Button>
-          <Button
-            className="w-full"
-            variant="secondary"
-            data-testid="button-share-card"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            Share Card
-          </Button>
-          <p className="text-xs text-muted-foreground text-center pt-2">
-            Perfect for printing (3.5" × 2") or sharing via email/text
-          </p>
         </div>
       </div>
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Button
+          onClick={() => setIsEditing(true)}
+          className="flex-1 sm:flex-none"
+          variant="outline"
+          data-testid="button-edit-card"
+        >
+          <Edit2 className="w-4 h-4 mr-2" />
+          Edit Card
+        </Button>
+        <Button
+          onClick={handleDownload}
+          className="flex-1 sm:flex-none"
+          data-testid="button-download-card"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          Download/Print
+        </Button>
+        <Button
+          className="flex-1 sm:flex-none"
+          variant="secondary"
+          data-testid="button-share-card"
+        >
+          <Share2 className="w-4 h-4 mr-2" />
+          Share
+        </Button>
+      </div>
+      
+      <p className="text-xs text-muted-foreground text-center">
+        Professional business card (3.5" × 2") - photo, name, contact, and scannable QR code
+      </p>
     </div>
   );
 }
