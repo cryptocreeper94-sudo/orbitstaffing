@@ -335,7 +335,7 @@ END:VCARD`;
         <div
           ref={cardRef}
           id="business-card-print"
-          className="w-full max-w-[350px] sm:w-[350px] h-auto sm:h-[200px] aspect-video sm:aspect-auto rounded-lg shadow-2xl overflow-hidden flex relative cursor-pointer group"
+          className="w-full max-w-[350px] sm:w-[350px] h-auto sm:h-[200px] aspect-video sm:aspect-auto rounded-lg shadow-2xl flex relative cursor-pointer group"
           style={{ backgroundColor: formData.brandColor + '15', border: `2px solid ${formData.brandColor}` }}
           onClick={() => photoPreview && setImageModalOpen(true)}
           data-testid="card-business-preview"
@@ -394,8 +394,8 @@ END:VCARD`;
           {/* Bottom Border - Cyan Frame Completion */}
           <div className="absolute bottom-0 left-0 right-0 h-0.5 z-10" style={{ backgroundColor: formData.brandColor }}></div>
 
-          {/* Right Border - Cyan Frame Completion (vertical stripe on right side) */}
-          <div className="absolute right-0 top-0 bottom-0" style={{ width: '0.125rem', backgroundColor: formData.brandColor, zIndex: 10 }}></div>
+          {/* Right Border - Cyan Frame Completion (connects photo bottom-right downward) */}
+          <div className="absolute bottom-0 right-0 h-1/2" style={{ width: '2px', backgroundColor: formData.brandColor, zIndex: 10 }}></div>
         </div>
       </div>
 
