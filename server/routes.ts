@@ -3243,6 +3243,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // FEATURE FLAGS (V2 ROADMAP)
+  // ========================
+  app.get("/api/feature-flags", async (req: Request, res: Response) => {
+    try {
+      const flags = await storage.getAllFeatureFlags?.() || [];
+      res.json({ flags });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch feature flags" });
+    }
+  });
+
+  app.post("/api/feature-flags/toggle", async (req: Request, res: Response) => {
+    try {
+      const { key, enabled } = req.body;
+      const result = await storage.updateFeatureFlag?.(key, { enabled });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to toggle feature flag" });
+    }
+  });
+
+  // ========================
+  // SMS NOTIFICATIONS (TWILIO)
+  // ========================
+  app.post("/api/sms/send", async (req: Request, res: Response) => {
+    try {
+      const { workerId, phoneNumber, message, messageType, referenceId } = req.body;
+      const sms = await storage.createSmsMessage?.({ workerId, phoneNumber, message, messageType, referenceId, status: "pending" });
+      res.json(sms);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to queue SMS" });
+    }
+  });
+
+  app.get("/api/sms/pending", async (req: Request, res: Response) => {
+    try {
+      const pending = await storage.getPendingSmsMessages?.() || [];
+      res.json({ pending });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pending SMS" });
+    }
+  });
+
+  app.post("/api/sms/:smsId/status", async (req: Request, res: Response) => {
+    try {
+      const { smsId } = req.params;
+      const { status } = req.body;
+      const result = await storage.updateSmsStatus?.(smsId, status, new Date());
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update SMS status" });
+    }
+  });
+
+  // ========================
+  // SKILL VERIFICATION
+  // ========================
+  app.post("/api/skills/create", async (req: Request, res: Response) => {
+    try {
+      const skill = await storage.createSkillVerification?.(req.body);
+      res.json(skill);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create skill verification" });
+    }
+  });
+
+  app.get("/api/skills/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const skills = await storage.getWorkerSkills?.(workerId) || [];
+      res.json({ skills });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker skills" });
+    }
+  });
+
+  app.post("/api/skills/:skillId/verify", async (req: Request, res: Response) => {
+    try {
+      const { skillId } = req.params;
+      const { verifiedBy } = req.body;
+      const result = await storage.verifyWorkerSkill?.(skillId, verifiedBy);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to verify skill" });
+    }
+  });
+
+  // ========================
+  // QUALITY ASSURANCE
+  // ========================
+  app.post("/api/qa/submit", async (req: Request, res: Response) => {
+    try {
+      const qa = await storage.createQASubmission?.(req.body);
+      res.json(qa);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to submit QA" });
+    }
+  });
+
+  app.get("/api/qa/assignment/:assignmentId", async (req: Request, res: Response) => {
+    try {
+      const { assignmentId } = req.params;
+      const qa = await storage.getQASubmission?.(assignmentId) || [];
+      res.json({ qa });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch QA submission" });
+    }
+  });
+
+  app.post("/api/qa/:qaId/approve", async (req: Request, res: Response) => {
+    try {
+      const { qaId } = req.params;
+      const { verifiedBy } = req.body;
+      const result = await storage.approveQASubmission?.(qaId, verifiedBy);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to approve QA" });
+    }
+  });
+
+  // ========================
+  // INSTANT PAY (FUTURE: STRIPE CONNECT)
+  // ========================
+  app.post("/api/instant-pay/request", async (req: Request, res: Response) => {
+    try {
+      const request = await storage.requestInstantPay?.(req.body);
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create instant pay request" });
+    }
+  });
+
+  app.get("/api/instant-pay/:requestId", async (req: Request, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const request = await storage.getInstantPayRequest?.(requestId);
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch instant pay request" });
+    }
+  });
+
+  app.get("/api/instant-pay/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const requests = await storage.getWorkerInstantPayRequests?.(workerId) || [];
+      res.json({ requests });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker instant pay requests" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

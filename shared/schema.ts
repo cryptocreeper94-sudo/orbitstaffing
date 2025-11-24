@@ -3414,3 +3414,231 @@ export const insertReferralBonusSchema = createInsertSchema(referralBonuses).omi
 
 export type InsertReferralBonus = z.infer<typeof insertReferralBonusSchema>;
 export type ReferralBonus = typeof referralBonuses.$inferSelect;
+
+// ========================
+// Feature Flags (V2 Roadmap)
+// ========================
+export const featureFlags = pgTable(
+  "feature_flags",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: varchar("name", { length: 255 }).notNull().unique(),
+    key: varchar("key", { length: 100 }).notNull().unique(), // e.g., "sms_notifications", "instant_pay"
+    description: text("description"),
+    enabled: boolean("enabled").default(false),
+    isRoadmap: boolean("is_roadmap").default(true), // True = locked/coming Q2 2026
+    releaseDate: date("release_date"), // Expected release date
+    category: varchar("category", { length: 100 }), // "communications", "payments", "engagement", "compliance"
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  }
+);
+
+export const insertFeatureFlagSchema = createInsertSchema(featureFlags).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFeatureFlag = z.infer<typeof insertFeatureFlagSchema>;
+export type FeatureFlag = typeof featureFlags.$inferSelect;
+
+// ========================
+// SMS Queue (Twilio)
+// ========================
+export const smsQueue = pgTable(
+  "sms_queue",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").references(() => workers.id),
+    phoneNumber: varchar("phone_number", { length: 20 }).notNull(),
+    message: text("message").notNull(),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // "pending", "sent", "failed", "bounced"
+    sentAt: timestamp("sent_at"),
+    failureReason: text("failure_reason"),
+    
+    // Context
+    messageType: varchar("message_type", { length: 50 }), // "shift_offer", "confirmation", "reminder", "alert", "bonus_update"
+    referenceId: varchar("reference_id"), // Link to assignment, bonus, etc.
+    
+    // Retry
+    retryCount: integer("retry_count").default(0),
+    maxRetries: integer("max_retries").default(3),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_sms_worker_id").on(table.workerId),
+    statusIdx: index("idx_sms_status").on(table.status),
+    createdIdx: index("idx_sms_created").on(table.createdAt),
+  })
+);
+
+export const insertSmsQueueSchema = createInsertSchema(smsQueue).omit({
+  id: true,
+  sentAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSmsQueue = z.infer<typeof insertSmsQueueSchema>;
+export type SmsQueue = typeof smsQueue.$inferSelect;
+
+// ========================
+// Skill Verification (Badges)
+// ========================
+export const workerSkillVerifications = pgTable(
+  "worker_skill_verifications",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    
+    // Skill Info
+    skillName: varchar("skill_name", { length: 255 }).notNull(), // e.g., "HVAC Technician", "Licensed Electrician"
+    skillCategory: varchar("skill_category", { length: 100 }), // "trades", "hospitality", "driving", "certification"
+    
+    // Certification Details
+    certificationName: varchar("certification_name", { length: 255 }),
+    certificationNumber: varchar("certification_number", { length: 100 }),
+    certificationUrl: text("certification_url"), // Link to uploaded document
+    
+    // Verification
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    verifiedAt: timestamp("verified_at"),
+    expiresAt: date("expires_at"), // Some certifications expire
+    
+    // Badge Status
+    badgeAwarded: boolean("badge_awarded").default(false),
+    badgeAwardedAt: timestamp("badge_awarded_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_skill_worker_id").on(table.workerId),
+    skillIdx: index("idx_skill_name").on(table.skillName),
+    verifiedIdx: index("idx_skill_verified").on(table.verifiedAt),
+  })
+);
+
+export const insertWorkerSkillVerificationSchema = createInsertSchema(workerSkillVerifications).omit({
+  id: true,
+  verifiedAt: true,
+  badgeAwardedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerSkillVerification = z.infer<typeof insertWorkerSkillVerificationSchema>;
+export type WorkerSkillVerification = typeof workerSkillVerifications.$inferSelect;
+
+// ========================
+// Quality Assurance / Work Verification
+// ========================
+export const workQualityAssurance = pgTable(
+  "work_quality_assurance",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    assignmentId: varchar("assignment_id").notNull().references(() => assignments.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    clientId: varchar("client_id").references(() => clients.id),
+    
+    // Submission
+    submittedAt: timestamp("submitted_at").default(sql`NOW()`),
+    submittedBy: varchar("submitted_by").notNull(), // "worker" or "client"
+    
+    // Quality Score
+    qualityScore: integer("quality_score"), // 1-5 stars or 0-100 percentage
+    notes: text("notes"),
+    
+    // Photo/Video Evidence
+    photoUrls: jsonb("photo_urls"), // Array of URLs to work photos
+    videoUrl: text("video_url"), // Link to video if applicable
+    
+    // Verification
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    verificationStatus: varchar("verification_status", { length: 50 }).default("pending"), // "pending", "approved", "disputed", "rejected"
+    verifiedAt: timestamp("verified_at"),
+    
+    // Dispute Resolution
+    isDisputed: boolean("is_disputed").default(false),
+    disputeReason: text("dispute_reason"),
+    disputeResolvedAt: timestamp("dispute_resolved_at"),
+    resolutionNotes: text("resolution_notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    assignmentIdx: index("idx_qa_assignment_id").on(table.assignmentId),
+    workerIdx: index("idx_qa_worker_id").on(table.workerId),
+    statusIdx: index("idx_qa_status").on(table.verificationStatus),
+  })
+);
+
+export const insertWorkQualityAssuranceSchema = createInsertSchema(workQualityAssurance).omit({
+  id: true,
+  submittedAt: true,
+  verifiedAt: true,
+  disputeResolvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkQualityAssurance = z.infer<typeof insertWorkQualityAssuranceSchema>;
+export type WorkQualityAssurance = typeof workQualityAssurance.$inferSelect;
+
+// ========================
+// Instant Pay Requests (Future: Stripe Connect)
+// ========================
+export const instantPayRequests = pgTable(
+  "instant_pay_requests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    assignmentId: varchar("assignment_id").references(() => assignments.id),
+    
+    // Amount
+    requestedAmount: decimal("requested_amount", { precision: 10, scale: 2 }).notNull(),
+    feePercentage: decimal("fee_percentage", { precision: 5, scale: 2 }).default("2.50"), // Processing fee
+    netAmount: decimal("net_amount", { precision: 10, scale: 2 }),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // "pending", "approved", "processing", "completed", "failed"
+    
+    // Payment Method
+    paymentMethod: varchar("payment_method", { length: 50 }), // "bank_transfer", "card", "wallet"
+    stripePayoutId: varchar("stripe_payout_id"), // Stripe Connect payout ID
+    
+    // Processing
+    requestedAt: timestamp("requested_at").default(sql`NOW()`),
+    processedAt: timestamp("processed_at"),
+    completedAt: timestamp("completed_at"),
+    failureReason: text("failure_reason"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_instant_pay_worker_id").on(table.workerId),
+    statusIdx: index("idx_instant_pay_status").on(table.status),
+    createdIdx: index("idx_instant_pay_created").on(table.createdAt),
+  })
+);
+
+export const insertInstantPayRequestSchema = createInsertSchema(instantPayRequests).omit({
+  id: true,
+  requestedAt: true,
+  processedAt: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertInstantPayRequest = z.infer<typeof insertInstantPayRequestSchema>;
+export type InstantPayRequest = typeof instantPayRequests.$inferSelect;

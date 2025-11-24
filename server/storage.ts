@@ -46,6 +46,11 @@ import {
   workerAvailability,
   assignmentAcceptances,
   referralBonuses,
+  featureFlags,
+  smsQueue,
+  workerSkillVerifications,
+  workQualityAssurance,
+  instantPayRequests,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -1837,6 +1842,89 @@ export class DrizzleStorage implements IStorage {
   async getTotalReferralEarnings(workerId: string): Promise<number> {
     const referrals = await this.getReferralBonuses(workerId);
     return referrals.reduce((sum, r) => sum + (r.status === "paid" ? parseFloat(r.bonusAmount.toString()) : 0), 0);
+  }
+
+  // ========================
+  // FEATURE FLAGS
+  // ========================
+  async getFeatureFlag(key: string) {
+    return db.select().from(featureFlags).where(eq(featureFlags.key, key)).limit(1);
+  }
+
+  async getAllFeatureFlags() {
+    return db.select().from(featureFlags);
+  }
+
+  async updateFeatureFlag(key: string, updates: any) {
+    return db.update(featureFlags).set(updates).where(eq(featureFlags.key, key)).returning();
+  }
+
+  // ========================
+  // SMS QUEUE
+  // ========================
+  async createSmsMessage(data: any) {
+    return db.insert(smsQueue).values(data).returning();
+  }
+
+  async getPendingSmsMessages() {
+    return db.select().from(smsQueue).where(eq(smsQueue.status, "pending")).limit(100);
+  }
+
+  async updateSmsStatus(id: string, status: string, sentAt?: Date) {
+    return db.update(smsQueue).set({ status, sentAt }).where(eq(smsQueue.id, id)).returning();
+  }
+
+  // ========================
+  // SKILL VERIFICATION
+  // ========================
+  async createSkillVerification(data: any) {
+    return db.insert(workerSkillVerifications).values(data).returning();
+  }
+
+  async getWorkerSkills(workerId: string) {
+    return db.select().from(workerSkillVerifications).where(eq(workerSkillVerifications.workerId, workerId));
+  }
+
+  async verifyWorkerSkill(skillId: string, verifiedBy: string) {
+    return db.update(workerSkillVerifications).set({ verifiedAt: new Date(), verifiedBy, badgeAwarded: true, badgeAwardedAt: new Date() }).where(eq(workerSkillVerifications.id, skillId)).returning();
+  }
+
+  // ========================
+  // QUALITY ASSURANCE
+  // ========================
+  async createQASubmission(data: any) {
+    return db.insert(workQualityAssurance).values(data).returning();
+  }
+
+  async getQASubmission(assignmentId: string) {
+    return db.select().from(workQualityAssurance).where(eq(workQualityAssurance.assignmentId, assignmentId));
+  }
+
+  async approveQASubmission(qaId: string, verifiedBy: string) {
+    return db.update(workQualityAssurance).set({ verificationStatus: "approved", verifiedBy, verifiedAt: new Date() }).where(eq(workQualityAssurance.id, qaId)).returning();
+  }
+
+  async disputeQASubmission(qaId: string, reason: string) {
+    return db.update(workQualityAssurance).set({ isDisputed: true, disputeReason: reason }).where(eq(workQualityAssurance.id, qaId)).returning();
+  }
+
+  // ========================
+  // INSTANT PAY
+  // ========================
+  async requestInstantPay(data: any) {
+    return db.insert(instantPayRequests).values(data).returning();
+  }
+
+  async getInstantPayRequest(id: string) {
+    return db.select().from(instantPayRequests).where(eq(instantPayRequests.id, id));
+  }
+
+  async updateInstantPayStatus(id: string, status: string) {
+    return db.update(instantPayRequests).set({ status }).where(eq(instantPayRequests.id, id)).returning();
+  }
+
+  async getWorkerInstantPayRequests(workerId: string) {
+    return db.select().from(instantPayRequests).where(eq(instantPayRequests.workerId, workerId));
   }
 }
 
