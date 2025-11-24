@@ -18,7 +18,7 @@ import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
-import saturnLogo from "@assets/generated_images/aqua_saturn_planet_transparent_background.png";
+import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
@@ -57,9 +57,9 @@ export default function Landing() {
         <img 
           src={saturnLogo} 
           alt="" 
-          className="w-[900px] h-[900px] opacity-25 object-contain"
+          className="w-[800px] h-[800px] opacity-20"
           style={{ 
-            filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.4))',
+            filter: 'drop-shadow(0 0 40px rgba(6, 182, 212, 0.3))',
           }}
         />
       </div>
@@ -69,20 +69,19 @@ export default function Landing() {
       
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center gap-8">
+          <div className="flex items-center gap-3 flex-shrink-0">
             <img 
               src={saturnLogo} 
               alt="ORBIT" 
-              className="w-12 h-12 object-contain opacity-90"
+              className="w-10 h-10 flex-shrink-0"
             />
-            <div className="font-heading font-bold text-lg tracking-wider">
-              ORBIT
-              <div className="text-[9px] text-muted-foreground tracking-widest">STAFFING OS</div>
+            <div className="font-heading font-bold text-lg tracking-wider text-white whitespace-nowrap">
+              Why ORBIT Staffing OS
             </div>
           </div>
           
-          <nav className="flex gap-1 bg-slate-800/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600">
+          <nav className="flex gap-1 bg-slate-800/50 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600 flex-shrink-0">
             <Link href="/why-orbit" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all">
               Why ORBIT
             </Link>
