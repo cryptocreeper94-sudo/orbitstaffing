@@ -230,7 +230,7 @@ export default function DeveloperLanding() {
             <Button
               onClick={() => handleJoinSandbox('owner')}
               disabled={loginMutation.isPending}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-lg mb-3 font-bold glow-green"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 text-base mb-3 font-bold glow-green"
               data-testid="button-join-owner-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'owner'
@@ -277,7 +277,7 @@ export default function DeveloperLanding() {
             <Button
               onClick={() => handleJoinSandbox('employee')}
               disabled={loginMutation.isPending}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg mb-3 font-bold glow-purple"
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 text-base mb-3 font-bold glow-purple"
               data-testid="button-join-employee-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'employee'
@@ -322,7 +322,7 @@ export default function DeveloperLanding() {
                   className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 glow-green"
                   data-testid="button-owner-login-enable"
                 >
-                  Login with Access Code
+                  Access Code
                 </Button>
               ) : (
                 <div className="space-y-2">
@@ -384,7 +384,7 @@ export default function DeveloperLanding() {
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 glow-purple"
                   data-testid="button-employee-login-enable"
                 >
-                  Login with Access Code
+                  Access Code
                 </Button>
               ) : (
                 <div className="space-y-2">
