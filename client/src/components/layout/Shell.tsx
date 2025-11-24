@@ -8,13 +8,15 @@ import {
   Menu,
   ScanLine,
   HardHat,
-  Activity
+  Activity,
+  MessageCircle
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { HallmarkPageWatermark } from "@/components/HallmarkWatermark";
+import { ContactForm } from "@/components/ContactForm";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -95,6 +97,8 @@ export function Sidebar() {
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {
+  const [contactOpen, setContactOpen] = useState(false);
+
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
       <Sidebar />
@@ -109,6 +113,18 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="p-8 relative z-10 max-w-7xl mx-auto">
           {children}
         </div>
+
+        {/* Contact Developer Button - Fixed Bottom Right */}
+        <Button
+          onClick={() => setContactOpen(true)}
+          className="fixed bottom-8 right-8 z-40 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all bg-primary text-primary-foreground hover:bg-primary/90"
+          data-testid="button-contact-developer"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </Button>
+
+        {/* Contact Form Modal */}
+        <ContactForm open={contactOpen} onOpenChange={setContactOpen} />
       </main>
     </div>
   );

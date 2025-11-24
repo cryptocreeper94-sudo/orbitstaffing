@@ -2539,3 +2539,53 @@ export const insertAdminBusinessCardSchema = createInsertSchema(adminBusinessCar
 
 export type InsertAdminBusinessCard = z.infer<typeof insertAdminBusinessCardSchema>;
 export type AdminBusinessCard = typeof adminBusinessCards.$inferSelect;
+
+// ========================
+// Developer Contact Messages
+// ========================
+export const developerContactMessages = pgTable(
+  "developer_contact_messages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Sender Info
+    senderName: varchar("sender_name", { length: 255 }).notNull(),
+    senderEmail: varchar("sender_email", { length: 255 }).notNull(),
+    senderPhone: varchar("sender_phone", { length: 20 }),
+    
+    // Message Content
+    category: varchar("category", { length: 50 }).notNull(), // IT worker, developer, owner, investor, general
+    subject: varchar("subject", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    
+    // Spam Detection
+    spamScore: integer("spam_score").default(0), // 0-100, higher = more likely spam
+    flaggedAsSpam: boolean("flagged_as_spam").default(false),
+    ipAddress: varchar("ip_address", { length: 45 }),
+    userAgent: text("user_agent"),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("new"), // new, read, responded, archived
+    respondedAt: timestamp("responded_at"),
+    
+    // Metadata
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_dev_contact_email").on(table.senderEmail),
+    categoryIdx: index("idx_dev_contact_category").on(table.category),
+    statusIdx: index("idx_dev_contact_status").on(table.status),
+    createdIdx: index("idx_dev_contact_created").on(table.createdAt),
+  })
+);
+
+export const insertDeveloperContactMessageSchema = createInsertSchema(developerContactMessages).omit({
+  id: true,
+  spamScore: true,
+  flaggedAsSpam: true,
+  respondedAt: true,
+  createdAt: true,
+});
+
+export type InsertDeveloperContactMessage = z.infer<typeof insertDeveloperContactMessageSchema>;
+export type DeveloperContactMessage = typeof developerContactMessages.$inferSelect;

@@ -27,6 +27,7 @@ import {
   workerOnboardingChecklist,
   developerChat,
   adminBusinessCards,
+  developerContactMessages,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -1199,6 +1200,34 @@ export class DrizzleStorage implements IStorage {
     const result = await db.update(adminBusinessCards)
       .set({ photoUrl, photoUploadedAt: new Date() })
       .where(eq(adminBusinessCards.adminId, adminId))
+      .returning();
+    return result[0];
+  }
+
+  // Developer Contact Messages
+  async createDeveloperContactMessage(data: any): Promise<any> {
+    const result = await db.insert(developerContactMessages).values(data).returning();
+    return result[0];
+  }
+
+  async getDeveloperContactMessages(limit: number = 50, offset: number = 0): Promise<any[]> {
+    const result = await db.select().from(developerContactMessages)
+      .orderBy(desc(developerContactMessages.createdAt))
+      .limit(limit)
+      .offset(offset);
+    return result;
+  }
+
+  async getDeveloperContactMessageById(id: string): Promise<any | undefined> {
+    const result = await db.select().from(developerContactMessages)
+      .where(eq(developerContactMessages.id, id));
+    return result[0];
+  }
+
+  async updateDeveloperContactMessageStatus(id: string, status: string): Promise<any | undefined> {
+    const result = await db.update(developerContactMessages)
+      .set({ status, respondedAt: new Date() })
+      .where(eq(developerContactMessages.id, id))
       .returning();
     return result[0];
   }

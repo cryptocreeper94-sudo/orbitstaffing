@@ -1,14 +1,16 @@
 /**
  * Admin Business Card
  * Professional, printable business card for admins/team members
- * Supports photo upload, sharing, and printing
+ * Supports photo upload, sharing, and printing with QR code
  */
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Share2, Upload, Edit2, Save, X, Shield } from 'lucide-react';
+import { Download, Share2, Upload, Edit2, Save, X, Shield, ZoomIn } from 'lucide-react';
 import QRCode from 'react-qr-code';
+import { ImageModal } from '@/components/ImageModal';
+import { toast } from 'sonner';
 
 interface AdminBusinessCardProps {
   adminId: string;
@@ -39,7 +41,9 @@ export function AdminBusinessCard({
 }: AdminBusinessCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [photoPreview, setPhotoPreview] = useState(photoUrl);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   
   const [formData, setFormData] = useState({
     fullName,
@@ -79,14 +83,79 @@ export function AdminBusinessCard({
         const saved = await response.json();
         onSave?.(saved);
         setIsEditing(false);
+        toast.success('Business card saved successfully');
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to save business card');
       }
     } catch (err) {
       console.error('Save error:', err);
+      toast.error('Error saving business card');
     }
   };
 
-  const handleDownload = () => {
-    window.print();
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `${formData.fullName.replace(/\s+/g, '-')}-business-card.png`;
+      link.click();
+      toast.success('Business card downloaded');
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download business card');
+    }
+  };
+
+  const handleShare = async () => {
+    if (!cardRef.current) return;
+
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
+      });
+
+      canvas.toBlob((blob: Blob | null) => {
+        if (!blob) {
+          toast.error('Failed to create image');
+          return;
+        }
+        
+        if (navigator.share) {
+          try {
+            const file = new File([blob], 'business-card.png', { type: 'image/png' });
+            navigator.share({
+              title: `${formData.fullName}'s Business Card`,
+              text: `Connect with ${formData.fullName} - ${formData.title || formData.companyName}`,
+              files: [file],
+            }).then(() => {
+              toast.success('Business card shared');
+            }).catch((err) => {
+              if (err.name !== 'AbortError') {
+                toast.error('Sharing failed');
+              }
+            });
+          } catch (err) {
+            toast.error('Share not available');
+          }
+        } else {
+          toast.error('Share not supported on this device');
+        }
+      });
+    } catch (error) {
+      console.error('Share error:', error);
+      toast.error('Failed to share business card');
+    }
   };
 
   // vCard format for QR code
@@ -113,13 +182,20 @@ END:VCARD`;
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Photo Upload - Square */}
+          {/* Photo Upload - Square with Click to Edit */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Photo (Square)</label>
-            <div className="w-32 h-32 rounded-lg border-2 border-dashed border-border flex items-center justify-center overflow-hidden bg-background/50 cursor-pointer hover:border-primary transition-colors"
-              onClick={() => fileInputRef.current?.click()}>
+            <div 
+              className="w-32 h-32 rounded-lg border-2 border-dashed border-border flex items-center justify-center overflow-hidden bg-background/50 cursor-pointer hover:border-primary transition-colors group relative"
+              onClick={() => fileInputRef.current?.click()}
+            >
               {photoPreview ? (
-                <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                <>
+                  <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <Upload className="w-6 h-6 text-white" />
+                  </div>
+                </>
               ) : (
                 <div className="text-center text-xs text-muted-foreground">
                   <Upload className="w-6 h-6 mx-auto mb-1 opacity-50" />
@@ -223,7 +299,7 @@ END:VCARD`;
                 <Input
                   value={formData.brandColor}
                   onChange={(e) => setFormData({ ...formData, brandColor: e.target.value })}
-                  className="font-mono text-sm"
+                  className="font-mono text-sm flex-1"
                   data-testid="input-color-hex"
                 />
               </div>
@@ -252,12 +328,14 @@ END:VCARD`;
 
   return (
     <div className="w-full space-y-6">
-      {/* Business Card Preview - Actual 3.5" x 2" ratio with QR code */}
+      {/* Business Card Preview */}
       <div className="flex justify-center">
         <div
+          ref={cardRef}
           id="business-card-print"
-          className="w-[350px] h-[200px] rounded-lg shadow-2xl overflow-hidden flex relative"
+          className="w-[350px] h-[200px] rounded-lg shadow-2xl overflow-hidden flex relative cursor-pointer group"
           style={{ backgroundColor: formData.brandColor + '15', border: `2px solid ${formData.brandColor}` }}
+          onClick={() => photoPreview && setImageModalOpen(true)}
           data-testid="card-business-preview"
         >
           {/* Background Logo - ORBIT */}
@@ -269,9 +347,16 @@ END:VCARD`;
           </div>
 
           {/* Left side - Photo (Square) */}
-          <div className="w-[120px] h-full bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10" style={{ borderColor: formData.brandColor }}>
+          <div className="w-[120px] h-full bg-gradient-to-b from-slate-800 to-slate-900 flex items-center justify-center flex-shrink-0 border-r-2 relative z-10 group-hover:opacity-90 transition-opacity" style={{ borderColor: formData.brandColor }}>
             {photoPreview ? (
-              <img src={photoPreview} alt={formData.fullName} className="w-full h-full object-cover" />
+              <>
+                <img src={photoPreview} alt={formData.fullName} className="w-full h-full object-cover" />
+                {photoPreview && (
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+                    <ZoomIn className="w-5 h-5 text-white" />
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-xs text-gray-500 text-center px-2">Photo</div>
             )}
@@ -294,12 +379,22 @@ END:VCARD`;
             </div>
           </div>
 
-          {/* Right side - QR Code */}
-          <div className="w-[100px] h-full flex items-center justify-center bg-white p-1 relative z-10">
-            <QRCode value={vCardData} size={90} level="M" />
+          {/* Bottom Right - Small QR Code */}
+          <div className="absolute bottom-2 left-2 w-24 h-24 bg-white p-1 rounded z-20">
+            <QRCode value={vCardData} size={80} level="M" />
           </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {photoPreview && (
+        <ImageModal
+          open={imageModalOpen}
+          onOpenChange={setImageModalOpen}
+          imageUrl={photoPreview}
+          title={`${formData.fullName}'s Photo`}
+        />
+      )}
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -318,9 +413,10 @@ END:VCARD`;
           data-testid="button-download-card"
         >
           <Download className="w-4 h-4 mr-2" />
-          Download/Print
+          Download
         </Button>
         <Button
+          onClick={handleShare}
           className="flex-1 sm:flex-none"
           variant="secondary"
           data-testid="button-share-card"
@@ -331,7 +427,7 @@ END:VCARD`;
       </div>
       
       <p className="text-xs text-muted-foreground text-center">
-        Professional business card (3.5" × 2") - photo, name, contact, and scannable QR code
+        Professional business card (3.5" × 2") with QR contact sharing
       </p>
     </div>
   );

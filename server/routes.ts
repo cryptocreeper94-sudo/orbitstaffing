@@ -31,6 +31,7 @@ import {
   insertCollectionSchema,
   insertOrbitAssetSchema,
   insertAdminBusinessCardSchema,
+  insertDeveloperContactMessageSchema,
   franchises,
   companies,
   users,
@@ -2280,6 +2281,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Photo upload error:", error);
       res.status(500).json({ error: "Failed to update photo" });
+    }
+  });
+
+  // ========================
+  // DEVELOPER CONTACT MESSAGE ROUTES
+  // ========================
+  app.post("/api/developer/contact", async (req: Request, res: Response) => {
+    try {
+      const body = req.body;
+      const parsed = insertDeveloperContactMessageSchema.safeParse(body);
+
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid contact data", details: parsed.error.errors });
+      }
+
+      // Save the message
+      const message = await storage.createDeveloperContactMessage(parsed.data);
+      res.status(201).json(message);
+    } catch (error) {
+      console.error("Contact message error:", error);
+      res.status(500).json({ error: "Failed to send contact message" });
+    }
+  });
+
+  app.get("/api/developer/contact", async (req: Request, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const offset = parseInt(req.query.offset as string) || 0;
+      
+      const messages = await storage.getDeveloperContactMessages(limit, offset);
+      res.json(messages);
+    } catch (error) {
+      console.error("Failed to fetch contact messages:", error);
+      res.status(500).json({ error: "Failed to fetch messages" });
     }
   });
 
