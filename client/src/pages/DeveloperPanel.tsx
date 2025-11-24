@@ -132,18 +132,18 @@ export default function DeveloperPanel() {
           </div>
 
           <p className="text-gray-400 text-sm mb-6 text-center">
-            Enter your PIN to access technical APIs and developer tools
+            Enter your access code to access technical APIs and developer tools
           </p>
 
           <form onSubmit={handlePinSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">PIN</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Please enter 7 digit access code</label>
               <input
                 type="password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 maxLength={4}
-                placeholder="••••"
+                placeholder="•••••••"
                 className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
                 autoFocus
                 data-testid="input-developer-pin"

@@ -140,14 +140,14 @@ export default function AdminPanel() {
               <form onSubmit={handlePinSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    PIN
+                    Please enter 7 digit access code
                   </label>
                   <input
                     type="password"
                     value={pin}
                     onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                     maxLength={4}
-                    placeholder="••••"
+                    placeholder="•••••••"
                     className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-cyan-400"
                     autoFocus
                     data-testid="input-admin-pin"
@@ -204,14 +204,14 @@ export default function AdminPanel() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Developer PIN
+                    Please enter 7 digit access code
                   </label>
                   <input
                     type="password"
                     value={developerPin}
                     onChange={(e) => setDeveloperPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                     maxLength={4}
-                    placeholder="••••"
+                    placeholder="•••••••"
                     className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
                     autoFocus
                     data-testid="input-developer-pin"
