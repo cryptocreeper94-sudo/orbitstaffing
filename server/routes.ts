@@ -328,6 +328,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Verify admin PIN endpoint
+  app.post("/api/auth/verify-admin-pin", async (req: Request, res: Response) => {
+    try {
+      const { pin } = req.body;
+
+      if (!pin) {
+        return res.status(400).json({ error: "PIN required" });
+      }
+
+      const adminPin = process.env.ADMIN_PIN;
+      
+      if (!adminPin) {
+        return res.status(500).json({ error: "Admin PIN not configured" });
+      }
+
+      if (pin === adminPin) {
+        return res.status(200).json({ 
+          success: true,
+          message: "Admin PIN verified"
+        });
+      } else {
+        return res.status(401).json({ error: "Invalid PIN" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: "PIN verification failed" });
+    }
+  });
+
   // Password reset endpoint
   app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
     try {

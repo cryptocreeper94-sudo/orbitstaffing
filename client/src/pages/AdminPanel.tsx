@@ -43,41 +43,36 @@ export default function AdminPanel() {
     }
   }, []);
 
-  const handlePinSubmit = (e: React.FormEvent) => {
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (pin.length !== 4) {
-      setError('PIN must be 4 digits');
+    if (pin.length < 4) {
+      setError('PIN must be at least 4 digits');
       return;
     }
 
-    // Special test PIN for Sidonie (expert tester)
-    if (pin === '4444') {
-      setIsAuthenticated(true);
-      setRole('master_admin');
-      setAdminName('Sidonie');
-      localStorage.setItem('adminAuthenticated', 'true');
-      localStorage.setItem('adminRole', 'master_admin');
-      localStorage.setItem('adminName', 'Sidonie');
-      localStorage.setItem('isSidonieTestLogin', 'true');
-      localStorage.setItem('showWelcomeMessage', 'true');
-      setPin('');
-      return;
-    }
+    try {
+      const res = await fetch('/api/auth/verify-admin-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
 
-    // Accept common test PINs - no process.env on frontend
-    const validPins = ['0000', '1234', '4444', '7777'];
-    if (validPins.includes(pin)) {
-      setIsAuthenticated(true);
-      setRole('master_admin');
-      setAdminName('Master Admin (System Owner)');
-      localStorage.setItem('adminAuthenticated', 'true');
-      localStorage.setItem('adminRole', 'master_admin');
-      localStorage.setItem('adminName', 'Master Admin (System Owner)');
-      setPin('');
-    } else {
-      setError('Invalid PIN.');
+      if (res.ok) {
+        setIsAuthenticated(true);
+        setRole('master_admin');
+        setAdminName('System Owner');
+        localStorage.setItem('adminAuthenticated', 'true');
+        localStorage.setItem('adminRole', 'master_admin');
+        localStorage.setItem('adminName', 'System Owner');
+        setPin('');
+      } else {
+        setError('Invalid PIN.');
+        setPin('');
+      }
+    } catch (err) {
+      setError('Failed to verify PIN. Please try again.');
       setPin('');
     }
   };
