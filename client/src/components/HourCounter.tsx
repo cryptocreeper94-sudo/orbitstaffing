@@ -1,6 +1,18 @@
-import React, { useState } from 'react';
-import { Clock, Edit2, Save, X, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Clock, Edit2, Save, X, AlertCircle, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+interface Worker {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface HourData {
+  period: 'today' | 'week' | 'allTime';
+  hours: number;
+  updatedAt?: string;
+}
 
 interface HourCounterProps {
   workerId?: string;
@@ -23,8 +35,65 @@ export default function HourCounter({
   const [editNotes, setEditNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  
+  // New filtering state
+  const [workers, setWorkers] = useState<Worker[]>([]);
+  const [selectedWorkerId, setSelectedWorkerId] = useState<string>(workerId || '');
+  const [selectedPeriod, setSelectedPeriod] = useState<'today' | 'week' | 'allTime'>('week');
+  const [isLoading, setIsLoading] = useState(false);
+  const [displayHours, setDisplayHours] = useState({ today: 0, week: weeklyHours, allTime: allTimeHours });
 
   const canEdit = userRole === 'admin' || userRole === 'dev';
+
+  // Fetch workers list on mount (for dev/admin)
+  useEffect(() => {
+    if ((userRole === 'admin' || userRole === 'dev') && workers.length === 0) {
+      fetchWorkers();
+    }
+  }, [userRole, workers.length]);
+
+  // Fetch hours when worker or period changes
+  useEffect(() => {
+    if (selectedWorkerId && (userRole === 'admin' || userRole === 'dev')) {
+      fetchWorkerHours();
+    }
+  }, [selectedWorkerId, selectedPeriod, userRole]);
+
+  const fetchWorkers = async () => {
+    try {
+      const res = await fetch('/api/workers');
+      if (res.ok) {
+        const data = await res.json();
+        setWorkers(Array.isArray(data) ? data : data.workers || []);
+        if (data.length > 0 && !selectedWorkerId) {
+          setSelectedWorkerId(data[0].id);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch workers:', err);
+    }
+  };
+
+  const fetchWorkerHours = async () => {
+    if (!selectedWorkerId) return;
+    
+    try {
+      setIsLoading(true);
+      const res = await fetch(`/api/timesheets/worker/${selectedWorkerId}?period=${selectedPeriod}`);
+      if (res.ok) {
+        const data = await res.json();
+        setDisplayHours(prev => ({
+          ...prev,
+          [selectedPeriod]: data.hours || 0
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch hours:', err);
+      setDisplayHours(prev => ({ ...prev, [selectedPeriod]: 0 }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSave = async () => {
     setError('');
@@ -53,6 +122,11 @@ export default function HourCounter({
       setIsSaving(false);
     }
   };
+
+  const selectedWorker = workers.find(w => w.id === selectedWorkerId);
+  const workerName = selectedWorker ? `${selectedWorker.firstName} ${selectedWorker.lastName}` : 'Select Worker';
+  const periodLabel = selectedPeriod === 'today' ? 'Today' : selectedPeriod === 'week' ? 'This Week' : 'All-Time';
+  const currentHours = displayHours[selectedPeriod] || 0;
 
   if (isEditing && canEdit) {
     return (
@@ -150,6 +224,7 @@ export default function HourCounter({
 
   return (
     <div className="bg-slate-800 border border-cyan-500/30 rounded-lg p-4">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-bold flex items-center gap-2">
           <Clock className="w-5 h-5 text-cyan-400" />
@@ -166,23 +241,90 @@ export default function HourCounter({
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
-          <div className="text-xs text-gray-400 mb-1">This Week</div>
-          <div className="text-2xl font-bold text-cyan-400">{weeklyHours.toFixed(1)}h</div>
-          <div className="text-xs text-gray-500 mt-1">Hours worked</div>
-        </div>
+      {/* Worker & Period Selection - Only for admin/dev */}
+      {(userRole === 'admin' || userRole === 'dev') && (
+        <div className="mb-4 space-y-2 pb-4 border-b border-slate-700">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="w-4 h-4 text-cyan-400" />
+            <span className="text-xs text-gray-400">Viewing:</span>
+          </div>
+          
+          {/* Worker Dropdown */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Worker</label>
+            <select
+              value={selectedWorkerId}
+              onChange={(e) => setSelectedWorkerId(e.target.value)}
+              className="w-full px-2 py-1.5 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-cyan-400"
+              data-testid="select-worker-hours"
+            >
+              <option value="">-- Select Worker --</option>
+              {workers.map(w => (
+                <option key={w.id} value={w.id}>
+                  {w.firstName} {w.lastName}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
-          <div className="text-xs text-gray-400 mb-1">All-Time</div>
-          <div className="text-2xl font-bold text-cyan-400">{allTimeHours.toFixed(0)}h</div>
-          <div className="text-xs text-gray-500 mt-1">Total hours</div>
+          {/* Time Period Buttons */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Period</label>
+            <div className="flex gap-1">
+              {(['today', 'week', 'allTime'] as const).map(period => (
+                <button
+                  key={period}
+                  onClick={() => setSelectedPeriod(period)}
+                  className={`flex-1 px-2 py-1 text-xs font-bold rounded transition-all ${
+                    selectedPeriod === period
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                  }`}
+                  data-testid={`button-period-${period}`}
+                >
+                  {period === 'today' ? 'Today' : period === 'week' ? 'Week' : 'All-Time'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {selectedWorkerId && (
+            <div className="text-xs text-cyan-400 mt-1">
+              ✓ Showing {periodLabel.toLowerCase()} hours for {selectedWorker?.firstName}
+            </div>
+          )}
         </div>
-      </div>
+      )}
+
+      {/* Hours Display */}
+      {isLoading ? (
+        <div className="text-center py-4 text-gray-400">Loading hours...</div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
+            <div className="text-xs text-gray-400 mb-1">{periodLabel}</div>
+            <div className="text-2xl font-bold text-cyan-400">
+              {currentHours.toFixed(1)}h
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              {userRole === 'admin' || userRole === 'dev' 
+                ? (selectedWorkerId ? 'Hours tracked' : 'Select a worker')
+                : 'Hours worked'
+              }
+            </div>
+          </div>
+
+          <div className="bg-slate-700/50 rounded p-3 border border-slate-600">
+            <div className="text-xs text-gray-400 mb-1">Reference</div>
+            <div className="text-2xl font-bold text-cyan-400">{allTimeHours.toFixed(0)}h</div>
+            <div className="text-xs text-gray-500 mt-1">Total hours</div>
+          </div>
+        </div>
+      )}
 
       {canEdit && (
         <div className="mt-3 text-xs text-gray-400 bg-cyan-900/20 p-2 rounded border border-cyan-500/20">
-          ✓ Admin/Dev can edit with documentation • All changes are hallmarked
+          ✓ Admin/Dev: Select worker above to view hours • Edit button available for manual adjustments
         </div>
       )}
     </div>

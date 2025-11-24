@@ -688,7 +688,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/timesheets/worker/:workerId", async (req: Request, res: Response) => {
     try {
       const timesheets = await storage.listTimesheetsByWorker(req.params.workerId);
-      res.status(200).json(timesheets);
+      const period = (req.query.period as string) || 'allTime';
+      
+      // Filter timesheets by period
+      const now = new Date();
+      const filtered = timesheets.filter((ts: any) => {
+        if (!ts.clockInTime) return false;
+        const tsDate = new Date(ts.clockInTime);
+        
+        if (period === 'today') {
+          return tsDate.toDateString() === now.toDateString();
+        } else if (period === 'week') {
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          return tsDate >= weekAgo;
+        }
+        return true; // allTime
+      });
+
+      // Calculate total hours
+      const hours = filtered.reduce((sum: number, ts: any) => {
+        if (ts.clockInTime && ts.clockOutTime) {
+          const diff = new Date(ts.clockOutTime).getTime() - new Date(ts.clockInTime).getTime();
+          return sum + (diff / (1000 * 60 * 60)); // Convert ms to hours
+        }
+        return sum;
+      }, 0);
+
+      res.status(200).json({ hours: parseFloat(hours.toFixed(1)), timesheets: filtered });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch timesheets" });
     }
