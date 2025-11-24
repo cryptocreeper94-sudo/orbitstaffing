@@ -380,7 +380,7 @@ END:VCARD`;
           </div>
 
           {/* Bottom Left - Tiny QR Code */}
-          <div className="absolute bottom-1.5 left-1.5 bg-white p-0.5 rounded z-20">
+          <div className="absolute bottom-1.5 left-1.5 p-1 rounded z-20" style={{ backgroundColor: formData.brandColor }}>
             <QRCode value={vCardData} size={32} level="M" />
           </div>
         </div>
