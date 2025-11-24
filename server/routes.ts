@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { sql } from "drizzle-orm";
 import { storage } from "./storage";
 import { emailService } from "./email";
+import { stripeService } from "./stripeService";
+import { coinbaseService } from "./coinbaseService";
 import {
   insertUserSchema,
   insertCompanySchema,
@@ -1867,6 +1869,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.get("/api/health", (req: Request, res: Response) => {
     res.status(200).json({ status: "ok" });
+  });
+
+  // ========================
+  // PAYMENT ROUTES (STRIPE & COINBASE)
+  // ========================
+  
+  app.post("/api/checkout", async (req: Request, res: Response) => {
+    try {
+      const { priceId, paymentMethod } = req.body;
+
+      if (!priceId || !paymentMethod) {
+        return res.status(400).json({ error: "Missing priceId or paymentMethod" });
+      }
+
+      if (paymentMethod === 'stripe') {
+        const session = {
+          url: 'https://checkout.stripe.com/pay/cs_test_demo',
+          id: 'cs_test_' + Math.random().toString(36).substr(2, 9),
+        };
+        return res.json(session);
+      }
+
+      if (paymentMethod === 'coinbase') {
+        try {
+          const amount = priceId.includes('199') ? 199 : priceId.includes('499') ? 499 : 999;
+          const charge = await coinbaseService.createCharge(
+            'customer@example.com',
+            amount,
+            'USD',
+            'ORBIT Staffing Platform Subscription'
+          );
+          return res.json({ charge });
+        } catch (error) {
+          console.warn('Coinbase checkout failed:', error);
+          return res.status(500).json({ error: 'Coinbase payment unavailable' });
+        }
+      }
+
+      res.status(400).json({ error: 'Invalid payment method' });
+    } catch (error) {
+      console.error('Checkout error:', error);
+      res.status(500).json({ error: 'Checkout failed' });
+    }
+  });
+
+  app.get("/api/prices", async (req: Request, res: Response) => {
+    try {
+      const prices = await stripeService.listPrices();
+      res.json({ prices: prices.data });
+    } catch (error) {
+      console.error('Error fetching prices:', error);
+      res.status(500).json({ error: 'Failed to fetch prices' });
+    }
+  });
+
+  app.post("/api/stripe/webhook", async (req: Request, res: Response) => {
+    try {
+      res.json({ received: true });
+    } catch (error) {
+      console.error('Webhook error:', error);
+      res.status(400).json({ error: 'Webhook processing failed' });
+    }
   });
 
   const httpServer = createServer(app);

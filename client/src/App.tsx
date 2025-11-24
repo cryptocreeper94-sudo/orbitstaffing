@@ -38,6 +38,7 @@ import IncidentReporting from "@/pages/IncidentReporting";
 import BusinessOwnerMarketing from "@/pages/BusinessOwnerMarketing";
 import MarketingDashboard from "@/pages/MarketingDashboard";
 import WorkflowDemoPage from "@/pages/WorkflowDemoPage";
+import Pricing from "@/pages/Pricing";
 import EmployeeNewsPortal from "@/pages/EmployeeNewsPortal";
 import StaffingPartnerHub from "@/pages/StaffingPartnerHub";
 import PartnerVerification from "@/pages/PartnerVerification";
@@ -102,6 +103,7 @@ function Router() {
       <Route path="/integrations" component={Integrations} />
       <Route path="/work-orders" component={WorkOrders} />
       <Route path="/ios-coming-soon" component={ComingSoonApple} />
+      <Route path="/pricing" component={Pricing} />
       <Route path="/admin/ios-interest" component={AdminIOSInterest} />
       <Route path="/incidents" component={IncidentReporting} />
       <Route path="/business-owner" component={BusinessOwnerMarketing} />

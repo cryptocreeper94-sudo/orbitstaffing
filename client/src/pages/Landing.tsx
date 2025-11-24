@@ -279,6 +279,14 @@ export default function Landing() {
             />
           </div>
 
+          {/* CTA to Pricing Page */}
+          <div className="mt-8 text-center">
+            <Link href="/pricing" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-semibold transition-colors" data-testid="link-view-pricing">
+              View Full Pricing & Payment Options
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
           {/* Pricing Info */}
           <div className="grid md:grid-cols-2 gap-6 mt-12">
             <Card className="bg-card/50 border-border/50">
@@ -303,14 +311,35 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Payment Banner - Prominent CTA */}
+      <section className="py-8 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border-y border-primary/30">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <DollarSign className="w-6 h-6 text-primary" />
+            <h2 className="text-2xl font-bold font-heading">Flexible Pricing Plans Available</h2>
+            <DollarSign className="w-6 h-6 text-primary" />
+          </div>
+          <p className="text-muted-foreground text-sm mb-5">Pay as you grow. Monthly plans from $199. Or revenue-share options for franchises.</p>
+          <div className="flex flex-col md:flex-row gap-3 justify-center">
+            <Link href="/pricing" className="h-10 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="button-upgrade-now">
+              💳 Upgrade Now
+            </Link>
+            <Button variant="outline" className="h-10 text-sm" data-testid="button-contact-sales">
+              📞 Contact Sales for Enterprise
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-10 bg-primary/5 border-y border-border/30">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold font-heading mb-3">Ready to Transform Your Staffing?</h2>
           <p className="text-muted-foreground text-sm mb-4">Join the next generation of staffing agencies.</p>
-          <Button className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90">
+          <Link href="/pricing" className="inline-flex items-center h-10 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
             Start Your Free Trial Today
-          </Button>
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Link>
         </div>
       </section>
 
