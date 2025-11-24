@@ -2487,21 +2487,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
-  // ADMIN/DEV/OWNER MESSAGING ROUTES
+  // ADMIN/DEV/OWNER MESSAGING ROUTES (Multi-Recipient)
   // ========================
   app.post("/api/messages", async (req: Request, res: Response) => {
     try {
-      const { fromUserId, toUserId, subject, message } = req.body;
+      const { fromUserId, recipientUserIds, subject, message, isOfficial } = req.body;
       
-      if (!fromUserId || !toUserId || !message) {
+      if (!fromUserId || !recipientUserIds || !Array.isArray(recipientUserIds) || !message) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
+      // Remove duplicates from recipients
+      const uniqueRecipients = Array.from(new Set(recipientUserIds));
+
       const newMessage = await storage.createMessage({
         fromUserId,
-        toUserId,
-        subject,
+        recipientUserIds: uniqueRecipients,
+        subject: subject || 'Message',
         message,
+        isOfficial: isOfficial || false,
       });
 
       res.json(newMessage);
@@ -2525,11 +2529,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/messages/:messageId/read", async (req: Request, res: Response) => {
     try {
       const { messageId } = req.params;
-      const message = await storage.markMessageAsRead(messageId);
+      const { userId } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ error: "Missing userId" });
+      }
+
+      const message = await storage.markMessageAsRead(messageId, userId);
       res.json(message);
     } catch (error) {
       console.error("Failed to mark message as read:", error);
       res.status(500).json({ error: "Failed to update message" });
+    }
+  });
+
+  app.post("/api/messages/:messageId/delete", async (req: Request, res: Response) => {
+    try {
+      const { messageId } = req.params;
+      const { deletingUserId } = req.body;
+
+      if (!deletingUserId) {
+        return res.status(400).json({ error: "Missing deletingUserId" });
+      }
+
+      const deleted = await storage.deleteOfficialMessageAsAdmin(messageId, deletingUserId);
+      
+      if (!deleted) {
+        return res.status(403).json({ error: "You do not have permission to delete this message" });
+      }
+
+      res.json({ success: true, message: "Message deleted" });
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+      res.status(500).json({ error: "Failed to delete message" });
+    }
+  });
+
+  // Cleanup job for expired unofficial messages (run periodically)
+  app.post("/api/messages/cleanup/expired", async (req: Request, res: Response) => {
+    try {
+      const deleted = await storage.deleteUnofficialMessages();
+      res.json({ success: true, deletedCount: deleted });
+    } catch (error) {
+      console.error("Failed to cleanup expired messages:", error);
+      res.status(500).json({ error: "Cleanup failed" });
     }
   });
 

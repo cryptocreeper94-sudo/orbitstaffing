@@ -2713,36 +2713,45 @@ export type InsertDevPersonalCard = z.infer<typeof insertDevPersonalCardSchema>;
 export type DevPersonalCard = typeof devPersonalCards.$inferSelect;
 
 // ========================
-// Admin/Dev/Owner Messaging
+// Admin/Dev/Owner Messaging (Multi-Recipient)
 // ========================
 export const adminDevOwnerMessages = pgTable(
   "admin_dev_owner_messages",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     fromUserId: varchar("from_user_id").notNull().references(() => users.id),
-    toUserId: varchar("to_user_id").notNull().references(() => users.id),
     
     // Message
     subject: varchar("subject", { length: 255 }),
     message: text("message").notNull(),
     
-    // Read Status
-    isRead: boolean("is_read").default(false),
-    readAt: timestamp("read_at"),
+    // Message Type
+    isOfficial: boolean("is_official").default(false), // true = database persistent, false = auto-delete in 30 days
+    
+    // Auto-delete for unofficial messages
+    expiresAt: timestamp("expires_at"), // 30 days from creation for unofficial
+    
+    // Recipients (array of user IDs for multi-recipient)
+    recipientUserIds: text("recipient_user_ids").array().notNull(), // JSON array of recipient user IDs
+    
+    // Read tracking (JSON: {userId: readAt timestamp})
+    readStatus: jsonb("read_status").default(sql`'{}'::jsonb`),
     
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
     fromIdx: index("idx_msg_from").on(table.fromUserId),
-    toIdx: index("idx_msg_to").on(table.toUserId),
+    officialIdx: index("idx_msg_official").on(table.isOfficial),
+    expiresIdx: index("idx_msg_expires").on(table.expiresAt),
     createdIdx: index("idx_msg_created").on(table.createdAt),
   })
 );
 
 export const insertAdminDevOwnerMessageSchema = createInsertSchema(adminDevOwnerMessages).omit({
   id: true,
-  readAt: true,
+  expiresAt: true,
+  readStatus: true,
   createdAt: true,
   updatedAt: true,
 });

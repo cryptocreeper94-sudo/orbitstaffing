@@ -1300,37 +1300,82 @@ export class DrizzleStorage implements IStorage {
     return result[0];
   }
 
-  // Admin/Dev/Owner Messages
+  // Admin/Dev/Owner Messages (Multi-Recipient)
   async createMessage(data: InsertAdminDevOwnerMessage): Promise<AdminDevOwnerMessage> {
-    const result = await db.insert(adminDevOwnerMessages).values(data).returning();
-    return result[0];
-  }
+    // Calculate expiration for unofficial messages (30 days)
+    const expiresAt = !data.isOfficial 
+      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
+      : null;
 
-  async getMessagesBetween(userId1: string, userId2: string): Promise<AdminDevOwnerMessage[]> {
-    const result = await db.select().from(adminDevOwnerMessages)
-      .where(
-        and(
-          eq(adminDevOwnerMessages.fromUserId, userId1),
-          eq(adminDevOwnerMessages.toUserId, userId2)
-        )
-      )
-      .orderBy(desc(adminDevOwnerMessages.createdAt));
-    return result;
+    const result = await db.insert(adminDevOwnerMessages).values({
+      ...data,
+      expiresAt,
+    }).returning();
+    return result[0];
   }
 
   async getMessagesForUser(userId: string): Promise<AdminDevOwnerMessage[]> {
+    // Get all messages where user is a recipient (excluding expired unofficial messages)
     const result = await db.select().from(adminDevOwnerMessages)
-      .where(eq(adminDevOwnerMessages.toUserId, userId))
+      .where(
+        and(
+          eq(adminDevOwnerMessages.isOfficial, true),
+          // recipient_user_ids contains userId
+        )
+      )
       .orderBy(desc(adminDevOwnerMessages.createdAt));
-    return result;
+    
+    // Filter messages where userId is in recipientUserIds
+    return result.filter(msg => msg.recipientUserIds.includes(userId));
   }
 
-  async markMessageAsRead(messageId: string): Promise<AdminDevOwnerMessage | undefined> {
+  async markMessageAsRead(messageId: string, userId: string): Promise<AdminDevOwnerMessage | undefined> {
+    // Get current message
+    const [message] = await db.select().from(adminDevOwnerMessages)
+      .where(eq(adminDevOwnerMessages.id, messageId));
+    
+    if (!message) return undefined;
+
+    // Update read status (JSON)
+    const readStatus = message.readStatus || {};
+    readStatus[userId] = new Date().toISOString();
+
     const result = await db.update(adminDevOwnerMessages)
-      .set({ isRead: true, readAt: new Date() })
+      .set({ readStatus })
       .where(eq(adminDevOwnerMessages.id, messageId))
       .returning();
     return result[0];
+  }
+
+  async deleteUnofficialMessages(): Promise<number> {
+    // Delete expired unofficial messages (older than 30 days)
+    const result = await db.delete(adminDevOwnerMessages)
+      .where(
+        and(
+          eq(adminDevOwnerMessages.isOfficial, false),
+          lte(adminDevOwnerMessages.expiresAt, new Date())
+        )
+      );
+    return result.rowCount;
+  }
+
+  async deleteOfficialMessageAsAdmin(messageId: string, deletingUserId: string): Promise<boolean> {
+    // Only the sender or dev/Sidonie can delete official messages
+    const [message] = await db.select().from(adminDevOwnerMessages)
+      .where(eq(adminDevOwnerMessages.id, messageId));
+    
+    if (!message) return false;
+    
+    // Only sender, dev, or Sidonie can delete
+    const canDelete = message.fromUserId === deletingUserId || 
+                     deletingUserId === 'dev-master-001' || 
+                     deletingUserId === 'sidonie-admin-001';
+    
+    if (!canDelete) return false;
+
+    await db.delete(adminDevOwnerMessages)
+      .where(eq(adminDevOwnerMessages.id, messageId));
+    return true;
   }
 
   // Employee Emergency Messages
