@@ -303,9 +303,6 @@ export default function DeveloperLanding() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Real Owner Login */}
             <div className={`glow-card bg-slate-800 rounded-lg p-6 border transition-all ${showOwnerCodeInput ? 'border-green-500/50 glow-button-green' : 'border-slate-600 hover:border-green-500/30'} relative backdrop-blur-sm`}>
-              <div className="absolute top-2 right-2 bg-green-600/80 px-2 py-1 rounded text-xs font-bold text-white">
-                Access Code
-              </div>
               <div className="flex items-center justify-center mb-3">
                 <Briefcase className="w-6 h-6 text-green-400" />
               </div>
@@ -365,9 +362,6 @@ export default function DeveloperLanding() {
 
             {/* Real Employee Login */}
             <div className={`glow-card bg-slate-800 rounded-lg p-6 border transition-all ${showEmployeeCodeInput ? 'border-purple-500/50 glow-button-purple' : 'border-slate-600 hover:border-purple-500/30'} relative backdrop-blur-sm`}>
-              <div className="absolute top-2 right-2 bg-purple-600/80 px-2 py-1 rounded text-xs font-bold text-white">
-                Access Code
-              </div>
               <div className="flex items-center justify-center mb-3">
                 <Users className="w-6 h-6 text-purple-400" />
               </div>
@@ -427,9 +421,6 @@ export default function DeveloperLanding() {
 
             {/* Real Admin Login */}
             <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
-              <div className="absolute top-2 right-2 bg-amber-600/80 px-2 py-1 rounded text-xs font-bold text-white">
-                Requires PIN
-              </div>
               <div className="flex items-center justify-center mb-3">
                 <Shield className="w-6 h-6 text-gray-500" />
               </div>
