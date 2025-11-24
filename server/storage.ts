@@ -32,6 +32,7 @@ import {
   devPersonalCards,
   adminDevOwnerMessages,
   employeeEmergencyMessages,
+  adminPasswordResets,
   type InsertUser,
   type User,
   type InsertDemoRegistration,
@@ -92,6 +93,8 @@ import {
   type AdminDevOwnerMessage,
   type InsertEmployeeEmergencyMessage,
   type EmployeeEmergencyMessage,
+  type InsertAdminPasswordReset,
+  type AdminPasswordReset,
   supportTickets,
   type InsertSupportTicket,
   type SupportTicket,
@@ -1355,6 +1358,56 @@ export class DrizzleStorage implements IStorage {
       .where(eq(employeeEmergencyMessages.id, messageId))
       .returning();
     return result[0];
+  }
+
+  // ========================
+  // CRM VISIBILITY FILTERING
+  // ========================
+  async listCompaniesByRole(currentUserId: string, userRole: string): Promise<Company[]> {
+    // Dev and Sidonie see all accounts (hidden + visible)
+    if (userRole === 'developer' || currentUserId === 'sidonie-admin-001') {
+      const result = await db.select().from(companies).orderBy(desc(companies.createdAt));
+      return result;
+    }
+
+    // Other admins see only non-hidden accounts
+    const result = await db.select().from(companies)
+      .where(eq(companies.isHidden, false))
+      .orderBy(desc(companies.createdAt));
+    return result;
+  }
+
+  async toggleCompanyVisibility(companyId: string, isHidden: boolean): Promise<Company | undefined> {
+    const result = await db.update(companies)
+      .set({ isHidden })
+      .where(eq(companies.id, companyId))
+      .returning();
+    return result[0];
+  }
+
+  async updateCompanyOwnerAdmin(companyId: string, ownerAdminId: string): Promise<Company | undefined> {
+    const result = await db.update(companies)
+      .set({ ownerAdminId })
+      .where(eq(companies.id, companyId))
+      .returning();
+    return result[0];
+  }
+
+  // ========================
+  // SIDONIE'S PASSWORD RESET
+  // ========================
+  async recordPasswordReset(resetByUserId: string, targetUserId: string, newPasswordHash: string): Promise<AdminPasswordReset> {
+    const result = await db.insert(adminPasswordResets)
+      .values({ resetByUserId, targetUserId, newPasswordHash })
+      .returning();
+    return result[0];
+  }
+
+  async getPasswordResetHistory(targetUserId: string): Promise<AdminPasswordReset[]> {
+    const result = await db.select().from(adminPasswordResets)
+      .where(eq(adminPasswordResets.targetUserId, targetUserId))
+      .orderBy(desc(adminPasswordResets.resetAt));
+    return result;
   }
 }
 

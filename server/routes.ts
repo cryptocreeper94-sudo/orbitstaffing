@@ -212,9 +212,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             companyId: "orbit-dev",
             isFirstLogin: true,
             isReadOnly: false,
+            isSidonie: true,
             requiresPasswordChange: true,
             greeting: `${getTimeGreeting()}, Sidonie! 👋`,
-            welcomeMessage: `${getTimeGreeting()}, Sidonie!\n\nWelcome to your ORBIT Admin Dashboard. Your admin profile is now active:\n\n👤 Asset ID: ${sidAssetNumber}\n📧 Admin Account: Full Control\n🔐 Status: Requires Password Update\n\nNext Steps:\n1. Update your password (required)\n2. Configure your admin business card\n3. Access your team management dashboard\n\nYour account has been registered and you can now manage ORBIT operations. Please change your password to secure your account.`,
+            welcomeMessage: `${getTimeGreeting()}, Sidonie!\n\nWelcome to your ORBIT Ops Manager Dashboard.\n\n👤 Asset ID: ${sidAssetNumber}\n🔐 Status: Ops Manager (Elevated Permissions)\n\n✨ YOUR SPECIAL ABILITIES:\n\n🔑 Admin Password Reset\n   Reset any admin's password in the system. All changes are logged.\n\n👁️ Account Visibility Control\n   Hide/show customer accounts from other admins. Only you, Dev, and the account owner can see hidden accounts.\n\n📊 Full CRM Access\n   Complete access to all customer data: contacts, notes, profiles, and communication history.\n\n👥 Account Ownership Management\n   Designate which admin owns and manages each customer account.\n\n📝 NEXT STEPS:\n1. Update your password (required)\n2. Configure your personal admin business card\n3. Explore the CRM - you can hide accounts with the eye icon\n4. Use password reset to onboard new admins\n\nYour elevated role is critical for team management. Use these abilities responsibly.`,
             needsPasswordReset: true,
           };
           return res.status(200).json(adminUser);
@@ -2631,6 +2632,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to get dev card:", error);
       res.status(500).json({ error: "Failed to retrieve card" });
+    }
+  });
+
+  // ========================
+  // CRM VISIBILITY ROUTES
+  // ========================
+  app.get("/api/crm/companies/:userId/:userRole", async (req: Request, res: Response) => {
+    try {
+      const { userId, userRole } = req.params;
+      const companies = await storage.listCompaniesByRole(userId, userRole);
+      res.json({ companies });
+    } catch (error) {
+      console.error("Failed to get companies:", error);
+      res.status(500).json({ error: "Failed to retrieve companies" });
+    }
+  });
+
+  app.post("/api/crm/companies/:companyId/toggle-visibility", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const { isHidden } = req.body;
+
+      if (typeof isHidden !== 'boolean') {
+        return res.status(400).json({ error: "Invalid visibility toggle" });
+      }
+
+      const company = await storage.toggleCompanyVisibility(companyId, isHidden);
+      res.json(company);
+    } catch (error) {
+      console.error("Failed to toggle visibility:", error);
+      res.status(500).json({ error: "Failed to update visibility" });
+    }
+  });
+
+  app.post("/api/crm/companies/:companyId/set-owner-admin", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const { ownerAdminId } = req.body;
+
+      if (!ownerAdminId) {
+        return res.status(400).json({ error: "Missing ownerAdminId" });
+      }
+
+      const company = await storage.updateCompanyOwnerAdmin(companyId, ownerAdminId);
+      res.json(company);
+    } catch (error) {
+      console.error("Failed to set owner admin:", error);
+      res.status(500).json({ error: "Failed to set owner admin" });
+    }
+  });
+
+  // ========================
+  // SIDONIE PASSWORD RESET ROUTES
+  // ========================
+  app.post("/api/admin/reset-password", async (req: Request, res: Response) => {
+    try {
+      const { resetByUserId, targetUserId, newPasswordHash } = req.body;
+
+      // Only Sidonie and Dev can reset passwords
+      if (resetByUserId !== 'sidonie-admin-001' && resetByUserId !== 'dev-master-001') {
+        return res.status(403).json({ error: "Only Sidonie or Dev can reset passwords" });
+      }
+
+      if (!targetUserId || !newPasswordHash) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Record password reset
+      const record = await storage.recordPasswordReset(resetByUserId, targetUserId, newPasswordHash);
+
+      // Update user password
+      const user = await storage.updateUser(targetUserId, { passwordHash: newPasswordHash });
+
+      res.json({
+        success: true,
+        message: `Password reset for ${user?.fullName || targetUserId}`,
+        record,
+      });
+    } catch (error) {
+      console.error("Failed to reset password:", error);
+      res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
+  app.get("/api/admin/password-reset-history/:userId", async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.params;
+      const history = await storage.getPasswordResetHistory(userId);
+      res.json({ history });
+    } catch (error) {
+      console.error("Failed to get password reset history:", error);
+      res.status(500).json({ error: "Failed to retrieve history" });
     }
   });
 

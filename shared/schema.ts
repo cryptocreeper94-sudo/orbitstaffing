@@ -87,9 +87,17 @@ export const companies = pgTable(
     daysOverdue: integer("days_overdue").default(0), // Days past due date
     totalOutstanding: decimal("total_outstanding", { precision: 10, scale: 2 }).default("0"), // Total unpaid amount
 
+    // CRM Access & Visibility Control
+    ownerAdminId: varchar("owner_admin_id").references(() => users.id), // First admin who created account = customer service owner
+    isHidden: boolean("is_hidden").default(false), // Hidden from other admins (only visible to dev/Sidonie/owner)
+
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
-  }
+  },
+  (table) => ({
+    ownerAdminIdx: index("idx_companies_owner_admin").on(table.ownerAdminId),
+    hiddenIdx: index("idx_companies_hidden").on(table.isHidden),
+  })
 );
 
 export const insertCompanySchema = createInsertSchema(companies).omit({
@@ -100,6 +108,33 @@ export const insertCompanySchema = createInsertSchema(companies).omit({
 
 export type InsertCompany = z.infer<typeof insertCompanySchema>;
 export type Company = typeof companies.$inferSelect;
+
+// ========================
+// Admin Password Reset Log (Sidonie's Ability)
+// ========================
+export const adminPasswordResets = pgTable(
+  "admin_password_resets",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    resetByUserId: varchar("reset_by_user_id").notNull().references(() => users.id), // Sidonie or Dev
+    targetUserId: varchar("target_user_id").notNull().references(() => users.id), // Admin whose password was reset
+    newPasswordHash: text("new_password_hash").notNull(),
+    resetAt: timestamp("reset_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    resetByIdx: index("idx_reset_by").on(table.resetByUserId),
+    targetIdx: index("idx_reset_target").on(table.targetUserId),
+    resetAtIdx: index("idx_reset_at").on(table.resetAt),
+  })
+);
+
+export const insertAdminPasswordResetSchema = createInsertSchema(adminPasswordResets).omit({
+  id: true,
+  resetAt: true,
+});
+
+export type InsertAdminPasswordReset = z.infer<typeof insertAdminPasswordResetSchema>;
+export type AdminPasswordReset = typeof adminPasswordResets.$inferSelect;
 
 // ========================
 // Demo Registrations (Lead Capture)
