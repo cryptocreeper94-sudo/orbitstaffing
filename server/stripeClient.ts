@@ -54,31 +54,3 @@ export async function getStripePublishableKey() {
   const { publishableKey } = await getCredentials();
   return publishableKey;
 }
-
-export async function getStripeSecretKey() {
-  const { secretKey } = await getCredentials();
-  return secretKey;
-}
-
-let stripeSync: any = null;
-
-export async function getStripeSync() {
-  if (!stripeSync) {
-    try {
-      const { StripeSync } = await import('stripe-replit-sync');
-      const secretKey = await getStripeSecretKey();
-
-      stripeSync = new StripeSync({
-        poolConfig: {
-          connectionString: process.env.DATABASE_URL!,
-          max: 2,
-        },
-        stripeSecretKey: secretKey,
-      });
-    } catch (error) {
-      console.error('StripeSync import failed:', error);
-      throw error;
-    }
-  }
-  return stripeSync;
-}

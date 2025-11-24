@@ -9,12 +9,7 @@ export class StripeService {
     });
   }
 
-  async createCheckoutSession(
-    customerId: string,
-    priceId: string,
-    successUrl: string,
-    cancelUrl: string
-  ) {
+  async createCheckoutSession(customerId: string, priceId: string, successUrl: string, cancelUrl: string) {
     const stripe = await getUncachableStripeClient();
     return await stripe.checkout.sessions.create({
       customer: customerId,
@@ -32,16 +27,6 @@ export class StripeService {
       customer: customerId,
       return_url: returnUrl,
     });
-  }
-
-  async getPrice(priceId: string) {
-    const stripe = await getUncachableStripeClient();
-    return await stripe.prices.retrieve(priceId);
-  }
-
-  async listPrices() {
-    const stripe = await getUncachableStripeClient();
-    return await stripe.prices.list({ limit: 100, active: true });
   }
 }
 

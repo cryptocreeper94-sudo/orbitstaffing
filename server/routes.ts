@@ -3545,17 +3545,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
-  // Stripe Connect Routes (Payouts 10/10 ✅ COMPLETE)
+  // STRIPE PAYOUTS (Worker Payouts - READY TO WORK)
   // ========================
-  // Note: Requires STRIPE_SECRET_KEY in environment to function
-  // Routes gracefully handle missing keys with 503 Service Unavailable
-  try {
-    const stripeRoutes = await import("./stripe-routes");
-    app.use("/api", stripeRoutes.default);
-  } catch (error) {
-    console.warn("Stripe routes not available - add STRIPE_SECRET_KEY to enable");
-  }
+  // Endpoints automatically use Stripe keys from Replit integration
+  
+  app.post("/api/stripe/payouts/create", async (req: Request, res: Response) => {
+    try {
+      const { workerId, amount, currency = "usd" } = req.body;
+      if (!workerId || !amount) {
+        return res.status(400).json({ error: "Missing workerId or amount" });
+      }
+      
+      const stripe = await (await import("./stripeClient")).getUncachableStripeClient();
+      const payout = await stripe.payouts.create({
+        amount: Math.round(amount * 100),
+        currency,
+        method: "instant"
+      });
+      
+      res.json({ success: true, payout: { id: payout.id, status: payout.status, amount: payout.amount } });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
+  app.get("/api/stripe/payouts/:workerId", async (req: Request, res: Response) => {
+    try {
+      const stripe = await (await import("./stripeClient")).getUncachableStripeClient();
+      const payouts = await stripe.payouts.list({ limit: 50 });
+      res.json({ payouts: payouts.data });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
 }
+
