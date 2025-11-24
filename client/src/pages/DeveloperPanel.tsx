@@ -16,13 +16,27 @@ import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
 import { getValidSession, setSessionWithExpiry, clearSession, isMobileDevice, shouldBypassMobileLogin } from '@/lib/sessionUtils';
+import { shouldBypassDeveloperLogin, enableBypassOnThisDevice, disableBypassOnThisDevice, isBypassDeviceEnabled } from '@/lib/deviceFingerprint';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
+  const [showBypassOption, setShowBypassOption] = useState(false);
+  const [showDeviceSettings, setShowDeviceSettings] = useState(false);
+  const [bypassEnabled, setBypassEnabled] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return isBypassDeviceEnabled();
+    }
+    return false;
+  });
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     if (typeof window !== 'undefined') {
+      // Check if this device has complete bypass enabled
+      if (shouldBypassDeveloperLogin()) {
+        return true;
+      }
+      
       // Check for valid persistent session (30 days)
       const session = getValidSession(DEVELOPER_SESSION_KEY);
       if (session?.authenticated) {
@@ -83,6 +97,8 @@ export default function DeveloperPanel() {
         localStorage.setItem('developerAuthenticated', 'true'); // Migrate old flag
         setIsAuthenticated(true);
         setPin('');
+        // Show bypass option after successful login
+        setShowBypassOption(true);
       } else {
         setError('Invalid PIN.');
         setPin('');
@@ -205,6 +221,50 @@ export default function DeveloperPanel() {
           <p className="text-xs text-gray-500 text-center mt-6">
             For technical team members and API integrations
           </p>
+
+          {/* Bypass Option Modal */}
+          {showBypassOption && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-purple-500/50 p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <Lock className="w-6 h-6 text-purple-400" />
+                  <h2 className="text-xl font-bold text-purple-300">Device Bypass Setup</h2>
+                </div>
+                
+                <p className="text-gray-300 mb-6">
+                  Enable complete bypass on this device? You'll go straight to the Developer tab without logging in again.
+                </p>
+                
+                <div className="bg-purple-900/20 border border-purple-600/30 rounded-lg p-3 mb-6">
+                  <p className="text-sm text-purple-200">
+                    ✓ You can always disable this in settings
+                    <br />✓ Only works on this specific device/browser
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => {
+                      enableBypassOnThisDevice();
+                      setShowBypassOption(false);
+                    }}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700"
+                    data-testid="button-enable-bypass"
+                  >
+                    Enable Bypass
+                  </Button>
+                  <Button
+                    onClick={() => setShowBypassOption(false)}
+                    variant="outline"
+                    className="flex-1"
+                    data-testid="button-skip-bypass"
+                  >
+                    Skip
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -327,8 +387,16 @@ export default function DeveloperPanel() {
               Main App
             </Button>
             <Button
+              onClick={() => setShowDeviceSettings(!showDeviceSettings)}
+              className="bg-slate-600 hover:bg-slate-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
+              data-testid="button-device-settings"
+            >
+              <Key className="w-4 h-4" />
+              Device Settings
+            </Button>
+            <Button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm md:col-span-2"
+              className="bg-red-600 hover:bg-red-700 text-white font-bold flex items-center gap-2 px-3 py-2 text-sm"
               data-testid="button-developer-logout"
             >
               <LogOut className="w-4 h-4" />
@@ -336,6 +404,81 @@ export default function DeveloperPanel() {
             </Button>
           </div>
         </div>
+
+        {/* Device Settings Modal */}
+        {showDeviceSettings && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-600 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Key className="w-5 h-5 text-slate-400" />
+                  Device Settings
+                </h2>
+                <button
+                  onClick={() => setShowDeviceSettings(false)}
+                  className="text-gray-400 hover:text-white text-2xl"
+                  data-testid="button-close-settings"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-semibold text-white">Complete Bypass</h3>
+                      <p className="text-sm text-gray-400">Go straight to Developer tab (no login)</p>
+                    </div>
+                    <div className={`px-2 py-1 rounded text-xs font-bold ${
+                      bypassEnabled ? 'bg-green-600 text-white' : 'bg-gray-600 text-white'
+                    }`}>
+                      {bypassEnabled ? 'ACTIVE' : 'OFF'}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-gray-400 mb-3">
+                    ✓ This device only
+                    <br />✓ Can be disabled anytime
+                  </p>
+
+                  {bypassEnabled ? (
+                    <Button
+                      onClick={() => {
+                        disableBypassOnThisDevice();
+                        setBypassEnabled(false);
+                      }}
+                      className="w-full bg-red-600 hover:bg-red-700"
+                      data-testid="button-disable-bypass"
+                    >
+                      Disable Bypass
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        enableBypassOnThisDevice();
+                        setBypassEnabled(true);
+                      }}
+                      className="w-full bg-green-600 hover:bg-green-700"
+                      data-testid="button-enable-bypass-settings"
+                    >
+                      Enable Bypass
+                    </Button>
+                  )}
+                </div>
+
+                <Button
+                  onClick={() => setShowDeviceSettings(false)}
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-close-device-settings"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex gap-4 mb-8 border-b border-slate-700 flex-wrap">
