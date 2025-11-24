@@ -1,6 +1,6 @@
 /**
  * Developer Landing Page
- * Sandbox entry point - join as Admin or Owner with PIN 4444
+ * Public sandbox entry point - join as Owner or Employee with PIN 7777
  */
 import React, { useState } from 'react';
 import { Code, Shield, Users, LogOut } from 'lucide-react';
@@ -18,12 +18,12 @@ export default function DeveloperLanding() {
   const [error, setError] = useState('');
 
   const loginMutation = useMutation({
-    mutationFn: async (sandboxRole: 'admin' | 'owner') => {
+    mutationFn: async (sandboxRole: 'owner' | 'employee') => {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          pin: '4444',
+          pin: '7777',
           sandboxRole: sandboxRole,
         }),
       });
@@ -50,7 +50,7 @@ export default function DeveloperLanding() {
     },
   });
 
-  const handleJoinSandbox = (role: 'admin' | 'owner') => {
+  const handleJoinSandbox = (role: 'owner' | 'employee') => {
     setSelectedRole(role);
     setError('');
     loginMutation.mutate(role);
@@ -140,7 +140,7 @@ export default function DeveloperLanding() {
             <h1 className="text-4xl font-bold text-white">ORBIT Staffing OS</h1>
           </div>
           <p className="text-gray-300 text-lg">
-            Complete Staffing Platform Demo - PIN: 4444
+            Complete Staffing Platform Demo - PIN: 7777
           </p>
         </div>
 
@@ -154,53 +154,6 @@ export default function DeveloperLanding() {
 
         {/* Sandbox Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Admin Sandbox */}
-          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-cyan-500 transition-all flex flex-col h-full">
-            <div className="flex items-center justify-center mb-4">
-              <Shield className="w-8 h-8 text-cyan-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-3 text-center">
-              Admin Sandbox
-            </h2>
-            <p className="text-gray-400 text-sm mb-6 text-center">
-              Monitor all companies, workers, and system metrics in real-time
-            </p>
-
-            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-cyan-400">✓</span>
-                Real-time dashboard & analytics
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-cyan-400">✓</span>
-                GPS verification & audit trails
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-cyan-400">✓</span>
-                System-wide monitoring
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-cyan-400">✓</span>
-                Compliance & reporting
-              </div>
-            </div>
-
-            <Button
-              onClick={() => handleJoinSandbox('admin')}
-              disabled={loginMutation.isPending}
-              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg mb-3"
-              data-testid="button-join-admin-sandbox"
-            >
-              {loginMutation.isPending && selectedRole === 'admin'
-                ? 'Joining...'
-                : 'Join as Admin (PIN: 4444)'}
-            </Button>
-
-            <p className="text-xs text-gray-500 text-center">
-              Email: sidonie@orbitstaffing.net
-            </p>
-          </div>
-
           {/* Owner Sandbox */}
           <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-green-500 transition-all flex flex-col h-full">
             <div className="flex items-center justify-center mb-4">
@@ -210,7 +163,7 @@ export default function DeveloperLanding() {
               Owner Sandbox
             </h2>
             <p className="text-gray-400 text-sm mb-6 text-center">
-              Create jobs, assign workers, process payroll instantly
+              Full control - manage jobs, workers, payroll, and invoices
             </p>
 
             <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
@@ -224,11 +177,11 @@ export default function DeveloperLanding() {
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <span className="text-green-400">✓</span>
-                Automatic payroll processing
+                Process instant payroll
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
                 <span className="text-green-400">✓</span>
-                Real-time earnings tracking
+                Track earnings and bonuses
               </div>
             </div>
 
@@ -240,11 +193,58 @@ export default function DeveloperLanding() {
             >
               {loginMutation.isPending && selectedRole === 'owner'
                 ? 'Joining...'
-                : 'Join as Owner (PIN: 4444)'}
+                : 'Join as Owner'}
             </Button>
 
             <p className="text-xs text-gray-500 text-center">
-              Email: owner@superiostaffing.com
+              Full control sandbox
+            </p>
+          </div>
+
+          {/* Employee Sandbox */}
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-purple-500 transition-all flex flex-col h-full">
+            <div className="flex items-center justify-center mb-4">
+              <Users className="w-8 h-8 text-purple-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">
+              Employee Sandbox
+            </h2>
+            <p className="text-gray-400 text-sm mb-6 text-center">
+              View jobs, clock in, track earnings and bonuses
+            </p>
+
+            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                View assigned jobs
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                GPS clock-in/out
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                Real-time earnings
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="text-purple-400">✓</span>
+                Track bonuses and payments
+              </div>
+            </div>
+
+            <Button
+              onClick={() => handleJoinSandbox('employee')}
+              disabled={loginMutation.isPending}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg mb-3"
+              data-testid="button-join-employee-sandbox"
+            >
+              {loginMutation.isPending && selectedRole === 'employee'
+                ? 'Joining...'
+                : 'Join as Employee'}
+            </Button>
+
+            <p className="text-xs text-gray-500 text-center">
+              Worker experience sandbox
             </p>
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function DeveloperLanding() {
             Complete demo environment ready for production testing
           </p>
           <p className="text-xs text-gray-500">
-            Both PIN: <span className="text-yellow-400 font-mono">4444</span> • Complete sandbox access
+            PIN: <span className="text-yellow-400 font-mono">7777</span> • Complete sandbox access
           </p>
         </div>
       </div>

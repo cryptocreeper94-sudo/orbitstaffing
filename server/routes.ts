@@ -73,9 +73,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password, pin, sandboxRole } = req.body;
 
-      // PIN 4444 - Sandbox login (admin, owner, or employee)
+      // PIN 4444 - Private sandbox for authorized users only (Admin, Owner, Employee)
       if (pin === "4444") {
-        // Admin sandbox
+        // Admin sandbox - READ-ONLY
         if (sandboxRole === "admin") {
           const adminUser = {
             id: "sidonie-test-001",
@@ -86,13 +86,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             companyId: "test-company",
             isFirstLogin: true,
             isReadOnly: true,
-            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
+            welcomeMessage: "SECURE SANDBOX LOGIN\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
             needsPasswordReset: true,
           };
           return res.status(200).json(adminUser);
         }
         
-        // Owner sandbox
+        // Owner sandbox - FULL CONTROL
         if (sandboxRole === "owner") {
           const ownerUser = {
             id: "owner-test-001",
@@ -103,13 +103,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             companyId: "superior-staffing",
             isFirstLogin: true,
             isReadOnly: false,
-            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nWelcome to ORBIT! You're logged in as the owner of Superior Staffing. This is your complete operational sandbox where you have full control:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nSwitch between Owner, Admin, and Employee views anytime using PIN 4444.",
+            welcomeMessage: "SECURE SANDBOX LOGIN\n\nWelcome to ORBIT! You're logged in as the owner of Superior Staffing. This is your complete operational sandbox where you have full control:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nYou have a personal admin role to manage your workers and communicate directly with ORBIT support.",
             needsPasswordReset: true,
           };
           return res.status(200).json(ownerUser);
         }
 
-        // Employee sandbox
+        // Employee sandbox - READ-ONLY
         if (sandboxRole === "employee") {
           const employeeUser = {
             id: "worker-test-001",
@@ -120,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             companyId: "superior-staffing",
             isFirstLogin: true,
             isReadOnly: true,
-            welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nWelcome to the ORBIT Worker App! This is the employee experience sandbox. You can:\n\n✓ View assigned jobs\n✓ Clock in/out with GPS verification\n✓ Track your earnings in real-time\n✓ See your bonus calculations\n✓ View payment history\n✓ Manage time-off requests\n\nSwitch between Owner, Admin, and Employee views anytime using PIN 4444.",
+            welcomeMessage: "SECURE SANDBOX LOGIN\n\nWelcome to the ORBIT Worker App! This is the employee experience sandbox. You can:\n\n✓ View assigned jobs\n✓ Clock in/out with GPS verification\n✓ Track your earnings in real-time\n✓ See your bonus calculations\n✓ View payment history\n✓ Manage time-off requests",
             needsPasswordReset: true,
           };
           return res.status(200).json(employeeUser);
@@ -136,10 +136,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
           companyId: "test-company",
           isFirstLogin: true,
           isReadOnly: true,
-          welcomeMessage: "PERMANENT SANDBOX LOGIN (PIN: 4444)\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
+          welcomeMessage: "SECURE SANDBOX LOGIN\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
           needsPasswordReset: true,
         };
         return res.status(200).json(testUser);
+      }
+
+      // PIN 7777 - Public universal demo code (Owner & Employee ONLY - NO ADMIN)
+      if (pin === "7777") {
+        // NO ADMIN ACCESS with PIN 7777 - only owner and employee
+        if (sandboxRole === "admin") {
+          return res.status(403).json({ error: "Admin access not available with this PIN. Please use regular login." });
+        }
+
+        // Owner demo sandbox
+        if (sandboxRole === "owner") {
+          const demoOwnerUser = {
+            id: "demo-owner-001",
+            email: "demo@orbitstaffing.net",
+            firstName: "Demo",
+            lastName: "Business Owner",
+            role: "owner",
+            companyId: "demo-company",
+            isFirstLogin: true,
+            isReadOnly: false,
+            welcomeMessage: "ORBIT DEMO SANDBOX\n\nWelcome to ORBIT! Test drive the complete staffing platform:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nThis is a fully functional demo. For support, contact ORBIT directly.",
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(demoOwnerUser);
+        }
+
+        // Employee demo sandbox
+        if (sandboxRole === "employee") {
+          const demoEmployeeUser = {
+            id: "demo-worker-001",
+            email: "demo-worker@orbitstaffing.net",
+            firstName: "Demo",
+            lastName: "Employee",
+            role: "worker",
+            companyId: "demo-company",
+            isFirstLogin: true,
+            isReadOnly: false,
+            welcomeMessage: "ORBIT DEMO SANDBOX\n\nWelcome to the ORBIT Worker App! Try out the complete employee experience:\n\n✓ View assigned jobs\n✓ Clock in/out with GPS verification\n✓ Track your earnings in real-time\n✓ See your bonus calculations\n✓ View payment history\n✓ Manage time-off requests\n\nThis is a fully functional demo. For support, contact ORBIT directly.",
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(demoEmployeeUser);
+        }
+
+        // Default to owner demo if no role specified
+        const demoOwnerUser = {
+          id: "demo-owner-001",
+          email: "demo@orbitstaffing.net",
+          firstName: "Demo",
+          lastName: "Business Owner",
+          role: "owner",
+          companyId: "demo-company",
+          isFirstLogin: true,
+          isReadOnly: false,
+          welcomeMessage: "ORBIT DEMO SANDBOX\n\nWelcome to ORBIT! Test drive the complete staffing platform:\n\n✓ Create jobs and post assignments\n✓ Assign workers and manage scheduling\n✓ Process instant payroll\n✓ Track earnings and bonuses\n✓ Generate invoices and reports\n\nThis is a fully functional demo. For support, contact ORBIT directly.",
+          needsPasswordReset: true,
+        };
+        return res.status(200).json(demoOwnerUser);
       }
 
       if (!email || !password) {

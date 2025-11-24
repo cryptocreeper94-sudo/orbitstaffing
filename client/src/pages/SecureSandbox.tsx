@@ -205,7 +205,7 @@ export default function SecureSandbox() {
             <h1 className="text-4xl font-bold text-white">Secure Sandbox</h1>
           </div>
           <p className="text-gray-300 text-lg">
-            Complete testing environment - PIN 4444
+            Complete testing environment
           </p>
           <p className="text-gray-500 text-xs mt-2">
             Test all three views: Admin, Owner, Employee
@@ -265,7 +265,7 @@ export default function SecureSandbox() {
             >
               {loginMutation.isPending && selectedRole === 'admin'
                 ? 'Joining...'
-                : 'Join Admin (PIN: 4444)'}
+                : 'Join Admin'}
             </Button>
 
             <p className="text-xs text-gray-500 text-center">
@@ -316,7 +316,7 @@ export default function SecureSandbox() {
             >
               {loginMutation.isPending && selectedRole === 'owner'
                 ? 'Joining...'
-                : 'Join Owner (PIN: 4444)'}
+                : 'Join Owner'}
             </Button>
 
             <p className="text-xs text-gray-500 text-center">
@@ -367,7 +367,7 @@ export default function SecureSandbox() {
             >
               {loginMutation.isPending && selectedRole === 'employee'
                 ? 'Joining...'
-                : 'Join Employee (PIN: 4444)'}
+                : 'Join Employee'}
             </Button>
 
             <p className="text-xs text-gray-500 text-center">
@@ -380,7 +380,7 @@ export default function SecureSandbox() {
         <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 text-center">
           <Lock className="w-5 h-5 inline text-purple-400 mr-2" />
           <p className="text-gray-400 text-sm">
-            Restricted access sandbox. PIN 4444 provides complete access to all three views.
+            Restricted access sandbox. Authorized access only.
           </p>
         </div>
       </div>
