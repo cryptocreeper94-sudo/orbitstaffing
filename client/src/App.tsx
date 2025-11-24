@@ -21,6 +21,7 @@ import { WorkerReferrals } from "@/pages/WorkerReferrals";
 import Roadmap from "@/pages/Roadmap";
 import PaymentPlans from "@/pages/PaymentPlans";
 import ValueProposition from "@/pages/ValueProposition";
+import ProfessionalStaffing from "@/pages/ProfessionalStaffing";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/roadmap" component={Roadmap} />
       <Route path="/payment-plans" component={PaymentPlans} />
       <Route path="/why-orbit" component={ValueProposition} />
+      <Route path="/professional-staffing" component={ProfessionalStaffing} />
       <Route component={NotFound} />
     </Switch>
   );

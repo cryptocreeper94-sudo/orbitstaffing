@@ -28,9 +28,11 @@ export default function Roadmap() {
     {
       category: "Q3 2026",
       items: [
+        { name: "Professional Staffing Division", description: "Nurses, accountants, engineers, consultants - high-margin placements", status: "locked", icon: Users },
+        { name: "Background Check Integration", description: "Checkr/Sterling API for professional verification", status: "locked", icon: CheckCircle2 },
+        { name: "Contract Engine", description: "Auto-generate SOWs with e-signature", status: "locked", icon: DollarSign },
         { name: "AI Job Matching", description: "Auto-recommend best workers for each job", status: "locked", icon: Brain },
         { name: "Predictive Analytics", description: "Forecast staffing needs and no-shows", status: "locked", icon: Zap },
-        { name: "Two-Sided Marketplace", description: "Workers browse and self-select jobs", status: "locked", icon: Users },
       ]
     }
   ];

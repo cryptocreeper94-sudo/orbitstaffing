@@ -359,7 +359,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard() {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -534,6 +534,18 @@ function MasterAdminDashboard() {
           <Eye className="w-4 h-4 inline mr-2" />
           Worker Availability
         </button>
+        <button
+          onClick={() => setActiveSection('professional')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'professional'
+              ? 'border-purple-500 text-purple-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-professional"
+        >
+          <Lock className="w-4 h-4 inline mr-2" />
+          Professional Division (V2)
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -559,6 +571,24 @@ function MasterAdminDashboard() {
       {activeSection === 'availability' && (
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
           <AdminWorkerAvailabilityManager />
+        </div>
+      )}
+
+      {activeSection === 'professional' && (
+        <div className="bg-slate-800 border border-purple-600/50 rounded-lg p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Lock className="w-6 h-6 text-purple-400" />
+            <div>
+              <h2 className="text-2xl font-bold text-purple-300">Professional Staffing Division</h2>
+              <p className="text-sm text-purple-300">Coming in Version 2 (Q3 2026)</p>
+            </div>
+          </div>
+          <p className="text-gray-300 mb-6">
+            Preview the Professional Staffing Division interface and features planned for Q3 2026. This includes nursing placements, executive recruiting, specialized contracting, and high-margin professional services.
+          </p>
+          <Button onClick={() => window.location.href = '/professional-staffing'} className="bg-purple-600 hover:bg-purple-700">
+            View Professional Division Preview
+          </Button>
         </div>
       )}
 
