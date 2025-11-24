@@ -322,52 +322,54 @@ function MasterAdminDashboard() {
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
-      category: '🚀 Version 1 - Launch Ready',
+      category: '🚀 Version 1 - Core Features',
       icon: '✅',
       tasks: [
-        { id: 'web-platform', title: 'Web platform fully built', completed: true },
-        { id: 'mobile-app', title: 'Mobile app (iOS/Android) ready', completed: true },
+        { id: 'web-platform', title: 'Web platform fully built & deployed', completed: true },
+        { id: 'mobile-app', title: 'Mobile app (iOS/Android) ready for submission', completed: true },
         { id: 'bonus-system', title: 'Dual-tier bonus system implemented', completed: true },
         { id: 'gps-verification', title: 'GPS verification system working', completed: true },
-        { id: 'database', title: 'PostgreSQL database configured', completed: true },
-        { id: 'legal-docs', title: 'All legal documents completed (12)', completed: true },
-        { id: 'marketing-system', title: 'Marketing landing page + demo', completed: true },
-        { id: 'admin-login', title: 'Multi-tenant admin PIN login', completed: true },
+        { id: 'database', title: 'PostgreSQL database configured with Neon', completed: true },
+        { id: 'worker-onboarding', title: 'Worker onboarding compliance system with file uploads', completed: true },
+        { id: 'admin-dashboard', title: 'Admin dashboard with worker tracking & management', completed: true },
+        { id: 'ui-polish', title: 'UI/UX polish (animations, glow effects, responsive design)', completed: true },
       ]
     },
     {
       id: 'pre-launch',
-      category: '⚡ Pre-Launch Checklist',
+      category: '⚡ Pre-Launch (Sidonie Testing)',
       icon: '📋',
       tasks: [
-        { id: 'testing', title: 'End-to-end testing on real devices', completed: false },
-        { id: 'payment-integration', title: 'Wire Stripe integration', completed: false },
-        { id: 'coinbase-integration', title: 'Wire Coinbase integration', completed: false },
+        { id: 'testing', title: 'End-to-end testing on real devices (Sidonie review)', completed: false },
+        { id: 'compliance-check', title: 'State compliance (TN/KY) verification', completed: true },
+        { id: 'sandbox-demo', title: 'Sandbox demo system ready for testing', completed: true },
+        { id: 'payment-integration', title: 'Stripe payment integration connected', completed: false },
+        { id: 'coinbase-integration', title: 'Coinbase Commerce integration connected', completed: false },
         { id: 'google-play', title: 'Submit app to Google Play Store', completed: false },
-        { id: 'web-deployment', title: 'Deploy web platform to production', completed: false },
-        { id: 'database-backup', title: 'Set up automated database backups', completed: false },
-        { id: 'monitoring', title: 'Set up error monitoring & logging', completed: false },
+        { id: 'app-store', title: 'Submit app to Apple App Store', completed: false },
       ]
     },
     {
-      id: 'marketing-launch',
-      category: '📢 Marketing & Customer Acquisition',
-      icon: '🎯',
+      id: 'superior-staffing',
+      category: '🎯 Superior Staffing (First Franchise)',
+      icon: '🏆',
       tasks: [
-        { id: 'case-study', title: 'Get case study from first customer', completed: false },
-        { id: 'press-release', title: 'Write and distribute press release', completed: false },
-        { id: 'franchise-outreach', title: 'Outreach to first 10 franchise prospects', completed: false },
-        { id: 'partnership-calls', title: 'Schedule calls with staffing associations', completed: false },
+        { id: 'ss-launch', title: 'Launch production environment for Superior Staffing', completed: false },
+        { id: 'ss-data-migration', title: 'Migrate customer/worker data into platform', completed: false },
+        { id: 'ss-training', title: 'Train Superior Staffing team on platform', completed: false },
+        { id: 'ss-go-live', title: 'Go-live with first paying customer', completed: false },
+        { id: 'franchise-deal', title: 'Finalize franchise agreement & licensing terms', completed: false },
       ]
     },
     {
       id: 'v2-planning',
-      category: '🎨 Version 2 Planning',
+      category: '🚀 Version 2 Planning',
       icon: '🗺️',
       tasks: [
-        { id: 'v2-roadmap', title: 'Complete V2 roadmap document', completed: true },
-        { id: 'feature-prioritization', title: 'Prioritize top 10 V2 features', completed: false },
-        { id: 'customer-feedback', title: 'Gather feedback from early customers', completed: false },
+        { id: 'v2-roadmap', title: 'V2 roadmap document (features & timeline)', completed: true },
+        { id: 'feature-prioritization', title: 'Prioritize top 10 V2 features with customers', completed: false },
+        { id: 'customer-feedback', title: 'Gather feedback from early customers & franchisees', completed: false },
+        { id: 'feature-tracking', title: 'Set up feature request system for franchisees', completed: false },
       ]
     }
   ]);
