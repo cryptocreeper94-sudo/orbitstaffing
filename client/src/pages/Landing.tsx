@@ -18,7 +18,7 @@ import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
-import saturnLogo from "@assets/generated_images/saturn_planet_with_true_alpha_transparency.png";
+import saturnLogo from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
