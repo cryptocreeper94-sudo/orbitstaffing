@@ -337,16 +337,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "PIN required" });
       }
 
-      const adminPin = process.env.ADMIN_PIN;
+      const devPin = process.env.ORBIT_DEV_PIN;
       
-      if (!adminPin) {
-        return res.status(500).json({ error: "Admin PIN not configured" });
+      if (!devPin) {
+        return res.status(500).json({ error: "Dev PIN not configured" });
       }
 
-      if (pin === adminPin) {
+      if (pin === devPin) {
         return res.status(200).json({ 
           success: true,
-          message: "Admin PIN verified"
+          message: "Dev PIN verified"
         });
       } else {
         return res.status(401).json({ error: "Invalid PIN" });
