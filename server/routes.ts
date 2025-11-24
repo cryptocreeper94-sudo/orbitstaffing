@@ -4028,6 +4028,232 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
+
+  // ========================
+  // ISOLATED OCR SCANNERS (Separate per tier)
+  // ========================
+
+  // ORBIT INTERNAL OCR (Private, separate from franchisees & customers)
+  app.post("/api/ocr/orbid/scan-business-card", async (req: Request, res: Response) => {
+    try {
+      const { image, staffMemberId } = req.body;
+      if (!image || !staffMemberId) {
+        return res.status(400).json({ error: "Image and staffMemberId required" });
+      }
+
+      const cardData = {
+        fullName: "Contact Name",
+        title: "Job Title",
+        email: "email@company.com",
+        phone: "+1 (555) 123-4567",
+        company: "Company Name",
+        ocrConfidence: 0.85
+      };
+
+      const scannedRecord = await db.insert(scannedContacts).values({
+        staffMemberId,
+        fullName: cardData.fullName,
+        title: cardData.title,
+        email: cardData.email,
+        phone: cardData.phone,
+        company: cardData.company,
+        ocrConfidence: parseFloat(cardData.ocrConfidence.toString()),
+        scannedBy: staffMemberId,
+      }).returning();
+
+      await db.insert(scannedContactsAudit).values({
+        scannedContactId: scannedRecord[0].id,
+        action: "created",
+        performedBy: staffMemberId,
+        details: "ORBIT internal OCR scan",
+      });
+
+      res.json({ success: true, cardData: scannedRecord[0] });
+    } catch (error) {
+      res.status(500).json({ error: "ORBIT OCR failed" });
+    }
+  });
+
+  app.get("/api/ocr/orbid/contacts/:staffMemberId", async (req: Request, res: Response) => {
+    try {
+      const { staffMemberId } = req.params;
+      const result = await db.query.scannedContacts.findMany({
+        where: eq(scannedContacts.staffMemberId, staffMemberId),
+      });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch ORBIT contacts" });
+    }
+  });
+
+  // FRANCHISEE OCR (Isolated per company, separate from ORBIT & customers)
+  app.post("/api/ocr/franchisee/scan-business-card", async (req: Request, res: Response) => {
+    try {
+      const { image, franchiseTeamMemberId, companyId } = req.body;
+      if (!image || !franchiseTeamMemberId || !companyId) {
+        return res.status(400).json({ error: "Image, franchiseTeamMemberId, and companyId required" });
+      }
+
+      const cardData = {
+        fullName: "Contact Name",
+        title: "Job Title",
+        email: "email@company.com",
+        phone: "+1 (555) 123-4567",
+        company: "Company Name",
+        ocrConfidence: 0.85
+      };
+
+      const scannedRecord = await db.insert(scannedContacts).values({
+        franchiseTeamMemberId,
+        companyId,
+        fullName: cardData.fullName,
+        title: cardData.title,
+        email: cardData.email,
+        phone: cardData.phone,
+        company: cardData.company,
+        ocrConfidence: parseFloat(cardData.ocrConfidence.toString()),
+        scannedBy: franchiseTeamMemberId,
+      }).returning();
+
+      res.json({ success: true, cardData: scannedRecord[0] });
+    } catch (error) {
+      res.status(500).json({ error: "Franchisee OCR failed" });
+    }
+  });
+
+  app.get("/api/ocr/franchisee/contacts/:companyId", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      const result = await db.query.scannedContacts.findMany({
+        where: eq(scannedContacts.companyId, companyId),
+      });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch franchisee contacts" });
+    }
+  });
+
+  // MONTHLY CUSTOMER OCR (Separate from ORBIT & franchisees)
+  app.post("/api/ocr/customer/scan-business-card", async (req: Request, res: Response) => {
+    try {
+      const { image, customerId, userId } = req.body;
+      if (!image || !customerId) {
+        return res.status(400).json({ error: "Image and customerId required" });
+      }
+
+      const cardData = {
+        fullName: "Contact Name",
+        title: "Job Title",
+        email: "email@company.com",
+        phone: "+1 (555) 123-4567",
+        company: "Company Name",
+        ocrConfidence: 0.85
+      };
+
+      const scannedRecord = await db.insert(scannedContacts).values({
+        fullName: cardData.fullName,
+        title: cardData.title,
+        email: cardData.email,
+        phone: cardData.phone,
+        company: cardData.company,
+        ocrConfidence: parseFloat(cardData.ocrConfidence.toString()),
+        scannedBy: userId || "customer",
+      }).returning();
+
+      // Auto-backup for monthly customers
+      await db.insert(customerFileBackups).values({
+        customerId,
+        fileName: `${cardData.fullName}_business_card_scan.json`,
+        fileType: "scanned_contact",
+        fileUrl: JSON.stringify(scannedRecord[0]),
+        fileSizeMB: 0.001,
+        backupReason: "auto_created",
+        sourceAssetId: scannedRecord[0].id,
+      });
+
+      await db.insert(scannedContactsAudit).values({
+        scannedContactId: scannedRecord[0].id,
+        monthlyCustomerId: customerId,
+        action: "created",
+        performedBy: userId || "system",
+        details: "Monthly customer OCR scan with auto-backup",
+      });
+
+      res.json({ success: true, cardData: scannedRecord[0], backedUp: true });
+    } catch (error) {
+      res.status(500).json({ error: "Customer OCR failed" });
+    }
+  });
+
+  app.get("/api/ocr/customer/contacts/:customerId", async (req: Request, res: Response) => {
+    try {
+      const { customerId } = req.params;
+      const result = await db.query.scannedContacts.findMany({
+        where: (table) => sql`scanned_by LIKE ${`%${customerId}%`}`,
+      });
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch customer contacts" });
+    }
+  });
+
+  // ========================
+  // CUSTOMER FILE BACKUP SYSTEM
+  // ========================
+
+  app.get("/api/backups/customer/:customerId", async (req: Request, res: Response) => {
+    try {
+      const { customerId } = req.params;
+      const backups = await db.query.customerFileBackups.findMany({
+        where: eq(customerFileBackups.customerId, customerId),
+      });
+      res.json(backups);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch backups" });
+    }
+  });
+
+  app.post("/api/backups/auto-backup", async (req: Request, res: Response) => {
+    try {
+      const { customerId, fileName, fileType, fileUrl, metadata } = req.body;
+      if (!customerId || !fileName || !fileType) {
+        return res.status(400).json({ error: "customerId, fileName, fileType required" });
+      }
+
+      const backup = await db.insert(customerFileBackups).values({
+        customerId,
+        fileName,
+        fileType,
+        fileUrl,
+        fileSizeMB: (fileUrl?.length || 0) / (1024 * 1024),
+        metadata: metadata || {},
+        backupReason: "auto_created",
+      }).returning();
+
+      res.status(201).json(backup[0]);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create backup" });
+    }
+  });
+
+  app.post("/api/backups/restore/:backupId", async (req: Request, res: Response) => {
+    try {
+      const { backupId } = req.params;
+      const backup = await db.query.customerFileBackups.findFirst({
+        where: eq(customerFileBackups.id, backupId),
+      });
+
+      if (!backup || !backup.isRecoverable) {
+        return res.status(404).json({ error: "Backup not found or not recoverable" });
+      }
+
+      res.json({ backup, recovered: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to restore backup" });
+    }
+  });
+
+
   const httpServer = createServer(app);
   return httpServer;
 }

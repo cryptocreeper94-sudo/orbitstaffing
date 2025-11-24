@@ -4113,3 +4113,102 @@ export const insertScannedContactSchema = createInsertSchema(scannedContacts).om
 
 export type InsertScannedContact = z.infer<typeof insertScannedContactSchema>;
 export type ScannedContact = typeof scannedContacts.$inferSelect;
+
+// ========================
+// Monthly Subscription Customers (Non-Franchise)
+// ========================
+export const monthlySubscriptionCustomers = pgTable(
+  "monthly_subscription_customers",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyName: varchar("company_name", { length: 255 }).notNull(),
+    contactEmail: varchar("contact_email", { length: 255 }).notNull(),
+    billingTier: varchar("billing_tier", { length: 50 }).default("basic"), // basic, pro, enterprise
+    status: varchar("status", { length: 50 }).default("active"), // active, paused, cancelled
+    autoBackupEnabled: boolean("auto_backup_enabled").default(true),
+    storageQuotaMB: integer("storage_quota_mb").default(5000), // 5GB default
+    usedStorageMB: integer("used_storage_mb").default(0),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_monthly_customer_email").on(table.contactEmail),
+    statusIdx: index("idx_monthly_customer_status").on(table.status),
+  })
+);
+
+export const insertMonthlySubscriptionCustomerSchema = createInsertSchema(monthlySubscriptionCustomers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertMonthlySubscriptionCustomer = z.infer<typeof insertMonthlySubscriptionCustomerSchema>;
+export type MonthlySubscriptionCustomer = typeof monthlySubscriptionCustomers.$inferSelect;
+
+// ========================
+// Customer File Backups (Auto-backup for monthly customers)
+// ========================
+export const customerFileBackups = pgTable(
+  "customer_file_backups",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    customerId: varchar("customer_id").notNull().references(() => monthlySubscriptionCustomers.id),
+    fileName: varchar("file_name", { length: 255 }).notNull(),
+    fileType: varchar("file_type", { length: 50 }).notNull(), // "asset", "invoice", "paycheck", "document", etc.
+    fileUrl: text("file_url").notNull(), // URL or base64 stored
+    fileSizeMB: decimal("file_size_mb", { precision: 10, scale: 2 }).default("0"),
+    documentHash: varchar("document_hash", { length: 64 }), // SHA256 for integrity
+    metadata: jsonb("metadata"), // asset details, related customer data, etc.
+    sourceAssetId: varchar("source_asset_id"), // Link to original asset if from their system
+    backupReason: varchar("backup_reason", { length: 100 }), // "auto_created", "user_requested", "compliance", etc.
+    isRecoverable: boolean("is_recoverable").default(true),
+    backedUpAt: timestamp("backed_up_at").default(sql`NOW()`),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    customerIdx: index("idx_backup_customer").on(table.customerId),
+    fileTypeIdx: index("idx_backup_file_type").on(table.fileType),
+    backedUpAtIdx: index("idx_backup_backed_up").on(table.backedUpAt),
+    hashIdx: index("idx_backup_hash").on(table.documentHash),
+  })
+);
+
+export const insertCustomerFileBackupSchema = createInsertSchema(customerFileBackups).omit({
+  id: true,
+  backedUpAt: true,
+  createdAt: true,
+});
+
+export type InsertCustomerFileBackup = z.infer<typeof insertCustomerFileBackupSchema>;
+export type CustomerFileBackup = typeof customerFileBackups.$inferSelect;
+
+// ========================
+// OCR Scanned Contacts - Updated for Isolation
+// ========================
+// Update existing scannedContacts to include customerContext
+export const scannedContactsAudit = pgTable(
+  "scanned_contacts_audit",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    scannedContactId: varchar("scanned_contact_id").references(() => scannedContacts.id),
+    monthlyCustomerId: varchar("monthly_customer_id").references(() => monthlySubscriptionCustomers.id),
+    action: varchar("action", { length: 50 }).notNull(), // "created", "edited", "accessed"
+    performedBy: varchar("performed_by", { length: 255 }),
+    details: text("details"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    contactIdx: index("idx_audit_contact").on(table.scannedContactId),
+    customerIdx: index("idx_audit_customer").on(table.monthlyCustomerId),
+    actionIdx: index("idx_audit_action").on(table.action),
+  })
+);
+
+export const insertScannedContactsAuditSchema = createInsertSchema(scannedContactsAudit).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertScannedContactsAudit = z.infer<typeof insertScannedContactsAuditSchema>;
+export type ScannedContactsAudit = typeof scannedContactsAudit.$inferSelect;
