@@ -188,20 +188,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // PIN 4444 - Private sandbox for authorized users only (Admin, Owner, Employee)
+      // PIN 4444 - Sidonie's Secure Admin Account
       if (pin === "4444") {
-        // Admin sandbox - READ-ONLY
+        // Admin sandbox - Sidonie's Account
         if (sandboxRole === "admin") {
+          const getTimeGreeting = () => {
+            const hour = new Date().getHours();
+            if (hour < 12) return "Good Morning";
+            if (hour < 18) return "Good Afternoon";
+            return "Good Evening";
+          };
+
+          // Generate Sid's asset number: ORBIT-ASSET-000000000002
+          const sidAssetNumber = "ORBIT-ASSET-000000000002";
+          
           const adminUser = {
-            id: "sidonie-test-001",
-            email: "sidonie@orbitstaffing.net",
+            id: "sidonie-admin-001",
+            email: "sidonie@darkswavestudio.com",
             firstName: "Sidonie",
-            lastName: "ORBIT Admin",
+            lastName: "Admin",
             role: "admin",
-            companyId: "test-company",
+            assetNumber: sidAssetNumber,
+            companyId: "orbit-dev",
             isFirstLogin: true,
-            isReadOnly: true,
-            welcomeMessage: "SECURE SANDBOX LOGIN\n\nYou are the ORBIT System Admin. This sandbox mirrors the full ORBIT system and you have full visibility across all operations. You can view:\n\n✓ Monitor all operations in real-time\n✓ Verify GPS check-ins and audit trails\n✓ Track payments and compliance\n✓ View complete audit trails\n✓ Access all system data\n\nYour role: System oversight and quality assurance (READ-ONLY - no modifications allowed).",
+            isReadOnly: false,
+            requiresPasswordChange: true,
+            greeting: `${getTimeGreeting()}, Sidonie! 👋`,
+            welcomeMessage: `${getTimeGreeting()}, Sidonie!\n\nWelcome to your ORBIT Admin Dashboard. Your admin profile is now active:\n\n👤 Asset ID: ${sidAssetNumber}\n📧 Admin Account: Full Control\n🔐 Status: Requires Password Update\n\nNext Steps:\n1. Update your password (required)\n2. Configure your admin business card\n3. Access your team management dashboard\n\nYour account has been registered and you can now manage ORBIT operations. Please change your password to secure your account.`,
             needsPasswordReset: true,
           };
           return res.status(200).json(adminUser);

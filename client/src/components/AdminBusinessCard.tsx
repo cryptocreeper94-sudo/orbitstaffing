@@ -393,6 +393,9 @@ END:VCARD`;
 
           {/* Bottom Border - Cyan Frame Completion */}
           <div className="absolute bottom-0 left-0 right-0 h-0.5 z-10" style={{ backgroundColor: formData.brandColor }}></div>
+
+          {/* Right Border - Cyan Frame Completion (connects from photo box bottom-right) */}
+          <div className="absolute right-0 bottom-0" style={{ width: '0.125rem', height: '50%', backgroundColor: formData.brandColor, zIndex: 10 }}></div>
         </div>
       </div>
 
