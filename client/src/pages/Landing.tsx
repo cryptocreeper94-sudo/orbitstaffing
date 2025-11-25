@@ -19,7 +19,6 @@ import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
-import saturnLogo from "@assets/generated_images/aqua_saturn_planet_with_glowing_rings.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
@@ -71,17 +70,6 @@ export default function Landing() {
       {/* Demo Request Form */}
       {showDemoForm && <DemoRequestForm onClose={() => setShowDemoForm(false)} />}
 
-      {/* Saturn Watermark - Fixed Centered Background - Transparent */}
-      <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
-        <img 
-          src={saturnLogo} 
-          alt="" 
-          className="w-[400px] h-[400px] opacity-15"
-          style={{ 
-            filter: 'drop-shadow(0 0 30px rgba(6, 182, 212, 0.25))',
-          }}
-        />
-      </div>
 
       {/* Content Layer */}
       <div className="relative z-10">
