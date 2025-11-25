@@ -19,7 +19,7 @@ import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
-import saturnLogo from "@assets/generated_images/orbit_staffing_emblem_on_black.png";
+import saturnLogo from "@assets/generated_images/aqua_saturn_planet_with_glowing_rings.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
