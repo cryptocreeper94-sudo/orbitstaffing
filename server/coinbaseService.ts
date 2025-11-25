@@ -3,9 +3,9 @@ let coinbaseClient: any = null;
 
 export function getCoinbaseClient() {
   if (!coinbaseClient) {
-    const apiKey = process.env.COINBASE_COMMERCE_API_KEY;
+    const apiKey = process.env.COINBASE_API_KEY || process.env.COINBASE_COMMERCE_API_KEY;
     if (!apiKey) {
-      console.warn('COINBASE_COMMERCE_API_KEY not set - Coinbase payments disabled');
+      console.warn('COINBASE_API_KEY not set - Coinbase payments disabled');
       return null;
     }
     // Coinbase Commerce client initialized with API key
