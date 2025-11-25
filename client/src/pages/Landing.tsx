@@ -507,10 +507,8 @@ export default function Landing() {
               <p>© 2025 ORBIT Staffing. All rights reserved.</p>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="https://darkwavestudios.net" target="_blank">
-                <a className="text-primary hover:text-primary/80 transition-colors font-bold">
-                  DarkWave Studios →
-                </a>
+              <Link href="https://darkwavestudios.net" target="_blank" className="text-primary hover:text-primary/80 transition-colors font-bold">
+                DarkWave Studios →
               </Link>
               <Link href="/developer" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
                 ⚙️
