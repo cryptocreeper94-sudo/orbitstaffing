@@ -19,8 +19,8 @@ export async function serveStatic(app: Express, server: Server) {
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (req, res) => {
-    // Serve Dark Wave Studios landing page for darkswavestudios.net
-    if (req.hostname === 'darkswavestudios.net' || req.hostname === 'www.darkswavestudios.net') {
+    // Serve Dark Wave Studios landing page for darkwavestudios.io
+    if (req.hostname === 'darkwavestudios.io' || req.hostname === 'www.darkwavestudios.io') {
       return res.sendFile(path.resolve(distPath, "studio-landing.html"));
     }
     // Serve ORBIT app for all other domains
