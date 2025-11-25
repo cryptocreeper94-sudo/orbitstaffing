@@ -390,6 +390,162 @@
             color: #00ffff;
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            border: 2px solid rgba(0, 255, 255, 0.4);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 20px 80px rgba(0, 255, 255, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #8b95a5;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #00ffff;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .modal-subtitle {
+            font-size: 1.1rem;
+            color: #8b95a5;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-features {
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .modal-features h4 {
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .modal-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .modal-features li {
+            color: #c0c8d0;
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .modal-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #00ffff;
+            font-weight: bold;
+        }
+
+        .modal-sandbox {
+            background: rgba(255, 200, 0, 0.1);
+            border: 2px solid rgba(255, 200, 0, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .modal-sandbox h4 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-sandbox p {
+            color: #e0e6ed;
+            line-height: 1.6;
+        }
+
+        .modal-cta {
+            display: inline-block;
+            width: 100%;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #00ffff, #0088ff);
+            color: #0a0e27;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -463,7 +619,7 @@
                         real-time scheduling, worker management, and blockchain-secured hallmarks. Built for agencies 
                         managing flexible labor across skilled trades, hospitality, and general workforce.
                     </p>
-                    <a href="https://orbitstaffing.net" class="product-link" target="_blank">Launch ORBIT →</a>
+                    <button onclick="openOrbitModal()" class="product-link" style="border: none; cursor: pointer;">Try ORBIT Demo →</button>
                 </div>
 
                 <div class="product-card">
@@ -475,7 +631,7 @@
                         Real-time analytics, predictive scheduling, equipment tracking, and automated compliance 
                         reporting for multi-location operations.
                     </p>
-                    <span class="product-link disabled">In Development</span>
+                    <button onclick="openOpsModal()" class="product-link" style="border: none; cursor: pointer;">Learn More →</button>
                 </div>
 
                 <div class="product-card">
@@ -486,7 +642,7 @@
                         Experience the dark electronic soundscape. Immersive audio-visual journey through 
                         industrial beats and synthetic waves. A creative exploration of sound and technology.
                     </p>
-                    <a href="https://darkwavepulse.com" class="product-link" target="_blank">Enter the Pulse →</a>
+                    <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience the Pulse →</button>
                 </div>
             </div>
         </section>
@@ -570,6 +726,118 @@
         </footer>
     </div>
 
+    <!-- ORBIT Staffing Modal -->
+    <div id="orbitModal" class="modal-overlay" onclick="closeModal('orbitModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('orbitModal')">&times;</button>
+            <div class="modal-icon">🚀</div>
+            <h2 class="modal-title">ORBIT Staffing OS</h2>
+            <p class="modal-subtitle">Complete Staffing Automation Platform</p>
+            
+            <div class="modal-features">
+                <h4>🎯 Core Features</h4>
+                <ul>
+                    <li>GPS-verified check-ins with 300ft geofencing</li>
+                    <li>Multi-state payroll compliance (TN/KY certified)</li>
+                    <li>Real-time scheduling & worker assignments</li>
+                    <li>Blockchain-secured hallmark verification</li>
+                    <li>Equipment tracking & PPE management</li>
+                    <li>Multi-tier worker bonuses</li>
+                    <li>SMS notifications via Twilio</li>
+                    <li>Mobile apps for iOS & Android</li>
+                </ul>
+            </div>
+
+            <div class="modal-sandbox">
+                <h4>🧪 Sandbox Demo Mode</h4>
+                <p>
+                    <strong>Try ORBIT risk-free!</strong> Our interactive sandbox lets you explore all features with 
+                    pre-loaded demo data. Create workers, assign jobs, process payroll, and verify hallmarks—all in 
+                    a safe testing environment. No real data required.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Demo Credentials:</strong> Click "Sandbox Demo" in the app to auto-login and explore!
+                </p>
+            </div>
+
+            <a href="https://orbitstaffing.net" target="_blank" class="modal-cta">Launch ORBIT Demo →</a>
+        </div>
+    </div>
+
+    <!-- Orbit Ops Pro Modal -->
+    <div id="opsModal" class="modal-overlay" onclick="closeModal('opsModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('opsModal')">&times;</button>
+            <div class="modal-icon">⚙️</div>
+            <h2 class="modal-title">Orbit Ops Pro</h2>
+            <p class="modal-subtitle">Enterprise Operations Management Suite</p>
+            
+            <div class="modal-features">
+                <h4>🎯 Planned Features</h4>
+                <ul>
+                    <li>Advanced real-time analytics dashboard</li>
+                    <li>Predictive scheduling with AI optimization</li>
+                    <li>Multi-location equipment tracking</li>
+                    <li>Automated compliance reporting</li>
+                    <li>Worker performance analytics</li>
+                    <li>Cost forecasting & budget management</li>
+                    <li>Custom workflow automation</li>
+                    <li>Enterprise-grade API access</li>
+                </ul>
+            </div>
+
+            <div class="modal-sandbox" style="border-color: rgba(139, 149, 165, 0.4); background: rgba(139, 149, 165, 0.1);">
+                <h4 style="color: #8b95a5;">🚧 Coming Soon</h4>
+                <p>
+                    Orbit Ops Pro is currently in development. Built on ORBIT's proven infrastructure, 
+                    it will deliver enterprise-scale workforce management with advanced analytics and automation.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Interested in early access?</strong> Contact us to join the beta program and help shape the future of Ops Pro.
+                </p>
+            </div>
+
+            <a href="mailto:cryptocreeper94@gmail.com?subject=Orbit Ops Pro Early Access" class="modal-cta" style="background: linear-gradient(135deg, #8b95a5, #6b7585);">Request Early Access →</a>
+        </div>
+    </div>
+
+    <!-- Dark Wave Pulse Modal -->
+    <div id="pulseModal" class="modal-overlay" onclick="closeModal('pulseModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal('pulseModal')">&times;</button>
+            <div class="modal-icon">🎵</div>
+            <h2 class="modal-title">Dark Wave Pulse</h2>
+            <p class="modal-subtitle">Immersive Audio-Visual Experience</p>
+            
+            <div class="modal-features">
+                <h4>🎯 Experience Features</h4>
+                <ul>
+                    <li>Dark electronic soundscape compositions</li>
+                    <li>Industrial beats & synthetic waves</li>
+                    <li>Immersive visual effects</li>
+                    <li>Interactive audio controls</li>
+                    <li>Curated dark wave playlists</li>
+                    <li>Original sound design</li>
+                    <li>Creative exploration platform</li>
+                    <li>Responsive audio visualization</li>
+                </ul>
+            </div>
+
+            <div class="modal-sandbox" style="border-color: rgba(186, 85, 211, 0.4); background: rgba(186, 85, 211, 0.1);">
+                <h4 style="color: #ba55d3;">🎧 Interactive Experience</h4>
+                <p>
+                    Dark Wave Pulse is a creative exploration of sound and technology. Dive into the dark electronic 
+                    soundscape with immersive visuals and industrial beats that push the boundaries of audio-visual art.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Ready to experience?</strong> Enter the pulse and let the sound take you on a journey.
+                </p>
+            </div>
+
+            <a href="https://darkwavepulse.com" target="_blank" class="modal-cta" style="background: linear-gradient(135deg, #ba55d3, #8b00ff);">Enter the Pulse →</a>
+        </div>
+    </div>
+
     <script>
         function createStars() {
             const starsContainer = document.getElementById('stars');
@@ -586,6 +854,31 @@
                 starsContainer.appendChild(star);
             }
         }
+
+        function openOrbitModal() {
+            document.getElementById('orbitModal').classList.add('active');
+        }
+
+        function openOpsModal() {
+            document.getElementById('opsModal').classList.add('active');
+        }
+
+        function openPulseModal() {
+            document.getElementById('pulseModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal('orbitModal');
+                closeModal('opsModal');
+                closeModal('pulseModal');
+            }
+        });
 
         createStars();
     </script>
