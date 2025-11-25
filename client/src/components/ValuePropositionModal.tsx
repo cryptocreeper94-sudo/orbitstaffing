@@ -118,11 +118,7 @@ export function ValuePropositionModal() {
           <>
             <DialogHeader className="text-center">
               <div className="flex justify-center mb-4">
-                <img 
-                  src={saturnLogo} 
-                  alt="ORBIT Saturn" 
-                  className="h-16 w-16 drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-                />
+                {/* Emblem removed - no white background */}
               </div>
               <DialogTitle className="text-3xl font-heading mb-2">
                 Welcome to ORBIT
