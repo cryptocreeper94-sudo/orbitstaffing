@@ -1253,3 +1253,367 @@ export const insertScannedContactsAuditSchema = createInsertSchema(scannedContac
 
 export type InsertScannedContactsAudit = z.infer<typeof insertScannedContactsAuditSchema>;
 export type ScannedContactsAudit = typeof scannedContactsAudit.$inferSelect;
+
+// ========================
+// Worker Insurance Tracking
+// ========================
+export const workerInsurance = pgTable(
+  "worker_insurance",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Workers Compensation
+    workersCompPolicyNumber: varchar("workers_comp_policy_number", { length: 100 }),
+    workersCompCarrier: varchar("workers_comp_carrier", { length: 255 }),
+    workersCompEffectiveDate: date("workers_comp_effective_date"),
+    workersCompExpiryDate: date("workers_comp_expiry_date"),
+    workersCompClassCode: varchar("workers_comp_class_code", { length: 20 }),
+    workersCompState: varchar("workers_comp_state", { length: 2 }),
+    
+    // General Liability (if worker-specific)
+    liabilityPolicyNumber: varchar("liability_policy_number", { length: 100 }),
+    liabilityCarrier: varchar("liability_carrier", { length: 255 }),
+    liabilityEffectiveDate: date("liability_effective_date"),
+    liabilityExpiryDate: date("liability_expiry_date"),
+    liabilityCoverage: decimal("liability_coverage", { precision: 12, scale: 2 }),
+    
+    // Health Insurance
+    hasHealthInsurance: boolean("has_health_insurance").default(false),
+    healthProvider: varchar("health_provider", { length: 255 }),
+    healthPlanType: varchar("health_plan_type", { length: 100 }), // "major_medical", "fixed_indemnity", "mec"
+    healthEnrollmentDate: date("health_enrollment_date"),
+    healthPolicyNumber: varchar("health_policy_number", { length: 100 }),
+    
+    // Dental Insurance
+    hasDentalInsurance: boolean("has_dental_insurance").default(false),
+    dentalProvider: varchar("dental_provider", { length: 255 }),
+    dentalEnrollmentDate: date("dental_enrollment_date"),
+    dentalPolicyNumber: varchar("dental_policy_number", { length: 100 }),
+    
+    // Fixed Indemnity Plan (Essential StaffCARE or similar)
+    hasIndemnityPlan: boolean("has_indemnity_plan").default(false),
+    indemnityProvider: varchar("indemnity_provider", { length: 255 }),
+    indemnityPlanName: varchar("indemnity_plan_name", { length: 255 }),
+    indemnityEnrollmentDate: date("indemnity_enrollment_date"),
+    indemnityMemberNumber: varchar("indemnity_member_number", { length: 100 }),
+    indemnityMonthlyPremium: decimal("indemnity_monthly_premium", { precision: 8, scale: 2 }),
+    
+    // Vision Insurance
+    hasVisionInsurance: boolean("has_vision_insurance").default(false),
+    visionProvider: varchar("vision_provider", { length: 255 }),
+    
+    // Status & Verification
+    insuranceStatus: varchar("insurance_status", { length: 50 }).default("pending"), // pending, active, expired, suspended
+    lastVerifiedDate: timestamp("last_verified_date"),
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_worker_insurance_worker").on(table.workerId),
+    tenantIdx: index("idx_worker_insurance_tenant").on(table.tenantId),
+    statusIdx: index("idx_worker_insurance_status").on(table.insuranceStatus),
+    workersCompExpiryIdx: index("idx_worker_insurance_wc_expiry").on(table.workersCompExpiryDate),
+  })
+);
+
+export const insertWorkerInsuranceSchema = createInsertSchema(workerInsurance).omit({
+  id: true,
+  lastVerifiedDate: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerInsurance = z.infer<typeof insertWorkerInsuranceSchema>;
+export type WorkerInsurance = typeof workerInsurance.$inferSelect;
+
+// ========================
+// Company Insurance Policies
+// ========================
+export const companyInsurance = pgTable(
+  "company_insurance",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    companyId: varchar("company_id").notNull().references(() => companies.id),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Policy Type
+    insuranceType: varchar("insurance_type", { length: 100 }).notNull(), // workers_comp, general_liability, professional_liability, cyber_liability, epli, commercial_auto
+    
+    // Policy Details
+    policyNumber: varchar("policy_number", { length: 100 }).notNull(),
+    carrier: varchar("carrier", { length: 255 }).notNull(),
+    effectiveDate: date("effective_date").notNull(),
+    expiryDate: date("expiry_date").notNull(),
+    
+    // Coverage Amounts
+    coverageAmount: decimal("coverage_amount", { precision: 12, scale: 2 }),
+    deductible: decimal("deductible", { precision: 10, scale: 2 }),
+    annualPremium: decimal("annual_premium", { precision: 10, scale: 2 }),
+    
+    // Multi-State Compliance
+    coveredStates: jsonb("covered_states"), // ["TN", "KY", "GA"]
+    section3aEndorsements: jsonb("section_3a_endorsements"), // State-specific endorsements
+    
+    // Workers Comp Specific
+    experienceModRate: decimal("experience_mod_rate", { precision: 5, scale: 2 }), // EMR
+    payAsYouGo: boolean("pay_as_you_go").default(false),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("active"), // active, expired, cancelled
+    renewalDate: date("renewal_date"),
+    autoRenew: boolean("auto_renew").default(false),
+    
+    // Compliance
+    certificateIssued: boolean("certificate_issued").default(false),
+    certificateIssuedDate: date("certificate_issued_date"),
+    
+    notes: text("notes"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    companyIdx: index("idx_company_insurance_company").on(table.companyId),
+    tenantIdx: index("idx_company_insurance_tenant").on(table.tenantId),
+    typeIdx: index("idx_company_insurance_type").on(table.insuranceType),
+    statusIdx: index("idx_company_insurance_status").on(table.status),
+    expiryIdx: index("idx_company_insurance_expiry").on(table.expiryDate),
+  })
+);
+
+export const insertCompanyInsuranceSchema = createInsertSchema(companyInsurance).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCompanyInsurance = z.infer<typeof insertCompanyInsuranceSchema>;
+export type CompanyInsurance = typeof companyInsurance.$inferSelect;
+
+// ========================
+// Insurance Documents (with Hallmarks)
+// ========================
+export const insuranceDocuments = pgTable(
+  "insurance_documents",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Document Association (either worker or company insurance)
+    workerInsuranceId: varchar("worker_insurance_id").references(() => workerInsurance.id),
+    companyInsuranceId: varchar("company_insurance_id").references(() => companyInsurance.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    companyId: varchar("company_id").references(() => companies.id),
+    
+    // Document Details
+    documentType: varchar("document_type", { length: 100 }).notNull(), // "workers_comp_certificate", "i9", "w4", "policy_declaration", "coi", "health_card"
+    documentName: varchar("document_name", { length: 255 }).notNull(),
+    documentUrl: varchar("document_url", { length: 500 }),
+    fileSize: integer("file_size"), // bytes
+    mimeType: varchar("mime_type", { length: 100 }),
+    
+    // Hallmark Verification
+    hallmarkId: varchar("hallmark_id").unique(),
+    hallmarkIssued: boolean("hallmark_issued").default(false),
+    hallmarkIssuedAt: timestamp("hallmark_issued_at"),
+    hallmarkVerifiable: boolean("hallmark_verifiable").default(true),
+    
+    // Metadata
+    uploadedBy: varchar("uploaded_by").references(() => users.id),
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    verifiedAt: timestamp("verified_at"),
+    
+    // Expiration tracking
+    expiryDate: date("expiry_date"),
+    expiryReminderSent: boolean("expiry_reminder_sent").default(false),
+    
+    status: varchar("status", { length: 50 }).default("pending_review"), // pending_review, approved, rejected, expired
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_insurance_docs_tenant").on(table.tenantId),
+    workerInsIdx: index("idx_insurance_docs_worker_ins").on(table.workerInsuranceId),
+    companyInsIdx: index("idx_insurance_docs_company_ins").on(table.companyInsuranceId),
+    workerIdx: index("idx_insurance_docs_worker").on(table.workerId),
+    companyIdx: index("idx_insurance_docs_company").on(table.companyId),
+    hallmarkIdx: index("idx_insurance_docs_hallmark").on(table.hallmarkId),
+    typeIdx: index("idx_insurance_docs_type").on(table.documentType),
+    statusIdx: index("idx_insurance_docs_status").on(table.status),
+    expiryIdx: index("idx_insurance_docs_expiry").on(table.expiryDate),
+  })
+);
+
+export const insertInsuranceDocumentSchema = createInsertSchema(insuranceDocuments).omit({
+  id: true,
+  hallmarkIssuedAt: true,
+  verifiedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertInsuranceDocument = z.infer<typeof insertInsuranceDocumentSchema>;
+export type InsuranceDocument = typeof insuranceDocuments.$inferSelect;
+
+// ========================
+// Client Worker Requests (Automated Workflow)
+// ========================
+export const workerRequests = pgTable(
+  "worker_requests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    clientId: varchar("client_id").notNull().references(() => clients.id),
+    
+    // Request Details
+    requestNumber: varchar("request_number", { length: 50 }).unique(),
+    jobTitle: varchar("job_title", { length: 255 }).notNull(),
+    jobDescription: text("job_description"),
+    industryType: varchar("industry_type", { length: 100 }), // construction, hospitality, healthcare, general_labor
+    
+    // Requirements
+    skillsRequired: jsonb("skills_required"), // ["electrician", "forklift_certified"]
+    certificationsRequired: jsonb("certifications_required"), // ["OSHA 10", "CPR"]
+    experienceLevel: varchar("experience_level", { length: 50 }), // entry, intermediate, expert
+    
+    // Quantity & Schedule
+    workersNeeded: integer("workers_needed").notNull().default(1),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date"),
+    startTime: varchar("start_time", { length: 10 }), // "08:00"
+    endTime: varchar("end_time", { length: 10 }), // "17:00"
+    shiftType: varchar("shift_type", { length: 50 }), // day, night, swing, rotating
+    
+    // Location
+    workLocation: varchar("work_location", { length: 255 }),
+    addressLine1: varchar("address_line1", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    latitude: decimal("latitude", { precision: 9, scale: 6 }),
+    longitude: decimal("longitude", { precision: 9, scale: 6 }),
+    
+    // Compensation
+    payRate: decimal("pay_rate", { precision: 8, scale: 2 }),
+    payRateType: varchar("pay_rate_type", { length: 20 }).default("hourly"), // hourly, daily, project
+    billingRate: decimal("billing_rate", { precision: 8, scale: 2 }), // What client pays
+    
+    // Insurance Requirements
+    workersCompRequired: boolean("workers_comp_required").default(true),
+    liabilityRequired: boolean("liability_required").default(false),
+    minimumCoverage: decimal("minimum_coverage", { precision: 12, scale: 2 }),
+    
+    // Special Requirements
+    backgroundCheckRequired: boolean("background_check_required").default(false),
+    drugTestRequired: boolean("drug_test_required").default(false),
+    uniforms: varchar("uniforms", { length: 255 }),
+    ppeRequired: jsonb("ppe_required"), // ["hard_hat", "safety_vest", "steel_toes"]
+    specialInstructions: text("special_instructions"),
+    
+    // Workflow Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, matched, assigned, in_progress, completed, cancelled
+    matchedAt: timestamp("matched_at"),
+    assignedAt: timestamp("assigned_at"),
+    completedAt: timestamp("completed_at"),
+    
+    // Matched Workers (auto-populated by matching engine)
+    autoMatchedWorkerIds: jsonb("auto_matched_worker_ids"), // ["worker-id-1", "worker-id-2"]
+    matchScore: jsonb("match_score"), // {"worker-id-1": 95, "worker-id-2": 87}
+    
+    // Assigned Workers (admin-selected)
+    assignedWorkerIds: jsonb("assigned_worker_ids"),
+    
+    // Admin Actions
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    assignedBy: varchar("assigned_by").references(() => users.id),
+    
+    // Priority & Urgency
+    priority: varchar("priority", { length: 20 }).default("normal"), // low, normal, high, urgent
+    urgent: boolean("urgent").default(false),
+    
+    // Hallmark
+    hallmarkId: varchar("hallmark_id"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_worker_requests_tenant").on(table.tenantId),
+    clientIdx: index("idx_worker_requests_client").on(table.clientId),
+    statusIdx: index("idx_worker_requests_status").on(table.status),
+    startDateIdx: index("idx_worker_requests_start_date").on(table.startDate),
+    requestNumberIdx: index("idx_worker_requests_number").on(table.requestNumber),
+    priorityIdx: index("idx_worker_requests_priority").on(table.priority),
+  })
+);
+
+export const insertWorkerRequestSchema = createInsertSchema(workerRequests).omit({
+  id: true,
+  matchedAt: true,
+  assignedAt: true,
+  completedAt: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerRequest = z.infer<typeof insertWorkerRequestSchema>;
+export type WorkerRequest = typeof workerRequests.$inferSelect;
+
+// ========================
+// Worker Request Match History
+// ========================
+export const workerRequestMatches = pgTable(
+  "worker_request_matches",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    requestId: varchar("request_id").notNull().references(() => workerRequests.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Match Details
+    matchScore: integer("match_score"), // 0-100
+    matchReason: jsonb("match_reason"), // {"skills": 95, "availability": 100, "location": 80, "insurance": 100}
+    
+    // Match Criteria Met
+    skillsMatch: boolean("skills_match").default(false),
+    availabilityMatch: boolean("availability_match").default(false),
+    insuranceMatch: boolean("insurance_match").default(false),
+    locationMatch: boolean("location_match").default(false),
+    experienceMatch: boolean("experience_match").default(false),
+    
+    // Status
+    matchStatus: varchar("match_status", { length: 50 }).default("suggested"), // suggested, selected, assigned, rejected
+    selectedAt: timestamp("selected_at"),
+    assignedAt: timestamp("assigned_at"),
+    rejectedAt: timestamp("rejected_at"),
+    rejectionReason: text("rejection_reason"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    requestIdx: index("idx_request_matches_request").on(table.requestId),
+    workerIdx: index("idx_request_matches_worker").on(table.workerId),
+    tenantIdx: index("idx_request_matches_tenant").on(table.tenantId),
+    statusIdx: index("idx_request_matches_status").on(table.matchStatus),
+    scoreIdx: index("idx_request_matches_score").on(table.matchScore),
+  })
+);
+
+export const insertWorkerRequestMatchSchema = createInsertSchema(workerRequestMatches).omit({
+  id: true,
+  selectedAt: true,
+  assignedAt: true,
+  rejectedAt: true,
+  createdAt: true,
+});
+
+export type InsertWorkerRequestMatch = z.infer<typeof insertWorkerRequestMatchSchema>;
+export type WorkerRequestMatch = typeof workerRequestMatches.$inferSelect;
