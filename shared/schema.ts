@@ -1304,6 +1304,10 @@ export const workerInsurance = pgTable(
     hasVisionInsurance: boolean("has_vision_insurance").default(false),
     visionProvider: varchar("vision_provider", { length: 255 }),
     
+    // Multi-State Compliance
+    stateEndorsements: jsonb("state_endorsements"), // State-specific endorsements: {"TN": {...}, "KY": {...}}
+    complianceFlags: jsonb("compliance_flags"), // Compliance status per state: {"TN": "compliant", "KY": "pending"}
+    
     // Status & Verification
     insuranceStatus: varchar("insurance_status", { length: 50 }).default("pending"), // pending, active, expired, suspended
     lastVerifiedDate: timestamp("last_verified_date"),
@@ -1508,6 +1512,9 @@ export const workerRequests = pgTable(
     workersCompRequired: boolean("workers_comp_required").default(true),
     liabilityRequired: boolean("liability_required").default(false),
     minimumCoverage: decimal("minimum_coverage", { precision: 12, scale: 2 }),
+    
+    // Multi-State Compliance
+    stateSpecificRequirements: jsonb("state_specific_requirements"), // State-specific requirements: {"TN": {"license": "required"}, "KY": {...}}
     
     // Special Requirements
     backgroundCheckRequired: boolean("background_check_required").default(false),

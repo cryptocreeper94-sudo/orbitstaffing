@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, desc, and, gte, lte, inArray } from "drizzle-orm";
+import { eq, desc, and, gte, lte, inArray, sql } from "drizzle-orm";
 import {
   users,
   companies,
@@ -292,13 +292,23 @@ export const storage: IStorage = {
     return result[0];
   },
 
-  async getWorkerInsurance(id: string): Promise<WorkerInsurance | undefined> {
-    const result = await db.select().from(workerInsurance).where(eq(workerInsurance.id, id));
+  async getWorkerInsurance(id: string, tenantId: string): Promise<WorkerInsurance | undefined> {
+    const result = await db.select().from(workerInsurance).where(
+      and(
+        eq(workerInsurance.id, id),
+        eq(workerInsurance.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
-  async getWorkerInsuranceByWorkerId(workerId: string): Promise<WorkerInsurance | undefined> {
-    const result = await db.select().from(workerInsurance).where(eq(workerInsurance.workerId, workerId));
+  async getWorkerInsuranceByWorkerId(workerId: string, tenantId: string): Promise<WorkerInsurance | undefined> {
+    const result = await db.select().from(workerInsurance).where(
+      and(
+        eq(workerInsurance.workerId, workerId),
+        eq(workerInsurance.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
@@ -307,23 +317,39 @@ export const storage: IStorage = {
   },
 
   async listExpiringWorkerInsurance(tenantId: string, daysFromNow: number): Promise<WorkerInsurance[]> {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + daysFromNow);
+    if (!Number.isFinite(daysFromNow) || daysFromNow < 0) {
+      throw new Error('Invalid daysFromNow');
+    }
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() + daysFromNow);
+    const cutoffDateStr = cutoffDate.toISOString().split('T')[0];
+
     return await db.select().from(workerInsurance).where(
       and(
         eq(workerInsurance.tenantId, tenantId),
-        lte(workerInsurance.workersCompExpiryDate, futureDate.toISOString().split('T')[0])
+        lte(workerInsurance.workersCompExpiryDate, cutoffDateStr)
       )
     );
   },
 
-  async updateWorkerInsurance(id: string, data: Partial<InsertWorkerInsurance>): Promise<WorkerInsurance | undefined> {
-    const result = await db.update(workerInsurance).set(data).where(eq(workerInsurance.id, id)).returning();
+  async updateWorkerInsurance(id: string, tenantId: string, data: Partial<InsertWorkerInsurance>): Promise<WorkerInsurance | undefined> {
+    const result = await db.update(workerInsurance).set(data).where(
+      and(
+        eq(workerInsurance.id, id),
+        eq(workerInsurance.tenantId, tenantId)
+      )
+    ).returning();
     return result[0];
   },
 
-  async deleteWorkerInsurance(id: string): Promise<void> {
-    await db.delete(workerInsurance).where(eq(workerInsurance.id, id));
+  async deleteWorkerInsurance(id: string, tenantId: string): Promise<void> {
+    await db.delete(workerInsurance).where(
+      and(
+        eq(workerInsurance.id, id),
+        eq(workerInsurance.tenantId, tenantId)
+      )
+    );
   },
 
   // ========================
@@ -334,42 +360,69 @@ export const storage: IStorage = {
     return result[0];
   },
 
-  async getCompanyInsurance(id: string): Promise<CompanyInsurance | undefined> {
-    const result = await db.select().from(companyInsurance).where(eq(companyInsurance.id, id));
+  async getCompanyInsurance(id: string, tenantId: string): Promise<CompanyInsurance | undefined> {
+    const result = await db.select().from(companyInsurance).where(
+      and(
+        eq(companyInsurance.id, id),
+        eq(companyInsurance.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
-  async listCompanyInsurance(companyId: string): Promise<CompanyInsurance[]> {
-    return await db.select().from(companyInsurance).where(eq(companyInsurance.companyId, companyId)).orderBy(desc(companyInsurance.createdAt));
-  },
-
-  async listCompanyInsuranceByType(companyId: string, insuranceType: string): Promise<CompanyInsurance[]> {
+  async listCompanyInsurance(companyId: string, tenantId: string): Promise<CompanyInsurance[]> {
     return await db.select().from(companyInsurance).where(
       and(
         eq(companyInsurance.companyId, companyId),
+        eq(companyInsurance.tenantId, tenantId)
+      )
+    ).orderBy(desc(companyInsurance.createdAt));
+  },
+
+  async listCompanyInsuranceByType(companyId: string, tenantId: string, insuranceType: string): Promise<CompanyInsurance[]> {
+    return await db.select().from(companyInsurance).where(
+      and(
+        eq(companyInsurance.companyId, companyId),
+        eq(companyInsurance.tenantId, tenantId),
         eq(companyInsurance.insuranceType, insuranceType)
       )
     );
   },
 
   async listExpiringCompanyInsurance(tenantId: string, daysFromNow: number): Promise<CompanyInsurance[]> {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + daysFromNow);
+    if (!Number.isFinite(daysFromNow) || daysFromNow < 0) {
+      throw new Error('Invalid daysFromNow');
+    }
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() + daysFromNow);
+    const cutoffDateStr = cutoffDate.toISOString().split('T')[0];
+
     return await db.select().from(companyInsurance).where(
       and(
         eq(companyInsurance.tenantId, tenantId),
-        lte(companyInsurance.expiryDate, futureDate.toISOString().split('T')[0])
+        lte(companyInsurance.expiryDate, cutoffDateStr)
       )
     );
   },
 
-  async updateCompanyInsurance(id: string, data: Partial<InsertCompanyInsurance>): Promise<CompanyInsurance | undefined> {
-    const result = await db.update(companyInsurance).set(data).where(eq(companyInsurance.id, id)).returning();
+  async updateCompanyInsurance(id: string, tenantId: string, data: Partial<InsertCompanyInsurance>): Promise<CompanyInsurance | undefined> {
+    const result = await db.update(companyInsurance).set(data).where(
+      and(
+        eq(companyInsurance.id, id),
+        eq(companyInsurance.tenantId, tenantId)
+      )
+    ).returning();
     return result[0];
   },
 
-  async deleteCompanyInsurance(id: string): Promise<void> {
-    await db.delete(companyInsurance).where(eq(companyInsurance.id, id));
+  async deleteCompanyInsurance(id: string, tenantId: string): Promise<void> {
+    await db.delete(companyInsurance).where(
+      and(
+        eq(companyInsurance.id, id),
+        eq(companyInsurance.tenantId, tenantId)
+      )
+    );
   },
 
   // ========================
@@ -380,8 +433,13 @@ export const storage: IStorage = {
     return result[0];
   },
 
-  async getInsuranceDocument(id: string): Promise<InsuranceDocument | undefined> {
-    const result = await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.id, id));
+  async getInsuranceDocument(id: string, tenantId: string): Promise<InsuranceDocument | undefined> {
+    const result = await db.select().from(insuranceDocuments).where(
+      and(
+        eq(insuranceDocuments.id, id),
+        eq(insuranceDocuments.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
@@ -389,12 +447,22 @@ export const storage: IStorage = {
     return await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.tenantId, tenantId)).orderBy(desc(insuranceDocuments.createdAt));
   },
 
-  async listInsuranceDocumentsByWorker(workerId: string): Promise<InsuranceDocument[]> {
-    return await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.workerId, workerId)).orderBy(desc(insuranceDocuments.createdAt));
+  async listInsuranceDocumentsByWorker(workerId: string, tenantId: string): Promise<InsuranceDocument[]> {
+    return await db.select().from(insuranceDocuments).where(
+      and(
+        eq(insuranceDocuments.workerId, workerId),
+        eq(insuranceDocuments.tenantId, tenantId)
+      )
+    ).orderBy(desc(insuranceDocuments.createdAt));
   },
 
-  async listInsuranceDocumentsByCompany(companyId: string): Promise<InsuranceDocument[]> {
-    return await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.companyId, companyId)).orderBy(desc(insuranceDocuments.createdAt));
+  async listInsuranceDocumentsByCompany(companyId: string, tenantId: string): Promise<InsuranceDocument[]> {
+    return await db.select().from(insuranceDocuments).where(
+      and(
+        eq(insuranceDocuments.companyId, companyId),
+        eq(insuranceDocuments.tenantId, tenantId)
+      )
+    ).orderBy(desc(insuranceDocuments.createdAt));
   },
 
   async listInsuranceDocumentsByType(tenantId: string, documentType: string): Promise<InsuranceDocument[]> {
@@ -406,18 +474,33 @@ export const storage: IStorage = {
     );
   },
 
-  async getInsuranceDocumentByHallmark(hallmarkId: string): Promise<InsuranceDocument | undefined> {
-    const result = await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.hallmarkId, hallmarkId));
+  async getInsuranceDocumentByHallmark(hallmarkId: string, tenantId: string): Promise<InsuranceDocument | undefined> {
+    const result = await db.select().from(insuranceDocuments).where(
+      and(
+        eq(insuranceDocuments.hallmarkId, hallmarkId),
+        eq(insuranceDocuments.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
-  async updateInsuranceDocument(id: string, data: Partial<InsertInsuranceDocument>): Promise<InsuranceDocument | undefined> {
-    const result = await db.update(insuranceDocuments).set(data).where(eq(insuranceDocuments.id, id)).returning();
+  async updateInsuranceDocument(id: string, tenantId: string, data: Partial<InsertInsuranceDocument>): Promise<InsuranceDocument | undefined> {
+    const result = await db.update(insuranceDocuments).set(data).where(
+      and(
+        eq(insuranceDocuments.id, id),
+        eq(insuranceDocuments.tenantId, tenantId)
+      )
+    ).returning();
     return result[0];
   },
 
-  async deleteInsuranceDocument(id: string): Promise<void> {
-    await db.delete(insuranceDocuments).where(eq(insuranceDocuments.id, id));
+  async deleteInsuranceDocument(id: string, tenantId: string): Promise<void> {
+    await db.delete(insuranceDocuments).where(
+      and(
+        eq(insuranceDocuments.id, id),
+        eq(insuranceDocuments.tenantId, tenantId)
+      )
+    );
   },
 
   // ========================
@@ -428,13 +511,23 @@ export const storage: IStorage = {
     return result[0];
   },
 
-  async getWorkerRequest(id: string): Promise<WorkerRequest | undefined> {
-    const result = await db.select().from(workerRequests).where(eq(workerRequests.id, id));
+  async getWorkerRequest(id: string, tenantId: string): Promise<WorkerRequest | undefined> {
+    const result = await db.select().from(workerRequests).where(
+      and(
+        eq(workerRequests.id, id),
+        eq(workerRequests.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
-  async getWorkerRequestByNumber(requestNumber: string): Promise<WorkerRequest | undefined> {
-    const result = await db.select().from(workerRequests).where(eq(workerRequests.requestNumber, requestNumber));
+  async getWorkerRequestByNumber(requestNumber: string, tenantId: string): Promise<WorkerRequest | undefined> {
+    const result = await db.select().from(workerRequests).where(
+      and(
+        eq(workerRequests.requestNumber, requestNumber),
+        eq(workerRequests.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
@@ -442,8 +535,13 @@ export const storage: IStorage = {
     return await db.select().from(workerRequests).where(eq(workerRequests.tenantId, tenantId)).orderBy(desc(workerRequests.createdAt));
   },
 
-  async listWorkerRequestsByClient(clientId: string): Promise<WorkerRequest[]> {
-    return await db.select().from(workerRequests).where(eq(workerRequests.clientId, clientId)).orderBy(desc(workerRequests.createdAt));
+  async listWorkerRequestsByClient(clientId: string, tenantId: string): Promise<WorkerRequest[]> {
+    return await db.select().from(workerRequests).where(
+      and(
+        eq(workerRequests.clientId, clientId),
+        eq(workerRequests.tenantId, tenantId)
+      )
+    ).orderBy(desc(workerRequests.createdAt));
   },
 
   async listWorkerRequestsByStatus(tenantId: string, status: string): Promise<WorkerRequest[]> {
@@ -464,13 +562,23 @@ export const storage: IStorage = {
     ).orderBy(desc(workerRequests.urgent), desc(workerRequests.priority), desc(workerRequests.createdAt));
   },
 
-  async updateWorkerRequest(id: string, data: Partial<InsertWorkerRequest>): Promise<WorkerRequest | undefined> {
-    const result = await db.update(workerRequests).set(data).where(eq(workerRequests.id, id)).returning();
+  async updateWorkerRequest(id: string, tenantId: string, data: Partial<InsertWorkerRequest>): Promise<WorkerRequest | undefined> {
+    const result = await db.update(workerRequests).set(data).where(
+      and(
+        eq(workerRequests.id, id),
+        eq(workerRequests.tenantId, tenantId)
+      )
+    ).returning();
     return result[0];
   },
 
-  async deleteWorkerRequest(id: string): Promise<void> {
-    await db.delete(workerRequests).where(eq(workerRequests.id, id));
+  async deleteWorkerRequest(id: string, tenantId: string): Promise<void> {
+    await db.delete(workerRequests).where(
+      and(
+        eq(workerRequests.id, id),
+        eq(workerRequests.tenantId, tenantId)
+      )
+    );
   },
 
   // ========================
@@ -486,35 +594,61 @@ export const storage: IStorage = {
     return result;
   },
 
-  async getWorkerRequestMatch(id: string): Promise<WorkerRequestMatch | undefined> {
-    const result = await db.select().from(workerRequestMatches).where(eq(workerRequestMatches.id, id));
+  async getWorkerRequestMatch(id: string, tenantId: string): Promise<WorkerRequestMatch | undefined> {
+    const result = await db.select().from(workerRequestMatches).where(
+      and(
+        eq(workerRequestMatches.id, id),
+        eq(workerRequestMatches.tenantId, tenantId)
+      )
+    );
     return result[0];
   },
 
-  async listWorkerRequestMatches(requestId: string): Promise<WorkerRequestMatch[]> {
-    return await db.select().from(workerRequestMatches).where(eq(workerRequestMatches.requestId, requestId)).orderBy(desc(workerRequestMatches.matchScore));
-  },
-
-  async listWorkerRequestMatchesByStatus(requestId: string, matchStatus: string): Promise<WorkerRequestMatch[]> {
+  async listWorkerRequestMatches(requestId: string, tenantId: string): Promise<WorkerRequestMatch[]> {
     return await db.select().from(workerRequestMatches).where(
       and(
         eq(workerRequestMatches.requestId, requestId),
+        eq(workerRequestMatches.tenantId, tenantId)
+      )
+    ).orderBy(desc(workerRequestMatches.matchScore));
+  },
+
+  async listWorkerRequestMatchesByStatus(requestId: string, tenantId: string, matchStatus: string): Promise<WorkerRequestMatch[]> {
+    return await db.select().from(workerRequestMatches).where(
+      and(
+        eq(workerRequestMatches.requestId, requestId),
+        eq(workerRequestMatches.tenantId, tenantId),
         eq(workerRequestMatches.matchStatus, matchStatus)
       )
     ).orderBy(desc(workerRequestMatches.matchScore));
   },
 
-  async updateWorkerRequestMatch(id: string, data: Partial<InsertWorkerRequestMatch>): Promise<WorkerRequestMatch | undefined> {
-    const result = await db.update(workerRequestMatches).set(data).where(eq(workerRequestMatches.id, id)).returning();
+  async updateWorkerRequestMatch(id: string, tenantId: string, data: Partial<InsertWorkerRequestMatch>): Promise<WorkerRequestMatch | undefined> {
+    const result = await db.update(workerRequestMatches).set(data).where(
+      and(
+        eq(workerRequestMatches.id, id),
+        eq(workerRequestMatches.tenantId, tenantId)
+      )
+    ).returning();
     return result[0];
   },
 
-  async deleteWorkerRequestMatch(id: string): Promise<void> {
-    await db.delete(workerRequestMatches).where(eq(workerRequestMatches.id, id));
+  async deleteWorkerRequestMatch(id: string, tenantId: string): Promise<void> {
+    await db.delete(workerRequestMatches).where(
+      and(
+        eq(workerRequestMatches.id, id),
+        eq(workerRequestMatches.tenantId, tenantId)
+      )
+    );
   },
 
-  async deleteWorkerRequestMatches(requestId: string): Promise<void> {
-    await db.delete(workerRequestMatches).where(eq(workerRequestMatches.requestId, requestId));
+  async deleteWorkerRequestMatches(requestId: string, tenantId: string): Promise<void> {
+    await db.delete(workerRequestMatches).where(
+      and(
+        eq(workerRequestMatches.requestId, requestId),
+        eq(workerRequestMatches.tenantId, tenantId)
+      )
+    );
   },
 };
 
