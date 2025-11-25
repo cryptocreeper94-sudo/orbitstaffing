@@ -216,6 +216,75 @@
             margin-bottom: 20px;
         }
 
+        .product-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(0, 212, 255, 0.3));
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .product-logo {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 20px rgba(0, 212, 255, 0.5));
+        }
+
+        .pulse-logo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .pulse-logo-container .product-logo {
+            margin: 0;
+        }
+
+        .pulse-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+
+        .pulse-line::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b9d, #c44569, transparent);
+            animation: pulse-sweep 3s ease-in-out infinite;
+            box-shadow: 0 0 10px #ff6b9d, 0 0 20px #c44569;
+        }
+
+        @keyframes pulse-sweep {
+            0% {
+                left: -100%;
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+
+        .product-card:hover .pulse-line::before {
+            animation-duration: 1.5s;
+        }
+
         .product-title {
             font-size: 1.8rem;
             color: #00d4ff;
@@ -691,7 +760,7 @@
         <section>
             <div class="products-grid">
                 <div class="product-card">
-                    <div class="product-icon">🚀</div>
+                    <img src="/orbit-saturn-logo.png" alt="ORBIT Staffing OS" class="product-logo">
                     <h3 class="product-title">ORBIT Staffing OS</h3>
                     <span class="product-status">LIVE NOW</span>
                     <p class="product-description">
@@ -703,7 +772,7 @@
                 </div>
 
                 <div class="product-card">
-                    <div class="product-icon">⚙️</div>
+                    <img src="/lotopspro-logo.png" alt="Lot Ops Pro" class="product-logo">
                     <h3 class="product-title">Lot Ops Pro</h3>
                     <span class="product-status coming-soon">COMING SOON</span>
                     <p class="product-description">
@@ -715,7 +784,10 @@
                 </div>
 
                 <div class="product-card">
-                    <div class="product-icon">🎵</div>
+                    <div class="pulse-logo-container">
+                        <img src="/darkwavepulse-logo.png" alt="Dark Wave Pulse" class="product-logo">
+                        <div class="pulse-line"></div>
+                    </div>
                     <h3 class="product-title">Dark Wave Pulse</h3>
                     <span class="product-status">LIVE NOW</span>
                     <p class="product-description">
