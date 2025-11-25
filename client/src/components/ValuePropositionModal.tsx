@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
+import saturnLogo from "@assets/generated_images/saturn_planet_icon_transparent.png";
 import {
   Zap,
   CheckCircle,
