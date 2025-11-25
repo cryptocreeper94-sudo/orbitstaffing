@@ -15,26 +15,31 @@ export async function serveStatic(app: Express, server: Server) {
     );
   }
 
+  // Serve DarkWave Studios landing page at /studio path
+  app.get('/studio', (_req, res) => {
+    res.sendFile(path.resolve(distPath, "studio-landing.html"));
+  });
+
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (req, res) => {
-    // Log hostname for debugging (can be removed later)
-    console.log('Hostname received:', req.hostname);
+    // Log hostname for debugging
+    console.log('Request:', req.method, req.path);
+    console.log('Hostname:', req.hostname);
     console.log('Host header:', req.headers.host);
-    console.log('X-Forwarded-Host:', req.headers['x-forwarded-host']);
     
     // Check multiple possible hostname headers for darkwavestudios.io
     const hostname = req.hostname || req.headers.host || req.headers['x-forwarded-host'] || '';
     
     // Serve Dark Wave Studios landing page for darkwavestudios.io
     if (hostname.includes('darkwavestudios.io')) {
-      console.log('Serving landing page for darkwavestudios.io');
+      console.log('✅ Serving landing page for darkwavestudios.io');
       return res.sendFile(path.resolve(distPath, "studio-landing.html"));
     }
     
     // Serve ORBIT app for all other domains
-    console.log('Serving ORBIT app');
+    console.log('📱 Serving ORBIT app');
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
