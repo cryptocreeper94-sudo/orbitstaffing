@@ -5,8 +5,11 @@ import path from "node:path";
 import express, { type Express, type Request } from "express";
 
 import runApp from "./app";
+import { setupWebSocket } from "./websocket";
 
 export async function serveStatic(app: Express, server: Server) {
+  // Setup WebSocket for real-time updates
+  setupWebSocket(server);
   const distPath = path.resolve(import.meta.dirname, "public");
 
   if (!fs.existsSync(distPath)) {

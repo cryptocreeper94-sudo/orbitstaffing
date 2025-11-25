@@ -4803,6 +4803,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // Background Checks API
+  // ========================
+  app.post("/api/background-checks/request", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { workerId, checkType, requestedBy } = req.body;
+
+      if (!workerId || !checkType) {
+        return res.status(400).json({ error: "workerId and checkType required" });
+      }
+
+      const bgCheck = await storage.requestBackgroundCheck({
+        tenantId,
+        workerId,
+        checkType,
+        requestedBy,
+        status: "pending"
+      });
+
+      res.json({ success: true, bgCheck });
+    } catch (error) {
+      console.error("Background check request error:", error);
+      res.status(500).json({ error: "Failed to request background check" });
+    }
+  });
+
+  app.get("/api/background-checks/:workerId", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { workerId } = req.params;
+      const checks = await storage.listBackgroundChecksByWorker(workerId, tenantId);
+
+      res.json({ success: true, checks });
+    } catch (error) {
+      console.error("List background checks error:", error);
+      res.status(500).json({ error: "Failed to list background checks" });
+    }
+  });
+
+  app.post("/api/drug-tests/request", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { workerId, testType, requestedBy } = req.body;
+
+      if (!workerId || !testType) {
+        return res.status(400).json({ error: "workerId and testType required" });
+      }
+
+      const drugTest = await storage.requestDrugTest({
+        tenantId,
+        workerId,
+        testType,
+        requestedBy,
+        status: "pending"
+      });
+
+      res.json({ success: true, drugTest });
+    } catch (error) {
+      console.error("Drug test request error:", error);
+      res.status(500).json({ error: "Failed to request drug test" });
+    }
+  });
+
+  app.get("/api/drug-tests/:workerId", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { workerId } = req.params;
+      const tests = await storage.listDrugTestsByWorker(workerId, tenantId);
+
+      res.json({ success: true, tests });
+    } catch (error) {
+      console.error("List drug tests error:", error);
+      res.status(500).json({ error: "Failed to list drug tests" });
+    }
+  });
+
+  app.post("/api/compliance-checks/create", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { workerId, checkType } = req.body;
+
+      if (!workerId || !checkType) {
+        return res.status(400).json({ error: "workerId and checkType required" });
+      }
+
+      const complianceCheck = await storage.createComplianceCheck({
+        tenantId,
+        workerId,
+        checkType,
+        status: "pending"
+      });
+
+      res.json({ success: true, complianceCheck });
+    } catch (error) {
+      console.error("Compliance check creation error:", error);
+      res.status(500).json({ error: "Failed to create compliance check" });
+    }
+  });
+
+  app.get("/api/compliance-checks/:workerId", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { workerId } = req.params;
+      const checks = await storage.listComplianceChecksByWorker(workerId, tenantId);
+
+      res.json({ success: true, checks });
+    } catch (error) {
+      console.error("List compliance checks error:", error);
+      res.status(500).json({ error: "Failed to list compliance checks" });
+    }
+  });
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -1417,14 +1417,24 @@ export const insuranceDocuments = pgTable(
     documentType: varchar("document_type", { length: 100 }).notNull(), // "workers_comp_certificate", "i9", "w4", "policy_declaration", "coi", "health_card"
     documentName: varchar("document_name", { length: 255 }).notNull(),
     documentUrl: varchar("document_url", { length: 500 }),
+    fileUrl: varchar("file_url", { length: 500 }), // storage path
+    fileName: varchar("file_name", { length: 255 }), // actual file name
+    fileType: varchar("file_type", { length: 20 }), // pdf, image, docx
     fileSize: integer("file_size"), // bytes
     mimeType: varchar("mime_type", { length: 100 }),
+    uploadedDate: timestamp("uploaded_date"),
     
     // Hallmark Verification
     hallmarkId: varchar("hallmark_id").unique(),
+    hallmarkAssetNumber: varchar("hallmark_asset_number", { length: 100 }), // Hallmark identifier
     hallmarkIssued: boolean("hallmark_issued").default(false),
     hallmarkIssuedAt: timestamp("hallmark_issued_at"),
     hallmarkVerifiable: boolean("hallmark_verifiable").default(true),
+    
+    // Verification & Scanning
+    verificationStatus: varchar("verification_status", { length: 50 }).default("pending"), // pending, verified, rejected
+    rejectionReason: text("rejection_reason"),
+    virusScanStatus: varchar("virus_scan_status", { length: 50 }).default("pending"), // pending, clean, infected
     
     // Metadata
     uploadedBy: varchar("uploaded_by").references(() => users.id),
@@ -1877,3 +1887,219 @@ export const insertGarnishmentPaymentSchema = createInsertSchema(garnishmentPaym
 
 export type InsertGarnishmentPayment = z.infer<typeof insertGarnishmentPaymentSchema>;
 export type GarnishmentPayment = typeof garnishmentPayments.$inferSelect;
+
+// ========================
+// Garnishment Documents
+// ========================
+export const garnishmentDocuments = pgTable(
+  "garnishment_documents",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    garnishmentOrderId: varchar("garnishment_order_id").notNull().references(() => garnishmentOrders.id),
+    
+    // File Storage
+    fileUrl: varchar("file_url", { length: 500 }).notNull(),
+    fileName: varchar("file_name", { length: 255 }).notNull(),
+    fileType: varchar("file_type", { length: 20 }).notNull(), // pdf, image, docx
+    fileSize: integer("file_size"), // bytes
+    
+    // Hallmark & Verification
+    hallmarkAssetNumber: varchar("hallmark_asset_number", { length: 100 }),
+    uploadedDate: timestamp("uploaded_date").default(sql`NOW()`),
+    verificationStatus: varchar("verification_status", { length: 50 }).default("pending"), // pending, verified, rejected
+    
+    // Source Info
+    sourceCreditor: varchar("source_creditor", { length: 255 }),
+    
+    // Metadata
+    uploadedBy: varchar("uploaded_by").references(() => users.id),
+    rejectionReason: text("rejection_reason"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_garnishment_docs_tenant").on(table.tenantId),
+    garnishmentIdx: index("idx_garnishment_docs_garnishment").on(table.garnishmentOrderId),
+    verificationIdx: index("idx_garnishment_docs_verification").on(table.verificationStatus),
+    uploadedDateIdx: index("idx_garnishment_docs_uploaded").on(table.uploadedDate),
+  })
+);
+
+export const insertGarnishmentDocumentSchema = createInsertSchema(garnishmentDocuments).omit({
+  id: true,
+  uploadedDate: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertGarnishmentDocument = z.infer<typeof insertGarnishmentDocumentSchema>;
+export type GarnishmentDocument = typeof garnishmentDocuments.$inferSelect;
+
+// ========================
+// Background Checks
+// ========================
+export const backgroundChecks = pgTable(
+  "background_checks",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Check Details
+    checkType: varchar("check_type", { length: 50 }).notNull(), // criminal, motor_vehicle, employment_history
+    requestedDate: timestamp("requested_date").default(sql`NOW()`),
+    completedDate: timestamp("completed_date"),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, processing, completed, failed
+    resultStatus: varchar("result_status", { length: 50 }), // clear, issues_found, disqualified
+    resultDetails: jsonb("result_details"), // violations, incidents, etc
+    
+    // Expiration
+    expiryDate: date("expiry_date"),
+    reportUrl: varchar("report_url", { length: 255 }),
+    
+    // Third-party Integration
+    externalId: varchar("external_id", { length: 100 }), // Checkr candidate_id, request_id
+    externalStatus: varchar("external_status", { length: 50 }),
+    
+    // Audit Trail
+    requestedBy: varchar("requested_by").references(() => users.id),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_bg_check_tenant").on(table.tenantId),
+    workerIdx: index("idx_bg_check_worker").on(table.workerId),
+    checkTypeIdx: index("idx_bg_check_type").on(table.checkType),
+    statusIdx: index("idx_bg_check_status").on(table.status),
+    resultStatusIdx: index("idx_bg_check_result_status").on(table.resultStatus),
+    expiryIdx: index("idx_bg_check_expiry").on(table.expiryDate),
+    externalIdIdx: index("idx_bg_check_external_id").on(table.externalId),
+  })
+);
+
+export const insertBackgroundCheckSchema = createInsertSchema(backgroundChecks).omit({
+  id: true,
+  requestedDate: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertBackgroundCheck = z.infer<typeof insertBackgroundCheckSchema>;
+export type BackgroundCheck = typeof backgroundChecks.$inferSelect;
+
+// ========================
+// Drug Tests
+// ========================
+export const drugTests = pgTable(
+  "drug_tests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Test Details
+    testType: varchar("test_type", { length: 50 }).notNull(), // pre_employment, random, post_incident
+    requestedDate: timestamp("requested_date").default(sql`NOW()`),
+    completedDate: timestamp("completed_date"),
+    
+    // Status & Results
+    status: varchar("status", { length: 50 }).default("pending"), // pending, processing, completed, failed
+    result: varchar("result", { length: 50 }), // pass, fail, inconclusive
+    testDetails: jsonb("test_details"), // panel tested, lab, etc
+    
+    // Expiration
+    expiryDate: date("expiry_date"),
+    reportUrl: varchar("report_url", { length: 255 }),
+    
+    // Third-party Integration
+    externalId: varchar("external_id", { length: 100 }), // Quest Diagnostics test_id
+    externalStatus: varchar("external_status", { length: 50 }),
+    
+    // Audit Trail
+    requestedBy: varchar("requested_by").references(() => users.id),
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_drug_test_tenant").on(table.tenantId),
+    workerIdx: index("idx_drug_test_worker").on(table.workerId),
+    testTypeIdx: index("idx_drug_test_type").on(table.testType),
+    statusIdx: index("idx_drug_test_status").on(table.status),
+    resultIdx: index("idx_drug_test_result").on(table.result),
+    expiryIdx: index("idx_drug_test_expiry").on(table.expiryDate),
+    externalIdIdx: index("idx_drug_test_external_id").on(table.externalId),
+  })
+);
+
+export const insertDrugTestSchema = createInsertSchema(drugTests).omit({
+  id: true,
+  requestedDate: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDrugTest = z.infer<typeof insertDrugTestSchema>;
+export type DrugTest = typeof drugTests.$inferSelect;
+
+// ========================
+// Compliance Checks
+// ========================
+export const complianceChecks = pgTable(
+  "compliance_checks",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Check Details
+    checkType: varchar("check_type", { length: 50 }).notNull(), // i9_verification, ssn_verification, right_to_work
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, completed, expired
+    complianceStatus: varchar("compliance_status", { length: 50 }), // compliant, non_compliant
+    
+    // Dates
+    completedDate: timestamp("completed_date"),
+    expiryDate: date("expiry_date"),
+    renewalReminderSent: boolean("renewal_reminder_sent").default(false),
+    
+    // Audit Trail
+    completedBy: varchar("completed_by").references(() => users.id),
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_compliance_check_tenant").on(table.tenantId),
+    workerIdx: index("idx_compliance_check_worker").on(table.workerId),
+    checkTypeIdx: index("idx_compliance_check_type").on(table.checkType),
+    statusIdx: index("idx_compliance_check_status").on(table.status),
+    complianceStatusIdx: index("idx_compliance_check_compliance").on(table.complianceStatus),
+    expiryIdx: index("idx_compliance_check_expiry").on(table.expiryDate),
+  })
+);
+
+export const insertComplianceCheckSchema = createInsertSchema(complianceChecks).omit({
+  id: true,
+  completedDate: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertComplianceCheck = z.infer<typeof insertComplianceCheckSchema>;
+export type ComplianceCheck = typeof complianceChecks.$inferSelect;

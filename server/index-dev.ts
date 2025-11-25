@@ -7,12 +7,15 @@ import { nanoid } from "nanoid";
 import { createServer as createViteServer, createLogger } from "vite";
 
 import runApp from "./app";
+import { setupWebSocket } from "./websocket";
 
 import viteConfig from "../vite.config";
 
 const viteLogger = createLogger();
 
 export async function setupVite(app: Express, server: Server) {
+  // Setup WebSocket for real-time updates
+  setupWebSocket(server);
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },

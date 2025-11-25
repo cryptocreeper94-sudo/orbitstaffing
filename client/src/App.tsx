@@ -30,6 +30,12 @@ import HallmarkRegistry from "@/pages/HallmarkRegistry";
 import HallmarkSeal from "@/pages/HallmarkSeal";
 import ClientRequestDashboard from "@/pages/ClientRequestDashboard";
 import AdminWorkerMatchingPanel from "@/pages/AdminWorkerMatchingPanel";
+import AdminPayrollDashboard from "@/pages/AdminPayrollDashboard";
+import AdminAssignmentDashboard from "@/pages/AdminAssignmentDashboard";
+import AdminGarnishmentDashboard from "@/pages/AdminGarnishmentDashboard";
+import WorkerPayrollPortal from "@/pages/WorkerPayrollPortal";
+import WorkerComplianceDashboard from "@/pages/WorkerComplianceDashboard";
+import AdminComplianceMonitor from "@/pages/AdminComplianceMonitor";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -72,6 +78,12 @@ function Router() {
       <Route path="/hallmark-seal" component={HallmarkSeal} />
       <Route path="/client/request-workers" component={ClientRequestDashboard} />
       <Route path="/admin/worker-matching" component={AdminWorkerMatchingPanel} />
+      <Route path="/admin/payroll-dashboard" component={AdminPayrollDashboard} />
+      <Route path="/admin/assignment-dashboard" component={AdminAssignmentDashboard} />
+      <Route path="/admin/garnishment-dashboard" component={AdminGarnishmentDashboard} />
+      <Route path="/admin/compliance-monitor" component={AdminComplianceMonitor} />
+      <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
+      <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -19,6 +19,10 @@ import {
   garnishmentOrders,
   payrollRecords,
   garnishmentPayments,
+  garnishmentDocuments,
+  backgroundChecks,
+  drugTests,
+  complianceChecks,
   type User,
   type InsertUser,
   type Company,
@@ -55,6 +59,14 @@ import {
   type InsertPayrollRecord,
   type GarnishmentPayment,
   type InsertGarnishmentPayment,
+  type GarnishmentDocument,
+  type InsertGarnishmentDocument,
+  type BackgroundCheck,
+  type InsertBackgroundCheck,
+  type DrugTest,
+  type InsertDrugTest,
+  type ComplianceCheck,
+  type InsertComplianceCheck,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -956,6 +968,275 @@ export const storage: IStorage = {
       )
     ).returning();
     return result[0];
+  },
+
+  // ========================
+  // Garnishment Documents
+  // ========================
+  async createGarnishmentDocument(data: InsertGarnishmentDocument): Promise<GarnishmentDocument> {
+    const result = await db.insert(garnishmentDocuments).values(data).returning();
+    return result[0];
+  },
+
+  async getGarnishmentDocument(id: string, tenantId: string): Promise<GarnishmentDocument | undefined> {
+    const result = await db.select().from(garnishmentDocuments).where(
+      and(
+        eq(garnishmentDocuments.id, id),
+        eq(garnishmentDocuments.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listGarnishmentDocuments(garnishmentOrderId: string, tenantId: string): Promise<GarnishmentDocument[]> {
+    return await db.select().from(garnishmentDocuments).where(
+      and(
+        eq(garnishmentDocuments.garnishmentOrderId, garnishmentOrderId),
+        eq(garnishmentDocuments.tenantId, tenantId)
+      )
+    ).orderBy(desc(garnishmentDocuments.uploadedDate));
+  },
+
+  async updateGarnishmentDocumentVerification(
+    id: string,
+    tenantId: string,
+    data: Partial<InsertGarnishmentDocument>
+  ): Promise<GarnishmentDocument | undefined> {
+    const result = await db.update(garnishmentDocuments).set(data).where(
+      and(
+        eq(garnishmentDocuments.id, id),
+        eq(garnishmentDocuments.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async deleteGarnishmentDocument(id: string, tenantId: string): Promise<void> {
+    await db.delete(garnishmentDocuments).where(
+      and(
+        eq(garnishmentDocuments.id, id),
+        eq(garnishmentDocuments.tenantId, tenantId)
+      )
+    );
+  },
+
+  // ========================
+  // Background Checks
+  // ========================
+  async requestBackgroundCheck(data: InsertBackgroundCheck): Promise<BackgroundCheck> {
+    const result = await db.insert(backgroundChecks).values(data).returning();
+    return result[0];
+  },
+
+  async getBackgroundCheck(id: string, tenantId: string): Promise<BackgroundCheck | undefined> {
+    const result = await db.select().from(backgroundChecks).where(
+      and(
+        eq(backgroundChecks.id, id),
+        eq(backgroundChecks.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listBackgroundChecksByWorker(workerId: string, tenantId: string): Promise<BackgroundCheck[]> {
+    return await db.select().from(backgroundChecks).where(
+      and(
+        eq(backgroundChecks.workerId, workerId),
+        eq(backgroundChecks.tenantId, tenantId)
+      )
+    ).orderBy(desc(backgroundChecks.requestedDate));
+  },
+
+  async listBackgroundChecksExpiring(tenantId: string, daysFromNow: number): Promise<BackgroundCheck[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() + daysFromNow);
+    const cutoffDateStr = cutoffDate.toISOString().split('T')[0];
+
+    return await db.select().from(backgroundChecks).where(
+      and(
+        eq(backgroundChecks.tenantId, tenantId),
+        lte(backgroundChecks.expiryDate, cutoffDateStr)
+      )
+    );
+  },
+
+  async updateBackgroundCheckStatus(
+    id: string,
+    tenantId: string,
+    data: Partial<InsertBackgroundCheck>
+  ): Promise<BackgroundCheck | undefined> {
+    const result = await db.update(backgroundChecks).set(data).where(
+      and(
+        eq(backgroundChecks.id, id),
+        eq(backgroundChecks.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async getBackgroundCheckByExternalId(externalId: string, tenantId: string): Promise<BackgroundCheck | undefined> {
+    const result = await db.select().from(backgroundChecks).where(
+      and(
+        eq(backgroundChecks.externalId, externalId),
+        eq(backgroundChecks.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  // ========================
+  // Drug Tests
+  // ========================
+  async requestDrugTest(data: InsertDrugTest): Promise<DrugTest> {
+    const result = await db.insert(drugTests).values(data).returning();
+    return result[0];
+  },
+
+  async getDrugTest(id: string, tenantId: string): Promise<DrugTest | undefined> {
+    const result = await db.select().from(drugTests).where(
+      and(
+        eq(drugTests.id, id),
+        eq(drugTests.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listDrugTestsByWorker(workerId: string, tenantId: string): Promise<DrugTest[]> {
+    return await db.select().from(drugTests).where(
+      and(
+        eq(drugTests.workerId, workerId),
+        eq(drugTests.tenantId, tenantId)
+      )
+    ).orderBy(desc(drugTests.requestedDate));
+  },
+
+  async listDrugTestsExpiring(tenantId: string, daysFromNow: number): Promise<DrugTest[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() + daysFromNow);
+    const cutoffDateStr = cutoffDate.toISOString().split('T')[0];
+
+    return await db.select().from(drugTests).where(
+      and(
+        eq(drugTests.tenantId, tenantId),
+        lte(drugTests.expiryDate, cutoffDateStr)
+      )
+    );
+  },
+
+  async updateDrugTestStatus(
+    id: string,
+    tenantId: string,
+    data: Partial<InsertDrugTest>
+  ): Promise<DrugTest | undefined> {
+    const result = await db.update(drugTests).set(data).where(
+      and(
+        eq(drugTests.id, id),
+        eq(drugTests.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async getDrugTestByExternalId(externalId: string, tenantId: string): Promise<DrugTest | undefined> {
+    const result = await db.select().from(drugTests).where(
+      and(
+        eq(drugTests.externalId, externalId),
+        eq(drugTests.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  // ========================
+  // Compliance Checks
+  // ========================
+  async createComplianceCheck(data: InsertComplianceCheck): Promise<ComplianceCheck> {
+    const result = await db.insert(complianceChecks).values(data).returning();
+    return result[0];
+  },
+
+  async getComplianceCheck(id: string, tenantId: string): Promise<ComplianceCheck | undefined> {
+    const result = await db.select().from(complianceChecks).where(
+      and(
+        eq(complianceChecks.id, id),
+        eq(complianceChecks.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listComplianceChecksByWorker(workerId: string, tenantId: string): Promise<ComplianceCheck[]> {
+    return await db.select().from(complianceChecks).where(
+      and(
+        eq(complianceChecks.workerId, workerId),
+        eq(complianceChecks.tenantId, tenantId)
+      )
+    ).orderBy(desc(complianceChecks.createdAt));
+  },
+
+  async listComplianceChecksByType(workerId: string, tenantId: string, checkType: string): Promise<ComplianceCheck | undefined> {
+    const result = await db.select().from(complianceChecks).where(
+      and(
+        eq(complianceChecks.workerId, workerId),
+        eq(complianceChecks.tenantId, tenantId),
+        eq(complianceChecks.checkType, checkType)
+      )
+    );
+    return result[0];
+  },
+
+  async listExpiringComplianceChecks(tenantId: string, daysFromNow: number): Promise<ComplianceCheck[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() + daysFromNow);
+    const cutoffDateStr = cutoffDate.toISOString().split('T')[0];
+
+    return await db.select().from(complianceChecks).where(
+      and(
+        eq(complianceChecks.tenantId, tenantId),
+        lte(complianceChecks.expiryDate, cutoffDateStr)
+      )
+    );
+  },
+
+  async updateComplianceCheckStatus(
+    id: string,
+    tenantId: string,
+    data: Partial<InsertComplianceCheck>
+  ): Promise<ComplianceCheck | undefined> {
+    const result = await db.update(complianceChecks).set(data).where(
+      and(
+        eq(complianceChecks.id, id),
+        eq(complianceChecks.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async getWorkforceComplianceSummary(tenantId: string): Promise<any> {
+    const totalWorkers = await db.select({ count: sql`count(*)` }).from(workers).where(eq(workers.tenantId, tenantId));
+    
+    const bgCheckCounts = await db.select({
+      status: backgroundChecks.status,
+      count: sql`count(*)`
+    }).from(backgroundChecks).where(eq(backgroundChecks.tenantId, tenantId)).groupBy(backgroundChecks.status);
+    
+    const drugTestCounts = await db.select({
+      status: drugTests.status,
+      count: sql`count(*)`
+    }).from(drugTests).where(eq(drugTests.tenantId, tenantId)).groupBy(drugTests.status);
+    
+    const complianceCounts = await db.select({
+      status: complianceChecks.complianceStatus,
+      count: sql`count(*)`
+    }).from(complianceChecks).where(eq(complianceChecks.tenantId, tenantId)).groupBy(complianceChecks.complianceStatus);
+
+    return {
+      totalWorkers: totalWorkers[0]?.count || 0,
+      backgroundChecks: bgCheckCounts,
+      drugTests: drugTestCounts,
+      complianceStatus: complianceCounts
+    };
   },
 };
 
