@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { sql, count, eq, desc, and } from "drizzle-orm";
+import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { db } from "./db";
 import { emailService } from "./email";
@@ -80,8 +81,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUser) {
         return res.status(409).json({ error: "Email already exists" });
       }
-      // TODO: Hash password before storing
-      const user = await storage.createUser(parsed.data);
+      // Hash password before storing (bcrypt with 10 rounds)
+      const hashedPassword = await bcrypt.hash(parsed.data.passwordHash, 10);
+      const user = await storage.createUser({
+        ...parsed.data,
+        passwordHash: hashedPassword
+      });
       res.status(201).json(user);
     } catch (error) {
       res.status(500).json({ error: "Registration failed" });
@@ -355,7 +360,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      // TODO: Verify password hash
+      // Verify password hash using bcrypt
+      const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ error: "Login failed" });
@@ -395,9 +404,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      // TODO: Hash password
+      // Hash password before storing (bcrypt with 10 rounds)
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
       const updatedUser = await storage.updateUser(user.id, {
-        passwordHash: newPassword, // In production, hash this
+        passwordHash: hashedPassword,
       });
       res.status(200).json({
         success: true,
@@ -2119,9 +2129,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!targetUserId || !newPassword) {
         return res.status(400).json({ error: "Missing required fields" });
       }
-      // Update user password (in production, hash this)
+      // Hash password before storing (bcrypt with 10 rounds)
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
       const user = await storage.updateUser(targetUserId, {
-        passwordHash: newPassword, // TODO: Hash password properly
+        passwordHash: hashedPassword,
       });
       res.json({
         success: true,
