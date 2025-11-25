@@ -57,15 +57,6 @@ export function BenefitDetailsModal({ isOpen, benefitId, onClose }: ModalProps) 
       className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      {/* Saturn Watermark - Floating Aqua Planet with Transparent Background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-        <img 
-          src={saturnLogo}
-          alt=""
-          className="w-96 h-96 object-contain drop-shadow-[0_0_40px_rgba(6,182,212,0.6)]"
-        />
-      </div>
-
       {/* Modal Content */}
       <div 
         className="relative z-10 bg-background rounded-lg max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-primary/30"
