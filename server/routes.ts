@@ -4576,6 +4576,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // PAYSTUB PDF GENERATION
+  // ========================
+  app.post("/api/paystubs/generate/:payrollId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { payrollId } = req.params;
+
+      // Fetch payroll record
+      const payrollRecord = await storage.getPayrollRecord(payrollId, tenantId);
+      if (!payrollRecord) {
+        return res.status(404).json({ error: "Payroll record not found" });
+      }
+
+      // Fetch worker
+      const worker = await storage.getWorker(payrollRecord.employeeId);
+      if (!worker) {
+        return res.status(404).json({ error: "Worker not found" });
+      }
+
+      // Fetch W-4 data
+      const w4Data = await storage.getEmployeeW4Data(payrollRecord.employeeId, tenantId);
+
+      // Fetch garnishment orders
+      const garnishmentOrders = await storage.listGarnishmentOrders(payrollRecord.employeeId, tenantId);
+
+      // Generate hallmark asset number
+      const hallmarkAssetNumber = `ORBIT-${tenantId.substring(0, 8).toUpperCase()}-${Date.now()}`;
+
+      // Generate PDF
+      const { generatePaystubPdf } = await import("./paystubGenerator");
+      const result = await generatePaystubPdf({
+        payrollRecord,
+        worker,
+        w4Data: w4Data || { fillingStatus: "single", extraWithheldPerPaycheck: 0 } as any,
+        garnishmentOrders,
+        companyName: "DarkWave Studios",
+        hallmarkAssetNumber,
+        verificationUrl: `https://orbit.app/verify?paystub=${payrollId}`,
+      });
+
+      // Update payroll record with PDF details
+      await storage.updatePaystubPdf(payrollId, tenantId, {
+        paystubPdfUrl: result.pdfUrl,
+        paystubFileName: result.fileName,
+        hallmarkAssetNumber: result.hallmarkAssetNumber,
+        qrCodeUrl: result.qrCodeUrl,
+      });
+
+      res.json({
+        success: true,
+        pdfUrl: result.pdfUrl,
+        fileName: result.fileName,
+        hallmarkAssetNumber: result.hallmarkAssetNumber,
+        qrCodeUrl: result.qrCodeUrl,
+      });
+    } catch (error) {
+      console.error("Paystub generation error:", error);
+      res.status(500).json({ 
+        error: "Failed to generate paystub PDF",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // GET paystub PDF
+  app.get("/api/paystubs/:payrollId/pdf", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { payrollId } = req.params;
+
+      // Fetch payroll record
+      const payrollRecord = await storage.getPayrollRecord(payrollId, tenantId);
+      if (!payrollRecord || !payrollRecord.paystubFileName) {
+        return res.status(404).json({ error: "Paystub PDF not found" });
+      }
+
+      // Get PDF file
+      const { getPaystubPdf } = await import("./paystubGenerator");
+      const pdfBuffer = await getPaystubPdf(tenantId, payrollRecord.paystubFileName);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${payrollRecord.paystubFileName}"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("PDF retrieval error:", error);
+      res.status(500).json({ error: "Failed to retrieve paystub PDF" });
+    }
+  });
+
+  // LIST employee paystubs
+  app.get("/api/paystubs/employee/:employeeId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { employeeId } = req.params;
+      const { startDate, endDate } = req.query;
+
+      const paystubs = await storage.listPaystubsForEmployee(
+        employeeId,
+        tenantId,
+        startDate as string | undefined,
+        endDate as string | undefined
+      );
+
+      res.json(paystubs.map(p => ({
+        id: p.id,
+        payPeriodStart: p.payPeriodStart,
+        payPeriodEnd: p.payPeriodEnd,
+        payDate: p.payDate,
+        grossPay: p.grossPay,
+        netPay: p.netPay,
+        paystubPdfUrl: p.paystubPdfUrl,
+        hallmarkAssetNumber: p.hallmarkAssetNumber,
+        paymentStatus: p.paymentStatus,
+      })));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch paystubs" });
+    }
+  });
+
+  // ========================
+  // STRIPE PAYMENT PROCESSING
+  // ========================
+  app.post("/api/payments/stripe/create", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { garnishmentOrderId, amount, creditorEmail } = req.body;
+
+      if (!garnishmentOrderId || !amount || !creditorEmail) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Fetch garnishment order
+      const garnishmentOrder = await storage.getGarnishmentOrder(garnishmentOrderId, tenantId);
+      if (!garnishmentOrder) {
+        return res.status(404).json({ error: "Garnishment order not found" });
+      }
+
+      // Create Stripe payment
+      const paymentResult = await stripeService.createGarnishmentPayment({
+        amount,
+        creditorEmail,
+        creditorStripeAccountId: req.body.creditorStripeAccountId,
+        employeeId: garnishmentOrder.employeeId,
+        garnishmentOrderId,
+        description: `Garnishment payment for ${garnishmentOrder.creditorName}`,
+      });
+
+      res.json({
+        success: true,
+        paymentIntentId: paymentResult.paymentIntentId,
+        clientSecret: paymentResult.clientSecret,
+        amount: paymentResult.amount,
+        status: paymentResult.status,
+      });
+    } catch (error) {
+      console.error("Payment creation error:", error);
+      res.status(500).json({ 
+        error: "Failed to create payment",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Stripe webhook handler
+  app.post("/api/payments/stripe/webhook", async (req: Request, res: Response) => {
+    try {
+      const event = req.body as any; // In production, verify webhook signature
+
+      const handleResult = await stripeService.handleWebhookEvent(event);
+
+      // Update garnishment payment status based on event
+      if (handleResult.type === "payment_succeeded" && event.data.object.metadata) {
+        const { employeeId, garnishmentOrderId } = event.data.object.metadata;
+        
+        // Find and update garnishment payment
+        const payments = await storage.listGarnishmentPaymentsByOrder(
+          garnishmentOrderId,
+          req.user?.tenantId || "unknown"
+        );
+
+        for (const payment of payments) {
+          if (payment.status === "pending") {
+            await storage.updateGarnishmentPaymentStatus(
+              payment.id,
+              payment.tenantId,
+              "confirmed",
+              event.data.object.id
+            );
+          }
+        }
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // GET payment status
+  app.get("/api/payments/status/:paymentId", async (req: Request, res: Response) => {
+    try {
+      const { paymentId } = req.params;
+
+      const paymentStatus = await stripeService.getPaymentStatus(paymentId);
+
+      res.json({
+        paymentIntentId: paymentStatus.paymentIntentId,
+        status: paymentStatus.status,
+        amount: paymentStatus.amount,
+        currency: paymentStatus.currency,
+      });
+    } catch (error) {
+      console.error("Payment status error:", error);
+      res.status(500).json({ error: "Failed to get payment status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

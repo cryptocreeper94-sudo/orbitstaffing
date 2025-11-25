@@ -1786,6 +1786,16 @@ export const payrollRecords = pgTable(
     // Notes
     notes: text("notes"),
     
+    // Paystub PDF Generation
+    paystubPdfUrl: varchar("paystub_pdf_url", { length: 255 }),
+    paystubFileName: varchar("paystub_file_name", { length: 255 }),
+    hallmarkAssetNumber: varchar("hallmark_asset_number", { length: 100 }),
+    qrCodeUrl: varchar("qr_code_url", { length: 255 }),
+    
+    // Stripe Payment Integration
+    stripePaymentId: varchar("stripe_payment_id", { length: 100 }),
+    paymentStatus: varchar("payment_status", { length: 50 }), // pending, completed, failed
+    
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
@@ -1794,6 +1804,8 @@ export const payrollRecords = pgTable(
     employeeIdx: index("idx_payroll_record_employee").on(table.employeeId),
     periodIdx: index("idx_payroll_record_period").on(table.payPeriodStart),
     statusIdx: index("idx_payroll_record_status").on(table.status),
+    paystubUrlIdx: index("idx_payroll_record_paystub_url").on(table.paystubPdfUrl),
+    hallmarkIdx: index("idx_payroll_record_hallmark").on(table.hallmarkAssetNumber),
   })
 );
 

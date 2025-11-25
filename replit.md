@@ -141,6 +141,80 @@ The ORBIT Staffing OS is a unified, multi-tenant white-label platform with a thr
 - State-specific compliance flags for each worker
 - Company-level state coverage tracking
 
+## Payroll System with Garnishment Processing (Nov 25, 2025 - COMPLETED)
+
+**Database Schema - 4 New Tables:**
+1. **employee_w4_data** - W-4 tax withholding data (filing status, dependents, income)
+2. **garnishment_orders** - Court-ordered deductions with type, amount, priority, status
+3. **payroll_records** - Complete paycheck history with all deductions and garnishments
+4. **garnishment_payments** - Audit trail of garnishment distributions to creditors
+
+**Payroll Calculation Engine (server/payrollCalculator.ts):**
+- **Federal Income Tax:** 2025 tax brackets (single, married, head of household)
+- **FICA Taxes:**
+  - Social Security: 6.2% capped at $176,100 wage base
+  - Medicare: 1.45% (all) + 0.9% additional for high earners
+- **State Taxes:**
+  - Tennessee: 0% (no income tax)
+  - Kentucky: 4% with $3,270 annual standard deduction
+- **Local Occupational Taxes:** Kentucky cities (Louisville 2.2%, Lexington 1.75%, etc.)
+- **Garnishment Processing (Priority-Based):**
+  1. Child support/alimony (50-65%)
+  2. IRS federal tax levy (varies by filing status)
+  3. Federal student loans (15%)
+  4. Consumer creditors (25% max or amount above $217.50/week)
+- **CCPA Compliance:** Enforced limits, protective thresholds, audit trails
+
+**Backend API Routes (Fully Implemented):**
+- `/api/garnishments/*` - CRUD for garnishment orders
+- `/api/payroll/calculate` - Preview paycheck (no save)
+- `/api/payroll/process` - Calculate and save payroll with garnishments
+- `/api/payroll/:id` - Retrieve paycheck details
+- `/api/payroll/employee/:employeeId` - List employee paychecks
+
+**Stripe Payment Processing (server/stripeService.ts):**
+- Stripe Connect integration for creditor routing
+- Payment intent creation and processing
+- Webhook event handling for payment confirmations
+- Payment status tracking (pending, completed, failed)
+- Refund handling for failed payments
+
+**PDF Paystub Generation (server/paystubGenerator.ts):**
+- Professional dark industrial theme paystubs matching DarkWave branding
+- Non-removable "Powered by ORBIT" blockchain hallmark with asset number
+- QR code verification linking to https://orbit.app/verify?paystub={id}
+- Complete payroll breakdown:
+  - Gross pay with hourly/salary breakdown
+  - Federal, state, local tax withholdings
+  - FICA deductions (Social Security + Medicare)
+  - All garnishment details with creditor routing
+  - Net pay and direct deposit information
+- Server-side PDF generation for security and consistency
+- Multi-tenant isolated storage at /server/paystubs/{tenantId}/
+
+**Backend API Routes (PDF & Payments):**
+- `/api/paystubs/generate/:payrollId` - Generate paystub PDF
+- `/api/paystubs/:payrollId/pdf` - Retrieve paystub PDF
+- `/api/paystubs/employee/:employeeId` - List employee paystubs
+- `/api/payments/stripe/create` - Process Stripe payment for garnishment
+- `/api/payments/stripe/webhook` - Handle Stripe webhook events
+- `/api/payments/status/:paymentId` - Check payment status
+
+**Security Features:**
+- Multi-tenant isolation on all payroll operations
+- Hallmark asset numbers non-removable on PDFs
+- QR code paystub verification for authenticity
+- Audit trails for all garnishment calculations
+- Environment-based secrets management for Stripe API keys
+- Payroll records audit trail with complete breakdown
+
+**Real-World Compliance:**
+- Tennessee: No state income tax, garnishment limits 25% (or $217.50/week threshold)
+- Kentucky: 4% state income tax, 2.2% occupational tax (Louisville), child support priority 50-65%
+- Federal CCPA limits enforced across all garnishment calculations
+- Dependent child exemptions ($2.50/week per child in Tennessee)
+- Garnishment priority ordering (child support > tax levy > student loan > creditor)
+
 ## External Dependencies
 
 -   **Database Hosting:** Neon (for PostgreSQL)
@@ -154,13 +228,17 @@ The ORBIT Staffing OS is a unified, multi-tenant white-label platform with a thr
 ✅ **App Published:** Running on Replit platform with live URL
 ✅ **Insurance System:** Complete with 5 database tables, 27 storage methods
 ✅ **Worker Matching:** Auto-matching engine with scoring algorithm
-✅ **API Routes:** 35+ endpoints for insurance and requests
+✅ **Payroll System:** Real tax calculations, garnishment processing, CCPA compliance
+✅ **Stripe Integration:** Payment processing and creditor routing
+✅ **PDF Paystubs:** Professional generation with blockchain hallmarks and QR verification
+✅ **API Routes:** 50+ endpoints for insurance, payroll, and payments
 ✅ **Frontend:** Two complete UI pages (client dashboard, admin panel)
-✅ **Security:** Multi-tenant isolation, SQL injection prevention, tenant validation
+✅ **Security:** Multi-tenant isolation, SQL injection prevention, tenant validation, hallmark verification
 
 **Next Build Phase:**
-- Document upload with file scanning
-- SMS/email notifications for assignments
-- Compliance alerts for expiring insurance
+- Twilio SMS/email notifications for payroll/assignments
+- Document upload with file scanning for garnishment orders
+- Compliance alerts for expiring insurance policies
 - Worker availability matching integration
 - Real-time dashboards with WebSocket
+- Background check and drug testing integrations

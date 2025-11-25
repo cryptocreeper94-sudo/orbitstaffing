@@ -865,6 +865,98 @@ export const storage: IStorage = {
     ).returning();
     return result[0];
   },
+
+  // ========================
+  // Paystub PDF Management
+  // ========================
+  async updatePaystubPdf(
+    payrollRecordId: string,
+    tenantId: string,
+    data: {
+      paystubPdfUrl: string;
+      paystubFileName: string;
+      hallmarkAssetNumber: string;
+      qrCodeUrl: string;
+    }
+  ): Promise<PayrollRecord | undefined> {
+    const result = await db.update(payrollRecords).set(data).where(
+      and(
+        eq(payrollRecords.id, payrollRecordId),
+        eq(payrollRecords.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async listPaystubsForEmployee(
+    employeeId: string,
+    tenantId: string,
+    startDate?: string,
+    endDate?: string
+  ): Promise<PayrollRecord[]> {
+    let query = db.select().from(payrollRecords).where(
+      and(
+        eq(payrollRecords.employeeId, employeeId),
+        eq(payrollRecords.tenantId, tenantId)
+      )
+    );
+
+    if (startDate) {
+      query = query.where(gte(payrollRecords.payPeriodStart, startDate));
+    }
+
+    if (endDate) {
+      query = query.where(lte(payrollRecords.payPeriodEnd, endDate));
+    }
+
+    return query.orderBy(desc(payrollRecords.payPeriodEnd));
+  },
+
+  // ========================
+  // Stripe Payment Integration
+  // ========================
+  async updatePaymentStatus(
+    payrollRecordId: string,
+    tenantId: string,
+    data: {
+      stripePaymentId?: string;
+      paymentStatus: "pending" | "completed" | "failed";
+    }
+  ): Promise<PayrollRecord | undefined> {
+    const result = await db.update(payrollRecords).set(data).where(
+      and(
+        eq(payrollRecords.id, payrollRecordId),
+        eq(payrollRecords.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async updateGarnishmentPaymentStatus(
+    paymentId: string,
+    tenantId: string,
+    status: "pending" | "sent" | "confirmed" | "failed",
+    stripeReference?: string
+  ): Promise<GarnishmentPayment | undefined> {
+    const updateData: any = { status };
+
+    if (status === "sent") {
+      updateData.sentAt = new Date();
+    } else if (status === "confirmed") {
+      updateData.confirmedAt = new Date();
+      if (stripeReference) {
+        updateData.wireReference = stripeReference;
+      }
+    }
+
+    const result = await db.update(garnishmentPayments).set(updateData).where(
+      and(
+        eq(garnishmentPayments.id, paymentId),
+        eq(garnishmentPayments.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
 };
 
 export default storage;
