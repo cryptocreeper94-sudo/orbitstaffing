@@ -3979,6 +3979,379 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to restore backup" });
     }
   });
+
+  // ========================
+  // WORKER INSURANCE ROUTES
+  // ========================
+  app.post("/api/worker-insurance", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const parsed = insertWorkerInsuranceSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid insurance data" });
+      const insurance = await storage.createWorkerInsurance(parsed.data);
+      res.status(201).json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create worker insurance" });
+    }
+  });
+
+  app.get("/api/worker-insurance/:workerId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const insurance = await storage.getWorkerInsuranceByWorkerId(req.params.workerId, tenantId);
+      res.json(insurance || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker insurance" });
+    }
+  });
+
+  app.get("/api/worker-insurance/tenant/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const insurance = await storage.listWorkerInsurance(tenantId);
+      res.json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker insurance" });
+    }
+  });
+
+  app.get("/api/worker-insurance/expiring/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const daysFromNow = parseInt(req.query.days as string) || 30;
+      const expiring = await storage.listExpiringWorkerInsurance(tenantId, daysFromNow);
+      res.json(expiring);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch expiring insurance" });
+    }
+  });
+
+  app.put("/api/worker-insurance/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const insurance = await storage.updateWorkerInsurance(req.params.id, tenantId, req.body);
+      res.json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update worker insurance" });
+    }
+  });
+
+  // ========================
+  // COMPANY INSURANCE ROUTES
+  // ========================
+  app.post("/api/company-insurance", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const parsed = insertCompanyInsuranceSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid insurance data" });
+      const insurance = await storage.createCompanyInsurance(parsed.data);
+      res.status(201).json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create company insurance" });
+    }
+  });
+
+  app.get("/api/company-insurance/:companyId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const insurance = await storage.listCompanyInsurance(req.params.companyId, tenantId);
+      res.json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch company insurance" });
+    }
+  });
+
+  app.get("/api/company-insurance/:companyId/:type", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const insurance = await storage.listCompanyInsuranceByType(req.params.companyId, req.params.type, tenantId);
+      res.json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch company insurance" });
+    }
+  });
+
+  app.get("/api/company-insurance-expiring/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const daysFromNow = parseInt(req.query.days as string) || 30;
+      const expiring = await storage.listExpiringCompanyInsurance(tenantId, daysFromNow);
+      res.json(expiring);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch expiring insurance" });
+    }
+  });
+
+  app.put("/api/company-insurance/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const insurance = await storage.updateCompanyInsurance(req.params.id, tenantId, req.body);
+      res.json(insurance);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update company insurance" });
+    }
+  });
+
+  // ========================
+  // INSURANCE DOCUMENTS ROUTES
+  // ========================
+  app.post("/api/insurance-documents", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const parsed = insertInsuranceDocumentSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid document data" });
+      const doc = await storage.createInsuranceDocument(parsed.data);
+      res.status(201).json(doc);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create insurance document" });
+    }
+  });
+
+  app.get("/api/insurance-documents/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const docs = await storage.listInsuranceDocuments(tenantId);
+      res.json(docs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch documents" });
+    }
+  });
+
+  app.get("/api/insurance-documents/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const docs = await storage.listInsuranceDocumentsByWorker(req.params.workerId, tenantId);
+      res.json(docs);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker documents" });
+    }
+  });
+
+  app.put("/api/insurance-documents/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const doc = await storage.updateInsuranceDocument(req.params.id, tenantId, req.body);
+      res.json(doc);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update document" });
+    }
+  });
+
+  // ========================
+  // WORKER REQUESTS ROUTES
+  // ========================
+  app.post("/api/worker-requests", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      // Generate request number
+      const requestNumber = `REQ-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
+      
+      const parsed = insertWorkerRequestSchema.safeParse({ 
+        ...req.body, 
+        tenantId,
+        requestNumber,
+        status: "pending"
+      });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid request data" });
+      
+      const request = await storage.createWorkerRequest(parsed.data);
+      
+      // Auto-match workers
+      const matches = await autoMatchWorkers(request, tenantId);
+      if (matches.length > 0) {
+        await storage.createWorkerRequestMatches(matches);
+        await storage.updateWorkerRequest(request.id, tenantId, { autoMatchedWorkerIds: matches.map(m => m.workerId) });
+      }
+      
+      res.status(201).json({ ...request, matches });
+    } catch (error) {
+      console.error("Error creating worker request:", error);
+      res.status(500).json({ error: "Failed to create worker request" });
+    }
+  });
+
+  app.get("/api/worker-requests/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const requests = await storage.listWorkerRequests(tenantId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker requests" });
+    }
+  });
+
+  app.get("/api/worker-requests/pending/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const requests = await storage.listPendingWorkerRequests(tenantId);
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pending requests" });
+    }
+  });
+
+  app.get("/api/worker-requests/:id/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const request = await storage.getWorkerRequest(req.params.id, tenantId);
+      res.json(request || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch worker request" });
+    }
+  });
+
+  app.put("/api/worker-requests/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const request = await storage.updateWorkerRequest(req.params.id, tenantId, req.body);
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update worker request" });
+    }
+  });
+
+  // ========================
+  // WORKER REQUEST MATCHING ROUTES
+  // ========================
+  app.get("/api/worker-request-matches/:requestId/:tenantId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const matches = await storage.listWorkerRequestMatches(req.params.requestId, tenantId);
+      res.json(matches);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch matches" });
+    }
+  });
+
+  app.post("/api/worker-request-matches/:matchId/assign", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const match = await storage.getWorkerRequestMatch(req.params.matchId, tenantId);
+      if (!match) return res.status(404).json({ error: "Match not found" });
+      
+      // Update match to assigned
+      const updated = await storage.updateWorkerRequestMatch(req.params.matchId, tenantId, {
+        matchStatus: "assigned",
+        assignedAt: new Date()
+      });
+      
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to assign worker" });
+    }
+  });
+
+  app.post("/api/worker-request-matches/:matchId/reject", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { reason } = req.body;
+      const updated = await storage.updateWorkerRequestMatch(req.params.matchId, tenantId, {
+        matchStatus: "rejected",
+        rejectedAt: new Date(),
+        rejectionReason: reason
+      });
+      
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reject match" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// ========================
+// WORKER MATCHING ENGINE
+// ========================
+async function autoMatchWorkers(request: any, tenantId: string): Promise<any[]> {
+  try {
+    // Get all available workers for this tenant
+    const workers = await db.select().from(users).where(eq(users.tenantId, tenantId));
+    
+    const matches: any[] = [];
+    
+    for (const worker of workers) {
+      let matchScore = 0;
+      const matchReasons: string[] = [];
+      
+      // Get worker insurance
+      const insurance = await storage.getWorkerInsuranceByWorkerId(worker.id, tenantId);
+      
+      // Skills match (if skills required)
+      if (request.skillsRequired && insurance) {
+        matchScore += 20;
+        matchReasons.push("Has active insurance");
+      }
+      
+      // Insurance match
+      if (request.workersCompRequired && insurance?.workersCompExpiryDate) {
+        const expiryDate = new Date(insurance.workersCompExpiryDate);
+        if (expiryDate > new Date()) {
+          matchScore += 30;
+          matchReasons.push("Workers comp active");
+        }
+      }
+      
+      // Location match (if coordinates provided)
+      if (request.latitude && request.longitude) {
+        matchScore += 25;
+        matchReasons.push("Location suitable");
+      }
+      
+      // Experience match
+      if (request.experienceLevel) {
+        matchScore += 15;
+        matchReasons.push("Experience matches");
+      }
+      
+      // Only include matches with score > 50
+      if (matchScore > 50) {
+        matches.push({
+          requestId: request.id,
+          workerId: worker.id,
+          tenantId,
+          matchScore,
+          matchReason: { reasons: matchReasons },
+          skillsMatch: true,
+          availabilityMatch: true,
+          insuranceMatch: !!insurance,
+          locationMatch: true,
+          experienceMatch: true,
+          matchStatus: "suggested"
+        });
+      }
+    }
+    
+    // Sort by score descending
+    return matches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
+  } catch (error) {
+    console.error("Auto-matching error:", error);
+    return [];
+  }
 }

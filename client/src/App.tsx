@@ -28,6 +28,8 @@ import { DevSMSPanel } from "@/pages/DevSMSPanel";
 import SendWelcomeLetters from "@/pages/SendWelcomeLetters";
 import HallmarkRegistry from "@/pages/HallmarkRegistry";
 import HallmarkSeal from "@/pages/HallmarkSeal";
+import ClientRequestDashboard from "@/pages/ClientRequestDashboard";
+import AdminWorkerMatchingPanel from "@/pages/AdminWorkerMatchingPanel";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,8 @@ function Router() {
       <Route path="/send-welcome-letters" component={SendWelcomeLetters} />
       <Route path="/hallmark-registry" component={HallmarkRegistry} />
       <Route path="/hallmark-seal" component={HallmarkSeal} />
+      <Route path="/client/request-workers" component={ClientRequestDashboard} />
+      <Route path="/admin/worker-matching" component={AdminWorkerMatchingPanel} />
       <Route component={NotFound} />
     </Switch>
   );
