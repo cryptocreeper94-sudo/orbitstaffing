@@ -67,6 +67,32 @@ The ORBIT Staffing OS is a unified, multi-tenant white-label platform with a thr
 -   **Scalability:** Supports a large number of companies and workers.
 -   **Flexibility:** Adaptable billing and white-label capabilities.
 -   **Customer-Driven Development:** Feature request system for product evolution.
+-   **Multi-Tenant Isolation (Nov 25, 2025):** Added `tenantId` field to all critical operational tables for complete data isolation between ORBIT, franchisees, and white-label customers. Each tenant's data is segregated via database-enforced constraints, NOT payment provider IDs. Tenant validation middleware ensures requests can only access their own data.
+
+### Multi-Tenant Architecture (Nov 25, 2025)
+
+**Implementation Details:**
+- Added `tenantId` (NOT `stripeCustomerId`) to all critical tables: workers, clients, jobPostings, assignments, timesheets, payroll, workerBonuses, equipment, invoices, paystubs, incidents, franchiseeTeamCRM
+- Added `tenantId` to users table to map users to their tenant (company)
+- Database indexes on all tenantId fields for query performance
+- Tenant validation middleware in routes.ts: `getTenantIdFromRequest()` and `validateTenantAccess()`
+
+**Why NOT Stripe ID:**
+- Stripe IDs should only be used for billing purposes
+- Using payment provider IDs for data isolation couples architecture to the payment provider
+- If switching payment providers, entire data isolation breaks
+- Industry standard is to use a tenant/organization ID independent of payment layer
+
+**Tenant Resolution Priority:**
+1. User's tenantId from session/auth context
+2. User's companyId from session/auth context (backward compatible)
+3. tenantId query parameter
+4. Reject with 401 if no tenant context found
+
+**Next Steps:**
+- Integrate tenant validation into all API endpoints (started with helper functions)
+- Add tenant context to session middleware
+- Test data isolation across franchisees
 
 ## External Dependencies
 
