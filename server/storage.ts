@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte, lte, inArray } from "drizzle-orm";
 import {
   users,
   companies,
@@ -10,6 +10,11 @@ import {
   hallmarks,
   bugReports,
   developerMessages,
+  workerInsurance,
+  companyInsurance,
+  insuranceDocuments,
+  workerRequests,
+  workerRequestMatches,
   type User,
   type InsertUser,
   type Company,
@@ -28,6 +33,16 @@ import {
   type InsertBugReport,
   type DeveloperMessage,
   type InsertDeveloperMessage,
+  type WorkerInsurance,
+  type InsertWorkerInsurance,
+  type CompanyInsurance,
+  type InsertCompanyInsurance,
+  type InsuranceDocument,
+  type InsertInsuranceDocument,
+  type WorkerRequest,
+  type InsertWorkerRequest,
+  type WorkerRequestMatch,
+  type InsertWorkerRequestMatch,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -268,6 +283,239 @@ export const storage: IStorage = {
   async getInstantPayRequest(id: string): Promise<any> { return { id }; },
   async updateInstantPayRequestStatus(id: string, status: string): Promise<any> { return { id, status }; },
   async getInstantPayRequestsByWorker(workerId: string): Promise<any[]> { return []; },
+
+  // ========================
+  // Worker Insurance
+  // ========================
+  async createWorkerInsurance(data: InsertWorkerInsurance): Promise<WorkerInsurance> {
+    const result = await db.insert(workerInsurance).values(data).returning();
+    return result[0];
+  },
+
+  async getWorkerInsurance(id: string): Promise<WorkerInsurance | undefined> {
+    const result = await db.select().from(workerInsurance).where(eq(workerInsurance.id, id));
+    return result[0];
+  },
+
+  async getWorkerInsuranceByWorkerId(workerId: string): Promise<WorkerInsurance | undefined> {
+    const result = await db.select().from(workerInsurance).where(eq(workerInsurance.workerId, workerId));
+    return result[0];
+  },
+
+  async listWorkerInsurance(tenantId: string): Promise<WorkerInsurance[]> {
+    return await db.select().from(workerInsurance).where(eq(workerInsurance.tenantId, tenantId));
+  },
+
+  async listExpiringWorkerInsurance(tenantId: string, daysFromNow: number): Promise<WorkerInsurance[]> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + daysFromNow);
+    return await db.select().from(workerInsurance).where(
+      and(
+        eq(workerInsurance.tenantId, tenantId),
+        lte(workerInsurance.workersCompExpiryDate, futureDate.toISOString().split('T')[0])
+      )
+    );
+  },
+
+  async updateWorkerInsurance(id: string, data: Partial<InsertWorkerInsurance>): Promise<WorkerInsurance | undefined> {
+    const result = await db.update(workerInsurance).set(data).where(eq(workerInsurance.id, id)).returning();
+    return result[0];
+  },
+
+  async deleteWorkerInsurance(id: string): Promise<void> {
+    await db.delete(workerInsurance).where(eq(workerInsurance.id, id));
+  },
+
+  // ========================
+  // Company Insurance
+  // ========================
+  async createCompanyInsurance(data: InsertCompanyInsurance): Promise<CompanyInsurance> {
+    const result = await db.insert(companyInsurance).values(data).returning();
+    return result[0];
+  },
+
+  async getCompanyInsurance(id: string): Promise<CompanyInsurance | undefined> {
+    const result = await db.select().from(companyInsurance).where(eq(companyInsurance.id, id));
+    return result[0];
+  },
+
+  async listCompanyInsurance(companyId: string): Promise<CompanyInsurance[]> {
+    return await db.select().from(companyInsurance).where(eq(companyInsurance.companyId, companyId)).orderBy(desc(companyInsurance.createdAt));
+  },
+
+  async listCompanyInsuranceByType(companyId: string, insuranceType: string): Promise<CompanyInsurance[]> {
+    return await db.select().from(companyInsurance).where(
+      and(
+        eq(companyInsurance.companyId, companyId),
+        eq(companyInsurance.insuranceType, insuranceType)
+      )
+    );
+  },
+
+  async listExpiringCompanyInsurance(tenantId: string, daysFromNow: number): Promise<CompanyInsurance[]> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + daysFromNow);
+    return await db.select().from(companyInsurance).where(
+      and(
+        eq(companyInsurance.tenantId, tenantId),
+        lte(companyInsurance.expiryDate, futureDate.toISOString().split('T')[0])
+      )
+    );
+  },
+
+  async updateCompanyInsurance(id: string, data: Partial<InsertCompanyInsurance>): Promise<CompanyInsurance | undefined> {
+    const result = await db.update(companyInsurance).set(data).where(eq(companyInsurance.id, id)).returning();
+    return result[0];
+  },
+
+  async deleteCompanyInsurance(id: string): Promise<void> {
+    await db.delete(companyInsurance).where(eq(companyInsurance.id, id));
+  },
+
+  // ========================
+  // Insurance Documents
+  // ========================
+  async createInsuranceDocument(data: InsertInsuranceDocument): Promise<InsuranceDocument> {
+    const result = await db.insert(insuranceDocuments).values(data).returning();
+    return result[0];
+  },
+
+  async getInsuranceDocument(id: string): Promise<InsuranceDocument | undefined> {
+    const result = await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.id, id));
+    return result[0];
+  },
+
+  async listInsuranceDocuments(tenantId: string): Promise<InsuranceDocument[]> {
+    return await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.tenantId, tenantId)).orderBy(desc(insuranceDocuments.createdAt));
+  },
+
+  async listInsuranceDocumentsByWorker(workerId: string): Promise<InsuranceDocument[]> {
+    return await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.workerId, workerId)).orderBy(desc(insuranceDocuments.createdAt));
+  },
+
+  async listInsuranceDocumentsByCompany(companyId: string): Promise<InsuranceDocument[]> {
+    return await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.companyId, companyId)).orderBy(desc(insuranceDocuments.createdAt));
+  },
+
+  async listInsuranceDocumentsByType(tenantId: string, documentType: string): Promise<InsuranceDocument[]> {
+    return await db.select().from(insuranceDocuments).where(
+      and(
+        eq(insuranceDocuments.tenantId, tenantId),
+        eq(insuranceDocuments.documentType, documentType)
+      )
+    );
+  },
+
+  async getInsuranceDocumentByHallmark(hallmarkId: string): Promise<InsuranceDocument | undefined> {
+    const result = await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.hallmarkId, hallmarkId));
+    return result[0];
+  },
+
+  async updateInsuranceDocument(id: string, data: Partial<InsertInsuranceDocument>): Promise<InsuranceDocument | undefined> {
+    const result = await db.update(insuranceDocuments).set(data).where(eq(insuranceDocuments.id, id)).returning();
+    return result[0];
+  },
+
+  async deleteInsuranceDocument(id: string): Promise<void> {
+    await db.delete(insuranceDocuments).where(eq(insuranceDocuments.id, id));
+  },
+
+  // ========================
+  // Worker Requests
+  // ========================
+  async createWorkerRequest(data: InsertWorkerRequest): Promise<WorkerRequest> {
+    const result = await db.insert(workerRequests).values(data).returning();
+    return result[0];
+  },
+
+  async getWorkerRequest(id: string): Promise<WorkerRequest | undefined> {
+    const result = await db.select().from(workerRequests).where(eq(workerRequests.id, id));
+    return result[0];
+  },
+
+  async getWorkerRequestByNumber(requestNumber: string): Promise<WorkerRequest | undefined> {
+    const result = await db.select().from(workerRequests).where(eq(workerRequests.requestNumber, requestNumber));
+    return result[0];
+  },
+
+  async listWorkerRequests(tenantId: string): Promise<WorkerRequest[]> {
+    return await db.select().from(workerRequests).where(eq(workerRequests.tenantId, tenantId)).orderBy(desc(workerRequests.createdAt));
+  },
+
+  async listWorkerRequestsByClient(clientId: string): Promise<WorkerRequest[]> {
+    return await db.select().from(workerRequests).where(eq(workerRequests.clientId, clientId)).orderBy(desc(workerRequests.createdAt));
+  },
+
+  async listWorkerRequestsByStatus(tenantId: string, status: string): Promise<WorkerRequest[]> {
+    return await db.select().from(workerRequests).where(
+      and(
+        eq(workerRequests.tenantId, tenantId),
+        eq(workerRequests.status, status)
+      )
+    ).orderBy(desc(workerRequests.priority), desc(workerRequests.createdAt));
+  },
+
+  async listPendingWorkerRequests(tenantId: string): Promise<WorkerRequest[]> {
+    return await db.select().from(workerRequests).where(
+      and(
+        eq(workerRequests.tenantId, tenantId),
+        eq(workerRequests.status, 'pending')
+      )
+    ).orderBy(desc(workerRequests.urgent), desc(workerRequests.priority), desc(workerRequests.createdAt));
+  },
+
+  async updateWorkerRequest(id: string, data: Partial<InsertWorkerRequest>): Promise<WorkerRequest | undefined> {
+    const result = await db.update(workerRequests).set(data).where(eq(workerRequests.id, id)).returning();
+    return result[0];
+  },
+
+  async deleteWorkerRequest(id: string): Promise<void> {
+    await db.delete(workerRequests).where(eq(workerRequests.id, id));
+  },
+
+  // ========================
+  // Worker Request Matches
+  // ========================
+  async createWorkerRequestMatch(data: InsertWorkerRequestMatch): Promise<WorkerRequestMatch> {
+    const result = await db.insert(workerRequestMatches).values(data).returning();
+    return result[0];
+  },
+
+  async createWorkerRequestMatches(matches: InsertWorkerRequestMatch[]): Promise<WorkerRequestMatch[]> {
+    const result = await db.insert(workerRequestMatches).values(matches).returning();
+    return result;
+  },
+
+  async getWorkerRequestMatch(id: string): Promise<WorkerRequestMatch | undefined> {
+    const result = await db.select().from(workerRequestMatches).where(eq(workerRequestMatches.id, id));
+    return result[0];
+  },
+
+  async listWorkerRequestMatches(requestId: string): Promise<WorkerRequestMatch[]> {
+    return await db.select().from(workerRequestMatches).where(eq(workerRequestMatches.requestId, requestId)).orderBy(desc(workerRequestMatches.matchScore));
+  },
+
+  async listWorkerRequestMatchesByStatus(requestId: string, matchStatus: string): Promise<WorkerRequestMatch[]> {
+    return await db.select().from(workerRequestMatches).where(
+      and(
+        eq(workerRequestMatches.requestId, requestId),
+        eq(workerRequestMatches.matchStatus, matchStatus)
+      )
+    ).orderBy(desc(workerRequestMatches.matchScore));
+  },
+
+  async updateWorkerRequestMatch(id: string, data: Partial<InsertWorkerRequestMatch>): Promise<WorkerRequestMatch | undefined> {
+    const result = await db.update(workerRequestMatches).set(data).where(eq(workerRequestMatches.id, id)).returning();
+    return result[0];
+  },
+
+  async deleteWorkerRequestMatch(id: string): Promise<void> {
+    await db.delete(workerRequestMatches).where(eq(workerRequestMatches.id, id));
+  },
+
+  async deleteWorkerRequestMatches(requestId: string): Promise<void> {
+    await db.delete(workerRequestMatches).where(eq(workerRequestMatches.requestId, requestId));
+  },
 };
 
 export default storage;
