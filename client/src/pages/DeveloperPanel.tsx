@@ -12,6 +12,7 @@ import { DigitalEmployeeCard } from '@/components/DigitalEmployeeCard';
 import PersonalCardGenerator from '@/components/PersonalCardGenerator';
 import EnhancedAdminMessaging from '@/components/EnhancedAdminMessaging';
 import WeatherNewsWidget from '@/components/WeatherNewsWidget';
+import { BugReportWidget } from '@/components/BugReportWidget';
 import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
@@ -53,6 +54,7 @@ export default function DeveloperPanel() {
   const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [showBugReport, setShowBugReport] = useState(false);
   const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'ai', text: string}>>([
     { role: 'ai', text: 'Hey! I\'m your AI assistant. What can I help you with?' }
   ]);
@@ -405,6 +407,16 @@ export default function DeveloperPanel() {
             >
               <BarChart3 className="w-6 h-6 md:w-7 md:h-7 text-green-400 group-hover:text-green-300 transition-colors" />
               <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">App</span>
+            </button>
+
+            {/* Bug Report Button */}
+            <button
+              onClick={() => setShowBugReport(true)}
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-amber-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-report-bug"
+            >
+              <AlertCircle className="w-6 h-6 md:w-7 md:h-7 text-amber-400 group-hover:text-amber-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Report Bug</span>
             </button>
 
             {/* Device Settings Button */}
@@ -963,6 +975,14 @@ export default function DeveloperPanel() {
           </div>
         )}
       </div>
+
+      {/* Bug Report Widget */}
+      <BugReportWidget 
+        isOpen={showBugReport}
+        onClose={() => setShowBugReport(false)}
+        userEmail="developer@orbitstaffing.net"
+        userName="Developer"
+      />
     </div>
   );
 }

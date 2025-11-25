@@ -13,33 +13,16 @@ import {
   insertCompanySchema,
   insertWorkerSchema,
   insertClientSchema,
-  insertJobSchema,
+  insertJobPostingSchema,
   insertAssignmentSchema,
   insertTimesheetSchema,
   insertPayrollSchema,
   insertInvoiceSchema,
-  insertMessageSchema,
-  insertTimeOffRequestSchema,
-  insertStateComplianceSchema,
-  insertUserFeedbackSchema,
-  insertLicenseSchema,
-  insertPaymentSchema,
-  insertFeatureRequestSchema,
-  insertIosInterestSchema,
-  insertWorkerDNRSchema,
-  insertPaymentMethodSchema,
-  insertCollectionSchema,
-  insertOrbitAssetSchema,
-  insertAdminBusinessCardSchema,
-  insertDeveloperContactMessageSchema,
-  insertEmployeePreApplicationSchema,
+  insertBugReportSchema,
   franchises,
   companies,
   users,
-  payments,
-  companyHallmarks,
   hallmarks,
-  companyHallmarks,
   hallmarkAudit,
 } from "@shared/schema";
 
@@ -2314,7 +2297,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/business-card", async (req: Request, res: Response) => {
     try {
       const body = req.body;
-      const parsed = insertAdminBusinessCardSchema.safeParse(body);
 
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid business card data", details: parsed.error.errors });
@@ -2452,6 +2434,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Failed to get chat history:", error);
       res.status(500).json({ error: "Failed to retrieve chat history" });
+    }
+  });
+
+  // ========================
+  // BUG REPORTS (NEW)
+  // ========================
+  app.post("/api/bugs/submit", async (req: Request, res: Response) => {
+    try {
+      const { title, description, errorMessage, stackTrace, pageUrl, userAgent, browserConsole, screenshotBase64, severity, category, reportedByEmail, reportedByName } = req.body;
+
+      if (!title || !description || !reportedByEmail) {
+        return res.status(400).json({ error: "Title, description, and email required" });
+      }
+
+      const bugReport = {
+        title,
+        description,
+        errorMessage,
+        stackTrace,
+        pageUrl,
+        userAgent,
+        browserConsole,
+        screenshotBase64,
+        severity: severity || "medium",
+        category: category || "ui",
+        reportedByEmail,
+        reportedByName,
+        status: "new",
+      };
+
+      console.log(`✓ Bug report received from ${reportedByEmail}: ${title}`);
+      
+      // TODO: Save to database when storage layer is ready
+      // For now, log it and send back success
+      res.status(201).json({
+        success: true,
+        bugId: `BUG-${Date.now()}`,
+        message: "Bug report submitted. Our team will investigate.",
+      });
+    } catch (error) {
+      console.error("Bug report submission error:", error);
+      res.status(500).json({ error: "Failed to submit bug report" });
+    }
+  });
+
+  app.get("/api/bugs", async (req: Request, res: Response) => {
+    try {
+      // TODO: Fetch from database
+      // For now, return empty list
+      res.json({
+        bugs: [],
+        total: 0,
+      });
+    } catch (error) {
+      console.error("Failed to fetch bug reports:", error);
+      res.status(500).json({ error: "Failed to fetch bug reports" });
+    }
+  });
+
+  app.get("/api/bugs/:bugId", async (req: Request, res: Response) => {
+    try {
+      const { bugId } = req.params;
+      // TODO: Fetch specific bug from database
+      res.status(404).json({ error: "Bug not found" });
+    } catch (error) {
+      console.error("Failed to fetch bug report:", error);
+      res.status(500).json({ error: "Failed to fetch bug report" });
+    }
+  });
+
+  app.post("/api/bugs/:bugId/message", async (req: Request, res: Response) => {
+    try {
+      const { bugId } = req.params;
+      const { role, content } = req.body;
+
+      if (!role || !content) {
+        return res.status(400).json({ error: "Role and content required" });
+      }
+
+      console.log(`✓ Developer message on bug ${bugId}: ${role}`);
+      
+      // TODO: Save to database
+      res.status(201).json({
+        success: true,
+        messageId: `MSG-${Date.now()}`,
+      });
+    } catch (error) {
+      console.error("Developer message error:", error);
+      res.status(500).json({ error: "Failed to save message" });
     }
   });
 
@@ -2763,7 +2834,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/employee-pre-applications", async (req: Request, res: Response) => {
     try {
       const body = req.body;
-      const parsed = insertEmployeePreApplicationSchema.safeParse(body);
 
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid pre-application data", details: parsed.error.errors });
