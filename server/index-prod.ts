@@ -25,7 +25,8 @@ export async function serveStatic(app: Express, server: Server) {
   // fall through to index.html if the file doesn't exist
   app.use("*", (req, res) => {
     // Check if request is for darkwavestudios.io domain
-    const host = req.headers.host || req.headers['x-forwarded-host'] || req.hostname || '';
+    const hostHeader = req.headers.host || req.headers['x-forwarded-host'] || req.hostname || '';
+    const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
     const isStudioDomain = host.toLowerCase().includes('darkwavestudios.io');
     
     // Serve Dark Wave Studios landing page for darkwavestudios.io
