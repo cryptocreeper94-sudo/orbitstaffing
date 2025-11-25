@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Wave Studios - Innovation in Motion</title>
+    <meta name="description" content="Dark Wave Studios - Building the future of workforce technology. Creators of ORBIT Staffing OS, Orbit Ops Pro, and Dark Wave Pulse.">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Dark Wave Studios - Innovation in Motion">
+    <meta property="og:description" content="Building the future of workforce technology. Creators of ORBIT Staffing OS, Orbit Ops Pro, and Dark Wave Pulse.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1419 100%);
+            color: #e0e6ed;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 60px 0 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .saturn-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .saturn-ring {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            border: 3px solid rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: rotate-ring 8s linear infinite;
+        }
+
+        @keyframes rotate-ring {
+            0% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(75deg) rotateZ(360deg); }
+        }
+
+        .saturn-planet {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #00ffff, #0088aa, #004455);
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), inset -20px -20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ffff 0%, #0088ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: #8b95a5;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #00ffff;
+            font-weight: 500;
+            margin-bottom: 40px;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 60px;
+        }
+
+        .cta-text {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .cta-subtext {
+            font-size: 1.2rem;
+            color: #8b95a5;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .product-card {
+            background: rgba(20, 25, 45, 0.8);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ffff, #0088ff);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(0, 255, 255, 0.6);
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.2);
+        }
+
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .product-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .product-title {
+            font-size: 1.8rem;
+            color: #00ffff;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .product-description {
+            color: #c0c8d0;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .product-status {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 20px;
+            color: #00ff88;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .product-status.coming-soon {
+            background: rgba(255, 200, 0, 0.1);
+            border-color: rgba(255, 200, 0, 0.3);
+            color: #ffcc00;
+        }
+
+        .product-link {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #00ffff, #0088ff);
+            color: #0a0e27;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .product-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .product-link.disabled {
+            background: rgba(100, 100, 100, 0.3);
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .product-link.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .services-section {
+            background: rgba(20, 25, 45, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 80px 0;
+            text-align: center;
+        }
+
+        .services-title {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .services-description {
+            font-size: 1.3rem;
+            color: #8b95a5;
+            margin-bottom: 40px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .service-item {
+            padding: 30px;
+            background: rgba(10, 15, 30, 0.6);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            border-color: rgba(0, 255, 255, 0.4);
+            transform: translateY(-5px);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .service-name {
+            font-size: 1.3rem;
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .service-detail {
+            color: #a0a8b0;
+            font-size: 0.95rem;
+        }
+
+        .contact-section {
+            text-align: center;
+            padding: 60px 0;
+            margin: 40px 0;
+        }
+
+        .contact-title {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .contact-info {
+            font-size: 1.2rem;
+            margin: 15px 0;
+        }
+
+        .contact-info a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #00ccff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: rgba(20, 25, 45, 0.8);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            border-color: rgba(0, 255, 255, 0.6);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .powered-by {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #00ffff;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            .cta-text {
+                font-size: 1.5rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .services-title, .contact-title {
+                font-size: 2rem;
+            }
+
+            .saturn-logo {
+                width: 80px;
+                height: 80px;
+            }
+
+            .saturn-ring {
+                width: 120px;
+                height: 120px;
+            }
+
+            .saturn-planet {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="saturn-logo">
+                    <div class="saturn-ring"></div>
+                    <div class="saturn-planet"></div>
+                </div>
+            </div>
+            <h1>Dark Wave Studios</h1>
+            <p class="tagline">Innovation in Motion</p>
+            <p class="subtitle">Building the Future of Workforce Technology</p>
+        </header>
+
+        <section class="cta-section">
+            <h2 class="cta-text">Have a Vision? We'll Make It Reality.</h2>
+            <p class="cta-subtext">
+                From concept to deployment, we build production-ready platforms that scale. 
+                Tell us what you need, and we'll engineer the solution.
+            </p>
+        </section>
+
+        <section>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-icon">🚀</div>
+                    <h3 class="product-title">ORBIT Staffing OS</h3>
+                    <span class="product-status">LIVE NOW</span>
+                    <p class="product-description">
+                        Complete staffing automation platform with GPS-verified check-ins, multi-state payroll compliance, 
+                        real-time scheduling, worker management, and blockchain-secured hallmarks. Built for agencies 
+                        managing flexible labor across skilled trades, hospitality, and general workforce.
+                    </p>
+                    <a href="https://orbitstaffing.net" class="product-link" target="_blank">Launch ORBIT →</a>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">⚙️</div>
+                    <h3 class="product-title">Orbit Ops Pro</h3>
+                    <span class="product-status coming-soon">COMING SOON</span>
+                    <p class="product-description">
+                        Advanced operations management suite for enterprise-scale workforce coordination. 
+                        Real-time analytics, predictive scheduling, equipment tracking, and automated compliance 
+                        reporting for multi-location operations.
+                    </p>
+                    <span class="product-link disabled">In Development</span>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">🎵</div>
+                    <h3 class="product-title">Dark Wave Pulse</h3>
+                    <span class="product-status">LIVE NOW</span>
+                    <p class="product-description">
+                        Experience the dark electronic soundscape. Immersive audio-visual journey through 
+                        industrial beats and synthetic waves. A creative exploration of sound and technology.
+                    </p>
+                    <a href="https://darkwavepulse.com" class="product-link" target="_blank">Enter the Pulse →</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="services-section">
+            <h2 class="services-title">Custom Development Services</h2>
+            <p class="services-description">
+                We specialize in building production-ready platforms from the ground up. Whether you need a complete 
+                business automation system, mobile applications, or custom integrations—we deliver solutions that scale.
+            </p>
+            
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-icon">💼</div>
+                    <h4 class="service-name">Full-Stack Development</h4>
+                    <p class="service-detail">React, Node.js, PostgreSQL, Express - complete web applications</p>
+                </div>
+
+                <div class="service-item">
+                    <div class="service-icon">📱</div>
+                    <h4 class="service-name">Mobile Apps</h4>
+                    <p class="service-detail">React Native + Expo for iOS and Android</p>
+                </div>
+
+                <div class="service-item">
+                    <div class="service-icon">🔐</div>
+                    <h4 class="service-name">Security & Compliance</h4>
+                    <p class="service-detail">Encryption, authentication, audit trails, multi-state compliance</p>
+                </div>
+
+                <div class="service-item">
+                    <div class="service-icon">🌐</div>
+                    <h4 class="service-name">API Integrations</h4>
+                    <p class="service-detail">Stripe, Twilio, payment gateways, third-party services</p>
+                </div>
+
+                <div class="service-item">
+                    <div class="service-icon">📊</div>
+                    <h4 class="service-name">Real-Time Systems</h4>
+                    <p class="service-detail">WebSocket, live dashboards, instant notifications</p>
+                </div>
+
+                <div class="service-item">
+                    <div class="service-icon">⚡</div>
+                    <h4 class="service-name">Rapid Prototyping</h4>
+                    <p class="service-detail">MVP to production in weeks, not months</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <h2 class="contact-title">Let's Build Something Amazing</h2>
+            <div class="contact-info">
+                <p>📧 Email: <a href="mailto:jason@darkwavestudios.net">jason@darkwavestudios.net</a></p>
+                <p>🌐 Ready to discuss your project?</p>
+            </div>
+
+            <div class="social-links">
+                <a href="#" class="social-link">
+                    <span>📘</span>
+                    <span>Facebook</span>
+                </a>
+                <a href="#" class="social-link">
+                    <span>🐦</span>
+                    <span>Twitter/X</span>
+                </a>
+                <a href="#" class="social-link">
+                    <span>💼</span>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="https://github.com/darkwavestudios" class="social-link" target="_blank">
+                    <span>💻</span>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 Dark Wave Studios, LLC. All rights reserved.</p>
+            <p class="powered-by">Innovation Powered by Dark Wave Technology</p>
+        </footer>
+    </div>
+
+    <script>
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 100;
+
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        createStars();
+    </script>
+</body>
+</html>
