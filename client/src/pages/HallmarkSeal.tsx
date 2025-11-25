@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Copy, CheckCircle2, Download } from 'lucide-react';
 import { Link } from 'wouter';
 import { HallmarkBadge } from '@/components/HallmarkBadge';
-import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
+import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 
 export default function HallmarkSeal() {
   const [copied, setCopied] = useState(false);

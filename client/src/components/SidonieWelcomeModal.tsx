@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Lock, Zap, BarChart3, Users, Shield, Sparkles, ArrowRight } from "lucide-react";
-import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
+import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 
 interface SidonieWelcomeModalProps {
   isOpen: boolean;
