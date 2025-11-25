@@ -42,9 +42,10 @@ We use collected information to:
 
 ### 4.2 Access Controls
 - Role-based access control (Master Admin, Franchise Admin, Customer Admin)
-- Multi-tenant isolation (data segregation between franchises/customers)
+- **Enterprise-grade multi-tenant isolation (Nov 25, 2025)** - Database-enforced tenantId fields on all critical tables with API-level validation layer ensures zero cross-tenant data leakage between franchises/customers
 - PIN-based admin authentication
 - Audit logs for all data access
+- Complete data separation for white-label deployments
 
 ### 4.3 Breach Notification
 If a security breach occurs, we will notify affected users within 30 days as required by law.

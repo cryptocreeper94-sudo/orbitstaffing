@@ -12,6 +12,7 @@
 - ✅ Drug testing integration
 - ✅ GPS verification
 - ✅ Privacy/legal compliance
+- ✅ **Multi-tenant isolation architecture (Nov 25, 2025)** - Complete data separation between ORBIT, franchisees, and white-label customers with database-enforced constraints and API-level validation
 
 **Target Launch:** December 2025
 
@@ -319,8 +320,9 @@
 1. **GPS Verification** - Only us + enterprise (ADP)
 2. **Multi-Provider Drug Testing** - Best rates + flexibility
 3. **Compliance-First Architecture** - Built-in, not bolt-on
-4. **Franchise Model** - Scalable white-label
+4. **Franchise Model** - Scalable white-label with bulletproof multi-tenant isolation
 5. **Blockchain Credentials** - Future-proof worker verification
+6. **Enterprise-Grade Data Isolation (Nov 25, 2025)** - Database-enforced tenantId fields + API validation ensure zero cross-tenant data leakage; independent of payment provider
 
 ---
 

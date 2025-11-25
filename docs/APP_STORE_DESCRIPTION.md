@@ -111,10 +111,11 @@ Automate your staffing operations. Save 50+ hours per month. Scale your agency w
 **Data Security:**
 - AES-256 encryption for sensitive data
 - Role-based access control
-- Multi-tenant isolation
+- **Enterprise-grade multi-tenant isolation (Nov 25, 2025)** - Database-enforced separation between all tenants with API validation layer
 - Daily backups
 - HIPAA-compliant health data handling
 - SOC 2 Type II ready
+- Complete data separation for white-label deployments
 
 **Perfect For:**
 - Staffing agencies (any size)
@@ -129,8 +130,9 @@ Automate your staffing operations. Save 50+ hours per month. Scale your agency w
 - Compliance baked-in (not a bolt-on)
 - GPS verification (proven accuracy)
 - Multiple drug test providers (best rates)
-- Franchise-ready (white-label capable)
+- Franchise-ready (white-label capable with bulletproof data isolation)
 - Zero lock-in (export data anytime)
+- Enterprise-grade security with isolated multi-tenant architecture
 
 **Contact & Support:**
 - Email: support@orbitstaffing.net
