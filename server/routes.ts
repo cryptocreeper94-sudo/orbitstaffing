@@ -360,8 +360,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      // Verify password hash using bcrypt
-      const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+      
+      // Guard against missing or null passwords
+      if (!user.passwordHash) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      // Migration strategy: Check if password is already hashed
+      // Bcrypt hashes start with "$2a$" or "$2b$"
+      const isHashed = user.passwordHash.startsWith("$2a$") || user.passwordHash.startsWith("$2b$");
+      
+      let passwordMatch = false;
+      if (isHashed) {
+        // Verify hashed password using bcrypt
+        passwordMatch = await bcrypt.compare(password, user.passwordHash);
+      } else {
+        // Legacy plaintext password - direct comparison
+        passwordMatch = password === user.passwordHash;
+        
+        // If plaintext password matches, migrate to hashed password
+        if (passwordMatch) {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          await storage.updateUser(user.id, {
+            passwordHash: hashedPassword,
+          });
+        }
+      }
+      
       if (!passwordMatch) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
