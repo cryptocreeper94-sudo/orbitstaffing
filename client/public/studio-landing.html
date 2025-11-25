@@ -168,6 +168,9 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
         }
 
         .product-card::before {
@@ -208,6 +211,7 @@
             color: #c0c8d0;
             margin-bottom: 20px;
             line-height: 1.8;
+            flex-grow: 1;
         }
 
         .product-status {
@@ -229,15 +233,18 @@
         }
 
         .product-link {
-            display: inline-block;
-            padding: 12px 30px;
+            display: block;
+            width: 100%;
+            padding: 14px 30px;
             background: linear-gradient(135deg, #00ffff, #0088ff);
             color: #0a0e27;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            text-align: center;
+            margin-top: auto;
         }
 
         .product-link:hover {
