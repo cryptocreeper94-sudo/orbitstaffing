@@ -827,7 +827,7 @@ export const insertHallmarkAuditSchema = createInsertSchema(hallmarkAudit).omit(
   createdAt: true,
 });
 
-export type InsertHallmarkAudit = z.infer<typeof hallmarkAuditSchema>;
+export type InsertHallmarkAudit = z.infer<typeof insertHallmarkAuditSchema>;
 export type HallmarkAudit = typeof hallmarkAudit.$inferSelect;
 
 // ========================
@@ -1240,9 +1240,9 @@ export const scannedContactsAudit = pgTable(
     createdAt: timestamp("created_at").default(sql`NOW()`),
   },
   (table) => ({
-    contactIdx: index("idx_audit_contact").on(table.scannedContactId),
-    customerIdx: index("idx_audit_customer").on(table.monthlyCustomerId),
-    actionIdx: index("idx_audit_action").on(table.action),
+    contactIdx: index("idx_scanned_audit_contact").on(table.scannedContactId),
+    customerIdx: index("idx_scanned_audit_customer").on(table.monthlyCustomerId),
+    actionIdx: index("idx_scanned_audit_action").on(table.action),
   })
 );
 

@@ -11,6 +11,7 @@ import { getUncachableStripeClient } from "./stripeClient";
 import { getCoinbaseClient } from "./coinbaseService";
 import {
   insertCompanySchema,
+  insertUserSchema,
   insertWorkerSchema,
   insertClientSchema,
   insertJobPostingSchema,
@@ -89,7 +90,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       res.status(201).json(user);
     } catch (error) {
-      res.status(500).json({ error: "Registration failed" });
+      console.error("Registration error:", error);
+      res.status(500).json({ 
+        error: "Registration failed",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
   // Demo Registration (Lead Capture)
