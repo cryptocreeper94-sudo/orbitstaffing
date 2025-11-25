@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 import {
   Zap,
   CheckCircle,
@@ -118,9 +119,9 @@ export function ValuePropositionModal() {
             <DialogHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <img 
-                  src="/orbit-logo.png" 
-                  alt="ORBIT Logo" 
-                  className="h-12 w-12"
+                  src={saturnLogo} 
+                  alt="ORBIT Saturn" 
+                  className="h-16 w-16 drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]"
                 />
               </div>
               <DialogTitle className="text-3xl font-heading mb-2">
