@@ -4927,6 +4927,310 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to list compliance checks" });
     }
   });
+
+  // ==================== LOT OPS PRO: VEHICLES ====================
+  app.post("/api/vehicles/create", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const parsed = insertVehicleSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid vehicle data" });
+      }
+
+      const vehicle = await storage.createVehicle(parsed.data);
+      res.status(201).json(vehicle);
+    } catch (error) {
+      console.error("Vehicle creation error:", error);
+      res.status(500).json({ error: "Failed to create vehicle" });
+    }
+  });
+
+  app.get("/api/vehicles/:vehicleId", async (req, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const vehicle = await storage.getVehicle(vehicleId);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+      res.json(vehicle);
+    } catch (error) {
+      console.error("Get vehicle error:", error);
+      res.status(500).json({ error: "Failed to get vehicle" });
+    }
+  });
+
+  app.get("/api/vehicles/tenant/:tenantId", async (req, res) => {
+    try {
+      const { tenantId } = req.params;
+      const vehicles = await storage.listVehiclesByTenant(tenantId);
+      res.json({ vehicles });
+    } catch (error) {
+      console.error("List vehicles error:", error);
+      res.status(500).json({ error: "Failed to list vehicles" });
+    }
+  });
+
+  app.put("/api/vehicles/:vehicleId/status", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { vehicleId } = req.params;
+      const { status } = req.body;
+
+      if (!status) {
+        return res.status(400).json({ error: "Status required" });
+      }
+
+      const vehicle = await storage.updateVehicleStatus(vehicleId, tenantId, status);
+      if (!vehicle) {
+        return res.status(404).json({ error: "Vehicle not found" });
+      }
+
+      res.json(vehicle);
+    } catch (error) {
+      console.error("Update vehicle status error:", error);
+      res.status(500).json({ error: "Failed to update vehicle status" });
+    }
+  });
+
+  // ==================== LOT OPS PRO: VEHICLE ASSIGNMENTS ====================
+  app.post("/api/vehicles/assign-roles", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const parsed = insertVehicleAssignmentSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid assignment data" });
+      }
+
+      const assignment = await storage.createVehicleAssignment(parsed.data);
+      res.status(201).json(assignment);
+    } catch (error) {
+      console.error("Assignment creation error:", error);
+      res.status(500).json({ error: "Failed to create assignment" });
+    }
+  });
+
+  app.get("/api/vehicles/assignments", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const assignments = await storage.listVehicleAssignments(tenantId);
+      res.json({ assignments });
+    } catch (error) {
+      console.error("List assignments error:", error);
+      res.status(500).json({ error: "Failed to list assignments" });
+    }
+  });
+
+  app.put("/api/vehicles/assignments/:id", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { id } = req.params;
+      const assignment = await storage.updateVehicleAssignment(id, tenantId, req.body);
+
+      if (!assignment) {
+        return res.status(404).json({ error: "Assignment not found" });
+      }
+
+      res.json(assignment);
+    } catch (error) {
+      console.error("Update assignment error:", error);
+      res.status(500).json({ error: "Failed to update assignment" });
+    }
+  });
+
+  // ==================== LOT OPS PRO: WORK ORDERS ====================
+  app.post("/api/work-orders/create", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const parsed = insertWorkOrderSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid work order data" });
+      }
+
+      const workOrder = await storage.createWorkOrder(parsed.data);
+      res.status(201).json(workOrder);
+    } catch (error) {
+      console.error("Work order creation error:", error);
+      res.status(500).json({ error: "Failed to create work order" });
+    }
+  });
+
+  app.get("/api/work-orders/mine", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      const userId = (req as any).user?.id;
+      if (!tenantId || !userId) return res.status(401).json({ error: "Unauthorized" });
+
+      const workOrders = await storage.listWorkOrdersByDriver(userId, tenantId);
+      res.json({ workOrders });
+    } catch (error) {
+      console.error("List my work orders error:", error);
+      res.status(500).json({ error: "Failed to list work orders" });
+    }
+  });
+
+  app.get("/api/work-orders/:vehicleId", async (req, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const workOrders = await storage.listWorkOrdersByVehicle(vehicleId);
+      res.json({ workOrders });
+    } catch (error) {
+      console.error("List work orders for vehicle error:", error);
+      res.status(500).json({ error: "Failed to list work orders" });
+    }
+  });
+
+  app.put("/api/work-orders/:id/complete", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { id } = req.params;
+      const completedDate = new Date();
+
+      const workOrder = await storage.updateWorkOrderStatus(id, tenantId, "completed", completedDate);
+      if (!workOrder) {
+        return res.status(404).json({ error: "Work order not found" });
+      }
+
+      res.json(workOrder);
+    } catch (error) {
+      console.error("Complete work order error:", error);
+      res.status(500).json({ error: "Failed to complete work order" });
+    }
+  });
+
+  app.get("/api/work-orders/action-types", async (req, res) => {
+    const actionTypes = [
+      { value: "jump_start", label: "Jump Start Battery" },
+      { value: "gas", label: "Fill Gas Tank" },
+      { value: "inflate_tire", label: "Inflate Tire" },
+      { value: "oil_change", label: "Oil Change" },
+      { value: "coolant", label: "Top off Coolant" },
+      { value: "other", label: "Other (describe below)" }
+    ];
+    res.json({ actionTypes });
+  });
+
+  // ==================== LOT OPS PRO: SAFETY REPORTS ====================
+  app.post("/api/safety-reports/create", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const parsed = insertSafetyReportSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid safety report data" });
+      }
+
+      const report = await storage.createSafetyReport(parsed.data);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Safety report creation error:", error);
+      res.status(500).json({ error: "Failed to create safety report" });
+    }
+  });
+
+  app.get("/api/safety-reports/mine", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      const userId = (req as any).user?.id;
+      if (!tenantId || !userId) return res.status(401).json({ error: "Unauthorized" });
+
+      const reports = await storage.listSafetyReportsBySafetyRep(userId, tenantId);
+      res.json({ reports });
+    } catch (error) {
+      console.error("List my safety reports error:", error);
+      res.status(500).json({ error: "Failed to list safety reports" });
+    }
+  });
+
+  app.get("/api/safety-reports/:vehicleId", async (req, res) => {
+    try {
+      const { vehicleId } = req.params;
+      const reports = await storage.listSafetyReportsByVehicle(vehicleId);
+      res.json({ reports });
+    } catch (error) {
+      console.error("List safety reports for vehicle error:", error);
+      res.status(500).json({ error: "Failed to list safety reports" });
+    }
+  });
+
+  app.get("/api/vehicles/assigned-to-me", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      const userId = (req as any).user?.id;
+      if (!tenantId || !userId) return res.status(401).json({ error: "Unauthorized" });
+
+      const assignments = await storage.listVehicleAssignments(tenantId);
+      const myVehicles = assignments.filter(a => 
+        a.safetyRepresentative === userId || a.maintenanceDriver === userId
+      );
+
+      res.json({ vehicles: myVehicles });
+    } catch (error) {
+      console.error("List my vehicles error:", error);
+      res.status(500).json({ error: "Failed to list your vehicles" });
+    }
+  });
+
+  // ==================== LOT OPS PRO: CORPORATE UPDATES ====================
+  app.post("/api/corporate-updates/create", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const parsed = insertCorporateUpdateSchema.safeParse({ ...req.body, tenantId });
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid corporate update data" });
+      }
+
+      const update = await storage.createCorporateUpdate(parsed.data);
+      res.status(201).json(update);
+    } catch (error) {
+      console.error("Corporate update creation error:", error);
+      res.status(500).json({ error: "Failed to create corporate update" });
+    }
+  });
+
+  app.get("/api/corporate-updates", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const updates = await storage.listCorporateUpdates(tenantId);
+      res.json({ updates });
+    } catch (error) {
+      console.error("List corporate updates error:", error);
+      res.status(500).json({ error: "Failed to list corporate updates" });
+    }
+  });
+
+  app.get("/api/corporate-updates/vehicle/:vehicleId", async (req, res) => {
+    try {
+      const tenantId = req.session?.tenantId;
+      if (!tenantId) return res.status(401).json({ error: "Unauthorized" });
+
+      const { vehicleId } = req.params;
+      const updates = await storage.listCorporateUpdatesByVehicle(vehicleId, tenantId);
+      res.json({ updates });
+    } catch (error) {
+      console.error("List corporate updates for vehicle error:", error);
+      res.status(500).json({ error: "Failed to list corporate updates" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
