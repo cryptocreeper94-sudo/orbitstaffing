@@ -15,6 +15,10 @@ import {
   insuranceDocuments,
   workerRequests,
   workerRequestMatches,
+  employeeW4Data,
+  garnishmentOrders,
+  payrollRecords,
+  garnishmentPayments,
   type User,
   type InsertUser,
   type Company,
@@ -43,6 +47,14 @@ import {
   type InsertWorkerRequest,
   type WorkerRequestMatch,
   type InsertWorkerRequestMatch,
+  type EmployeeW4Data,
+  type InsertEmployeeW4Data,
+  type GarnishmentOrder,
+  type InsertGarnishmentOrder,
+  type PayrollRecord,
+  type InsertPayrollRecord,
+  type GarnishmentPayment,
+  type InsertGarnishmentPayment,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -649,6 +661,209 @@ export const storage: IStorage = {
         eq(workerRequestMatches.tenantId, tenantId)
       )
     );
+  },
+
+  // ========================
+  // Employee W-4 Data
+  // ========================
+  async createEmployeeW4Data(data: InsertEmployeeW4Data): Promise<EmployeeW4Data> {
+    const result = await db.insert(employeeW4Data).values(data).returning();
+    return result[0];
+  },
+
+  async getEmployeeW4Data(id: string, tenantId: string): Promise<EmployeeW4Data | undefined> {
+    const result = await db.select().from(employeeW4Data).where(
+      and(
+        eq(employeeW4Data.id, id),
+        eq(employeeW4Data.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async getCurrentEmployeeW4Data(workerId: string, tenantId: string): Promise<EmployeeW4Data | undefined> {
+    const result = await db.select().from(employeeW4Data).where(
+      and(
+        eq(employeeW4Data.workerId, workerId),
+        eq(employeeW4Data.tenantId, tenantId),
+        eq(employeeW4Data.isCurrentW4, true)
+      )
+    ).orderBy(desc(employeeW4Data.createdAt));
+    return result[0];
+  },
+
+  async listEmployeeW4Data(workerId: string, tenantId: string): Promise<EmployeeW4Data[]> {
+    return await db.select().from(employeeW4Data).where(
+      and(
+        eq(employeeW4Data.workerId, workerId),
+        eq(employeeW4Data.tenantId, tenantId)
+      )
+    ).orderBy(desc(employeeW4Data.createdAt));
+  },
+
+  async updateEmployeeW4Data(id: string, tenantId: string, data: Partial<InsertEmployeeW4Data>): Promise<EmployeeW4Data | undefined> {
+    const result = await db.update(employeeW4Data).set(data).where(
+      and(
+        eq(employeeW4Data.id, id),
+        eq(employeeW4Data.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  // ========================
+  // Garnishment Orders
+  // ========================
+  async createGarnishmentOrder(data: InsertGarnishmentOrder): Promise<GarnishmentOrder> {
+    const result = await db.insert(garnishmentOrders).values(data).returning();
+    return result[0];
+  },
+
+  async getGarnishmentOrder(id: string, tenantId: string): Promise<GarnishmentOrder | undefined> {
+    const result = await db.select().from(garnishmentOrders).where(
+      and(
+        eq(garnishmentOrders.id, id),
+        eq(garnishmentOrders.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listGarnishmentOrders(employeeId: string, tenantId: string): Promise<GarnishmentOrder[]> {
+    return await db.select().from(garnishmentOrders).where(
+      and(
+        eq(garnishmentOrders.employeeId, employeeId),
+        eq(garnishmentOrders.tenantId, tenantId)
+      )
+    ).orderBy(garnishmentOrders.priority);
+  },
+
+  async listActiveGarnishmentOrders(employeeId: string, tenantId: string): Promise<GarnishmentOrder[]> {
+    return await db.select().from(garnishmentOrders).where(
+      and(
+        eq(garnishmentOrders.employeeId, employeeId),
+        eq(garnishmentOrders.tenantId, tenantId),
+        eq(garnishmentOrders.status, "active")
+      )
+    ).orderBy(garnishmentOrders.priority);
+  },
+
+  async updateGarnishmentOrder(id: string, tenantId: string, data: Partial<InsertGarnishmentOrder>): Promise<GarnishmentOrder | undefined> {
+    const result = await db.update(garnishmentOrders).set(data).where(
+      and(
+        eq(garnishmentOrders.id, id),
+        eq(garnishmentOrders.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  async deleteGarnishmentOrder(id: string, tenantId: string): Promise<void> {
+    await db.delete(garnishmentOrders).where(
+      and(
+        eq(garnishmentOrders.id, id),
+        eq(garnishmentOrders.tenantId, tenantId)
+      )
+    );
+  },
+
+  // ========================
+  // Payroll Records
+  // ========================
+  async createPayrollRecord(data: InsertPayrollRecord): Promise<PayrollRecord> {
+    const result = await db.insert(payrollRecords).values(data).returning();
+    return result[0];
+  },
+
+  async getPayrollRecord(id: string, tenantId: string): Promise<PayrollRecord | undefined> {
+    const result = await db.select().from(payrollRecords).where(
+      and(
+        eq(payrollRecords.id, id),
+        eq(payrollRecords.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listPayrollRecords(employeeId: string, tenantId: string): Promise<PayrollRecord[]> {
+    return await db.select().from(payrollRecords).where(
+      and(
+        eq(payrollRecords.employeeId, employeeId),
+        eq(payrollRecords.tenantId, tenantId)
+      )
+    ).orderBy(desc(payrollRecords.payPeriodStart));
+  },
+
+  async listPayrollRecordsByPeriod(
+    employeeId: string,
+    tenantId: string,
+    startDate: string,
+    endDate: string
+  ): Promise<PayrollRecord[]> {
+    return await db.select().from(payrollRecords).where(
+      and(
+        eq(payrollRecords.employeeId, employeeId),
+        eq(payrollRecords.tenantId, tenantId),
+        gte(payrollRecords.payPeriodStart, startDate),
+        lte(payrollRecords.payPeriodEnd, endDate)
+      )
+    ).orderBy(desc(payrollRecords.payPeriodStart));
+  },
+
+  async updatePayrollRecord(id: string, tenantId: string, data: Partial<InsertPayrollRecord>): Promise<PayrollRecord | undefined> {
+    const result = await db.update(payrollRecords).set(data).where(
+      and(
+        eq(payrollRecords.id, id),
+        eq(payrollRecords.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
+  },
+
+  // ========================
+  // Garnishment Payments
+  // ========================
+  async createGarnishmentPayment(data: InsertGarnishmentPayment): Promise<GarnishmentPayment> {
+    const result = await db.insert(garnishmentPayments).values(data).returning();
+    return result[0];
+  },
+
+  async getGarnishmentPayment(id: string, tenantId: string): Promise<GarnishmentPayment | undefined> {
+    const result = await db.select().from(garnishmentPayments).where(
+      and(
+        eq(garnishmentPayments.id, id),
+        eq(garnishmentPayments.tenantId, tenantId)
+      )
+    );
+    return result[0];
+  },
+
+  async listGarnishmentPayments(payrollRecordId: string, tenantId: string): Promise<GarnishmentPayment[]> {
+    return await db.select().from(garnishmentPayments).where(
+      and(
+        eq(garnishmentPayments.payrollRecordId, payrollRecordId),
+        eq(garnishmentPayments.tenantId, tenantId)
+      )
+    ).orderBy(desc(garnishmentPayments.createdAt));
+  },
+
+  async listGarnishmentPaymentsByOrder(garnishmentOrderId: string, tenantId: string): Promise<GarnishmentPayment[]> {
+    return await db.select().from(garnishmentPayments).where(
+      and(
+        eq(garnishmentPayments.garnishmentOrderId, garnishmentOrderId),
+        eq(garnishmentPayments.tenantId, tenantId)
+      )
+    ).orderBy(desc(garnishmentPayments.paymentDate));
+  },
+
+  async updateGarnishmentPayment(id: string, tenantId: string, data: Partial<InsertGarnishmentPayment>): Promise<GarnishmentPayment | undefined> {
+    const result = await db.update(garnishmentPayments).set(data).where(
+      and(
+        eq(garnishmentPayments.id, id),
+        eq(garnishmentPayments.tenantId, tenantId)
+      )
+    ).returning();
+    return result[0];
   },
 };
 

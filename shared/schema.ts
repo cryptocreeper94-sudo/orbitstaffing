@@ -1624,3 +1624,244 @@ export const insertWorkerRequestMatchSchema = createInsertSchema(workerRequestMa
 
 export type InsertWorkerRequestMatch = z.infer<typeof insertWorkerRequestMatchSchema>;
 export type WorkerRequestMatch = typeof workerRequestMatches.$inferSelect;
+
+// ========================
+// Employee W-4 Tax Data
+// ========================
+export const employeeW4Data = pgTable(
+  "employee_w4_data",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // W-4 Filing Information
+    fillingStatus: varchar("filling_status", { length: 20 }).notNull(), // single, married, HOH (Head of Household)
+    dependents: integer("dependents").default(0),
+    otherIncome: decimal("other_income", { precision: 10, scale: 2 }).default("0"),
+    
+    // Deductions
+    standardDeduction: boolean("standard_deduction").default(true),
+    claimableDeductions: decimal("claimable_deductions", { precision: 10, scale: 2 }).default("0"),
+    
+    // Additional Withholding
+    extraWithheldPerPaycheck: decimal("extra_withheld_per_paycheck", { precision: 8, scale: 2 }).default("0"),
+    
+    // Effective Period
+    effectiveYear: integer("effective_year").notNull(),
+    effectiveDate: date("effective_date"),
+    
+    // Status
+    isCurrentW4: boolean("is_current_w4").default(true),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_w4_tenant").on(table.tenantId),
+    workerIdx: index("idx_w4_worker").on(table.workerId),
+    currentIdx: index("idx_w4_current").on(table.isCurrentW4),
+  })
+);
+
+export const insertEmployeeW4DataSchema = createInsertSchema(employeeW4Data).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEmployeeW4Data = z.infer<typeof insertEmployeeW4DataSchema>;
+export type EmployeeW4Data = typeof employeeW4Data.$inferSelect;
+
+// ========================
+// Garnishment Orders (Court-Ordered Deductions)
+// ========================
+export const garnishmentOrders = pgTable(
+  "garnishment_orders",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    employeeId: varchar("employee_id").notNull().references(() => workers.id),
+    
+    // Garnishment Type
+    type: varchar("type", { length: 50 }).notNull(), // child_support, tax_levy, student_loan, creditor
+    creditorName: varchar("creditor_name", { length: 255 }),
+    orderNumber: varchar("order_number", { length: 100 }),
+    caseNumber: varchar("case_number", { length: 100 }),
+    
+    // Amount
+    amountFixed: decimal("amount_fixed", { precision: 10, scale: 2 }), // Fixed dollar amount per period
+    amountPercentage: decimal("amount_percentage", { precision: 5, scale: 2 }), // Percentage of disposable earnings
+    
+    // Effective Dates
+    effectiveDate: date("effective_date").notNull(),
+    expiryDate: date("expiry_date"),
+    
+    // Payment Instructions
+    paymentInstructions: text("payment_instructions"),
+    remittanceAddress: text("remittance_address"),
+    
+    // Status: active, suspended, completed
+    status: varchar("status", { length: 50 }).default("active"),
+    
+    // Priority (auto-calculated from type: child_support=1, tax_levy=2, student_loan=3, creditor=4)
+    priority: integer("priority").default(4),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_garnishment_tenant").on(table.tenantId),
+    employeeIdx: index("idx_garnishment_employee").on(table.employeeId),
+    typeIdx: index("idx_garnishment_type").on(table.type),
+    statusIdx: index("idx_garnishment_status").on(table.status),
+    priorityIdx: index("idx_garnishment_priority").on(table.priority),
+  })
+);
+
+export const insertGarnishmentOrderSchema = createInsertSchema(garnishmentOrders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertGarnishmentOrder = z.infer<typeof insertGarnishmentOrderSchema>;
+export type GarnishmentOrder = typeof garnishmentOrders.$inferSelect;
+
+// ========================
+// Payroll Records (Detailed Paycheck Breakdown)
+// ========================
+export const payrollRecords = pgTable(
+  "payroll_records",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    employeeId: varchar("employee_id").notNull().references(() => workers.id),
+    payrollId: varchar("payroll_id").references(() => payroll.id),
+    
+    // Pay Period
+    payPeriodStart: date("pay_period_start").notNull(),
+    payPeriodEnd: date("pay_period_end").notNull(),
+    payDate: date("pay_date"),
+    
+    // Gross Pay
+    grossPay: decimal("gross_pay", { precision: 10, scale: 2 }).notNull(),
+    
+    // Mandatory Withholdings
+    federalIncomeTax: decimal("federal_income_tax", { precision: 10, scale: 2 }).default("0"),
+    socialSecurityTax: decimal("social_security_tax", { precision: 10, scale: 2 }).default("0"),
+    medicareTax: decimal("medicare_tax", { precision: 10, scale: 2 }).default("0"),
+    additionalMedicareTax: decimal("additional_medicare_tax", { precision: 10, scale: 2 }).default("0"),
+    stateTax: decimal("state_tax", { precision: 10, scale: 2 }).default("0"),
+    localTax: decimal("local_tax", { precision: 10, scale: 2 }).default("0"),
+    
+    // Total Mandatory Deductions
+    totalMandatoryDeductions: decimal("total_mandatory_deductions", { precision: 10, scale: 2 }).default("0"),
+    
+    // Disposable Earnings (used for garnishment calculation)
+    disposableEarnings: decimal("disposable_earnings", { precision: 10, scale: 2 }).default("0"),
+    
+    // Garnishments (details stored as JSON)
+    garnishmentsApplied: jsonb("garnishments_applied"), // [{id, type, amount, priority}]
+    totalGarnishments: decimal("total_garnishments", { precision: 10, scale: 2 }).default("0"),
+    
+    // Final Net Pay
+    netPay: decimal("net_pay", { precision: 10, scale: 2 }).default("0"),
+    
+    // W-4 Reference
+    w4DataId: varchar("w4_data_id").references(() => employeeW4Data.id),
+    
+    // State Location (for local tax)
+    workState: varchar("work_state", { length: 2 }),
+    workCity: varchar("work_city", { length: 100 }),
+    
+    // Full Breakdown (for audit trail)
+    breakdown: jsonb("breakdown"),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, processed, paid
+    processedAt: timestamp("processed_at"),
+    paidAt: timestamp("paid_at"),
+    
+    // Notes
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_payroll_record_tenant").on(table.tenantId),
+    employeeIdx: index("idx_payroll_record_employee").on(table.employeeId),
+    periodIdx: index("idx_payroll_record_period").on(table.payPeriodStart),
+    statusIdx: index("idx_payroll_record_status").on(table.status),
+  })
+);
+
+export const insertPayrollRecordSchema = createInsertSchema(payrollRecords).omit({
+  id: true,
+  processedAt: true,
+  paidAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPayrollRecord = z.infer<typeof insertPayrollRecordSchema>;
+export type PayrollRecord = typeof payrollRecords.$inferSelect;
+
+// ========================
+// Garnishment Payments (Tracking Payment to Creditors)
+// ========================
+export const garnishmentPayments = pgTable(
+  "garnishment_payments",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    payrollRecordId: varchar("payroll_record_id").notNull().references(() => payrollRecords.id),
+    garnishmentOrderId: varchar("garnishment_order_id").notNull().references(() => garnishmentOrders.id),
+    employeeId: varchar("employee_id").notNull().references(() => workers.id),
+    
+    // Payment Details
+    paymentDate: date("payment_date"),
+    amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
+    
+    // Recipient
+    recipientName: varchar("recipient_name", { length: 255 }),
+    recipientType: varchar("recipient_type", { length: 50 }), // court, irs, student_loan_servicer, creditor
+    remittanceAddress: text("remittance_address"),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, sent, confirmed, failed
+    sentAt: timestamp("sent_at"),
+    confirmedAt: timestamp("confirmed_at"),
+    failureReason: text("failure_reason"),
+    
+    // Reference Numbers
+    checkNumber: varchar("check_number", { length: 50 }),
+    wireReference: varchar("wire_reference", { length: 100 }),
+    
+    // Notes
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_garnishment_payment_tenant").on(table.tenantId),
+    payrollRecordIdx: index("idx_garnishment_payment_payroll").on(table.payrollRecordId),
+    garnishmentOrderIdx: index("idx_garnishment_payment_order").on(table.garnishmentOrderId),
+    employeeIdx: index("idx_garnishment_payment_employee").on(table.employeeId),
+    statusIdx: index("idx_garnishment_payment_status").on(table.status),
+    paymentDateIdx: index("idx_garnishment_payment_date").on(table.paymentDate),
+  })
+);
+
+export const insertGarnishmentPaymentSchema = createInsertSchema(garnishmentPayments).omit({
+  id: true,
+  sentAt: true,
+  confirmedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertGarnishmentPayment = z.infer<typeof insertGarnishmentPaymentSchema>;
+export type GarnishmentPayment = typeof garnishmentPayments.$inferSelect;

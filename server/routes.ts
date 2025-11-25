@@ -4282,6 +4282,300 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // GARNISHMENT ENDPOINTS
+  // ========================
+  app.post("/api/garnishments", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const parsed = insertGarnishmentOrderSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Invalid garnishment data" });
+      }
+
+      // Set priority based on type
+      let priority = 4; // default: creditor
+      if (parsed.data.type === "child_support") priority = 1;
+      else if (parsed.data.type === "tax_levy") priority = 2;
+      else if (parsed.data.type === "student_loan") priority = 3;
+
+      const garnishment = await storage.createGarnishmentOrder({
+        ...parsed.data,
+        tenantId,
+        priority,
+      });
+
+      res.status(201).json(garnishment);
+    } catch (error) {
+      console.error("Garnishment creation error:", error);
+      res.status(500).json({ error: "Failed to create garnishment order" });
+    }
+  });
+
+  app.get("/api/garnishments/:employeeId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const garnishments = await storage.listGarnishmentOrders(
+        req.params.employeeId,
+        tenantId
+      );
+      res.json(garnishments);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch garnishments" });
+    }
+  });
+
+  app.put("/api/garnishments/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const updates = req.body;
+
+      // Update priority if type changed
+      if (updates.type) {
+        let priority = 4;
+        if (updates.type === "child_support") priority = 1;
+        else if (updates.type === "tax_levy") priority = 2;
+        else if (updates.type === "student_loan") priority = 3;
+        updates.priority = priority;
+      }
+
+      const garnishment = await storage.updateGarnishmentOrder(
+        req.params.id,
+        tenantId,
+        updates
+      );
+
+      if (!garnishment) {
+        return res.status(404).json({ error: "Garnishment not found" });
+      }
+
+      res.json(garnishment);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update garnishment" });
+    }
+  });
+
+  app.delete("/api/garnishments/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      await storage.deleteGarnishmentOrder(req.params.id, tenantId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete garnishment" });
+    }
+  });
+
+  // ========================
+  // PAYROLL CALCULATION ENDPOINTS
+  // ========================
+  app.post("/api/payroll/calculate", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const {
+        employeeId,
+        grossPay,
+        workState,
+        workCity,
+        annualGrossPaid,
+      } = req.body;
+
+      if (!employeeId || !grossPay || !workState) {
+        return res.status(400).json({
+          error: "Required fields: employeeId, grossPay, workState",
+        });
+      }
+
+      // Get W-4 data
+      const w4Data = await storage.getCurrentEmployeeW4Data(employeeId, tenantId);
+      if (!w4Data) {
+        return res.status(404).json({
+          error: "No W-4 data found for employee. Please set up W-4 first.",
+        });
+      }
+
+      // Get active garnishment orders
+      const garnishments = await storage.listActiveGarnishmentOrders(
+        employeeId,
+        tenantId
+      );
+
+      // Import and use calculator
+      const { calculatePayroll } = await import("./payrollCalculator");
+
+      const result = calculatePayroll({
+        grossPay: parseFloat(grossPay.toString()),
+        w4Data,
+        garnishmentOrders: garnishments,
+        payPeriodDays: 7,
+        workState,
+        workCity,
+        annualGrossPaid: parseFloat(annualGrossPaid?.toString() || "0"),
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error("Payroll calculation error:", error);
+      res.status(500).json({
+        error: "Failed to calculate payroll",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
+  app.post("/api/payroll/process", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const {
+        employeeId,
+        grossPay,
+        workState,
+        workCity,
+        payPeriodStart,
+        payPeriodEnd,
+        annualGrossPaid,
+      } = req.body;
+
+      if (!employeeId || !grossPay || !workState || !payPeriodStart || !payPeriodEnd) {
+        return res.status(400).json({
+          error: "Required fields: employeeId, grossPay, workState, payPeriodStart, payPeriodEnd",
+        });
+      }
+
+      // Get W-4 data
+      const w4Data = await storage.getCurrentEmployeeW4Data(employeeId, tenantId);
+      if (!w4Data) {
+        return res.status(404).json({
+          error: "No W-4 data found for employee",
+        });
+      }
+
+      // Get active garnishment orders
+      const garnishments = await storage.listActiveGarnishmentOrders(
+        employeeId,
+        tenantId
+      );
+
+      // Calculate payroll
+      const { calculatePayroll } = await import("./payrollCalculator");
+
+      const calculation = calculatePayroll({
+        grossPay: parseFloat(grossPay.toString()),
+        w4Data,
+        garnishmentOrders: garnishments,
+        payPeriodDays: 7,
+        workState,
+        workCity,
+        annualGrossPaid: parseFloat(annualGrossPaid?.toString() || "0"),
+      });
+
+      // Create payroll record
+      const payrollRecord = await storage.createPayrollRecord({
+        tenantId,
+        employeeId,
+        payPeriodStart: new Date(payPeriodStart),
+        payPeriodEnd: new Date(payPeriodEnd),
+        payDate: new Date(),
+        w4DataId: w4Data.id,
+        workState,
+        workCity,
+        grossPay: calculation.grossPay,
+        federalIncomeTax: calculation.federalIncomeTax,
+        socialSecurityTax: calculation.socialSecurityTax,
+        medicareTax: calculation.medicareTax,
+        additionalMedicareTax: calculation.additionalMedicareTax,
+        stateTax: calculation.stateTax,
+        localTax: calculation.localTax,
+        totalMandatoryDeductions: calculation.totalMandatoryDeductions,
+        disposableEarnings: calculation.disposableEarnings,
+        garnishmentsApplied: calculation.garnishmentsApplied,
+        totalGarnishments: calculation.totalGarnishments,
+        netPay: calculation.netPay,
+        breakdown: calculation.breakdown,
+        status: "processed",
+        processedAt: new Date(),
+      });
+
+      // Create garnishment payment records for each garnishment applied
+      for (const garnishment of calculation.garnishmentsApplied) {
+        const order = garnishments.find((g) => g.id === garnishment.id);
+        if (order && garnishment.amount > 0) {
+          await storage.createGarnishmentPayment({
+            tenantId,
+            payrollRecordId: payrollRecord.id,
+            garnishmentOrderId: garnishment.id,
+            employeeId,
+            paymentDate: new Date(payPeriodEnd),
+            amountPaid: garnishment.amount,
+            recipientName: order.creditorName,
+            recipientType: order.type as any,
+            remittanceAddress: order.remittanceAddress,
+            status: "pending",
+          });
+        }
+      }
+
+      res.status(201).json(payrollRecord);
+    } catch (error) {
+      console.error("Payroll processing error:", error);
+      res.status(500).json({
+        error: "Failed to process payroll",
+        details: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
+  app.get("/api/payroll/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const payrollRecord = await storage.getPayrollRecord(req.params.id, tenantId);
+      if (!payrollRecord) {
+        return res.status(404).json({ error: "Payroll record not found" });
+      }
+
+      // Get associated garnishment payments
+      const payments = await storage.listGarnishmentPayments(
+        payrollRecord.id,
+        tenantId
+      );
+
+      res.json({
+        ...payrollRecord,
+        garnishmentPayments: payments,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch payroll record" });
+    }
+  });
+
+  app.get("/api/payroll/employee/:employeeId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const records = await storage.listPayrollRecords(
+        req.params.employeeId,
+        tenantId
+      );
+      res.json(records);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch payroll records" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
