@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Copy, CheckCircle2, ArrowLeft, Download, Share2 } from 'lucide-react';
 import { Link } from 'wouter';
 import { QRCodeSVG } from 'qrcode.react';
-import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 
 export default function HallmarkVerification() {
   const [copied, setCopied] = useState(false);
@@ -64,15 +63,7 @@ export default function HallmarkVerification() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               {/* Left: Emblem & Info */}
               <div className="flex flex-col items-center">
-                {/* ORBIT Logo/Emblem */}
-                <div className="bg-black p-8 rounded-2xl border-2 border-cyan-400/30 mb-8 w-full max-w-xs">
-                  <img 
-                    src={saturnLogo} 
-                    alt="ORBIT Hallmark" 
-                    className="w-full h-auto"
-                  />
-                </div>
-
+  
                 {/* Serial Number Display */}
                 <div className="text-center mb-8 w-full">
                   <p className="text-sm text-gray-400 mb-2">Hallmark Serial Number</p>

@@ -2,7 +2,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Lock, Zap, BarChart3, Users, Shield, Sparkles, ArrowRight } from "lucide-react";
-import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 
 interface SidonieWelcomeModalProps {
   isOpen: boolean;
@@ -15,7 +14,6 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-950 border border-cyan-500/30">
         <DialogHeader className="pb-4 border-b border-cyan-500/20">
           <div className="flex items-center gap-3 mb-3">
-            <img src={saturnLogo} alt="ORBIT" className="w-10 h-10" />
             <DialogTitle className="text-2xl font-bold text-cyan-300">
               Welcome to ORBIT Staffing OS, Sidonie
             </DialogTitle>

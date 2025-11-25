@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
 
 interface BenefitDetail {
   id: string;

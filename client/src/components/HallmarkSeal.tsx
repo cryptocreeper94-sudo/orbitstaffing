@@ -1,5 +1,3 @@
-import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
-
 interface HallmarkSealProps {
   verificationCode?: string;
   size?: 'small' | 'medium' | 'large';
@@ -27,14 +25,6 @@ export function HallmarkSeal({
         style={{ opacity }}
       />
 
-      {/* Saturn Logo */}
-      <div className="absolute flex items-center justify-center" style={{ opacity }}>
-        <img
-          src={saturnLogo}
-          alt="ORBIT Verification Seal"
-          className="w-full h-full object-contain"
-        />
-      </div>
 
       {/* Text Arc - Verification Code */}
       <svg

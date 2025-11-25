@@ -1,5 +1,3 @@
-import saturnLogo from "@assets/generated_images/pure_aqua_saturn_planet_on_transparency.png";
-
 interface LetterheadProps {
   withAddress?: boolean;
   company?: {
@@ -23,7 +21,6 @@ export function ORBITLetterhead({
     <div className="w-full border-b-2 border-cyan-500/30 pb-6 mb-6">
       {/* Logo & Title */}
       <div className="flex items-center gap-4 mb-4">
-        <img src={saturnLogo} alt="ORBIT" className="w-12 h-12" />
         <div>
           <h1 className="text-2xl font-bold text-cyan-300">ORBIT</h1>
           <p className="text-sm text-slate-400">Staffing OS</p>
