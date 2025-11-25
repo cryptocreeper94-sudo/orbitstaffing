@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import {
   Dialog,
   DialogContent,
@@ -171,6 +172,18 @@ export function ValuePropositionModal() {
                   </Button>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Admin Login Footer Link */}
+            <div className="flex justify-center pt-4 border-t border-border/30">
+              <Link href="/admin">
+                <a
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors duration-200"
+                  data-testid="link-admin-login"
+                >
+                  Admin Login
+                </a>
+              </Link>
             </div>
           </>
         ) : (
