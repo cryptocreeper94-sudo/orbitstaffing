@@ -482,9 +482,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.get("/api/workers", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const companyId = req.query.companyId as string;
       if (!companyId) {
         return res.status(400).json({ error: "Company ID required" });
+      }
+      // Verify tenant can access this company
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to view this company's workers" });
       }
       const workers = await storage.listWorkers(companyId);
       res.status(200).json(workers);
@@ -505,11 +511,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.post("/api/workers", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const parsed = insertWorkerSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid worker data" });
       }
-      const worker = await storage.createWorker(parsed.data);
+      // Ensure worker is assigned to the user's tenant
+      const workerData = { ...parsed.data, tenantId };
+      const worker = await storage.createWorker(workerData);
       res.status(201).json(worker);
     } catch (error) {
       res.status(500).json({ error: "Failed to create worker" });
@@ -531,9 +541,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.get("/api/assignments", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const companyId = req.query.companyId as string;
       if (!companyId) {
         return res.status(400).json({ error: "Company ID required" });
+      }
+      // Verify tenant can access this company
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to view this company's assignments" });
       }
       const assignments = await storage.listAssignments(companyId);
       res.status(200).json(assignments);
@@ -551,11 +567,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.post("/api/assignments", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const parsed = insertAssignmentSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid assignment data" });
       }
-      const assignment = await storage.createAssignment(parsed.data);
+      // Ensure assignment is assigned to the user's tenant
+      const assignmentData = { ...parsed.data, tenantId };
+      const assignment = await storage.createAssignment(assignmentData);
       res.status(201).json(assignment);
     } catch (error) {
       res.status(500).json({ error: "Failed to create assignment" });
@@ -604,9 +624,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get("/api/timesheets", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const companyId = req.query.companyId as string;
       if (!companyId) {
         return res.status(400).json({ error: "Company ID required" });
+      }
+      // Verify tenant can access this company
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to view this company's timesheets" });
       }
       const timesheets = await storage.listTimesheets(companyId);
       res.status(200).json(timesheets);
@@ -649,9 +675,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.get("/api/payroll", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const companyId = req.query.companyId as string;
       if (!companyId) {
         return res.status(400).json({ error: "Company ID required" });
+      }
+      // Verify tenant can access this company
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to view this company's payroll" });
       }
       const payroll = await storage.listPayroll(companyId);
       res.status(200).json(payroll);
@@ -661,11 +693,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.post("/api/payroll", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const parsed = insertPayrollSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid payroll data" });
       }
-      const payroll = await storage.createPayroll(parsed.data);
+      // Ensure payroll is assigned to the user's tenant
+      const payrollData = { ...parsed.data, tenantId };
+      const payroll = await storage.createPayroll(payrollData);
       res.status(201).json(payroll);
     } catch (error) {
       res.status(500).json({ error: "Failed to create payroll" });
@@ -676,9 +712,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.get("/api/invoices", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const companyId = req.query.companyId as string;
       if (!companyId) {
         return res.status(400).json({ error: "Company ID required" });
+      }
+      // Verify tenant can access this company
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to view this company's invoices" });
       }
       const invoices = await storage.listInvoices(companyId);
       res.status(200).json(invoices);
@@ -688,11 +730,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.post("/api/invoices", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const parsed = insertInvoiceSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid invoice data" });
       }
-      const invoice = await storage.createInvoice(parsed.data);
+      // Ensure invoice is assigned to the user's tenant
+      const invoiceData = { ...parsed.data, tenantId };
+      const invoice = await storage.createInvoice(invoiceData);
       res.status(201).json(invoice);
     } catch (error) {
       res.status(500).json({ error: "Failed to create invoice" });
@@ -748,11 +794,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.post("/api/messages", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const parsed = insertMessageSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid message data" });
       }
-      const message = await storage.createMessage(parsed.data);
+      // Ensure message is assigned to the user's tenant
+      const messageData = { ...parsed.data, tenantId };
+      const message = await storage.createMessage(messageData);
       res.status(201).json(message);
     } catch (error) {
       res.status(500).json({ error: "Failed to create message" });
@@ -786,11 +836,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.post("/api/time-off", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const parsed = insertTimeOffRequestSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({ error: "Invalid time off request data" });
       }
-      const request = await storage.createTimeOffRequest(parsed.data);
+      // Ensure time-off request is assigned to the user's tenant
+      const requestData = { ...parsed.data, tenantId };
+      const request = await storage.createTimeOffRequest(requestData);
       res.status(201).json(request);
     } catch (error) {
       res.status(500).json({ error: "Failed to create time off request" });
@@ -827,9 +881,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.post("/api/billing/change-model", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const { companyId, newModel, newTier, revenueSharePercentage } = req.body;
       if (!companyId || !newModel) {
         return res.status(400).json({ error: "companyId and newModel required" });
+      }
+      // Verify tenant can modify this company's billing
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to modify this company's billing" });
       }
       const result = await storage.changeBillingModel(
         companyId,
@@ -844,9 +904,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get("/api/billing/history", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const companyId = req.query.companyId as string;
       if (!companyId) {
         return res.status(400).json({ error: "Company ID required" });
+      }
+      // Verify tenant can access this company's billing history
+      if (tenantId !== companyId) {
+        return res.status(403).json({ error: "Access denied - you do not have permission to view this company's billing history" });
       }
       const history = await storage.getBillingHistory(companyId);
       res.status(200).json(history);
@@ -1139,6 +1205,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   app.post("/api/incidents", async (req: Request, res: Response) => {
     try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
       const {
         incidentType,
         severity,
@@ -1157,6 +1225,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store incident in database (create incidents table if needed)
       const incident = {
         id: crypto.randomUUID(),
+        tenantId,
         incidentType,
         severity: severity || "medium",
         workerName: workerName || null,
