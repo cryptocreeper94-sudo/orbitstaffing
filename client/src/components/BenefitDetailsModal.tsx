@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import saturnLogo from "@assets/generated_images/saturn_on_solid_black_background.png";
 
 interface BenefitDetail {
   id: string;
@@ -58,15 +57,6 @@ export function BenefitDetailsModal({ isOpen, benefitId, onClose }: ModalProps) 
       className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
-      {/* Saturn Watermark Background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10">
-        <img 
-          src={saturnLogo}
-          alt=""
-          className="w-96 h-96 object-contain"
-        />
-      </div>
-
       {/* Modal Content */}
       <div 
         className="relative z-10 bg-background rounded-lg max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-primary/30"
