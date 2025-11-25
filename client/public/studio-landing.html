@@ -221,13 +221,16 @@
             height: 120px;
             margin: 0 auto 20px;
             object-fit: contain;
-            filter: drop-shadow(0 4px 12px rgba(0, 212, 255, 0.3));
+            border-radius: 20px;
+            mix-blend-mode: screen;
+            opacity: 0.95;
             transition: all 0.3s ease;
         }
 
         .product-card:hover .product-logo {
             transform: scale(1.05);
-            filter: drop-shadow(0 8px 20px rgba(0, 212, 255, 0.5));
+            opacity: 1;
+            mix-blend-mode: normal;
         }
 
         .pulse-logo-container {
