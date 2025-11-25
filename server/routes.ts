@@ -35,6 +35,35 @@ function parseJSON(req: Request, res: Response, next: () => void) {
   }
   next();
 }
+
+// Multi-tenant helper: Extract tenantId from user session or request
+function getTenantIdFromRequest(req: Request): string | null {
+  // Try to get from user session/auth context
+  const user = (req as any).user;
+  if (user && user.tenantId) {
+    return user.tenantId;
+  }
+  if (user && user.companyId) {
+    return user.companyId;
+  }
+  // Try to get from query parameter
+  const tenantIdParam = req.query.tenantId as string;
+  if (tenantIdParam) {
+    return tenantIdParam;
+  }
+  return null;
+}
+
+// Validate tenant access for API endpoints
+function validateTenantAccess(req: Request, res: Response): string | false {
+  const tenantId = getTenantIdFromRequest(req);
+  if (!tenantId) {
+    res.status(401).json({ error: "Tenant ID required. Access denied." });
+    return false;
+  }
+  return tenantId;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use(parseJSON);
   // ========================
