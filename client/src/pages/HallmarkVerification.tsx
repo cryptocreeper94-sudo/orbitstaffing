@@ -104,6 +104,12 @@ export default function HallmarkVerification() {
                     size={256}
                     level="H"
                     includeMargin={true}
+                    imageSettings={{
+                      src: "/orbit-saturn-logo.png",
+                      height: 60,
+                      width: 60,
+                      excavate: true,
+                    }}
                     data-testid="qrcode-hallmark"
                   />
                 </div>
