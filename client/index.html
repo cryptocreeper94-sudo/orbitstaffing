@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 
+    <!-- Auto-redirect darkwavestudios.io to landing page -->
+    <script>
+      if (window.location.hostname.includes('darkwavestudios.io') && window.location.pathname === '/') {
+        window.location.href = '/studio';
+      }
+    </script>
+
     <meta property="og:title" content="ORBIT Staffing" />
     <meta property="og:description" content="GPS-verified staffing platform for temporary workers. Real-time assignments, secure payments, and mobile-first design." />
     <meta property="og:type" content="website" />
