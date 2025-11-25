@@ -25,7 +25,9 @@ export const users = pgTable(
     passwordHash: text("password_hash").notNull(),
     // Roles: master_admin (system owner), franchise_admin (franchise owner), customer_admin (monthly customer owner), manager, worker, client
     role: varchar("role", { length: 50 }).notNull().default("worker"),
-    companyId: varchar("company_id").references(() => companies.id),
+    // tenantId: identifies which tenant/company this user belongs to (for multi-tenant isolation)
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    companyId: varchar("company_id").references(() => companies.id), // Deprecated - use tenantId
     franchiseId: varchar("franchise_id").references(() => franchises.id), // For franchise owners
     adminPin: varchar("admin_pin", { length: 4 }), // 4-digit PIN for admin login
     fullName: varchar("full_name", { length: 255 }),
@@ -36,6 +38,7 @@ export const users = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_users_tenant_id").on(table.tenantId),
     companyIdx: index("idx_users_company_id").on(table.companyId),
     emailIdx: index("idx_users_email").on(table.email),
   })
@@ -210,6 +213,7 @@ export const workers = pgTable(
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
     userId: varchar("user_id").references(() => users.id),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
 
     // Personal Info
@@ -237,6 +241,7 @@ export const workers = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_workers_tenant_id").on(table.tenantId),
     companyIdx: index("idx_workers_company_id").on(table.companyId),
     userIdx: index("idx_workers_user_id").on(table.userId),
     employeeNumberIdx: index("idx_workers_employee_number").on(table.employeeNumber),
@@ -259,6 +264,7 @@ export const clients = pgTable(
   "clients",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
 
     name: varchar("name", { length: 255 }).notNull(),
@@ -282,6 +288,7 @@ export const clients = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_clients_tenant_id").on(table.tenantId),
     companyIdx: index("idx_clients_company_id").on(table.companyId),
     nameIdx: index("idx_clients_name").on(table.name),
   })
@@ -303,6 +310,7 @@ export const jobPostings = pgTable(
   "job_postings",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
     clientId: varchar("client_id").references(() => clients.id),
 
@@ -336,6 +344,7 @@ export const jobPostings = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_job_postings_tenant").on(table.tenantId),
     companyIdx: index("idx_job_postings_company").on(table.companyId),
     clientIdx: index("idx_job_postings_client").on(table.clientId),
     statusIdx: index("idx_job_postings_status").on(table.status),
@@ -359,6 +368,7 @@ export const assignments = pgTable(
   "assignments",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     jobPostingId: varchar("job_posting_id").references(() => jobPostings.id),
     workerId: varchar("worker_id").references(() => workers.id),
     companyId: varchar("company_id").references(() => companies.id),
@@ -388,6 +398,7 @@ export const assignments = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_assignments_tenant").on(table.tenantId),
     jobPostingIdx: index("idx_assignments_job_posting").on(table.jobPostingId),
     workerIdx: index("idx_assignments_worker").on(table.workerId),
     companyIdx: index("idx_assignments_company").on(table.companyId),
@@ -415,6 +426,7 @@ export const timesheets = pgTable(
   "timesheets",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
     assignmentId: varchar("assignment_id").references(() => assignments.id),
     workerId: varchar("worker_id").references(() => workers.id),
@@ -453,6 +465,7 @@ export const timesheets = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_timesheets_tenant_id").on(table.tenantId),
     companyIdx: index("idx_timesheets_company_id").on(table.companyId),
     assignmentIdx: index("idx_timesheets_assignment_id").on(table.assignmentId),
     workerIdx: index("idx_timesheets_worker_id").on(table.workerId),
@@ -478,6 +491,7 @@ export const payroll = pgTable(
   "payroll",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
     workerId: varchar("worker_id").references(() => workers.id),
 
@@ -502,6 +516,7 @@ export const payroll = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_payroll_tenant").on(table.tenantId),
     companyIdx: index("idx_payroll_company").on(table.companyId),
     workerIdx: index("idx_payroll_worker").on(table.workerId),
     periodIdx: index("idx_payroll_period").on(table.payPeriodStart),
@@ -526,6 +541,7 @@ export const workerBonuses = pgTable(
   "worker_bonuses",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     workerId: varchar("worker_id").notNull().references(() => workers.id),
     companyId: varchar("company_id").notNull().references(() => companies.id),
     
@@ -556,6 +572,7 @@ export const workerBonuses = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_bonuses_tenant").on(table.tenantId),
     workerIdx: index("idx_bonuses_worker").on(table.workerId),
     companyIdx: index("idx_bonuses_company").on(table.companyId),
     periodIdx: index("idx_bonuses_period").on(table.weekStartDate),
@@ -581,6 +598,7 @@ export const equipment = pgTable(
   "equipment",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
 
     name: varchar("name", { length: 255 }).notNull(),
@@ -611,6 +629,7 @@ export const equipment = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_equipment_tenant").on(table.tenantId),
     companyIdx: index("idx_equipment_company").on(table.companyId),
     skuIdx: index("idx_equipment_sku").on(table.sku),
     statusIdx: index("idx_equipment_status").on(table.status),
@@ -637,6 +656,7 @@ export const invoices = pgTable(
   "invoices",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
     clientId: varchar("client_id").references(() => clients.id),
 
@@ -664,6 +684,7 @@ export const invoices = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_invoices_tenant").on(table.tenantId),
     companyIdx: index("idx_invoices_company").on(table.companyId),
     clientIdx: index("idx_invoices_client").on(table.clientId),
     numberIdx: index("idx_invoices_number").on(table.invoiceNumber),
@@ -688,6 +709,7 @@ export const paystubs = pgTable(
   "paystubs",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     payrollId: varchar("payroll_id").references(() => payroll.id),
     workerId: varchar("worker_id").references(() => workers.id),
     companyId: varchar("company_id").references(() => companies.id),
@@ -717,6 +739,7 @@ export const paystubs = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_paystubs_tenant").on(table.tenantId),
     payrollIdx: index("idx_paystubs_payroll").on(table.payrollId),
     workerIdx: index("idx_paystubs_worker").on(table.workerId),
     companyIdx: index("idx_paystubs_company").on(table.companyId),
@@ -956,6 +979,7 @@ export const incidents = pgTable(
   "incidents",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").references(() => companies.id),
     assignmentId: varchar("assignment_id").references(() => assignments.id),
     workerId: varchar("worker_id").references(() => workers.id),
@@ -977,6 +1001,7 @@ export const incidents = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_incidents_tenant").on(table.tenantId),
     companyIdx: index("idx_incidents_company").on(table.companyId),
     workerIdx: index("idx_incidents_worker").on(table.workerId),
     statusIdx: index("idx_incidents_status").on(table.status),
@@ -1077,6 +1102,7 @@ export const franchiseeTeamCRM = pgTable(
   "franchisee_team_crm",
   {
     id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id), // Multi-tenant isolation
     companyId: varchar("company_id").notNull().references(() => companies.id),
     
     fullName: varchar("full_name", { length: 255 }).notNull(),
@@ -1099,6 +1125,7 @@ export const franchiseeTeamCRM = pgTable(
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
+    tenantIdx: index("idx_franchisee_crm_tenant").on(table.tenantId),
     companyIdx: index("idx_franchisee_crm_company").on(table.companyId),
     emailIdx: index("idx_franchisee_crm_email").on(table.email),
     createdAtIdx: index("idx_franchisee_crm_created_at").on(table.createdAt),
