@@ -194,6 +194,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       // PIN 4444 - Sidonie's Secure Admin Account
       if (pin === "4444") {
+        // *** NOTIFICATION LOG FOR JASON ***
+        console.log("🔔 ═══════════════════════════════════════════════════════════");
+        console.log("🔔 SIDONIE LOGIN DETECTED - PIN 4444");
+        console.log(`🔔 Timestamp: ${new Date().toISOString()}`);
+        console.log(`🔔 Role: ${sandboxRole || 'admin'}`);
+        console.log(`🔔 Mode: SANDBOX (Demo/Test Data Only)`);
+        console.log("🔔 ═══════════════════════════════════════════════════════════");
+        
         // Admin sandbox - Sidonie's Account
         if (sandboxRole === "admin") {
           const getTimeGreeting = () => {
@@ -211,13 +219,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             lastName: "Admin",
             role: "admin",
             assetNumber: sidAssetNumber,
-            companyId: "orbit-dev",
+            companyId: "orbit-dev-sandbox", // Sandbox company
             isFirstLogin: true,
             isReadOnly: false,
             isSidonie: true,
+            isSandbox: true, // Flag for sandbox mode
+            sandboxMode: "FULL_ACCESS_DEMO_DATA_ONLY",
             requiresPasswordChange: true,
             greeting: `${getTimeGreeting()}, Sidonie! 👋`,
-            welcomeMessage: `${getTimeGreeting()}, Sidonie!\n\nWelcome to your ORBIT Ops Manager Dashboard.\n\n👤 Asset ID: ${sidAssetNumber}\n🔐 Status: Ops Manager (Elevated Permissions)\n\n✨ YOUR SPECIAL ABILITIES:\n\n🔑 Admin Password Reset\n   Reset any admin's password in the system. All changes are logged.\n\n👁️ Account Visibility Control\n   Hide/show customer accounts from other admins. Only you, Dev, and the account owner can see hidden accounts.\n\n📊 Full CRM Access\n   Complete access to all customer data: contacts, notes, profiles, and communication history.\n\n👥 Account Ownership Management\n   Designate which admin owns and manages each customer account.\n\n📝 NEXT STEPS:\n1. Update your password (required)\n2. Configure your personal admin business card\n3. Explore the CRM - you can hide accounts with the eye icon\n4. Use password reset to onboard new admins\n\nYour elevated role is critical for team management. Use these abilities responsibly.`,
+            welcomeMessage: `🎯 SANDBOX MODE - DEMO/TEST DATA ONLY\n\n${getTimeGreeting()}, Sidonie!\n\nWelcome to your ORBIT Ops Manager Dashboard.\n\n⚠️ IMPORTANT: This is a SANDBOX environment. All data you see is demo/test data - NO LIVE CUSTOMERS, NO LIVE WORKERS, NO REAL PHONE NUMBERS.\n\n👤 Asset ID: ${sidAssetNumber}\n🔐 Status: Ops Manager (Elevated Permissions)\n🧪 Environment: SANDBOX (Safe for Testing)\n\n✨ YOUR SPECIAL ABILITIES:\n\n🔑 Admin Password Reset\n   Reset any admin's password in the system. All changes are logged.\n\n👁️ Account Visibility Control\n   Hide/show customer accounts from other admins. Only you, Dev, and the account owner can see hidden accounts.\n\n📊 Full CRM Access\n   Complete access to all customer data: contacts, notes, profiles, and communication history.\n\n👥 Account Ownership Management\n   Designate which admin owns and manages each customer account.\n\n🧪 SANDBOX FEATURES YOU CAN TEST:\n   • Create/edit workers (demo data)\n   • Manage assignments (demo data)\n   • Process payroll (demo data)\n   • Generate invoices (demo data)\n   • Test all CRM features\n   • Explore full admin capabilities\n\n📝 NEXT STEPS:\n1. Explore all features freely - everything here is safe test data\n2. Try creating workers, assignments, and schedules\n3. Test the CRM - you can hide accounts with the eye icon\n4. Process demo payroll and generate test invoices\n\n✅ Safe to test everything - this is your sandbox!`,
             needsPasswordReset: true,
           };
           return res.status(200).json(adminUser);
