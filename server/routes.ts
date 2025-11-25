@@ -259,6 +259,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
         return res.status(200).json(testUser);
       }
+      // PIN 5555 - General Admin Code (for future admins and salespeople)
+      if (pin === "5555") {
+        if (sandboxRole === "admin") {
+          const getTimeGreeting = () => {
+            const hour = new Date().getHours();
+            if (hour < 12) return "Good Morning";
+            if (hour < 18) return "Good Afternoon";
+            return "Good Evening";
+          };
+          const adminUser = {
+            id: "admin-" + Math.random().toString(36).substr(2, 9),
+            email: "admin@orbitstaffing.net",
+            firstName: "Admin",
+            lastName: "User",
+            role: "admin",
+            adminRole: "general_admin",
+            companyId: "orbit-system",
+            isFirstLogin: true,
+            isReadOnly: false,
+            canEditDevelopment: false,
+            canEditPricing: false,
+            canManageEmployees: true,
+            canManageOwners: true,
+            canManageAccounts: true,
+            requiresPasswordChange: true,
+            greeting: `${getTimeGreeting()}, Admin! 👋`,
+            welcomeMessage: `${getTimeGreeting()}, Admin!\n\nWelcome to ORBIT Admin Dashboard.\n\n🔐 Status: General Admin (Operations)\n\n✨ YOUR ACCESS:\n\n✓ Full Employee Management\n  Hire, manage, and track all workers\n\n✓ Full Owner/Company Management\n  Manage all franchisees and customers\n\n✓ Account Access & Control\n  Full visibility and control over all accounts\n\n✓ Operations & Reporting\n  Real-time dashboards, analytics, compliance tracking\n\n❌ RESTRICTED:\n  - Development and system code changes (Sidonie/Dev only)\n  - Pricing changes (Sidonie/Dev only)\n\n📝 NEXT STEPS:\n1. Update your password (required)\n2. Configure your personal profile\n3. Begin managing accounts and employees\n\nFor system changes, contact Sidonie or Dev.`,
+            needsPasswordReset: true,
+          };
+          return res.status(200).json(adminUser);
+        }
+        // No owner/employee access with 5555
+        if (sandboxRole === "owner" || sandboxRole === "employee") {
+          return res.status(403).json({ error: "This PIN is for admin access only" });
+        }
+      }
       // PIN 7777 - Public universal demo code (Owner & Employee ONLY - NO ADMIN)
       if (pin === "7777") {
         // NO ADMIN ACCESS with PIN 7777 - only owner and employee
