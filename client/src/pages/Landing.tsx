@@ -101,18 +101,18 @@ export default function Landing() {
             </div>
           </div>
           
-          <nav className="flex gap-0 bg-slate-800/50 backdrop-blur-sm px-2 sm:px-2 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600 flex-shrink-0 min-h-[44px] items-center">
+          <nav className="flex gap-0 bg-slate-800/50 backdrop-blur-sm px-2 sm:px-3 py-2 rounded-lg border border-slate-700/50 hover:border-slate-600 flex-shrink-0 min-h-[44px] items-center overflow-hidden">
             <Link href="/hallmark-seal" className="px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium text-amber-300 hover:text-amber-200 hover:bg-amber-900/30 rounded-md transition-all min-h-[40px] flex items-center" data-testid="link-hallmark-seal">
               <span className="hidden sm:inline">✓ Hallmark</span>
               <span className="sm:hidden">✓</span>
             </Link>
-            <div className="h-6 w-px bg-slate-600/50 mx-0.5 sm:mx-1" />
-            <Link href="/why-orbit" className="w-24 sm:w-32 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all h-[40px] flex items-center justify-center border border-slate-600/30 rounded-l-md" data-testid="link-why-orbit">
+            <div className="h-6 w-px bg-slate-600/50 mx-0.5 sm:mx-0.5" />
+            <Link href="/why-orbit" className="w-20 sm:w-28 px-1.5 sm:px-2 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all h-[40px] flex items-center justify-center border border-slate-600/30 rounded-l-md" data-testid="link-why-orbit">
               <span className="hidden sm:inline">Why ORBIT</span>
               <span className="sm:hidden">Why</span>
             </Link>
             <div className="h-6 w-px bg-slate-600/50" />
-            <Link href="/professional-staffing" className="w-24 sm:w-32 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all h-[40px] flex items-center justify-center border border-slate-600/30 rounded-r-md" data-testid="link-professional">
+            <Link href="/professional-staffing" className="w-20 sm:w-28 px-1.5 sm:px-2 py-2 text-xs sm:text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all h-[40px] flex items-center justify-center border border-slate-600/30 rounded-r-md" data-testid="link-professional">
               <div className="text-center leading-tight">
                 <div className="hidden sm:block text-xs sm:text-sm">Professional</div>
                 <div className="text-[9px] text-slate-400 hidden sm:block">Division</div>
