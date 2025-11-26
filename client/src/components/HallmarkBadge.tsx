@@ -20,24 +20,24 @@ export function HallmarkBadge({
     sm: { 
       container: 'w-32 h-40',
       saturn: 'w-32 h-32',
-      qr: 40,
-      qrContainer: 'w-10 h-10',
+      qr: 24,
+      qrContainer: 'w-6 h-6',
       serialText: 'text-xs',
       poweredText: 'text-[8px]'
     },
     md: { 
       container: 'w-48 h-56',
       saturn: 'w-48 h-48',
-      qr: 60,
-      qrContainer: 'w-16 h-16',
+      qr: 32,
+      qrContainer: 'w-8 h-8',
       serialText: 'text-sm',
       poweredText: 'text-[10px]'
     },
     lg: { 
       container: 'w-64 h-72',
       saturn: 'w-64 h-64',
-      qr: 80,
-      qrContainer: 'w-20 h-20',
+      qr: 40,
+      qrContainer: 'w-10 h-10',
       serialText: 'text-base',
       poweredText: 'text-xs'
     }

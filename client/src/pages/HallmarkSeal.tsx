@@ -7,7 +7,7 @@ import { HallmarkBadge } from '@/components/HallmarkBadge';
 
 export default function HallmarkSeal() {
   const [copied, setCopied] = useState(false);
-  const serialNumber = '000';
+  const serialNumber = '0';
   const hallmarkCode = `ORBIT-SEAL-${serialNumber}`;
   const verificationUrl = `${window.location.origin}/verify/${hallmarkCode}`;
 

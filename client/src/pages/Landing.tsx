@@ -407,17 +407,150 @@ export default function Landing() {
             </CardContent>
           </Card>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-8 mb-12">
             <p className="text-slate-400 text-sm mb-4">
               <Lock className="w-4 h-4 inline mr-2 text-amber-500" />
               Our 1.45x markup is <span className="text-amber-300 font-semibold">locked and transparent</span> — no hidden fees, no surprises.
             </p>
-            <Button 
-              onClick={() => setShowDemoForm(true)}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]"
-            >
-              See Your Savings <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+          </div>
+
+          {/* TOTAL COST SAVINGS BREAKDOWN */}
+          <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/40 rounded-2xl p-8 mb-8">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-bold text-white mb-3">But Wait — There's More Savings</h3>
+              <p className="text-lg text-slate-300 max-w-3xl mx-auto">
+                The 1.45x markup is just the beginning. When you factor in <span className="text-cyan-400 font-semibold">everything ORBIT replaces</span>, your real savings are <span className="text-green-400 font-bold text-xl">35-50%+ of total operating costs.</span>
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {/* Traditional Agency Costs */}
+              <div>
+                <h4 className="text-lg font-bold text-red-300 mb-4 flex items-center gap-2">
+                  <span className="text-2xl">💸</span> Traditional Agency Monthly Costs
+                </h4>
+                <div className="space-y-2 bg-slate-950/50 rounded-lg p-4 border border-red-900/30">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Payroll processing service</span>
+                    <span className="text-white font-mono">$500-2,000</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Time tracking software</span>
+                    <span className="text-white font-mono">$300-500</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Scheduling software</span>
+                    <span className="text-white font-mono">$200-400</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">HR/compliance software</span>
+                    <span className="text-white font-mono">$300-600</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Office space rent</span>
+                    <span className="text-white font-mono">$1,500-3,000</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Office manager salary</span>
+                    <span className="text-white font-mono">$3,333-5,000</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Admin assistant salary</span>
+                    <span className="text-white font-mono">$2,500-3,333</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Accounting fees</span>
+                    <span className="text-white font-mono">$500-1,500</span>
+                  </div>
+                  <div className="flex justify-between text-sm border-t border-red-900/30 pt-2 mt-2">
+                    <span className="text-red-300 font-bold">TOTAL MONTHLY:</span>
+                    <span className="text-red-400 font-bold font-mono">$9,000-16,000</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-red-400">
+                    <span>ANNUAL:</span>
+                    <span className="font-mono">$108,000-192,000</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ORBIT Cost */}
+              <div>
+                <h4 className="text-lg font-bold text-green-300 mb-4 flex items-center gap-2">
+                  <span className="text-2xl">✨</span> ORBIT All-In-One Cost
+                </h4>
+                <div className="space-y-4 bg-slate-950/50 rounded-lg p-4 border border-green-500/30">
+                  <div>
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-slate-400 text-sm">ORBIT Subscription</span>
+                      <span className="text-green-400 font-bold font-mono">$499/mo</span>
+                    </div>
+                    <ul className="text-xs text-slate-500 space-y-1 ml-4">
+                      <li>✓ Payroll processing included</li>
+                      <li>✓ Time tracking included</li>
+                      <li>✓ Scheduling included</li>
+                      <li>✓ Compliance tools included</li>
+                      <li>✓ No office needed</li>
+                      <li>✓ No office staff needed</li>
+                      <li>✓ Run everything from phone</li>
+                      <li>✓ Unlimited users</li>
+                    </ul>
+                  </div>
+                  <div className="flex justify-between text-sm border-t border-green-900/30 pt-2">
+                    <span className="text-green-300 font-bold">TOTAL MONTHLY:</span>
+                    <span className="text-green-400 font-bold font-mono">$499</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-green-400">
+                    <span>ANNUAL:</span>
+                    <span className="font-mono">$5,988</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-4 border-2 border-green-500/50">
+                  <div className="text-center">
+                    <div className="text-xs text-green-400 font-semibold mb-1">YOUR OPERATIONAL SAVINGS</div>
+                    <div className="text-4xl font-bold text-green-400 mb-1">
+                      $102K-186K<span className="text-lg text-slate-400">/year</span>
+                    </div>
+                    <div className="text-sm text-slate-300">That's real money back in your pocket</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Savings Summary */}
+            <Card className="bg-gradient-to-r from-purple-950/40 via-blue-950/40 to-cyan-950/40 border-2 border-cyan-500/50">
+              <CardContent className="p-6">
+                <h4 className="text-2xl font-bold text-white mb-6 text-center">Total Cost Savings Breakdown</h4>
+                <div className="grid md:grid-cols-3 gap-6 text-center">
+                  <div>
+                    <div className="text-xs text-cyan-400 font-semibold mb-2">Lower Markup Savings</div>
+                    <div className="text-4xl font-bold text-cyan-300 mb-1">~10%</div>
+                    <div className="text-xs text-slate-400">On billable labor costs</div>
+                  </div>
+                  <div className="border-l border-r border-cyan-900/30">
+                    <div className="text-xs text-green-400 font-semibold mb-2">Operational Cost Savings</div>
+                    <div className="text-4xl font-bold text-green-400 mb-1">20-35%</div>
+                    <div className="text-xs text-slate-400">Eliminated overhead</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-amber-400 font-semibold mb-2">TOTAL SAVINGS</div>
+                    <div className="text-5xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent mb-1">35-50%+</div>
+                    <div className="text-xs text-slate-400">Of your total costs</div>
+                  </div>
+                </div>
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-slate-300 mb-4">
+                    For a <span className="text-white font-semibold">$500K/year agency</span>, that's <span className="text-green-400 font-bold">$175K-250K in annual savings</span> — enough to hire 3-5 more salespeople or expand to new markets.
+                  </p>
+                  <Button 
+                    onClick={() => setShowDemoForm(true)}
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-lg px-8 py-6"
+                  >
+                    Calculate Your Exact Savings <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
