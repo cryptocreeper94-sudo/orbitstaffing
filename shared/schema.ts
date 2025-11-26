@@ -245,6 +245,13 @@ export const workers = pgTable(
     employeeNumber: varchar("employee_number", { length: 50 }).unique(),
     onboardingCompleted: boolean("onboarding_completed").default(false),
     onboardingCompletedDate: timestamp("onboarding_completed_date"),
+    
+    // Onboarding Deadline Tracking
+    applicationStartedDate: timestamp("application_started_date"),
+    applicationDeadline: timestamp("application_deadline"), // 3 business days after application
+    assignmentDate: timestamp("assignment_date"), // When assigned to first job
+    assignmentOnboardingDeadline: timestamp("assignment_onboarding_deadline"), // 1 business day after assignment
+    onboardingTimedOut: boolean("onboarding_timed_out").default(false),
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -292,6 +299,19 @@ export const clients = pgTable(
     jobTypes: jsonb("job_types"), // ['construction', 'cleaning', etc.]
     estimatedMonthlySpend: decimal("estimated_monthly_spend", { precision: 10, scale: 2 }),
     status: varchar("status", { length: 50 }).default("active"),
+
+    // CSA (Client Service Agreement) Tracking
+    csaStatus: varchar("csa_status", { length: 50 }).default("not_signed"), // not_signed, pending, signed, expired
+    csaSignedDate: timestamp("csa_signed_date"),
+    csaVersion: varchar("csa_version", { length: 10 }), // "1.0", "2.0"
+    csaDocumentUrl: varchar("csa_document_url", { length: 500 }),
+    csaExpirationDate: date("csa_expiration_date"),
+    csaSignerName: varchar("csa_signer_name", { length: 255 }),
+    csaSignatureData: jsonb("csa_signature_data"),
+
+    // Account Ownership Tracking
+    accountOwnerId: varchar("account_owner_id").references(() => users.id),
+    accountOwnerAssignedDate: timestamp("account_owner_assigned_date"),
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -2538,6 +2558,55 @@ export const insertWorkerAcceptanceSchema = createInsertSchema(workerAcceptances
 
 export type InsertWorkerAcceptance = z.infer<typeof insertWorkerAcceptanceSchema>;
 export type WorkerAcceptance = typeof workerAcceptances.$inferSelect;
+
+// ========================
+// Standard Pay Rates (Market Rates by Position/Location)
+// ========================
+export const standardPayRates = pgTable(
+  "standard_pay_rates",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Position Details
+    position: varchar("position", { length: 100 }).notNull(), // "General Laborer", "Forklift Operator", "Warehouse Associate", etc.
+    positionCategory: varchar("position_category", { length: 100 }), // "warehouse", "construction", "hospitality", "healthcare"
+    skillLevel: varchar("skill_level", { length: 50 }).default("entry"), // "entry", "intermediate", "experienced", "expert"
+    
+    // Geographic Location
+    state: varchar("state", { length: 2 }).notNull(), // TN, KY, AL, etc.
+    city: varchar("city", { length: 100 }), // Optional: Nashville, Memphis, Louisville, etc.
+    region: varchar("region", { length: 50 }), // Optional: "Middle TN", "Western KY"
+    
+    // Rate Information
+    hourlyRate: decimal("hourly_rate", { precision: 8, scale: 2 }).notNull(),
+    minRate: decimal("min_rate", { precision: 8, scale: 2 }), // Min market rate
+    maxRate: decimal("max_rate", { precision: 8, scale: 2 }), // Max market rate
+    
+    // Metadata
+    effectiveDate: date("effective_date").notNull(),
+    expirationDate: date("expiration_date"),
+    source: varchar("source", { length: 255 }).default("Market Survey"), // "Market Survey", "Bureau of Labor Stats", "Industry Standard"
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    positionStateIdx: index("idx_std_pay_position_state").on(table.position, table.state),
+    stateIdx: index("idx_std_pay_state").on(table.state),
+    categoryIdx: index("idx_std_pay_category").on(table.positionCategory),
+    effectiveDateIdx: index("idx_std_pay_effective").on(table.effectiveDate),
+  })
+);
+
+export const insertStandardPayRateSchema = createInsertSchema(standardPayRates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertStandardPayRate = z.infer<typeof insertStandardPayRateSchema>;
+export type StandardPayRate = typeof standardPayRates.$inferSelect;
 
 // ========================
 // Prevailing Wages (Government-mandated rates by state/job)
