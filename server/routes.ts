@@ -17,6 +17,9 @@ import {
   users,
   workers,
   companies,
+  prevailingWages,
+  workersCompRates,
+  stateComplianceRules,
 } from "@shared/schema";
 
 // ========================
@@ -858,3 +861,75 @@ export async function autoMatchWorkers(request: any, tenantId: string): Promise<
     return [];
   }
 }
+
+  // ========================
+  // COMPLIANCE & WAGE SCALES
+  // ========================
+  app.get("/api/compliance/prevailing-wages", async (req: Request, res: Response) => {
+    try {
+      const { state, jobClassification } = req.query;
+      let query = db.select().from(prevailingWages);
+      
+      if (state) {
+        query = query.where(eq(prevailingWages.state, state as string));
+      }
+      if (jobClassification) {
+        query = query.where(eq(prevailingWages.jobClassification, jobClassification as string));
+      }
+      
+      const wages = await query;
+      res.json(wages);
+    } catch (error) {
+      console.error("Prevailing wage fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch prevailing wages" });
+    }
+  });
+
+  app.get("/api/compliance/workers-comp-rates", async (req: Request, res: Response) => {
+    try {
+      const { state, industry } = req.query;
+      let query = db.select().from(workersCompRates);
+      
+      if (state) {
+        query = query.where(eq(workersCompRates.state, state as string));
+      }
+      if (industry) {
+        query = query.where(eq(workersCompRates.industryClassification, industry as string));
+      }
+      
+      const rates = await query;
+      res.json(rates);
+    } catch (error) {
+      console.error("Workers comp rate fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch workers comp rates" });
+    }
+  });
+
+  app.get("/api/compliance/state-rules/:state", async (req: Request, res: Response) => {
+    try {
+      const { state } = req.params;
+      const rules = await db.select().from(stateComplianceRules).where(eq(stateComplianceRules.state, state));
+      if (!rules.length) {
+        return res.status(404).json({ error: "State compliance rules not found" });
+      }
+      res.json(rules[0]);
+    } catch (error) {
+      console.error("State compliance fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch state compliance rules" });
+    }
+  });
+
+  app.get("/api/compliance/all-states", async (req: Request, res: Response) => {
+    try {
+      const states = await db.select().from(stateComplianceRules);
+      res.json(states);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch states" });
+    }
+  });
+
+import {
+  prevailingWages,
+  workersCompRates,
+  stateComplianceRules,
+} from "@shared/schema";

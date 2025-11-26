@@ -2538,3 +2538,131 @@ export const insertWorkerAcceptanceSchema = createInsertSchema(workerAcceptances
 
 export type InsertWorkerAcceptance = z.infer<typeof insertWorkerAcceptanceSchema>;
 export type WorkerAcceptance = typeof workerAcceptances.$inferSelect;
+
+// ========================
+// Prevailing Wages (Government-mandated rates by state/job)
+// ========================
+export const prevailingWages = pgTable(
+  "prevailing_wages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Geographic & Classification
+    state: varchar("state", { length: 2 }).notNull(), // TN, KY, AL, AR, NC, SC, GA, MS
+    jobClassification: varchar("job_classification", { length: 100 }).notNull(), // "Electrician", "Carpenter", "General Laborer", etc.
+    skillLevel: varchar("skill_level", { length: 50 }), // "Apprentice", "Journeyman", "Master", etc.
+    
+    // Rates
+    baseHourlyRate: decimal("base_hourly_rate", { precision: 8, scale: 2 }).notNull(),
+    fringe: decimal("fringe", { precision: 8, scale: 2 }).default("0.00"), // Additional fringe benefits
+    totalHourlyRate: decimal("total_hourly_rate", { precision: 8, scale: 2 }).notNull(), // base + fringe
+    
+    // Metadata
+    effectiveDate: date("effective_date").notNull(),
+    expirationDate: date("expiration_date"),
+    source: varchar("source", { length: 255 }), // "US Dept of Labor", "State Labor Board", etc.
+    applicableProjectTypes: varchar("applicable_project_types", { length: 255 }), // "public_works", "government_contracts", "union_work"
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    stateIdx: index("idx_prevailing_state").on(table.state),
+    classificationIdx: index("idx_prevailing_classification").on(table.jobClassification),
+    effectiveDateIdx: index("idx_prevailing_effective").on(table.effectiveDate),
+  })
+);
+
+export const insertPrevailingWageSchema = createInsertSchema(prevailingWages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPrevailingWage = z.infer<typeof insertPrevailingWageSchema>;
+export type PrevailingWage = typeof prevailingWages.$inferSelect;
+
+// ========================
+// Workers Comp Rates (State-specific by industry)
+// ========================
+export const workersCompRates = pgTable(
+  "workers_comp_rates",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Geographic & Industry
+    state: varchar("state", { length: 2 }).notNull(),
+    industryClassification: varchar("industry_classification", { length: 100 }).notNull(), // "construction", "healthcare", "general_labor", etc.
+    riskLevel: varchar("risk_level", { length: 50 }), // "low", "medium", "high"
+    
+    // Rates
+    percentageOfPayroll: decimal("percentage_of_payroll", { precision: 8, scale: 4 }).notNull(), // 0.5% - 20%
+    minimumPremiumPerEmployee: decimal("minimum_premium_per_employee", { precision: 10, scale: 2 }),
+    
+    // Requirements
+    coverageRequired: boolean("coverage_required").default(true),
+    minimumCoverage: decimal("minimum_coverage", { precision: 12, scale: 2 }),
+    
+    // Metadata
+    effectiveDate: date("effective_date").notNull(),
+    expirationDate: date("expiration_date"),
+    governingBody: varchar("governing_body", { length: 100 }), // "TN Department of Labor", etc.
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    stateIdx: index("idx_wc_state").on(table.state),
+    industryIdx: index("idx_wc_industry").on(table.industryClassification),
+    effectiveDateIdx: index("idx_wc_effective").on(table.effectiveDate),
+  })
+);
+
+export const insertWorkersCompRateSchema = createInsertSchema(workersCompRates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkersCompRate = z.infer<typeof insertWorkersCompRateSchema>;
+export type WorkersCompRate = typeof workersCompRates.$inferSelect;
+
+// ========================
+// State Compliance Rules
+// ========================
+export const stateComplianceRules = pgTable(
+  "state_compliance_rules",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // State
+    state: varchar("state", { length: 2 }).notNull().unique(),
+    
+    // Key Compliance Requirements
+    minWagePerHour: decimal("min_wage_per_hour", { precision: 8, scale: 2 }).notNull(),
+    workersCompRequired: boolean("workers_comp_required").default(true),
+    backgroundCheckRequired: boolean("background_check_required").default(false),
+    licenseRequirementsPerTrade: jsonb("license_requirements_per_trade"), // {"electrician": "required", "plumber": "required"}
+    prevailingWageApplies: boolean("prevailing_wage_applies").default(false),
+    
+    // Notes & Resources
+    specialRequirements: text("special_requirements"),
+    departmentOfLaborUrl: varchar("department_of_labor_url", { length: 500 }),
+    lastUpdated: timestamp("last_updated").notNull(),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    stateIdx: index("idx_compliance_state").on(table.state),
+  })
+);
+
+export const insertStateComplianceRuleSchema = createInsertSchema(stateComplianceRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertStateComplianceRule = z.infer<typeof insertStateComplianceRuleSchema>;
+export type StateComplianceRule = typeof stateComplianceRules.$inferSelect;
