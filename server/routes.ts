@@ -222,6 +222,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // WORKER APPLICATION & REFERRAL ROUTES
+  // ========================
+  
+  app.post("/api/workers/apply", async (req: Request, res: Response) => {
+    try {
+      const parsed = insertWorkerSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          error: "Invalid application data", 
+          details: parsed.error.issues 
+        });
+      }
+      
+      const applicationData = {
+        ...parsed.data,
+        signatureIpAddress: req.ip || req.connection.remoteAddress || "unknown",
+      };
+      
+      const worker = await storage.createWorkerApplication(applicationData);
+      
+      if (parsed.data.referredBy) {
+        try {
+          await storage.createReferralBonus(
+            parsed.data.referredBy,
+            worker.id,
+            applicationData.tenantId
+          );
+        } catch (error) {
+          console.error("Failed to create referral bonus:", error);
+        }
+      }
+      
+      res.status(201).json({
+        id: worker.id,
+        status: worker.status,
+        message: "Application submitted successfully! We'll review your application within 24 hours."
+      });
+    } catch (error) {
+      console.error("Worker application error:", error);
+      res.status(500).json({ error: "Failed to submit application" });
+    }
+  });
+  
+  app.get("/api/workers/apply/verify-referrer", async (req: Request, res: Response) => {
+    try {
+      const { phone, employeeNumber } = req.query;
+      
+      if (!phone && !employeeNumber) {
+        return res.status(400).json({ error: "Phone number or employee number required" });
+      }
+      
+      let referrer;
+      if (phone) {
+        referrer = await storage.getWorkerByPhone(phone as string);
+      } else if (employeeNumber) {
+        referrer = await storage.getWorkerByEmployeeNumber(employeeNumber as string);
+      }
+      
+      if (!referrer) {
+        return res.status(404).json({ exists: false, message: "Referrer not found" });
+      }
+      
+      if (referrer.status !== "approved") {
+        return res.status(400).json({ 
+          exists: true, 
+          valid: false, 
+          message: "Referrer must be an approved worker" 
+        });
+      }
+      
+      res.json({
+        exists: true,
+        valid: true,
+        referrerId: referrer.id,
+        referrerName: referrer.fullName,
+      });
+    } catch (error) {
+      console.error("Referrer verification error:", error);
+      res.status(500).json({ error: "Failed to verify referrer" });
+    }
+  });
+  
+  app.get("/api/workers/:id/referrals", async (req: Request, res: Response) => {
+    try {
+      const workerId = req.params.id;
+      const referrals = await storage.getWorkerReferrals(workerId);
+      
+      const referralsWithDetails = await Promise.all(
+        referrals.map(async (referral) => {
+          const referredWorker = await storage.getWorker(referral.referredWorkerId);
+          return {
+            ...referral,
+            referredWorkerName: referredWorker?.fullName || "Unknown",
+            referredWorkerPhone: referredWorker?.phone || "Unknown",
+            referredWorkerStatus: referredWorker?.status || "Unknown",
+          };
+        })
+      );
+      
+      res.json(referralsWithDetails);
+    } catch (error) {
+      console.error("Get referrals error:", error);
+      res.status(500).json({ error: "Failed to fetch referrals" });
+    }
+  });
+  
+  app.get("/api/workers/:id/referral-earnings", async (req: Request, res: Response) => {
+    try {
+      const workerId = req.params.id;
+      const earnings = await storage.getTotalReferralEarnings(workerId);
+      
+      res.json({
+        totalEarnings: earnings.total,
+        earnedButUnpaid: earnings.earned,
+        totalPaid: earnings.paid,
+      });
+    } catch (error) {
+      console.error("Get referral earnings error:", error);
+      res.status(500).json({ error: "Failed to fetch referral earnings" });
+    }
+  });
+  
+  app.post("/api/workers/:id/referral-link", async (req: Request, res: Response) => {
+    try {
+      const workerId = req.params.id;
+      const worker = await storage.getWorker(workerId);
+      
+      if (!worker) {
+        return res.status(404).json({ error: "Worker not found" });
+      }
+      
+      if (worker.status !== "approved") {
+        return res.status(400).json({ 
+          error: "Only approved workers can refer others" 
+        });
+      }
+      
+      const baseUrl = process.env.APP_URL || "http://localhost:5000";
+      const referralLink = `${baseUrl}/apply?ref=${workerId}`;
+      
+      res.json({
+        referralLink,
+        workerId,
+        workerName: worker.fullName,
+      });
+    } catch (error) {
+      console.error("Generate referral link error:", error);
+      res.status(500).json({ error: "Failed to generate referral link" });
+    }
+  });
+
+  // ========================
   // INSURANCE ROUTES
   // ========================
   app.post("/api/worker-insurance", async (req: Request, res: Response) => {

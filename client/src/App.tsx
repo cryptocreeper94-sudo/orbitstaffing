@@ -18,6 +18,7 @@ import { WorkerBonusTracker } from "@/pages/WorkerBonusTracker";
 import { WorkerShiftOffers } from "@/pages/WorkerShiftOffers";
 import { WorkerAvailabilityCalendar } from "@/pages/WorkerAvailabilityCalendar";
 import { WorkerReferrals } from "@/pages/WorkerReferrals";
+import WorkerApplication from "@/pages/WorkerApplication";
 import Roadmap from "@/pages/Roadmap";
 import PaymentPlans from "@/pages/PaymentPlans";
 import ValueProposition from "@/pages/ValueProposition";
@@ -68,6 +69,7 @@ function Router() {
       <Route path="/worker-shifts" component={WorkerShiftOffers} />
       <Route path="/worker-availability" component={WorkerAvailabilityCalendar} />
       <Route path="/worker-referrals" component={WorkerReferrals} />
+      <Route path="/apply" component={WorkerApplication} />
       <Route path="/roadmap" component={Roadmap} />
       <Route path="/payment-plans" component={PaymentPlans} />
       <Route path="/why-orbit" component={ValueProposition} />

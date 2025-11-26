@@ -28,6 +28,7 @@ import {
   syncedData,
   clients,
   csaTemplates,
+  workerReferralBonuses,
   type User,
   type InsertUser,
   type Company,
@@ -82,6 +83,8 @@ import {
   type InsertClient,
   type CSATemplate,
   type InsertCSATemplate,
+  type WorkerReferralBonus,
+  type InsertWorkerReferralBonus,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -354,10 +357,24 @@ export const storage: IStorage = {
   async createCompany(data: any): Promise<any> { return { id: `co-${Date.now()}`, ...data }; },
   async updateCompany(id: string, data: any): Promise<any> { return { id, ...data }; },
 
-  async getWorker(id: string): Promise<any> { return { id }; },
-  async listWorkers(): Promise<any[]> { return []; },
-  async createWorker(data: any): Promise<any> { return { id: `w-${Date.now()}`, ...data }; },
-  async updateWorker(id: string, data: any): Promise<any> { return { id, ...data }; },
+  async getWorker(id: string): Promise<Worker | undefined> {
+    const result = await db.select().from(workers).where(eq(workers.id, id));
+    return result[0];
+  },
+  
+  async listWorkers(): Promise<Worker[]> {
+    return await db.select().from(workers).orderBy(desc(workers.createdAt));
+  },
+  
+  async createWorker(data: InsertWorker): Promise<Worker> {
+    const result = await db.insert(workers).values(data).returning();
+    return result[0];
+  },
+  
+  async updateWorker(id: string, data: Partial<InsertWorker>): Promise<Worker | undefined> {
+    const result = await db.update(workers).set({...data, updatedAt: new Date()}).where(eq(workers.id, id)).returning();
+    return result[0];
+  },
 
   async getAssignment(id: string): Promise<any> { return { id }; },
   async listAssignments(): Promise<any[]> { return []; },
@@ -411,8 +428,314 @@ export const storage: IStorage = {
   async listIncidentReports(): Promise<any[]> { return []; },
   async updateIncidentReportStatus(id: string, status: string): Promise<any> { return { id, status }; },
 
-  async createReferralBonus(data: any): Promise<any> { return { id: `ref-${Date.now()}`, ...data }; },
-  async getReferralBonusesByReferrer(workerId: string): Promise<any[]> { return []; },
+  // ========================
+  // Worker Application & Referral System
+  // ========================
+  
+  async createWorkerApplication(data: InsertWorker): Promise<Worker> {
+    const now = new Date();
+    const threeDaysLater = new Date(now);
+    threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+    
+    const applicationData = {
+      ...data,
+      status: "pending_review",
+      applicationStartedDate: now,
+      applicationDeadline: threeDaysLater,
+      signatureDate: now,
+    };
+    
+    const result = await db.insert(workers).values(applicationData).returning();
+    return result[0];
+  },
+  
+  async updateWorkerStatus(workerId: string, status: string): Promise<Worker | undefined> {
+    const updates: any = { status, updatedAt: new Date() };
+    
+    if (status === "approved") {
+      updates.onboardingCompleted = true;
+      updates.onboardingCompletedDate = new Date();
+    }
+    
+    const result = await db.update(workers)
+      .set(updates)
+      .where(eq(workers.id, workerId))
+      .returning();
+    return result[0];
+  },
+  
+  async getWorkerByPhone(phone: string): Promise<Worker | undefined> {
+    const result = await db.select().from(workers).where(eq(workers.phone, phone)).limit(1);
+    return result[0];
+  },
+  
+  async getWorkerByEmployeeNumber(employeeNumber: string): Promise<Worker | undefined> {
+    const result = await db.select().from(workers).where(eq(workers.employeeNumber, employeeNumber)).limit(1);
+    return result[0];
+  },
+  
+  async createReferralBonus(referrerId: string, referredWorkerId: string, tenantId: string): Promise<WorkerReferralBonus> {
+    const data: InsertWorkerReferralBonus = {
+      tenantId,
+      referrerId,
+      referredWorkerId,
+      bonusAmount: "100.00",
+      bonusStatus: "pending",
+      hoursWorkedByReferred: "0",
+      minimumHoursRequired: "40.00",
+      eligibilityMet: false,
+    };
+    
+    const result = await db.insert(workerReferralBonuses).values(data).returning();
+    return result[0];
+  },
+  
+  async updateReferralBonusHours(referredWorkerId: string, hours: number): Promise<void> {
+    const referralBonuses = await db.select()
+      .from(workerReferralBonuses)
+      .where(
+        and(
+          eq(workerReferralBonuses.referredWorkerId, referredWorkerId),
+          eq(workerReferralBonuses.bonusStatus, "pending")
+        )
+      );
+    
+    for (const bonus of referralBonuses) {
+      const totalHours = parseFloat(bonus.hoursWorkedByReferred || "0") + hours;
+      const minimumHours = parseFloat(bonus.minimumHoursRequired || "40");
+      
+      const updates: any = {
+        hoursWorkedByReferred: totalHours.toString(),
+        updatedAt: new Date(),
+      };
+      
+      if (totalHours >= minimumHours && !bonus.eligibilityMet) {
+        updates.eligibilityMet = true;
+        updates.bonusStatus = "earned";
+        updates.bonusEarnedDate = new Date();
+      }
+      
+      await db.update(workerReferralBonuses)
+        .set(updates)
+        .where(eq(workerReferralBonuses.id, bonus.id));
+    }
+  },
+  
+  async getWorkerReferrals(workerId: string): Promise<WorkerReferralBonus[]> {
+    return await db.select()
+      .from(workerReferralBonuses)
+      .where(eq(workerReferralBonuses.referrerId, workerId))
+      .orderBy(desc(workerReferralBonuses.createdAt));
+  },
+  
+  async markReferralBonusPaid(bonusId: string, payrollCycleId?: string): Promise<WorkerReferralBonus | undefined> {
+    const result = await db.update(workerReferralBonuses)
+      .set({
+        bonusStatus: "paid",
+        bonusPaidDate: new Date(),
+        payrollCycleId: payrollCycleId || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(workerReferralBonuses.id, bonusId))
+      .returning();
+    return result[0];
+  },
+  
+  async getReferralBonusesByReferrer(workerId: string): Promise<WorkerReferralBonus[]> {
+    return await this.getWorkerReferrals(workerId);
+  },
+  
+  async getTotalReferralEarnings(workerId: string): Promise<{ total: number; earned: number; paid: number }> {
+    const referrals = await this.getWorkerReferrals(workerId);
+    
+    let total = 0;
+    let earned = 0;
+    let paid = 0;
+    
+    for (const referral of referrals) {
+      const amount = parseFloat(referral.bonusAmount || "0");
+      total += amount;
+      
+      if (referral.bonusStatus === "earned") {
+        earned += amount;
+      } else if (referral.bonusStatus === "paid") {
+        paid += amount;
+      }
+    }
+    
+    return { total, earned, paid };
+  },
+  
+  // ========================
+  // PUBLIC REFERRALS
+  // ========================
+  async createPublicReferral(referrerInfo: {
+    name: string;
+    phone: string;
+    email: string;
+    paymentMethod: string;
+    paymentDetails: string;
+  }, workerInfo: {
+    name: string;
+    phone: string;
+    email?: string;
+    relationship: string;
+    notes?: string;
+  }, tenantId: string): Promise<WorkerReferralBonus> {
+    const data: InsertWorkerReferralBonus = {
+      tenantId,
+      referrerType: "public",
+      publicReferrerName: referrerInfo.name,
+      publicReferrerPhone: referrerInfo.phone,
+      publicReferrerEmail: referrerInfo.email,
+      paymentMethod: referrerInfo.paymentMethod,
+      paymentDetails: referrerInfo.paymentDetails,
+      paymentStatus: "pending",
+      referredWorkerName: workerInfo.name,
+      referredWorkerPhone: workerInfo.phone,
+      referredWorkerEmail: workerInfo.email || null,
+      relationship: workerInfo.relationship,
+      notes: workerInfo.notes || null,
+      bonusAmount: "50.00", // $50 for public referrals
+      bonusStatus: "pending",
+      hoursWorkedByReferred: "0",
+      minimumHoursRequired: "80.00", // 80 hours (2 weeks) for public referrals
+      eligibilityMet: false,
+    };
+    
+    const result = await db.insert(workerReferralBonuses).values(data).returning();
+    return result[0];
+  },
+  
+  async getPublicReferralByPhone(workerPhone: string): Promise<WorkerReferralBonus | null> {
+    const result = await db.select()
+      .from(workerReferralBonuses)
+      .where(
+        and(
+          eq(workerReferralBonuses.referrerType, "public"),
+          eq(workerReferralBonuses.referredWorkerPhone, workerPhone),
+          sql`${workerReferralBonuses.referredWorkerId} IS NULL` // Not yet linked to a worker
+        )
+      )
+      .limit(1);
+    return result[0] || null;
+  },
+  
+  async linkWorkerToPublicReferral(workerId: string, referralId: string): Promise<WorkerReferralBonus | undefined> {
+    const result = await db.update(workerReferralBonuses)
+      .set({
+        referredWorkerId: workerId,
+        workerAppliedDate: new Date(),
+        bonusStatus: "pending", // Will be updated to worker_approved when approved
+        updatedAt: new Date(),
+      })
+      .where(eq(workerReferralBonuses.id, referralId))
+      .returning();
+    return result[0];
+  },
+  
+  async updatePublicReferralOnWorkerApproval(workerId: string): Promise<void> {
+    await db.update(workerReferralBonuses)
+      .set({
+        bonusStatus: "worker_approved",
+        workerApprovedDate: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(workerReferralBonuses.referredWorkerId, workerId),
+          eq(workerReferralBonuses.referrerType, "public")
+        )
+      );
+  },
+  
+  async getPublicReferralStatus(referralId: string): Promise<WorkerReferralBonus | null> {
+    const result = await db.select()
+      .from(workerReferralBonuses)
+      .where(eq(workerReferralBonuses.id, referralId))
+      .limit(1);
+    return result[0] || null;
+  },
+  
+  async updatePublicReferralHours(workerId: string, totalHours: number): Promise<void> {
+    const referralBonuses = await db.select()
+      .from(workerReferralBonuses)
+      .where(
+        and(
+          eq(workerReferralBonuses.referredWorkerId, workerId),
+          eq(workerReferralBonuses.referrerType, "public"),
+          eq(workerReferralBonuses.eligibilityMet, false)
+        )
+      );
+    
+    for (const bonus of referralBonuses) {
+      const minimumRequired = parseFloat(bonus.minimumHoursRequired || "80");
+      
+      if (totalHours >= minimumRequired) {
+        // Mark as earned!
+        await db.update(workerReferralBonuses)
+          .set({
+            hoursWorkedByReferred: totalHours.toString(),
+            eligibilityMet: true,
+            bonusStatus: "earned",
+            bonusEarnedDate: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(workerReferralBonuses.id, bonus.id));
+          
+        // Send notification email (if emailService is available)
+        try {
+          if (bonus.publicReferrerEmail) {
+            await emailService.sendEmail({
+              to: bonus.publicReferrerEmail,
+              subject: "🎉 You earned $50 with ORBIT!",
+              html: `
+                <h2>Congratulations!</h2>
+                <p>You've earned a $50 referral bonus!</p>
+                <p>${bonus.referredWorkerName} has completed their first 2 weeks (80 hours) of work.</p>
+                <p>Your payment via ${bonus.paymentMethod} will be processed within 3 business days.</p>
+                <p>Thank you for helping us grow!</p>
+              `,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to send bonus earned email:", error);
+        }
+      } else {
+        // Just update hours
+        await db.update(workerReferralBonuses)
+          .set({
+            hoursWorkedByReferred: totalHours.toString(),
+            updatedAt: new Date(),
+          })
+          .where(eq(workerReferralBonuses.id, bonus.id));
+      }
+    }
+  },
+  
+  async getPublicReferralsByEmail(email: string): Promise<WorkerReferralBonus[]> {
+    return await db.select()
+      .from(workerReferralBonuses)
+      .where(
+        and(
+          eq(workerReferralBonuses.referrerType, "public"),
+          eq(workerReferralBonuses.publicReferrerEmail, email)
+        )
+      )
+      .orderBy(desc(workerReferralBonuses.createdAt));
+  },
+  
+  async updatePublicReferralPaymentInfo(referralId: string, paymentMethod: string, paymentDetails: string): Promise<WorkerReferralBonus | undefined> {
+    const result = await db.update(workerReferralBonuses)
+      .set({
+        paymentMethod,
+        paymentDetails,
+        updatedAt: new Date(),
+      })
+      .where(eq(workerReferralBonuses.id, referralId))
+      .returning();
+    return result[0];
+  },
 
   async getFeatureFlag(key: string): Promise<any> { return null; },
   async getAllFeatureFlags(): Promise<any[]> { return []; },

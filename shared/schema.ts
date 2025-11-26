@@ -226,14 +226,63 @@ export const workers = pgTable(
     companyId: varchar("company_id").references(() => companies.id),
 
     // Personal Info
+    fullName: varchar("full_name", { length: 255 }),
+    phone: varchar("phone", { length: 20 }),
+    email: varchar("email", { length: 255 }),
     ssnEncrypted: varchar("ssn_encrypted", { length: 255 }), // encrypted
     dateOfBirth: date("date_of_birth"),
     driversLicense: varchar("drivers_license", { length: 50 }),
+    driversLicenseState: varchar("drivers_license_state", { length: 2 }),
+
+    // Address
+    streetAddress: varchar("street_address", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+
+    // Emergency Contact
+    emergencyContactName: varchar("emergency_contact_name", { length: 255 }),
+    emergencyContactPhone: varchar("emergency_contact_phone", { length: 20 }),
+    emergencyContactRelationship: varchar("emergency_contact_relationship", { length: 100 }),
 
     // Skills & Work Info
     skills: jsonb("skills"), // ['electrician', 'plumber', etc.]
+    otherSkills: text("other_skills"),
     hourlyWage: decimal("hourly_wage", { precision: 8, scale: 2 }),
     availabilityStatus: varchar("availability_status", { length: 50 }).default("available"),
+
+    // Skilled Worker Details (for trades requiring certifications)
+    yearsExperience: varchar("years_experience", { length: 20 }),
+    licenseNumber: varchar("license_number", { length: 100 }),
+    licenseIssuingState: varchar("license_issuing_state", { length: 2 }),
+    licenseExpirationDate: date("license_expiration_date"),
+    certificationDocumentUrl: varchar("certification_document_url", { length: 500 }),
+
+    // Availability Preferences
+    availableToStart: varchar("available_to_start", { length: 50 }), // immediately, 1_week, 2_weeks, 1_month
+    preferredShift: varchar("preferred_shift", { length: 50 }), // morning, afternoon, night, any
+    daysAvailable: jsonb("days_available"), // ['monday', 'tuesday', 'wednesday', etc.]
+    willingToWorkWeekends: boolean("willing_to_work_weekends"),
+    transportation: varchar("transportation", { length: 50 }), // own_vehicle, public_transit, need_ride
+
+    // Application Status
+    status: varchar("status", { length: 50 }).default("pending_review"), // pending_review, background_check_pending, approved, rejected
+
+    // Consent & Agreement
+    backgroundCheckConsent: boolean("background_check_consent").default(false),
+    backgroundCheckConsentDate: timestamp("background_check_consent_date"),
+    mvrCheckConsent: boolean("mvr_check_consent").default(false),
+    mvrCheckConsentDate: timestamp("mvr_check_consent_date"),
+    certificationAccuracyConsent: boolean("certification_accuracy_consent").default(false),
+    certificationAccuracyConsentDate: timestamp("certification_accuracy_consent_date"),
+
+    // Application Signature
+    signatureName: varchar("signature_name", { length: 255 }),
+    signatureDate: timestamp("signature_date"),
+    signatureIpAddress: varchar("signature_ip_address", { length: 100 }),
+
+    // Referral Tracking
+    referredBy: varchar("referred_by").references(() => workers.id),
 
     // Compliance
     i9Verified: boolean("i9_verified").default(false),
@@ -261,6 +310,9 @@ export const workers = pgTable(
     companyIdx: index("idx_workers_company_id").on(table.companyId),
     userIdx: index("idx_workers_user_id").on(table.userId),
     employeeNumberIdx: index("idx_workers_employee_number").on(table.employeeNumber),
+    statusIdx: index("idx_workers_status").on(table.status),
+    phoneIdx: index("idx_workers_phone").on(table.phone),
+    referredByIdx: index("idx_workers_referred_by").on(table.referredBy),
   })
 );
 
@@ -622,6 +674,87 @@ export const insertWorkerBonusSchema = createInsertSchema(workerBonuses).omit({
 
 export type InsertWorkerBonus = z.infer<typeof insertWorkerBonusSchema>;
 export type WorkerBonus = typeof workerBonuses.$inferSelect;
+
+// ========================
+// Worker Referral Bonuses
+// ========================
+export const workerReferralBonuses = pgTable(
+  "worker_referral_bonuses",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Referral Type
+    referrerType: varchar("referrer_type", { length: 50 }).notNull().default("worker"), // "worker" or "public"
+    
+    // Worker Referral (for internal worker-to-worker referrals)
+    referrerId: varchar("referrer_id").references(() => workers.id), // Worker who made the referral (nullable for public)
+    
+    // Public Referral Info (for non-worker public referrals)
+    publicReferrerName: varchar("public_referrer_name", { length: 255 }),
+    publicReferrerPhone: varchar("public_referrer_phone", { length: 20 }),
+    publicReferrerEmail: varchar("public_referrer_email", { length: 255 }),
+    
+    // Payment Info (for public referrals)
+    paymentMethod: varchar("payment_method", { length: 50 }), // venmo, cashapp, zelle, paypal, check
+    paymentDetails: text("payment_details"), // Username, phone, or mailing address
+    paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, sent, confirmed
+    
+    // Worker Being Referred
+    referredWorkerId: varchar("referred_worker_id").references(() => workers.id), // Worker who was referred (nullable until they apply)
+    referredWorkerName: varchar("referred_worker_name", { length: 255 }), // Pre-filled name before application
+    referredWorkerPhone: varchar("referred_worker_phone", { length: 20 }), // Pre-filled phone before application
+    referredWorkerEmail: varchar("referred_worker_email", { length: 255 }), // Pre-filled email before application
+    
+    // Relationship Info (for public referrals)
+    relationship: varchar("relationship", { length: 100 }), // Friend, Family, Neighbor, Coworker, Other
+    notes: text("notes"), // Why would they be a good worker?
+    
+    // Bonus Details
+    bonusAmount: decimal("bonus_amount", { precision: 10, scale: 2 }).default("100.00"), // Default $100 for worker, $50 for public
+    bonusStatus: varchar("bonus_status", { length: 50 }).default("pending"), // pending, worker_approved, earned, paid
+    
+    // Eligibility Tracking
+    hoursWorkedByReferred: decimal("hours_worked_by_referred", { precision: 8, scale: 2 }).default("0"),
+    minimumHoursRequired: decimal("minimum_hours_required", { precision: 8, scale: 2 }).default("40.00"), // 40 for worker, 80 for public
+    eligibilityMet: boolean("eligibility_met").default(false),
+    
+    // Dates
+    referralDate: timestamp("referral_date").default(sql`NOW()`),
+    workerAppliedDate: timestamp("worker_applied_date"),
+    workerApprovedDate: timestamp("worker_approved_date"),
+    bonusEarnedDate: timestamp("bonus_earned_date"),
+    bonusPaidDate: timestamp("bonus_paid_date"),
+    
+    // Payroll Integration
+    payrollCycleId: varchar("payroll_cycle_id"), // Links to payroll when paid
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_referral_bonuses_tenant").on(table.tenantId),
+    referrerIdx: index("idx_referral_bonuses_referrer").on(table.referrerId),
+    referredWorkerIdx: index("idx_referral_bonuses_referred_worker").on(table.referredWorkerId),
+    statusIdx: index("idx_referral_bonuses_status").on(table.bonusStatus),
+    referrerTypeIdx: index("idx_referral_bonuses_type").on(table.referrerType),
+    publicEmailIdx: index("idx_referral_bonuses_public_email").on(table.publicReferrerEmail),
+    referredPhoneIdx: index("idx_referral_bonuses_referred_phone").on(table.referredWorkerPhone),
+  })
+);
+
+export const insertWorkerReferralBonusSchema = createInsertSchema(workerReferralBonuses).omit({
+  id: true,
+  workerAppliedDate: true,
+  workerApprovedDate: true,
+  bonusEarnedDate: true,
+  bonusPaidDate: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerReferralBonus = z.infer<typeof insertWorkerReferralBonusSchema>;
+export type WorkerReferralBonus = typeof workerReferralBonuses.$inferSelect;
 
 // ========================
 // Equipment Tracking
