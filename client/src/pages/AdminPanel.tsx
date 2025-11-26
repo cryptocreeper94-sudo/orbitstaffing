@@ -44,6 +44,13 @@ export default function AdminPanel() {
       setIsAuthenticated(true);
       setRole(session.role as AdminRole);
       setAdminName(session.name || 'Admin');
+      
+      // Show automation update for Sidonie if she hasn't seen it yet
+      const hasSeenAutomationUpdate = localStorage.getItem('sidonieV1AutomationUpdate') === 'seen';
+      if (session.name === 'Sidonie' && !hasSeenAutomationUpdate) {
+        setShowWelcomeMessage(true);
+      }
+      
       return;
     }
     
@@ -52,15 +59,19 @@ export default function AdminPanel() {
     const savedRole = localStorage.getItem('adminRole') as AdminRole;
     const savedName = localStorage.getItem('adminName');
     const hasFirstLogin = localStorage.getItem('sidonieFirstLogin') === 'true';
+    const hasSeenAutomationUpdate = localStorage.getItem('sidonieV1AutomationUpdate') === 'seen';
     
     if (adminAuth === 'true' && savedRole) {
       setIsAuthenticated(true);
       setRole(savedRole);
       setAdminName(savedName || 'Admin');
       
-      if (hasFirstLogin && savedName === 'Sidonie') {
-        setShowWelcomeMessage(true);
-        localStorage.removeItem('sidonieFirstLogin');
+      // Show welcome message on first login OR if she hasn't seen automation update
+      if (savedName === 'Sidonie') {
+        if (hasFirstLogin || !hasSeenAutomationUpdate) {
+          setShowWelcomeMessage(true);
+          localStorage.removeItem('sidonieFirstLogin');
+        }
       }
     }
   }, []);
@@ -92,10 +103,11 @@ export default function AdminPanel() {
         localStorage.setItem('adminAuthenticated', 'true');
         localStorage.setItem('adminRole', 'master_admin');
         localStorage.setItem('adminName', 'Sidonie');
-        localStorage.setItem('sidonieFirstLogin', 'true');
         setIsAuthenticated(true);
         setRole('master_admin');
         setAdminName('Sidonie');
+        
+        // Always show welcome message on successful login
         setShowWelcomeMessage(true);
         setPin('');
       } else {
@@ -289,7 +301,11 @@ export default function AdminPanel() {
       {/* Sidonie Welcome Modal */}
       <SidonieWelcomeModal 
         isOpen={showWelcomeMessage} 
-        onClose={() => setShowWelcomeMessage(false)} 
+        onClose={() => {
+          setShowWelcomeMessage(false);
+          // Mark automation update as seen
+          localStorage.setItem('sidonieV1AutomationUpdate', 'seen');
+        }} 
       />
       
       <div className="max-w-6xl mx-auto">
@@ -351,7 +367,7 @@ export default function AdminPanel() {
         </div>
 
         {/* Role-Based Admin Views */}
-        {role === 'master_admin' && <MasterAdminDashboard />}
+        {role === 'master_admin' && <MasterAdminDashboard adminName={adminName} />}
         {role === 'franchise_admin' && <FranchiseAdminDashboard />}
         {role === 'customer_admin' && <CustomerAdminDashboard />}
       </div>
@@ -362,7 +378,7 @@ export default function AdminPanel() {
 // ==========================================
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
-function MasterAdminDashboard() {
+function MasterAdminDashboard({ adminName }: { adminName: string }) {
   const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional'>('checklist');
   const [checklist, setChecklist] = useState([
     {
