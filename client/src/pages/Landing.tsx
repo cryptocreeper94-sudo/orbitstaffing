@@ -323,6 +323,105 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* MARKUP COMPARISON - Show 1.45x vs 1.6x Advantage */}
+      <section className="py-16 bg-gradient-to-br from-green-950/20 via-background to-emerald-950/10 border-y border-green-500/20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-sm mb-4">
+              <DollarSign className="w-4 h-4 mr-2" /> Transparent Pricing
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-3 text-white">
+              Lower Markup = More Savings
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              While most staffing agencies in Tennessee charge 1.6x markup, <span className="text-green-400 font-bold">ORBIT charges just 1.45x</span> — saving you real money on every hour worked.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {/* Industry Average */}
+            <Card className="bg-gradient-to-br from-red-950/40 to-slate-900 border-2 border-red-500/30 relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-bl-lg">
+                INDUSTRY AVERAGE
+              </div>
+              <CardContent className="p-8 text-center">
+                <div className="text-6xl mb-4 opacity-50">🏢</div>
+                <h3 className="text-2xl font-bold text-red-300 mb-2">Typical Agencies</h3>
+                <div className="text-5xl font-bold text-red-400 mb-4">1.6x</div>
+                <p className="text-slate-400 text-sm mb-6">Markup on Worker Pay Rate</p>
+                <div className="bg-slate-950/50 rounded-lg p-4 border border-red-900/30">
+                  <div className="text-xs text-slate-400 mb-2">Example: $20/hr worker</div>
+                  <div className="text-2xl font-bold text-white">
+                    $32.00<span className="text-sm text-slate-400">/hr</span>
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">You pay to agency</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* ORBIT */}
+            <Card className="bg-gradient-to-br from-green-950/40 to-emerald-900/30 border-2 border-green-500/50 relative overflow-hidden shadow-[0_0_40px_rgba(34,197,94,0.2)]">
+              <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> ORBIT ADVANTAGE
+              </div>
+              <CardContent className="p-8 text-center">
+                <div className="text-6xl mb-4">✨</div>
+                <h3 className="text-2xl font-bold text-green-300 mb-2">ORBIT Staffing OS</h3>
+                <div className="text-5xl font-bold text-green-400 mb-4">1.45x</div>
+                <p className="text-slate-400 text-sm mb-6">Lower Markup, Same Quality</p>
+                <div className="bg-slate-950/50 rounded-lg p-4 border border-green-500/30">
+                  <div className="text-xs text-slate-400 mb-2">Example: $20/hr worker</div>
+                  <div className="text-2xl font-bold text-green-400">
+                    $29.00<span className="text-sm text-slate-400">/hr</span>
+                  </div>
+                  <div className="text-xs text-green-500 mt-1 font-semibold">You pay to ORBIT</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Savings Callout */}
+          <Card className="bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-green-500/10 border-2 border-amber-500/30">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-center md:text-left">
+                  <div className="text-sm text-amber-400 font-semibold mb-2">YOUR SAVINGS PER HOUR</div>
+                  <div className="text-5xl font-bold text-amber-300 mb-2">
+                    $3.00<span className="text-2xl text-slate-400">/hr</span>
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    On a $20/hr worker • <span className="text-green-400 font-semibold">10% cost reduction</span>
+                  </div>
+                </div>
+                <div className="h-px md:h-16 w-full md:w-px bg-gradient-to-r md:bg-gradient-to-b from-transparent via-amber-500/50 to-transparent"></div>
+                <div className="text-center md:text-right">
+                  <div className="text-sm text-amber-400 font-semibold mb-2">ANNUAL SAVINGS</div>
+                  <div className="text-4xl font-bold text-green-400 mb-2">
+                    $6,240<span className="text-xl text-slate-400">/yr</span>
+                  </div>
+                  <div className="text-sm text-slate-400">
+                    Per full-time worker (40 hrs/week × 52 weeks)
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="text-center mt-8">
+            <p className="text-slate-400 text-sm mb-4">
+              <Lock className="w-4 h-4 inline mr-2 text-amber-500" />
+              Our 1.45x markup is <span className="text-amber-300 font-semibold">locked and transparent</span> — no hidden fees, no surprises.
+            </p>
+            <Button 
+              onClick={() => setShowDemoForm(true)}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]"
+            >
+              See Your Savings <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-12 bg-card/30 backdrop-blur-sm border-y border-border/30">
         <div className="max-w-6xl mx-auto px-6">
