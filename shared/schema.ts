@@ -2704,3 +2704,77 @@ export const insertIntegrationTokenSchema = createInsertSchema(integrationTokens
 
 export type InsertIntegrationToken = z.infer<typeof insertIntegrationTokenSchema>;
 export type IntegrationToken = typeof integrationTokens.$inferSelect;
+
+// ========================
+// Data Sync Tracking
+// ========================
+export const syncLogs = pgTable(
+  "sync_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    integrationType: varchar("integration_type", { length: 50 }).notNull(),
+    entityType: varchar("entity_type", { length: 50 }).notNull(), // "customer", "worker", "invoice", "timesheet"
+    syncStatus: varchar("sync_status", { length: 50 }).default("pending"), // "pending", "in_progress", "completed", "failed"
+    recordsProcessed: integer("records_processed").default(0),
+    recordsSucceeded: integer("records_succeeded").default(0),
+    recordsFailed: integer("records_failed").default(0),
+    errorMessage: text("error_message"),
+    syncStartedAt: timestamp("sync_started_at"),
+    syncCompletedAt: timestamp("sync_completed_at"),
+    nextSyncAt: timestamp("next_sync_at"),
+    metadata: jsonb("metadata"), // Store sync-specific details
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_sync_logs_tenant").on(table.tenantId),
+    typeIdx: index("idx_sync_logs_integration").on(table.integrationType),
+    statusIdx: index("idx_sync_logs_status").on(table.syncStatus),
+  })
+);
+
+export const insertSyncLogSchema = createInsertSchema(syncLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertSyncLog = z.infer<typeof insertSyncLogSchema>;
+export type SyncLog = typeof syncLogs.$inferSelect;
+
+// ========================
+// Synced Data Cache (Local Copy)
+// ========================
+export const syncedData = pgTable(
+  "synced_data",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    integrationType: varchar("integration_type", { length: 50 }).notNull(),
+    entityType: varchar("entity_type", { length: 50 }).notNull(), // "customer", "worker", "invoice"
+    externalId: varchar("external_id", { length: 255 }).notNull(), // ID from source system
+    orbitId: varchar("orbit_id", { length: 255 }), // ID in ORBIT if created
+    sourceData: jsonb("source_data").notNull(), // Raw data from provider
+    normalizedData: jsonb("normalized_data"), // Transformed to ORBIT format
+    syncedAt: timestamp("synced_at").default(sql`NOW()`),
+    externalUpdatedAt: timestamp("external_updated_at"), // Last update timestamp from provider
+    localUpdatedAt: timestamp("local_updated_at"), // Last time we modified it locally
+    conflict: boolean("conflict").default(false), // Flag if data conflicts locally
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_synced_tenant").on(table.tenantId),
+    typeIdx: index("idx_synced_integration_entity").on(table.integrationType, table.entityType),
+    externalIdIdx: index("idx_synced_external_id").on(table.externalId),
+  })
+);
+
+export const insertSyncedDataSchema = createInsertSchema(syncedData).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  syncedAt: true,
+});
+
+export type InsertSyncedData = z.infer<typeof insertSyncedDataSchema>;
+export type SyncedData = typeof syncedData.$inferSelect;
