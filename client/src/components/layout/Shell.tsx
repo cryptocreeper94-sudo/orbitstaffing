@@ -9,7 +9,8 @@ import {
   ScanLine,
   HardHat,
   Activity,
-  MessageCircle
+  MessageCircle,
+  Zap
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { HallmarkPageWatermark } from "@/components/HallmarkWatermark";
 import { ContactForm } from "@/components/ContactForm";
+import { OCRScannerModal } from "@/components/layout/OCRScannerModal";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -98,22 +100,34 @@ export function Sidebar() {
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const [contactOpen, setContactOpen] = useState(false);
+  const [ocrScannerOpen, setOcrScannerOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
       <Sidebar />
       <main className="flex-1 overflow-y-auto relative">
-        {/* App Store Coming Soon Banner */}
+        {/* App Store Coming Soon Banner + OCR Scanner Button */}
         <div className="sticky top-0 z-50 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b-2 border-cyan-500/50 backdrop-blur-sm">
           <div className="px-8 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1">
               <div className="text-xl">📱</div>
-              <div>
+              <div className="flex-1">
                 <div className="text-sm font-bold text-cyan-300">Coming Soon</div>
                 <div className="text-xs text-cyan-200/80">Google Play Store & Apple App Store Native Apps</div>
               </div>
             </div>
-            <div className="text-xs text-cyan-300/70">Get native mobile experience</div>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => setOcrScannerOpen(true)}
+                size="sm"
+                className="gap-2 bg-cyan-600 hover:bg-cyan-700 text-white"
+                data-testid="button-open-ocr-scanner"
+              >
+                <Zap className="w-4 h-4" />
+                <span className="hidden sm:inline">Scan</span>
+              </Button>
+              <div className="text-xs text-cyan-300/70">Get native mobile experience</div>
+            </div>
           </div>
         </div>
 
@@ -127,6 +141,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="p-8 relative z-10 max-w-7xl mx-auto">
           {children}
         </div>
+
+        {/* OCR Scanner Modal */}
+        <OCRScannerModal 
+          isOpen={ocrScannerOpen}
+          onClose={() => setOcrScannerOpen(false)}
+        />
 
         {/* Contact Developer Button - REMOVED - will be added back in proper location */}
         {/* Contact Form Modal - REMOVED */}
