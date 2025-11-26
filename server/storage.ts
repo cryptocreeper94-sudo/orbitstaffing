@@ -485,9 +485,108 @@ export const storage: IStorage = {
   async listAssignments(): Promise<any[]> { return []; },
   async updateAssignment(id: string, data: any): Promise<any> { return { id, ...data }; },
 
-  async getTimesheet(id: string): Promise<any> { return { id }; },
-  async listTimesheets(): Promise<any[]> { return []; },
-  async updateTimesheet(id: string, data: any): Promise<any> { return { id, ...data }; },
+  async getTimesheet(id: string): Promise<Timesheet | null> {
+    const result = await db.select().from(timesheets).where(eq(timesheets.id, id)).limit(1);
+    return result[0] || null;
+  },
+
+  async listTimesheets(tenantId?: string): Promise<Timesheet[]> {
+    let query = db.select().from(timesheets);
+    if (tenantId) {
+      query = query.where(eq(timesheets.tenantId, tenantId));
+    }
+    return await query.orderBy(desc(timesheets.clockInTime));
+  },
+
+  async getTimesheetsByStatus(tenantId: string, status: string): Promise<Timesheet[]> {
+    return await db
+      .select()
+      .from(timesheets)
+      .where(and(eq(timesheets.tenantId, tenantId), eq(timesheets.status, status)))
+      .orderBy(desc(timesheets.clockInTime));
+  },
+
+  async createTimesheet(data: InsertTimesheet): Promise<Timesheet> {
+    const result = await db.insert(timesheets).values(data).returning();
+    return result[0];
+  },
+
+  async updateTimesheet(id: string, data: Partial<InsertTimesheet>): Promise<Timesheet> {
+    const result = await db
+      .update(timesheets)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(timesheets.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async autoApproveTimesheet(timesheetId: string): Promise<void> {
+    const timesheet = await this.getTimesheet(timesheetId);
+    if (!timesheet || !timesheet.clockOutTime) {
+      console.log(`[Timesheet] ⚠️ Cannot auto-approve - incomplete timesheet ${timesheetId}`);
+      return;
+    }
+
+    const clockIn = new Date(timesheet.clockInTime);
+    const clockOut = new Date(timesheet.clockOutTime);
+    const hoursWorked = (clockOut.getTime() - clockIn.getTime()) / (1000 * 60 * 60);
+    const bothGPSVerified = timesheet.clockInVerified && timesheet.clockOutVerified;
+
+    if (bothGPSVerified && hoursWorked > 0 && hoursWorked < 16) {
+      await db
+        .update(timesheets)
+        .set({
+          status: 'approved',
+          approvedAt: new Date(),
+          approvedBy: 'system_auto',
+          totalHoursWorked: hoursWorked.toFixed(2),
+          updatedAt: new Date(),
+        })
+        .where(eq(timesheets.id, timesheetId));
+
+      console.log(`[Timesheet] ✅ Auto-approved timesheet ${timesheetId}: ${hoursWorked.toFixed(2)} hours`);
+    } else {
+      const notes = `GPS Verified: ${bothGPSVerified}, Hours: ${hoursWorked.toFixed(2)}`;
+      await db
+        .update(timesheets)
+        .set({
+          status: 'requires_review',
+          notes,
+          totalHoursWorked: hoursWorked.toFixed(2),
+          updatedAt: new Date(),
+        })
+        .where(eq(timesheets.id, timesheetId));
+
+      console.log(`[Timesheet] ⚠️ Timesheet ${timesheetId} requires manual review: ${notes}`);
+    }
+  },
+
+  async approveTimesheet(timesheetId: string, approvedBy: string): Promise<Timesheet> {
+    const result = await db
+      .update(timesheets)
+      .set({
+        status: 'approved',
+        approvedBy,
+        approvedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(timesheets.id, timesheetId))
+      .returning();
+    return result[0];
+  },
+
+  async rejectTimesheet(timesheetId: string, reason: string): Promise<Timesheet> {
+    const result = await db
+      .update(timesheets)
+      .set({
+        status: 'rejected',
+        notes: reason,
+        updatedAt: new Date(),
+      })
+      .where(eq(timesheets.id, timesheetId))
+      .returning();
+    return result[0];
+  },
 
   async getPayroll(id: string): Promise<any> { return { id }; },
   async listPayroll(): Promise<any[]> { return []; },

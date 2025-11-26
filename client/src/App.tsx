@@ -42,6 +42,7 @@ import CSASigningPage from "@/pages/CSASigningPage";
 import RateConfirmation from "@/pages/RateConfirmation";
 import OAuthConnectionWizard from "@/pages/OAuthConnectionWizard";
 import OAuthSettings from "@/pages/OAuthSettings";
+import TimesheetApproval from "@/pages/TimesheetApproval";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -92,6 +93,7 @@ function Router() {
       <Route path="/admin/garnishment-dashboard" component={AdminGarnishmentDashboard} />
       <Route path="/admin/compliance-monitor" component={AdminComplianceMonitor} />
       <Route path="/admin/compliance" component={ComplianceDashboard} />
+      <Route path="/admin/timesheet-approval" component={TimesheetApproval} />
       <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />

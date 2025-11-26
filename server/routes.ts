@@ -534,6 +534,307 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // GPS CLOCK-IN/OUT ROUTES (Timesheet Generation)
+  // ========================
+  
+  /**
+   * Haversine formula to calculate distance between two GPS coordinates in feet
+   */
+  function verifyGeofence(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+    radiusFeet: number
+  ): boolean {
+    const R = 20902231; // Earth radius in feet
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    
+    return distance <= radiusFeet;
+  }
+  
+  /**
+   * GPS Clock-In - Creates timesheet entry
+   * Verifies worker is at job site using GPS geofence
+   */
+  app.post('/api/gps/clock-in', async (req: Request, res: Response) => {
+    try {
+      const { workerId, assignmentId, latitude, longitude, accuracy } = req.body;
+      const tenantId = getTenantIdFromRequest(req);
+      
+      if (!tenantId) {
+        return res.status(401).json({ error: 'Tenant ID required' });
+      }
+      
+      if (!workerId || !assignmentId || latitude === undefined || longitude === undefined) {
+        return res.status(400).json({ error: 'Missing required fields: workerId, assignmentId, latitude, longitude' });
+      }
+      
+      // Get assignment to verify geofence
+      const assignment = await storage.getAssignment(assignmentId);
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      
+      // Verify GPS is within geofence (300 feet / ~90 meters)
+      const geofenceRadiusFeet = 300;
+      const assignmentLat = parseFloat(assignment.latitude || '0');
+      const assignmentLon = parseFloat(assignment.longitude || '0');
+      
+      const isWithinGeofence = verifyGeofence(
+        latitude,
+        longitude,
+        assignmentLat,
+        assignmentLon,
+        geofenceRadiusFeet
+      );
+      
+      if (!isWithinGeofence) {
+        return res.status(400).json({
+          error: 'You are not at the work location. Please move closer to clock in.',
+          distanceCheck: 'failed',
+        });
+      }
+      
+      // Create timesheet entry
+      const timesheet = await storage.createTimesheet({
+        workerId,
+        tenantId,
+        assignmentId,
+        clockInTime: new Date(),
+        clockInLatitude: latitude.toString(),
+        clockInLongitude: longitude.toString(),
+        clockInVerified: true,
+        status: 'draft',
+      });
+      
+      console.log(`[GPS Clock-In] ✅ Worker ${workerId} clocked in at assignment ${assignmentId}`);
+      
+      res.json({
+        success: true,
+        timesheetId: timesheet.id,
+        clockInTime: timesheet.clockInTime,
+        verified: true,
+      });
+    } catch (error) {
+      console.error('GPS clock-in error:', error);
+      res.status(500).json({ error: 'Failed to clock in' });
+    }
+  });
+  
+  /**
+   * GPS Clock-Out - Updates timesheet and auto-approves if valid
+   * Calculates hours worked and triggers auto-approval logic
+   */
+  app.post('/api/gps/clock-out', async (req: Request, res: Response) => {
+    try {
+      const { timesheetId, latitude, longitude, accuracy } = req.body;
+      
+      if (!timesheetId || latitude === undefined || longitude === undefined) {
+        return res.status(400).json({ error: 'Missing required fields: timesheetId, latitude, longitude' });
+      }
+      
+      // Get existing timesheet
+      const timesheet = await storage.getTimesheet(timesheetId);
+      if (!timesheet) {
+        return res.status(404).json({ error: 'Timesheet not found' });
+      }
+      
+      // Get assignment to verify geofence
+      const assignment = await storage.getAssignment(timesheet.assignmentId);
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      
+      // Verify GPS for clock-out
+      const geofenceRadiusFeet = 300;
+      const assignmentLat = parseFloat(assignment.latitude || '0');
+      const assignmentLon = parseFloat(assignment.longitude || '0');
+      
+      const isWithinGeofence = verifyGeofence(
+        latitude,
+        longitude,
+        assignmentLat,
+        assignmentLon,
+        geofenceRadiusFeet
+      );
+      
+      // Update timesheet with clock-out info
+      await storage.updateTimesheet(timesheetId, {
+        clockOutTime: new Date(),
+        clockOutLatitude: latitude.toString(),
+        clockOutLongitude: longitude.toString(),
+        clockOutVerified: isWithinGeofence,
+      });
+      
+      // AUTO-APPROVE if GPS verified and hours reasonable
+      await storage.autoApproveTimesheet(timesheetId);
+      
+      // Get updated timesheet to return hours worked
+      const updatedTimesheet = await storage.getTimesheet(timesheetId);
+      
+      console.log(`[GPS Clock-Out] ✅ Worker ${timesheet.workerId} clocked out from assignment ${timesheet.assignmentId}`);
+      
+      res.json({
+        success: true,
+        clockOutTime: updatedTimesheet?.clockOutTime,
+        hoursWorked: updatedTimesheet?.totalHoursWorked,
+        status: updatedTimesheet?.status,
+        verified: isWithinGeofence,
+      });
+    } catch (error) {
+      console.error('GPS clock-out error:', error);
+      res.status(500).json({ error: 'Failed to clock out' });
+    }
+  });
+  
+  /**
+   * Get active clock-in for a worker (currently clocked in, no clock-out)
+   */
+  app.get('/api/gps/active/:workerId', async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const tenantId = getTenantIdFromRequest(req);
+      
+      if (!tenantId) {
+        return res.status(401).json({ error: 'Tenant ID required' });
+      }
+      
+      const timesheets = await storage.listTimesheets(tenantId);
+      const activeTimesheet = timesheets.find(
+        ts => ts.workerId === workerId && ts.clockInTime && !ts.clockOutTime
+      );
+      
+      if (!activeTimesheet) {
+        return res.status(404).json({ error: 'No active clock-in found' });
+      }
+      
+      res.json(activeTimesheet);
+    } catch (error) {
+      console.error('Get active clock-in error:', error);
+      res.status(500).json({ error: 'Failed to get active clock-in' });
+    }
+  });
+  
+  // ========================
+  // TIMESHEET ADMIN ROUTES (Approval/Rejection)
+  // ========================
+  
+  /**
+   * Get timesheets requiring manual review
+   */
+  app.get('/api/timesheets/requires-review', async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const timesheets = await storage.getTimesheetsByStatus(tenantId, 'requires_review');
+      
+      // Enrich with worker details
+      const enrichedTimesheets = await Promise.all(
+        timesheets.map(async (timesheet) => {
+          const worker = await storage.getWorker(timesheet.workerId || '');
+          return {
+            ...timesheet,
+            workerName: worker?.fullName || 'Unknown',
+            workerPhone: worker?.phone || 'Unknown',
+          };
+        })
+      );
+      
+      res.json(enrichedTimesheets);
+    } catch (error) {
+      console.error('Get review timesheets error:', error);
+      res.status(500).json({ error: 'Failed to fetch timesheets' });
+    }
+  });
+  
+  /**
+   * Get all timesheets by status (pending, approved, rejected, requires_review, draft)
+   */
+  app.get('/api/timesheets/status/:status', async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { status } = req.params;
+      const timesheets = await storage.getTimesheetsByStatus(tenantId, status);
+      
+      res.json(timesheets);
+    } catch (error) {
+      console.error('Get timesheets by status error:', error);
+      res.status(500).json({ error: 'Failed to fetch timesheets' });
+    }
+  });
+  
+  /**
+   * Approve a timesheet (admin action)
+   */
+  app.post('/api/timesheets/:id/approve', async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { id } = req.params;
+      const { approvedBy } = req.body;
+      
+      if (!approvedBy) {
+        return res.status(400).json({ error: 'approvedBy (user ID or name) required' });
+      }
+      
+      const approvedTimesheet = await storage.approveTimesheet(id, approvedBy);
+      
+      console.log(`[Timesheet] ✅ Admin approved timesheet ${id} by ${approvedBy}`);
+      
+      res.json({
+        success: true,
+        timesheet: approvedTimesheet,
+      });
+    } catch (error) {
+      console.error('Approve timesheet error:', error);
+      res.status(500).json({ error: 'Failed to approve timesheet' });
+    }
+  });
+  
+  /**
+   * Reject a timesheet (admin action)
+   */
+  app.post('/api/timesheets/:id/reject', async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { id } = req.params;
+      const { reason } = req.body;
+      
+      if (!reason) {
+        return res.status(400).json({ error: 'Rejection reason required' });
+      }
+      
+      const rejectedTimesheet = await storage.rejectTimesheet(id, reason);
+      
+      console.log(`[Timesheet] ❌ Admin rejected timesheet ${id}: ${reason}`);
+      
+      res.json({
+        success: true,
+        timesheet: rejectedTimesheet,
+      });
+    } catch (error) {
+      console.error('Reject timesheet error:', error);
+      res.status(500).json({ error: 'Failed to reject timesheet' });
+    }
+  });
+  
+  // ========================
   // INSURANCE ROUTES
   // ========================
   app.post("/api/worker-insurance", async (req: Request, res: Response) => {
