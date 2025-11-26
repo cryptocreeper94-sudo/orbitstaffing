@@ -748,10 +748,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Valid email address required" });
       }
 
-      // Get PDF from request (can be in body as base64 or handled by multipart)
+      // Get PDF from request (can be in body as base64)
       const pdfData = req.body.pdfData || req.body.pdf;
 
-      if (!pdfData && !req.files) {
+      if (!pdfData) {
         return res.status(400).json({ error: "PDF data required" });
       }
 
