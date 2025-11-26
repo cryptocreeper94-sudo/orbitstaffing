@@ -738,6 +738,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // DOCUMENT CAPTURE & EMAIL
+  // ========================
+  app.post("/api/send-photos-email", async (req: Request, res: Response) => {
+    try {
+      const { to, subject, body } = req.body;
+
+      if (!to || !to.includes("@")) {
+        return res.status(400).json({ error: "Valid email address required" });
+      }
+
+      // Get PDF from request (can be in body as base64 or handled by multipart)
+      const pdfData = req.body.pdfData || req.body.pdf;
+
+      if (!pdfData && !req.files) {
+        return res.status(400).json({ error: "PDF data required" });
+      }
+
+      // Create HTML email with document notification
+      const htmlEmail = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #000000 0%, #1f2937 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 24px;">📸 Document Captured</h1>
+            <p style="margin: 10px 0 0 0; font-size: 14px;">ORBIT Staffing On-Site Capture</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb;">
+            <p style="color: #333; line-height: 1.6; margin-bottom: 20px;">
+              ${body || "Please find the captured document(s) attached below."}
+            </p>
+            
+            <div style="background: white; padding: 15px; border-left: 4px solid #0ea5e9; margin: 20px 0;">
+              <p style="color: #666; font-size: 12px; margin: 0;">
+                📎 <strong>Attachment:</strong> photos-document.pdf<br/>
+                ✓ Captured on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}<br/>
+                ✓ Powered by ORBIT Staffing OS
+              </p>
+            </div>
+
+            <div style="color: #666; font-size: 11px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0;">This is an automated message from ORBIT Staffing OS. Please do not reply to this email.</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Send email via email service
+      const result = await emailService.send({
+        to,
+        subject: subject || "On-Site Document Capture",
+        html: htmlEmail,
+      });
+
+      if (result.success) {
+        res.json({ success: true, message: `Email sent to ${to}` });
+      } else {
+        res.status(500).json({ error: "Failed to send email" });
+      }
+    } catch (error) {
+      console.error("Email send error:", error);
+      res.status(500).json({ error: "Failed to process email request" });
+    }
+  });
+
+  // ========================
   // HEALTH CHECK
   // ========================
   app.get("/api/health", async (req: Request, res: Response) => {
