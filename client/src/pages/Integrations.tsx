@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Zap,
   CheckCircle2,
@@ -15,6 +16,7 @@ import {
   Plus,
   RefreshCw,
   Trash2,
+  Loader,
 } from "lucide-react";
 
 interface Integration {
@@ -140,29 +142,69 @@ const AVAILABLE_INTEGRATIONS = [
 ];
 
 export default function Integrations() {
-  const [connectedIntegrations, setConnectedIntegrations] = useState<Integration[]>([
-    {
-      id: "1",
-      type: "quickbooks",
-      name: "QuickBooks Online",
-      description: "Sync clients, invoices, payments, and billing data",
-      status: "connected",
-      lastSync: "2025-11-22 at 2:00 AM",
-      nextSync: "2025-11-23 at 2:00 AM",
-      recordsSynced: 1250,
-    },
-  ]);
+  const [connectedIntegrations, setConnectedIntegrations] = useState<Integration[]>([]);
+  const [loadingType, setLoadingType] = useState<string | null>(null);
 
-  const handleConnect = (integrationType: string) => {
-    const integration = AVAILABLE_INTEGRATIONS.find((i) => i.type === integrationType);
-    if (integration) {
-      alert(`Connecting to ${integration.name}...\n\nIn production, this would redirect to their OAuth login.`);
+  // Fetch integration status
+  const { data: statusData, refetch: refetchStatus } = useQuery({
+    queryKey: ["integrations-status"],
+    queryFn: async () => {
+      const types = ["quickbooks", "adp"];
+      const results: { [key: string]: any } = {};
+      for (const type of types) {
+        try {
+          const res = await fetch(`/api/oauth/status/${type}`);
+          if (res.ok) results[type] = await res.json();
+        } catch (err) {
+          console.error(`Failed to fetch ${type} status:`, err);
+        }
+      }
+      return results;
+    },
+    refetchInterval: 5000,
+  });
+
+  // Disconnect mutation
+  const disconnectMutation = useMutation({
+    mutationFn: async (integrationType: string) => {
+      const res = await fetch(`/api/oauth/disconnect/${integrationType}`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed to disconnect");
+      return res.json();
+    },
+    onSuccess: () => refetchStatus(),
+  });
+
+  // Trigger OAuth flow
+  const handleConnect = async (integrationType: string) => {
+    try {
+      setLoadingType(integrationType);
+      const res = await fetch(`/api/oauth/${integrationType}/auth?tenantId=default`);
+      const { authUrl } = await res.json();
+
+      // Open OAuth popup
+      const popup = window.open(authUrl, "oauth-popup", "width=600,height=700");
+      if (!popup) {
+        alert("Please allow popups to connect integrations");
+        return;
+      }
+
+      // Poll for completion
+      const checkInterval = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(checkInterval);
+          setLoadingType(null);
+          setTimeout(() => refetchStatus(), 1000);
+        }
+      }, 500);
+    } catch (error) {
+      console.error("OAuth connection failed:", error);
+      alert("Failed to connect. Please check your API keys.");
+      setLoadingType(null);
     }
   };
 
-  const handleDisconnect = (id: string) => {
-    setConnectedIntegrations((prev) => prev.filter((i) => i.id !== id));
-    alert("Integration disconnected. All synced data remains in ORBIT.");
+  const handleDisconnect = async (type: string) => {
+    await disconnectMutation.mutateAsync(type);
   };
 
   const handleManualSync = (id: string) => {
@@ -242,6 +284,7 @@ export default function Integrations() {
               <AvailableIntegrationCard
                 key={integration.type}
                 integration={integration}
+                isLoading={loadingType === integration.type}
                 onConnect={() => handleConnect(integration.type)}
               />
             ))
@@ -578,9 +621,11 @@ function ConnectedIntegrationCard({
 
 function AvailableIntegrationCard({
   integration,
+  isLoading,
   onConnect,
 }: {
   integration: { type: string; name: string; description: string; icon: string; category: string };
+  isLoading?: boolean;
   onConnect: () => void;
 }) {
   return (
@@ -604,10 +649,20 @@ function AvailableIntegrationCard({
         <Button
           className="w-full gap-2"
           onClick={onConnect}
+          disabled={isLoading}
           data-testid={`button-connect-${integration.type}`}
         >
-          <Plus className="w-4 h-4" />
-          Connect {integration.name}
+          {isLoading ? (
+            <>
+              <Loader className="w-4 h-4 animate-spin" />
+              Connecting...
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4" />
+              Connect {integration.name}
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>
