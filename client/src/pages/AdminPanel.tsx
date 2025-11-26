@@ -19,6 +19,14 @@ import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessi
 import { AssetTracker } from '@/components/AssetTracker';
 import { CompanyHallmarkManager } from '@/components/CompanyHallmarkManager';
 import { FloatingHelpButton } from '@/components/HelpCenter';
+import { AdvancedAnalyticsDashboard } from '@/components/AdvancedAnalyticsDashboard';
+import { BulkOperations } from '@/components/BulkOperations';
+import { AdvancedSearch } from '@/components/AdvancedSearch';
+import { ComplianceReports } from '@/components/ComplianceReports';
+import { InvoiceCustomization } from '@/components/InvoiceCustomization';
+import { WorkforceForecastingAI } from '@/components/WorkforceForecastingAI';
+import { MultiCurrencySupport } from '@/components/MultiCurrencySupport';
+import { DocumentOCR } from '@/components/DocumentOCR';
 
 const ADMIN_SESSION_KEY = 'admin';
 
@@ -380,7 +388,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard({ adminName }: { adminName: string }) {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -567,6 +575,94 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
           <Lock className="w-4 h-4 inline mr-2" />
           Professional Division (V2)
         </button>
+        <button
+          onClick={() => setActiveSection('analytics')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'analytics'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-analytics"
+        >
+          Advanced Analytics
+        </button>
+        <button
+          onClick={() => setActiveSection('bulk-ops')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'bulk-ops'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-bulk-ops"
+        >
+          Bulk Operations
+        </button>
+        <button
+          onClick={() => setActiveSection('search')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'search'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-search"
+        >
+          Advanced Search
+        </button>
+        <button
+          onClick={() => setActiveSection('compliance')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'compliance'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-compliance"
+        >
+          Compliance Reports
+        </button>
+        <button
+          onClick={() => setActiveSection('invoices')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'invoices'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-invoices"
+        >
+          Invoice Templates
+        </button>
+        <button
+          onClick={() => setActiveSection('forecasting')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'forecasting'
+              ? 'border-purple-500 text-purple-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-forecasting"
+        >
+          AI Forecasting
+        </button>
+        <button
+          onClick={() => setActiveSection('currency')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'currency'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-currency"
+        >
+          Multi-Currency
+        </button>
+        <button
+          onClick={() => setActiveSection('ocr')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'ocr'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-ocr"
+        >
+          Document OCR
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -612,6 +708,22 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
           </Button>
         </div>
       )}
+
+      {activeSection === 'analytics' && <AdvancedAnalyticsDashboard />}
+
+      {activeSection === 'bulk-ops' && <BulkOperations />}
+
+      {activeSection === 'search' && <AdvancedSearch />}
+
+      {activeSection === 'compliance' && <ComplianceReports />}
+
+      {activeSection === 'invoices' && <InvoiceCustomization />}
+
+      {activeSection === 'forecasting' && <WorkforceForecastingAI />}
+
+      {activeSection === 'currency' && <MultiCurrencySupport />}
+
+      {activeSection === 'ocr' && <DocumentOCR />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">
