@@ -376,6 +376,52 @@ export const storage: IStorage = {
     return result;
   },
 
+  /**
+   * Get tenant payroll automation settings
+   */
+  async getTenantPayrollSettings(tenantId: string): Promise<any> {
+    const result = await db.select({
+      frequency: companies.payrollFrequency,
+      payDay: companies.payrollDay,
+      autoRun: companies.autoRunPayroll,
+    })
+      .from(companies)
+      .where(eq(companies.id, tenantId))
+      .limit(1);
+    
+    return result[0] || null;
+  },
+
+  /**
+   * Get worker time entries for a date range (approved only)
+   */
+  async getWorkerTimeEntries(
+    workerId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]> {
+    const result = await db.select({
+      id: timesheets.id,
+      workerId: timesheets.workerId,
+      clockIn: timesheets.clockInTime,
+      clockOut: timesheets.clockOutTime,
+      totalHours: timesheets.totalHoursWorked,
+      approvedAt: timesheets.approvedAt,
+      status: timesheets.status,
+    })
+      .from(timesheets)
+      .where(
+        and(
+          eq(timesheets.workerId, workerId),
+          gte(timesheets.clockInTime, startDate),
+          lte(timesheets.clockInTime, endDate),
+          eq(timesheets.status, 'approved')
+        )
+      );
+    
+    return result;
+  },
+
   async getWorker(id: string): Promise<Worker | undefined> {
     const result = await db.select().from(workers).where(eq(workers.id, id));
     return result[0];

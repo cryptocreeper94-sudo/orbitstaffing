@@ -2292,6 +2292,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create and return HTTP server
   const httpServer = createServer(app);
+  // ========================
+  // PAYROLL AUTOMATION SETTINGS
+  // ========================
+  
+  // Get payroll automation settings for current tenant
+  app.get("/api/payroll/automation-settings", async (req: Request, res: Response) => {
+    try {
+      // For now, use first company as default tenant (multi-tenant support later)
+      const companies_list = await db.select().from(companies).limit(1);
+      
+      if (companies_list.length === 0) {
+        return res.json({
+          frequency: 'weekly',
+          payDay: 0,
+          autoRun: true,
+        });
+      }
+      
+      const company = companies_list[0];
+      const settings = await storage.getTenantPayrollSettings(company.id);
+      
+      res.json({
+        frequency: settings?.frequency || 'weekly',
+        payDay: settings?.payDay !== undefined ? settings.payDay : 0,
+        autoRun: settings?.autoRun !== false,
+      });
+    } catch (error: any) {
+      console.error("Payroll settings fetch error:", error);
+      res.status(500).json({ error: "Failed to load payroll settings" });
+    }
+  });
+  
+  // Update payroll automation settings
+  app.put("/api/payroll/automation-settings", async (req: Request, res: Response) => {
+    try {
+      const { frequency, payDay, autoRun } = req.body;
+      
+      // Validate input
+      if (!['weekly', 'biweekly', 'monthly'].includes(frequency)) {
+        return res.status(400).json({ error: "Invalid frequency" });
+      }
+      
+      if (payDay < 0 || payDay > 6) {
+        return res.status(400).json({ error: "Invalid pay day (must be 0-6)" });
+      }
+      
+      // For now, use first company as default tenant (multi-tenant support later)
+      const companies_list = await db.select().from(companies).limit(1);
+      
+      if (companies_list.length === 0) {
+        return res.status(404).json({ error: "No company found" });
+      }
+      
+      const company = companies_list[0];
+      
+      // Update company payroll settings
+      await db.update(companies)
+        .set({
+          payrollFrequency: frequency,
+          payrollDay: payDay,
+          autoRunPayroll: autoRun,
+          updatedAt: new Date(),
+        })
+        .where(eq(companies.id, company.id));
+      
+      console.log(`[Payroll Settings] Updated for tenant ${company.id}: ${frequency} on day ${payDay}, auto: ${autoRun}`);
+      
+      res.json({
+        success: true,
+        message: "Payroll automation settings updated successfully",
+      });
+    } catch (error: any) {
+      console.error("Payroll settings update error:", error);
+      res.status(500).json({ error: "Failed to update payroll settings" });
+    }
+  });
+
   return httpServer;
 }
 

@@ -1277,6 +1277,176 @@ function BackgroundJobMonitoring() {
           <div className="text-sm text-gray-400">No reassignments in the last 24 hours</div>
         )}
       </div>
+
+      {/* Payroll Automation Settings */}
+      <PayrollAutomationSettings />
+    </div>
+  );
+}
+
+// Payroll Automation Settings Component
+function PayrollAutomationSettings() {
+  const [settings, setSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [frequency, setFrequency] = useState('weekly');
+  const [payDay, setPayDay] = useState(0);
+  const [autoRun, setAutoRun] = useState(true);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  async function loadSettings() {
+    try {
+      const res = await fetch('/api/payroll/automation-settings');
+      if (res.ok) {
+        const data = await res.json();
+        setSettings(data);
+        setFrequency(data.frequency || 'weekly');
+        setPayDay(data.payDay || 0);
+        setAutoRun(data.autoRun !== false); // Default to true if not set
+      }
+    } catch (err) {
+      console.error('Failed to load payroll automation settings:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function saveSettings() {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/payroll/automation-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          frequency,
+          payDay,
+          autoRun,
+        }),
+      });
+      
+      if (res.ok) {
+        alert('Payroll automation settings saved successfully!');
+        loadSettings();
+      } else {
+        alert('Failed to save settings');
+      }
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+      alert('Error saving settings');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  if (loading) {
+    return <div className="text-gray-300">Loading payroll automation settings...</div>;
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-green-900/30 to-green-800/20 border border-green-700/50 rounded-lg p-6">
+      <div className="flex items-center gap-3 mb-4">
+        <Trophy className="w-6 h-6 text-green-400" />
+        <h2 className="text-2xl font-bold text-white">💰 Payroll Automation Settings</h2>
+      </div>
+      <p className="text-gray-300 mb-6">
+        Automated payroll processing runs on schedule without human intervention - completing the 100% automation chain!
+      </p>
+
+      <div className="space-y-4">
+        {/* Frequency Selection */}
+        <div>
+          <label className="block text-sm font-bold text-gray-300 mb-2">
+            Payroll Frequency
+          </label>
+          <select
+            value={frequency}
+            onChange={(e) => setFrequency(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-green-400"
+            data-testid="select-payroll-frequency"
+          >
+            <option value="weekly">Weekly</option>
+            <option value="biweekly">Bi-Weekly (Every 2 weeks)</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+
+        {/* Pay Day Selection */}
+        <div>
+          <label className="block text-sm font-bold text-gray-300 mb-2">
+            Pay Day
+          </label>
+          <select
+            value={payDay}
+            onChange={(e) => setPayDay(parseInt(e.target.value))}
+            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white focus:outline-none focus:border-green-400"
+            data-testid="select-payroll-day"
+          >
+            {dayNames.map((day, index) => (
+              <option key={index} value={index}>
+                {day}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Auto-Run Toggle */}
+        <div className="flex items-center gap-3 p-4 bg-slate-800 rounded">
+          <input
+            type="checkbox"
+            id="auto-run-payroll"
+            checked={autoRun}
+            onChange={(e) => setAutoRun(e.target.checked)}
+            className="w-5 h-5"
+            data-testid="checkbox-auto-run-payroll"
+          />
+          <label htmlFor="auto-run-payroll" className="text-white font-bold cursor-pointer">
+            Enable Automatic Payroll
+          </label>
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-green-900/20 border border-green-600 rounded p-4">
+          <p className="text-sm text-green-100">
+            When enabled, payroll runs automatically on <strong>{dayNames[payDay]}</strong> every{' '}
+            {frequency === 'weekly' ? 'week' : frequency === 'biweekly' ? '2 weeks' : 'month'} for all workers with approved timesheets.
+          </p>
+          <p className="text-xs text-green-200 mt-2">
+            ✓ Workers receive SMS + in-app notification<br />
+            ✓ Paystub generated with hallmark verification<br />
+            ✓ Full audit trail logged<br />
+            ✓ 100% AUTOMATION - No manual intervention required!
+          </p>
+        </div>
+
+        {/* Save Button */}
+        <Button
+          onClick={saveSettings}
+          disabled={saving}
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3"
+          data-testid="button-save-payroll-settings"
+        >
+          {saving ? 'Saving...' : 'Save Payroll Automation Settings'}
+        </Button>
+      </div>
+
+      {/* Current Status */}
+      {settings && (
+        <div className="mt-6 pt-6 border-t border-green-700/50">
+          <h3 className="text-sm font-bold text-gray-300 mb-2">Current Configuration:</h3>
+          <div className="text-sm text-gray-400 space-y-1">
+            <div>Frequency: <span className="text-white font-bold">{settings.frequency || 'weekly'}</span></div>
+            <div>Pay Day: <span className="text-white font-bold">{dayNames[settings.payDay || 0]}</span></div>
+            <div>Status: <span className={`font-bold ${settings.autoRun !== false ? 'text-green-400' : 'text-red-400'}`}>
+              {settings.autoRun !== false ? '✓ ENABLED' : '✗ DISABLED'}
+            </span></div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

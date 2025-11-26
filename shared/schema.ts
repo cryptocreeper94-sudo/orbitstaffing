@@ -95,6 +95,11 @@ export const companies = pgTable(
     equipmentTrackingEnabled: boolean("equipment_tracking_enabled").default(true),
     payrollEnabled: boolean("payroll_enabled").default(true),
 
+    // Payroll Automation Settings
+    payrollFrequency: varchar("payroll_frequency", { length: 20 }).default('weekly'), // weekly, biweekly, monthly
+    payrollDay: integer("payroll_day").default(0), // 0 = Sunday, 1 = Monday, etc.
+    autoRunPayroll: boolean("auto_run_payroll").default(true),
+
     // Billing & CSA Settings
     defaultMarkupPercentage: decimal("default_markup_percentage", { precision: 5, scale: 2 }).default("1.45"), // 1.45x markup
     paymentTermsDays: integer("payment_terms_days").default(30), // Net 30 default
