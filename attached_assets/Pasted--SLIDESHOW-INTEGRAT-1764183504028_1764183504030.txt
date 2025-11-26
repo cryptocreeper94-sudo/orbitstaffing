@@ -1,0 +1,130 @@
+================================================================================
+SLIDESHOW INTEGRATION GUIDE FOR LOT OPS PRO
+================================================================================
+
+INSTRUCTIONS FOR OTHER AGENT:
+1. Copy the two files below (Slideshow.tsx and slidesData.ts)
+2. Create them in your project at these exact paths:
+   - client/src/pages/Slideshow.tsx
+   - client/src/data/slidesData.ts
+3. Add the route to your App.tsx file (see step 4)
+4. Restart your app
+5. Access the slideshow at /slideshow
+
+================================================================================
+STEP 1: INTEGRATE INTO YOUR APP.TSX
+================================================================================
+
+Add this import at the top of client/src/App.tsx:
+import Slideshow from "@/pages/Slideshow";
+
+Then add this route in your Route definitions (inside your <Switch> component):
+<Route path="/slideshow" component={Slideshow} />
+
+If you want to add a button to your home page, add something like:
+<Link href="/slideshow"><Button>View Slideshow</Button></Link>
+
+================================================================================
+FILE 1: Create client/src/pages/Slideshow.tsx
+================================================================================
+
+[Copy the entire Slideshow.tsx file from below - starts with "import" and ends with the last closing brace]
+
+================================================================================
+FILE 2: Create client/src/data/slidesData.ts  
+================================================================================
+
+[Copy the entire slidesData.ts file from below - starts with "// Lot Ops Pro" and ends with the last closing bracket]
+
+================================================================================
+REQUIREMENTS (Already Installed)
+================================================================================
+
+Your project needs these packages (they're already installed based on package.json):
+- framer-motion
+- lucide-react
+- @radix-ui/react-toast
+- React Query (already in your stack)
+- Wouter (already in your stack)
+- Tailwind CSS (already in your stack)
+
+If any are missing, install with:
+npm install framer-motion lucide-react
+
+================================================================================
+FEATURES
+================================================================================
+
+✅ 35 slides covering Lot Ops Pro features
+✅ Auto-play (each slide 8 seconds)
+✅ Manual navigation (arrows, keyboard shortcuts)
+✅ Table of Contents (click menu icon)
+✅ Mobile responsive (tested on all screen sizes)
+✅ Keyboard shortcuts:
+   - Left/Right Arrows: Navigate
+   - Space: Play/Pause
+   - ESC: Exit to home page
+✅ Progress bar at bottom
+✅ Slide counter (e.g., "3 / 35 • Opening & Hook")
+
+================================================================================
+KEYBOARD HINTS DISPLAYED ON SCREEN
+================================================================================
+
+- ← → Navigate
+- Space = Play/Pause
+- ESC = Exit
+
+================================================================================
+FILE CONTENTS BELOW - COPY EACH SECTION
+================================================================================
+
+------- FILE 1 START: Slideshow.tsx -------
+
+[PASTE FULL Slideshow.tsx CONTENT HERE]
+
+------- FILE 1 END -------
+
+------- FILE 2 START: slidesData.ts -------
+
+[PASTE FULL slidesData.ts CONTENT HERE]
+
+------- FILE 2 END -------
+
+================================================================================
+OPTIONAL: CUSTOMIZE SLIDE TIMING
+================================================================================
+
+If you want to change slide duration from 8 seconds to something else:
+1. Open client/src/data/slidesData.ts
+2. Find "duration: 8," entries
+3. Change 8 to your desired number of seconds
+4. Save and restart app
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+After adding the files:
+☐ App starts without errors
+☐ Can navigate to /slideshow
+☐ Slides display properly on desktop
+☐ Slides display properly on mobile (test in browser dev tools)
+☐ Click left/right sides to navigate
+☐ Click menu icon for Table of Contents
+☐ Click Play/Pause button
+☐ All 35 slides load correctly
+☐ Can press ESC to exit back to home page
+
+================================================================================
+QUESTIONS?
+================================================================================
+
+If the slideshow doesn't appear:
+1. Check that both files were created in correct paths
+2. Check that App.tsx has the import and route
+3. Check browser console for errors
+4. Restart the app: npm run dev
+5. Check that /slideshow route loads (not getting 404)
+
+Good luck!
