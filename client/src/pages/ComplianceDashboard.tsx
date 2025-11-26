@@ -108,7 +108,7 @@ export function ComplianceDashboard() {
                   <CardContent className="space-y-6 text-slate-300">
                     <div className="bg-gradient-to-r from-slate-700/50 to-slate-600/30 p-4 rounded-lg border border-green-500/30">
                       <span className="text-sm font-semibold text-slate-400">Minimum Wage</span>
-                      <p className="text-3xl font-bold text-green-400 mt-2">${stateRules.minWagePerHour?.toFixed(2)}/hr</p>
+                      <p className="text-3xl font-bold text-green-400 mt-2">${Number(stateRules.minWagePerHour || 0).toFixed(2)}/hr</p>
                     </div>
 
                     <div className="space-y-3">
@@ -184,9 +184,9 @@ export function ComplianceDashboard() {
                             <p className="text-xs text-slate-400 uppercase tracking-wide mt-1">{wage.skillLevel}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-green-400">${wage.totalHourlyRate?.toFixed(2)}/hr</p>
+                            <p className="text-2xl font-bold text-green-400">${Number(wage.totalHourlyRate || 0).toFixed(2)}/hr</p>
                             <p className="text-xs text-slate-400 mt-1">
-                              Base: <span className="text-green-300">${wage.baseHourlyRate?.toFixed(2)}</span> + <span className="text-emerald-300">${wage.fringe?.toFixed(2)}</span>
+                              Base: <span className="text-green-300">${Number(wage.baseHourlyRate || 0).toFixed(2)}</span> + <span className="text-emerald-300">${Number(wage.fringe || 0).toFixed(2)}</span>
                             </p>
                           </div>
                         </div>
@@ -233,7 +233,7 @@ export function ComplianceDashboard() {
                               </div>
                               <div className="bg-slate-800/50 p-3 rounded border-l-4 border-purple-400">
                                 <p className="text-xs text-slate-400 font-semibold">% of Payroll</p>
-                                <p className="text-2xl font-bold text-purple-300">{rate.percentageOfPayroll?.toFixed(2)}%</p>
+                                <p className="text-2xl font-bold text-purple-300">{Number(rate.percentageOfPayroll || 0).toFixed(2)}%</p>
                               </div>
                               <div className="text-sm space-y-1">
                                 <p className="text-slate-400">Min Premium: <span className="text-amber-300 font-semibold">${rate.minimumPremiumPerEmployee}</span></p>
