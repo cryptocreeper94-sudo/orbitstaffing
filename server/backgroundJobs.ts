@@ -31,30 +31,51 @@ const lastNotificationSent = new Map<string, Date>();
  * Main deadline checker - runs every hour
  */
 async function checkOnboardingDeadlines() {
-  console.log('[Background Job] ⏰ Checking onboarding deadlines...');
-  
   try {
-    // Send deadline warnings (1 day before)
-    await sendDeadlineWarnings();
+    console.log('[Background Job] ⏰ Checking onboarding deadlines...');
     
-    // Check and process overdue applications (3 business days)
-    await processOverdueApplications();
+    // Get all active tenants
+    const tenants = await storage.getAllActiveTenants();
     
-    // Check and process overdue assignments (1 business day)
-    await processOverdueAssignments();
+    if (tenants.length === 0) {
+      console.log('[Background Job] ℹ️ No active tenants found');
+      return;
+    }
+    
+    console.log(`[Background Job] 📋 Checking deadlines for ${tenants.length} tenant(s)`);
+    
+    // Process each tenant separately
+    for (const tenant of tenants) {
+      try {
+        console.log(`[Background Job] Processing tenant: ${tenant.name} (${tenant.id})`);
+        
+        // Send warnings for approaching deadlines
+        await sendDeadlineWarnings(tenant.id);
+        
+        // Process overdue applications
+        await processOverdueApplications(tenant.id);
+        
+        // Process overdue assignments
+        await processOverdueAssignments(tenant.id);
+        
+      } catch (error) {
+        console.error(`[Background Job] ❌ Error processing tenant ${tenant.name}:`, error);
+        // Continue with other tenants even if one fails
+      }
+    }
     
     console.log('[Background Job] ✅ Deadline check completed successfully');
   } catch (error) {
-    console.error('[Background Job] ❌ Error checking deadlines:', error);
+    console.error('[Background Job] ❌ Critical error in deadline check:', error);
   }
 }
 
 /**
  * Send deadline warnings to workers approaching their deadlines
  */
-async function sendDeadlineWarnings() {
+async function sendDeadlineWarnings(tenantId: string) {
   try {
-    const approaching = await storage.getWorkersApproachingDeadline(1);
+    const approaching = await storage.getWorkersApproachingDeadline(tenantId, 1);
     
     // Application deadline warnings
     for (const worker of approaching.application || []) {
@@ -86,20 +107,20 @@ async function sendDeadlineWarnings() {
       }
     }
     
-    console.log(`[Background Job] Sent warnings to ${(approaching.application?.length || 0) + (approaching.assignment?.length || 0)} workers`);
+    console.log(`[Background Job] Sent warnings to ${(approaching.application?.length || 0) + (approaching.assignment?.length || 0)} workers for tenant ${tenantId}`);
   } catch (error) {
-    console.error('[Background Job] Error sending warnings:', error);
+    console.error(`[Background Job] Error sending warnings for tenant ${tenantId}:`, error);
   }
 }
 
 /**
  * Process workers with overdue application deadlines (3 business days)
  */
-async function processOverdueApplications() {
+async function processOverdueApplications(tenantId: string) {
   try {
-    const overdueWorkers = await storage.getWorkersWithOverdueApplications();
+    const overdueWorkers = await storage.getWorkersWithOverdueApplications(tenantId);
     
-    console.log(`[Background Job] Found ${overdueWorkers.length} workers with overdue applications`);
+    console.log(`[Background Job] Found ${overdueWorkers.length} workers with overdue applications for tenant ${tenantId}`);
     
     for (const worker of overdueWorkers) {
       console.log(`[Background Job] Processing overdue application for worker ${worker.id} (${worker.fullName})`);
@@ -118,18 +139,18 @@ async function processOverdueApplications() {
       console.log(`[Background Job] ✓ Worker ${worker.id} marked as timed out, ${assignments.length} assignments reassigned`);
     }
   } catch (error) {
-    console.error('[Background Job] Error processing overdue applications:', error);
+    console.error(`[Background Job] Error processing overdue applications for tenant ${tenantId}:`, error);
   }
 }
 
 /**
  * Process workers with overdue assignment deadlines (1 business day)
  */
-async function processOverdueAssignments() {
+async function processOverdueAssignments(tenantId: string) {
   try {
-    const overdueAssignments = await storage.getWorkersWithOverdueAssignments();
+    const overdueAssignments = await storage.getWorkersWithOverdueAssignments(tenantId);
     
-    console.log(`[Background Job] Found ${overdueAssignments.length} overdue assignments`);
+    console.log(`[Background Job] Found ${overdueAssignments.length} overdue assignments for tenant ${tenantId}`);
     
     for (const assignment of overdueAssignments) {
       console.log(`[Background Job] Processing overdue assignment: Request ${assignment.requestNumber}, Worker ${assignment.workerName}`);
@@ -147,7 +168,7 @@ async function processOverdueAssignments() {
       console.log(`[Background Job] ✓ Assignment ${assignment.requestNumber} reassigned from worker ${assignment.workerId}`);
     }
   } catch (error) {
-    console.error('[Background Job] Error processing overdue assignments:', error);
+    console.error(`[Background Job] Error processing overdue assignments for tenant ${tenantId}:`, error);
   }
 }
 

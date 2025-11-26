@@ -362,6 +362,19 @@ export const storage: IStorage = {
   async listCompanies(): Promise<any[]> { return []; },
   async createCompany(data: any): Promise<any> { return { id: `co-${Date.now()}`, ...data }; },
   async updateCompany(id: string, data: any): Promise<any> { return { id, ...data }; },
+  
+  /**
+   * Get all active tenants (companies) for background job processing
+   */
+  async getAllActiveTenants(): Promise<{id: string, name: string}[]> {
+    const result = await db.select({
+      id: companies.id,
+      name: companies.name
+    })
+      .from(companies);
+    
+    return result;
+  },
 
   async getWorker(id: string): Promise<Worker | undefined> {
     const result = await db.select().from(workers).where(eq(workers.id, id));
@@ -674,13 +687,14 @@ export const storage: IStorage = {
    * 2. Have NOT completed onboarding
    * 3. Have NOT been marked as timed out already
    */
-  async getWorkersWithOverdueApplications(): Promise<Worker[]> {
+  async getWorkersWithOverdueApplications(tenantId: string): Promise<Worker[]> {
     const now = new Date();
     
     const result = await db.select()
       .from(workers)
       .where(
         and(
+          eq(workers.tenantId, tenantId),
           sql`${workers.applicationDeadline} IS NOT NULL`,
           sql`${workers.applicationDeadline} < ${now}`,
           eq(workers.onboardingCompleted, false),
@@ -699,7 +713,7 @@ export const storage: IStorage = {
    * 3. Have NOT completed onboarding
    * 4. Have NOT been marked as timed out
    */
-  async getWorkersWithOverdueAssignments(): Promise<any[]> {
+  async getWorkersWithOverdueAssignments(tenantId: string): Promise<any[]> {
     const now = new Date();
     
     // Get workers with overdue assignment deadlines
@@ -707,6 +721,7 @@ export const storage: IStorage = {
       .from(workers)
       .where(
         and(
+          eq(workers.tenantId, tenantId),
           sql`${workers.assignmentOnboardingDeadline} IS NOT NULL`,
           sql`${workers.assignmentOnboardingDeadline} < ${now}`,
           eq(workers.onboardingCompleted, false),
@@ -868,7 +883,7 @@ export const storage: IStorage = {
   /**
    * Get workers approaching their onboarding deadlines (for warnings)
    */
-  async getWorkersApproachingDeadline(daysUntil: number = 1): Promise<any[]> {
+  async getWorkersApproachingDeadline(tenantId: string, daysUntil: number = 1): Promise<any> {
     const now = new Date();
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + daysUntil + 1); // Add 1 to include the target day
@@ -878,6 +893,7 @@ export const storage: IStorage = {
       .from(workers)
       .where(
         and(
+          eq(workers.tenantId, tenantId),
           sql`${workers.applicationDeadline} IS NOT NULL`,
           sql`${workers.applicationDeadline} > ${now}`,
           sql`${workers.applicationDeadline} < ${futureDate}`,
@@ -891,6 +907,7 @@ export const storage: IStorage = {
       .from(workers)
       .where(
         and(
+          eq(workers.tenantId, tenantId),
           sql`${workers.assignmentOnboardingDeadline} IS NOT NULL`,
           sql`${workers.assignmentOnboardingDeadline} > ${now}`,
           sql`${workers.assignmentOnboardingDeadline} < ${futureDate}`,

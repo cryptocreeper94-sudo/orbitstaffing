@@ -1851,7 +1851,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get workers approaching deadlines
   app.get("/api/background-jobs/approaching-deadlines", async (req: Request, res: Response) => {
     try {
-      const approaching = await storage.getWorkersApproachingDeadline(1);
+      const tenantId = getTenantIdFromRequest(req) || '1';
+      const approaching = await storage.getWorkersApproachingDeadline(tenantId, 1);
       res.json(approaching);
     } catch (error) {
       console.error("Error getting approaching deadlines:", error);
@@ -1862,8 +1863,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get overdue workers
   app.get("/api/background-jobs/overdue-workers", async (req: Request, res: Response) => {
     try {
-      const overdueApplications = await storage.getWorkersWithOverdueApplications();
-      const overdueAssignments = await storage.getWorkersWithOverdueAssignments();
+      const tenantId = getTenantIdFromRequest(req) || '1';
+      const overdueApplications = await storage.getWorkersWithOverdueApplications(tenantId);
+      const overdueAssignments = await storage.getWorkersWithOverdueAssignments(tenantId);
       
       res.json({
         applications: overdueApplications,
