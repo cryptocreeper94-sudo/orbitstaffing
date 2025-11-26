@@ -44,6 +44,7 @@ import OAuthConnectionWizard from "@/pages/OAuthConnectionWizard";
 import OAuthSettings from "@/pages/OAuthSettings";
 import TimesheetApproval from "@/pages/TimesheetApproval";
 import ProductsGallery from "@/pages/ProductsGallery";
+import Slideshow from "@/pages/Slideshow";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -100,6 +101,7 @@ function Router() {
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />
       <Route path="/oauth/settings" component={OAuthSettings} />
       <Route path="/products" component={ProductsGallery} />
+      <Route path="/slideshow" component={Slideshow} />
       <Route component={NotFound} />
     </Switch>
   );
