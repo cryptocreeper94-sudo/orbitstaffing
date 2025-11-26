@@ -640,3 +640,206 @@ export const slidesData: Slide[] = [
     }
   }
 ];
+
+export const orbitSlides: Slide[] = [
+  {
+    id: 1,
+    title: "ORBIT Staffing OS",
+    section: "Opening & Hook",
+    duration: 8,
+    content: {
+      type: 'hero',
+      headline: 'ORBIT Staffing OS',
+      subheadline: 'Eliminate manual staffing workflows. 100% automation from hire to payroll.'
+    }
+  },
+  {
+    id: 2,
+    title: "The Staffing Crisis",
+    section: "Problem Statement",
+    duration: 8,
+    content: {
+      type: 'problem',
+      headline: 'Staffing Agencies Face Critical Challenges',
+      bullets: [
+        'Manual matching = Lost time and wrong placements',
+        'No compliance tracking = Regulatory risks and fines',
+        'Broken payroll workflows = Worker dissatisfaction',
+        'Zero visibility = Can\'t scale operations',
+        'Outdated systems = Losing business to competitors'
+      ]
+    }
+  },
+  {
+    id: 3,
+    title: "ORBIT Solution",
+    section: "Solution Overview",
+    duration: 8,
+    content: {
+      type: 'solution',
+      headline: 'ORBIT - Complete Staffing Automation',
+      bullets: [
+        'AI-powered worker matching - find perfect fit instantly',
+        'Fully automated payroll - 2025 tax compliance built-in',
+        'GPS-verified check-ins - 300ft geofencing accuracy',
+        'Real-time dashboards - complete operational visibility',
+        'Zero manual entry - 100% automation, zero errors'
+      ]
+    }
+  },
+  {
+    id: 4,
+    title: "Intelligent Matching",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'AI-Powered Worker Matching',
+      subheadline: 'Automate recruitment and placement',
+      description: 'Machine learning algorithms analyze skills, availability, and preferences to match workers with perfect opportunities instantly.',
+      bullets: [
+        'Skill-based matching engine',
+        'Automatic candidate screening',
+        'Real-time availability checking',
+        'Preference-aware assignments',
+        'Bias-free objective matching'
+      ]
+    }
+  },
+  {
+    id: 5,
+    title: "Automated Payroll",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Fully Automated Payroll',
+      subheadline: '2025 tax compliance built-in',
+      description: 'Process payroll in minutes. Multi-state tax handling, garnishment processing, and W-2 generation all automated.',
+      bullets: [
+        'One-click payroll processing',
+        'Multi-state tax compliance',
+        'Automatic garnishment routing',
+        'PDF paystub generation',
+        'Direct deposit & check processing'
+      ]
+    }
+  },
+  {
+    id: 6,
+    title: "GPS Verification",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'GPS-Verified Clock-In/Out',
+      subheadline: '300ft geofencing with biometric security',
+      description: 'Know exactly when and where workers are. Prevent time theft. Verify assignments with location data.',
+      bullets: [
+        '300ft geofencing accuracy',
+        'Real-time GPS tracking',
+        'Biometric verification',
+        'Photo timestamp capture',
+        'Automatic time corrections'
+      ]
+    }
+  },
+  {
+    id: 7,
+    title: "Real-Time Dashboard",
+    section: "Enterprise Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Operational Intelligence',
+      subheadline: 'Live visibility across all operations',
+      description: 'WebSocket-powered real-time dashboard. See assignments, timesheets, payroll status, and worker performance live.',
+      bullets: [
+        'Live worker locations on map',
+        'Real-time assignment status',
+        'Active timesheet monitoring',
+        'Instant notification alerts',
+        'Mobile app for on-the-go'
+      ]
+    }
+  },
+  {
+    id: 8,
+    title: "Compliance & Security",
+    section: "Compliance",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Enterprise-Grade Security',
+      subheadline: 'Compliance ready, audit-proof',
+      description: 'I-9 verification, background checks, drug testing, prevailing wage, and complete audit trails.',
+      bullets: [
+        'I-9 E-Verify integration',
+        'Background check automation',
+        'Prevailing wage compliance',
+        'Complete audit trails',
+        'Encrypted SSN storage'
+      ]
+    }
+  },
+  {
+    id: 9,
+    title: "Dual Referral System",
+    section: "Growth Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Built-In Growth Incentives',
+      subheadline: 'Viral worker referrals + public marketplace',
+      description: 'Worker-to-worker referrals ($100 per 40hrs) and public marketplace referrals ($50 per 80hrs) drive organic growth.',
+      bullets: [
+        'Worker-to-worker: $100 per 40 hours',
+        'Public marketplace: $50 per 80 hours',
+        'Real-time referral tracking',
+        'Automatic bonus calculations',
+        'Viral growth mechanics'
+      ]
+    }
+  },
+  {
+    id: 10,
+    title: "Transparent Pricing",
+    section: "Pricing",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Customer Service Agency (CSA) Model',
+      subheadline: '1.45x transparent markup',
+      description: 'Simple, fair pricing. Charge clients 1.45x worker cost. No hidden fees. No complexity.',
+      bullets: [
+        '1.45x transparent markup to clients',
+        'Worker wages paid in full',
+        'Your margin: 31% of worker cost',
+        'Fixed monthly fee or revenue-share options',
+        'White-label available for agencies'
+      ]
+    }
+  },
+  {
+    id: 11,
+    title: "Ready to Transform?",
+    section: "Action",
+    duration: 8,
+    content: {
+      type: 'cta',
+      headline: 'Transform Your Staffing Today',
+      description: 'Join agencies nationwide using ORBIT to eliminate manual work and scale operations. Start your free trial.'
+    }
+  },
+  {
+    id: 12,
+    title: "Thank You",
+    section: "Closing",
+    duration: 12,
+    content: {
+      type: 'closing',
+      headline: 'Thank You for Exploring ORBIT Staffing OS',
+      description: 'The future of staffing is automated, compliant, and infinitely scalable.'
+    }
+  }
+];

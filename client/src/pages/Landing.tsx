@@ -19,6 +19,8 @@ import { ValuePropositionModal } from "@/components/ValuePropositionModal";
 import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
+import { HomeSlideshow } from "@/components/HomeSlideshow";
+import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
 export default function Landing() {
@@ -26,6 +28,8 @@ export default function Landing() {
   const [showDemoForm, setShowDemoForm] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [selectedBenefit, setSelectedBenefit] = useState<string | null>(null);
+  const [showLotOpsSlideshow, setShowLotOpsSlideshow] = useState(false);
+  const [showOrbitSlideshow, setShowOrbitSlideshow] = useState(false);
 
   useEffect(() => {
     // Show interactive onboarding for first-time visitors
@@ -695,6 +699,54 @@ export default function Landing() {
               title="Full Automation"
               desc="Zero manual entry. Rules-based workflows. Audit-ready. Everything logged. Multi-state tax handling. Real-time notifications."
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Product Showcases */}
+      <section className="py-12 border-t border-border/50 bg-slate-900/30">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold font-heading mb-2">Product Showcases</h2>
+            <p className="text-muted-foreground text-sm">Explore our complete product suite. Click below to see detailed feature walkthroughs.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Lot Ops Pro Showcase */}
+            <div className="space-y-4">
+              <Button 
+                onClick={() => setShowLotOpsSlideshow(!showLotOpsSlideshow)}
+                className="w-full h-12 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold text-lg"
+                data-testid="button-show-lot-ops-slideshow"
+              >
+                {showLotOpsSlideshow ? '▼ Hide' : '▶ View'} Lot Ops Pro Showcase
+              </Button>
+              {showLotOpsSlideshow && (
+                <HomeSlideshow 
+                  slides={slidesData as any} 
+                  title="Lot Ops Pro Slides"
+                  product="Lot Ops Pro"
+                />
+              )}
+            </div>
+
+            {/* ORBIT Staffing OS Showcase */}
+            <div className="space-y-4">
+              <Button 
+                onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
+                className="w-full h-12 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-700 hover:to-violet-600 text-white font-semibold text-lg"
+                data-testid="button-show-orbit-slideshow"
+              >
+                {showOrbitSlideshow ? '▼ Hide' : '▶ View'} ORBIT Staffing OS Showcase
+              </Button>
+              {showOrbitSlideshow && (
+                <HomeSlideshow 
+                  slides={orbitSlides as any} 
+                  title="ORBIT Slides"
+                  product="ORBIT Staffing OS"
+                />
+              )}
+            </div>
           </div>
         </div>
       </section>
