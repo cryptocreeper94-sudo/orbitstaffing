@@ -20,6 +20,13 @@ import {
   prevailingWages,
   workersCompRates,
   stateComplianceRules,
+  rateConfirmations,
+  billingConfirmations,
+  workerAcceptances,
+  wageScales,
+  insertRateConfirmationSchema,
+  insertBillingConfirmationSchema,
+  insertWorkerAcceptanceSchema,
 } from "@shared/schema";
 
 // ========================
@@ -927,3 +934,103 @@ export async function autoMatchWorkers(request: any, tenantId: string): Promise<
     return [];
   }
 }
+
+  // ========================
+  // BILLING & RATE CONFIRMATIONS
+  // ========================
+  app.get("/api/confirmations/rate-confirmations/:requestId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const { requestId } = req.params;
+      
+      const confirmations = await db.select().from(rateConfirmations).where(and(
+        eq(rateConfirmations.workerRequestId, requestId),
+        eq(rateConfirmations.tenantId, tenantId)
+      ));
+      
+      res.json(confirmations[0] || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch rate confirmation" });
+    }
+  });
+
+  app.get("/api/confirmations/billing-confirmations/:requestId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      const { requestId } = req.params;
+      
+      const confirmations = await db.select().from(billingConfirmations).where(and(
+        eq(billingConfirmations.workerRequestId, requestId),
+        eq(billingConfirmations.tenantId, tenantId)
+      ));
+      
+      res.json(confirmations[0] || null);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch billing confirmation" });
+    }
+  });
+
+  app.post("/api/confirmations/rate-confirmations", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const data = req.body;
+      const parsed = insertRateConfirmationSchema.safeParse({ ...data, tenantId });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid data" });
+
+      const [result] = await db.insert(rateConfirmations).values(parsed.data).returning();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create rate confirmation" });
+    }
+  });
+
+  app.post("/api/confirmations/billing-confirmations", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const data = req.body;
+      const parsed = insertBillingConfirmationSchema.safeParse({ ...data, tenantId });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid data" });
+
+      const [result] = await db.insert(billingConfirmations).values(parsed.data).returning();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create billing confirmation" });
+    }
+  });
+
+  app.post("/api/worker-acceptance", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const data = req.body;
+      const parsed = insertWorkerAcceptanceSchema.safeParse({ ...data, tenantId });
+      if (!parsed.success) return res.status(400).json({ error: "Invalid data" });
+
+      const [result] = await db.insert(workerAcceptances).values(parsed.data).returning();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to record worker acceptance" });
+    }
+  });
+
+  app.get("/api/wage-scales/:state/:industry", async (req: Request, res: Response) => {
+    try {
+      const { state, industry } = req.params;
+      
+      const scales = await db.select().from(wageScales).where(and(
+        eq(wageScales.state, state),
+        eq(wageScales.industry, industry)
+      ));
+      
+      res.json(scales);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch wage scales" });
+    }
+  });
