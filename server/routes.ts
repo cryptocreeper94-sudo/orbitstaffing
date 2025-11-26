@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { db } from "./db";
 import { emailService } from "./email";
 import { oauthClients } from "./oauthClients";
+import { syncEngine } from "./syncEngine";
 import { stripeService } from "./stripeService";
 import {
   insertUserSchema,
@@ -1072,6 +1073,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to disconnect integration" });
+    }
+  });
+
+  // ========================
+  // DATA SYNC OPERATIONS
+  // ========================
+  
+  // Trigger manual sync
+  app.post("/api/sync/:integrationType/trigger", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { integrationType } = req.params;
+      const { entityType } = req.body;
+
+      const result = await syncEngine.triggerSync(tenantId, integrationType, entityType);
+      res.json(result);
+    } catch (error) {
+      console.error("Manual sync failed:", error);
+      res.status(500).json({ error: "Failed to trigger sync" });
+    }
+  });
+
+  // Get sync history
+  app.get("/api/sync/history", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const limit = parseInt(req.query.limit as string) || 20;
+      const history = await syncEngine.getSyncHistory(tenantId, limit);
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch sync history" });
+    }
+  });
+
+  // Get synced data
+  app.get("/api/sync/data/:integrationType/:entityType", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { integrationType, entityType } = req.params;
+      const data = await syncEngine.getSyncedData(tenantId, integrationType, entityType);
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch synced data" });
     }
   });
 
