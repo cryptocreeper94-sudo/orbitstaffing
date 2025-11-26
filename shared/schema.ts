@@ -2327,3 +2327,214 @@ export const insertCustomerDocumentPreferenceSchema = createInsertSchema(custome
 
 export type InsertCustomerDocumentPreference = z.infer<typeof insertCustomerDocumentPreferenceSchema>;
 export type CustomerDocumentPreference = typeof customerDocumentPreferences.$inferSelect;
+
+// ========================
+// Wage Scales (Master Data by Region/Industry/Skill)
+// ========================
+export const wageScales = pgTable(
+  "wage_scales",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Geographic & Industry Filters
+    region: varchar("region", { length: 50 }).notNull(), // "TN", "KY", "Southeast", etc.
+    industry: varchar("industry", { length: 100 }).notNull(), // "construction", "healthcare", "general_labor", "skilled_trades", "hospitality"
+    jobCategory: varchar("job_category", { length: 100 }).notNull(), // "electrician_journeyman", "general_laborer", "RN", etc.
+    
+    // Skill Level
+    skillLevel: varchar("skill_level", { length: 50 }).notNull(), // "entry", "intermediate", "journeyman", "expert"
+    
+    // Hourly Rate
+    hourlyRate: decimal("hourly_rate", { precision: 8, scale: 2 }).notNull(), // Base rate for this skill/region
+    
+    // Metadata
+    effectiveDate: date("effective_date").notNull(),
+    expirationDate: date("expiration_date"), // Optional: if set, scale is inactive after this date
+    source: varchar("source", { length: 255 }), // "Bureau of Labor Statistics", "Industry Survey", "Manual Entry", etc.
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_wage_scales_tenant").on(table.tenantId),
+    regionIndustryIdx: index("idx_wage_scales_region_industry").on(table.region, table.industry),
+    skillLevelIdx: index("idx_wage_scales_skill").on(table.skillLevel),
+    effectiveDateIdx: index("idx_wage_scales_effective").on(table.effectiveDate),
+  })
+);
+
+export const insertWageScaleSchema = createInsertSchema(wageScales).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWageScale = z.infer<typeof insertWageScaleSchema>;
+export type WageScale = typeof wageScales.$inferSelect;
+
+// ========================
+// Rate Confirmations (What Worker Makes)
+// ========================
+export const rateConfirmations = pgTable(
+  "rate_confirmations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerRequestId: varchar("worker_request_id").notNull().references(() => workerRequests.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    customerId: varchar("customer_id").notNull().references(() => clients.id),
+    
+    // Hallmark Tracking
+    hallmarkId: varchar("hallmark_id").notNull().references(() => hallmarks.id),
+    
+    // Worker Pay Details
+    hourlyRate: decimal("hourly_rate", { precision: 8, scale: 2 }).notNull(),
+    payPeriodStart: date("pay_period_start").notNull(),
+    payPeriodEnd: date("pay_period_end").notNull(),
+    estimatedHours: decimal("estimated_hours", { precision: 8, scale: 2 }),
+    
+    // Document Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, signed_by_customer, signed_by_worker, acknowledged, voided
+    
+    // Customer (Employer) Signature
+    customerSignedDate: timestamp("customer_signed_date"),
+    customerSignatureData: jsonb("customer_signature_data"),
+    
+    // Worker Acknowledgment
+    workerAcceptedDate: timestamp("worker_accepted_date"),
+    workerAcceptanceData: jsonb("worker_acceptance_data"),
+    
+    // Document Content
+    documentContent: text("document_content"), // HTML rendering
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_rate_conf_tenant").on(table.tenantId),
+    requestIdx: index("idx_rate_conf_request").on(table.workerRequestId),
+    workerIdx: index("idx_rate_conf_worker").on(table.workerId),
+    hallmarkIdx: index("idx_rate_conf_hallmark").on(table.hallmarkId),
+    statusIdx: index("idx_rate_conf_status").on(table.status),
+  })
+);
+
+export const insertRateConfirmationSchema = createInsertSchema(rateConfirmations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertRateConfirmation = z.infer<typeof insertRateConfirmationSchema>;
+export type RateConfirmation = typeof rateConfirmations.$inferSelect;
+
+// ========================
+// Billing Confirmations (What Customer Pays)
+// ========================
+export const billingConfirmations = pgTable(
+  "billing_confirmations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerRequestId: varchar("worker_request_id").notNull().references(() => workerRequests.id),
+    customerId: varchar("customer_id").notNull().references(() => clients.id),
+    rateConfirmationId: varchar("rate_confirmation_id").notNull().references(() => rateConfirmations.id),
+    
+    // Hallmark Tracking
+    hallmarkId: varchar("hallmark_id").notNull().references(() => hallmarks.id),
+    
+    // Billing Details
+    workerHourlyRate: decimal("worker_hourly_rate", { precision: 8, scale: 2 }).notNull(),
+    markupPercentage: decimal("markup_percentage", { precision: 5, scale: 2 }).notNull(), // 1.45
+    billingHourlyRate: decimal("billing_hourly_rate", { precision: 8, scale: 2 }).notNull(), // Calculated: worker rate × markup
+    paymentTermsDays: integer("payment_terms_days").notNull().default(30),
+    
+    // Period
+    billingPeriodStart: date("billing_period_start").notNull(),
+    billingPeriodEnd: date("billing_period_end").notNull(),
+    estimatedHours: decimal("estimated_hours", { precision: 8, scale: 2 }),
+    estimatedInvoiceAmount: decimal("estimated_invoice_amount", { precision: 12, scale: 2 }),
+    
+    // Document Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, signed, acknowledged, invoiced, voided
+    
+    // Customer Signature
+    signedDate: timestamp("signed_date"),
+    signatureData: jsonb("signature_data"),
+    
+    // Document Content
+    documentContent: text("document_content"), // HTML rendering
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_billing_conf_tenant").on(table.tenantId),
+    requestIdx: index("idx_billing_conf_request").on(table.workerRequestId),
+    hallmarkIdx: index("idx_billing_conf_hallmark").on(table.hallmarkId),
+    statusIdx: index("idx_billing_conf_status").on(table.status),
+  })
+);
+
+export const insertBillingConfirmationSchema = createInsertSchema(billingConfirmations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertBillingConfirmation = z.infer<typeof insertBillingConfirmationSchema>;
+export type BillingConfirmation = typeof billingConfirmations.$inferSelect;
+
+// ========================
+// Worker Acceptance (Position Acceptance)
+// ========================
+export const workerAcceptances = pgTable(
+  "worker_acceptances",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerRequestId: varchar("worker_request_id").notNull().references(() => workerRequests.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Status
+    acceptanceStatus: varchar("acceptance_status", { length: 50 }).notNull(), // "accepted", "rejected", "pending"
+    acceptedAt: timestamp("accepted_at"),
+    rejectedAt: timestamp("rejected_at"),
+    rejectionReason: text("rejection_reason"),
+    
+    // Rates Accepted
+    acceptedHourlyRate: decimal("accepted_hourly_rate", { precision: 8, scale: 2 }),
+    
+    // Worker Metadata
+    acceptanceMethod: varchar("acceptance_method", { length: 50 }), // "app", "sms", "phone", "email"
+    acceptanceIpAddress: varchar("acceptance_ip_address", { length: 45 }),
+    acceptanceDeviceInfo: varchar("acceptance_device_info", { length: 255 }),
+    
+    // Audit
+    acknowledgedAt: timestamp("acknowledged_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_acceptance_tenant").on(table.tenantId),
+    requestIdx: index("idx_acceptance_request").on(table.workerRequestId),
+    workerIdx: index("idx_acceptance_worker").on(table.workerId),
+    statusIdx: index("idx_acceptance_status").on(table.acceptanceStatus),
+    acceptedAtIdx: index("idx_acceptance_accepted_at").on(table.acceptedAt),
+  })
+);
+
+export const insertWorkerAcceptanceSchema = createInsertSchema(workerAcceptances).omit({
+  id: true,
+  acceptedAt: true,
+  rejectedAt: true,
+  acknowledgedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerAcceptance = z.infer<typeof insertWorkerAcceptanceSchema>;
+export type WorkerAcceptance = typeof workerAcceptances.$inferSelect;
