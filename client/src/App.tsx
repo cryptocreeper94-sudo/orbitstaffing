@@ -43,6 +43,7 @@ import RateConfirmation from "@/pages/RateConfirmation";
 import OAuthConnectionWizard from "@/pages/OAuthConnectionWizard";
 import OAuthSettings from "@/pages/OAuthSettings";
 import TimesheetApproval from "@/pages/TimesheetApproval";
+import ProductsGallery from "@/pages/ProductsGallery";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -98,6 +99,7 @@ function Router() {
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />
       <Route path="/oauth/settings" component={OAuthSettings} />
+      <Route path="/products" component={ProductsGallery} />
       <Route component={NotFound} />
     </Switch>
   );
