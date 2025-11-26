@@ -10,7 +10,8 @@ import {
   HardHat,
   Activity,
   MessageCircle,
-  Zap
+  Zap,
+  Camera
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ import { useState } from "react";
 import { HallmarkPageWatermark } from "@/components/HallmarkWatermark";
 import { ContactForm } from "@/components/ContactForm";
 import { OCRScannerModal } from "@/components/layout/OCRScannerModal";
+import { CameraModal } from "@/components/layout/CameraModal";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -101,6 +103,7 @@ export function Sidebar() {
 export function Shell({ children }: { children: React.ReactNode }) {
   const [contactOpen, setContactOpen] = useState(false);
   const [ocrScannerOpen, setOcrScannerOpen] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
@@ -116,7 +119,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 <div className="text-xs text-cyan-200/80">Google Play Store & Apple App Store Native Apps</div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Button
                 onClick={() => setOcrScannerOpen(true)}
                 size="sm"
@@ -126,7 +129,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 <Zap className="w-4 h-4" />
                 <span className="hidden sm:inline">Scan</span>
               </Button>
-              <div className="text-xs text-cyan-300/70">Get native mobile experience</div>
+              <Button
+                onClick={() => setCameraOpen(true)}
+                size="sm"
+                className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                data-testid="button-open-camera"
+              >
+                <Camera className="w-4 h-4" />
+                <span className="hidden sm:inline">Camera</span>
+              </Button>
+              <div className="text-xs text-cyan-300/70 hidden md:block">Get native mobile experience</div>
             </div>
           </div>
         </div>
@@ -146,6 +158,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <OCRScannerModal 
           isOpen={ocrScannerOpen}
           onClose={() => setOcrScannerOpen(false)}
+        />
+
+        {/* Camera Modal */}
+        <CameraModal
+          isOpen={cameraOpen}
+          onClose={() => setCameraOpen(false)}
         />
 
         {/* Contact Developer Button - REMOVED - will be added back in proper location */}
