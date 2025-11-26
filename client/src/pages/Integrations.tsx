@@ -121,6 +121,22 @@ const AVAILABLE_INTEGRATIONS = [
     icon: "🌳",
     category: "hr",
   },
+
+  // Productivity & File Storage
+  {
+    type: "google-workspace",
+    name: "Google Workspace",
+    description: "Google Drive file sync, Calendar appointments, Gmail contacts",
+    icon: "🌐",
+    category: "productivity",
+  },
+  {
+    type: "microsoft-365",
+    name: "Microsoft 365",
+    description: "OneDrive files, Outlook Calendar, Exchange contacts",
+    icon: "📧",
+    category: "productivity",
+  },
 ];
 
 export default function Integrations() {
@@ -165,7 +181,7 @@ export default function Integrations() {
           External Integrations
         </h1>
         <p className="text-muted-foreground">
-          Connect your existing systems (QuickBooks, ADP, UKG Pro) to sync data automatically
+          Connect your existing systems (QuickBooks, ADP, UKG Pro, Google Workspace, Microsoft 365) to sync data automatically — no manual entry required
         </p>
       </div>
 
@@ -364,6 +380,45 @@ export default function Integrations() {
               <div>✓ Benefits & compliance</div>
               <div>✓ Analytics dashboard</div>
               <div className="text-xs text-primary font-semibold mt-2">Scaling agencies</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Productivity & File Storage */}
+      <div className="mt-8 space-y-4">
+        <h2 className="text-xl font-bold font-heading">Productivity & File Storage</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Connect your Google or Microsoft accounts to sync files, calendars, and contacts seamlessly
+        </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">🌐</span> Google Workspace
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">G Suite Integration</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ Google Drive file sync</div>
+              <div>✓ Calendar appointments</div>
+              <div>✓ Gmail contact import</div>
+              <div className="text-xs text-primary font-semibold mt-2">Cloud productivity</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm">
+                <span className="text-xl mr-2">📧</span> Microsoft 365
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-normal mt-1">Office 365 & OneDrive</p>
+            </CardHeader>
+            <CardContent className="text-xs text-muted-foreground space-y-1">
+              <div>✓ OneDrive file storage</div>
+              <div>✓ Outlook Calendar sync</div>
+              <div>✓ Exchange contacts</div>
+              <div className="text-xs text-primary font-semibold mt-2">Enterprise productivity</div>
             </CardContent>
           </Card>
         </div>

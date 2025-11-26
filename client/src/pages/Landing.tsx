@@ -323,6 +323,107 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* CONNECT YOUR EXISTING SYSTEMS - HERO INTEGRATION CALLOUT */}
+      <section className="py-12 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-sm mb-4">
+              <Zap className="w-4 h-4 mr-2" /> Seamless Integration
+            </Badge>
+            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-white">
+              Keep Using Your Existing Systems
+            </h2>
+            <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-3">
+              Already using <span className="text-cyan-400 font-bold">QuickBooks, ADP, Google Workspace, or Microsoft 365?</span> No problem.
+            </p>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              ORBIT connects directly to your current payroll, accounting, productivity, and HR systems. <span className="text-white font-semibold">No data re-entry. No migration headaches.</span> Just sync and go.
+            </p>
+          </div>
+
+          {/* Integration Logos/Names - Top 6 */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
+              <CardContent className="p-6 text-center">
+                <div className="text-4xl mb-2">📊</div>
+                <div className="text-sm font-bold text-white">QuickBooks</div>
+                <div className="text-xs text-slate-400 mt-1">Accounting & Invoicing</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
+              <CardContent className="p-6 text-center">
+                <div className="text-4xl mb-2">👥</div>
+                <div className="text-sm font-bold text-white">ADP Workforce Now</div>
+                <div className="text-xs text-slate-400 mt-1">Payroll & HR</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
+              <CardContent className="p-6 text-center">
+                <div className="text-4xl mb-2">📅</div>
+                <div className="text-sm font-bold text-white">UKG Pro</div>
+                <div className="text-xs text-slate-400 mt-1">Scheduling & Time</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
+              <CardContent className="p-6 text-center">
+                <div className="text-4xl mb-2">💼</div>
+                <div className="text-sm font-bold text-white">Paychex Flex</div>
+                <div className="text-xs text-slate-400 mt-1">Payroll Automation</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Benefits Grid */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <Card className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">🔗</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Connect in Minutes</h3>
+                    <p className="text-sm text-slate-400">One-click OAuth connection. ORBIT automatically syncs your data daily (or in real-time).</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">⚡</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Zero Manual Entry</h3>
+                    <p className="text-sm text-slate-400">Employees, pay rates, invoices, and schedules sync automatically. No duplicate data entry.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-3xl">🛡️</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Keep Your Data</h3>
+                    <p className="text-sm text-slate-400">Your existing systems stay active. ORBIT reads and syncs—you maintain complete control.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center">
+            <p className="text-sm text-slate-400 mb-4">
+              <span className="text-cyan-400 font-semibold">16 integrations ready</span> including Gusto, Rippling, Workday, Paylocity, Google Workspace, and Microsoft 365
+            </p>
+            <Link href="/integrations">
+              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+                View All Integrations <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* MARKUP COMPARISON - Show 1.45x vs 1.6x Advantage */}
       <section className="py-16 bg-gradient-to-br from-green-950/20 via-background to-emerald-950/10 border-y border-green-500/20">
         <div className="max-w-6xl mx-auto px-6">
