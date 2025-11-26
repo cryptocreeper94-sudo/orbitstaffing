@@ -23,11 +23,6 @@ import {
   backgroundChecks,
   drugTests,
   complianceChecks,
-  vehicles,
-  vehicleAssignments,
-  workOrders,
-  safetyReports,
-  corporateUpdates,
   type User,
   type InsertUser,
   type Company,
@@ -72,16 +67,6 @@ import {
   type InsertDrugTest,
   type ComplianceCheck,
   type InsertComplianceCheck,
-  type Vehicle,
-  type InsertVehicle,
-  type VehicleAssignment,
-  type InsertVehicleAssignment,
-  type WorkOrder,
-  type InsertWorkOrder,
-  type SafetyReport,
-  type InsertSafetyReport,
-  type CorporateUpdate,
-  type InsertCorporateUpdate,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -1254,146 +1239,6 @@ export const storage: IStorage = {
     };
   },
 
-  // ==================== LOT OPS PRO: VEHICLES ====================
-  async createVehicle(data: InsertVehicle): Promise<Vehicle> {
-    const result = await db.insert(vehicles).values(data).returning();
-    return result[0];
-  },
-
-  async getVehicle(id: string): Promise<Vehicle | undefined> {
-    const result = await db.select().from(vehicles).where(eq(vehicles.id, id));
-    return result[0];
-  },
-
-  async listVehiclesByTenant(tenantId: string): Promise<Vehicle[]> {
-    return db.select().from(vehicles).where(eq(vehicles.tenantId, tenantId));
-  },
-
-  async updateVehicleStatus(id: string, tenantId: string, status: string): Promise<Vehicle | undefined> {
-    const result = await db.update(vehicles)
-      .set({ status })
-      .where(and(eq(vehicles.id, id), eq(vehicles.tenantId, tenantId)))
-      .returning();
-    return result[0];
-  },
-
-  // ==================== LOT OPS PRO: VEHICLE ASSIGNMENTS ====================
-  async createVehicleAssignment(data: InsertVehicleAssignment): Promise<VehicleAssignment> {
-    const result = await db.insert(vehicleAssignments).values(data).returning();
-    return result[0];
-  },
-
-  async getVehicleAssignment(id: string): Promise<VehicleAssignment | undefined> {
-    const result = await db.select().from(vehicleAssignments).where(eq(vehicleAssignments.id, id));
-    return result[0];
-  },
-
-  async listVehicleAssignments(tenantId: string): Promise<VehicleAssignment[]> {
-    return db.select().from(vehicleAssignments).where(eq(vehicleAssignments.tenantId, tenantId));
-  },
-
-  async listVehicleAssignmentsByVehicle(vehicleId: string): Promise<VehicleAssignment[]> {
-    return db.select().from(vehicleAssignments).where(eq(vehicleAssignments.vehicleId, vehicleId));
-  },
-
-  async updateVehicleAssignment(id: string, tenantId: string, data: Partial<InsertVehicleAssignment>): Promise<VehicleAssignment | undefined> {
-    const result = await db.update(vehicleAssignments)
-      .set(data)
-      .where(and(eq(vehicleAssignments.id, id), eq(vehicleAssignments.tenantId, tenantId)))
-      .returning();
-    return result[0];
-  },
-
-  async deleteVehicleAssignment(id: string, tenantId: string): Promise<boolean> {
-    await db.delete(vehicleAssignments)
-      .where(and(eq(vehicleAssignments.id, id), eq(vehicleAssignments.tenantId, tenantId)));
-    return true;
-  },
-
-  // ==================== LOT OPS PRO: WORK ORDERS ====================
-  async createWorkOrder(data: InsertWorkOrder): Promise<WorkOrder> {
-    const result = await db.insert(workOrders).values(data).returning();
-    return result[0];
-  },
-
-  async getWorkOrder(id: string): Promise<WorkOrder | undefined> {
-    const result = await db.select().from(workOrders).where(eq(workOrders.id, id));
-    return result[0];
-  },
-
-  async listWorkOrdersByVehicle(vehicleId: string): Promise<WorkOrder[]> {
-    return db.select().from(workOrders).where(eq(workOrders.vehicleId, vehicleId)).orderBy(desc(workOrders.createdAt));
-  },
-
-  async listWorkOrdersByDriver(maintenanceDriverId: string, tenantId: string): Promise<WorkOrder[]> {
-    return db.select().from(workOrders)
-      .where(and(eq(workOrders.maintenanceDriverId, maintenanceDriverId), eq(workOrders.tenantId, tenantId)))
-      .orderBy(desc(workOrders.createdAt));
-  },
-
-  async updateWorkOrderStatus(id: string, tenantId: string, status: string, completedDate?: Date): Promise<WorkOrder | undefined> {
-    const updateData: any = { status };
-    if (completedDate) {
-      updateData.completedDate = completedDate;
-    }
-    const result = await db.update(workOrders)
-      .set(updateData)
-      .where(and(eq(workOrders.id, id), eq(workOrders.tenantId, tenantId)))
-      .returning();
-    return result[0];
-  },
-
-  // ==================== LOT OPS PRO: SAFETY REPORTS ====================
-  async createSafetyReport(data: InsertSafetyReport): Promise<SafetyReport> {
-    const result = await db.insert(safetyReports).values(data).returning();
-    return result[0];
-  },
-
-  async getSafetyReport(id: string): Promise<SafetyReport | undefined> {
-    const result = await db.select().from(safetyReports).where(eq(safetyReports.id, id));
-    return result[0];
-  },
-
-  async listSafetyReportsByVehicle(vehicleId: string): Promise<SafetyReport[]> {
-    return db.select().from(safetyReports).where(eq(safetyReports.vehicleId, vehicleId)).orderBy(desc(safetyReports.reportDate));
-  },
-
-  async listSafetyReportsBySafetyRep(safetyRepId: string, tenantId: string): Promise<SafetyReport[]> {
-    return db.select().from(safetyReports)
-      .where(and(eq(safetyReports.safetyRepId, safetyRepId), eq(safetyReports.tenantId, tenantId)))
-      .orderBy(desc(safetyReports.reportDate));
-  },
-
-  async updateSafetyReport(id: string, tenantId: string, data: Partial<InsertSafetyReport>): Promise<SafetyReport | undefined> {
-    const result = await db.update(safetyReports)
-      .set(data)
-      .where(and(eq(safetyReports.id, id), eq(safetyReports.tenantId, tenantId)))
-      .returning();
-    return result[0];
-  },
-
-  // ==================== LOT OPS PRO: CORPORATE UPDATES ====================
-  async createCorporateUpdate(data: InsertCorporateUpdate): Promise<CorporateUpdate> {
-    const result = await db.insert(corporateUpdates).values(data).returning();
-    return result[0];
-  },
-
-  async getCorporateUpdate(id: string): Promise<CorporateUpdate | undefined> {
-    const result = await db.select().from(corporateUpdates).where(eq(corporateUpdates.id, id));
-    return result[0];
-  },
-
-  async listCorporateUpdates(tenantId: string): Promise<CorporateUpdate[]> {
-    return db.select().from(corporateUpdates)
-      .where(eq(corporateUpdates.tenantId, tenantId))
-      .orderBy(desc(corporateUpdates.releaseDate));
-  },
-
-  async listCorporateUpdatesByVehicle(vehicleId: string, tenantId: string): Promise<CorporateUpdate[]> {
-    return db.select().from(corporateUpdates)
-      .where(eq(corporateUpdates.tenantId, tenantId))
-      .orderBy(desc(corporateUpdates.releaseDate));
-  },
 };
 
 export default storage;
