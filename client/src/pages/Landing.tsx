@@ -883,9 +883,9 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold font-heading mb-3">Ready to Transform Your Staffing?</h2>
           <p className="text-muted-foreground text-sm mb-4">Join the next generation of staffing agencies.</p>
-          <Link href="/pricing" className="inline-flex items-center h-10 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
+          <Link href="/pricing" className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold whitespace-nowrap">
             Start Your Free Trial Today
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
           </Link>
         </div>
       </section>
