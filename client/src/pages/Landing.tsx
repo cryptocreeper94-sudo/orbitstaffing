@@ -20,6 +20,7 @@ import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
 import { HomeSlideshow } from "@/components/HomeSlideshow";
+import { Accordion } from "@/components/Accordion";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
@@ -662,55 +663,57 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-12 bg-card/30 backdrop-blur-sm border-y border-border/30">
+      {/* Features - Collapsible */}
+      <section className="py-6 sm:py-8 bg-card/30 backdrop-blur-sm border-y border-border/30">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold font-heading mb-2">End-to-End Staffing Lifecycle</h2>
-            <p className="text-muted-foreground text-sm">Complete control from recruitment through payroll and billing. No missing pieces.</p>
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-1">End-to-End Staffing Lifecycle</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm">Click to explore features. Complete control from recruitment through payroll.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FeatureCard 
-              icon={Users}
-              title="Recruit & Source"
-              desc="Multi-channel job posting, ATS, resume parsing, background checks, I-9 verification, reference checks, credential validation."
-            />
-            <FeatureCard 
-              icon={Clock}
-              title="Match & Place"
-              desc="Smart candidate matching, client interviews, offer negotiation, assignment tracking, fast fulfillment in minutes not hours."
-            />
-            <FeatureCard 
-              icon={DollarSign}
-              title="Time & Payroll"
-              desc="Mobile timesheets, client approval workflows, payroll processing, tax withholding, W-2s, direct deposit, compliance reporting."
-            />
-            <FeatureCard 
-              icon={BarChart3}
-              title="Billing & Revenue"
-              desc="Automatic invoice generation, bill rate management, AR tracking, payment collections, P&L dashboards, margin analysis."
-            />
-            <FeatureCard 
-              icon={Shield}
-              title="Compliance & Risk"
-              desc="I-9 management, E-Verify, background screening, prevailing wage, workers' comp, tax filings (941, W-2), OSHA safety."
-            />
-            <FeatureCard 
-              icon={Zap}
-              title="Full Automation"
-              desc="Zero manual entry. Rules-based workflows. Audit-ready. Everything logged. Multi-state tax handling. Real-time notifications."
-            />
-          </div>
+          <Accordion 
+            items={[
+              {
+                title: "Recruit & Source",
+                icon: "👥",
+                description: "Multi-channel job posting, ATS, resume parsing, background checks, I-9 verification, reference checks, credential validation."
+              },
+              {
+                title: "Match & Place",
+                icon: "🎯",
+                description: "Smart candidate matching, client interviews, offer negotiation, assignment tracking, fast fulfillment in minutes not hours."
+              },
+              {
+                title: "Time & Payroll",
+                icon: "💰",
+                description: "Mobile timesheets, client approval workflows, payroll processing, tax withholding, W-2s, direct deposit, compliance reporting."
+              },
+              {
+                title: "Billing & Revenue",
+                icon: "📊",
+                description: "Automatic invoice generation, bill rate management, AR tracking, payment collections, P&L dashboards, margin analysis."
+              },
+              {
+                title: "Compliance & Risk",
+                icon: "🛡️",
+                description: "I-9 management, E-Verify, background screening, prevailing wage, workers' comp, tax filings (941, W-2), OSHA safety."
+              },
+              {
+                title: "Full Automation",
+                icon: "⚡",
+                description: "Zero manual entry. Rules-based workflows. Audit-ready. Everything logged. Multi-state tax handling. Real-time notifications."
+              }
+            ]}
+          />
         </div>
       </section>
 
       {/* Product Showcases */}
-      <section className="py-12 border-t border-border/50 bg-slate-900/30">
+      <section className="py-6 sm:py-8 border-t border-border/50 bg-slate-900/30">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold font-heading mb-2">Product Showcases</h2>
-            <p className="text-muted-foreground text-sm">Explore our complete product suite. Click below to see detailed feature walkthroughs.</p>
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-1">Product Showcases</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm">Click to explore detailed feature walkthroughs.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -754,11 +757,11 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section className="py-12">
+      <section className="py-6 sm:py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold font-heading mb-2">Flexible Pricing for Every Staffing Model</h2>
-            <p className="text-muted-foreground text-sm">Pay only for what you use. Fixed monthly, revenue-share, or white-label franchise options available.</p>
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-1">Flexible Pricing</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm">Pay only for what you use. Monthly, revenue-share, or white-label options.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -881,10 +884,10 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-10 bg-primary/5 border-y border-border/30">
+      <section className="py-6 bg-primary/5 border-y border-border/30">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold font-heading mb-3">Ready to Transform Your Staffing?</h2>
-          <p className="text-muted-foreground text-sm mb-4">Join the next generation of staffing agencies.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Ready to Transform Your Staffing?</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm mb-3">Join the next generation of staffing agencies.</p>
           <Link href="/pricing" className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-semibold whitespace-nowrap">
             Start Your Free Trial Today
             <ArrowRight className="w-4 h-4 ml-2 flex-shrink-0" />
