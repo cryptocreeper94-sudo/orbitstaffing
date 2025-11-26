@@ -118,6 +118,13 @@ export const storage: IStorage = {
     await db.delete(integrationTokens).where(eq(integrationTokens.id, id));
   },
 
+  async getAllIntegrationTokens() {
+    return await db
+      .select()
+      .from(integrationTokens)
+      .orderBy(desc(integrationTokens.connectedAt));
+  },
+
   // ========================
   // SYNC TRACKING
   // ========================

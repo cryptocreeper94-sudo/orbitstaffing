@@ -22,6 +22,392 @@ import { shouldBypassDeveloperLogin, enableBypassOnThisDevice, disableBypassOnTh
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
+// OAuth Provider Configuration with Setup Links
+const OAUTH_PROVIDERS = [
+  {
+    type: 'quickbooks',
+    name: 'QuickBooks',
+    setupLink: 'https://developer.intuit.com/app/developer/qbo/docs/get-started',
+    fields: ['QUICKBOOKS_CLIENT_ID', 'QUICKBOOKS_CLIENT_SECRET'],
+  },
+  {
+    type: 'adp',
+    name: 'ADP',
+    setupLink: 'https://developers.adp.com/getting-started',
+    fields: ['ADP_CLIENT_ID', 'ADP_CLIENT_SECRET'],
+  },
+  {
+    type: 'paychex',
+    name: 'Paychex',
+    setupLink: 'https://developer.paychex.com/',
+    fields: ['PAYCHEX_CLIENT_ID', 'PAYCHEX_CLIENT_SECRET'],
+  },
+  {
+    type: 'gusto',
+    name: 'Gusto',
+    setupLink: 'https://dev.gusto.com/docs/api/',
+    fields: ['GUSTO_CLIENT_ID', 'GUSTO_CLIENT_SECRET'],
+  },
+  {
+    type: 'rippling',
+    name: 'Rippling',
+    setupLink: 'https://developer.rippling.com/',
+    fields: ['RIPPLING_CLIENT_ID', 'RIPPLING_CLIENT_SECRET'],
+  },
+  {
+    type: 'workday',
+    name: 'Workday',
+    setupLink: 'https://community.workday.com/dev',
+    fields: ['WORKDAY_CLIENT_ID', 'WORKDAY_CLIENT_SECRET'],
+  },
+  {
+    type: 'paylocity',
+    name: 'Paylocity',
+    setupLink: 'https://www.paylocity.com/api/',
+    fields: ['PAYLOCITY_CLIENT_ID', 'PAYLOCITY_CLIENT_SECRET'],
+  },
+  {
+    type: 'onpay',
+    name: 'OnPay',
+    setupLink: 'https://api.onpay.com/',
+    fields: ['ONPAY_CLIENT_ID', 'ONPAY_CLIENT_SECRET'],
+  },
+  {
+    type: 'bullhorn',
+    name: 'Bullhorn',
+    setupLink: 'https://bullhorn.github.io/rest-api-docs/',
+    fields: ['BULLHORN_CLIENT_ID', 'BULLHORN_CLIENT_SECRET'],
+  },
+  {
+    type: 'wurknow',
+    name: 'WurkNow',
+    setupLink: 'https://www.wurknow.com/api',
+    fields: ['WURKNOW_CLIENT_ID', 'WURKNOW_CLIENT_SECRET'],
+  },
+  {
+    type: 'ukgpro',
+    name: 'UKG Pro',
+    setupLink: 'https://developer.ukg.com/',
+    fields: ['UKGPRO_CLIENT_ID', 'UKGPRO_CLIENT_SECRET'],
+  },
+  {
+    type: 'bamboohr',
+    name: 'BambooHR',
+    setupLink: 'https://documentation.bamboohr.com/docs',
+    fields: ['BAMBOOHR_CLIENT_ID', 'BAMBOOHR_CLIENT_SECRET'],
+  },
+  {
+    type: 'google',
+    name: 'Google Workspace',
+    setupLink: 'https://console.cloud.google.com/apis/credentials',
+    fields: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'],
+  },
+  {
+    type: 'microsoft',
+    name: 'Microsoft 365',
+    setupLink: 'https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade',
+    fields: ['MICROSOFT_CLIENT_ID', 'MICROSOFT_CLIENT_SECRET'],
+  },
+];
+
+// Secrets Manager Component
+function SecretsManager() {
+  const [selectedProvider, setSelectedProvider] = useState('');
+  const [configuredProviders, setConfiguredProviders] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [customerConnections, setCustomerConnections] = useState<any>({});
+  const [showCustomerView, setShowCustomerView] = useState(false);
+
+  // Fetch which providers are already configured
+  useEffect(() => {
+    loadConfiguredProviders();
+    loadCustomerConnections();
+  }, []);
+
+  async function loadConfiguredProviders() {
+    try {
+      const res = await fetch('/api/developer/secrets/status', {
+        headers: {
+          'x-admin-pin': process.env.ADMIN_PIN || '',
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setConfiguredProviders(data.configured || []);
+      }
+    } catch (err) {
+      console.error('Failed to load secrets status:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function loadCustomerConnections() {
+    try {
+      const res = await fetch('/api/developer/customer-oauth-summary', {
+        headers: {
+          'x-admin-pin': process.env.ADMIN_PIN || '',
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCustomerConnections(data || {});
+      }
+    } catch (err) {
+      console.error('Failed to load customer connections:', err);
+    }
+  }
+
+  const currentProvider = OAUTH_PROVIDERS.find(p => p.type === selectedProvider);
+  const isConfigured = configuredProviders.includes(selectedProvider);
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <Key className="w-6 h-6 text-purple-400" />
+          <h2 className="text-2xl font-bold text-white">Secrets Manager</h2>
+        </div>
+        <p className="text-gray-300">
+          Securely store OAuth credentials for external integrations. These are saved as encrypted secrets and will be used automatically when customers connect their accounts.
+        </p>
+      </div>
+
+      {/* Provider Selection */}
+      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <Database className="w-5 h-5 text-cyan-400" />
+          Select OAuth Provider
+        </h3>
+
+        <select
+          value={selectedProvider}
+          onChange={(e) => setSelectedProvider(e.target.value)}
+          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-400"
+          data-testid="select-oauth-provider"
+        >
+          <option value="">-- Select a provider --</option>
+          {OAUTH_PROVIDERS.map(provider => (
+            <option key={provider.type} value={provider.type}>
+              {provider.name} {configuredProviders.includes(provider.type) ? '✓ Configured' : ''}
+            </option>
+          ))}
+        </select>
+
+        {/* Provider Status Grid */}
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+          {OAUTH_PROVIDERS.map(provider => (
+            <div
+              key={provider.type}
+              className={`p-3 rounded-lg border ${
+                configuredProviders.includes(provider.type)
+                  ? 'bg-green-900/20 border-green-700/50'
+                  : 'bg-slate-700/50 border-slate-600'
+              }`}
+            >
+              <div className="text-sm font-bold text-gray-300">{provider.name}</div>
+              <div className={`text-xs mt-1 ${
+                configuredProviders.includes(provider.type) ? 'text-green-400' : 'text-gray-500'
+              }`}>
+                {configuredProviders.includes(provider.type) ? '✓ Configured' : 'Not configured'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Credentials Form */}
+      {currentProvider && (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <Shield className="w-5 h-5 text-purple-400" />
+              {currentProvider.name} Credentials
+            </h3>
+            {isConfigured && (
+              <div className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold">
+                ✓ CONFIGURED
+              </div>
+            )}
+          </div>
+
+          {/* Setup Link */}
+          <a
+            href={currentProvider.setupLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+            data-testid="link-oauth-setup"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              Click here to set up {currentProvider.name} OAuth credentials
+            </span>
+          </a>
+
+          <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4">
+            <p className="text-sm text-purple-200">
+              <strong>Setup Instructions:</strong>
+              <br />1. Click the link above to open {currentProvider.name}'s developer portal
+              <br />2. Create a new OAuth application called "ORBIT Staffing OS"
+              <br />3. Set the redirect URI to: <code className="bg-black/30 px-2 py-1 rounded">https://yourdomain.com/api/oauth/{currentProvider.type}/callback</code>
+              <br />4. Copy the Client ID and Client Secret below
+            </p>
+          </div>
+
+          {/* Action Instructions */}
+          <div className="bg-cyan-900/20 border border-cyan-700/50 rounded-lg p-4">
+            <h4 className="font-bold text-cyan-300 mb-2">📋 What You Need:</h4>
+            <ol className="text-sm text-cyan-100 space-y-1 list-decimal list-inside">
+              <li>Go to the developer portal (link above)</li>
+              <li>Create an OAuth app called "ORBIT Staffing OS"</li>
+              <li>Copy the Client ID and Client Secret</li>
+              <li>Come back and add them as secrets in Replit</li>
+            </ol>
+          </div>
+
+          {/* Manual Instructions */}
+          <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4">
+            <h4 className="font-bold text-purple-300 mb-2">🔐 Add Secrets Manually:</h4>
+            <p className="text-sm text-purple-100 mb-3">
+              Open Replit's Secrets pane (Tools → Secrets) and add these two secrets:
+            </p>
+            <div className="bg-black/30 rounded p-3 font-mono text-xs text-green-400 space-y-1">
+              <div className="flex items-center justify-between">
+                <span>{currentProvider.fields[0]}</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(currentProvider.fields[0]);
+                    alert('Copied to clipboard!');
+                  }}
+                  className="text-cyan-400 hover:text-cyan-300 ml-2"
+                >
+                  <Copy className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span>{currentProvider.fields[1]}</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(currentProvider.fields[1]);
+                    alert('Copied to clipboard!');
+                  }}
+                  className="text-cyan-400 hover:text-cyan-300 ml-2"
+                >
+                  <Copy className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">
+              Click the copy icon to copy the secret name, then paste your credentials from {currentProvider.name}
+            </p>
+          </div>
+
+          {/* Refresh Status Button */}
+          <Button
+            onClick={() => loadConfiguredProviders()}
+            className="w-full bg-cyan-600 hover:bg-cyan-700 py-3 font-bold text-lg"
+            data-testid="button-refresh-status"
+          >
+            🔄 Refresh Status
+          </Button>
+
+          {isConfigured && (
+            <div className="bg-green-900/20 border border-green-700 rounded-lg p-3 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
+              <p className="text-sm text-green-200">
+                {currentProvider.name} credentials are configured! OAuth connections will work automatically.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Info Box */}
+      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-cyan-400 mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-bold text-white mb-2">Security Notes</h4>
+            <ul className="text-sm text-gray-300 space-y-1">
+              <li>• Credentials are stored as encrypted secrets in Replit</li>
+              <li>• They are never exposed in the frontend or logs</li>
+              <li>• Each customer's OAuth connection is separate and tenant-isolated</li>
+              <li>• You only need to set these up once per provider</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Customer OAuth Connections Statistics */}
+      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-green-400" />
+            Customer OAuth Statistics
+          </h3>
+          <Button
+            onClick={() => setShowCustomerView(!showCustomerView)}
+            variant="outline"
+            className="text-sm"
+            data-testid="button-toggle-customer-view"
+          >
+            {showCustomerView ? 'Hide' : 'Show'}
+          </Button>
+        </div>
+
+        {showCustomerView && (
+          <div className="space-y-3">
+            {Object.keys(customerConnections.providerCounts || {}).length === 0 ? (
+              <p className="text-gray-400 text-sm">No customer OAuth connections yet. Statistics will appear here when customers connect their external systems.</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {Object.entries(customerConnections.providerCounts || {}).map(([provider, stats]: [string, any]) => (
+                    <div
+                      key={provider}
+                      className="p-4 rounded-lg border bg-slate-700/50 border-slate-600"
+                    >
+                      <div className="font-bold text-white text-sm mb-2">
+                        {provider.toUpperCase()}
+                      </div>
+                      <div className="text-xs text-gray-300 space-y-1">
+                        <div className="flex justify-between">
+                          <span>Total:</span>
+                          <span className="font-bold text-cyan-400">{stats.total}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Connected:</span>
+                          <span className="font-bold text-green-400">{stats.connected}</span>
+                        </div>
+                        {stats.error > 0 && (
+                          <div className="flex justify-between">
+                            <span>Errors:</span>
+                            <span className="font-bold text-red-400">{stats.error}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-cyan-900/20 border border-cyan-700/50 rounded-lg p-3">
+                  <p className="text-sm text-cyan-100">
+                    <strong>Total Connections:</strong> {customerConnections.totalConnections || 0}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    ✓ Aggregate statistics only. No personal or tenant data is exposed.
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
   const [showBypassOption, setShowBypassOption] = useState(false);
@@ -51,7 +437,7 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -563,6 +949,18 @@ export default function DeveloperPanel() {
             <MessageCircle className="w-4 h-4" />
             Secure Messaging
           </button>
+          <button
+            onClick={() => setActiveTab('secrets')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'secrets'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-secrets"
+          >
+            <Key className="w-4 h-4" />
+            Secrets Manager
+          </button>
           <div className="ml-auto flex items-center">
             <button
               onClick={() => setShowChat(!showChat)}
@@ -974,6 +1372,9 @@ export default function DeveloperPanel() {
             />
           </div>
         )}
+
+        {/* SECRETS MANAGER TAB */}
+        {activeTab === 'secrets' && <SecretsManager />}
       </div>
 
       {/* Bug Report Widget */}

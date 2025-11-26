@@ -1125,6 +1125,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // DEVELOPER SECRETS MANAGEMENT
+  // (Protected - requires developer/admin authentication)
+  // ========================
+  
+  // Developer authentication middleware
+  function requireDeveloperAuth(req: Request, res: Response, next: () => void): void {
+    // Check if user is authenticated as developer/admin
+    // TODO: Implement proper session-based auth check
+    // For now, require ADMIN_PIN verification
+    const authHeader = req.headers['x-admin-pin'];
+    if (!authHeader || authHeader !== process.env.ADMIN_PIN) {
+      res.status(403).json({ error: "Developer authentication required" });
+      return;
+    }
+    next();
+  }
+  
+  // Check which OAuth providers have credentials configured
+  app.get("/api/developer/secrets/status", requireDeveloperAuth, async (req: Request, res: Response) => {
+    try {
+      const configured: string[] = [];
+      
+      // Check which OAuth provider secrets exist
+      const providers = [
+        'quickbooks', 'adp', 'paychex', 'gusto', 'rippling', 'workday',
+        'paylocity', 'onpay', 'bullhorn', 'wurknow', 'ukgpro', 'bamboohr',
+        'google', 'microsoft'
+      ];
+      
+      for (const provider of providers) {
+        const clientIdKey = `${provider.toUpperCase()}_CLIENT_ID`;
+        const clientSecretKey = `${provider.toUpperCase()}_CLIENT_SECRET`;
+        
+        // Check if both secrets exist
+        if (process.env[clientIdKey] && process.env[clientSecretKey]) {
+          configured.push(provider);
+        }
+      }
+      
+      res.json({ configured });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check secrets status" });
+    }
+  });
+
+  // Get customer OAuth connection aggregate counts (NO PERSONAL DATA)
+  app.get("/api/developer/customer-oauth-summary", requireDeveloperAuth, async (req: Request, res: Response) => {
+    try {
+      // Get connection summary WITHOUT exposing ANY identifying data
+      const allTokens = await storage.getAllIntegrationTokens();
+      
+      // Aggregate by provider - NO tenant IDs or personal data
+      const providerCounts: Record<string, { total: number, connected: number, error: number }> = {};
+      
+      allTokens.forEach(token => {
+        if (!providerCounts[token.integrationType]) {
+          providerCounts[token.integrationType] = { total: 0, connected: 0, error: 0 };
+        }
+        providerCounts[token.integrationType].total++;
+        if (token.connectionStatus === 'connected') {
+          providerCounts[token.integrationType].connected++;
+        } else if (token.connectionStatus === 'error') {
+          providerCounts[token.integrationType].error++;
+        }
+      });
+      
+      res.json({ providerCounts, totalConnections: allTokens.length });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch OAuth summary" });
+    }
+  });
+
   // Create and return HTTP server
   const httpServer = createServer(app);
   return httpServer;
