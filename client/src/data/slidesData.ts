@@ -1,7 +1,6 @@
 export interface Slide {
   id: number;
   title: string;
-  subtitle?: string;
   section: string;
   duration: number;
   content: {
@@ -67,7 +66,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'GPS & RFID Vehicle Tracking',
-      subtitle: 'Know exactly where every vehicle is, 24/7',
+      subheadline: 'Know exactly where every vehicle is, 24/7',
       description: 'Live GPS positioning with interactive map display. Track location history, receive geofence alerts, and identify missing vehicles instantly.',
       bullets: [
         'Live location updates every 30 seconds',
@@ -86,7 +85,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Preventive Maintenance Automation',
-      subtitle: 'Never miss a service interval again',
+      subheadline: 'Never miss a service interval again',
       description: 'Maintenance triggers based on mileage, hours, or calendar. Automatic reminders, service tracking, and predictive alerts.',
       bullets: [
         'Mileage-based triggers (oil changes at 5k miles)',
@@ -105,7 +104,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Fleet Performance Dashboard',
-      subtitle: 'Maximize revenue, minimize costs',
+      subheadline: 'Maximize revenue, minimize costs',
       description: 'Real-time metrics showing utilization rate, revenue per vehicle, fuel efficiency, and repair downtime. Identify underperforming assets instantly.',
       bullets: [
         'Daily utilization rates with trends',
@@ -124,7 +123,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Unified Multi-Site Management',
-      subtitle: 'Manage unlimited locations from one dashboard',
+      subheadline: 'Manage unlimited locations from one dashboard',
       description: 'Centralized inventory management across all lots. Inter-lot transfers tracked. Location-specific KPIs and performance metrics.',
       bullets: [
         'Central dashboard for all locations',
@@ -143,7 +142,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Automated Rental Processing',
-      subtitle: '90% faster customer turnaround',
+      subheadline: '90% faster customer turnaround',
       description: 'Intelligent vehicle assignment based on category and availability. Seamless transaction processing and automated rental workflow.',
       bullets: [
         'AI-powered vehicle category matching',
@@ -162,7 +161,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Smart Inspection Checklists',
-      subtitle: 'Protect against damage claims & disputes',
+      subheadline: 'Protect against damage claims & disputes',
       description: 'Pre-rental and return inspections with photo documentation. Condition scoring and automated damage charge calculations.',
       bullets: [
         'Digital inspection forms with photos',
@@ -181,7 +180,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Automated Compliance Checks',
-      subtitle: 'Reduce liability and regulatory risk',
+      subheadline: 'Reduce liability and regulatory risk',
       description: 'License verification, insurance validation, and automated compliance rejections. Eligibility scoring for renters.',
       bullets: [
         'Real-time license validation integration',
@@ -200,7 +199,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Fuel & Mileage Intelligence',
-      subtitle: 'Reduce waste, increase profitability',
+      subheadline: 'Reduce waste, increase profitability',
       description: 'Track fuel consumption per vehicle. Route optimization to reduce mileage. Anomaly detection for fuel theft.',
       bullets: [
         'Fuel economy tracking per vehicle',
@@ -219,7 +218,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Insurance & Claims Integration',
-      subtitle: 'Streamlined claims & reduced fraud',
+      subheadline: 'Streamlined claims & reduced fraud',
       description: 'Automatic accident detection via GPS data. Damage photos integrated with claim documentation. Fraud prevention.',
       bullets: [
         'GPS accident detection triggers',
@@ -238,7 +237,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Lot Attendant Mobile App',
-      subtitle: 'Empower your team with instant information',
+      subheadline: 'Empower your team with instant information',
       description: 'Real-time vehicle location, quick inspections, transfer coordination. Everything your lot team needs on mobile.',
       bullets: [
         'Live GPS map of all vehicles',
@@ -257,7 +256,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Built for Multiple Industries',
-      subtitle: 'Rental agencies, dealers, fleet operators, and logistics',
+      subheadline: 'Rental agencies, dealers, fleet operators, and logistics',
       description: 'Lot Ops Pro adapts to any organization managing vehicle inventory and operations.',
       bullets: [
         'Car rental agencies: Utilization & revenue optimization',
@@ -276,7 +275,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Proven Results',
-      subtitle: 'Real data from real customers',
+      subheadline: 'Real data from real customers',
       description: 'Organizations using Lot Ops Pro see immediate improvements in efficiency, utilization, and profitability.',
       bullets: [
         '35% increase in fleet utilization rates',
@@ -295,7 +294,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Future Capabilities',
-      subtitle: 'Advanced features coming soon',
+      subheadline: 'Advanced features coming soon',
       description: 'We\'re constantly innovating to keep Lot Ops Pro ahead of industry needs.',
       bullets: [
         'AI-powered predictive maintenance (Q2 2025)',
@@ -314,7 +313,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Enterprise-Grade Security',
-      subtitle: 'Your data is protected',
+      subheadline: 'Your data is protected',
       description: 'Bank-level encryption, compliance with automotive regulations, and continuous security monitoring.',
       bullets: [
         'End-to-end encryption for all data',
@@ -333,7 +332,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'API-First Architecture',
-      subtitle: 'Connects with your existing systems',
+      subheadline: 'Connects with your existing systems',
       description: 'RESTful APIs and webhooks for easy integration with your CRM, accounting, and fleet management systems.',
       bullets: [
         'REST & GraphQL APIs',
@@ -352,7 +351,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Flexible Pricing',
-      subtitle: 'Scales with your business',
+      subheadline: 'Scales with your business',
       description: 'Pay only for what you use. No hidden fees. Annual discounts available.',
       bullets: [
         'Per-vehicle monthly pricing',
@@ -371,7 +370,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: '24/7 Expert Support',
-      subtitle: 'We\'re here to help you succeed',
+      subheadline: 'We\'re here to help you succeed',
       description: 'Dedicated support team, comprehensive training, and continuous optimization.',
       bullets: [
         'Phone, email, chat support available 24/7',
@@ -390,7 +389,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Quick 30-Day Implementation',
-      subtitle: 'From signup to operations in one month',
+      subheadline: 'From signup to operations in one month',
       description: 'Streamlined onboarding process with minimal disruption to your operations.',
       bullets: [
         'Week 1: Setup & vehicle tagging',
@@ -409,7 +408,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Why Lot Ops Pro Stands Out',
-      subtitle: 'Unique capabilities competitors don\'t offer',
+      subheadline: 'Unique capabilities competitors don\'t offer',
       description: 'We\'ve built features specifically for automotive lot operations, not generic fleet management.',
       bullets: [
         'Rental-focused inspection workflows',
@@ -428,7 +427,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Enterprise Rental Agency Success',
-      subtitle: 'From chaos to control',
+      subheadline: 'From chaos to control',
       description: 'A leading rental company with 5,000 vehicles across 50 locations transformed their operations.',
       bullets: [
         '40% reduction in administrative overhead',
@@ -447,7 +446,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Regional Auto Dealer Achievement',
-      subtitle: 'Inventory chaos solved',
+      subheadline: 'Inventory chaos solved',
       description: 'Medium-sized dealer with 300-vehicle inventory improved operations dramatically.',
       bullets: [
         '95% accuracy in inventory counts',
@@ -483,7 +482,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Built by Automotive Experts',
-      subtitle: 'Founded by people who understand lot operations',
+      subheadline: 'Founded by people who understand lot operations',
       description: 'Lot Ops Pro comes from Darkwave Studios - the same team behind ORBIT Staffing OS and DarkWave Pulse.',
       bullets: [
         '15+ years automotive industry experience',
@@ -502,7 +501,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Certified & Audited',
-      subtitle: 'Enterprise-grade security standards',
+      subheadline: 'Enterprise-grade security standards',
       description: 'Lot Ops Pro meets the highest security and compliance standards in the industry.',
       bullets: [
         'SOC 2 Type II certified',
@@ -532,7 +531,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Built to Customize',
-      subtitle: 'Adapt to your unique workflows',
+      subheadline: 'Adapt to your unique workflows',
       description: 'Every organization is different. Lot Ops Pro is highly customizable to your specific needs.',
       bullets: [
         'Custom inspection checklists',
@@ -551,7 +550,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Proven at Enterprise Scale',
-      subtitle: 'From startup to 50,000+ vehicles',
+      subheadline: 'From startup to 50,000+ vehicles',
       description: 'Lot Ops Pro handles operations of any size - from a single lot to global fleet management.',
       bullets: [
         'Handles 10,000+ concurrent users',
@@ -570,7 +569,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Drive Sustainability',
-      subtitle: 'Reduce emissions through optimization',
+      subheadline: 'Reduce emissions through optimization',
       description: 'Lot Ops Pro\'s route optimization and utilization improvements directly reduce carbon footprint.',
       bullets: [
         'Route optimization reduces miles by 20%',
@@ -589,7 +588,7 @@ export const slidesData: Slide[] = [
     content: {
       type: 'feature',
       headline: 'Train Your Team Properly',
-      subtitle: 'Certification programs available',
+      subheadline: 'Certification programs available',
       description: 'We offer comprehensive training and certification programs to ensure your team gets maximum value.',
       bullets: [
         'Onsite & remote training available',
