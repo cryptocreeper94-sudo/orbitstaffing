@@ -23,6 +23,7 @@ import {
   backgroundChecks,
   drugTests,
   complianceChecks,
+  integrationTokens,
   type User,
   type InsertUser,
   type Company,
@@ -67,11 +68,58 @@ import {
   type InsertDrugTest,
   type ComplianceCheck,
   type InsertComplianceCheck,
+  type IntegrationToken,
+  type InsertIntegrationToken,
 } from "@shared/schema";
 
 export interface IStorage {
+  // OAuth Integration Tokens
+  storeIntegrationToken(token: InsertIntegrationToken): Promise<IntegrationToken>;
+  getIntegrationToken(tenantId: string, integrationType: string): Promise<IntegrationToken | null>;
+  updateIntegrationToken(id: string, updates: Partial<InsertIntegrationToken>): Promise<IntegrationToken>;
+  deleteIntegrationToken(id: string): Promise<void>;
   [key: string]: any;
 }
+
+// OAuth Integration Token Methods
+export const storage: IStorage & {
+  // Keep existing methods signature
+  storeIntegrationToken: (token: InsertIntegrationToken) => Promise<IntegrationToken>;
+  getIntegrationToken: (tenantId: string, integrationType: string) => Promise<IntegrationToken | null>;
+  updateIntegrationToken: (id: string, updates: Partial<InsertIntegrationToken>) => Promise<IntegrationToken>;
+  deleteIntegrationToken: (id: string) => Promise<void>;
+} = {
+  async storeIntegrationToken(token: InsertIntegrationToken) {
+    const result = await db.insert(integrationTokens).values(token).returning();
+    return result[0];
+  },
+
+  async getIntegrationToken(tenantId: string, integrationType: string) {
+    const result = await db
+      .select()
+      .from(integrationTokens)
+      .where(
+        and(
+          eq(integrationTokens.tenantId, tenantId),
+          eq(integrationTokens.integrationType, integrationType)
+        )
+      )
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async updateIntegrationToken(id: string, updates: Partial<InsertIntegrationToken>) {
+    const result = await db
+      .update(integrationTokens)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(integrationTokens.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async deleteIntegrationToken(id: string) {
+    await db.delete(integrationTokens).where(eq(integrationTokens.id, id));
+  },
 
 export const storage: IStorage = {
   // Users

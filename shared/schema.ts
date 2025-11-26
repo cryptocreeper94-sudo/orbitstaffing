@@ -2666,3 +2666,41 @@ export const insertStateComplianceRuleSchema = createInsertSchema(stateComplianc
 
 export type InsertStateComplianceRule = z.infer<typeof insertStateComplianceRuleSchema>;
 export type StateComplianceRule = typeof stateComplianceRules.$inferSelect;
+
+// ========================
+// Integration OAuth Tokens
+// ========================
+export const integrationTokens = pgTable(
+  "integration_tokens",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    integrationType: varchar("integration_type", { length: 50 }).notNull(), // "quickbooks", "adp", "google", "microsoft"
+    accessToken: text("access_token").notNull(), // Encrypted
+    refreshToken: text("refresh_token"), // Encrypted
+    expiresAt: timestamp("expires_at"),
+    scope: text("scope"), // OAuth scopes granted
+    realmId: varchar("realm_id", { length: 255 }), // QuickBooks realm ID
+    lastSyncedAt: timestamp("last_synced_at"),
+    connectionStatus: varchar("connection_status", { length: 50 }).default("connected"), // "connected", "error", "expired"
+    lastError: text("last_error"),
+    metadata: jsonb("metadata"), // Store provider-specific data
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_tokens_tenant").on(table.tenantId),
+    typeIdx: index("idx_tokens_type").on(table.integrationType),
+    tenantTypeIdx: index("idx_tokens_tenant_type").on(table.tenantId, table.integrationType),
+  })
+);
+
+export const insertIntegrationTokenSchema = createInsertSchema(integrationTokens).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastSyncedAt: true,
+});
+
+export type InsertIntegrationToken = z.infer<typeof insertIntegrationTokenSchema>;
+export type IntegrationToken = typeof integrationTokens.$inferSelect;
