@@ -29,6 +29,8 @@ import {
   clients,
   csaTemplates,
   workerReferralBonuses,
+  rateConfirmations,
+  billingConfirmations,
   type User,
   type InsertUser,
   type Company,
@@ -85,6 +87,10 @@ import {
   type InsertCSATemplate,
   type WorkerReferralBonus,
   type InsertWorkerReferralBonus,
+  type RateConfirmation,
+  type InsertRateConfirmation,
+  type BillingConfirmation,
+  type InsertBillingConfirmation,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -1066,6 +1072,49 @@ export const storage: IStorage = {
     );
   },
 
+  async confirmRatesAndCSA(params: {
+    requestId: string;
+    tenantId: string;
+    customerId: string;
+    workerHourlyRate: number;
+    totalBillingRate: number;
+    paymentTerms: string;
+    csaAccepted: boolean;
+    customerIp: string;
+  }): Promise<{ success: boolean; confirmationId?: string; error?: string }> {
+    try {
+      const { requestId, tenantId, customerId, workerHourlyRate, totalBillingRate, paymentTerms, csaAccepted, customerIp } = params;
+      
+      if (!csaAccepted) {
+        return { success: false, error: "CSA must be accepted to confirm rates" };
+      }
+
+      const paymentTermsDays = paymentTerms === 'net7' ? 7 : paymentTerms === 'net15' ? 15 : 30;
+      const markupPercentage = 1.45;
+
+      const workerRequest = await this.getWorkerRequest(requestId, tenantId);
+      if (!workerRequest) {
+        return { success: false, error: "Worker request not found" };
+      }
+
+      const startDate = new Date(workerRequest.startDate);
+      const endDate = workerRequest.endDate ? new Date(workerRequest.endDate) : new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+      await this.updateWorkerRequest(requestId, tenantId, {
+        status: 'confirmed',
+        confirmedAt: new Date()
+      });
+
+      return {
+        success: true,
+        confirmationId: requestId
+      };
+    } catch (error) {
+      console.error("Error confirming rates and CSA:", error);
+      return { success: false, error: "Failed to confirm rates and CSA" };
+    }
+  },
+
   // ========================
   // Worker Request Matches
   // ========================
@@ -1861,6 +1910,114 @@ export const storage: IStorage = {
       .where(eq(clients.id, id))
       .returning();
     return result[0];
+  },
+
+  // ========================
+  // PAYROLL OPERATIONS
+  // ========================
+  async getWorkersReadyForPayroll(
+    tenantId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<any[]> {
+    // Get approved timesheets with worker details
+    const result = await db
+      .select({
+        workerId: workers.id,
+        workerName: workers.fullName,
+        workerEmail: workers.email,
+        workerState: workers.state,
+        hourlyWage: workers.hourlyWage,
+        totalHours: sql<number>`SUM(COALESCE(${timesheets.totalHoursWorked}, 0))`,
+        regularHours: sql<number>`SUM(CASE WHEN ${timesheets.totalHoursWorked} <= 40 THEN ${timesheets.totalHoursWorked} ELSE 40 END)`,
+        overtimeHours: sql<number>`SUM(CASE WHEN ${timesheets.totalHoursWorked} > 40 THEN ${timesheets.totalHoursWorked} - 40 ELSE 0 END)`,
+      })
+      .from(timesheets)
+      .innerJoin(workers, eq(timesheets.workerId, workers.id))
+      .where(
+        and(
+          eq(timesheets.tenantId, tenantId),
+          eq(timesheets.status, 'approved'),
+          gte(timesheets.clockInTime, startDate),
+          lte(timesheets.clockInTime, endDate)
+        )
+      )
+      .groupBy(workers.id, workers.fullName, workers.email, workers.state, workers.hourlyWage);
+
+    return result;
+  },
+
+  async getWorkerW4Data(workerId: string): Promise<EmployeeW4Data | null> {
+    const result = await db
+      .select()
+      .from(employeeW4Data)
+      .where(
+        and(
+          eq(employeeW4Data.workerId, workerId),
+          eq(employeeW4Data.isCurrentW4, true)
+        )
+      )
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getWorkerGarnishments(workerId: string): Promise<GarnishmentOrder[]> {
+    return await db
+      .select()
+      .from(garnishmentOrders)
+      .where(
+        and(
+          eq(garnishmentOrders.employeeId, workerId),
+          eq(garnishmentOrders.status, 'active')
+        )
+      )
+      .orderBy(garnishmentOrders.priority);
+  },
+
+  async createPayrollRecord(data: InsertPayrollRecord): Promise<PayrollRecord> {
+    const result = await db.insert(payrollRecords).values(data).returning();
+    return result[0];
+  },
+
+  async getPayrollRecord(id: string): Promise<PayrollRecord | null> {
+    const result = await db
+      .select()
+      .from(payrollRecords)
+      .where(eq(payrollRecords.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getPayrollHistory(
+    tenantId: string,
+    workerId?: string,
+    limit: number = 50
+  ): Promise<PayrollRecord[]> {
+    let query = db
+      .select()
+      .from(payrollRecords)
+      .where(eq(payrollRecords.tenantId, tenantId));
+
+    if (workerId) {
+      query = query.where(eq(payrollRecords.employeeId, workerId));
+    }
+
+    return await query
+      .orderBy(desc(payrollRecords.payPeriodEnd))
+      .limit(limit);
+  },
+
+  async updatePayrollRecord(id: string, data: Partial<InsertPayrollRecord>): Promise<PayrollRecord> {
+    const result = await db
+      .update(payrollRecords)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(payrollRecords.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async getPaystubByPayrollId(payrollId: string): Promise<PayrollRecord | null> {
+    return this.getPayrollRecord(payrollId);
   },
 
 };

@@ -8,6 +8,8 @@ import { emailService } from "./email";
 import { oauthClients } from "./oauthClients";
 import { syncEngine } from "./syncEngine";
 import { stripeService } from "./stripeService";
+import { calculatePayroll } from "./payrollCalculator";
+import type { PayrollCalculationInput } from "./payrollCalculator";
 import {
   insertUserSchema,
   insertWorkerSchema,
@@ -16,6 +18,7 @@ import {
   insertInsuranceDocumentSchema,
   insertWorkerRequestSchema,
   insertWorkerRequestMatchSchema,
+  insertPayrollRecordSchema,
   users,
   workers,
   companies,
@@ -504,25 +507,246 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ========================
   // PAYROLL ROUTES
   // ========================
-  app.get("/api/payroll", async (req: Request, res: Response) => {
+  
+  // Get workers ready for payroll processing
+  app.get("/api/payroll/ready", async (req: Request, res: Response) => {
     try {
       const tenantId = validateTenantAccess(req, res);
       if (!tenantId) return;
-      const payrollList = await storage.listPayroll();
-      res.json(payrollList);
+      
+      const { startDate, endDate } = req.query;
+      const start = startDate ? new Date(startDate as string) : new Date();
+      const end = endDate ? new Date(endDate as string) : new Date();
+      
+      const workers_data = await storage.getWorkersReadyForPayroll(tenantId, start, end);
+      
+      // Estimate gross pay and deductions for each worker
+      const workersWithEstimates = workers_data.map((worker: any) => {
+        const hourlyRate = parseFloat(worker.hourlyWage || "0");
+        const regularHours = parseFloat(worker.regularHours || "0");
+        const overtimeHours = parseFloat(worker.overtimeHours || "0");
+        
+        const regularPay = regularHours * hourlyRate;
+        const overtimePay = overtimeHours * hourlyRate * 1.5;
+        const grossPay = regularPay + overtimePay;
+        
+        // Rough estimate of deductions (will be accurate during actual processing)
+        const estimatedDeductions = grossPay * 0.25; // ~25% for taxes/FICA
+        const estimatedNetPay = grossPay - estimatedDeductions;
+        
+        return {
+          ...worker,
+          hourlyRate,
+          regularHours,
+          overtimeHours,
+          grossPay,
+          estimatedDeductions,
+          estimatedNetPay,
+          status: 'ready',
+        };
+      });
+      
+      res.json(workersWithEstimates);
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch payroll" });
+      console.error("Failed to fetch workers ready for payroll:", error);
+      res.status(500).json({ error: "Failed to fetch workers ready for payroll" });
     }
   });
-
-  app.post("/api/payroll", async (req: Request, res: Response) => {
+  
+  // Process payroll for worker(s)
+  app.post("/api/payroll/process", async (req: Request, res: Response) => {
     try {
       const tenantId = validateTenantAccess(req, res);
       if (!tenantId) return;
-      const payroll = await storage.createPayroll({ ...req.body, tenantId });
-      res.status(201).json(payroll);
+      
+      const { workerIds, payPeriodStart, payPeriodEnd } = req.body;
+      
+      if (!workerIds || !Array.isArray(workerIds) || workerIds.length === 0) {
+        return res.status(400).json({ error: "workerIds array required" });
+      }
+      
+      if (!payPeriodStart || !payPeriodEnd) {
+        return res.status(400).json({ error: "payPeriodStart and payPeriodEnd required" });
+      }
+      
+      const processedPayrolls = [];
+      const errors = [];
+      
+      for (const workerId of workerIds) {
+        try {
+          // Get worker data
+          const worker = await storage.getWorker(workerId);
+          if (!worker) {
+            errors.push({ workerId, error: "Worker not found" });
+            continue;
+          }
+          
+          // Get worker's W4 data
+          const w4Data = await storage.getWorkerW4Data(workerId);
+          if (!w4Data) {
+            errors.push({ workerId, error: "W4 data not found for worker" });
+            continue;
+          }
+          
+          // Get worker's garnishments
+          const garnishments = await storage.getWorkerGarnishments(workerId);
+          
+          // Get worker's timesheets for the pay period
+          const workersData = await storage.getWorkersReadyForPayroll(
+            tenantId,
+            new Date(payPeriodStart),
+            new Date(payPeriodEnd)
+          );
+          
+          const workerData = workersData.find((w: any) => w.workerId === workerId);
+          if (!workerData) {
+            errors.push({ workerId, error: "No approved hours for pay period" });
+            continue;
+          }
+          
+          const hourlyRate = parseFloat(worker.hourlyWage || "0");
+          const regularHours = parseFloat(workerData.regularHours || "0");
+          const overtimeHours = parseFloat(workerData.overtimeHours || "0");
+          
+          const regularPay = regularHours * hourlyRate;
+          const overtimePay = overtimeHours * hourlyRate * 1.5;
+          const grossPay = regularPay + overtimePay;
+          
+          // Calculate payroll using payrollCalculator.ts
+          const payrollInput: PayrollCalculationInput = {
+            grossPay,
+            w4Data,
+            garnishmentOrders: garnishments,
+            payPeriodDays: 7, // Weekly
+            workState: worker.state || 'TN',
+            workCity: worker.city,
+            annualGrossPaid: 0, // TODO: Get YTD gross from database
+          };
+          
+          const payrollResult = calculatePayroll(payrollInput);
+          
+          // Generate hallmark asset number
+          const hallmarkAssetNumber = `ORBIT-${Date.now()}-${workerId.substring(0, 6).toUpperCase()}`;
+          
+          // Create payroll record
+          const payrollRecord = await storage.createPayrollRecord({
+            tenantId,
+            employeeId: workerId,
+            payPeriodStart: new Date(payPeriodStart),
+            payPeriodEnd: new Date(payPeriodEnd),
+            payDate: new Date(),
+            
+            // Hours
+            regularHours: regularHours.toString(),
+            overtimeHours: overtimeHours.toString(),
+            totalHours: (regularHours + overtimeHours).toString(),
+            
+            // Pay
+            hourlyRate: hourlyRate.toString(),
+            regularPay: regularPay.toString(),
+            overtimePay: overtimePay.toString(),
+            grossPay: payrollResult.grossPay.toString(),
+            
+            // Deductions
+            federalIncomeTax: payrollResult.federalIncomeTax.toString(),
+            socialSecurityTax: payrollResult.socialSecurityTax.toString(),
+            medicareTax: payrollResult.medicareTax.toString(),
+            additionalMedicareTax: payrollResult.additionalMedicareTax.toString(),
+            stateTax: payrollResult.stateTax.toString(),
+            localTax: payrollResult.localTax.toString(),
+            totalMandatoryDeductions: payrollResult.totalMandatoryDeductions.toString(),
+            
+            // Garnishments
+            totalGarnishments: payrollResult.totalGarnishments.toString(),
+            garnishmentsBreakdown: payrollResult.garnishmentsApplied,
+            
+            // Net
+            netPay: payrollResult.netPay.toString(),
+            
+            // Metadata
+            w4DataId: w4Data.id,
+            workState: worker.state || 'TN',
+            workCity: worker.city,
+            hallmarkAssetNumber,
+            calculationBreakdown: payrollResult.breakdown,
+            
+            status: 'processed',
+            processedAt: new Date(),
+          });
+          
+          processedPayrolls.push({
+            payrollId: payrollRecord.id,
+            workerId,
+            workerName: worker.fullName,
+            grossPay: payrollResult.grossPay,
+            netPay: payrollResult.netPay,
+            hallmarkAssetNumber,
+          });
+          
+        } catch (error: any) {
+          errors.push({ workerId, error: error.message || "Processing failed" });
+        }
+      }
+      
+      res.json({
+        success: true,
+        processed: processedPayrolls.length,
+        failed: errors.length,
+        payrolls: processedPayrolls,
+        errors,
+      });
+      
     } catch (error) {
-      res.status(500).json({ error: "Failed to create payroll" });
+      console.error("Failed to process payroll:", error);
+      res.status(500).json({ error: "Failed to process payroll" });
+    }
+  });
+  
+  // Get paystub details
+  app.get("/api/payroll/paystub/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const payrollRecord = await storage.getPayrollRecord(req.params.id);
+      
+      if (!payrollRecord) {
+        return res.status(404).json({ error: "Paystub not found" });
+      }
+      
+      // Get worker details
+      const worker = await storage.getWorker(payrollRecord.employeeId);
+      
+      res.json({
+        ...payrollRecord,
+        workerName: worker?.fullName || "Unknown",
+        workerEmail: worker?.email,
+      });
+    } catch (error) {
+      console.error("Failed to fetch paystub:", error);
+      res.status(500).json({ error: "Failed to fetch paystub" });
+    }
+  });
+  
+  // Get payroll history
+  app.get("/api/payroll/history", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { workerId, limit } = req.query;
+      const limitNum = limit ? parseInt(limit as string) : 50;
+      
+      const history = await storage.getPayrollHistory(
+        tenantId,
+        workerId as string | undefined,
+        limitNum
+      );
+      
+      res.json(history);
+    } catch (error) {
+      console.error("Failed to fetch payroll history:", error);
+      res.status(500).json({ error: "Failed to fetch payroll history" });
     }
   });
 
@@ -1532,6 +1756,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching clients:", error);
       res.status(500).json({ error: "Failed to fetch clients" });
+    }
+  });
+
+  // ========================
+  // WORKER REQUEST RATE CONFIRMATION
+  // ========================
+  
+  // Confirm rates and CSA for a worker request
+  app.post("/api/worker-requests/:id/confirm-rates", async (req: Request, res: Response) => {
+    try {
+      const requestId = req.params.id;
+      const { workerHourlyRate, totalBillingRate, paymentTerms, csaAccepted } = req.body;
+      
+      if (!requestId || !workerHourlyRate || !totalBillingRate || !paymentTerms) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      if (!csaAccepted) {
+        return res.status(400).json({ error: "CSA must be accepted to confirm rates" });
+      }
+      
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      // Capture customer IP address
+      const customerIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
+      
+      // Get customer/client ID from the request (in a real scenario, this would come from auth)
+      const customerId = req.body.customerId || 'default-customer';
+      
+      const result = await storage.confirmRatesAndCSA({
+        requestId,
+        tenantId,
+        customerId,
+        workerHourlyRate,
+        totalBillingRate,
+        paymentTerms,
+        csaAccepted,
+        customerIp,
+      });
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      
+      res.json({
+        success: true,
+        confirmationId: result.confirmationId,
+        message: "Rates confirmed successfully. Worker matching has been initiated."
+      });
+    } catch (error) {
+      console.error("Error confirming rates:", error);
+      res.status(500).json({ error: "Failed to confirm rates" });
+    }
+  });
+
+  // Get worker request details for rate confirmation
+  app.get("/api/worker-requests/:id", async (req: Request, res: Response) => {
+    try {
+      const requestId = req.params.id;
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const workerRequest = await storage.getWorkerRequest(requestId, tenantId);
+      
+      if (!workerRequest) {
+        return res.status(404).json({ error: "Worker request not found" });
+      }
+      
+      res.json(workerRequest);
+    } catch (error) {
+      console.error("Error fetching worker request:", error);
+      res.status(500).json({ error: "Failed to fetch worker request" });
     }
   });
 

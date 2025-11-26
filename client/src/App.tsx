@@ -39,6 +39,7 @@ import WorkerComplianceDashboard from "@/pages/WorkerComplianceDashboard";
 import AdminComplianceMonitor from "@/pages/AdminComplianceMonitor";
 import { ComplianceDashboard } from "@/pages/ComplianceDashboard";
 import CSASigningPage from "@/pages/CSASigningPage";
+import RateConfirmation from "@/pages/RateConfirmation";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,7 @@ function Router() {
       <Route path="/hallmark-seal" component={HallmarkSeal} />
       <Route path="/client/request-workers" component={ClientRequestDashboard} />
       <Route path="/clients/:clientId/csa/sign" component={CSASigningPage} />
+      <Route path="/rate-confirmation/:requestId" component={RateConfirmation} />
       <Route path="/admin/worker-matching" component={AdminWorkerMatchingPanel} />
       <Route path="/admin/payroll-dashboard" component={AdminPayrollDashboard} />
       <Route path="/admin/assignment-dashboard" component={AdminAssignmentDashboard} />
