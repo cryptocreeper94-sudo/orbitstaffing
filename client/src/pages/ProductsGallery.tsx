@@ -16,12 +16,12 @@ export default function ProductsGallery() {
       slides: slideContent.ORBIT,
     },
     {
-      id: 'Darkwave Bolt',
-      name: 'Darkwave Bolt',
+      id: 'DarkWave Pulse',
+      name: 'DarkWave Pulse',
       tagline: 'Lightning-Fast Compliance & Safety Platform',
       description: 'Enterprise-grade safety management. Real-time incident detection, OSHA compliance automation, safety culture analytics.',
       color: 'from-purple-500 to-pink-600',
-      slides: slideContent['Darkwave Bolt'],
+      slides: slideContent['DarkWave Pulse'],
     },
     {
       id: 'Lot Ops Pro',

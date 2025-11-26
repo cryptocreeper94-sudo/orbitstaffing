@@ -281,9 +281,9 @@ export const slideContent: ProductSlides = {
       category: "CALL TO ACTION"
     }
   ],
-  "Darkwave Bolt": [
+  "DarkWave Pulse": [
     {
-      title: "Darkwave Bolt",
+      title: "DarkWave Pulse",
       subtitle: "Lightning-Fast Compliance & Safety Platform",
       content: "Enterprise-grade compliance and workplace safety solution for any organization. Real-time incident detection, regulatory compliance automation, and safety culture analytics.",
       category: "INTRODUCTION"
