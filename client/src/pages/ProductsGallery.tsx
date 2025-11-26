@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
+import { HomeSlideshow } from '@/components/HomeSlideshow';
 import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
+import { slidesData, orbitSlides } from '@/data/slidesData';
 
 export default function ProductsGallery() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [showSlideshow, setShowSlideshow] = useState<string | null>(null);
 
   const products = [
     {
@@ -15,6 +18,7 @@ export default function ProductsGallery() {
       description: 'Zero manual intervention staffing platform. GPS-verified check-ins, automated matching, comprehensive payroll with 2025 tax calculations.',
       color: 'from-cyan-500 to-blue-600',
       slides: slideContent.ORBIT,
+      slideshowData: orbitSlides,
     },
     {
       id: 'DarkWave Pulse',
@@ -23,6 +27,7 @@ export default function ProductsGallery() {
       description: 'Enterprise-grade safety management. Real-time incident detection, OSHA compliance automation, safety culture analytics.',
       color: 'from-purple-500 to-pink-600',
       slides: slideContent['DarkWave Pulse'],
+      slideshowData: null,
     },
     {
       id: 'Lot Ops Pro',
@@ -31,6 +36,7 @@ export default function ProductsGallery() {
       description: 'Complete inventory and fleet operations. Real-time tracking, maintenance scheduling, utilization analytics.',
       color: 'from-amber-500 to-orange-600',
       slides: slideContent['Lot Ops Pro'],
+      slideshowData: slidesData,
     },
   ];
 
@@ -84,21 +90,37 @@ export default function ProductsGallery() {
                 </p>
 
                 {/* Slide count and CTA */}
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    {product.slides.length} slides
-                  </span>
-                  <button
-                    className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${product.color} rounded-lg font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/50 transition transform hover:translate-x-1`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedProduct(product.id);
-                    }}
-                    data-testid={`button-view-${product.id}`}
-                  >
-                    View Presentation
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">
+                      {product.slides.length} slides
+                    </span>
+                    <button
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r ${product.color} rounded-lg font-semibold text-xs hover:shadow-lg hover:shadow-cyan-500/50 transition transform hover:translate-x-1`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedProduct(product.id);
+                      }}
+                      data-testid={`button-view-presentation-${product.id}`}
+                    >
+                      Presentation
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                  
+                  {product.slideshowData && (
+                    <button
+                      className={`w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 bg-gradient-to-r ${product.color} rounded-lg font-semibold text-xs hover:shadow-lg hover:shadow-cyan-500/50 transition transform hover:scale-105`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSlideshow(product.id);
+                      }}
+                      data-testid={`button-view-slideshow-${product.id}`}
+                    >
+                      View Slideshow
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -144,13 +166,45 @@ export default function ProductsGallery() {
         </div>
       </div>
 
-      {/* Slideshow Modal */}
+      {/* Product Presentation Modal */}
       {selectedProduct && (
         <ProductSlideshow
           productName={selectedProduct}
           slides={slideContent[selectedProduct] || []}
           onClose={() => setSelectedProduct(null)}
         />
+      )}
+
+      {/* Slideshow View */}
+      {showSlideshow && (
+        <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-sm z-50 overflow-y-auto">
+          <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <button
+              onClick={() => setShowSlideshow(null)}
+              className="absolute top-4 right-4 p-2 hover:bg-slate-800 rounded-lg transition"
+              data-testid="button-close-slideshow"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            <div className="w-full max-w-6xl mt-8">
+              {showSlideshow === 'ORBIT' && (
+                <HomeSlideshow 
+                  slides={orbitSlides as any} 
+                  product="ORBIT Staffing OS"
+                  title="ORBIT Staffing OS Slideshow"
+                />
+              )}
+              {showSlideshow === 'Lot Ops Pro' && (
+                <HomeSlideshow 
+                  slides={slidesData as any} 
+                  product="Lot Ops Pro"
+                  title="Lot Ops Pro Slideshow"
+                />
+              )}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Footer */}
