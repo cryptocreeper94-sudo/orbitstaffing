@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -22,6 +22,7 @@ import { shouldBypassDeveloperLogin, enableBypassOnThisDevice, disableBypassOnTh
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminLoginHistory } from '@/components/AdminLoginHistory';
+import { LegalDocs } from '@/components/LegalDocs';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
@@ -1481,7 +1482,7 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal' | 'monitoring' | 'login-logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal' | 'llc-docs' | 'monitoring' | 'login-logs'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -2014,8 +2015,20 @@ export default function DeveloperPanel() {
             }`}
             data-testid="button-tab-dev-legal"
           >
-            <Scale className="w-4 h-4" />
-            Legal / CSA
+            <FileText className="w-4 h-4" />
+            CSA Manager
+          </button>
+          <button
+            onClick={() => setActiveTab('llc-docs')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'llc-docs'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-llc-docs"
+          >
+            <Building2 className="w-4 h-4" />
+            LLC Docs
           </button>
           <button
             onClick={() => setActiveTab('monitoring')}
@@ -2463,8 +2476,11 @@ export default function DeveloperPanel() {
           </div>
         )}
 
-        {/* LEGAL / CSA MANAGEMENT TAB */}
+        {/* CSA MANAGER TAB */}
         {activeTab === 'legal' && <LegalCSAManager />}
+
+        {/* LLC OPERATING AGREEMENT TAB */}
+        {activeTab === 'llc-docs' && <LegalDocs />}
         
         {/* BACKGROUND JOB MONITORING TAB */}
         {activeTab === 'monitoring' && <BackgroundJobMonitoring />}
