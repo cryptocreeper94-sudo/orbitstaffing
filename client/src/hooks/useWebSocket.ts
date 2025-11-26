@@ -15,7 +15,7 @@ export function useWebSocket(
   const wsRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reconnectTimeoutRef = useRef<number | null>(null);
 
   const connect = useCallback(() => {
     try {
@@ -66,7 +66,7 @@ export function useWebSocket(
         reconnectTimeoutRef.current = window.setTimeout(() => {
           console.log("Attempting to reconnect...");
           connect();
-        }, 3000);
+        }, 3000) as unknown as ReturnType<typeof setTimeout>;
       };
 
       wsRef.current = ws;
