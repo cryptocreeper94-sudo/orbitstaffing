@@ -26,6 +26,8 @@ import {
   integrationTokens,
   syncLogs,
   syncedData,
+  clients,
+  csaTemplates,
   type User,
   type InsertUser,
   type Company,
@@ -76,6 +78,10 @@ import {
   type InsertSyncLog,
   type SyncedData,
   type InsertSyncedData,
+  type Client,
+  type InsertClient,
+  type CSATemplate,
+  type InsertCSATemplate,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -1369,6 +1375,169 @@ export const storage: IStorage = {
       drugTests: drugTestCounts,
       complianceStatus: complianceCounts
     };
+  },
+
+  // ========================
+  // CSA Templates & Management
+  // ========================
+  async getActiveCSATemplate(state?: string): Promise<CSATemplate | null> {
+    const query = db
+      .select()
+      .from(csaTemplates)
+      .where(eq(csaTemplates.isActive, true))
+      .orderBy(desc(csaTemplates.effectiveDate))
+      .limit(1);
+    
+    if (state) {
+      const stateSpecific = await db
+        .select()
+        .from(csaTemplates)
+        .where(
+          and(
+            eq(csaTemplates.isActive, true),
+            eq(csaTemplates.jurisdiction, state)
+          )
+        )
+        .orderBy(desc(csaTemplates.effectiveDate))
+        .limit(1);
+      
+      if (stateSpecific.length > 0) {
+        return stateSpecific[0];
+      }
+    }
+    
+    const result = await query;
+    return result[0] || null;
+  },
+
+  async createCSATemplate(data: InsertCSATemplate): Promise<CSATemplate> {
+    if (data.isActive) {
+      await db
+        .update(csaTemplates)
+        .set({ isActive: false })
+        .where(eq(csaTemplates.isActive, true));
+    }
+    
+    const result = await db.insert(csaTemplates).values(data).returning();
+    return result[0];
+  },
+
+  async updateCSATemplate(id: string, data: Partial<InsertCSATemplate>): Promise<CSATemplate> {
+    if (data.isActive) {
+      await db
+        .update(csaTemplates)
+        .set({ isActive: false })
+        .where(eq(csaTemplates.isActive, true));
+    }
+    
+    const result = await db
+      .update(csaTemplates)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(csaTemplates.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async getCSATemplate(id: string): Promise<CSATemplate | null> {
+    const result = await db
+      .select()
+      .from(csaTemplates)
+      .where(eq(csaTemplates.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async listCSATemplates(): Promise<CSATemplate[]> {
+    return await db
+      .select()
+      .from(csaTemplates)
+      .orderBy(desc(csaTemplates.createdAt));
+  },
+
+  async createClientCSA(clientId: string, data: {
+    templateId: string;
+    signerName: string;
+    signerTitle?: string;
+    signatureData: any;
+    ipAddress: string;
+    device: string;
+    acceptedTerms: any;
+  }): Promise<Client> {
+    const template = await this.getCSATemplate(data.templateId);
+    if (!template) {
+      throw new Error('CSA template not found');
+    }
+    
+    const result = await db
+      .update(clients)
+      .set({
+        csaStatus: 'signed',
+        csaSignedDate: new Date(),
+        csaVersion: template.version,
+        csaSignerName: data.signerName,
+        csaSignatureData: data.signatureData,
+        csaSignatureIpAddress: data.ipAddress,
+        csaSignatureDevice: data.device,
+        csaAcceptedTerms: data.acceptedTerms,
+        updatedAt: new Date(),
+      })
+      .where(eq(clients.id, clientId))
+      .returning();
+    
+    return result[0];
+  },
+
+  async verifyClientCSA(clientId: string): Promise<{ valid: boolean; client?: Client; message?: string }> {
+    const result = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, clientId))
+      .limit(1);
+    
+    if (!result || result.length === 0) {
+      return { valid: false, message: 'Client not found' };
+    }
+    
+    const client = result[0];
+    
+    if (client.csaStatus !== 'signed') {
+      return { valid: false, client, message: 'CSA not signed' };
+    }
+    
+    if (client.csaExpirationDate) {
+      const expDate = new Date(client.csaExpirationDate);
+      if (expDate < new Date()) {
+        return { valid: false, client, message: 'CSA expired' };
+      }
+    }
+    
+    return { valid: true, client };
+  },
+
+  async getClient(id: string): Promise<Client | null> {
+    const result = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async listClients(tenantId: string): Promise<Client[]> {
+    return await db
+      .select()
+      .from(clients)
+      .where(eq(clients.tenantId, tenantId))
+      .orderBy(desc(clients.createdAt));
+  },
+
+  async updateClient(id: string, data: Partial<InsertClient>): Promise<Client> {
+    const result = await db
+      .update(clients)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(clients.id, id))
+      .returning();
+    return result[0];
   },
 
 };

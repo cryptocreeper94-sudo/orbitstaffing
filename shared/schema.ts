@@ -308,6 +308,9 @@ export const clients = pgTable(
     csaExpirationDate: date("csa_expiration_date"),
     csaSignerName: varchar("csa_signer_name", { length: 255 }),
     csaSignatureData: jsonb("csa_signature_data"),
+    csaSignatureIpAddress: varchar("csa_signature_ip_address", { length: 100 }),
+    csaSignatureDevice: varchar("csa_signature_device", { length: 255 }),
+    csaAcceptedTerms: jsonb("csa_accepted_terms"), // Checkbox confirmations: {conversionFee: true, paymentTerms: true, liability: true, markup: true}
 
     // Account Ownership Tracking
     accountOwnerId: varchar("account_owner_id").references(() => users.id),
@@ -2847,3 +2850,52 @@ export const insertSyncedDataSchema = createInsertSchema(syncedData).omit({
 
 export type InsertSyncedData = z.infer<typeof insertSyncedDataSchema>;
 export type SyncedData = typeof syncedData.$inferSelect;
+
+// ========================
+// CSA Templates (Client Service Agreement)
+// ========================
+export const csaTemplates = pgTable(
+  "csa_templates",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    version: varchar("version", { length: 20 }).notNull(), // "1.0", "1.1", "2.0"
+    templateContent: text("template_content").notNull(), // Full HTML or Markdown content
+    
+    // Metadata
+    effectiveDate: date("effective_date").notNull(),
+    expirationDate: date("expiration_date"),
+    isActive: boolean("is_active").default(false), // Only one active version at a time
+    jurisdiction: varchar("jurisdiction", { length: 2 }), // State code for state-specific variations (TN, KY, etc.)
+    
+    // Audit Trail
+    createdBy: varchar("created_by").references(() => users.id),
+    approvedBy: varchar("approved_by").references(() => users.id),
+    approvedAt: timestamp("approved_at"),
+    
+    // Key Terms (for quick reference without parsing content)
+    conversionFeeDollars: decimal("conversion_fee_dollars", { precision: 10, scale: 2 }).default("5000.00"),
+    conversionPeriodMonths: integer("conversion_period_months").default(6),
+    conversionPeriodHours: integer("conversion_period_hours").default(480),
+    defaultMarkupMultiplier: decimal("default_markup_multiplier", { precision: 5, scale: 2 }).default("1.45"),
+    latePaymentInterestRate: decimal("late_payment_interest_rate", { precision: 5, scale: 2 }).default("1.50"), // 1.5% monthly
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    versionIdx: index("idx_csa_version").on(table.version),
+    activeIdx: index("idx_csa_active").on(table.isActive),
+    effectiveDateIdx: index("idx_csa_effective").on(table.effectiveDate),
+    jurisdictionIdx: index("idx_csa_jurisdiction").on(table.jurisdiction),
+  })
+);
+
+export const insertCSATemplateSchema = createInsertSchema(csaTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  approvedAt: true,
+});
+
+export type InsertCSATemplate = z.infer<typeof insertCSATemplateSchema>;
+export type CSATemplate = typeof csaTemplates.$inferSelect;

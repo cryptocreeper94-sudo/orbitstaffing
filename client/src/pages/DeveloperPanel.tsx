@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -408,6 +408,312 @@ function SecretsManager() {
   );
 }
 
+// Legal / CSA Manager Component
+function LegalCSAManager() {
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [activeTemplate, setActiveTemplate] = useState<any>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
+  const [editVersion, setEditVersion] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTemplates();
+  }, []);
+
+  async function loadTemplates() {
+    try {
+      const res = await fetch('/api/csa/templates', {
+        headers: {
+          'x-admin-pin': process.env.ADMIN_PIN || '',
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTemplates(data);
+        const active = data.find((t: any) => t.isActive);
+        if (active) {
+          setActiveTemplate(active);
+          setEditContent(active.templateContent);
+          setEditVersion(active.version);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load CSA templates:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handlePublish() {
+    if (!confirm('Publish this version as the active CSA template? This will deactivate the current version.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/csa/templates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-pin': process.env.ADMIN_PIN || '',
+        },
+        body: JSON.stringify({
+          version: editVersion,
+          templateContent: editContent,
+          effectiveDate: new Date().toISOString().split('T')[0],
+          isActive: true,
+        }),
+      });
+
+      if (res.ok) {
+        alert('CSA template published successfully!');
+        setIsEditing(false);
+        loadTemplates();
+      } else {
+        alert('Failed to publish template');
+      }
+    } catch (err) {
+      console.error('Failed to publish template:', err);
+      alert('Error publishing template');
+    }
+  }
+
+  async function handleUpdate() {
+    if (!activeTemplate) return;
+    
+    if (!confirm('Update the current active template?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/csa/templates/${activeTemplate.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-pin': process.env.ADMIN_PIN || '',
+        },
+        body: JSON.stringify({
+          templateContent: editContent,
+        }),
+      });
+
+      if (res.ok) {
+        alert('CSA template updated successfully!');
+        setIsEditing(false);
+        loadTemplates();
+      } else {
+        alert('Failed to update template');
+      }
+    } catch (err) {
+      console.error('Failed to update template:', err);
+      alert('Error updating template');
+    }
+  }
+
+  if (loading) {
+    return <div className="text-gray-300">Loading CSA templates...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <Scale className="w-6 h-6 text-purple-400" />
+          <h2 className="text-2xl font-bold text-white">Legal / CSA Management</h2>
+        </div>
+        <p className="text-gray-300">
+          Manage Client Service Agreement (CSA) templates, versions, and legal protections for ORBIT Staffing OS.
+        </p>
+      </div>
+
+      {/* Active Template Info */}
+      {activeTemplate && (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+              <FileText className="w-5 h-5 text-green-400" />
+              Current Active CSA Template
+            </h3>
+            <div className="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold">
+              VERSION {activeTemplate.version}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <div className="text-gray-400">Effective Date</div>
+              <div className="text-white font-bold">{new Date(activeTemplate.effectiveDate).toLocaleDateString()}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Conversion Fee</div>
+              <div className="text-white font-bold">${activeTemplate.conversionFeeDollars}</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Conversion Period</div>
+              <div className="text-white font-bold">{activeTemplate.conversionPeriodMonths} months / {activeTemplate.conversionPeriodHours} hours</div>
+            </div>
+            <div>
+              <div className="text-gray-400">Markup</div>
+              <div className="text-white font-bold">{activeTemplate.defaultMarkupMultiplier}x</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-4">
+        <Button
+          onClick={() => setIsEditing(!isEditing)}
+          className={`flex items-center gap-2 ${isEditing ? 'bg-red-600 hover:bg-red-700' : 'bg-cyan-600 hover:bg-cyan-700'}`}
+          data-testid="button-toggle-csa-edit"
+        >
+          <Edit className="w-4 h-4" />
+          {isEditing ? 'Cancel Editing' : 'Edit CSA Template'}
+        </Button>
+        
+        <Button
+          onClick={() => setShowPreview(!showPreview)}
+          variant="outline"
+          className="flex items-center gap-2"
+          data-testid="button-toggle-csa-preview"
+        >
+          <Eye className="w-4 h-4" />
+          {showPreview ? 'Hide Preview' : 'Preview CSA'}
+        </Button>
+      </div>
+
+      {/* Editor */}
+      {isEditing && (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-4">
+          <h3 className="text-lg font-bold text-white mb-4">Edit CSA Template</h3>
+          
+          <div>
+            <label className="block text-sm font-bold text-gray-300 mb-2">Version</label>
+            <input
+              type="text"
+              value={editVersion}
+              onChange={(e) => setEditVersion(e.target.value)}
+              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
+              placeholder="e.g., 1.0, 1.1, 2.0"
+              data-testid="input-csa-version"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-300 mb-2">Template Content (Markdown)</label>
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="w-full h-96 px-4 py-3 bg-slate-900 border border-slate-600 rounded text-white font-mono text-sm"
+              placeholder="# CLIENT SERVICE AGREEMENT..."
+              data-testid="textarea-csa-content"
+            />
+            <p className="text-xs text-gray-400 mt-2">
+              Use Markdown syntax. Variables: {"{{effectiveDate}}, {{clientName}}, {{state}}, {{paymentTerms}}, etc."}
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+            {activeTemplate ? (
+              <Button
+                onClick={handleUpdate}
+                className="bg-cyan-600 hover:bg-cyan-700 font-bold"
+                data-testid="button-update-csa"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Update Current Template
+              </Button>
+            ) : null}
+            
+            <Button
+              onClick={handlePublish}
+              className="bg-green-600 hover:bg-green-700 font-bold"
+              data-testid="button-publish-csa"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Publish as New Version
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Preview */}
+      {showPreview && (
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-white mb-4">CSA Preview</h3>
+          <div className="bg-white text-black p-8 rounded max-h-96 overflow-y-auto">
+            <pre className="whitespace-pre-wrap font-sans text-sm">{editContent || activeTemplate?.templateContent}</pre>
+          </div>
+        </div>
+      )}
+
+      {/* Version History */}
+      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-cyan-400" />
+          CSA Version History
+        </h3>
+        
+        {templates.length === 0 ? (
+          <p className="text-gray-400 text-sm">No CSA templates found. Create your first template above.</p>
+        ) : (
+          <div className="space-y-3">
+            {templates.map((template) => (
+              <div
+                key={template.id}
+                className={`p-4 rounded-lg border ${
+                  template.isActive
+                    ? 'bg-green-900/20 border-green-700'
+                    : 'bg-slate-700/50 border-slate-600'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-white">
+                      Version {template.version}
+                      {template.isActive && (
+                        <span className="ml-2 bg-green-600 text-white px-2 py-1 rounded text-xs">ACTIVE</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-400">
+                      Effective: {new Date(template.effectiveDate).toLocaleDateString()}
+                      {template.jurisdiction && ` | State: ${template.jurisdiction}`}
+                    </div>
+                  </div>
+                  <div className="text-right text-sm">
+                    <div className="text-gray-300">
+                      Fee: ${template.conversionFeeDollars} | {template.conversionPeriodMonths}mo / {template.conversionPeriodHours}hrs
+                    </div>
+                    <div className="text-gray-400">
+                      Markup: {template.defaultMarkupMultiplier}x | Interest: {template.latePaymentInterestRate}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Legal Disclaimer */}
+      <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-bold text-yellow-300 mb-2">⚖️ Legal Disclaimer</h4>
+            <p className="text-sm text-yellow-100">
+              This CSA is a preliminary agreement. ORBIT Staffing OS strongly recommends review by legal counsel before use. 
+              This template is not a substitute for professional legal advice tailored to your specific business needs and applicable state laws.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
   const [showBypassOption, setShowBypassOption] = useState(false);
@@ -437,7 +743,7 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -961,6 +1267,18 @@ export default function DeveloperPanel() {
             <Key className="w-4 h-4" />
             Secrets Manager
           </button>
+          <button
+            onClick={() => setActiveTab('legal')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'legal'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-legal"
+          >
+            <Scale className="w-4 h-4" />
+            Legal / CSA
+          </button>
           <div className="ml-auto flex items-center">
             <button
               onClick={() => setShowChat(!showChat)}
@@ -1375,6 +1693,9 @@ export default function DeveloperPanel() {
 
         {/* SECRETS MANAGER TAB */}
         {activeTab === 'secrets' && <SecretsManager />}
+
+        {/* LEGAL / CSA MANAGEMENT TAB */}
+        {activeTab === 'legal' && <LegalCSAManager />}
       </div>
 
       {/* Bug Report Widget */}

@@ -1198,6 +1198,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // CSA (CLIENT SERVICE AGREEMENT) ROUTES
+  // ========================
+  
+  // Get active CSA template for a specific state (or general template)
+  app.get("/api/csa/current", async (req: Request, res: Response) => {
+    try {
+      const state = req.query.state as string | undefined;
+      const template = await storage.getActiveCSATemplate(state);
+      
+      if (!template) {
+        return res.status(404).json({ error: "No active CSA template found" });
+      }
+      
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching CSA template:", error);
+      res.status(500).json({ error: "Failed to fetch CSA template" });
+    }
+  });
+
+  // Client signs CSA
+  app.post("/api/csa/sign", async (req: Request, res: Response) => {
+    try {
+      const { clientId, templateId, signerName, signerTitle, acceptedTerms } = req.body;
+      
+      if (!clientId || !templateId || !signerName || !acceptedTerms) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+      
+      // Validate that all required terms are accepted
+      const requiredTerms = ['conversionFee', 'paymentTerms', 'liability', 'markup'];
+      const missingTerms = requiredTerms.filter(term => !acceptedTerms[term]);
+      
+      if (missingTerms.length > 0) {
+        return res.status(400).json({ 
+          error: "All terms must be accepted",
+          missingTerms 
+        });
+      }
+      
+      // Capture IP address and device info
+      const ipAddress = req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'unknown';
+      const device = req.headers['user-agent'] || 'unknown';
+      
+      // Create signature data
+      const signatureData = {
+        signerName,
+        signerTitle: signerTitle || '',
+        signedAt: new Date().toISOString(),
+        ipAddress,
+        device,
+      };
+      
+      const updatedClient = await storage.createClientCSA(clientId, {
+        templateId,
+        signerName,
+        signerTitle,
+        signatureData,
+        ipAddress,
+        device,
+        acceptedTerms,
+      });
+      
+      res.json({ 
+        success: true, 
+        client: updatedClient,
+        message: "CSA signed successfully" 
+      });
+    } catch (error: any) {
+      console.error("Error signing CSA:", error);
+      res.status(500).json({ error: error.message || "Failed to sign CSA" });
+    }
+  });
+
+  // Get client's signed CSA document
+  app.get("/api/clients/:id/csa-document", async (req: Request, res: Response) => {
+    try {
+      const clientId = req.params.id;
+      const client = await storage.getClient(clientId);
+      
+      if (!client) {
+        return res.status(404).json({ error: "Client not found" });
+      }
+      
+      if (client.csaStatus !== 'signed') {
+        return res.status(404).json({ error: "No signed CSA found for this client" });
+      }
+      
+      res.json({
+        client: {
+          id: client.id,
+          name: client.name,
+          csaStatus: client.csaStatus,
+          csaSignedDate: client.csaSignedDate,
+          csaVersion: client.csaVersion,
+          csaSignerName: client.csaSignerName,
+          csaSignatureData: client.csaSignatureData,
+          csaAcceptedTerms: client.csaAcceptedTerms,
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching CSA document:", error);
+      res.status(500).json({ error: "Failed to fetch CSA document" });
+    }
+  });
+
+  // Verify client has valid CSA
+  app.get("/api/clients/:id/csa-verify", async (req: Request, res: Response) => {
+    try {
+      const clientId = req.params.id;
+      const verification = await storage.verifyClientCSA(clientId);
+      res.json(verification);
+    } catch (error) {
+      console.error("Error verifying CSA:", error);
+      res.status(500).json({ error: "Failed to verify CSA" });
+    }
+  });
+
+  // ========================
+  // CSA TEMPLATE MANAGEMENT (ADMIN ONLY)
+  // ========================
+  
+  // List all CSA templates
+  app.get("/api/csa/templates", requireDeveloperAuth, async (req: Request, res: Response) => {
+    try {
+      const templates = await storage.listCSATemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching CSA templates:", error);
+      res.status(500).json({ error: "Failed to fetch CSA templates" });
+    }
+  });
+
+  // Get specific CSA template
+  app.get("/api/csa/templates/:id", requireDeveloperAuth, async (req: Request, res: Response) => {
+    try {
+      const template = await storage.getCSATemplate(req.params.id);
+      if (!template) {
+        return res.status(404).json({ error: "Template not found" });
+      }
+      res.json(template);
+    } catch (error) {
+      console.error("Error fetching CSA template:", error);
+      res.status(500).json({ error: "Failed to fetch CSA template" });
+    }
+  });
+
+  // Create new CSA template
+  app.post("/api/csa/templates", requireDeveloperAuth, async (req: Request, res: Response) => {
+    try {
+      const templateData = req.body;
+      const template = await storage.createCSATemplate(templateData);
+      res.status(201).json(template);
+    } catch (error) {
+      console.error("Error creating CSA template:", error);
+      res.status(500).json({ error: "Failed to create CSA template" });
+    }
+  });
+
+  // Update CSA template
+  app.put("/api/csa/templates/:id", requireDeveloperAuth, async (req: Request, res: Response) => {
+    try {
+      const template = await storage.updateCSATemplate(req.params.id, req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating CSA template:", error);
+      res.status(500).json({ error: "Failed to update CSA template" });
+    }
+  });
+
+  // List all clients
+  app.get("/api/clients", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const clients_list = await storage.listClients(tenantId);
+      res.json(clients_list);
+    } catch (error) {
+      console.error("Error fetching clients:", error);
+      res.status(500).json({ error: "Failed to fetch clients" });
+    }
+  });
+
   // Create and return HTTP server
   const httpServer = createServer(app);
   return httpServer;
