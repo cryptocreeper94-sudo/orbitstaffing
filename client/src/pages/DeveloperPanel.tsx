@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -19,6 +19,8 @@ import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager
 import { getValidSession, setSessionWithExpiry, clearSession, isMobileDevice, shouldBypassMobileLogin } from '@/lib/sessionUtils';
 import { AssetTracker } from '@/components/AssetTracker';
 import { shouldBypassDeveloperLogin, enableBypassOnThisDevice, disableBypassOnThisDevice, isBypassDeviceEnabled } from '@/lib/deviceFingerprint';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
@@ -109,6 +111,345 @@ const OAUTH_PROVIDERS = [
     fields: ['MICROSOFT_CLIENT_ID', 'MICROSOFT_CLIENT_SECRET'],
   },
 ];
+
+// Jason's To-Do List Data
+const TODO_TASKS = [
+  {
+    id: 'stripe-issuing',
+    name: 'Stripe Issuing - Pay Cards',
+    priority: 'HIGH',
+    priorityBadge: '🔥 HIGH PRIORITY',
+    priorityColor: 'red',
+    why: '90% of workers need pay cards (no bank accounts)',
+    setupGuide: 'https://docs.stripe.com/issuing/how-issuing-works',
+    action: 'Contact Stripe Sales to enable Issuing on account',
+    notes: [
+      'Virtual cards: $0.10 each, instant',
+      'Physical cards: Standard included',
+      'Daily pay possible with Stripe Issuing',
+      'Huge competitive advantage for staffing',
+    ],
+  },
+  {
+    id: 'twilio-sms',
+    name: 'Twilio SMS Credentials',
+    priority: 'MEDIUM',
+    priorityBadge: '⚡ MEDIUM',
+    priorityColor: 'orange',
+    why: 'Worker notifications (shift offers, payroll alerts, safety)',
+    setupGuide: 'https://console.twilio.com/',
+    action: 'Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER',
+    notes: [
+      'All SMS templates ready, just needs credentials',
+      'Status: Placeholder active',
+    ],
+  },
+  {
+    id: 'openai-api',
+    name: 'OpenAI API Key',
+    priority: 'FUTURE',
+    priorityBadge: '💡 FUTURE',
+    priorityColor: 'blue',
+    why: 'AI-powered worker matching, chat support, resume parsing',
+    setupGuide: 'https://platform.openai.com/api-keys',
+    action: 'Generate API key and add to secrets',
+    notes: [
+      'Not required for MVP, future enhancement',
+      'Optional - can be added later',
+    ],
+  },
+  {
+    id: 'oauth-providers',
+    name: 'OAuth Provider Setup (16 integrations)',
+    priority: 'MEDIUM',
+    priorityBadge: '⚡ MEDIUM',
+    priorityColor: 'orange',
+    why: 'Auto-import customer data from existing systems',
+    setupGuide: '#secrets', // Internal link to Secrets Manager section
+    action: 'Configure OAuth credentials for customer integrations',
+    notes: [
+      'QuickBooks, ADP, Paychex, Gusto, etc.',
+      'See Secrets Manager section below for setup',
+    ],
+  },
+  {
+    id: 'stripe-payments',
+    name: 'Stripe Payment Processing',
+    priority: 'MEDIUM',
+    priorityBadge: '⚡ MEDIUM',
+    priorityColor: 'orange',
+    why: 'CSA billing, referral bonuses, garnishment payments',
+    setupGuide: 'https://stripe.com/docs/keys',
+    action: 'Add STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY',
+    notes: [
+      'Required for automated payment flows',
+      'Check secrets below for status',
+    ],
+  },
+  {
+    id: 'checkr-api',
+    name: 'Background Check API - Checkr',
+    priority: 'FUTURE',
+    priorityBadge: '💡 FUTURE',
+    priorityColor: 'blue',
+    why: 'Automated worker background checks',
+    setupGuide: 'https://docs.checkr.com/',
+    action: 'Create Checkr account, add API key',
+    notes: [
+      'Integration ready, credentials needed',
+      'Future enhancement',
+    ],
+  },
+  {
+    id: 'quest-diagnostics',
+    name: 'Drug Testing API - Quest Diagnostics',
+    priority: 'FUTURE',
+    priorityBadge: '💡 FUTURE',
+    priorityColor: 'blue',
+    why: 'Automated drug testing orders',
+    setupGuide: 'https://www.questdiagnostics.com/',
+    action: 'Establish partnership, get API credentials',
+    notes: [
+      'Manual process for now, API for scale',
+      'Contact Quest Diagnostics for API access',
+    ],
+  },
+];
+
+// Jason's To-Do List Component
+function JasonsTodoList() {
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('jasons-todo-completed');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    }
+    return new Set();
+  });
+
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('jasons-todo-completed', JSON.stringify(Array.from(completedTasks)));
+    }
+
+    // Check if all tasks are complete
+    if (completedTasks.size === TODO_TASKS.length && completedTasks.size > 0) {
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 3000);
+    }
+  }, [completedTasks]);
+
+  const toggleTask = (taskId: string) => {
+    setCompletedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  const completionPercentage = Math.round((completedTasks.size / TODO_TASKS.length) * 100);
+
+  const getPriorityColor = (color: string) => {
+    switch (color) {
+      case 'red':
+        return 'bg-red-500/20 text-red-400 border-red-500';
+      case 'orange':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500';
+      case 'blue':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500';
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500';
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, setupGuide: string) => {
+    if (setupGuide === '#secrets') {
+      e.preventDefault();
+      // Scroll to secrets manager section
+      const secretsSection = document.getElementById('secrets-manager');
+      if (secretsSection) {
+        secretsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-6 mb-8">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-red-900/40 via-orange-900/30 to-red-800/40 border-2 border-orange-600/60 rounded-lg p-6 relative overflow-hidden">
+        {/* Animated background effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-orange-600/10 animate-pulse" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-3">
+            <Target className="w-8 h-8 text-orange-400 animate-pulse" />
+            <Trophy className="w-8 h-8 text-yellow-400" />
+            <h2 className="text-2xl font-bold text-white">🎯 Jason's To-Do List - Production Setup</h2>
+          </div>
+          <p className="text-orange-100 mb-4">
+            Critical items to get ORBIT fully operational
+          </p>
+          
+          {/* Progress Bar */}
+          <div className="bg-slate-900/50 rounded-lg p-4 border border-orange-500/30">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-white">
+                {completedTasks.size} of {TODO_TASKS.length} tasks complete
+              </span>
+              <span className={`text-lg font-bold ${completionPercentage === 100 ? 'text-green-400' : 'text-orange-400'}`}>
+                {completionPercentage}%
+              </span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+              <div
+                className={`h-full transition-all duration-500 ${
+                  completionPercentage === 100
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+                    : 'bg-gradient-to-r from-orange-500 to-red-500'
+                }`}
+                style={{ width: `${completionPercentage}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Celebration Message */}
+          {showCelebration && (
+            <div className="mt-4 bg-green-600 text-white p-4 rounded-lg text-center font-bold animate-bounce">
+              🎉 Congratulations! All tasks complete! ORBIT is production-ready! 🚀
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Tasks Accordion */}
+      <Accordion type="multiple" className="space-y-3">
+        {TODO_TASKS.map((task, index) => {
+          const isComplete = completedTasks.has(task.id);
+          
+          return (
+            <AccordionItem
+              key={task.id}
+              value={task.id}
+              className={`bg-slate-800 border-2 rounded-lg overflow-hidden transition-all ${
+                isComplete
+                  ? 'border-green-500/50 bg-green-900/10'
+                  : 'border-slate-700 hover:border-orange-500/50'
+              }`}
+            >
+              <AccordionTrigger className="px-6 py-4 hover:no-underline" data-testid={`accordion-trigger-${task.id}`}>
+                <div className="flex items-center gap-4 w-full">
+                  {/* Checkbox */}
+                  <Checkbox
+                    checked={isComplete}
+                    onCheckedChange={() => toggleTask(task.id)}
+                    className="border-2 border-orange-400 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                    data-testid={`checkbox-task-${task.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  
+                  {/* Task Number */}
+                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    isComplete ? 'bg-green-600 text-white' : 'bg-orange-600 text-white'
+                  }`}>
+                    {isComplete ? '✓' : index + 1}
+                  </div>
+
+                  {/* Task Name and Priority */}
+                  <div className="flex-1 text-left">
+                    <div className={`font-bold text-lg ${isComplete ? 'text-green-400 line-through' : 'text-white'}`}>
+                      {task.name}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`text-xs px-2 py-1 rounded border ${getPriorityColor(task.priorityColor)}`}>
+                        {task.priorityBadge}
+                      </span>
+                      {isComplete && (
+                        <span className="text-xs bg-green-600 text-white px-2 py-1 rounded font-bold">
+                          ✅ COMPLETE
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </AccordionTrigger>
+
+              <AccordionContent className="px-6 pb-4">
+                <div className="space-y-4 pt-2">
+                  {/* Why It's Needed */}
+                  <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+                    <h4 className="font-bold text-cyan-400 mb-2 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4" />
+                      Why It's Needed
+                    </h4>
+                    <p className="text-gray-300 text-sm">{task.why}</p>
+                  </div>
+
+                  {/* Action Required */}
+                  <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+                    <h4 className="font-bold text-orange-400 mb-2 flex items-center gap-2">
+                      <ArrowRight className="w-4 h-4" />
+                      Action Required
+                    </h4>
+                    <p className="text-gray-300 text-sm">{task.action}</p>
+                  </div>
+
+                  {/* Notes */}
+                  {task.notes.length > 0 && (
+                    <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
+                      <h4 className="font-bold text-purple-400 mb-2">📝 Notes</h4>
+                      <ul className="text-gray-300 text-sm space-y-1">
+                        {task.notes.map((note, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-purple-400 mt-1">•</span>
+                            <span>{note}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Setup Guide Link */}
+                  <a
+                    href={task.setupGuide}
+                    target={task.setupGuide.startsWith('#') ? undefined : '_blank'}
+                    rel={task.setupGuide.startsWith('#') ? undefined : 'noopener noreferrer'}
+                    onClick={(e) => handleLinkClick(e, task.setupGuide)}
+                    className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-lg font-bold transition-colors"
+                    data-testid={`link-setup-guide-${task.id}`}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>
+                      {task.setupGuide.startsWith('#') ? 'Go to Secrets Manager Section' : 'Open Setup Guide'}
+                    </span>
+                  </a>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          );
+        })}
+      </Accordion>
+
+      {/* Help Section */}
+      <div className="bg-orange-900/20 border border-orange-700/50 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-orange-400 mt-1 flex-shrink-0" />
+          <div>
+            <h4 className="font-bold text-orange-300 mb-2">💡 Getting Help</h4>
+            <p className="text-sm text-orange-100">
+              Each task above includes setup documentation links. Click "Open Setup Guide" for detailed instructions. 
+              Your progress is automatically saved and will persist across sessions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Secrets Manager Component
 function SecretsManager() {
@@ -1294,6 +1635,9 @@ export default function DeveloperPanel() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
+            {/* Jason's To-Do List - Production Setup */}
+            <JasonsTodoList />
+
             {/* Widgets */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1">
@@ -1692,7 +2036,11 @@ export default function DeveloperPanel() {
         )}
 
         {/* SECRETS MANAGER TAB */}
-        {activeTab === 'secrets' && <SecretsManager />}
+        {activeTab === 'secrets' && (
+          <div id="secrets-manager">
+            <SecretsManager />
+          </div>
+        )}
 
         {/* LEGAL / CSA MANAGEMENT TAB */}
         {activeTab === 'legal' && <LegalCSAManager />}
