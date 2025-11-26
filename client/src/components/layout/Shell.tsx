@@ -21,6 +21,7 @@ import { HallmarkPageWatermark } from "@/components/HallmarkWatermark";
 import { ContactForm } from "@/components/ContactForm";
 import { OCRScannerModal } from "@/components/layout/OCRScannerModal";
 import { CameraModal } from "@/components/layout/CameraModal";
+import { FloatingHelpButton } from "@/components/HelpCenter";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -165,6 +166,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
           isOpen={cameraOpen}
           onClose={() => setCameraOpen(false)}
         />
+
+        {/* Floating Help Button */}
+        <FloatingHelpButton />
 
         {/* Contact Developer Button - REMOVED - will be added back in proper location */}
         {/* Contact Form Modal - REMOVED */}

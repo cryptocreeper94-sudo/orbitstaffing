@@ -23,6 +23,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminLoginHistory } from '@/components/AdminLoginHistory';
 import { LegalDocs } from '@/components/LegalDocs';
+import { FloatingHelpButton } from '@/components/HelpCenter';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 

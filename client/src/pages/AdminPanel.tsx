@@ -18,6 +18,7 @@ import { SidonieWelcomeModal } from '@/components/SidonieWelcomeModal';
 import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessionUtils';
 import { AssetTracker } from '@/components/AssetTracker';
 import { CompanyHallmarkManager } from '@/components/CompanyHallmarkManager';
+import { FloatingHelpButton } from '@/components/HelpCenter';
 
 const ADMIN_SESSION_KEY = 'admin';
 
