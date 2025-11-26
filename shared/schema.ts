@@ -34,6 +34,11 @@ export const users = pgTable(
     phone: varchar("phone", { length: 20 }),
     verified: boolean("verified").default(false),
     verifiedAt: timestamp("verified_at"),
+
+    // NDA Tracking (for internal staff)
+    ndaSignedDate: timestamp("nda_signed_date"), // When staff signed NDA
+    ndaVersion: varchar("nda_version", { length: 10 }), // Version of NDA signed (e.g., "1.0")
+
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
@@ -89,6 +94,10 @@ export const companies = pgTable(
     gpsEnabled: boolean("gps_enabled").default(true),
     equipmentTrackingEnabled: boolean("equipment_tracking_enabled").default(true),
     payrollEnabled: boolean("payroll_enabled").default(true),
+
+    // Billing & CSA Settings
+    defaultMarkupPercentage: decimal("default_markup_percentage", { precision: 5, scale: 2 }).default("1.45"), // 1.45x markup
+    paymentTermsDays: integer("payment_terms_days").default(30), // Net 30 default
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -2103,3 +2112,218 @@ export const insertComplianceCheckSchema = createInsertSchema(complianceChecks).
 
 export type InsertComplianceCheck = z.infer<typeof insertComplianceCheckSchema>;
 export type ComplianceCheck = typeof complianceChecks.$inferSelect;
+
+// ========================
+// Customer Service Agreements (CSA)
+// ========================
+export const customerServiceAgreements = pgTable(
+  "customer_service_agreements",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    customerId: varchar("customer_id").notNull().references(() => clients.id),
+    
+    // Hallmark Tracking
+    hallmarkId: varchar("hallmark_id").notNull().references(() => hallmarks.id),
+    
+    // Document Details
+    version: varchar("version", { length: 10 }).default("1.0"),
+    status: varchar("status", { length: 50 }).default("draft"), // draft, active, superseded, voided
+    
+    // Pricing & Terms
+    markupPercentage: decimal("markup_percentage", { precision: 5, scale: 2 }).notNull().default("1.45"), // 1.45x
+    paymentTermsDays: integer("payment_terms_days").notNull().default(30), // Net 30
+    
+    // Signatory Information
+    signatoryName: varchar("signatory_name", { length: 255 }),
+    signatoryTitle: varchar("signatory_title", { length: 100 }),
+    
+    // Signature Tracking
+    signatureMethod: varchar("signature_method", { length: 20 }), // "digital" or "paper"
+    signedDate: timestamp("signed_date"),
+    signatureData: jsonb("signature_data"), // { timestamp, ip, device, method }
+    
+    // Document Content
+    documentContent: text("document_content"), // HTML template
+    
+    // Dates
+    effectiveDate: date("effective_date"),
+    expirationDate: date("expiration_date"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_csa_tenant").on(table.tenantId),
+    customerIdx: index("idx_csa_customer").on(table.customerId),
+    hallmarkIdx: index("idx_csa_hallmark").on(table.hallmarkId),
+    statusIdx: index("idx_csa_status").on(table.status),
+    signedDateIdx: index("idx_csa_signed_date").on(table.signedDate),
+  })
+);
+
+export const insertCSASchema = createInsertSchema(customerServiceAgreements).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCSA = z.infer<typeof insertCSASchema>;
+export type CustomerServiceAgreement = typeof customerServiceAgreements.$inferSelect;
+
+// ========================
+// Internal NDAs (Staff)
+// ========================
+export const internalNDAs = pgTable(
+  "internal_ndas",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    userId: varchar("user_id").notNull().references(() => users.id),
+    
+    // Hallmark Tracking
+    hallmarkId: varchar("hallmark_id").notNull().references(() => hallmarks.id),
+    
+    // NDA Details
+    ndaVersion: varchar("nda_version", { length: 10 }).default("1.0"),
+    status: varchar("status", { length: 50 }).default("pending"), // pending, signed, expired, voided
+    
+    // Signatory
+    signatoryName: varchar("signatory_name", { length: 255 }).notNull(),
+    signatoryTitle: varchar("signatory_title", { length: 100 }),
+    
+    // Terms (1-year non-solicitation standard)
+    nonSolicitationMonths: integer("non_solicitation_months").default(12),
+    
+    // Signature Tracking
+    signedDate: timestamp("signed_date"),
+    signatureData: jsonb("signature_data"), // { timestamp, ip, device }
+    
+    // Document Content
+    documentContent: text("document_content"), // HTML template
+    
+    // Validity
+    expirationDate: date("expiration_date"), // When NDA expires
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_nda_tenant").on(table.tenantId),
+    userIdx: index("idx_nda_user").on(table.userId),
+    hallmarkIdx: index("idx_nda_hallmark").on(table.hallmarkId),
+    statusIdx: index("idx_nda_status").on(table.status),
+    signedDateIdx: index("idx_nda_signed_date").on(table.signedDate),
+    expirationIdx: index("idx_nda_expiration").on(table.expirationDate),
+  })
+);
+
+export const insertNDASchema = createInsertSchema(internalNDAs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertNDA = z.infer<typeof insertNDASchema>;
+export type InternalNDA = typeof internalNDAs.$inferSelect;
+
+// ========================
+// Document Signatures (Both CSA & NDA)
+// ========================
+export const documentSignatures = pgTable(
+  "document_signatures",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Document References
+    csaId: varchar("csa_id").references(() => customerServiceAgreements.id),
+    ndaId: varchar("nda_id").references(() => internalNDAs.id),
+    
+    // Signer Info
+    signerName: varchar("signer_name", { length: 255 }).notNull(),
+    signerEmail: varchar("signer_email", { length: 255 }),
+    signerRole: varchar("signer_role", { length: 100 }), // "owner", "authorized_representative", etc.
+    
+    // Signature Method
+    signatureMethod: varchar("signature_method", { length: 20 }).notNull(), // "digital" or "paper_scanned"
+    
+    // Digital Signature Data
+    signatureHash: text("signature_hash"), // Hash of signature for verification
+    ipAddress: varchar("ip_address", { length: 45 }),
+    deviceInfo: varchar("device_info", { length: 255 }),
+    
+    // Paper Signature Data
+    paperUploadUrl: varchar("paper_upload_url", { length: 500 }), // URL to scanned PDF
+    paperUploadDate: timestamp("paper_upload_date"),
+    
+    // Timestamp
+    signedAt: timestamp("signed_at").notNull(),
+    
+    // Audit Trail
+    verifiedAt: timestamp("verified_at"),
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_sig_tenant").on(table.tenantId),
+    csaIdx: index("idx_sig_csa").on(table.csaId),
+    ndaIdx: index("idx_sig_nda").on(table.ndaId),
+    signedAtIdx: index("idx_sig_signed_at").on(table.signedAt),
+    methodIdx: index("idx_sig_method").on(table.signatureMethod),
+  })
+);
+
+export const insertDocumentSignatureSchema = createInsertSchema(documentSignatures).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertDocumentSignature = z.infer<typeof insertDocumentSignatureSchema>;
+export type DocumentSignature = typeof documentSignatures.$inferSelect;
+
+// ========================
+// Customer Document Preferences
+// ========================
+export const customerDocumentPreferences = pgTable(
+  "customer_document_preferences",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    customerId: varchar("customer_id").notNull().references(() => clients.id),
+    
+    // Signature Preference
+    preferredSignatureMethod: varchar("preferred_signature_method", { length: 20 }).default("digital"), // "digital" or "paper"
+    
+    // Invoice Preference
+    preferInvoiceDigital: boolean("prefer_invoice_digital").default(true),
+    preferInvoicePaper: boolean("prefer_invoice_paper").default(false),
+    
+    // CSA Preference
+    preferCSADigital: boolean("prefer_csa_digital").default(true),
+    preferCSAPaper: boolean("prefer_csa_paper").default(false),
+    
+    // Notification
+    contactEmail: varchar("contact_email", { length: 255 }),
+    
+    // Special Requests
+    specialDocumentationRequests: text("special_documentation_requests"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_pref_tenant").on(table.tenantId),
+    customerIdx: index("idx_pref_customer").on(table.customerId),
+  })
+);
+
+export const insertCustomerDocumentPreferenceSchema = createInsertSchema(customerDocumentPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCustomerDocumentPreference = z.infer<typeof insertCustomerDocumentPreferenceSchema>;
+export type CustomerDocumentPreference = typeof customerDocumentPreferences.$inferSelect;
