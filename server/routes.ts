@@ -805,64 +805,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
-  // HEALTH CHECK
-  // ========================
-  app.get("/api/health", async (req: Request, res: Response) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
-  // Create and return HTTP server
-  const httpServer = createServer(app);
-  return httpServer;
-}
-
-// ========================
-// WORKER MATCHING ENGINE
-// ========================
-export async function autoMatchWorkers(request: any, tenantId: string): Promise<any[]> {
-  try {
-    const workers_list = await db.select().from(users).where(eq(users.tenantId, tenantId));
-    const matches: any[] = [];
-
-    for (const worker of workers_list) {
-      let matchScore = 0;
-      const matchReasons: string[] = [];
-
-      const insurance = await storage.getWorkerInsuranceByWorkerId(worker.id, tenantId);
-
-      if (request.skillsRequired && insurance) {
-        matchScore += 20;
-        matchReasons.push("Has active insurance");
-      }
-
-      if (request.workersCompRequired && insurance?.workersCompExpiryDate) {
-        const expiryDate = new Date(insurance.workersCompExpiryDate);
-        if (expiryDate > new Date()) {
-          matchScore += 30;
-          matchReasons.push("Workers comp active");
-        }
-      }
-
-      if (matchScore > 50) {
-        matches.push({
-          requestId: request.id,
-          workerId: worker.id,
-          tenantId,
-          matchScore,
-          matchReason: { reasons: matchReasons },
-          matchStatus: "suggested",
-        });
-      }
-    }
-
-    return matches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
-  } catch (error) {
-    console.error("Auto-matching error:", error);
-    return [];
-  }
-}
-
-  // ========================
   // COMPLIANCE & WAGE SCALES
   // ========================
   app.get("/api/compliance/prevailing-wages", async (req: Request, res: Response) => {
@@ -928,8 +870,60 @@ export async function autoMatchWorkers(request: any, tenantId: string): Promise<
     }
   });
 
-import {
-  prevailingWages,
-  workersCompRates,
-  stateComplianceRules,
-} from "@shared/schema";
+  // ========================
+  // HEALTH CHECK
+  // ========================
+  app.get("/api/health", async (req: Request, res: Response) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // Create and return HTTP server
+  const httpServer = createServer(app);
+  return httpServer;
+}
+
+// ========================
+// WORKER MATCHING ENGINE
+// ========================
+export async function autoMatchWorkers(request: any, tenantId: string): Promise<any[]> {
+  try {
+    const workers_list = await db.select().from(users).where(eq(users.tenantId, tenantId));
+    const matches: any[] = [];
+
+    for (const worker of workers_list) {
+      let matchScore = 0;
+      const matchReasons: string[] = [];
+
+      const insurance = await storage.getWorkerInsuranceByWorkerId(worker.id, tenantId);
+
+      if (request.skillsRequired && insurance) {
+        matchScore += 20;
+        matchReasons.push("Has active insurance");
+      }
+
+      if (request.workersCompRequired && insurance?.workersCompExpiryDate) {
+        const expiryDate = new Date(insurance.workersCompExpiryDate);
+        if (expiryDate > new Date()) {
+          matchScore += 30;
+          matchReasons.push("Workers comp active");
+        }
+      }
+
+      if (matchScore > 50) {
+        matches.push({
+          requestId: request.id,
+          workerId: worker.id,
+          tenantId,
+          matchScore,
+          matchReason: { reasons: matchReasons },
+          matchStatus: "suggested",
+        });
+      }
+    }
+
+    return matches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
+  } catch (error) {
+    console.error("Auto-matching error:", error);
+    return [];
+  }
+}
