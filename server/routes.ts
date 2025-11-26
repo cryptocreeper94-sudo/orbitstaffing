@@ -33,6 +33,8 @@ import {
   insertRateConfirmationSchema,
   insertBillingConfirmationSchema,
   insertWorkerAcceptanceSchema,
+  adminLoginLogs,
+  insertAdminLoginLogSchema,
 } from "@shared/schema";
 
 // ========================
@@ -137,12 +139,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!userId || !pin) {
         return res.status(400).json({ error: "User ID and PIN required" });
       }
+      
+      // Get IP address
+      const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+      
       const user = await storage.getUser(userId);
       if (!user || user.adminPin !== pin) {
+        console.log(`[Admin Login] ❌ Failed login attempt with PIN: ${pin.substring(0, 1)}***`);
         return res.status(401).json({ error: "Invalid PIN" });
       }
+      
+      // Log successful login
+      await db.insert(adminLoginLogs).values({
+        adminName: user.fullName || user.email || 'Unknown Admin',
+        adminRole: user.role || 'admin',
+        loginTime: new Date(),
+        ipAddress: ipAddress as string,
+        userAgent: userAgent || 'Unknown',
+      });
+      
+      console.log(`[Admin Login] ✅ ${user.fullName || user.email} logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+      
       res.json({ verified: true, userId: user.id });
     } catch (error) {
+      console.error('[Admin Login] Error:', error);
       res.status(500).json({ error: "Failed to verify PIN" });
     }
   });
@@ -162,6 +183,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, message: "Password reset successfully" });
     } catch (error) {
       res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
+  // ========================
+  // ADMIN LOGIN TRACKING
+  // ========================
+  
+  // Get recent admin logins (last 50)
+  app.get("/api/admin/login-history", async (req: Request, res: Response) => {
+    try {
+      const logs = await db.select()
+        .from(adminLoginLogs)
+        .orderBy(desc(adminLoginLogs.loginTime))
+        .limit(50);
+      
+      res.json({ logs });
+    } catch (error) {
+      console.error('[Admin Login History] Error:', error);
+      res.status(500).json({ error: "Failed to fetch login history" });
+    }
+  });
+
+  // Get latest login for specific admin
+  app.get("/api/admin/latest-login/:adminName", async (req: Request, res: Response) => {
+    try {
+      const { adminName } = req.params;
+      
+      const [latestLogin] = await db.select()
+        .from(adminLoginLogs)
+        .where(eq(adminLoginLogs.adminName, adminName))
+        .orderBy(desc(adminLoginLogs.loginTime))
+        .limit(1);
+      
+      res.json({ latestLogin: latestLogin || null });
+    } catch (error) {
+      console.error('[Latest Login] Error:', error);
+      res.status(500).json({ error: "Failed to fetch latest login" });
     }
   });
 

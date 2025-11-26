@@ -10,6 +10,7 @@ import {
   integer,
   jsonb,
   index,
+  serial,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -3037,3 +3038,31 @@ export const insertCSATemplateSchema = createInsertSchema(csaTemplates).omit({
 
 export type InsertCSATemplate = z.infer<typeof insertCSATemplateSchema>;
 export type CSATemplate = typeof csaTemplates.$inferSelect;
+
+// ========================
+// Admin Login Logs (Security & Audit Trail)
+// ========================
+export const adminLoginLogs = pgTable(
+  "admin_login_logs",
+  {
+    id: serial("id").primaryKey(),
+    adminName: varchar("admin_name", { length: 255 }).notNull(),
+    adminRole: varchar("admin_role", { length: 50 }).notNull(), // master_admin, franchise_admin, customer_admin
+    loginTime: timestamp("login_time").default(sql`NOW()`).notNull(),
+    ipAddress: varchar("ip_address", { length: 45 }), // IPv6 compatible
+    userAgent: text("user_agent"),
+    sessionDuration: integer("session_duration"), // minutes, updated on logout
+    logoutTime: timestamp("logout_time"),
+  },
+  (table) => ({
+    adminNameIdx: index("idx_admin_login_logs_name").on(table.adminName),
+    loginTimeIdx: index("idx_admin_login_logs_time").on(table.loginTime),
+  })
+);
+
+export const insertAdminLoginLogSchema = createInsertSchema(adminLoginLogs).omit({
+  id: true,
+});
+
+export type InsertAdminLoginLog = z.infer<typeof insertAdminLoginLogSchema>;
+export type AdminLoginLog = typeof adminLoginLogs.$inferSelect;

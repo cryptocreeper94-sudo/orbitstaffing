@@ -21,6 +21,7 @@ import { AssetTracker } from '@/components/AssetTracker';
 import { shouldBypassDeveloperLogin, enableBypassOnThisDevice, disableBypassOnThisDevice, isBypassDeviceEnabled } from '@/lib/deviceFingerprint';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
+import { AdminLoginHistory } from '@/components/AdminLoginHistory';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
@@ -1480,7 +1481,7 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal' | 'monitoring' | 'login-logs'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -2028,6 +2029,18 @@ export default function DeveloperPanel() {
             <Clock className="w-4 h-4" />
             Monitoring
           </button>
+          <button
+            onClick={() => setActiveTab('login-logs')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'login-logs'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-login-logs"
+          >
+            <Shield className="w-4 h-4" />
+            Login History
+          </button>
           <div className="ml-auto flex items-center">
             <button
               onClick={() => setShowChat(!showChat)}
@@ -2455,6 +2468,13 @@ export default function DeveloperPanel() {
         
         {/* BACKGROUND JOB MONITORING TAB */}
         {activeTab === 'monitoring' && <BackgroundJobMonitoring />}
+
+        {/* ADMIN LOGIN HISTORY TAB */}
+        {activeTab === 'login-logs' && (
+          <div>
+            <AdminLoginHistory />
+          </div>
+        )}
       </div>
 
       {/* Bug Report Widget */}
