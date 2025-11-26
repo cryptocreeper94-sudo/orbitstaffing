@@ -663,6 +663,274 @@ export const storage: IStorage = {
     return result[0] || null;
   },
   
+  // ========================
+  // ONBOARDING DEADLINE ENFORCEMENT
+  // ========================
+  
+  /**
+   * Get workers with overdue application deadlines (3 business days)
+   * Returns workers who:
+   * 1. Have applicationDeadline set and it has passed
+   * 2. Have NOT completed onboarding
+   * 3. Have NOT been marked as timed out already
+   */
+  async getWorkersWithOverdueApplications(): Promise<Worker[]> {
+    const now = new Date();
+    
+    const result = await db.select()
+      .from(workers)
+      .where(
+        and(
+          sql`${workers.applicationDeadline} IS NOT NULL`,
+          sql`${workers.applicationDeadline} < ${now}`,
+          eq(workers.onboardingCompleted, false),
+          eq(workers.onboardingTimedOut, false)
+        )
+      );
+    
+    return result;
+  },
+  
+  /**
+   * Get workers with overdue assignment deadlines (1 business day)
+   * Returns workers who:
+   * 1. Have been assigned to a job (assignmentOnboardingDeadline set)
+   * 2. The deadline has passed
+   * 3. Have NOT completed onboarding
+   * 4. Have NOT been marked as timed out
+   */
+  async getWorkersWithOverdueAssignments(): Promise<any[]> {
+    const now = new Date();
+    
+    // Get workers with overdue assignment deadlines
+    const overdueWorkers = await db.select()
+      .from(workers)
+      .where(
+        and(
+          sql`${workers.assignmentOnboardingDeadline} IS NOT NULL`,
+          sql`${workers.assignmentOnboardingDeadline} < ${now}`,
+          eq(workers.onboardingCompleted, false),
+          eq(workers.onboardingTimedOut, false)
+        )
+      );
+    
+    // Get their pending assignments
+    const assignments = [];
+    for (const worker of overdueWorkers) {
+      const matches = await db.select()
+        .from(workerRequestMatches)
+        .where(
+          and(
+            eq(workerRequestMatches.workerId, worker.id),
+            eq(workerRequestMatches.matchStatus, 'assigned')
+          )
+        );
+      
+      for (const match of matches) {
+        const request = await db.select()
+          .from(workerRequests)
+          .where(eq(workerRequests.id, match.requestId))
+          .limit(1);
+        
+        if (request[0]) {
+          assignments.push({
+            workerId: worker.id,
+            workerName: worker.fullName,
+            requestId: match.requestId,
+            requestNumber: request[0].requestNumber,
+            matchId: match.id,
+            clientId: request[0].clientId,
+          });
+        }
+      }
+    }
+    
+    return assignments;
+  },
+  
+  /**
+   * Mark a worker as onboarding timed out
+   */
+  async markWorkerOnboardingTimedOut(workerId: string): Promise<void> {
+    await db.update(workers)
+      .set({
+        onboardingTimedOut: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(workers.id, workerId));
+    
+    console.log(`[Storage] Worker ${workerId} marked as onboarding timed out`);
+  },
+  
+  /**
+   * Mark an assignment as reassigned
+   */
+  async markAssignmentReassigned(requestId: string, workerId: string): Promise<void> {
+    await db.update(workerRequestMatches)
+      .set({
+        matchStatus: 'reassigned',
+        rejectionReason: 'Onboarding deadline exceeded - automatically reassigned',
+      })
+      .where(
+        and(
+          eq(workerRequestMatches.requestId, requestId),
+          eq(workerRequestMatches.workerId, workerId)
+        )
+      );
+    
+    console.log(`[Storage] Assignment for request ${requestId} and worker ${workerId} marked as reassigned`);
+  },
+  
+  /**
+   * Get worker assignments (matches)
+   */
+  async getWorkerAssignments(workerId: string, status?: string): Promise<WorkerRequestMatch[]> {
+    const conditions = [eq(workerRequestMatches.workerId, workerId)];
+    
+    if (status) {
+      conditions.push(eq(workerRequestMatches.matchStatus, status));
+    }
+    
+    const result = await db.select()
+      .from(workerRequestMatches)
+      .where(and(...conditions))
+      .orderBy(desc(workerRequestMatches.createdAt));
+    
+    return result;
+  },
+  
+  /**
+   * Get a worker request by ID
+   */
+  async getWorkerRequest(requestId: string, tenantId?: string): Promise<WorkerRequest | null> {
+    const conditions = [eq(workerRequests.id, requestId)];
+    
+    if (tenantId) {
+      conditions.push(eq(workerRequests.tenantId, tenantId));
+    }
+    
+    const result = await db.select()
+      .from(workerRequests)
+      .where(and(...conditions))
+      .limit(1);
+    
+    return result[0] || null;
+  },
+  
+  /**
+   * Get all matches for a worker request
+   */
+  async getWorkerRequestMatches(requestId: string): Promise<WorkerRequestMatch[]> {
+    const result = await db.select()
+      .from(workerRequestMatches)
+      .where(eq(workerRequestMatches.requestId, requestId))
+      .orderBy(desc(workerRequestMatches.matchScore));
+    
+    return result;
+  },
+  
+  /**
+   * Assign a worker to a request
+   * Sets assignment date and deadline for the worker
+   */
+  async assignWorkerToRequest(requestId: string, workerId: string): Promise<void> {
+    const now = new Date();
+    
+    // Import business days calculator
+    const { addBusinessDays } = await import('./lib/businessDays');
+    const assignmentDeadline = addBusinessDays(now, 1); // 1 business day
+    
+    // Update the match status
+    await db.update(workerRequestMatches)
+      .set({
+        matchStatus: 'assigned',
+        assignedAt: now,
+      })
+      .where(
+        and(
+          eq(workerRequestMatches.requestId, requestId),
+          eq(workerRequestMatches.workerId, workerId)
+        )
+      );
+    
+    // Update worker's assignment deadline
+    await db.update(workers)
+      .set({
+        assignmentDate: now,
+        assignmentOnboardingDeadline: assignmentDeadline,
+        updatedAt: now,
+      })
+      .where(eq(workers.id, workerId));
+    
+    console.log(`[Storage] Worker ${workerId} assigned to request ${requestId}, deadline: ${assignmentDeadline}`);
+  },
+  
+  /**
+   * Get workers approaching their onboarding deadlines (for warnings)
+   */
+  async getWorkersApproachingDeadline(daysUntil: number = 1): Promise<any[]> {
+    const now = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + daysUntil + 1); // Add 1 to include the target day
+    
+    // Application deadlines approaching
+    const applicationDeadlines = await db.select()
+      .from(workers)
+      .where(
+        and(
+          sql`${workers.applicationDeadline} IS NOT NULL`,
+          sql`${workers.applicationDeadline} > ${now}`,
+          sql`${workers.applicationDeadline} < ${futureDate}`,
+          eq(workers.onboardingCompleted, false),
+          eq(workers.onboardingTimedOut, false)
+        )
+      );
+    
+    // Assignment deadlines approaching
+    const assignmentDeadlines = await db.select()
+      .from(workers)
+      .where(
+        and(
+          sql`${workers.assignmentOnboardingDeadline} IS NOT NULL`,
+          sql`${workers.assignmentOnboardingDeadline} > ${now}`,
+          sql`${workers.assignmentOnboardingDeadline} < ${futureDate}`,
+          eq(workers.onboardingCompleted, false),
+          eq(workers.onboardingTimedOut, false)
+        )
+      );
+    
+    return {
+      application: applicationDeadlines,
+      assignment: assignmentDeadlines,
+    };
+  },
+  
+  /**
+   * Get recent auto-reassignments (for admin dashboard)
+   */
+  async getRecentReassignments(hours: number = 24): Promise<any[]> {
+    const since = new Date();
+    since.setHours(since.getHours() - hours);
+    
+    const result = await db.select({
+      match: workerRequestMatches,
+      worker: workers,
+      request: workerRequests,
+    })
+    .from(workerRequestMatches)
+    .leftJoin(workers, eq(workerRequestMatches.workerId, workers.id))
+    .leftJoin(workerRequests, eq(workerRequestMatches.requestId, workerRequests.id))
+    .where(
+      and(
+        eq(workerRequestMatches.matchStatus, 'reassigned'),
+        sql`${workerRequestMatches.rejectionReason} LIKE '%deadline%'`
+      )
+    )
+    .orderBy(desc(workerRequestMatches.createdAt));
+    
+    return result;
+  },
+  
   async updatePublicReferralHours(workerId: string, totalHours: number): Promise<void> {
     const referralBonuses = await db.select()
       .from(workerReferralBonuses)

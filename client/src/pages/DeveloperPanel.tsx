@@ -1055,6 +1055,232 @@ function LegalCSAManager() {
   );
 }
 
+// Background Job Monitoring Component
+function BackgroundJobMonitoring() {
+  const [status, setStatus] = useState<any>(null);
+  const [approaching, setApproaching] = useState<any>(null);
+  const [overdue, setOverdue] = useState<any>(null);
+  const [reassignments, setReassignments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadMonitoringData();
+    const interval = setInterval(loadMonitoringData, 60000); // Refresh every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  async function loadMonitoringData() {
+    try {
+      const [statusRes, approachingRes, overdueRes, reassignRes] = await Promise.all([
+        fetch('/api/background-jobs/status'),
+        fetch('/api/background-jobs/approaching-deadlines'),
+        fetch('/api/background-jobs/overdue-workers'),
+        fetch('/api/background-jobs/recent-reassignments'),
+      ]);
+
+      if (statusRes.ok) setStatus(await statusRes.json());
+      if (approachingRes.ok) setApproaching(await approachingRes.json());
+      if (overdueRes.ok) setOverdue(await overdueRes.json());
+      if (reassignRes.ok) setReassignments(await reassignRes.json());
+    } catch (err) {
+      console.error('Failed to load monitoring data:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function triggerManualCheck() {
+    try {
+      const res = await fetch('/api/background-jobs/check-now', {
+        method: 'POST',
+      });
+      if (res.ok) {
+        alert('Manual deadline check initiated. Check console logs for results.');
+        setTimeout(loadMonitoringData, 2000); // Reload data after 2 seconds
+      }
+    } catch (err) {
+      console.error('Failed to trigger manual check:', err);
+    }
+  }
+
+  if (loading) {
+    return <div className="text-gray-300">Loading monitoring data...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-cyan-900/30 to-cyan-800/20 border border-cyan-700/50 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <Clock className="w-6 h-6 text-cyan-400" />
+            <h2 className="text-2xl font-bold text-white">Onboarding Deadline Enforcement</h2>
+          </div>
+          <div className={`px-4 py-2 rounded-lg font-bold ${
+            status?.running
+              ? 'bg-green-600 text-white'
+              : 'bg-red-600 text-white'
+          }`}>
+            {status?.running ? '✓ RUNNING' : '⚠ STOPPED'}
+          </div>
+        </div>
+        <p className="text-gray-300">
+          Automated enforcement of onboarding deadlines (3 business days for applications, 1 business day for assignments)
+        </p>
+        {status?.nextCheck && (
+          <p className="text-sm text-cyan-300 mt-2">
+            Next check: {new Date(status.nextCheck).toLocaleString()}
+          </p>
+        )}
+      </div>
+
+      {/* Manual Trigger */}
+      <div className="flex gap-4">
+        <Button
+          onClick={triggerManualCheck}
+          className="bg-cyan-600 hover:bg-cyan-700"
+          data-testid="button-trigger-deadline-check"
+        >
+          <Zap className="w-4 h-4 mr-2" />
+          Trigger Manual Check Now
+        </Button>
+        <Button
+          onClick={loadMonitoringData}
+          variant="outline"
+          data-testid="button-refresh-monitoring"
+        >
+          Refresh Data
+        </Button>
+      </div>
+
+      {/* Workers Approaching Deadlines */}
+      <div className="bg-yellow-900/20 border border-yellow-600 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-yellow-300 mb-4 flex items-center gap-2">
+          <AlertCircle className="w-5 h-5" />
+          Workers Approaching Deadlines (Next 1 Business Day)
+        </h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <div className="text-sm text-gray-400 mb-2">Application Deadlines:</div>
+            <div className="bg-slate-800 rounded p-3">
+              {approaching?.application?.length > 0 ? (
+                <div className="space-y-2">
+                  {approaching.application.map((worker: any, i: number) => (
+                    <div key={i} className="text-sm">
+                      <div className="font-bold text-white">{worker.fullName}</div>
+                      <div className="text-xs text-gray-400">
+                        Deadline: {new Date(worker.applicationDeadline).toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-green-400">No approaching deadlines</div>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-400 mb-2">Assignment Deadlines:</div>
+            <div className="bg-slate-800 rounded p-3">
+              {approaching?.assignment?.length > 0 ? (
+                <div className="space-y-2">
+                  {approaching.assignment.map((worker: any, i: number) => (
+                    <div key={i} className="text-sm">
+                      <div className="font-bold text-white">{worker.fullName}</div>
+                      <div className="text-xs text-gray-400">
+                        Deadline: {new Date(worker.assignmentOnboardingDeadline).toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-green-400">No approaching deadlines</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Overdue Workers */}
+      <div className="bg-red-900/20 border border-red-600 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-red-300 mb-4 flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5" />
+          Overdue Workers (Auto-Reassignment Triggered)
+        </h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <div className="text-sm text-gray-400 mb-2">Overdue Applications:</div>
+            <div className="bg-slate-800 rounded p-3">
+              {overdue?.applications?.length > 0 ? (
+                <div className="space-y-2">
+                  {overdue.applications.map((worker: any, i: number) => (
+                    <div key={i} className="text-sm">
+                      <div className="font-bold text-red-300">{worker.fullName}</div>
+                      <div className="text-xs text-gray-400">
+                        Deadline missed: {new Date(worker.applicationDeadline).toLocaleString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-green-400">No overdue applications</div>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className="text-sm text-gray-400 mb-2">Overdue Assignments:</div>
+            <div className="bg-slate-800 rounded p-3">
+              {overdue?.assignments?.length > 0 ? (
+                <div className="space-y-2">
+                  {overdue.assignments.map((assignment: any, i: number) => (
+                    <div key={i} className="text-sm">
+                      <div className="font-bold text-red-300">{assignment.workerName}</div>
+                      <div className="text-xs text-gray-400">
+                        Request: {assignment.requestNumber}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-green-400">No overdue assignments</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Reassignments */}
+      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <BarChart3 className="w-5 h-5 text-purple-400" />
+          Recent Auto-Reassignments (Last 24 Hours)
+        </h3>
+        {reassignments.length > 0 ? (
+          <div className="space-y-2">
+            {reassignments.map((item: any, i: number) => (
+              <div key={i} className="bg-slate-700 rounded p-3 text-sm">
+                <div className="flex justify-between">
+                  <div>
+                    <div className="font-bold text-white">{item.worker?.fullName}</div>
+                    <div className="text-xs text-gray-400">
+                      Request: {item.request?.requestNumber} | {item.request?.jobTitle}
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {new Date(item.match?.createdAt).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-gray-400">No reassignments in the last 24 hours</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
   const [showBypassOption, setShowBypassOption] = useState(false);
@@ -1620,6 +1846,18 @@ export default function DeveloperPanel() {
             <Scale className="w-4 h-4" />
             Legal / CSA
           </button>
+          <button
+            onClick={() => setActiveTab('monitoring')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'monitoring'
+                ? 'border-cyan-400 text-cyan-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-monitoring"
+          >
+            <Clock className="w-4 h-4" />
+            Monitoring
+          </button>
           <div className="ml-auto flex items-center">
             <button
               onClick={() => setShowChat(!showChat)}
@@ -2044,6 +2282,9 @@ export default function DeveloperPanel() {
 
         {/* LEGAL / CSA MANAGEMENT TAB */}
         {activeTab === 'legal' && <LegalCSAManager />}
+        
+        {/* BACKGROUND JOB MONITORING TAB */}
+        {activeTab === 'monitoring' && <BackgroundJobMonitoring />}
       </div>
 
       {/* Bug Report Widget */}

@@ -4,6 +4,7 @@ import express, { type Express, type Request, Response, NextFunction } from "exp
 import { registerRoutes } from "./routes";
 import { seedComplianceData } from "./seedComplianceData";
 import "./scheduler"; // Auto-starts sync scheduler on module load
+import { startBackgroundJobs, stopBackgroundJobs } from "./backgroundJobs"; // Onboarding deadline enforcement
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -67,6 +68,28 @@ export default async function runApp(
 
   // Seed compliance data on startup
   await seedComplianceData();
+  
+  // Start background jobs for onboarding deadline enforcement
+  startBackgroundJobs();
+  
+  // Graceful shutdown handlers
+  process.on('SIGTERM', () => {
+    log('SIGTERM received, shutting down gracefully...');
+    stopBackgroundJobs();
+    server.close(() => {
+      log('Server closed');
+      process.exit(0);
+    });
+  });
+  
+  process.on('SIGINT', () => {
+    log('SIGINT received, shutting down gracefully...');
+    stopBackgroundJobs();
+    server.close(() => {
+      log('Server closed');
+      process.exit(0);
+    });
+  });
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

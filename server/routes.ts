@@ -1831,6 +1831,305 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch worker request" });
     }
   });
+  
+  // ========================
+  // BACKGROUND JOB MONITORING
+  // ========================
+  
+  // Get background job status
+  app.get("/api/background-jobs/status", async (req: Request, res: Response) => {
+    try {
+      const { getBackgroundJobStatus } = await import('./backgroundJobs');
+      const status = getBackgroundJobStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Error getting background job status:", error);
+      res.status(500).json({ error: "Failed to get background job status" });
+    }
+  });
+  
+  // Get workers approaching deadlines
+  app.get("/api/background-jobs/approaching-deadlines", async (req: Request, res: Response) => {
+    try {
+      const approaching = await storage.getWorkersApproachingDeadline(1);
+      res.json(approaching);
+    } catch (error) {
+      console.error("Error getting approaching deadlines:", error);
+      res.status(500).json({ error: "Failed to get approaching deadlines" });
+    }
+  });
+  
+  // Get overdue workers
+  app.get("/api/background-jobs/overdue-workers", async (req: Request, res: Response) => {
+    try {
+      const overdueApplications = await storage.getWorkersWithOverdueApplications();
+      const overdueAssignments = await storage.getWorkersWithOverdueAssignments();
+      
+      res.json({
+        applications: overdueApplications,
+        assignments: overdueAssignments,
+      });
+    } catch (error) {
+      console.error("Error getting overdue workers:", error);
+      res.status(500).json({ error: "Failed to get overdue workers" });
+    }
+  });
+  
+  // Get recent reassignments
+  app.get("/api/background-jobs/recent-reassignments", async (req: Request, res: Response) => {
+    try {
+      const hours = parseInt(req.query.hours as string) || 24;
+      const reassignments = await storage.getRecentReassignments(hours);
+      res.json(reassignments);
+    } catch (error) {
+      console.error("Error getting recent reassignments:", error);
+      res.status(500).json({ error: "Failed to get recent reassignments" });
+    }
+  });
+  
+  // Manually trigger deadline check (admin only)
+  app.post("/api/background-jobs/check-now", async (req: Request, res: Response) => {
+    try {
+      const { checkOnboardingDeadlines } = await import('./backgroundJobs');
+      
+      // Run the check asynchronously
+      checkOnboardingDeadlines().then(() => {
+        console.log('[Admin] Manual deadline check completed');
+      }).catch((error) => {
+        console.error('[Admin] Manual deadline check failed:', error);
+      });
+      
+      res.json({ 
+        success: true, 
+        message: "Deadline check initiated. Results will be logged to console." 
+      });
+    } catch (error) {
+      console.error("Error triggering deadline check:", error);
+      res.status(500).json({ error: "Failed to trigger deadline check" });
+    }
+  });
+
+  // ========================
+  // OAUTH CONNECTION ROUTES
+  // ========================
+  
+  // Initiate OAuth flow
+  app.get("/api/oauth/connect/:provider", async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { OAUTH_PROVIDERS, generateAuthUrl, generateState } = await import("./oauthConfig");
+      
+      if (!OAUTH_PROVIDERS[provider]) {
+        return res.status(404).json({ error: "Unknown OAuth provider" });
+      }
+
+      const config = OAUTH_PROVIDERS[provider];
+      const clientId = process.env[config.clientIdEnv];
+
+      if (!clientId) {
+        return res.status(500).json({ 
+          error: "OAuth provider not configured",
+          message: `Missing ${config.clientIdEnv}. Please configure in Developer Panel.`
+        });
+      }
+
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/oauth/callback/${provider}`;
+      const state = generateState();
+
+      (req as any).session.oauthState = state;
+      (req as any).session.oauthProvider = provider;
+      (req as any).session.oauthTenantId = tenantId;
+
+      const authUrl = generateAuthUrl(provider, clientId, redirectUri, state);
+
+      res.json({ authUrl, state });
+    } catch (error: any) {
+      console.error("OAuth connect error:", error);
+      res.status(500).json({ error: "Failed to initiate OAuth flow", details: error.message });
+    }
+  });
+
+  // OAuth callback handler
+  app.get("/api/oauth/callback/:provider", async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const { code, state, error: oauthError } = req.query;
+
+      if (oauthError) {
+        return res.redirect(`/oauth/settings?error=${encodeURIComponent(oauthError as string)}`);
+      }
+
+      if (!code || !state) {
+        return res.redirect('/oauth/settings?error=missing_parameters');
+      }
+
+      const sessionState = (req as any).session.oauthState;
+      const sessionProvider = (req as any).session.oauthProvider;
+      const sessionTenantId = (req as any).session.oauthTenantId;
+
+      if (state !== sessionState || provider !== sessionProvider) {
+        return res.redirect('/oauth/settings?error=invalid_state');
+      }
+
+      const { OAUTH_PROVIDERS, exchangeCodeForToken } = await import("./oauthConfig");
+      const config = OAUTH_PROVIDERS[provider];
+
+      if (!config) {
+        return res.redirect('/oauth/settings?error=unknown_provider');
+      }
+
+      const clientId = process.env[config.clientIdEnv];
+      const clientSecret = process.env[config.clientSecretEnv];
+
+      if (!clientId || !clientSecret) {
+        return res.redirect('/oauth/settings?error=provider_not_configured');
+      }
+
+      const redirectUri = `${req.protocol}://${req.get('host')}/api/oauth/callback/${provider}`;
+      const tokenData = await exchangeCodeForToken(
+        provider,
+        code as string,
+        clientId,
+        clientSecret,
+        redirectUri
+      );
+
+      const expiresAt = new Date(Date.now() + tokenData.expiresIn * 1000);
+
+      await storage.storeIntegrationToken({
+        tenantId: sessionTenantId,
+        integrationType: provider,
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken || '',
+        expiresAt,
+        scope: tokenData.scope || config.scopes.join(' '),
+        connectionStatus: 'connected',
+      });
+
+      delete (req as any).session.oauthState;
+      delete (req as any).session.oauthProvider;
+      delete (req as any).session.oauthTenantId;
+
+      res.redirect('/oauth/settings?success=true&provider=' + provider);
+    } catch (error: any) {
+      console.error("OAuth callback error:", error);
+      res.redirect(`/oauth/settings?error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
+  // Get connection status
+  app.get("/api/oauth/status", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { OAUTH_PROVIDERS } = await import("./oauthConfig");
+      const connections = await storage.getAllIntegrationTokens();
+      const tenantConnections = connections.filter(c => c.tenantId === tenantId);
+
+      const status = Object.keys(OAUTH_PROVIDERS).map(provider => {
+        const connection = tenantConnections.find(c => c.integrationType === provider);
+        
+        if (!connection) {
+          return {
+            provider,
+            name: OAUTH_PROVIDERS[provider].name,
+            connected: false,
+          };
+        }
+
+        return {
+          provider,
+          name: OAUTH_PROVIDERS[provider].name,
+          connected: true,
+          lastSync: connection.lastSyncedAt,
+          status: connection.connectionStatus,
+          connectedAt: connection.createdAt,
+        };
+      });
+
+      res.json(status);
+    } catch (error: any) {
+      console.error("OAuth status error:", error);
+      res.status(500).json({ error: "Failed to get connection status" });
+    }
+  });
+
+  // Disconnect provider
+  app.post("/api/oauth/disconnect/:provider", async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const connection = await storage.getIntegrationToken(tenantId, provider);
+      
+      if (!connection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+
+      await storage.deleteIntegrationToken(connection.id);
+
+      res.json({ success: true, message: `Disconnected from ${provider}` });
+    } catch (error: any) {
+      console.error("OAuth disconnect error:", error);
+      res.status(500).json({ error: "Failed to disconnect provider" });
+    }
+  });
+
+  // Refresh OAuth token
+  app.post("/api/oauth/refresh/:provider", async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const connection = await storage.getIntegrationToken(tenantId, provider);
+      
+      if (!connection || !connection.refreshToken) {
+        return res.status(404).json({ error: "Connection not found or no refresh token" });
+      }
+
+      const { OAUTH_PROVIDERS, refreshAccessToken } = await import("./oauthConfig");
+      const config = OAUTH_PROVIDERS[provider];
+
+      if (!config) {
+        return res.status(404).json({ error: "Unknown provider" });
+      }
+
+      const clientId = process.env[config.clientIdEnv];
+      const clientSecret = process.env[config.clientSecretEnv];
+
+      if (!clientId || !clientSecret) {
+        return res.status(500).json({ error: "Provider not configured" });
+      }
+
+      const tokenData = await refreshAccessToken(
+        provider,
+        connection.refreshToken,
+        clientId,
+        clientSecret
+      );
+
+      const expiresAt = new Date(Date.now() + tokenData.expiresIn * 1000);
+
+      await storage.updateIntegrationToken(connection.id, {
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresAt,
+        connectionStatus: 'connected',
+        lastError: null,
+      });
+
+      res.json({ success: true, message: "Token refreshed successfully" });
+    } catch (error: any) {
+      console.error("OAuth refresh error:", error);
+      res.status(500).json({ error: "Failed to refresh token", details: error.message });
+    }
+  });
 
   // Create and return HTTP server
   const httpServer = createServer(app);

@@ -40,6 +40,8 @@ import AdminComplianceMonitor from "@/pages/AdminComplianceMonitor";
 import { ComplianceDashboard } from "@/pages/ComplianceDashboard";
 import CSASigningPage from "@/pages/CSASigningPage";
 import RateConfirmation from "@/pages/RateConfirmation";
+import OAuthConnectionWizard from "@/pages/OAuthConnectionWizard";
+import OAuthSettings from "@/pages/OAuthSettings";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -92,6 +94,8 @@ function Router() {
       <Route path="/admin/compliance" component={ComplianceDashboard} />
       <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
+      <Route path="/oauth/wizard" component={OAuthConnectionWizard} />
+      <Route path="/oauth/settings" component={OAuthSettings} />
       <Route component={NotFound} />
     </Switch>
   );
