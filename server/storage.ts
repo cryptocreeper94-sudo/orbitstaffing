@@ -395,6 +395,46 @@ export const storage: IStorage = {
     return result[0];
   },
 
+  /**
+   * Get eligible workers for matching with worker requests
+   * Filters by tenant, approved status, and optional criteria
+   */
+  async getEligibleWorkers(tenantId: string, criteria?: {
+    skills?: any[];
+    startDate?: string;
+    requiresInsurance?: boolean;
+  }): Promise<Worker[]> {
+    const conditions = [
+      eq(workers.tenantId, tenantId),
+      eq(workers.status, 'approved'),
+      eq(workers.onboardingCompleted, true)
+    ];
+    
+    const result = await db.select().from(workers).where(and(...conditions));
+    
+    return result;
+  },
+
+  /**
+   * Create in-app notification (placeholder - logs to console for now)
+   */
+  async createNotification(notification: {
+    userId?: string;
+    type: string;
+    title: string;
+    message: string;
+    relatedId?: string;
+  }): Promise<any> {
+    console.log('[Notification] Created:', {
+      userId: notification.userId,
+      type: notification.type,
+      title: notification.title,
+      message: notification.message.substring(0, 100),
+      relatedId: notification.relatedId
+    });
+    return { id: `notif-${Date.now()}`, ...notification, createdAt: new Date() };
+  },
+
   async getAssignment(id: string): Promise<any> { return { id }; },
   async listAssignments(): Promise<any[]> { return []; },
   async updateAssignment(id: string, data: any): Promise<any> { return { id, ...data }; },

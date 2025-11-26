@@ -10,6 +10,7 @@ import { syncEngine } from "./syncEngine";
 import { stripeService } from "./stripeService";
 import { calculatePayroll } from "./payrollCalculator";
 import type { PayrollCalculationInput } from "./payrollCalculator";
+import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
 import {
   insertUserSchema,
   insertWorkerSchema,
@@ -221,6 +222,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(worker);
     } catch (error) {
       res.status(500).json({ error: "Failed to update worker" });
+    }
+  });
+
+  // ========================
+  // WORKER REQUEST ROUTES (Auto-Matching System)
+  // ========================
+  
+  /**
+   * Create worker request and trigger automatic matching
+   * This is the entry point for the 100% automated staffing system
+   */
+  app.post("/api/worker-requests", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      // Validate request data
+      const parsed = insertWorkerRequestSchema.safeParse({
+        ...req.body,
+        tenantId,
+      });
+
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          error: "Invalid worker request data",
+          details: parsed.error.issues 
+        });
+      }
+
+      // Create worker request
+      const request = await storage.createWorkerRequest(parsed.data);
+
+      // TRIGGER AUTO-MATCHING ENGINE
+      try {
+        await autoMatchWorkers(request.id, tenantId);
+        console.log(`[Routes] Auto-matching triggered for request ${request.id}`);
+      } catch (matchError) {
+        console.error(`[Routes] Auto-matching failed for request ${request.id}:`, matchError);
+        // Don't fail the request creation if matching fails - it can be retried
+      }
+
+      res.status(201).json({ 
+        success: true, 
+        request,
+        message: "Worker request created and matching initiated"
+      });
+    } catch (error) {
+      console.error('Error creating worker request:', error);
+      res.status(500).json({ error: 'Failed to create worker request' });
+    }
+  });
+
+  /**
+   * Worker accepts a shift opportunity
+   * Marks match as accepted and sets onboarding deadline
+   */
+  app.post("/api/worker-requests/:id/accept", async (req: Request, res: Response) => {
+    try {
+      const requestId = req.params.id;
+      const { workerId } = req.body;
+      
+      if (!workerId) {
+        return res.status(400).json({ error: "Worker ID required" });
+      }
+
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      // Find the specific match
+      const matches = await storage.listWorkerRequestMatches(requestId, tenantId);
+      const match = matches.find(m => m.workerId === workerId);
+
+      if (!match) {
+        return res.status(404).json({ error: "Match not found" });
+      }
+
+      // Update match status to accepted
+      await storage.updateWorkerRequestMatch(match.id, tenantId, {
+        matchStatus: 'accepted',
+        acceptedAt: new Date(),
+      });
+
+      // Update worker request status
+      await storage.updateWorkerRequest(requestId, tenantId, {
+        status: 'assigned',
+        assignedWorkerId: workerId,
+      });
+
+      // Set assignment date and onboarding deadline for worker
+      const onboardingDeadline = new Date();
+      onboardingDeadline.setDate(onboardingDeadline.getDate() + 1); // 1 business day
+
+      await storage.updateWorker(workerId, {
+        assignmentDate: new Date(),
+        assignmentOnboardingDeadline: onboardingDeadline,
+      });
+
+      console.log(`[Routes] Worker ${workerId} accepted request ${requestId}`);
+
+      res.json({ 
+        success: true,
+        message: "Shift accepted successfully",
+        onboardingDeadline: onboardingDeadline.toISOString()
+      });
+    } catch (error) {
+      console.error('Error accepting shift:', error);
+      res.status(500).json({ error: 'Failed to accept shift' });
+    }
+  });
+
+  /**
+   * Worker declines a shift opportunity
+   * Auto-reassigns to next best match
+   */
+  app.post("/api/worker-requests/:id/decline", async (req: Request, res: Response) => {
+    try {
+      const requestId = req.params.id;
+      const { workerId } = req.body;
+      
+      if (!workerId) {
+        return res.status(400).json({ error: "Worker ID required" });
+      }
+
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      // Find the specific match
+      const matches = await storage.listWorkerRequestMatches(requestId, tenantId);
+      const match = matches.find(m => m.workerId === workerId);
+
+      if (!match) {
+        return res.status(404).json({ error: "Match not found" });
+      }
+
+      // Update match status to declined
+      await storage.updateWorkerRequestMatch(match.id, tenantId, {
+        matchStatus: 'declined',
+        declinedAt: new Date(),
+      });
+
+      // AUTO-REASSIGN to next best match
+      try {
+        await autoReassignWorkerRequest(requestId, tenantId, workerId);
+        console.log(`[Routes] Auto-reassignment triggered for request ${requestId}`);
+      } catch (reassignError) {
+        console.error(`[Routes] Auto-reassignment failed:`, reassignError);
+        // Don't fail the decline if reassignment fails
+      }
+
+      res.json({ 
+        success: true,
+        message: "Shift declined, reassigning to next match"
+      });
+    } catch (error) {
+      console.error('Error declining shift:', error);
+      res.status(500).json({ error: 'Failed to decline shift' });
     }
   });
 
