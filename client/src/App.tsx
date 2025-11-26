@@ -36,6 +36,7 @@ import AdminGarnishmentDashboard from "@/pages/AdminGarnishmentDashboard";
 import WorkerPayrollPortal from "@/pages/WorkerPayrollPortal";
 import WorkerComplianceDashboard from "@/pages/WorkerComplianceDashboard";
 import AdminComplianceMonitor from "@/pages/AdminComplianceMonitor";
+import { ComplianceDashboard } from "@/pages/ComplianceDashboard";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,7 @@ function Router() {
       <Route path="/admin/assignment-dashboard" component={AdminAssignmentDashboard} />
       <Route path="/admin/garnishment-dashboard" component={AdminGarnishmentDashboard} />
       <Route path="/admin/compliance-monitor" component={AdminComplianceMonitor} />
+      <Route path="/admin/compliance" component={ComplianceDashboard} />
       <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route component={NotFound} />
