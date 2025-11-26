@@ -986,84 +986,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
-  // OAUTH INTEGRATIONS
+  // OAUTH INTEGRATIONS (GENERIC)
   // ========================
   
-  // QuickBooks OAuth
-  app.get("/api/oauth/quickbooks/auth", async (req: Request, res: Response) => {
+  // Generic auth URL endpoint for ANY provider
+  app.get("/api/oauth/:integrationType/auth", async (req: Request, res: Response) => {
     try {
+      const { integrationType } = req.params;
       const { tenantId, state } = req.query;
       if (!tenantId) return res.status(400).json({ error: "tenantId required" });
       
-      const authUrl = oauthClients.getQuickBooksAuthUrl(state as string || tenantId as string);
+      const authUrl = oauthClients.getAuthUrl(integrationType, (state as string) || (tenantId as string));
       res.json({ authUrl });
     } catch (error) {
-      res.status(500).json({ error: "Failed to generate QuickBooks auth URL" });
+      console.error("Auth URL generation failed:", error);
+      res.status(500).json({ error: "Failed to generate auth URL" });
     }
   });
 
-  app.post("/api/oauth/quickbooks/callback", async (req: Request, res: Response) => {
+  // Generic callback endpoint for ANY provider
+  app.post("/api/oauth/:integrationType/callback", async (req: Request, res: Response) => {
     try {
-      const { code, realmId, tenantId } = req.body;
-      if (!code || !realmId || !tenantId) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-
-      const tokenData = await oauthClients.exchangeQuickBooksCode(code, realmId);
-      const stored = await storage.storeIntegrationToken({
-        tenantId,
-        integrationType: "quickbooks",
-        accessToken: tokenData.accessToken,
-        refreshToken: tokenData.refreshToken,
-        expiresAt: tokenData.expiresAt,
-        scope: tokenData.scope,
-        realmId,
-        connectionStatus: "connected",
-        metadata: { realm_id: realmId },
-      });
-
-      res.json({ success: true, token: stored.id });
-    } catch (error) {
-      console.error("QuickBooks callback error:", error);
-      res.status(500).json({ error: "Failed to connect QuickBooks" });
-    }
-  });
-
-  // ADP OAuth
-  app.get("/api/oauth/adp/auth", async (req: Request, res: Response) => {
-    try {
-      const { tenantId, state } = req.query;
-      if (!tenantId) return res.status(400).json({ error: "tenantId required" });
-      
-      const authUrl = oauthClients.getADPAuthUrl(state as string || tenantId as string);
-      res.json({ authUrl });
-    } catch (error) {
-      res.status(500).json({ error: "Failed to generate ADP auth URL" });
-    }
-  });
-
-  app.post("/api/oauth/adp/callback", async (req: Request, res: Response) => {
-    try {
-      const { code, tenantId } = req.body;
+      const { integrationType } = req.params;
+      const { code, tenantId, realmId } = req.body;
       if (!code || !tenantId) {
-        return res.status(400).json({ error: "Missing required fields" });
+        return res.status(400).json({ error: "Missing required fields: code, tenantId" });
       }
 
-      const tokenData = await oauthClients.exchangeADPCode(code);
+      const tokenData = await oauthClients.exchangeCode(integrationType, code, { realmId });
       const stored = await storage.storeIntegrationToken({
         tenantId,
-        integrationType: "adp",
+        integrationType,
         accessToken: tokenData.accessToken,
         refreshToken: tokenData.refreshToken,
         expiresAt: tokenData.expiresAt,
         scope: tokenData.scope,
         connectionStatus: "connected",
+        metadata: realmId ? { realm_id: realmId } : undefined,
       });
 
       res.json({ success: true, token: stored.id });
     } catch (error) {
-      console.error("ADP callback error:", error);
-      res.status(500).json({ error: "Failed to connect ADP" });
+      console.error("OAuth callback error:", error);
+      res.status(500).json({ error: `Failed to connect ${req.params.integrationType}` });
     }
   });
 

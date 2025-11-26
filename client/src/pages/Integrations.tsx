@@ -21,7 +21,21 @@ import {
 
 interface Integration {
   id: string;
-  type: "quickbooks" | "adp" | "ukgpro" | "paylocity" | "bamboohr";
+  type:
+    | "quickbooks"
+    | "adp"
+    | "paychex"
+    | "gusto"
+    | "rippling"
+    | "workday"
+    | "paylocity"
+    | "onpay"
+    | "bullhorn"
+    | "wurknow"
+    | "ukgpro"
+    | "bamboohr"
+    | "google-workspace"
+    | "microsoft-365";
   name: string;
   description: string;
   status: "connected" | "disconnected" | "error" | "syncing";
@@ -149,14 +163,18 @@ export default function Integrations() {
   const { data: statusData, refetch: refetchStatus } = useQuery({
     queryKey: ["integrations-status"],
     queryFn: async () => {
-      const types = ["quickbooks", "adp"];
+      const types = [
+        "quickbooks", "adp", "paychex", "gusto", "rippling", "workday",
+        "paylocity", "onpay", "bullhorn", "wurknow", "ukgpro", "bamboohr",
+        "google-workspace", "microsoft-365"
+      ];
       const results: { [key: string]: any } = {};
       for (const type of types) {
         try {
           const res = await fetch(`/api/oauth/status/${type}`);
           if (res.ok) results[type] = await res.json();
         } catch (err) {
-          console.error(`Failed to fetch ${type} status:`, err);
+          // Integration not configured yet, skip
         }
       }
       return results;
