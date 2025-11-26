@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
+import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
 
 export default function ProductsGallery() {
@@ -151,6 +152,9 @@ export default function ProductsGallery() {
           onClose={() => setSelectedProduct(null)}
         />
       )}
+
+      {/* Footer */}
+      <DarkwaveFooter product="Darkwave Studios Ecosystem" />
     </div>
   );
 }
