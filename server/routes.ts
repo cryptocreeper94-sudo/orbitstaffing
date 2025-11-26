@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { db } from "./db";
 import { emailService } from "./email";
+import { oauthClients } from "./oauthClients";
 import { stripeService } from "./stripeService";
 import {
   insertUserSchema,
@@ -981,6 +982,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(scales);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch wage scales" });
+    }
+  });
+
+  // ========================
+  // OAUTH INTEGRATIONS
+  // ========================
+  
+  // QuickBooks OAuth
+  app.get("/api/oauth/quickbooks/auth", async (req: Request, res: Response) => {
+    try {
+      const { tenantId, state } = req.query;
+      if (!tenantId) return res.status(400).json({ error: "tenantId required" });
+      
+      const authUrl = oauthClients.getQuickBooksAuthUrl(state as string || tenantId as string);
+      res.json({ authUrl });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate QuickBooks auth URL" });
+    }
+  });
+
+  app.post("/api/oauth/quickbooks/callback", async (req: Request, res: Response) => {
+    try {
+      const { code, realmId, tenantId } = req.body;
+      if (!code || !realmId || !tenantId) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const tokenData = await oauthClients.exchangeQuickBooksCode(code, realmId);
+      const stored = await storage.storeIntegrationToken({
+        tenantId,
+        integrationType: "quickbooks",
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresAt: tokenData.expiresAt,
+        scope: tokenData.scope,
+        realmId,
+        connectionStatus: "connected",
+        metadata: { realm_id: realmId },
+      });
+
+      res.json({ success: true, token: stored.id });
+    } catch (error) {
+      console.error("QuickBooks callback error:", error);
+      res.status(500).json({ error: "Failed to connect QuickBooks" });
+    }
+  });
+
+  // ADP OAuth
+  app.get("/api/oauth/adp/auth", async (req: Request, res: Response) => {
+    try {
+      const { tenantId, state } = req.query;
+      if (!tenantId) return res.status(400).json({ error: "tenantId required" });
+      
+      const authUrl = oauthClients.getADPAuthUrl(state as string || tenantId as string);
+      res.json({ authUrl });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate ADP auth URL" });
+    }
+  });
+
+  app.post("/api/oauth/adp/callback", async (req: Request, res: Response) => {
+    try {
+      const { code, tenantId } = req.body;
+      if (!code || !tenantId) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const tokenData = await oauthClients.exchangeADPCode(code);
+      const stored = await storage.storeIntegrationToken({
+        tenantId,
+        integrationType: "adp",
+        accessToken: tokenData.accessToken,
+        refreshToken: tokenData.refreshToken,
+        expiresAt: tokenData.expiresAt,
+        scope: tokenData.scope,
+        connectionStatus: "connected",
+      });
+
+      res.json({ success: true, token: stored.id });
+    } catch (error) {
+      console.error("ADP callback error:", error);
+      res.status(500).json({ error: "Failed to connect ADP" });
+    }
+  });
+
+  // Get integration status
+  app.get("/api/oauth/status/:integrationType", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { integrationType } = req.params;
+      const token = await storage.getIntegrationToken(tenantId, integrationType);
+      
+      if (!token) {
+        return res.json({ connected: false });
+      }
+
+      res.json({
+        connected: token.connectionStatus === "connected",
+        status: token.connectionStatus,
+        lastSynced: token.lastSyncedAt,
+        lastError: token.lastError,
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to check integration status" });
+    }
+  });
+
+  // Disconnect integration
+  app.post("/api/oauth/disconnect/:integrationType", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const { integrationType } = req.params;
+      const token = await storage.getIntegrationToken(tenantId, integrationType);
+      
+      if (token) {
+        await storage.deleteIntegrationToken(token.id);
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to disconnect integration" });
     }
   });
 

@@ -73,22 +73,13 @@ import {
 } from "@shared/schema";
 
 export interface IStorage {
-  // OAuth Integration Tokens
-  storeIntegrationToken(token: InsertIntegrationToken): Promise<IntegrationToken>;
-  getIntegrationToken(tenantId: string, integrationType: string): Promise<IntegrationToken | null>;
-  updateIntegrationToken(id: string, updates: Partial<InsertIntegrationToken>): Promise<IntegrationToken>;
-  deleteIntegrationToken(id: string): Promise<void>;
   [key: string]: any;
 }
 
-// OAuth Integration Token Methods
-export const storage: IStorage & {
-  // Keep existing methods signature
-  storeIntegrationToken: (token: InsertIntegrationToken) => Promise<IntegrationToken>;
-  getIntegrationToken: (tenantId: string, integrationType: string) => Promise<IntegrationToken | null>;
-  updateIntegrationToken: (id: string, updates: Partial<InsertIntegrationToken>) => Promise<IntegrationToken>;
-  deleteIntegrationToken: (id: string) => Promise<void>;
-} = {
+export const storage: IStorage = {
+  // ========================
+  // OAUTH INTEGRATION TOKENS
+  // ========================
   async storeIntegrationToken(token: InsertIntegrationToken) {
     const result = await db.insert(integrationTokens).values(token).returning();
     return result[0];
@@ -121,8 +112,9 @@ export const storage: IStorage & {
     await db.delete(integrationTokens).where(eq(integrationTokens.id, id));
   },
 
-export const storage: IStorage = {
-  // Users
+  // ========================
+  // USERS
+  // ========================
   async getUser(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id));
     return result[0];
