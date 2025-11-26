@@ -649,9 +649,11 @@ export default function Landing() {
                   </p>
                   <Button 
                     onClick={() => setShowDemoForm(true)}
-                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-lg px-8 py-6"
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-sm sm:text-lg px-4 sm:px-8 py-6 h-auto flex items-center justify-center gap-2 whitespace-nowrap"
+                    data-testid="button-calculate-savings"
                   >
-                    Calculate Your Exact Savings <ArrowRight className="w-5 h-5 ml-2" />
+                    <span>Calculate Your Exact Savings</span>
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                   </Button>
                 </div>
               </CardContent>
