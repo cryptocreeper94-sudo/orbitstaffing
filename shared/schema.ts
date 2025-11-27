@@ -3066,3 +3066,70 @@ export const insertAdminLoginLogSchema = createInsertSchema(adminLoginLogs).omit
 
 export type InsertAdminLoginLog = z.infer<typeof insertAdminLoginLogSchema>;
 export type AdminLoginLog = typeof adminLoginLogs.$inferSelect;
+
+// ========================
+// Beta Testers (Sandbox Access System)
+// ========================
+export const betaTesters = pgTable(
+  "beta_testers",
+  {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }),
+    hashedPin: varchar("hashed_pin", { length: 255 }).notNull(), // bcrypt hashed 3-digit PIN
+    status: varchar("status", { length: 20 }).default("active"), // active, suspended, revoked
+    accessLevel: varchar("access_level", { length: 50 }).default("full_sandbox"), // full_sandbox, limited, view_only
+    notes: text("notes"),
+    createdBy: varchar("created_by", { length: 255 }).default("Sidonie"), // Master admin who created
+    lastLoginAt: timestamp("last_login_at"),
+    loginCount: integer("login_count").default(0),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    statusIdx: index("idx_beta_testers_status").on(table.status),
+    emailIdx: index("idx_beta_testers_email").on(table.email),
+  })
+);
+
+export const insertBetaTesterSchema = createInsertSchema(betaTesters).omit({
+  id: true,
+  lastLoginAt: true,
+  loginCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertBetaTester = z.infer<typeof insertBetaTesterSchema>;
+export type BetaTester = typeof betaTesters.$inferSelect;
+
+// ========================
+// Beta Tester Access Logs (Audit Trail)
+// ========================
+export const betaTesterAccessLogs = pgTable(
+  "beta_tester_access_logs",
+  {
+    id: serial("id").primaryKey(),
+    testerId: integer("tester_id").references(() => betaTesters.id).notNull(),
+    testerName: varchar("tester_name", { length: 255 }).notNull(),
+    action: varchar("action", { length: 100 }).notNull(), // login, logout, view_feature, test_workflow
+    feature: varchar("feature", { length: 255 }), // Which feature was accessed
+    details: text("details"), // Additional context
+    ipAddress: varchar("ip_address", { length: 45 }),
+    userAgent: text("user_agent"),
+    timestamp: timestamp("timestamp").default(sql`NOW()`).notNull(),
+  },
+  (table) => ({
+    testerIdx: index("idx_beta_access_logs_tester").on(table.testerId),
+    timestampIdx: index("idx_beta_access_logs_time").on(table.timestamp),
+    actionIdx: index("idx_beta_access_logs_action").on(table.action),
+  })
+);
+
+export const insertBetaTesterAccessLogSchema = createInsertSchema(betaTesterAccessLogs).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertBetaTesterAccessLog = z.infer<typeof insertBetaTesterAccessLogSchema>;
+export type BetaTesterAccessLog = typeof betaTesterAccessLogs.$inferSelect;

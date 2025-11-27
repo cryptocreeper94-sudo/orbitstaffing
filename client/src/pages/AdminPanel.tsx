@@ -32,14 +32,19 @@ import { WorkerRatingSystem } from '@/components/WorkerRatingSystem';
 import { ShiftMarketplace } from '@/components/ShiftMarketplace';
 import { CredentialTracker } from '@/components/CredentialTracker';
 import { WorkerPerformanceDashboard } from '@/components/WorkerPerformanceDashboard';
+import { BetaTesterDashboard } from '@/components/BetaTesterDashboard';
+import { BetaTesterManagement } from '@/components/BetaTesterManagement';
 
 const ADMIN_SESSION_KEY = 'admin';
+const BETA_SESSION_KEY = 'beta_tester';
 
 type AdminRole = 'master_admin' | 'franchise_admin' | 'customer_admin' | null;
 
 export default function AdminPanel() {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isBetaTester, setIsBetaTester] = useState(false);
+  const [betaTesterName, setBetaTesterName] = useState('');
   const [role, setRole] = useState<AdminRole>(null);
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
@@ -52,7 +57,15 @@ export default function AdminPanel() {
 
   // Check if already authenticated
   useEffect(() => {
-    // Check for valid persistent session (30 days)
+    // Check for beta tester session first
+    const betaSession = getValidSession(BETA_SESSION_KEY);
+    if (betaSession?.authenticated && betaSession.isBetaTester) {
+      setIsBetaTester(true);
+      setBetaTesterName(betaSession.name || 'Beta Tester');
+      return;
+    }
+    
+    // Check for valid admin persistent session (30 days)
     const session = getValidSession(ADMIN_SESSION_KEY);
     if (session?.authenticated && session.role) {
       setIsAuthenticated(true);
@@ -94,11 +107,50 @@ export default function AdminPanel() {
     e.preventDefault();
     setError('');
 
-    if (pin.length < 4) {
-      setError('PIN must be at least 4 digits');
+    // Detect PIN length to route appropriately
+    // 3 digits = Beta Tester
+    // 4 digits = Master Admin (Sidonie)
+    
+    if (pin.length === 3) {
+      // Beta Tester login
+      try {
+        const res = await fetch('/api/auth/verify-beta-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          // Set beta tester session (shorter TTL - 7 days)
+          setSessionWithExpiry(BETA_SESSION_KEY, { 
+            authenticated: true, 
+            isBetaTester: true,
+            name: data.testerName,
+            testerId: data.testerId,
+            accessLevel: data.accessLevel
+          }, 7); // 7 days for beta testers
+          
+          setIsBetaTester(true);
+          setBetaTesterName(data.testerName);
+          setPin('');
+        } else {
+          setError('Invalid beta tester PIN.');
+          setPin('');
+        }
+      } catch (err) {
+        setError('Failed to verify PIN. Please try again.');
+        setPin('');
+      }
       return;
     }
 
+    if (pin.length < 4) {
+      setError('PIN must be 3 digits (beta tester) or 4 digits (admin)');
+      return;
+    }
+
+    // Admin login (4+ digits)
     try {
       const res = await fetch('/api/auth/verify-admin-pin', {
         method: 'POST',
@@ -134,9 +186,19 @@ export default function AdminPanel() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Call server to destroy session
+    try {
+      await fetch('/api/auth/admin-logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Server logout failed:', err);
+    }
+    
     // Clear both old and new session formats
     clearSession(ADMIN_SESSION_KEY);
+    clearSession(BETA_SESSION_KEY);
+    setIsBetaTester(false);
+    setBetaTesterName('');
     localStorage.removeItem('adminAuthenticated');
     localStorage.removeItem('adminRole');
     localStorage.removeItem('adminName');
@@ -177,6 +239,11 @@ export default function AdminPanel() {
     }
   };
 
+  // Show Beta Tester Dashboard if logged in as beta tester
+  if (isBetaTester) {
+    return <BetaTesterDashboard testerName={betaTesterName} onLogout={handleLogout} />;
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
@@ -193,11 +260,11 @@ export default function AdminPanel() {
         <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
           <div className="flex items-center justify-center mb-6">
             <Shield className="w-8 h-8 text-cyan-400 mr-3" />
-            <h1 className="text-2xl font-bold text-white">Admin Access</h1>
+            <h1 className="text-2xl font-bold text-white">ORBIT Access</h1>
           </div>
 
           <p className="text-gray-400 text-sm mb-6 text-center">
-            Admins assigned by the system owner can access this panel
+            Enter your access PIN to continue
           </p>
 
           {!showDeveloperPin ? (
@@ -205,18 +272,21 @@ export default function AdminPanel() {
               <form onSubmit={handlePinSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Please enter 7 digit access code
+                    Access Code
                   </label>
                   <input
                     type="password"
                     value={pin}
                     onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                     maxLength={4}
-                    placeholder="•••••••"
+                    placeholder="•••"
                     className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-cyan-400"
                     autoFocus
                     data-testid="input-admin-pin"
                   />
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    3 digits = Beta Tester • 4 digits = Admin
+                  </p>
                 </div>
 
                 {error && (
@@ -231,7 +301,7 @@ export default function AdminPanel() {
                   className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-lg"
                   data-testid="button-admin-login"
                 >
-                  Login to Admin
+                  Access ORBIT
                 </Button>
               </form>
 
@@ -245,7 +315,7 @@ export default function AdminPanel() {
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-6">
-                Enter your admin PIN
+                Enter your assigned PIN
               </p>
             </>
           ) : (
@@ -393,7 +463,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard({ adminName }: { adminName: string }) {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr' | 'client-portal' | 'ratings' | 'shift-marketplace' | 'credentials' | 'worker-performance'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr' | 'client-portal' | 'ratings' | 'shift-marketplace' | 'credentials' | 'worker-performance' | 'beta-testers'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -723,6 +793,17 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         >
           Worker Performance
         </button>
+        <button
+          onClick={() => setActiveSection('beta-testers')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'beta-testers'
+              ? 'border-yellow-500 text-yellow-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-beta-testers"
+        >
+          🧪 Beta Testers
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -794,6 +875,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       {activeSection === 'credentials' && <CredentialTracker />}
 
       {activeSection === 'worker-performance' && <WorkerPerformanceDashboard />}
+
+      {activeSection === 'beta-testers' && <BetaTesterManagement />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">

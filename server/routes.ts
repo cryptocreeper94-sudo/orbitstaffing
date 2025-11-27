@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { sql, eq, desc, and, count, gte, lte } from "drizzle-orm";
 import bcrypt from "bcrypt";
@@ -11,6 +11,15 @@ import { stripeService } from "./stripeService";
 import { calculatePayroll } from "./payrollCalculator";
 import type { PayrollCalculationInput } from "./payrollCalculator";
 import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
+
+// Session type extension for admin authentication
+declare module 'express-session' {
+  interface SessionData {
+    adminAuthenticated?: boolean;
+    adminName?: string;
+    adminRole?: string;
+  }
+}
 import {
   insertUserSchema,
   insertWorkerSchema,
@@ -35,14 +44,24 @@ import {
   insertWorkerAcceptanceSchema,
   adminLoginLogs,
   insertAdminLoginLogSchema,
+  betaTesters,
+  betaTesterAccessLogs,
+  insertBetaTesterSchema,
 } from "@shared/schema";
 
 // ========================
 // MIDDLEWARE
 // ========================
 function parseJSON(req: Request, res: Response, next: () => void): void {
-  // Express json middleware already handles parsing,
-  // this is a no-op but maintains required structure
+  next();
+}
+
+// Admin authentication middleware - requires valid admin session
+function requireMasterAdmin(req: Request, res: Response, next: NextFunction): void {
+  if (!req.session?.adminAuthenticated || req.session?.adminRole !== 'master') {
+    res.status(403).json({ error: "Master admin authentication required" });
+    return;
+  }
   next();
 }
 
@@ -136,36 +155,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/verify-admin-pin", async (req: Request, res: Response) => {
     try {
       const { userId, pin } = req.body;
-      if (!userId || !pin) {
-        return res.status(400).json({ error: "User ID and PIN required" });
+      
+      if (!pin) {
+        return res.status(400).json({ error: "PIN required" });
       }
       
-      // Get IP address
       const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       const userAgent = req.headers['user-agent'];
       
-      const user = await storage.getUser(userId);
-      if (!user || user.adminPin !== pin) {
-        console.log(`[Admin Login] ❌ Failed login attempt with PIN: ${pin.substring(0, 1)}***`);
-        return res.status(401).json({ error: "Invalid PIN" });
+      // Check for Master Admin PIN (4444 or ADMIN_PIN env variable)
+      const masterPin = process.env.ADMIN_PIN || '4444';
+      if (pin === masterPin) {
+        // Regenerate session to prevent session fixation
+        req.session.regenerate(async (err) => {
+          if (err) {
+            console.error('[Session] Failed to regenerate session:', err);
+            return res.status(500).json({ error: "Session error" });
+          }
+          
+          // Set session for master admin
+          req.session.adminAuthenticated = true;
+          req.session.adminName = 'Sidonie';
+          req.session.adminRole = 'master';
+          
+          // Log successful master admin login
+          await db.insert(adminLoginLogs).values({
+            adminName: 'Sidonie',
+            adminRole: 'master_admin',
+            loginTime: new Date(),
+            ipAddress: ipAddress as string,
+            userAgent: userAgent || 'Unknown',
+          });
+          
+          console.log(`[Master Admin Login] ✅ Sidonie logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          
+          return res.json({ verified: true, role: 'master_admin', name: 'Sidonie' });
+        });
+        return;
       }
       
-      // Log successful login
-      await db.insert(adminLoginLogs).values({
-        adminName: user.fullName || user.email || 'Unknown Admin',
-        adminRole: user.role || 'admin',
-        loginTime: new Date(),
-        ipAddress: ipAddress as string,
-        userAgent: userAgent || 'Unknown',
-      });
+      // Check for user-specific admin PIN
+      if (userId) {
+        const user = await storage.getUser(userId);
+        if (!user || user.adminPin !== pin) {
+          console.log(`[Admin Login] ❌ Failed login attempt with PIN: ${pin.substring(0, 1)}***`);
+          return res.status(401).json({ error: "Invalid PIN" });
+        }
+        
+        // Regenerate session to prevent session fixation
+        req.session.regenerate(async (err) => {
+          if (err) {
+            console.error('[Session] Failed to regenerate session:', err);
+            return res.status(500).json({ error: "Session error" });
+          }
+          
+          // Set session for regular admin
+          req.session.adminAuthenticated = true;
+          req.session.adminName = user.fullName || user.email || 'Unknown Admin';
+          req.session.adminRole = 'admin';
+          
+          // Log successful login
+          await db.insert(adminLoginLogs).values({
+            adminName: user.fullName || user.email || 'Unknown Admin',
+            adminRole: user.role || 'admin',
+            loginTime: new Date(),
+            ipAddress: ipAddress as string,
+            userAgent: userAgent || 'Unknown',
+          });
+          
+          console.log(`[Admin Login] ✅ ${user.fullName || user.email} logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          
+          return res.json({ verified: true, userId: user.id });
+        });
+        return;
+      }
       
-      console.log(`[Admin Login] ✅ ${user.fullName || user.email} logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
-      
-      res.json({ verified: true, userId: user.id });
+      // No userId provided and PIN doesn't match master PIN
+      console.log(`[Admin Login] ❌ Failed login attempt with PIN: ${pin.substring(0, 1)}***`);
+      return res.status(401).json({ error: "Invalid PIN" });
     } catch (error) {
       console.error('[Admin Login] Error:', error);
       res.status(500).json({ error: "Failed to verify PIN" });
     }
+  });
+
+  // Admin logout - destroy server session
+  app.post("/api/auth/admin-logout", (req: Request, res: Response) => {
+    const adminName = req.session?.adminName || 'Unknown';
+    
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('[Admin Logout] Session destruction failed:', err);
+        return res.status(500).json({ error: "Logout failed" });
+      }
+      
+      res.clearCookie('orbit.sid');
+      console.log(`[Admin Logout] ✅ ${adminName} logged out at ${new Date().toLocaleString()}`);
+      res.json({ success: true, message: "Logged out successfully" });
+    });
   });
 
   app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
@@ -220,6 +307,233 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[Latest Login] Error:', error);
       res.status(500).json({ error: "Failed to fetch latest login" });
+    }
+  });
+
+  // ========================
+  // BETA TESTER ROUTES
+  // ========================
+  
+  // Verify 3-digit beta tester PIN
+  app.post("/api/auth/verify-beta-pin", async (req: Request, res: Response) => {
+    try {
+      const { pin } = req.body;
+      
+      if (!pin || pin.length !== 3) {
+        return res.status(400).json({ error: "Invalid PIN format. Must be 3 digits." });
+      }
+      
+      const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+      
+      // Find beta tester by comparing hashed PINs
+      const allTesters = await db.select().from(betaTesters).where(eq(betaTesters.status, 'active'));
+      
+      let matchedTester = null;
+      for (const tester of allTesters) {
+        const pinMatch = await bcrypt.compare(pin, tester.hashedPin);
+        if (pinMatch) {
+          matchedTester = tester;
+          break;
+        }
+      }
+      
+      if (!matchedTester) {
+        console.log(`[Beta Login] ❌ Failed login attempt with PIN: ${pin.substring(0, 1)}**`);
+        return res.status(401).json({ error: "Invalid PIN" });
+      }
+      
+      // Update last login
+      await db.update(betaTesters)
+        .set({ 
+          lastLoginAt: new Date(),
+          loginCount: (matchedTester.loginCount || 0) + 1
+        })
+        .where(eq(betaTesters.id, matchedTester.id));
+      
+      // Log access
+      await db.insert(betaTesterAccessLogs).values({
+        testerId: matchedTester.id,
+        testerName: matchedTester.name,
+        action: 'login',
+        ipAddress: ipAddress as string,
+        userAgent: userAgent || 'Unknown',
+      });
+      
+      console.log(`[Beta Login] ✅ ${matchedTester.name} logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+      
+      res.json({ 
+        verified: true, 
+        testerId: matchedTester.id,
+        testerName: matchedTester.name,
+        accessLevel: matchedTester.accessLevel
+      });
+    } catch (error) {
+      console.error('[Beta Login] Error:', error);
+      res.status(500).json({ error: "Failed to verify PIN" });
+    }
+  });
+  
+  // Get all beta testers (Master Admin only)
+  app.get("/api/beta-testers", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const testers = await db.select().from(betaTesters).orderBy(desc(betaTesters.createdAt));
+      res.json({ testers });
+    } catch (error) {
+      console.error('[Beta Testers] Error:', error);
+      res.status(500).json({ error: "Failed to fetch beta testers" });
+    }
+  });
+  
+  // Create new beta tester (Master Admin only)
+  app.post("/api/beta-testers", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { name, email, pin, notes, accessLevel } = req.body;
+      
+      if (!name || !pin) {
+        return res.status(400).json({ error: "Name and PIN are required" });
+      }
+      
+      if (pin.length !== 3 || !/^\d{3}$/.test(pin)) {
+        return res.status(400).json({ error: "PIN must be exactly 3 digits" });
+      }
+      
+      // Hash the PIN
+      const hashedPin = await bcrypt.hash(pin, 10);
+      
+      const [newTester] = await db.insert(betaTesters).values({
+        name,
+        email: email || null,
+        hashedPin,
+        notes: notes || null,
+        accessLevel: accessLevel || 'full_sandbox',
+        createdBy: 'Sidonie',
+      }).returning();
+      
+      console.log(`[Beta Tester] ✅ Created: ${name} by Sidonie`);
+      
+      res.status(201).json({ 
+        success: true, 
+        tester: { ...newTester, hashedPin: undefined },
+        message: `Beta tester "${name}" created with PIN ${pin}`
+      });
+    } catch (error) {
+      console.error('[Beta Tester Create] Error:', error);
+      res.status(500).json({ error: "Failed to create beta tester" });
+    }
+  });
+  
+  // Update beta tester (Master Admin only)
+  app.put("/api/beta-testers/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { name, email, status, notes, accessLevel, newPin } = req.body;
+      
+      const updateData: any = { updatedAt: new Date() };
+      if (name) updateData.name = name;
+      if (email !== undefined) updateData.email = email;
+      if (status) updateData.status = status;
+      if (notes !== undefined) updateData.notes = notes;
+      if (accessLevel) updateData.accessLevel = accessLevel;
+      
+      // If new PIN provided, hash it
+      if (newPin && newPin.length === 3 && /^\d{3}$/.test(newPin)) {
+        updateData.hashedPin = await bcrypt.hash(newPin, 10);
+      }
+      
+      const [updated] = await db.update(betaTesters)
+        .set(updateData)
+        .where(eq(betaTesters.id, parseInt(id)))
+        .returning();
+      
+      if (!updated) {
+        return res.status(404).json({ error: "Beta tester not found" });
+      }
+      
+      console.log(`[Beta Tester] ✅ Updated: ${updated.name}`);
+      
+      res.json({ success: true, tester: { ...updated, hashedPin: undefined } });
+    } catch (error) {
+      console.error('[Beta Tester Update] Error:', error);
+      res.status(500).json({ error: "Failed to update beta tester" });
+    }
+  });
+  
+  // Delete beta tester (Master Admin only)
+  app.delete("/api/beta-testers/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      // First delete access logs
+      await db.delete(betaTesterAccessLogs).where(eq(betaTesterAccessLogs.testerId, parseInt(id)));
+      
+      // Then delete tester
+      const [deleted] = await db.delete(betaTesters)
+        .where(eq(betaTesters.id, parseInt(id)))
+        .returning();
+      
+      if (!deleted) {
+        return res.status(404).json({ error: "Beta tester not found" });
+      }
+      
+      console.log(`[Beta Tester] ✅ Deleted: ${deleted.name}`);
+      
+      res.json({ success: true, message: `Beta tester "${deleted.name}" deleted` });
+    } catch (error) {
+      console.error('[Beta Tester Delete] Error:', error);
+      res.status(500).json({ error: "Failed to delete beta tester" });
+    }
+  });
+  
+  // Get beta tester access logs (Master Admin only)
+  app.get("/api/beta-testers/logs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const logs = await db.select()
+        .from(betaTesterAccessLogs)
+        .orderBy(desc(betaTesterAccessLogs.timestamp))
+        .limit(100);
+      
+      res.json({ logs });
+    } catch (error) {
+      console.error('[Beta Logs] Error:', error);
+      res.status(500).json({ error: "Failed to fetch access logs" });
+    }
+  });
+  
+  // Generate unique 3-digit PIN (Master Admin only)
+  app.get("/api/beta-testers/generate-pin", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get all existing testers to check for PIN uniqueness
+      const existingTesters = await db.select().from(betaTesters);
+      
+      // Generate a unique 3-digit PIN
+      let newPin = '';
+      let isUnique = false;
+      let attempts = 0;
+      
+      while (!isUnique && attempts < 100) {
+        newPin = String(Math.floor(Math.random() * 900) + 100); // 100-999
+        
+        // Check if PIN is unique by comparing hashes
+        isUnique = true;
+        for (const tester of existingTesters) {
+          const match = await bcrypt.compare(newPin, tester.hashedPin);
+          if (match) {
+            isUnique = false;
+            break;
+          }
+        }
+        attempts++;
+      }
+      
+      if (!isUnique) {
+        return res.status(500).json({ error: "Could not generate unique PIN" });
+      }
+      
+      res.json({ pin: newPin });
+    } catch (error) {
+      console.error('[Generate PIN] Error:', error);
+      res.status(500).json({ error: "Failed to generate PIN" });
     }
   });
 

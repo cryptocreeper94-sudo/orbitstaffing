@@ -1,6 +1,7 @@
 import { type Server } from "node:http";
 
 import express, { type Express, type Request, Response, NextFunction } from "express";
+import session from "express-session";
 import { registerRoutes } from "./routes";
 import { seedComplianceData } from "./seedComplianceData";
 import "./scheduler"; // Auto-starts sync scheduler on module load
@@ -30,6 +31,31 @@ app.use(express.json({
   }
 }));
 app.use(express.urlencoded({ extended: false }));
+
+// Session configuration for admin authentication
+// Production requires SESSION_SECRET. Development uses ADMIN_PIN-derived secret.
+if (!process.env.SESSION_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('[CRITICAL] SESSION_SECRET environment variable is required in production.');
+  }
+  // Development: create deterministic but stronger secret from ADMIN_PIN
+  console.log('[Session] Using ADMIN_PIN-derived session secret for development');
+}
+// Use SESSION_SECRET if set, otherwise derive from ADMIN_PIN with added entropy
+const sessionSecret = process.env.SESSION_SECRET || 
+  `orbit-dev-${process.env.ADMIN_PIN || 'default'}-${process.env.DATABASE_URL?.slice(-8) || 'local'}`;
+app.use(session({
+  secret: sessionSecret,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    sameSite: 'lax',
+  },
+  name: 'orbit.sid',
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();
