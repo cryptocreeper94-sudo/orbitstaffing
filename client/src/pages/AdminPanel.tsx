@@ -27,6 +27,11 @@ import { InvoiceCustomization } from '@/components/InvoiceCustomization';
 import { WorkforceForecastingAI } from '@/components/WorkforceForecastingAI';
 import { MultiCurrencySupport } from '@/components/MultiCurrencySupport';
 import { DocumentOCR } from '@/components/DocumentOCR';
+import { ClientPortal } from '@/components/ClientPortal';
+import { WorkerRatingSystem } from '@/components/WorkerRatingSystem';
+import { ShiftMarketplace } from '@/components/ShiftMarketplace';
+import { CredentialTracker } from '@/components/CredentialTracker';
+import { WorkerPerformanceDashboard } from '@/components/WorkerPerformanceDashboard';
 
 const ADMIN_SESSION_KEY = 'admin';
 
@@ -388,7 +393,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard({ adminName }: { adminName: string }) {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr' | 'client-portal' | 'ratings' | 'shift-marketplace' | 'credentials' | 'worker-performance'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -663,6 +668,61 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         >
           Document OCR
         </button>
+        <button
+          onClick={() => setActiveSection('client-portal')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'client-portal'
+              ? 'border-green-500 text-green-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-client-portal"
+        >
+          Client Portal
+        </button>
+        <button
+          onClick={() => setActiveSection('ratings')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'ratings'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-ratings"
+        >
+          Worker Ratings
+        </button>
+        <button
+          onClick={() => setActiveSection('shift-marketplace')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'shift-marketplace'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-marketplace"
+        >
+          Shift Marketplace
+        </button>
+        <button
+          onClick={() => setActiveSection('credentials')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'credentials'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-credentials"
+        >
+          Credential Tracker
+        </button>
+        <button
+          onClick={() => setActiveSection('worker-performance')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'worker-performance'
+              ? 'border-cyan-500 text-cyan-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-worker-performance"
+        >
+          Worker Performance
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -724,6 +784,16 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       {activeSection === 'currency' && <MultiCurrencySupport />}
 
       {activeSection === 'ocr' && <DocumentOCR />}
+
+      {activeSection === 'client-portal' && <ClientPortal />}
+
+      {activeSection === 'ratings' && <WorkerRatingSystem />}
+
+      {activeSection === 'shift-marketplace' && <ShiftMarketplace />}
+
+      {activeSection === 'credentials' && <CredentialTracker />}
+
+      {activeSection === 'worker-performance' && <WorkerPerformanceDashboard />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">
