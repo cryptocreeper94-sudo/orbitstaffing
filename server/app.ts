@@ -33,17 +33,11 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: false }));
 
 // Session configuration for admin authentication
-// Production requires SESSION_SECRET. Development uses ADMIN_PIN-derived secret.
+// SESSION_SECRET is REQUIRED in all environments
 if (!process.env.SESSION_SECRET) {
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('[CRITICAL] SESSION_SECRET environment variable is required in production.');
-  }
-  // Development: create deterministic but stronger secret from ADMIN_PIN
-  console.log('[Session] Using ADMIN_PIN-derived session secret for development');
+  throw new Error('[CRITICAL] SESSION_SECRET environment variable is required. Please set a secure random string (e.g., run: openssl rand -hex 32)');
 }
-// Use SESSION_SECRET if set, otherwise derive from ADMIN_PIN with added entropy
-const sessionSecret = process.env.SESSION_SECRET || 
-  `orbit-dev-${process.env.ADMIN_PIN || 'default'}-${process.env.DATABASE_URL?.slice(-8) || 'local'}`;
+const sessionSecret = process.env.SESSION_SECRET;
 app.use(session({
   secret: sessionSecret,
   resave: false,
