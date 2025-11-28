@@ -169,6 +169,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
       const userAgent = req.headers['user-agent'];
       
+      // Check for Developer PIN (0424 or ORBIT_DEV_PIN env variable)
+      const devPin = process.env.ORBIT_DEV_PIN || '0424';
+      if (pin === devPin) {
+        // Regenerate session to prevent session fixation
+        req.session.regenerate(async (err) => {
+          if (err) {
+            console.error('[Session] Failed to regenerate session:', err);
+            return res.status(500).json({ error: "Session error" });
+          }
+          
+          // Set session for developer
+          req.session.adminAuthenticated = true;
+          req.session.adminName = 'Developer';
+          req.session.adminRole = 'developer';
+          
+          // Log successful developer login
+          await db.insert(adminLoginLogs).values({
+            adminName: 'Developer',
+            adminRole: 'developer',
+            loginTime: new Date(),
+            ipAddress: ipAddress as string,
+            userAgent: userAgent || 'Unknown',
+          });
+          
+          console.log(`[Developer Login] ✅ Developer logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          
+          return res.json({ verified: true, role: 'developer', name: 'Developer', redirectTo: '/developer' });
+        });
+        return;
+      }
+      
       // Check for Master Admin PIN (4444 or ADMIN_PIN env variable)
       const masterPin = process.env.ADMIN_PIN || '4444';
       if (pin === masterPin) {

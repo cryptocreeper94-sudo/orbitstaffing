@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Lock, Zap, Users, Shield, Sparkles, Rocket, Bot, MapPin, DollarSign, Calendar, FileCheck, Globe } from "lucide-react";
+import { CheckCircle2, Lock, Zap, Users, Shield, Sparkles, Rocket, Bot, MapPin, DollarSign, Calendar, FileCheck, Globe, Smartphone, Briefcase, Building2, Cloud, Wrench } from "lucide-react";
 
 interface SidonieWelcomeModalProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
             </DialogTitle>
           </div>
           <DialogDescription className="text-slate-300 text-lg">
-            Major Updates: 100% Automation System Now Live!
+            Latest Updates: November 2025 - Major New Features!
           </DialogDescription>
         </DialogHeader>
 
@@ -51,12 +51,145 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
             </CardContent>
           </Card>
 
+          {/* NEW: ORBIT Talent Exchange */}
+          <Card className="bg-gradient-to-br from-blue-950/60 to-indigo-950/60 border border-blue-500/50 shadow-lg shadow-blue-500/20">
+            <CardHeader>
+              <CardTitle className="text-blue-300 flex items-center gap-2 text-xl">
+                <Briefcase className="w-6 h-6" />
+                NEW: ORBIT Talent Exchange
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-blue-100 font-semibold text-lg">
+                Two-Way Job Marketplace with Aggressive Competitive Pricing!
+              </p>
+              <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
+                <p className="text-slate-300">💰 <strong className="text-green-400">60-68% Less</strong> than competitors:</p>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  <div className="bg-blue-900/30 rounded p-2 text-center">
+                    <p className="text-lg font-bold text-blue-300">$39</p>
+                    <p className="text-xs text-slate-400">Starter</p>
+                  </div>
+                  <div className="bg-blue-900/30 rounded p-2 text-center">
+                    <p className="text-lg font-bold text-blue-300">$99</p>
+                    <p className="text-xs text-slate-400">Growth</p>
+                  </div>
+                  <div className="bg-blue-900/30 rounded p-2 text-center">
+                    <p className="text-lg font-bold text-blue-300">$249</p>
+                    <p className="text-xs text-slate-400">Professional</p>
+                  </div>
+                </div>
+                <p className="text-slate-300 mt-2">✅ Workers find jobs • Employers find talent</p>
+                <p className="text-slate-300">✅ Full SEO optimization with Schema.org</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* NEW: Self-Service Portals */}
+          <Card className="bg-gradient-to-br from-purple-950/60 to-violet-950/60 border border-purple-500/50 shadow-lg shadow-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-purple-300 flex items-center gap-2 text-xl">
+                <Building2 className="w-6 h-6" />
+                NEW: Self-Service Portals
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-purple-300 font-semibold">
+                    <Users className="w-5 h-5" />
+                    Employee Hub
+                  </div>
+                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
+                    <li>• Full employee data access</li>
+                    <li>• Onboarding acknowledgments</li>
+                    <li>• Schedule & availability</li>
+                    <li>• Pay stubs & documents</li>
+                  </ul>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
+                  <div className="flex items-center gap-2 text-violet-300 font-semibold">
+                    <Building2 className="w-5 h-5" />
+                    Owner Hub
+                  </div>
+                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
+                    <li>• Full admin visibility</li>
+                    <li>• Weather verification</li>
+                    <li>• Business analytics</li>
+                    <li>• Team management</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* NEW: Mobile & UI Improvements */}
+          <Card className="bg-gradient-to-br from-teal-950/60 to-cyan-950/60 border border-teal-500/50">
+            <CardHeader>
+              <CardTitle className="text-teal-300 flex items-center gap-2 text-xl">
+                <Smartphone className="w-6 h-6" />
+                Mobile-Optimized UI
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-slate-900/50 rounded-lg p-3">
+                  <p className="text-teal-300 font-semibold mb-1">Compact Controls</p>
+                  <p className="text-xs text-slate-400">Reduced padding, optimized buttons for mobile</p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-3">
+                  <p className="text-teal-300 font-semibold mb-1">Multi-Column Grids</p>
+                  <p className="text-xs text-slate-400">3-col Talent Exchange, 4-col Sandbox, 2-col Access</p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-3">
+                  <p className="text-teal-300 font-semibold mb-1">Touch-Friendly</p>
+                  <p className="text-xs text-slate-400">Swipe gestures, larger tap targets</p>
+                </div>
+                <div className="bg-slate-900/50 rounded-lg p-3">
+                  <p className="text-teal-300 font-semibold mb-1">Responsive Design</p>
+                  <p className="text-xs text-slate-400">Perfect on any screen size</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* NEW: DarkWave Studios & GarageBot */}
+          <Card className="bg-gradient-to-br from-slate-900/80 to-gray-950/80 border border-slate-600/50">
+            <CardHeader>
+              <CardTitle className="text-slate-300 flex items-center gap-2 text-xl">
+                <Wrench className="w-6 h-6" />
+                DarkWave Studios Products
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/30">
+                  <p className="text-cyan-300 font-semibold">ORBIT Staffing OS</p>
+                  <p className="text-xs text-slate-400 mt-1">Full staffing automation platform</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-amber-500/30">
+                  <p className="text-amber-300 font-semibold">Lot Ops Pro</p>
+                  <p className="text-xs text-slate-400 mt-1">Car dealership operations</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-purple-500/30">
+                  <p className="text-purple-300 font-semibold">Dark Wave Pulse</p>
+                  <p className="text-xs text-slate-400 mt-1">Operational heartbeat platform</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-teal-500/30">
+                  <p className="text-teal-300 font-semibold">GarageBot (Coming Soon)</p>
+                  <p className="text-xs text-slate-400 mt-1">Auto parts AI assistant - 21-slide showcase</p>
+                </div>
+              </div>
+              <p className="text-xs text-slate-500 mt-2">Visit /studio-landing.html for full product showcase</p>
+            </CardContent>
+          </Card>
+
           {/* What's New Section */}
           <Card className="bg-cyan-950/40 border border-cyan-500/30">
             <CardHeader>
               <CardTitle className="text-cyan-300 flex items-center gap-2 text-xl">
                 <Sparkles className="w-6 h-6" />
-                What's New Since Your Last Login
+                Core Automation Features
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -252,51 +385,51 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
             <CardHeader>
               <CardTitle className="text-amber-300 flex items-center gap-2">
                 <Rocket className="w-5 h-5" />
-                Coming in Version 2.0 (Q1 2025)
+                Coming in Version 2.0 (Q1 2026)
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-amber-200">SMS Notifications</h5>
-                    <p className="text-xs text-slate-400">Real-time shift updates via SMS</p>
+                    <h5 className="font-semibold text-green-200">SMS Notifications ✓</h5>
+                    <p className="text-xs text-slate-400">Twilio ready - templates configured</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-amber-200">Mobile App</h5>
-                    <p className="text-xs text-slate-400">iOS & Android with GPS verification</p>
+                    <h5 className="font-semibold text-green-200">Mobile App ✓</h5>
+                    <p className="text-xs text-slate-400">iOS & Android ready for app stores</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-semibold text-amber-200">Stripe Payouts</h5>
-                    <p className="text-xs text-slate-400">Instant worker payments</p>
+                    <p className="text-xs text-slate-400">Coming: Instant worker payments</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-semibold text-amber-200">Blockchain Hallmarks</h5>
-                    <p className="text-xs text-slate-400">Secure asset verification</p>
+                    <p className="text-xs text-slate-400">Coming: On-chain verification</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-amber-200">Equipment Tracking</h5>
-                    <p className="text-xs text-slate-400">PPE management & auto-deduction</p>
+                    <h5 className="font-semibold text-green-200">Equipment Tracking ✓</h5>
+                    <p className="text-xs text-slate-400">PPE & asset management live</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-amber-200">Advanced Analytics</h5>
-                    <p className="text-xs text-slate-400">Detailed workforce intelligence</p>
+                    <h5 className="font-semibold text-green-200">Advanced Analytics ✓</h5>
+                    <p className="text-xs text-slate-400">Dashboard & reports live</p>
                   </div>
                 </div>
               </div>

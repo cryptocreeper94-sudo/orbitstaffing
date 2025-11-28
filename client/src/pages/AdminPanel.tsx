@@ -159,19 +159,36 @@ export default function AdminPanel() {
       });
 
       if (res.ok) {
-        // Set 30-day persistent session
+        const data = await res.json();
+        
+        // Check if this is a developer login - redirect to developer panel
+        if (data.role === 'developer' || data.redirectTo === '/developer') {
+          // Set developer session
+          setSessionWithExpiry('developer', { 
+            authenticated: true, 
+            role: 'developer',
+            name: 'Developer'
+          });
+          localStorage.setItem('developerAuthenticated', 'true');
+          
+          // Redirect to developer panel
+          setLocation('/developer');
+          return;
+        }
+        
+        // Set 30-day persistent session for admin
         setSessionWithExpiry(ADMIN_SESSION_KEY, { 
           authenticated: true, 
           role: 'master_admin',
-          name: 'Sidonie'
+          name: data.name || 'Sidonie'
         });
         // Migrate old flags
         localStorage.setItem('adminAuthenticated', 'true');
         localStorage.setItem('adminRole', 'master_admin');
-        localStorage.setItem('adminName', 'Sidonie');
+        localStorage.setItem('adminName', data.name || 'Sidonie');
         setIsAuthenticated(true);
         setRole('master_admin');
-        setAdminName('Sidonie');
+        setAdminName(data.name || 'Sidonie');
         
         // Always show welcome message on successful login
         setShowWelcomeMessage(true);
