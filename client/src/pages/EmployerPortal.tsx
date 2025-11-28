@@ -728,6 +728,36 @@ export default function EmployerPortal() {
     setLocation("/jobs");
   };
 
+  const handleSubscribe = async (planSlug: string) => {
+    if (!employer) return;
+    
+    try {
+      const endpoint = planSlug === 'pay-per-post' 
+        ? '/api/talent-exchange/billing/pay-per-post'
+        : '/api/talent-exchange/billing/checkout';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          employerId: employer.id, 
+          planSlug,
+          billingCycle: 'monthly'
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+    }
+  };
+
   const handleUpdateStatus = (appId: number, status: string) => {
     updateApplicationMutation.mutate({ appId, status });
   };
@@ -861,6 +891,14 @@ export default function EmployerPortal() {
               data-testid="tab-settings"
             >
               Settings
+            </TabsTrigger>
+            <TabsTrigger
+              value="billing"
+              className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+              data-testid="tab-billing"
+            >
+              <Crown className="w-4 h-4 mr-1" />
+              Plans & Billing
             </TabsTrigger>
           </TabsList>
 
@@ -1154,6 +1192,168 @@ export default function EmployerPortal() {
                 </>
               )
             )}
+          </TabsContent>
+
+          <TabsContent value="billing" className="space-y-6">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
+              <p className="text-slate-400">
+                ORBIT beats Indeed & ZipRecruiter pricing with better candidates
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Pay Per Post */}
+              <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all" data-testid="plan-payperpost">
+                <CardHeader className="text-center pb-2">
+                  <Badge className="bg-slate-600/50 text-slate-300 w-fit mx-auto mb-2">One-Time</Badge>
+                  <CardTitle className="text-white text-lg">Pay Per Post</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold text-white">$19</span>
+                    <span className="text-slate-400">/job</span>
+                  </div>
+                  <p className="text-xs text-green-400 mt-1">vs Indeed's $15/day ($450/mo)</p>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Single job post (30 days)</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 5 candidate contacts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> GPS-verified candidates</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Background check access</li>
+                  </ul>
+                  <Button 
+                    className="w-full bg-slate-600 hover:bg-slate-500"
+                    onClick={() => handleSubscribe('pay-per-post')}
+                    data-testid="button-buy-post"
+                  >
+                    Buy Single Post
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Starter */}
+              <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all" data-testid="plan-starter">
+                <CardHeader className="text-center pb-2">
+                  <Badge className="bg-cyan-600/50 text-cyan-300 w-fit mx-auto mb-2">Starter</Badge>
+                  <CardTitle className="text-white text-lg">Small Business</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold text-white">$39</span>
+                    <span className="text-slate-400">/mo</span>
+                  </div>
+                  <p className="text-xs text-green-400 mt-1">68% less than Indeed</p>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 2 active job posts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 20 candidate contacts/mo</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 30 talent searches</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Performance scores visible</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Email support</li>
+                  </ul>
+                  <Button 
+                    className="w-full bg-cyan-600 hover:bg-cyan-500"
+                    onClick={() => handleSubscribe('starter')}
+                    data-testid="button-subscribe-starter"
+                  >
+                    Get Starter
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Growth - Popular */}
+              <Card className="bg-gradient-to-b from-emerald-900/30 to-slate-800/50 border-2 border-emerald-500/50 hover:border-emerald-400 transition-all relative" data-testid="plan-growth">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-emerald-500 text-white px-3">MOST POPULAR</Badge>
+                </div>
+                <CardHeader className="text-center pb-2 pt-6">
+                  <Badge className="bg-emerald-600/50 text-emerald-300 w-fit mx-auto mb-2">Growth</Badge>
+                  <CardTitle className="text-white text-lg">Growing Teams</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold text-white">$99</span>
+                    <span className="text-slate-400">/mo</span>
+                  </div>
+                  <p className="text-xs text-green-400 mt-1">67% less than ZipRecruiter</p>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> 8 active job posts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> 100 candidate contacts/mo</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Unlimited talent search</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> 2 featured listings/mo</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Interview scheduling</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Analytics dashboard</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Priority support</li>
+                  </ul>
+                  <Button 
+                    className="w-full bg-emerald-600 hover:bg-emerald-500"
+                    onClick={() => handleSubscribe('growth')}
+                    data-testid="button-subscribe-growth"
+                  >
+                    Get Growth
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Enterprise */}
+              <Card className="bg-slate-800/50 border-slate-700/50 hover:border-purple-500/40 transition-all" data-testid="plan-enterprise">
+                <CardHeader className="text-center pb-2">
+                  <Badge className="bg-purple-600/50 text-purple-300 w-fit mx-auto mb-2">Enterprise</Badge>
+                  <CardTitle className="text-white text-lg">High Volume</CardTitle>
+                  <div className="mt-2">
+                    <span className="text-3xl font-bold text-white">$249</span>
+                    <span className="text-slate-400">/mo</span>
+                  </div>
+                  <p className="text-xs text-green-400 mt-1">Enterprise features at startup price</p>
+                </CardHeader>
+                <CardContent className="pt-2">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Unlimited job posts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Unlimited contacts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> 10 featured listings/mo</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> API/ATS integration</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Dedicated manager</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Co-branded hiring page</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Custom reporting</li>
+                  </ul>
+                  <Button 
+                    className="w-full bg-purple-600 hover:bg-purple-500"
+                    onClick={() => handleSubscribe('enterprise')}
+                    data-testid="button-subscribe-enterprise"
+                  >
+                    Get Enterprise
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Value Proposition */}
+            <Card className="bg-gradient-to-r from-cyan-900/20 to-emerald-900/20 border-cyan-500/30 mt-8">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-bold text-white mb-4 text-center">Why ORBIT Beats the Competition</h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl mb-2">🎯</div>
+                    <div className="text-cyan-400 font-semibold">Pre-Vetted Workers</div>
+                    <div className="text-sm text-slate-400">Background checks included</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl mb-2">📍</div>
+                    <div className="text-cyan-400 font-semibold">GPS Verified</div>
+                    <div className="text-sm text-slate-400">Confirmed work history</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl mb-2">⭐</div>
+                    <div className="text-cyan-400 font-semibold">Performance Scores</div>
+                    <div className="text-sm text-slate-400">Real employer ratings</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl mb-2">💰</div>
+                    <div className="text-cyan-400 font-semibold">68% Lower Cost</div>
+                    <div className="text-sm text-slate-400">Better value guaranteed</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

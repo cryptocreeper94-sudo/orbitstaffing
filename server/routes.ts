@@ -3165,6 +3165,317 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ========================
+  // TALENT EXCHANGE BILLING ROUTES (Connected to Stripe)
+  // ========================
+  
+  // Create subscription checkout session
+  app.post("/api/talent-exchange/billing/checkout", async (req: Request, res: Response) => {
+    try {
+      const { employerId, planSlug, billingCycle = 'monthly' } = req.body;
+      
+      if (!employerId || !planSlug) {
+        return res.status(400).json({ error: "Employer ID and plan required" });
+      }
+      
+      // Get employer
+      const employerResult = await db.execute(sql`
+        SELECT id, contact_email, company_name, stripe_customer_id 
+        FROM talent_exchange_employers WHERE id = ${employerId}
+      `);
+      
+      if (employerResult.rows.length === 0) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      const employer = employerResult.rows[0] as any;
+      
+      // Get pricing plan
+      const planResult = await db.execute(sql`
+        SELECT * FROM talent_exchange_pricing_plans WHERE slug = ${planSlug} AND is_active = true
+      `);
+      
+      if (planResult.rows.length === 0) {
+        return res.status(404).json({ error: "Plan not found" });
+      }
+      
+      const plan = planResult.rows[0] as any;
+      
+      // Create or get Stripe customer
+      let stripeCustomerId = employer.stripe_customer_id;
+      if (!stripeCustomerId) {
+        const customer = await stripeService.createCustomer(employer.contact_email, employerId);
+        stripeCustomerId = customer.id;
+        
+        await db.execute(sql`
+          UPDATE talent_exchange_employers 
+          SET stripe_customer_id = ${stripeCustomerId} 
+          WHERE id = ${employerId}
+        `);
+      }
+      
+      // Get the appropriate price ID
+      const priceId = billingCycle === 'annual' 
+        ? plan.stripe_price_id_annual 
+        : plan.stripe_price_id_monthly;
+      
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : 'http://localhost:5000';
+      
+      // Create checkout session
+      const session = await stripeService.createCheckoutSession(
+        stripeCustomerId,
+        priceId,
+        `${baseUrl}/employer/portal?subscription=success&plan=${planSlug}`,
+        `${baseUrl}/employer/portal?subscription=cancelled`
+      );
+      
+      console.log(`[Talent Exchange Billing] Checkout created for ${employer.company_name}: ${plan.name}`);
+      
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+        plan: plan.name,
+        price: billingCycle === 'annual' ? plan.annual_price : plan.monthly_price
+      });
+    } catch (error: any) {
+      console.error("Checkout creation error:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+  
+  // Get employer subscription status
+  app.get("/api/talent-exchange/billing/:employerId/subscription", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT e.subscription_tier, e.subscription_status, e.subscription_expires_at,
+               e.job_post_credits, e.talent_search_credits, e.featured_post_credits,
+               e.active_job_posts_limit, e.talent_searches_per_month,
+               p.name as plan_name, p.monthly_price, p.features
+        FROM talent_exchange_employers e
+        LEFT JOIN talent_exchange_pricing_plans p ON e.subscription_tier = p.slug
+        WHERE e.id = ${employerId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get subscription error:", error);
+      res.status(500).json({ error: "Failed to fetch subscription" });
+    }
+  });
+  
+  // Manage subscription (portal session for upgrades/downgrades/cancellation)
+  app.post("/api/talent-exchange/billing/:employerId/portal", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT stripe_customer_id FROM talent_exchange_employers WHERE id = ${employerId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      const employer = result.rows[0] as any;
+      
+      if (!employer.stripe_customer_id) {
+        return res.status(400).json({ error: "No active subscription" });
+      }
+      
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : 'http://localhost:5000';
+      
+      const session = await stripeService.createCustomerPortalSession(
+        employer.stripe_customer_id,
+        `${baseUrl}/employer/portal`
+      );
+      
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Portal session error:", error);
+      res.status(500).json({ error: "Failed to create portal session" });
+    }
+  });
+  
+  // Handle Talent Exchange subscription webhooks
+  app.post("/api/talent-exchange/billing/webhook", async (req: Request, res: Response) => {
+    try {
+      const event = req.body;
+      
+      switch (event.type) {
+        case 'checkout.session.completed': {
+          const session = event.data.object;
+          const customerId = session.customer;
+          
+          // Find employer by Stripe customer ID
+          const employerResult = await db.execute(sql`
+            SELECT id FROM talent_exchange_employers WHERE stripe_customer_id = ${customerId}
+          `);
+          
+          if (employerResult.rows.length > 0) {
+            const employerId = (employerResult.rows[0] as any).id;
+            
+            // Update subscription status
+            await db.execute(sql`
+              UPDATE talent_exchange_employers 
+              SET subscription_status = 'active',
+                  subscription_started_at = NOW(),
+                  updated_at = NOW()
+              WHERE id = ${employerId}
+            `);
+            
+            console.log(`[Talent Exchange] Subscription activated for employer ${employerId}`);
+          }
+          break;
+        }
+        
+        case 'customer.subscription.updated': {
+          const subscription = event.data.object;
+          const customerId = subscription.customer;
+          const status = subscription.status;
+          
+          await db.execute(sql`
+            UPDATE talent_exchange_employers 
+            SET subscription_status = ${status},
+                updated_at = NOW()
+            WHERE stripe_customer_id = ${customerId}
+          `);
+          break;
+        }
+        
+        case 'customer.subscription.deleted': {
+          const subscription = event.data.object;
+          const customerId = subscription.customer;
+          
+          await db.execute(sql`
+            UPDATE talent_exchange_employers 
+            SET subscription_status = 'cancelled',
+                subscription_tier = 'free',
+                active_job_posts_limit = 0,
+                talent_searches_per_month = 5,
+                updated_at = NOW()
+            WHERE stripe_customer_id = ${customerId}
+          `);
+          
+          console.log(`[Talent Exchange] Subscription cancelled for customer ${customerId}`);
+          break;
+        }
+      }
+      
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+  
+  // Purchase single job post (pay-per-post)
+  app.post("/api/talent-exchange/billing/pay-per-post", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.body;
+      
+      if (!employerId) {
+        return res.status(400).json({ error: "Employer ID required" });
+      }
+      
+      const employerResult = await db.execute(sql`
+        SELECT id, contact_email, company_name, stripe_customer_id 
+        FROM talent_exchange_employers WHERE id = ${employerId}
+      `);
+      
+      if (employerResult.rows.length === 0) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      const employer = employerResult.rows[0] as any;
+      
+      // Create or get Stripe customer
+      let stripeCustomerId = employer.stripe_customer_id;
+      if (!stripeCustomerId) {
+        const customer = await stripeService.createCustomer(employer.contact_email, employerId);
+        stripeCustomerId = customer.id;
+        
+        await db.execute(sql`
+          UPDATE talent_exchange_employers 
+          SET stripe_customer_id = ${stripeCustomerId} 
+          WHERE id = ${employerId}
+        `);
+      }
+      
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : 'http://localhost:5000';
+      
+      // Create one-time payment session for $19
+      const session = await stripeService.createCheckoutSession(
+        stripeCustomerId,
+        'price_payperpost',
+        `${baseUrl}/employer/portal?purchase=success&type=job_post`,
+        `${baseUrl}/employer/portal?purchase=cancelled`
+      );
+      
+      console.log(`[Talent Exchange] Pay-per-post checkout for ${employer.company_name}`);
+      
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+        price: 19
+      });
+    } catch (error: any) {
+      console.error("Pay-per-post error:", error);
+      res.status(500).json({ error: "Failed to create payment session" });
+    }
+  });
+  
+  // Grant free access for ORBIT franchise clients
+  app.post("/api/talent-exchange/billing/grant-franchise-access", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.body;
+      
+      if (!companyId) {
+        return res.status(400).json({ error: "Company ID required" });
+      }
+      
+      // Check if company exists
+      const companyResult = await db.execute(sql`
+        SELECT id, name FROM companies WHERE id = ${companyId}
+      `);
+      
+      if (companyResult.rows.length === 0) {
+        return res.status(404).json({ error: "Company not found" });
+      }
+      
+      const company = companyResult.rows[0] as any;
+      
+      // Update company with Talent Exchange access
+      await db.execute(sql`
+        UPDATE companies 
+        SET talent_exchange_enabled = true,
+            updated_at = NOW()
+        WHERE id = ${companyId}
+      `);
+      
+      console.log(`[Talent Exchange] Granted free access to ORBIT franchise: ${company.name}`);
+      
+      res.json({ 
+        success: true, 
+        message: `Talent Exchange access granted to ${company.name}` 
+      });
+    } catch (error) {
+      console.error("Grant franchise access error:", error);
+      res.status(500).json({ error: "Failed to grant access" });
+    }
+  });
+
   // Get employer profile
   app.get("/api/talent-exchange/employers/:employerId", async (req: Request, res: Response) => {
     try {
