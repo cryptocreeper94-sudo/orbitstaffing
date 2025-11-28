@@ -3815,3 +3815,60 @@ export const insertTalentExchangeAnalyticsSchema = createInsertSchema(talentExch
 
 export type InsertTalentExchangeAnalytics = z.infer<typeof insertTalentExchangeAnalyticsSchema>;
 export type TalentExchangeAnalytics = typeof talentExchangeAnalytics.$inferSelect;
+
+// ========================
+// Report Requests (Self-Service Reports History)
+// ========================
+export const reportRequests = pgTable(
+  "report_requests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Request Info
+    requestedBy: varchar("requested_by").references(() => users.id),
+    requestedByType: varchar("requested_by_type", { length: 50 }), // worker, client, employer, admin
+    requestedByEntityId: varchar("requested_by_entity_id"), // workerId, clientId, etc.
+    
+    // Report Type
+    reportType: varchar("report_type", { length: 100 }).notNull(), // timecard, pay_history, assignment_history, invoice, utilization, payroll_summary, revenue, compliance
+    reportName: varchar("report_name", { length: 255 }).notNull(),
+    
+    // Filters
+    dateRangeStart: date("date_range_start"),
+    dateRangeEnd: date("date_range_end"),
+    filterParams: jsonb("filter_params"), // Additional filters like workerId, clientId, etc.
+    
+    // Output
+    format: varchar("format", { length: 20 }).default("pdf"), // pdf, csv, excel
+    fileUrl: varchar("file_url", { length: 500 }),
+    fileSizeBytes: integer("file_size_bytes"),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, generating, completed, failed
+    errorMessage: text("error_message"),
+    generatedAt: timestamp("generated_at"),
+    expiresAt: timestamp("expires_at"),
+    downloadCount: integer("download_count").default(0),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_report_requests_tenant").on(table.tenantId),
+    requestedByIdx: index("idx_report_requests_requested_by").on(table.requestedBy),
+    typeIdx: index("idx_report_requests_type").on(table.reportType),
+    statusIdx: index("idx_report_requests_status").on(table.status),
+    createdIdx: index("idx_report_requests_created").on(table.createdAt),
+  })
+);
+
+export const insertReportRequestSchema = createInsertSchema(reportRequests).omit({
+  id: true,
+  generatedAt: true,
+  expiresAt: true,
+  downloadCount: true,
+  createdAt: true,
+});
+
+export type InsertReportRequest = z.infer<typeof insertReportRequestSchema>;
+export type ReportRequest = typeof reportRequests.$inferSelect;
