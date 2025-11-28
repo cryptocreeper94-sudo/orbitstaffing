@@ -178,6 +178,261 @@
             margin: 60px 0;
         }
 
+        /* Mobile Products Carousel */
+        .products-carousel-wrapper {
+            display: none;
+            position: relative;
+            margin: 40px 0;
+        }
+
+        .products-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            gap: 15px;
+            padding: 20px 10px;
+        }
+
+        .products-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .products-carousel .product-card {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+            min-height: 420px;
+        }
+
+        .carousel-nav-mobile {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .carousel-nav-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-nav-btn:hover, .carousel-nav-btn:active {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            transform: scale(1.1);
+        }
+
+        .carousel-indicators {
+            display: flex;
+            gap: 8px;
+        }
+
+        .carousel-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-indicator.active {
+            background: #00d4ff;
+            width: 28px;
+            border-radius: 5px;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .testimonials-title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 50px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: rgba(20, 25, 45, 0.6);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            border-color: rgba(0, 212, 255, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.15);
+        }
+
+        .testimonial-quote {
+            font-size: 1.1rem;
+            color: #c0c8d0;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .testimonial-quote::before {
+            content: '"';
+            font-size: 3rem;
+            color: rgba(0, 212, 255, 0.3);
+            display: block;
+            line-height: 0.5;
+            margin-bottom: 10px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #0088aa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .testimonial-info h4 {
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .testimonial-info p {
+            color: #8b95a5;
+            font-size: 0.9rem;
+        }
+
+        /* Feature Highlights Section */
+        .highlights-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.03) 50%, transparent 100%);
+        }
+
+        .highlights-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .highlights-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #8b95a5;
+            margin-bottom: 50px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .highlight-card {
+            background: rgba(20, 25, 45, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .highlight-card:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            background: rgba(20, 25, 45, 0.8);
+        }
+
+        .highlight-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .highlight-stat {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .highlight-label {
+            color: #c0c8d0;
+            font-size: 1rem;
+        }
+
+        /* Stats Banner */
+        .stats-banner {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            padding: 40px 20px;
+            margin: 40px 0;
+            background: rgba(0, 212, 255, 0.05);
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: #8b95a5;
+            margin-top: 5px;
+        }
+
         .product-card {
             background: rgba(20, 25, 45, 0.8);
             border: 2px solid rgba(0, 212, 255, 0.2);
@@ -807,7 +1062,31 @@
             }
 
             .products-grid {
+                display: none;
+            }
+
+            .products-carousel-wrapper {
+                display: block;
+            }
+
+            .testimonials-title, .highlights-title {
+                font-size: 1.8rem;
+            }
+
+            .testimonials-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .highlights-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stats-banner {
+                gap: 25px;
+            }
+
+            .stat-number {
+                font-size: 1.8rem;
             }
 
             .services-title, .contact-title {
@@ -939,6 +1218,173 @@
                         Meet Buddy, your AI parts expert.
                     </p>
                     <button onclick="openGarageBotModal()" class="product-link" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">Explore GarageBot →</button>
+                </div>
+            </div>
+
+            <!-- Mobile Products Carousel -->
+            <div class="products-carousel-wrapper" id="productsCarouselWrapper">
+                <div class="products-carousel" id="productsCarousel">
+                    <div class="product-card">
+                        <img src="/orbit-saturn-logo.png" alt="ORBIT Staffing OS" class="product-logo">
+                        <h3 class="product-title">ORBIT Staffing OS</h3>
+                        <span class="product-status">LIVE NOW</span>
+                        <p class="product-description">
+                            Complete staffing automation platform with GPS-verified check-ins, multi-state payroll compliance, 
+                            real-time scheduling, and blockchain-secured hallmarks.
+                        </p>
+                        <button onclick="openOrbitModal()" class="product-link" style="border: none; cursor: pointer;">Try ORBIT Demo →</button>
+                    </div>
+
+                    <div class="product-card">
+                        <img src="/lotopspro-logo.png" alt="Lot Ops Pro" class="product-logo">
+                        <h3 class="product-title">Lot Ops Pro</h3>
+                        <span class="product-status">LIVE NOW</span>
+                        <p class="product-description">
+                            Advanced operations management suite for enterprise-scale workforce coordination with real-time analytics.
+                        </p>
+                        <button onclick="openOpsModal()" class="product-link" style="border: none; cursor: pointer;">Learn More →</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div class="pulse-logo-container">
+                            <img src="/darkwavepulse-logo.png" alt="Dark Wave Pulse" class="product-logo">
+                            <div class="pulse-line"></div>
+                        </div>
+                        <h3 class="product-title">Dark Wave Pulse</h3>
+                        <span class="product-status">LIVE NOW</span>
+                        <p class="product-description">
+                            Immersive audio-visual journey through industrial beats and synthetic waves.
+                        </p>
+                        <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience the Pulse →</button>
+                    </div>
+
+                    <div class="product-card">
+                        <div style="font-size: 4rem; text-align: center; margin-bottom: 15px;">🔧</div>
+                        <h3 class="product-title" style="color: #20b2aa;">GarageBot</h3>
+                        <span class="product-status coming-soon">COMING SOON</span>
+                        <p class="product-description">
+                            The ultimate auto parts aggregator. Search 20+ retailers to find the right part at the best price.
+                        </p>
+                        <button onclick="openGarageBotModal()" class="product-link" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">Explore GarageBot →</button>
+                    </div>
+                </div>
+                <div class="carousel-nav-mobile">
+                    <button class="carousel-nav-btn" onclick="scrollProductsCarousel(-1)">←</button>
+                    <div class="carousel-indicators" id="productIndicators">
+                        <button class="carousel-indicator active" onclick="scrollToProduct(0)"></button>
+                        <button class="carousel-indicator" onclick="scrollToProduct(1)"></button>
+                        <button class="carousel-indicator" onclick="scrollToProduct(2)"></button>
+                        <button class="carousel-indicator" onclick="scrollToProduct(3)"></button>
+                    </div>
+                    <button class="carousel-nav-btn" onclick="scrollProductsCarousel(1)">→</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Banner -->
+        <div class="stats-banner">
+            <div class="stat-item">
+                <div class="stat-number">4+</div>
+                <div class="stat-label">Products Built</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Automation</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">System Uptime</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">Cost Savings</div>
+            </div>
+        </div>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials-section">
+            <h2 class="testimonials-title">What People Are Saying</h2>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">
+                        The attention to detail and technical execution is outstanding. They took our complex requirements 
+                        and delivered a solution that exceeded expectations. The real-time features are game-changing.
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👨‍💼</div>
+                        <div class="testimonial-info">
+                            <h4>Marcus Chen</h4>
+                            <p>Operations Director, TechFlow Solutions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">
+                        Finally, a development team that understands staffing operations. The GPS verification and 
+                        automated compliance features have saved us countless hours every week.
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👩‍💼</div>
+                        <div class="testimonial-info">
+                            <h4>Sarah Mitchell</h4>
+                            <p>CEO, Premier Workforce Group</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-quote">
+                        From concept to launch in weeks, not months. The platform handles everything from scheduling 
+                        to payroll seamlessly. This is enterprise-grade software at a fraction of the cost.
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👨‍🔧</div>
+                        <div class="testimonial-info">
+                            <h4>David Rodriguez</h4>
+                            <p>Founder, Industrial Staffing Co.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Highlights Section -->
+        <section class="highlights-section">
+            <h2 class="highlights-title">Why Choose DarkWave</h2>
+            <p class="highlights-subtitle">
+                We build production-ready platforms that solve real business problems with cutting-edge technology.
+            </p>
+            <div class="highlights-grid">
+                <div class="highlight-card">
+                    <div class="highlight-icon">🚀</div>
+                    <div class="highlight-stat">10x</div>
+                    <div class="highlight-label">Faster Development</div>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">💰</div>
+                    <div class="highlight-stat">68%</div>
+                    <div class="highlight-label">Lower Than Competitors</div>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">⚡</div>
+                    <div class="highlight-stat">Real-Time</div>
+                    <div class="highlight-label">WebSocket Updates</div>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">🔒</div>
+                    <div class="highlight-stat">Bank-Grade</div>
+                    <div class="highlight-label">Security & Encryption</div>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">📱</div>
+                    <div class="highlight-stat">Mobile-First</div>
+                    <div class="highlight-label">iOS & Android Ready</div>
+                </div>
+                <div class="highlight-card">
+                    <div class="highlight-icon">🎯</div>
+                    <div class="highlight-stat">Custom</div>
+                    <div class="highlight-label">White-Label Solutions</div>
                 </div>
             </div>
         </section>
@@ -1413,6 +1859,64 @@
             if (touchEndX > touchStartX + swipeThreshold) {
                 garageBotPrevSlide();
             }
+        }
+
+        // Mobile Products Carousel
+        let currentProductIndex = 0;
+        const totalProducts = 4;
+
+        function scrollProductsCarousel(direction) {
+            const carousel = document.getElementById('productsCarousel');
+            const cards = carousel.querySelectorAll('.product-card');
+            const cardWidth = cards[0].offsetWidth + 15;
+            
+            currentProductIndex += direction;
+            if (currentProductIndex < 0) currentProductIndex = totalProducts - 1;
+            if (currentProductIndex >= totalProducts) currentProductIndex = 0;
+            
+            carousel.scrollTo({
+                left: currentProductIndex * cardWidth,
+                behavior: 'smooth'
+            });
+            
+            updateProductIndicators();
+        }
+
+        function scrollToProduct(index) {
+            const carousel = document.getElementById('productsCarousel');
+            const cards = carousel.querySelectorAll('.product-card');
+            const cardWidth = cards[0].offsetWidth + 15;
+            
+            currentProductIndex = index;
+            carousel.scrollTo({
+                left: index * cardWidth,
+                behavior: 'smooth'
+            });
+            
+            updateProductIndicators();
+        }
+
+        function updateProductIndicators() {
+            const indicators = document.querySelectorAll('#productIndicators .carousel-indicator');
+            indicators.forEach((ind, i) => {
+                ind.classList.toggle('active', i === currentProductIndex);
+            });
+        }
+
+        // Update indicators on scroll
+        const productsCarousel = document.getElementById('productsCarousel');
+        if (productsCarousel) {
+            productsCarousel.addEventListener('scroll', function() {
+                const cards = productsCarousel.querySelectorAll('.product-card');
+                const cardWidth = cards[0].offsetWidth + 15;
+                const scrollPosition = productsCarousel.scrollLeft;
+                const newIndex = Math.round(scrollPosition / cardWidth);
+                
+                if (newIndex !== currentProductIndex && newIndex >= 0 && newIndex < totalProducts) {
+                    currentProductIndex = newIndex;
+                    updateProductIndicators();
+                }
+            });
         }
 
         createStars();
