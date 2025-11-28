@@ -6,22 +6,32 @@ Quick reference for all development tasks and configurations.
 
 ## GitHub Repository
 
-**Repository URL:** `https://github.com/cryptocreeper94-sudo/orbitstaffing.git`
+**Repository:** ORBIT Staffing OS  
+**Owner:** cryptocreeper94-sudo  
+**URL:** `https://github.com/cryptocreeper94-sudo/orbitstaffing`
 
-**Quick Push to GitHub:**
+---
 
+### Standard Push Commands (Use These Every Time)
+
+**Command 1 - Stage changes:**
 ```bash
 git add .
-git commit -m "your message here"
-git push https://$(git config user.name):$ORBIT_GITHUB_TOKEN@github.com/Cryptocreeper94-sudo/orbitstaffing.git main
 ```
 
-**Or as one-liner:**
+**Command 2 - Commit with message:**
 ```bash
-git add . && git commit -m "your message" && git push https://$(git config user.name):$ORBIT_GITHUB_TOKEN@github.com/Cryptocreeper94-sudo/orbitstaffing.git main
+git commit -m "your message here"
 ```
 
-**GitHub Token:** Stored in Replit Secrets as `ORBIT_GITHUB_TOKEN`
+**Command 3 - Push to GitHub:**
+```bash
+git push
+```
+
+That's it. These three commands handle everything. If you get an error on push, it means the remote needs to be reset (very rare). 
+
+**GitHub Authentication:** Using `ORBIT_GITHUB_TOKEN` (stored in Replit Secrets)
 
 ---
 
