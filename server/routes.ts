@@ -4881,48 +4881,4 @@ async function recalculateWorkerPerformance(workerId: string, tenantId: string) 
   }
 }
 
-// ========================
-// WORKER MATCHING ENGINE
-// ========================
-export async function autoMatchWorkers(request: any, tenantId: string): Promise<any[]> {
-  try {
-    const workers_list = await db.select().from(users).where(eq(users.tenantId, tenantId));
-    const matches: any[] = [];
-
-    for (const worker of workers_list) {
-      let matchScore = 0;
-      const matchReasons: string[] = [];
-
-      const insurance = await storage.getWorkerInsuranceByWorkerId(worker.id, tenantId);
-
-      if (request.skillsRequired && insurance) {
-        matchScore += 20;
-        matchReasons.push("Has active insurance");
-      }
-
-      if (request.workersCompRequired && insurance?.workersCompExpiryDate) {
-        const expiryDate = new Date(insurance.workersCompExpiryDate);
-        if (expiryDate > new Date()) {
-          matchScore += 30;
-          matchReasons.push("Workers comp active");
-        }
-      }
-
-      if (matchScore > 50) {
-        matches.push({
-          requestId: request.id,
-          workerId: worker.id,
-          tenantId,
-          matchScore,
-          matchReason: { reasons: matchReasons },
-          matchStatus: "suggested",
-        });
-      }
-    }
-
-    return matches.sort((a, b) => b.matchScore - a.matchScore).slice(0, 10);
-  } catch (error) {
-    console.error("Auto-matching error:", error);
-    return [];
-  }
-}
+// Worker matching is handled by ./matchingService - see autoMatchWorkers and autoReassignWorkerRequest exports

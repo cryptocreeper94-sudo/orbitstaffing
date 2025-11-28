@@ -914,50 +914,50 @@ export default function Landing() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <PricingCard 
-              tier="Solo/Micro"
-              price="$199"
+              tier="Starter"
+              price="$39"
               period="/month"
-              desc="Just starting out"
-              workers="1-25 workers"
+              desc="68% less than Indeed"
+              workers="1-10 workers"
               features={[
                 "Job posting & matching",
-                "Mobile time tracking",
-                "1-2 active clients",
+                "GPS time tracking",
                 "Basic payroll export",
+                "Employee Hub access",
                 "Email support"
               ]}
               cta="Get Started Free"
             />
             <PricingCard 
-              tier="Small Agency"
-              price="$499"
+              tier="Growth"
+              price="$99"
               period="/month"
-              desc="For established staffing agencies"
-              workers="25-150 workers"
+              desc="67% less than ZipRecruiter"
+              workers="10-50 workers"
               features={[
-                "Everything in Solo",
-                "Unlimited clients",
+                "Everything in Starter",
+                "Owner Hub access",
                 "Full payroll automation",
-                "GPS verification",
-                "Compliance reports",
-                "Priority email support"
+                "Reports API",
+                "Unlimited clients",
+                "Priority support"
               ]}
               cta="Start Free Trial"
               featured
             />
             <PricingCard 
-              tier="Growth Agency"
-              price="$999"
+              tier="Professional"
+              price="$249"
               period="/month"
-              desc="Multi-location scaling"
-              workers="150-500 workers"
+              desc="60% less than Bullhorn"
+              workers="50-200 workers"
               features={[
-                "Everything in Small",
-                "Multi-location management",
+                "Everything in Growth",
+                "Multi-location",
                 "Advanced analytics",
-                "Custom integrations",
-                "Dedicated support",
-                "API access"
+                "Weather verification",
+                "Full API access",
+                "Dedicated support"
               ]}
               cta="Schedule Demo"
             />
@@ -966,9 +966,9 @@ export default function Landing() {
               price="Custom"
               period="pricing"
               desc="White-label & franchises"
-              workers="500+ workers"
+              workers="200+ workers"
               features={[
-                "Everything in Growth",
+                "Everything in Pro",
                 "White-label platform",
                 "Custom branding",
                 "Multi-tenant support",
@@ -1019,7 +1019,7 @@ export default function Landing() {
             <h2 className="text-2xl font-bold font-heading">Flexible Pricing Plans Available</h2>
             <DollarSign className="w-6 h-6 text-primary" />
           </div>
-          <p className="text-muted-foreground text-sm mb-5">Pay as you grow. Monthly plans from $199. Or revenue-share options for franchises.</p>
+          <p className="text-muted-foreground text-sm mb-5">Pay as you grow. Monthly plans from $39. Or revenue-share options for franchises.</p>
           <div className="flex flex-col md:flex-row gap-3 justify-center">
             <Link href="/pricing" className="h-10 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="button-upgrade-now">
               💳 Upgrade Now
