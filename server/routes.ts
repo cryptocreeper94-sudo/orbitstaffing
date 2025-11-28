@@ -3787,7 +3787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { skills, city, state, available, search, page = '1', limit = '20' } = req.query;
       const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
       
-      let whereConditions = [`w.status = 'approved'`, `ps.is_visible_to_employers = true`];
+      let whereConditions = [`(w.status = 'approved' OR w.status = 'active')`];
       
       if (city) whereConditions.push(`LOWER(w.city) = LOWER('${city}')`);
       if (state) whereConditions.push(`w.state = '${state}'`);
