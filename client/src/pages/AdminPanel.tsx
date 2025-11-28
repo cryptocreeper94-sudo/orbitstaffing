@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera, ChevronLeft } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera, ChevronLeft, Search, User, Mail, Phone, FileText, ExternalLink, Cloud, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -463,7 +463,7 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard({ adminName }: { adminName: string }) {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr' | 'client-portal' | 'ratings' | 'shift-marketplace' | 'credentials' | 'worker-performance' | 'beta-testers'>('checklist');
+  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr' | 'client-portal' | 'ratings' | 'shift-marketplace' | 'credentials' | 'worker-performance' | 'beta-testers' | 'user-data-access'>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
@@ -804,6 +804,18 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         >
           🧪 Beta Testers
         </button>
+        <button
+          onClick={() => setActiveSection('user-data-access')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'user-data-access'
+              ? 'border-emerald-500 text-emerald-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-user-data-access"
+        >
+          <Search className="w-4 h-4 inline mr-2" />
+          User Data Access
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -877,6 +889,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       {activeSection === 'worker-performance' && <WorkerPerformanceDashboard />}
 
       {activeSection === 'beta-testers' && <BetaTesterManagement />}
+
+      {activeSection === 'user-data-access' && <UserDataAccessSection />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">
@@ -1037,6 +1051,357 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       </div>
     </div>
       )}
+    </div>
+  );
+}
+
+// ==========================================
+// USER DATA ACCESS SECTION
+// ==========================================
+function UserDataAccessSection() {
+  const [, setLocation] = useLocation();
+  const [employeeSearchOpen, setEmployeeSearchOpen] = useState(true);
+  const [ownerSearchOpen, setOwnerSearchOpen] = useState(false);
+  const [quickLinksOpen, setQuickLinksOpen] = useState(false);
+  const [employeeSearch, setEmployeeSearch] = useState('');
+  const [ownerSearch, setOwnerSearch] = useState('');
+  const [weatherDate, setWeatherDate] = useState(new Date().toISOString().split('T')[0]);
+  const [weatherLocation, setWeatherLocation] = useState('37201');
+
+  const mockEmployees = [
+    { id: 'EMP-2024-0847', name: 'Jason Mitchell', email: 'jason.mitchell@email.com', phone: '(615) 555-0123', position: 'Forklift Operator', status: 'Active' },
+    { id: 'EMP-2024-0512', name: 'Sarah Johnson', email: 'sarah.johnson@email.com', phone: '(615) 555-0456', position: 'Warehouse Associate', status: 'Active' },
+    { id: 'EMP-2024-0293', name: 'Michael Chen', email: 'michael.chen@email.com', phone: '(615) 555-0789', position: 'Assembly Tech', status: 'On Leave' },
+    { id: 'EMP-2024-0184', name: 'Emily Rodriguez', email: 'emily.rodriguez@email.com', phone: '(615) 555-0321', position: 'Quality Control', status: 'Active' },
+  ];
+
+  const mockOwners = [
+    { id: 'OWN-001', name: 'TechCorp Distribution', contact: 'Jennifer Adams', email: 'contact@techcorp.com', phone: '(615) 555-7890', employees: 45 },
+    { id: 'OWN-002', name: 'Nashville Logistics', contact: 'Robert Martinez', email: 'info@nashlogistics.com', phone: '(615) 555-2345', employees: 28 },
+    { id: 'OWN-003', name: 'Metro Warehouse Co', contact: 'Amanda Foster', email: 'ops@metrowarehouse.com', phone: '(615) 555-6789', employees: 62 },
+  ];
+
+  const filteredEmployees = mockEmployees.filter(emp =>
+    emp.name.toLowerCase().includes(employeeSearch.toLowerCase()) ||
+    emp.email.toLowerCase().includes(employeeSearch.toLowerCase()) ||
+    emp.id.toLowerCase().includes(employeeSearch.toLowerCase())
+  );
+
+  const filteredOwners = mockOwners.filter(owner =>
+    owner.name.toLowerCase().includes(ownerSearch.toLowerCase()) ||
+    owner.contact.toLowerCase().includes(ownerSearch.toLowerCase())
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-emerald-900/20 border border-emerald-700/50 rounded-lg p-6">
+        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
+          <Search className="w-5 h-5 text-emerald-400" />
+          Employee & Owner Data Access
+        </h2>
+        <p className="text-gray-300 text-sm">
+          Search and access complete profile data for any employee or company owner. Generate reports and view detailed information.
+        </p>
+      </div>
+
+      <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setEmployeeSearchOpen(!employeeSearchOpen)}
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
+          data-testid="button-toggle-employee-search"
+        >
+          <div className="flex items-center gap-3">
+            <User className="w-5 h-5 text-cyan-400" />
+            <span className="font-bold text-lg">Employee Search</span>
+          </div>
+          {employeeSearchOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+        </button>
+        
+        {employeeSearchOpen && (
+          <div className="px-6 pb-6 border-t border-slate-700">
+            <div className="mt-4 mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={employeeSearch}
+                  onChange={(e) => setEmployeeSearch(e.target.value)}
+                  placeholder="Search by name, email, or employee ID..."
+                  className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
+                  data-testid="input-employee-search"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {filteredEmployees.length === 0 ? (
+                <p className="text-gray-400 text-center py-4">No employees found matching your search</p>
+              ) : (
+                filteredEmployees.map(emp => (
+                  <div
+                    key={emp.id}
+                    className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 hover:border-cyan-500/50 transition-all"
+                    data-testid={`employee-card-${emp.id}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white">{emp.name}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${emp.status === 'Active' ? 'bg-green-600/20 text-green-400' : 'bg-amber-600/20 text-amber-400'}`}>
+                            {emp.status}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-400">{emp.position}</p>
+                        <p className="text-xs text-gray-500">ID: {emp.id}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-600/50"
+                          onClick={() => setLocation('/employee-hub')}
+                          data-testid={`button-view-employee-${emp.id}`}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Hub
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Mail className="w-3 h-3" />
+                        <span>{emp.email}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Phone className="w-3 h-3" />
+                        <span>{emp.phone}</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
+                        data-testid={`button-generate-report-${emp.id}`}
+                      >
+                        <FileText className="w-3 h-3 mr-1" />
+                        Generate Report
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
+                        data-testid={`button-view-timecards-${emp.id}`}
+                      >
+                        View Timecards
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
+                        data-testid={`button-view-pay-history-${emp.id}`}
+                      >
+                        Pay History
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setOwnerSearchOpen(!ownerSearchOpen)}
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
+          data-testid="button-toggle-owner-search"
+        >
+          <div className="flex items-center gap-3">
+            <Building2 className="w-5 h-5 text-purple-400" />
+            <span className="font-bold text-lg">Company / Owner Search</span>
+          </div>
+          {ownerSearchOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+        </button>
+        
+        {ownerSearchOpen && (
+          <div className="px-6 pb-6 border-t border-slate-700">
+            <div className="mt-4 mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={ownerSearch}
+                  onChange={(e) => setOwnerSearch(e.target.value)}
+                  placeholder="Search by company name or contact name..."
+                  className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-400"
+                  data-testid="input-owner-search"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {filteredOwners.length === 0 ? (
+                <p className="text-gray-400 text-center py-4">No companies found matching your search</p>
+              ) : (
+                filteredOwners.map(owner => (
+                  <div
+                    key={owner.id}
+                    className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 hover:border-purple-500/50 transition-all"
+                    data-testid={`owner-card-${owner.id}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <span className="font-bold text-white text-lg">{owner.name}</span>
+                        <p className="text-sm text-gray-400">Contact: {owner.contact}</p>
+                        <p className="text-xs text-gray-500">{owner.employees} employees assigned</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-600/50"
+                          onClick={() => setLocation('/owner-hub')}
+                          data-testid={`button-view-owner-${owner.id}`}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Hub
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-4 text-sm">
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Mail className="w-3 h-3" />
+                        <span>{owner.email}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-gray-400">
+                        <Phone className="w-3 h-3" />
+                        <span>{owner.phone}</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
+                        data-testid={`button-company-report-${owner.id}`}
+                      >
+                        <FileText className="w-3 h-3 mr-1" />
+                        Company Report
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
+                        data-testid={`button-employee-roster-${owner.id}`}
+                      >
+                        Employee Roster
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
+                        data-testid={`button-billing-history-${owner.id}`}
+                      >
+                        Billing History
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+        <button
+          onClick={() => setQuickLinksOpen(!quickLinksOpen)}
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
+          data-testid="button-toggle-quick-links"
+        >
+          <div className="flex items-center gap-3">
+            <ExternalLink className="w-5 h-5 text-amber-400" />
+            <span className="font-bold text-lg">Quick Links & Weather Verification</span>
+          </div>
+          {quickLinksOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+        </button>
+        
+        {quickLinksOpen && (
+          <div className="px-6 pb-6 border-t border-slate-700">
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Button
+                className="bg-cyan-600 hover:bg-cyan-700 h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation('/employee-hub')}
+                data-testid="button-quick-employee-hub"
+              >
+                <User className="w-6 h-6" />
+                <span>Employee Hub</span>
+                <span className="text-xs opacity-75">View any worker's portal</span>
+              </Button>
+              <Button
+                className="bg-purple-600 hover:bg-purple-700 h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation('/owner-hub')}
+                data-testid="button-quick-owner-hub"
+              >
+                <Building2 className="w-6 h-6" />
+                <span>Owner Hub</span>
+                <span className="text-xs opacity-75">View any company's portal</span>
+              </Button>
+              <Button
+                className="bg-amber-600 hover:bg-amber-700 h-auto py-4 flex flex-col items-center gap-2"
+                onClick={() => setLocation('/gps-clockin')}
+                data-testid="button-quick-gps-verification"
+              >
+                <Cloud className="w-6 h-6" />
+                <span>GPS Check-In</span>
+                <span className="text-xs opacity-75">Verify worker locations</span>
+              </Button>
+            </div>
+
+            <div className="mt-6 bg-slate-700/50 rounded-lg p-4 border border-slate-600">
+              <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
+                <Cloud className="w-5 h-5 text-sky-400" />
+                Weather Verification Tool
+              </h4>
+              <p className="text-sm text-gray-400 mb-4">
+                Check historical weather data for any date/location to verify timecard accuracy.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">Date</label>
+                  <input
+                    type="date"
+                    value={weatherDate}
+                    onChange={(e) => setWeatherDate(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm"
+                    data-testid="input-weather-date"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-gray-400 block mb-1">ZIP Code</label>
+                  <input
+                    type="text"
+                    value={weatherLocation}
+                    onChange={(e) => setWeatherLocation(e.target.value.slice(0, 5))}
+                    placeholder="37201"
+                    maxLength={5}
+                    className="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded text-white text-sm"
+                    data-testid="input-weather-zip"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    className="w-full bg-sky-600 hover:bg-sky-700"
+                    data-testid="button-check-weather"
+                  >
+                    Check Weather
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

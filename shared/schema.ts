@@ -3872,3 +3872,213 @@ export const insertReportRequestSchema = createInsertSchema(reportRequests).omit
 
 export type InsertReportRequest = z.infer<typeof insertReportRequestSchema>;
 export type ReportRequest = typeof reportRequests.$inferSelect;
+
+// ========================
+// Employee Documents (Tax forms, certifications, ID copies)
+// ========================
+export const employeeDocuments = pgTable(
+  "employee_documents",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+
+    documentType: varchar("document_type", { length: 100 }).notNull(),
+    documentName: varchar("document_name", { length: 255 }).notNull(),
+    fileUrl: varchar("file_url", { length: 500 }),
+    fileSize: integer("file_size"),
+    mimeType: varchar("mime_type", { length: 100 }),
+
+    expirationDate: date("expiration_date"),
+    isVerified: boolean("is_verified").default(false),
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    verifiedAt: timestamp("verified_at"),
+
+    notes: text("notes"),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_employee_docs_tenant").on(table.tenantId),
+    workerIdx: index("idx_employee_docs_worker").on(table.workerId),
+    typeIdx: index("idx_employee_docs_type").on(table.documentType),
+  })
+);
+
+export const insertEmployeeDocumentSchema = createInsertSchema(employeeDocuments).omit({
+  id: true,
+  verifiedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEmployeeDocument = z.infer<typeof insertEmployeeDocumentSchema>;
+export type EmployeeDocument = typeof employeeDocuments.$inferSelect;
+
+// ========================
+// Employee Acknowledgments (Workers rights, insurance, policies)
+// ========================
+export const employeeAcknowledgments = pgTable(
+  "employee_acknowledgments",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+
+    acknowledgmentType: varchar("acknowledgment_type", { length: 100 }).notNull(),
+    documentVersion: varchar("document_version", { length: 20 }),
+    documentUrl: varchar("document_url", { length: 500 }),
+
+    acknowledgedAt: timestamp("acknowledged_at"),
+    signatureName: varchar("signature_name", { length: 255 }),
+    signatureIpAddress: varchar("signature_ip_address", { length: 100 }),
+
+    expiresAt: timestamp("expires_at"),
+    isActive: boolean("is_active").default(true),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_employee_ack_tenant").on(table.tenantId),
+    workerIdx: index("idx_employee_ack_worker").on(table.workerId),
+    typeIdx: index("idx_employee_ack_type").on(table.acknowledgmentType),
+  })
+);
+
+export const insertEmployeeAcknowledgmentSchema = createInsertSchema(employeeAcknowledgments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEmployeeAcknowledgment = z.infer<typeof insertEmployeeAcknowledgmentSchema>;
+export type EmployeeAcknowledgment = typeof employeeAcknowledgments.$inferSelect;
+
+// ========================
+// Insurance Plans (Available insurance/indemnity plans)
+// ========================
+export const insurancePlans = pgTable(
+  "insurance_plans",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+
+    planName: varchar("plan_name", { length: 255 }).notNull(),
+    planType: varchar("plan_type", { length: 100 }).notNull(),
+    provider: varchar("provider", { length: 255 }),
+    description: text("description"),
+
+    premiumAmount: decimal("premium_amount", { precision: 10, scale: 2 }),
+    premiumFrequency: varchar("premium_frequency", { length: 50 }),
+    deductible: decimal("deductible", { precision: 10, scale: 2 }),
+    coverageLimit: decimal("coverage_limit", { precision: 12, scale: 2 }),
+
+    effectiveDate: date("effective_date"),
+    expirationDate: date("expiration_date"),
+    isActive: boolean("is_active").default(true),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_insurance_plans_tenant").on(table.tenantId),
+    typeIdx: index("idx_insurance_plans_type").on(table.planType),
+    activeIdx: index("idx_insurance_plans_active").on(table.isActive),
+  })
+);
+
+export const insertInsurancePlanSchema = createInsertSchema(insurancePlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertInsurancePlan = z.infer<typeof insertInsurancePlanSchema>;
+export type InsurancePlan = typeof insurancePlans.$inferSelect;
+
+// ========================
+// Insurance Enrollments (Employee insurance selections)
+// ========================
+export const insuranceEnrollments = pgTable(
+  "insurance_enrollments",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    planId: varchar("plan_id").notNull().references(() => insurancePlans.id),
+
+    enrollmentDate: date("enrollment_date"),
+    effectiveDate: date("effective_date"),
+    terminationDate: date("termination_date"),
+
+    status: varchar("status", { length: 50 }).default("active"),
+    employeeContribution: decimal("employee_contribution", { precision: 10, scale: 2 }),
+    employerContribution: decimal("employer_contribution", { precision: 10, scale: 2 }),
+
+    beneficiaryName: varchar("beneficiary_name", { length: 255 }),
+    beneficiaryRelationship: varchar("beneficiary_relationship", { length: 100 }),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_insurance_enroll_tenant").on(table.tenantId),
+    workerIdx: index("idx_insurance_enroll_worker").on(table.workerId),
+    planIdx: index("idx_insurance_enroll_plan").on(table.planId),
+    statusIdx: index("idx_insurance_enroll_status").on(table.status),
+  })
+);
+
+export const insertInsuranceEnrollmentSchema = createInsertSchema(insuranceEnrollments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertInsuranceEnrollment = z.infer<typeof insertInsuranceEnrollmentSchema>;
+export type InsuranceEnrollment = typeof insuranceEnrollments.$inferSelect;
+
+// ========================
+// Weather Logs (Weather data by date/location for verification)
+// ========================
+export const weatherLogs = pgTable(
+  "weather_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+
+    logDate: date("log_date").notNull(),
+    latitude: decimal("latitude", { precision: 9, scale: 6 }),
+    longitude: decimal("longitude", { precision: 9, scale: 6 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+
+    temperature: decimal("temperature", { precision: 5, scale: 2 }),
+    feelsLike: decimal("feels_like", { precision: 5, scale: 2 }),
+    humidity: integer("humidity"),
+    windSpeed: decimal("wind_speed", { precision: 5, scale: 2 }),
+    conditions: varchar("conditions", { length: 100 }),
+    precipitation: decimal("precipitation", { precision: 5, scale: 2 }),
+
+    dataSource: varchar("data_source", { length: 100 }),
+    rawData: jsonb("raw_data"),
+
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_weather_logs_tenant").on(table.tenantId),
+    dateIdx: index("idx_weather_logs_date").on(table.logDate),
+    locationIdx: index("idx_weather_logs_location").on(table.city, table.state),
+  })
+);
+
+export const insertWeatherLogSchema = createInsertSchema(weatherLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertWeatherLog = z.infer<typeof insertWeatherLogSchema>;
+export type WeatherLog = typeof weatherLogs.$inferSelect;

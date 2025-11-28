@@ -11,6 +11,9 @@ export interface SessionData {
   authenticated: boolean;
   role?: string;
   name?: string;
+  isBetaTester?: boolean;
+  testerId?: string;
+  accessLevel?: string;
   timestamp: number;
   expiresAt: number;
 }
@@ -26,14 +29,15 @@ export const isMobileDevice = (): boolean => {
 };
 
 /**
- * Set persistent session with 30-day expiry
+ * Set persistent session with configurable expiry (default 30 days)
  */
 export const setSessionWithExpiry = (
   sessionKey: string,
-  data: Omit<SessionData, 'timestamp' | 'expiresAt'>
+  data: Omit<SessionData, 'timestamp' | 'expiresAt'>,
+  expiryDays: number = 30
 ): void => {
   const now = Date.now();
-  const expiresAt = now + THIRTY_DAYS_MS;
+  const expiresAt = now + (expiryDays * 24 * 60 * 60 * 1000);
   
   const sessionData: SessionData = {
     ...data,

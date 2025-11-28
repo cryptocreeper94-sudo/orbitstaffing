@@ -52,6 +52,8 @@ import EmployerLogin from "@/pages/EmployerLogin";
 import EmployerRegister from "@/pages/EmployerRegister";
 import TalentPool from "@/pages/TalentPool";
 import AdminTalentExchange from "@/pages/AdminTalentExchange";
+import EmployeeHub from "@/pages/EmployeeHub";
+import OwnerHub from "@/pages/OwnerHub";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -117,6 +119,9 @@ function Router() {
       <Route path="/employer/portal" component={EmployerPortal} />
       <Route path="/employer/login" component={EmployerLogin} />
       <Route path="/employer/register" component={EmployerRegister} />
+      <Route path="/employee-hub" component={EmployeeHub} />
+      <Route path="/my-hub" component={EmployeeHub} />
+      <Route path="/owner-hub" component={OwnerHub} />
       <Route component={NotFound} />
     </Switch>
   );
