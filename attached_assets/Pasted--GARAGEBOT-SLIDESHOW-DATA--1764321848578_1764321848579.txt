@@ -1,0 +1,302 @@
+// ===========================================
+// GARAGEBOT SLIDESHOW DATA
+// ===========================================
+
+// === PRODUCT METADATA ===
+const garageBotProduct = {
+  name: "GarageBot",
+  tagline: "Right Part. First Time. Every Engine.",
+  description: "GarageBot is the ultimate auto parts aggregator that searches 20+ retailers to find the right part at the best price for every vehicle with an engine - cars, trucks, motorcycles, boats, ATVs, RVs, classics, exotics, and more.",
+  gradient: "from-cyan-500 to-teal-600",
+  icon: "Wrench" // or Bot, Car, etc.
+};
+
+// === FORMAT 1: SLIDE CONTENT (ProductSlideshow) ===
+const slideContent = [
+  {
+    title: "GarageBot",
+    subtitle: "Right Part. First Time. Every Engine.",
+    content: "The only parts platform built for every vehicle with an engine. Search 20+ retailers instantly.",
+    category: "INTRODUCTION"
+  },
+  {
+    title: "The Vision",
+    content: "Eliminate the frustration of parts hunting. One search, every retailer, every vehicle type - from daily drivers to rare classics.",
+    category: "VISION"
+  },
+  {
+    title: "Universal Vehicle Coverage",
+    content: "Cars, trucks, motorcycles, ATVs, boats, RVs, diesel rigs, classics, exotics, kit cars, and Chinese imports - all in one platform.",
+    category: "CORE FEATURE"
+  },
+  {
+    title: "20+ Retailer Network",
+    content: "Aggregates inventory from AutoZone, O'Reilly, RockAuto, Advance Auto, Amazon, NAPA, Summit Racing, and specialty suppliers.",
+    category: "CORE FEATURE"
+  },
+  {
+    title: "Meet Buddy - Your AI Parts Expert",
+    content: "Natural language parts search powered by AI. Describe your problem, snap a photo, or use voice - Buddy finds the right part.",
+    category: "CORE FEATURE"
+  },
+  {
+    title: "Smart Photo Recognition",
+    content: "Upload a photo of any part and Buddy identifies it instantly. Works for worn parts, damaged components, and mystery pieces.",
+    category: "AUTOMATION"
+  },
+  {
+    title: "VIN Decode Integration",
+    content: "Scan or enter your VIN for guaranteed fitment. NHTSA-verified decoding ensures every part matches your exact vehicle.",
+    category: "AUTOMATION"
+  },
+  {
+    title: "My Garage - Fleet Management",
+    content: "Save unlimited vehicles with full specs. Track maintenance schedules, get AI-powered service reminders, and build maintenance history.",
+    category: "CORE FEATURE"
+  },
+  {
+    title: "Local Pickup Priority",
+    content: "Need it now? GarageBot shows local store availability first, with real-time stock status and same-day pickup options.",
+    category: "CORE FEATURE"
+  },
+  {
+    title: "Price Comparison Engine",
+    content: "Compare prices across all retailers instantly. See shipping costs, estimated delivery, and total landed cost before you buy.",
+    category: "ANALYTICS"
+  },
+  {
+    title: "DIY Repair Guides",
+    content: "AI-generated step-by-step repair instructions tailored to your specific vehicle. Includes tool lists and difficulty ratings.",
+    category: "AUTOMATION"
+  },
+  {
+    title: "Mechanic Cost Estimates",
+    content: "Get instant labor estimates for any repair. Compare DIY savings vs professional shop costs in your local market.",
+    category: "ANALYTICS"
+  },
+  {
+    title: "Proactive Maintenance Alerts",
+    content: "Buddy monitors your vehicles and sends timely reminders for oil changes, tire rotations, seasonal prep, and recall notices.",
+    category: "AUTOMATION"
+  },
+  {
+    title: "Insurance Comparison",
+    content: "Compare auto, motorcycle, boat, and RV insurance quotes from multiple carriers. Integrated Insurify partnership for instant quotes.",
+    category: "INTEGRATION"
+  },
+  {
+    title: "Genesis Hallmark NFT",
+    content: "Early adopters receive blockchain-verified vehicle badges. Permanent proof of ownership, service history, and platform loyalty.",
+    category: "INTEGRATION"
+  },
+  {
+    title: "Shop Portal for Mechanics",
+    content: "Professional-grade tools for repair shops. Bulk ordering, customer vehicle management, and wholesale pricing access.",
+    category: "ENTERPRISE"
+  },
+  {
+    title: "Mobile-First Design",
+    content: "Full functionality on any device. Scan VINs, snap photos, and order parts from your phone in the garage or on the road.",
+    category: "MOBILE"
+  },
+  {
+    title: "Secure Checkout",
+    content: "Stripe-powered payments with saved payment methods. Future support for cryptocurrency via Coinbase Commerce.",
+    category: "SECURITY"
+  },
+  {
+    title: "Affiliate Rewards",
+    content: "Earn commissions by sharing deals. Track referrals, view earnings, and get paid monthly through our affiliate program.",
+    category: "INTEGRATION"
+  },
+  {
+    title: "GarageBot Pro",
+    subtitle: "$2.99/month",
+    content: "Priority AI responses, unlimited photo IDs, exclusive deals, early access to features, and premium support.",
+    category: "PRICING"
+  },
+  {
+    title: "Start Your Garage Today",
+    content: "Join thousands of vehicle owners who trust GarageBot to find the right part, first time, every time.",
+    category: "INTRODUCTION"
+  }
+];
+
+// === FORMAT 2: SLIDES DATA (HomeSlideshow) ===
+const slidesData = [
+  {
+    id: 1,
+    title: "Opening Hook",
+    section: "Opening & Hook",
+    duration: 8,
+    content: {
+      type: "hero",
+      headline: "Right Part. First Time. Every Engine.",
+      subheadline: "The Ultimate Auto Parts Aggregator",
+      description: "GarageBot searches 20+ retailers to find the perfect part for any vehicle - cars, trucks, motorcycles, boats, ATVs, RVs, and more."
+    }
+  },
+  {
+    id: 2,
+    title: "The Problem",
+    section: "Problem Statement",
+    duration: 8,
+    content: {
+      type: "problem",
+      headline: "Parts Hunting is Broken",
+      bullets: [
+        "Searching multiple websites wastes hours of your time",
+        "Wrong parts lead to costly returns and project delays",
+        "Specialty vehicles have scattered, hard-to-find inventory",
+        "No single source covers cars, boats, ATVs, and motorcycles",
+        "Local availability is impossible to check efficiently"
+      ]
+    }
+  },
+  {
+    id: 3,
+    title: "The Solution",
+    section: "Solution Overview",
+    duration: 8,
+    content: {
+      type: "solution",
+      headline: "One Search. Every Retailer. Every Vehicle.",
+      description: "GarageBot aggregates 20+ retailers into one powerful search. Find parts for any vehicle with an engine - guaranteed fitment, best prices, local pickup options."
+    }
+  },
+  {
+    id: 4,
+    title: "Meet Buddy",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: "feature",
+      headline: "Buddy - Your AI Parts Expert",
+      description: "Tell Buddy what you need in plain English, snap a photo of a worn part, or describe your vehicle's symptoms. Advanced AI finds the exact part you need.",
+      bullets: [
+        "Natural language parts search",
+        "Photo recognition for any component",
+        "Voice-activated hands-free search",
+        "Context-aware recommendations"
+      ]
+    }
+  },
+  {
+    id: 5,
+    title: "Universal Coverage",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: "feature",
+      headline: "Every Vehicle With an Engine",
+      bullets: [
+        "Cars, Trucks & SUVs - domestic and import",
+        "Motorcycles, ATVs & UTVs - all makes",
+        "Boats, PWC & Marine engines",
+        "RVs, Motorhomes & Trailers",
+        "Classics, Exotics & Kit Cars",
+        "Diesel, Commercial & Small Engines"
+      ]
+    }
+  },
+  {
+    id: 6,
+    title: "Retailer Network",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: "feature",
+      headline: "20+ Retailers, One Search",
+      bullets: [
+        "AutoZone, O'Reilly, Advance Auto, NAPA",
+        "RockAuto, Amazon Automotive, eBay Motors",
+        "Summit Racing, Jegs, 4 Wheel Parts",
+        "West Marine, VMC Chinese Parts",
+        "Specialty suppliers for exotics and classics"
+      ]
+    }
+  },
+  {
+    id: 7,
+    title: "My Garage",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: "feature",
+      headline: "Your Complete Vehicle Hub",
+      description: "Save all your vehicles in one place. Track maintenance, get AI-powered service reminders, and find parts instantly with saved specs.",
+      bullets: [
+        "Unlimited vehicle profiles",
+        "VIN decode for guaranteed fitment",
+        "Maintenance schedule tracking",
+        "Service history records"
+      ]
+    }
+  },
+  {
+    id: 8,
+    title: "Smart Features",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: "feature",
+      headline: "Intelligence Built In",
+      bullets: [
+        "DIY repair guides tailored to your vehicle",
+        "Mechanic labor cost estimates",
+        "Proactive maintenance alerts",
+        "Recall notifications",
+        "Seasonal prep reminders"
+      ]
+    }
+  },
+  {
+    id: 9,
+    title: "Comparison",
+    section: "Comparison",
+    duration: 8,
+    content: {
+      type: "comparison",
+      headline: "GarageBot vs The Old Way",
+      bullets: [
+        "One search vs 10+ websites",
+        "AI assistance vs guesswork",
+        "All vehicles vs cars only",
+        "Local pickup vs shipping only",
+        "Guaranteed fit vs hope and returns"
+      ]
+    }
+  },
+  {
+    id: 10,
+    title: "Pro Subscription",
+    section: "Pricing",
+    duration: 8,
+    content: {
+      type: "feature",
+      headline: "GarageBot Pro - $2.99/month",
+      bullets: [
+        "Priority AI responses - no waiting",
+        "Unlimited photo identifications",
+        "Exclusive Pro-only deals",
+        "Early access to new features",
+        "Premium support channel"
+      ]
+    }
+  },
+  {
+    id: 11,
+    title: "Call to Action",
+    section: "Closing",
+    duration: 8,
+    content: {
+      type: "cta",
+      headline: "Start Finding Parts Smarter",
+      subheadline: "Join GarageBot Today",
+      description: "Create your garage, add your vehicles, and let Buddy help you find the right part - first time, every time."
+    }
+  }
+];
+
+// === EXPORT ===
+export { garageBotProduct, slideContent, slidesData };
