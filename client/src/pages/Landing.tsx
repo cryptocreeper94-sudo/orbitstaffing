@@ -22,6 +22,7 @@ import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
 import { HomeSlideshow } from "@/components/HomeSlideshow";
 import { Accordion } from "@/components/Accordion";
 import { V2SignupModal } from "@/components/V2SignupModal";
+import { ISO20022Banner } from "@/components/ISO20022Banner";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
@@ -126,6 +127,9 @@ export default function Landing() {
           </nav>
         </div>
       </header>
+
+      {/* ISO 20022 BANKING ROADMAP BANNER */}
+      <ISO20022Banner />
 
       {/* TALENT EXCHANGE SECTION */}
       <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-4 sm:py-8">

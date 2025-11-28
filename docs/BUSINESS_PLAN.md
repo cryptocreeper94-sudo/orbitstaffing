@@ -119,13 +119,22 @@ Additional products in development:
 
 **Year 1 Projection:** $50K
 
-### 4.4 Total Year 1 Revenue Projection
+### 4.4 ISO 20022 Enterprise Banking (Coming Q3-Q4 2026)
+- Enterprise tier: $5K-10K/month
+- Targets: Fortune 500 companies, enterprises
+- Revenue per customer: Avg $7.5K/mo = $90K/year per customer
+- Year 1 Projection (if launched): 1-2 enterprise customers = $90-180K
+
+### 4.5 Total Year 1 Revenue Projection
 | Stream | Amount |
 |--------|--------|
 | Subscriptions | $850K |
 | Franchising | $150K |
 | Usage fees | $50K |
-| **Total** | **$1.05M** |
+| Enterprise Banking (Q3-Q4) | $0-180K |
+| **Total** | **$1.05M - $1.23M** |
+
+**Year 2 Projection (with ISO 20022):** $2M+ ARR with 5-10 enterprise customers
 
 ---
 

@@ -153,6 +153,20 @@ Sign up for V2 updates at **orbitstaffing.net** to get early access to:
 5. **Native Mobile App** - iOS & Android with offline mode
 6. **Blockchain Credentials** - Portable, verified worker certifications
 
+## Enterprise Features (Q3-Q4 2026)
+
+### ISO 20022 Banking Compliance ⭐
+**Coming Q3-Q4 2026** — Direct bank connectivity for Fortune 500 enterprises
+
+ORBIT will become **ISO 20022 compliant**, enabling:
+- Direct SWIFT/ACH network integration
+- Enterprise-grade payroll processing
+- Automated bank reconciliation
+- Treasury system compatibility
+- **Positions ORBIT as enterprise platform competitive with ADP/Workday**
+
+This opens the **$50B+ enterprise staffing market** and demonstrates technical credibility at the highest level.
+
 ---
 
 ## Investment Opportunity

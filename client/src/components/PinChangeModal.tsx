@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, CheckCircle2, AlertCircle, Shield } from "lucide-react";
+import { Lock, CheckCircle2, AlertCircle, Shield, TrendingUp, Zap } from "lucide-react";
 
 interface PinChangeModalProps {
   isOpen: boolean;
@@ -188,6 +188,25 @@ export function PinChangeModal({ isOpen, onClose, onSkip, adminName }: PinChange
             You can also change your PIN later from Settings.
           </p>
         </form>
+
+        {/* ISO 20022 Enterprise Roadmap Info */}
+        <div className="border-t border-slate-700/50 pt-4 mt-4">
+          <div className="bg-blue-950/40 border border-blue-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <TrendingUp className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-blue-300 font-semibold text-sm">Enterprise Roadmap: ISO 20022 Banking</p>
+                <p className="text-slate-400 text-xs mt-2">
+                  Coming Q3-Q4 2026: Direct bank integration, Fortune 500 payroll processing, and SWIFT network connectivity. Enterprise credibility tier: $5K-10K/mo.
+                </p>
+                <p className="text-slate-500 text-xs mt-2 flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  See docs/ISO_20022_IMPLEMENTATION.md for full details
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
