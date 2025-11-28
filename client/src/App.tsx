@@ -45,6 +45,13 @@ import OAuthSettings from "@/pages/OAuthSettings";
 import TimesheetApproval from "@/pages/TimesheetApproval";
 import ProductsGallery from "@/pages/ProductsGallery";
 import Slideshow from "@/pages/Slideshow";
+import JobBoard from "@/pages/JobBoard";
+import JobDetails from "@/pages/JobDetails";
+import EmployerPortal from "@/pages/EmployerPortal";
+import EmployerLogin from "@/pages/EmployerLogin";
+import EmployerRegister from "@/pages/EmployerRegister";
+import TalentPool from "@/pages/TalentPool";
+import AdminTalentExchange from "@/pages/AdminTalentExchange";
 
 function RootPage() {
   const [loading, setLoading] = useState(true);
@@ -96,12 +103,20 @@ function Router() {
       <Route path="/admin/compliance-monitor" component={AdminComplianceMonitor} />
       <Route path="/admin/compliance" component={ComplianceDashboard} />
       <Route path="/admin/timesheet-approval" component={TimesheetApproval} />
+      <Route path="/admin/talent-exchange" component={AdminTalentExchange} />
       <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />
       <Route path="/oauth/settings" component={OAuthSettings} />
       <Route path="/products" component={ProductsGallery} />
       <Route path="/slideshow" component={Slideshow} />
+      <Route path="/jobs" component={JobBoard} />
+      <Route path="/jobs/:jobId" component={JobDetails} />
+      <Route path="/talent-pool" component={TalentPool} />
+      <Route path="/employer-portal" component={EmployerPortal} />
+      <Route path="/employer/portal" component={EmployerPortal} />
+      <Route path="/employer/login" component={EmployerLogin} />
+      <Route path="/employer/register" component={EmployerRegister} />
       <Route component={NotFound} />
     </Switch>
   );

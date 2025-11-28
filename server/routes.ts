@@ -3042,7 +3042,1200 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================
+  // TALENT EXCHANGE ROUTES
+  // ========================
+  
+  // Get all pricing plans (public)
+  app.get("/api/talent-exchange/pricing-plans", async (req: Request, res: Response) => {
+    try {
+      const plans = await db.execute(sql`
+        SELECT * FROM talent_exchange_pricing_plans 
+        WHERE is_active = true 
+        ORDER BY sort_order ASC
+      `);
+      res.json(plans.rows);
+    } catch (error) {
+      console.error("Get pricing plans error:", error);
+      res.status(500).json({ error: "Failed to fetch pricing plans" });
+    }
+  });
+  
+  // Employer Registration
+  app.post("/api/talent-exchange/employers/register", async (req: Request, res: Response) => {
+    try {
+      const { 
+        companyName, industry, companySize, website, description,
+        contactName, contactEmail, contactPhone, contactTitle,
+        addressLine1, addressLine2, city, state, zipCode, password
+      } = req.body;
+      
+      if (!companyName || !contactName || !contactEmail || !password) {
+        return res.status(400).json({ error: "Company name, contact name, email, and password required" });
+      }
+      
+      // Check if email already exists
+      const existing = await db.execute(sql`
+        SELECT id FROM talent_exchange_employers WHERE contact_email = ${contactEmail}
+      `);
+      
+      if (existing.rows.length > 0) {
+        return res.status(409).json({ error: "Email already registered" });
+      }
+      
+      const passwordHash = await bcrypt.hash(password, 10);
+      const verificationToken = crypto.randomUUID();
+      
+      const result = await db.execute(sql`
+        INSERT INTO talent_exchange_employers (
+          company_name, industry, company_size, website, description,
+          contact_name, contact_email, contact_phone, contact_title,
+          address_line1, address_line2, city, state, zip_code,
+          password_hash, verification_token, verification_status,
+          job_post_credits, active_job_posts_limit, talent_searches_per_month
+        ) VALUES (
+          ${companyName}, ${industry || null}, ${companySize || null}, ${website || null}, ${description || null},
+          ${contactName}, ${contactEmail}, ${contactPhone || null}, ${contactTitle || null},
+          ${addressLine1 || null}, ${addressLine2 || null}, ${city || null}, ${state || null}, ${zipCode || null},
+          ${passwordHash}, ${verificationToken}, 'pending',
+          1, 1, 5
+        )
+        RETURNING id, company_name, contact_email, verification_status
+      `);
+      
+      console.log(`[Talent Exchange] New employer registered: ${companyName} (${contactEmail})`);
+      
+      res.status(201).json({
+        success: true,
+        employer: result.rows[0],
+        message: "Registration successful. Please wait for admin approval."
+      });
+    } catch (error: any) {
+      console.error("Employer registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+  
+  // Employer Login
+  app.post("/api/talent-exchange/employers/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password required" });
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM talent_exchange_employers WHERE contact_email = ${email}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      const employer = result.rows[0] as any;
+      
+      const passwordValid = await bcrypt.compare(password, employer.password_hash);
+      if (!passwordValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      if (employer.verification_status !== 'approved' && employer.verification_status !== 'pending') {
+        return res.status(403).json({ error: "Account not approved" });
+      }
+      
+      // Update last login
+      await db.execute(sql`
+        UPDATE talent_exchange_employers SET last_login_at = NOW() WHERE id = ${employer.id}
+      `);
+      
+      res.json({
+        id: employer.id,
+        companyName: employer.company_name,
+        contactEmail: employer.contact_email,
+        contactName: employer.contact_name,
+        subscriptionTier: employer.subscription_tier,
+        verificationStatus: employer.verification_status,
+        jobPostCredits: employer.job_post_credits,
+        activeJobPostsLimit: employer.active_job_posts_limit
+      });
+    } catch (error) {
+      console.error("Employer login error:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+  
+  // Get employer profile
+  app.get("/api/talent-exchange/employers/:employerId", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT id, company_name, industry, company_size, website, logo_url, description,
+               contact_name, contact_email, contact_phone, contact_title,
+               address_line1, address_line2, city, state, zip_code,
+               verification_status, subscription_tier, subscription_status,
+               job_post_credits, talent_search_credits, featured_post_credits,
+               active_job_posts_limit, talent_searches_per_month,
+               total_jobs_posted, total_applications_received, total_hires,
+               created_at
+        FROM talent_exchange_employers WHERE id = ${employerId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get employer error:", error);
+      res.status(500).json({ error: "Failed to fetch employer" });
+    }
+  });
+  
+  // Update employer profile
+  app.put("/api/talent-exchange/employers/:employerId", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      const updates = req.body;
+      
+      const allowedFields = [
+        'company_name', 'industry', 'company_size', 'website', 'logo_url', 'description',
+        'contact_name', 'contact_phone', 'contact_title',
+        'address_line1', 'address_line2', 'city', 'state', 'zip_code', 'billing_email'
+      ];
+      
+      const setClause = Object.entries(updates)
+        .filter(([key]) => allowedFields.includes(key))
+        .map(([key, value]) => `${key} = '${value}'`)
+        .join(', ');
+      
+      if (!setClause) {
+        return res.status(400).json({ error: "No valid fields to update" });
+      }
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_employers 
+        SET ${sql.raw(setClause)}, updated_at = NOW()
+        WHERE id = ${employerId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Update employer error:", error);
+      res.status(500).json({ error: "Failed to update employer" });
+    }
+  });
+  
+  // Create job post
+  app.post("/api/talent-exchange/jobs", async (req: Request, res: Response) => {
+    try {
+      const { employerId, ...jobData } = req.body;
+      
+      if (!employerId) {
+        return res.status(400).json({ error: "Employer ID required" });
+      }
+      
+      // Check employer exists and has credits
+      const employer = await db.execute(sql`
+        SELECT id, job_post_credits, active_job_posts_limit, total_jobs_posted
+        FROM talent_exchange_employers WHERE id = ${employerId}
+      `);
+      
+      if (employer.rows.length === 0) {
+        return res.status(404).json({ error: "Employer not found" });
+      }
+      
+      const emp = employer.rows[0] as any;
+      
+      // Generate slug
+      const slug = `${jobData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`;
+      
+      const result = await db.execute(sql`
+        INSERT INTO talent_exchange_job_posts (
+          employer_id, title, slug, description, requirements, responsibilities, benefits,
+          category, subcategory, job_type, experience_level,
+          required_skills, preferred_skills, certifications,
+          work_location, address_line1, city, state, zip_code,
+          compensation_type, pay_range_min, pay_range_max, show_pay_range,
+          schedule_type, hours_per_week, start_date, end_date,
+          is_urgent, positions_available, screening_questions,
+          status, expires_at
+        ) VALUES (
+          ${employerId}, ${jobData.title}, ${slug}, ${jobData.description}, 
+          ${jobData.requirements || null}, ${jobData.responsibilities || null}, ${jobData.benefits || null},
+          ${jobData.category || null}, ${jobData.subcategory || null}, 
+          ${jobData.jobType || 'full_time'}, ${jobData.experienceLevel || null},
+          ${JSON.stringify(jobData.requiredSkills || [])}, 
+          ${JSON.stringify(jobData.preferredSkills || [])},
+          ${JSON.stringify(jobData.certifications || [])},
+          ${jobData.workLocation || 'on_site'}, ${jobData.addressLine1 || null},
+          ${jobData.city}, ${jobData.state}, ${jobData.zipCode || null},
+          ${jobData.compensationType || 'hourly'}, 
+          ${jobData.payRangeMin || null}, ${jobData.payRangeMax || null}, 
+          ${jobData.showPayRange !== false},
+          ${jobData.scheduleType || null}, ${jobData.hoursPerWeek || null},
+          ${jobData.startDate || null}, ${jobData.endDate || null},
+          ${jobData.isUrgent || false}, ${jobData.positionsAvailable || 1},
+          ${JSON.stringify(jobData.screeningQuestions || [])},
+          'pending_review', NOW() + INTERVAL '30 days'
+        )
+        RETURNING *
+      `);
+      
+      // Update employer stats
+      await db.execute(sql`
+        UPDATE talent_exchange_employers 
+        SET total_jobs_posted = total_jobs_posted + 1
+        WHERE id = ${employerId}
+      `);
+      
+      console.log(`[Talent Exchange] Job created: ${jobData.title} by employer ${employerId}`);
+      
+      res.status(201).json(result.rows[0]);
+    } catch (error: any) {
+      console.error("Create job error:", error);
+      res.status(500).json({ error: "Failed to create job post" });
+    }
+  });
+  
+  // Get employer's jobs
+  app.get("/api/talent-exchange/employers/:employerId/jobs", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      const { status } = req.query;
+      
+      let query = sql`
+        SELECT * FROM talent_exchange_job_posts 
+        WHERE employer_id = ${employerId}
+      `;
+      
+      if (status) {
+        query = sql`
+          SELECT * FROM talent_exchange_job_posts 
+          WHERE employer_id = ${employerId} AND status = ${status}
+        `;
+      }
+      
+      query = sql`${query} ORDER BY created_at DESC`;
+      
+      const result = await db.execute(query);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get employer jobs error:", error);
+      res.status(500).json({ error: "Failed to fetch jobs" });
+    }
+  });
+  
+  // Update job post
+  app.put("/api/talent-exchange/jobs/:jobId", async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      const updates = req.body;
+      
+      // Build update query dynamically
+      const updatePairs: string[] = [];
+      const updateValues: any[] = [];
+      
+      if (updates.title) updatePairs.push(`title = '${updates.title}'`);
+      if (updates.description) updatePairs.push(`description = '${updates.description}'`);
+      if (updates.requirements) updatePairs.push(`requirements = '${updates.requirements}'`);
+      if (updates.responsibilities) updatePairs.push(`responsibilities = '${updates.responsibilities}'`);
+      if (updates.benefits) updatePairs.push(`benefits = '${updates.benefits}'`);
+      if (updates.category) updatePairs.push(`category = '${updates.category}'`);
+      if (updates.jobType) updatePairs.push(`job_type = '${updates.jobType}'`);
+      if (updates.city) updatePairs.push(`city = '${updates.city}'`);
+      if (updates.state) updatePairs.push(`state = '${updates.state}'`);
+      if (updates.payRangeMin !== undefined) updatePairs.push(`pay_range_min = ${updates.payRangeMin}`);
+      if (updates.payRangeMax !== undefined) updatePairs.push(`pay_range_max = ${updates.payRangeMax}`);
+      if (updates.status) updatePairs.push(`status = '${updates.status}'`);
+      
+      if (updatePairs.length === 0) {
+        return res.status(400).json({ error: "No fields to update" });
+      }
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_job_posts 
+        SET ${sql.raw(updatePairs.join(', '))}, updated_at = NOW()
+        WHERE id = ${jobId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Update job error:", error);
+      res.status(500).json({ error: "Failed to update job" });
+    }
+  });
+  
+  // Delete job post
+  app.delete("/api/talent-exchange/jobs/:jobId", async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_job_posts SET status = 'deleted' WHERE id = ${jobId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete job error:", error);
+      res.status(500).json({ error: "Failed to delete job" });
+    }
+  });
+  
+  // PUBLIC JOB BOARD ROUTES
+  
+  // Get all public jobs (with filters)
+  app.get("/api/talent-exchange/public/jobs", async (req: Request, res: Response) => {
+    try {
+      const { 
+        category, city, state, jobType, search, 
+        payMin, payMax, featured, 
+        page = '1', limit = '20' 
+      } = req.query;
+      
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      
+      let whereConditions = [`j.status = 'active'`, `j.expires_at > NOW()`];
+      
+      if (category) whereConditions.push(`j.category = '${category}'`);
+      if (city) whereConditions.push(`LOWER(j.city) = LOWER('${city}')`);
+      if (state) whereConditions.push(`j.state = '${state}'`);
+      if (jobType) whereConditions.push(`j.job_type = '${jobType}'`);
+      if (payMin) whereConditions.push(`j.pay_range_min >= ${payMin}`);
+      if (payMax) whereConditions.push(`j.pay_range_max <= ${payMax}`);
+      if (featured === 'true') whereConditions.push(`j.is_featured = true`);
+      if (search) {
+        whereConditions.push(`(
+          LOWER(j.title) LIKE LOWER('%${search}%') OR 
+          LOWER(j.description) LIKE LOWER('%${search}%') OR
+          LOWER(e.company_name) LIKE LOWER('%${search}%')
+        )`);
+      }
+      
+      const whereClause = whereConditions.join(' AND ');
+      
+      const result = await db.execute(sql`
+        SELECT j.*, e.company_name, e.logo_url, e.industry as employer_industry
+        FROM talent_exchange_job_posts j
+        JOIN talent_exchange_employers e ON j.employer_id = e.id
+        WHERE ${sql.raw(whereClause)}
+        ORDER BY j.is_featured DESC, j.published_at DESC NULLS LAST, j.created_at DESC
+        LIMIT ${parseInt(limit as string)} OFFSET ${offset}
+      `);
+      
+      const countResult = await db.execute(sql`
+        SELECT COUNT(*) as total FROM talent_exchange_job_posts j
+        JOIN talent_exchange_employers e ON j.employer_id = e.id
+        WHERE ${sql.raw(whereClause)}
+      `);
+      
+      res.json({
+        jobs: result.rows,
+        total: parseInt((countResult.rows[0] as any).total),
+        page: parseInt(page as string),
+        limit: parseInt(limit as string)
+      });
+    } catch (error) {
+      console.error("Get public jobs error:", error);
+      res.status(500).json({ error: "Failed to fetch jobs" });
+    }
+  });
+  
+  // Get single job details (public)
+  app.get("/api/talent-exchange/public/jobs/:jobId", async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT j.*, e.company_name, e.logo_url, e.industry as employer_industry, 
+               e.company_size, e.website, e.description as company_description
+        FROM talent_exchange_job_posts j
+        JOIN talent_exchange_employers e ON j.employer_id = e.id
+        WHERE j.id = ${jobId} OR j.slug = ${jobId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+      
+      // Increment view count
+      await db.execute(sql`
+        UPDATE talent_exchange_job_posts SET view_count = view_count + 1 WHERE id = ${jobId}
+      `);
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get job details error:", error);
+      res.status(500).json({ error: "Failed to fetch job details" });
+    }
+  });
+  
+  // Get job categories (aggregated from existing jobs)
+  app.get("/api/talent-exchange/public/categories", async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT category, COUNT(*) as count 
+        FROM talent_exchange_job_posts 
+        WHERE status = 'active' AND category IS NOT NULL
+        GROUP BY category 
+        ORDER BY count DESC
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get categories error:", error);
+      res.status(500).json({ error: "Failed to fetch categories" });
+    }
+  });
+  
+  // Get featured jobs
+  app.get("/api/talent-exchange/public/featured-jobs", async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT j.*, e.company_name, e.logo_url
+        FROM talent_exchange_job_posts j
+        JOIN talent_exchange_employers e ON j.employer_id = e.id
+        WHERE j.is_featured = true AND j.status = 'active' AND j.expires_at > NOW()
+        ORDER BY j.published_at DESC
+        LIMIT 6
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get featured jobs error:", error);
+      res.status(500).json({ error: "Failed to fetch featured jobs" });
+    }
+  });
+  
+  // CANDIDATE ROUTES
+  
+  // Candidate Registration
+  app.post("/api/talent-exchange/candidates/register", async (req: Request, res: Response) => {
+    try {
+      const { 
+        fullName, email, phone, password, city, state, zipCode,
+        headline, summary, skills, certifications, yearsExperience,
+        preferredJobTypes, preferredCategories, desiredPayMin, availableToStart
+      } = req.body;
+      
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ error: "Name, email, and password required" });
+      }
+      
+      // Check if email already exists
+      const existing = await db.execute(sql`
+        SELECT id FROM talent_exchange_candidates WHERE email = ${email}
+      `);
+      
+      if (existing.rows.length > 0) {
+        return res.status(409).json({ error: "Email already registered" });
+      }
+      
+      const passwordHash = await bcrypt.hash(password, 10);
+      
+      const result = await db.execute(sql`
+        INSERT INTO talent_exchange_candidates (
+          full_name, email, phone, password_hash, city, state, zip_code,
+          headline, summary, skills, certifications, years_experience,
+          preferred_job_types, preferred_categories, desired_pay_min, available_to_start,
+          profile_visibility
+        ) VALUES (
+          ${fullName}, ${email}, ${phone || null}, ${passwordHash}, 
+          ${city || null}, ${state || null}, ${zipCode || null},
+          ${headline || null}, ${summary || null}, 
+          ${JSON.stringify(skills || [])}, ${JSON.stringify(certifications || [])},
+          ${yearsExperience || null},
+          ${JSON.stringify(preferredJobTypes || [])}, ${JSON.stringify(preferredCategories || [])},
+          ${desiredPayMin || null}, ${availableToStart || null},
+          'public'
+        )
+        RETURNING id, full_name, email
+      `);
+      
+      res.status(201).json({
+        success: true,
+        candidate: result.rows[0]
+      });
+    } catch (error) {
+      console.error("Candidate registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+  
+  // Candidate Login
+  app.post("/api/talent-exchange/candidates/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password required" });
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM talent_exchange_candidates WHERE email = ${email}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      const candidate = result.rows[0] as any;
+      
+      const passwordValid = await bcrypt.compare(password, candidate.password_hash);
+      if (!passwordValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      // Update last active
+      await db.execute(sql`
+        UPDATE talent_exchange_candidates SET last_active_at = NOW() WHERE id = ${candidate.id}
+      `);
+      
+      res.json({
+        id: candidate.id,
+        fullName: candidate.full_name,
+        email: candidate.email,
+        city: candidate.city,
+        state: candidate.state,
+        workerId: candidate.worker_id
+      });
+    } catch (error) {
+      console.error("Candidate login error:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+  
+  // Get candidate profile
+  app.get("/api/talent-exchange/candidates/:candidateId", async (req: Request, res: Response) => {
+    try {
+      const { candidateId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT id, full_name, email, phone, city, state, zip_code,
+               willing_to_relocate, travel_radius, headline, summary,
+               skills, certifications, years_experience, preferred_job_types,
+               preferred_categories, preferred_schedule, desired_pay_min,
+               available_to_start, resume_url, profile_visibility,
+               profile_views, application_count, status, worker_id
+        FROM talent_exchange_candidates WHERE id = ${candidateId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Candidate not found" });
+      }
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get candidate error:", error);
+      res.status(500).json({ error: "Failed to fetch candidate" });
+    }
+  });
+  
+  // Apply to job
+  app.post("/api/talent-exchange/applications", async (req: Request, res: Response) => {
+    try {
+      const { jobPostId, candidateId, coverLetter, screeningAnswers, resumeUrl } = req.body;
+      
+      if (!jobPostId || !candidateId) {
+        return res.status(400).json({ error: "Job ID and candidate ID required" });
+      }
+      
+      // Check if already applied
+      const existing = await db.execute(sql`
+        SELECT id FROM talent_exchange_applications 
+        WHERE job_post_id = ${jobPostId} AND candidate_id = ${candidateId}
+      `);
+      
+      if (existing.rows.length > 0) {
+        return res.status(409).json({ error: "Already applied to this job" });
+      }
+      
+      // Get job's employer ID
+      const job = await db.execute(sql`
+        SELECT employer_id FROM talent_exchange_job_posts WHERE id = ${jobPostId}
+      `);
+      
+      if (job.rows.length === 0) {
+        return res.status(404).json({ error: "Job not found" });
+      }
+      
+      const employerId = (job.rows[0] as any).employer_id;
+      
+      const result = await db.execute(sql`
+        INSERT INTO talent_exchange_applications (
+          job_post_id, candidate_id, employer_id, cover_letter, 
+          screening_answers, resume_url, status, status_history
+        ) VALUES (
+          ${jobPostId}, ${candidateId}, ${employerId}, ${coverLetter || null},
+          ${JSON.stringify(screeningAnswers || {})}, ${resumeUrl || null},
+          'submitted', ${JSON.stringify([{ status: 'submitted', timestamp: new Date() }])}
+        )
+        RETURNING *
+      `);
+      
+      // Update job application count
+      await db.execute(sql`
+        UPDATE talent_exchange_job_posts SET application_count = application_count + 1 WHERE id = ${jobPostId}
+      `);
+      
+      // Update candidate application count
+      await db.execute(sql`
+        UPDATE talent_exchange_candidates SET application_count = application_count + 1 WHERE id = ${candidateId}
+      `);
+      
+      // Update employer stats
+      await db.execute(sql`
+        UPDATE talent_exchange_employers SET total_applications_received = total_applications_received + 1 WHERE id = ${employerId}
+      `);
+      
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error("Apply error:", error);
+      res.status(500).json({ error: "Failed to submit application" });
+    }
+  });
+  
+  // Get candidate's applications
+  app.get("/api/talent-exchange/candidates/:candidateId/applications", async (req: Request, res: Response) => {
+    try {
+      const { candidateId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT a.*, j.title as job_title, j.city, j.state, j.pay_range_min, j.pay_range_max,
+               e.company_name, e.logo_url
+        FROM talent_exchange_applications a
+        JOIN talent_exchange_job_posts j ON a.job_post_id = j.id
+        JOIN talent_exchange_employers e ON a.employer_id = e.id
+        WHERE a.candidate_id = ${candidateId}
+        ORDER BY a.created_at DESC
+      `);
+      
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get applications error:", error);
+      res.status(500).json({ error: "Failed to fetch applications" });
+    }
+  });
+  
+  // Get employer's applications
+  app.get("/api/talent-exchange/employers/:employerId/applications", async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      const { jobId, status } = req.query;
+      
+      let whereClause = `a.employer_id = '${employerId}'`;
+      if (jobId) whereClause += ` AND a.job_post_id = '${jobId}'`;
+      if (status) whereClause += ` AND a.status = '${status}'`;
+      
+      const result = await db.execute(sql`
+        SELECT a.*, c.full_name, c.email as candidate_email, c.phone as candidate_phone,
+               c.headline, c.skills, c.certifications, c.years_experience,
+               c.resume_url as candidate_resume_url, c.city as candidate_city, c.state as candidate_state,
+               j.title as job_title
+        FROM talent_exchange_applications a
+        JOIN talent_exchange_candidates c ON a.candidate_id = c.id
+        JOIN talent_exchange_job_posts j ON a.job_post_id = j.id
+        WHERE ${sql.raw(whereClause)}
+        ORDER BY a.created_at DESC
+      `);
+      
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get employer applications error:", error);
+      res.status(500).json({ error: "Failed to fetch applications" });
+    }
+  });
+  
+  // Update application status
+  app.put("/api/talent-exchange/applications/:applicationId/status", async (req: Request, res: Response) => {
+    try {
+      const { applicationId } = req.params;
+      const { status, notes, interviewDate, interviewType } = req.body;
+      
+      const validStatuses = ['submitted', 'viewed', 'shortlisted', 'interview_scheduled', 
+                             'interviewed', 'offer_made', 'hired', 'rejected', 'withdrawn'];
+      
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+      
+      let updateQuery = `status = '${status}', updated_at = NOW()`;
+      if (notes) updateQuery += `, notes = '${notes}'`;
+      if (status === 'viewed') updateQuery += `, viewed_at = NOW()`;
+      if (status === 'interview_scheduled' && interviewDate) {
+        updateQuery += `, interview_scheduled_at = '${interviewDate}'`;
+        if (interviewType) updateQuery += `, interview_type = '${interviewType}'`;
+      }
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_applications 
+        SET ${sql.raw(updateQuery)}
+        WHERE id = ${applicationId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Update application error:", error);
+      res.status(500).json({ error: "Failed to update application" });
+    }
+  });
+  
+  // TALENT POOL ROUTES (Search ORBIT Workers)
+  
+  // Get available ORBIT workers for talent pool
+  app.get("/api/talent-exchange/talent-pool", async (req: Request, res: Response) => {
+    try {
+      const { skills, city, state, available, search, page = '1', limit = '20' } = req.query;
+      const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
+      
+      let whereConditions = [`w.status = 'approved'`, `ps.is_visible_to_employers = true`];
+      
+      if (city) whereConditions.push(`LOWER(w.city) = LOWER('${city}')`);
+      if (state) whereConditions.push(`w.state = '${state}'`);
+      if (available === 'true') whereConditions.push(`w.availability_status = 'available'`);
+      if (search) {
+        whereConditions.push(`(
+          LOWER(w.full_name) LIKE LOWER('%${search}%') OR 
+          w.skills::text LIKE '%${search}%'
+        )`);
+      }
+      
+      const whereClause = whereConditions.join(' AND ');
+      
+      const result = await db.execute(sql`
+        SELECT 
+          w.id, w.full_name, w.city, w.state, w.skills, w.availability_status,
+          w.years_experience, w.preferred_shift,
+          ps.overall_score, ps.customer_feedback_score, ps.reliability_score,
+          ps.total_assignments_completed, ps.average_customer_rating,
+          ps.badges, ps.profile_highlights, ps.on_time_arrival_rate
+        FROM workers w
+        LEFT JOIN worker_performance_scores ps ON w.id = ps.worker_id
+        WHERE ${sql.raw(whereClause)}
+        ORDER BY ps.overall_score DESC NULLS LAST
+        LIMIT ${parseInt(limit as string)} OFFSET ${offset}
+      `);
+      
+      const countResult = await db.execute(sql`
+        SELECT COUNT(*) as total FROM workers w
+        LEFT JOIN worker_performance_scores ps ON w.id = ps.worker_id
+        WHERE ${sql.raw(whereClause)}
+      `);
+      
+      res.json({
+        workers: result.rows,
+        total: parseInt((countResult.rows[0] as any).total),
+        page: parseInt(page as string),
+        limit: parseInt(limit as string)
+      });
+    } catch (error) {
+      console.error("Get talent pool error:", error);
+      res.status(500).json({ error: "Failed to fetch talent pool" });
+    }
+  });
+  
+  // Get worker profile for talent pool
+  app.get("/api/talent-exchange/talent-pool/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT 
+          w.id, w.full_name, w.city, w.state, w.skills, w.availability_status,
+          w.years_experience, w.preferred_shift, w.days_available,
+          w.i9_verified, w.background_check_status, w.onboarding_completed,
+          ps.overall_score, ps.customer_feedback_score, ps.reliability_score,
+          ps.availability_score, ps.productivity_score, ps.loyalty_score,
+          ps.total_assignments_completed, ps.total_hours_worked, 
+          ps.on_time_arrival_rate, ps.assignment_completion_rate,
+          ps.average_customer_rating, ps.total_feedback_count,
+          ps.would_hire_again_rate, ps.badges, ps.profile_highlights,
+          ps.current_streak, ps.longest_streak, ps.tenure_months
+        FROM workers w
+        LEFT JOIN worker_performance_scores ps ON w.id = ps.worker_id
+        WHERE w.id = ${workerId} AND w.status = 'approved'
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Worker not found" });
+      }
+      
+      // Increment profile views
+      await db.execute(sql`
+        UPDATE worker_performance_scores SET profile_highlights = profile_highlights WHERE worker_id = ${workerId}
+      `);
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get worker profile error:", error);
+      res.status(500).json({ error: "Failed to fetch worker profile" });
+    }
+  });
+  
+  // Request worker (employer wants to hire/contact an ORBIT worker)
+  app.post("/api/talent-exchange/worker-requests", async (req: Request, res: Response) => {
+    try {
+      const { employerId, workerId, requestType, message, jobPostId } = req.body;
+      
+      if (!employerId || !workerId) {
+        return res.status(400).json({ error: "Employer ID and worker ID required" });
+      }
+      
+      const result = await db.execute(sql`
+        INSERT INTO talent_exchange_worker_requests (
+          employer_id, worker_id, request_type, message, job_post_id, status
+        ) VALUES (
+          ${employerId}, ${workerId}, ${requestType || 'hire'}, 
+          ${message || null}, ${jobPostId || null}, 'pending'
+        )
+        RETURNING *
+      `);
+      
+      console.log(`[Talent Exchange] Worker request: employer ${employerId} -> worker ${workerId}`);
+      
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error("Worker request error:", error);
+      res.status(500).json({ error: "Failed to create worker request" });
+    }
+  });
+  
+  // ADMIN MODERATION ROUTES
+  
+  // Get pending employer verifications
+  app.get("/api/talent-exchange/admin/pending-employers", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT * FROM talent_exchange_employers 
+        WHERE verification_status = 'pending'
+        ORDER BY created_at ASC
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get pending employers error:", error);
+      res.status(500).json({ error: "Failed to fetch pending employers" });
+    }
+  });
+  
+  // Approve/Reject employer
+  app.put("/api/talent-exchange/admin/employers/:employerId/verify", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { employerId } = req.params;
+      const { status, rejectionReason, verifiedBy } = req.body;
+      
+      if (!['approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ error: "Status must be approved or rejected" });
+      }
+      
+      let updateQuery = `verification_status = '${status}', verified_at = NOW()`;
+      if (verifiedBy) updateQuery += `, verified_by = '${verifiedBy}'`;
+      if (status === 'rejected' && rejectionReason) updateQuery += `, rejection_reason = '${rejectionReason}'`;
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_employers 
+        SET ${sql.raw(updateQuery)}
+        WHERE id = ${employerId}
+      `);
+      
+      console.log(`[Talent Exchange] Employer ${employerId} ${status}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Verify employer error:", error);
+      res.status(500).json({ error: "Failed to verify employer" });
+    }
+  });
+  
+  // Get pending job posts
+  app.get("/api/talent-exchange/admin/pending-jobs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT j.*, e.company_name, e.contact_email
+        FROM talent_exchange_job_posts j
+        JOIN talent_exchange_employers e ON j.employer_id = e.id
+        WHERE j.status = 'pending_review'
+        ORDER BY j.created_at ASC
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get pending jobs error:", error);
+      res.status(500).json({ error: "Failed to fetch pending jobs" });
+    }
+  });
+  
+  // Approve/Reject job post
+  app.put("/api/talent-exchange/admin/jobs/:jobId/moderate", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      const { status, moderationNotes, moderatedBy, rejectionReason } = req.body;
+      
+      if (!['active', 'rejected'].includes(status)) {
+        return res.status(400).json({ error: "Status must be active or rejected" });
+      }
+      
+      let updateQuery = `status = '${status}', moderated_at = NOW()`;
+      if (moderatedBy) updateQuery += `, moderated_by = '${moderatedBy}'`;
+      if (moderationNotes) updateQuery += `, moderation_notes = '${moderationNotes}'`;
+      if (status === 'rejected' && rejectionReason) updateQuery += `, rejection_reason = '${rejectionReason}'`;
+      if (status === 'active') updateQuery += `, published_at = NOW()`;
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_job_posts 
+        SET ${sql.raw(updateQuery)}
+        WHERE id = ${jobId}
+      `);
+      
+      console.log(`[Talent Exchange] Job ${jobId} ${status}`);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Moderate job error:", error);
+      res.status(500).json({ error: "Failed to moderate job" });
+    }
+  });
+  
+  // Get worker requests for admin
+  app.get("/api/talent-exchange/admin/worker-requests", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { status } = req.query;
+      
+      let whereClause = '1=1';
+      if (status) whereClause = `r.status = '${status}'`;
+      
+      const result = await db.execute(sql`
+        SELECT r.*, e.company_name, e.contact_email, w.full_name as worker_name, w.phone as worker_phone
+        FROM talent_exchange_worker_requests r
+        JOIN talent_exchange_employers e ON r.employer_id = e.id
+        JOIN workers w ON r.worker_id = w.id
+        WHERE ${sql.raw(whereClause)}
+        ORDER BY r.created_at DESC
+      `);
+      
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get worker requests error:", error);
+      res.status(500).json({ error: "Failed to fetch worker requests" });
+    }
+  });
+  
+  // Approve/Reject worker request
+  app.put("/api/talent-exchange/admin/worker-requests/:requestId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { requestId } = req.params;
+      const { status, reviewNotes, reviewedBy } = req.body;
+      
+      if (!['approved', 'rejected'].includes(status)) {
+        return res.status(400).json({ error: "Status must be approved or rejected" });
+      }
+      
+      await db.execute(sql`
+        UPDATE talent_exchange_worker_requests 
+        SET status = ${status}, reviewed_at = NOW(), 
+            review_notes = ${reviewNotes || null}, reviewed_by = ${reviewedBy || null}
+        WHERE id = ${requestId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Update worker request error:", error);
+      res.status(500).json({ error: "Failed to update worker request" });
+    }
+  });
+  
+  // Get Talent Exchange analytics
+  app.get("/api/talent-exchange/admin/analytics", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const [employers, jobs, applications, candidates] = await Promise.all([
+        db.execute(sql`SELECT COUNT(*) as count, verification_status FROM talent_exchange_employers GROUP BY verification_status`),
+        db.execute(sql`SELECT COUNT(*) as count, status FROM talent_exchange_job_posts GROUP BY status`),
+        db.execute(sql`SELECT COUNT(*) as count, status FROM talent_exchange_applications GROUP BY status`),
+        db.execute(sql`SELECT COUNT(*) as count FROM talent_exchange_candidates`)
+      ]);
+      
+      res.json({
+        employers: employers.rows,
+        jobs: jobs.rows,
+        applications: applications.rows,
+        candidates: (candidates.rows[0] as any).count
+      });
+    } catch (error) {
+      console.error("Get analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+  
+  // WORKER PERFORMANCE & FEEDBACK ROUTES
+  
+  // Get worker performance score
+  app.get("/api/workers/:workerId/performance", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      
+      const result = await db.execute(sql`
+        SELECT * FROM worker_performance_scores WHERE worker_id = ${workerId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.json({
+          workerId,
+          overallScore: 0,
+          message: "No performance data yet"
+        });
+      }
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get performance error:", error);
+      res.status(500).json({ error: "Failed to fetch performance" });
+    }
+  });
+  
+  // Submit worker feedback
+  app.post("/api/workers/:workerId/feedback", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const {
+        tenantId, assignmentId, clientId, overallRating,
+        punctualityRating, qualityRating, attitudeRating,
+        communicationRating, safetyRating, wouldHireAgain,
+        feedback, highlightedStrengths, areasForImprovement,
+        feedbackSource, submittedBy
+      } = req.body;
+      
+      if (!tenantId || !overallRating) {
+        return res.status(400).json({ error: "Tenant ID and overall rating required" });
+      }
+      
+      const result = await db.execute(sql`
+        INSERT INTO worker_feedback (
+          worker_id, tenant_id, assignment_id, client_id,
+          overall_rating, punctuality_rating, quality_rating, attitude_rating,
+          communication_rating, safety_rating, would_hire_again,
+          feedback, highlighted_strengths, areas_for_improvement,
+          feedback_source, submitted_by, is_verified
+        ) VALUES (
+          ${workerId}, ${tenantId}, ${assignmentId || null}, ${clientId || null},
+          ${overallRating}, ${punctualityRating || null}, ${qualityRating || null}, 
+          ${attitudeRating || null}, ${communicationRating || null}, ${safetyRating || null},
+          ${wouldHireAgain || null}, ${feedback || null}, 
+          ${JSON.stringify(highlightedStrengths || [])},
+          ${JSON.stringify(areasForImprovement || [])},
+          ${feedbackSource || 'client'}, ${submittedBy || null}, false
+        )
+        RETURNING *
+      `);
+      
+      // Trigger performance score recalculation (async)
+      recalculateWorkerPerformance(workerId, tenantId).catch(err => {
+        console.error("Performance recalc error:", err);
+      });
+      
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error("Submit feedback error:", error);
+      res.status(500).json({ error: "Failed to submit feedback" });
+    }
+  });
+  
+  // Get worker feedback history
+  app.get("/api/workers/:workerId/feedback", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const { limit = '10' } = req.query;
+      
+      const result = await db.execute(sql`
+        SELECT f.*, c.name as client_name
+        FROM worker_feedback f
+        LEFT JOIN clients c ON f.client_id = c.id
+        WHERE f.worker_id = ${workerId} AND f.is_public = true
+        ORDER BY f.created_at DESC
+        LIMIT ${parseInt(limit as string)}
+      `);
+      
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get feedback error:", error);
+      res.status(500).json({ error: "Failed to fetch feedback" });
+    }
+  });
+
   return httpServer;
+}
+
+// Worker performance calculation function
+async function recalculateWorkerPerformance(workerId: string, tenantId: string) {
+  try {
+    // Get feedback from last 90 days
+    const feedback = await db.execute(sql`
+      SELECT AVG(overall_rating) as avg_rating, 
+             COUNT(*) as feedback_count,
+             SUM(CASE WHEN would_hire_again = true THEN 1 ELSE 0 END) as hire_again_count
+      FROM worker_feedback 
+      WHERE worker_id = ${workerId} 
+        AND created_at > NOW() - INTERVAL '90 days'
+    `);
+    
+    const feedbackData = feedback.rows[0] as any;
+    const avgRating = parseFloat(feedbackData.avg_rating) || 0;
+    const feedbackCount = parseInt(feedbackData.feedback_count) || 0;
+    const hireAgainRate = feedbackCount > 0 
+      ? (parseInt(feedbackData.hire_again_count) / feedbackCount) * 100 
+      : 0;
+    
+    // Calculate customer feedback score (40% weight)
+    const customerFeedbackScore = (avgRating / 5) * 100;
+    
+    // Get reliability metrics from timesheets
+    const reliability = await db.execute(sql`
+      SELECT 
+        COUNT(*) as total_shifts,
+        SUM(CASE WHEN clock_in IS NOT NULL THEN 1 ELSE 0 END) as completed_shifts
+      FROM timesheets 
+      WHERE worker_id = ${workerId}
+        AND created_at > NOW() - INTERVAL '90 days'
+    `);
+    
+    const reliabilityData = reliability.rows[0] as any;
+    const totalShifts = parseInt(reliabilityData.total_shifts) || 0;
+    const completedShifts = parseInt(reliabilityData.completed_shifts) || 0;
+    const reliabilityScore = totalShifts > 0 ? (completedShifts / totalShifts) * 100 : 0;
+    
+    // Overall score calculation with weights
+    // Customer Feedback: 40%, Reliability: 25%, Availability: 15%, Productivity: 15%, Loyalty: 5%
+    const overallScore = (
+      (customerFeedbackScore * 0.40) +
+      (reliabilityScore * 0.25) +
+      (50 * 0.15) + // Availability placeholder
+      (50 * 0.15) + // Productivity placeholder  
+      (50 * 0.05)   // Loyalty placeholder
+    );
+    
+    // Upsert performance score
+    await db.execute(sql`
+      INSERT INTO worker_performance_scores (
+        worker_id, tenant_id, overall_score, customer_feedback_score,
+        reliability_score, average_customer_rating, total_feedback_count,
+        would_hire_again_rate, last_calculated_at
+      ) VALUES (
+        ${workerId}, ${tenantId}, ${overallScore}, ${customerFeedbackScore},
+        ${reliabilityScore}, ${avgRating}, ${feedbackCount},
+        ${hireAgainRate}, NOW()
+      )
+      ON CONFLICT (worker_id) DO UPDATE SET
+        overall_score = ${overallScore},
+        customer_feedback_score = ${customerFeedbackScore},
+        reliability_score = ${reliabilityScore},
+        average_customer_rating = ${avgRating},
+        total_feedback_count = ${feedbackCount},
+        would_hire_again_rate = ${hireAgainRate},
+        last_calculated_at = NOW(),
+        updated_at = NOW()
+    `);
+    
+    console.log(`[Performance] Updated worker ${workerId} score: ${overallScore.toFixed(2)}`);
+  } catch (error) {
+    console.error("Performance calculation error:", error);
+    throw error;
+  }
 }
 
 // ========================
