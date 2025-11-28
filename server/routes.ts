@@ -49,6 +49,10 @@ import {
   insertBetaTesterSchema,
   reportRequests,
   insertReportRequestSchema,
+  type WorkerRequestMatch,
+  type WorkerReferralBonus,
+  type Timesheet,
+  type IntegrationToken,
 } from "@shared/schema";
 
 // ========================
@@ -666,7 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Find the specific match
       const matches = await storage.listWorkerRequestMatches(requestId, tenantId);
-      const match = matches.find(m => m.workerId === workerId);
+      const match = matches.find((m: WorkerRequestMatch) => m.workerId === workerId);
 
       if (!match) {
         return res.status(404).json({ error: "Match not found" });
@@ -724,7 +728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Find the specific match
       const matches = await storage.listWorkerRequestMatches(requestId, tenantId);
-      const match = matches.find(m => m.workerId === workerId);
+      const match = matches.find((m: WorkerRequestMatch) => m.workerId === workerId);
 
       if (!match) {
         return res.status(404).json({ error: "Match not found" });
@@ -781,7 +785,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.createReferralBonus(
             parsed.data.referredBy,
             worker.id,
-            applicationData.tenantId
+            parsed.data.tenantId
           );
         } catch (error) {
           console.error("Failed to create referral bonus:", error);
@@ -844,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const referrals = await storage.getWorkerReferrals(workerId);
       
       const referralsWithDetails = await Promise.all(
-        referrals.map(async (referral) => {
+        referrals.map(async (referral: WorkerReferralBonus) => {
           const referredWorker = await storage.getWorker(referral.referredWorkerId);
           return {
             ...referral,
@@ -1085,7 +1089,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const timesheets = await storage.listTimesheets(tenantId);
       const activeTimesheet = timesheets.find(
-        ts => ts.workerId === workerId && ts.clockInTime && !ts.clockOutTime
+        (ts: Timesheet) => ts.workerId === workerId && ts.clockInTime && !ts.clockOutTime
       );
       
       if (!activeTimesheet) {
@@ -1115,7 +1119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Enrich with worker details
       const enrichedTimesheets = await Promise.all(
-        timesheets.map(async (timesheet) => {
+        timesheets.map(async (timesheet: Timesheet) => {
           const worker = await storage.getWorker(timesheet.workerId || '');
           return {
             ...timesheet,
@@ -2027,16 +2031,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/compliance/prevailing-wages", async (req: Request, res: Response) => {
     try {
       const { state, jobClassification } = req.query;
-      let query = db.select().from(prevailingWages);
+      const conditions = [];
       
       if (state) {
-        query = query.where(eq(prevailingWages.state, state as string));
+        conditions.push(eq(prevailingWages.state, state as string));
       }
       if (jobClassification) {
-        query = query.where(eq(prevailingWages.jobClassification, jobClassification as string));
+        conditions.push(eq(prevailingWages.jobClassification, jobClassification as string));
       }
       
-      const wages = await query;
+      const wages = conditions.length > 0 
+        ? await db.select().from(prevailingWages).where(and(...conditions))
+        : await db.select().from(prevailingWages);
       res.json(wages);
     } catch (error) {
       console.error("Prevailing wage fetch error:", error);
@@ -2047,16 +2053,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/compliance/workers-comp-rates", async (req: Request, res: Response) => {
     try {
       const { state, industry } = req.query;
-      let query = db.select().from(workersCompRates);
+      const conditions = [];
       
       if (state) {
-        query = query.where(eq(workersCompRates.state, state as string));
+        conditions.push(eq(workersCompRates.state, state as string));
       }
       if (industry) {
-        query = query.where(eq(workersCompRates.industryClassification, industry as string));
+        conditions.push(eq(workersCompRates.industryClassification, industry as string));
       }
       
-      const rates = await query;
+      const rates = conditions.length > 0
+        ? await db.select().from(workersCompRates).where(and(...conditions))
+        : await db.select().from(workersCompRates);
       res.json(rates);
     } catch (error) {
       console.error("Workers comp rate fetch error:", error);
@@ -2184,7 +2192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { state, industry } = req.params;
       
       const scales = await db.select().from(wageScales).where(and(
-        eq(wageScales.state, state),
+        eq(wageScales.region, state),
         eq(wageScales.industry, industry)
       ));
       
@@ -2388,7 +2396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Aggregate by provider - NO tenant IDs or personal data
       const providerCounts: Record<string, { total: number, connected: number, error: number }> = {};
       
-      allTokens.forEach(token => {
+      allTokens.forEach((token: IntegrationToken) => {
         if (!providerCounts[token.integrationType]) {
           providerCounts[token.integrationType] = { total: 0, connected: 0, error: 0 };
         }
@@ -2862,10 +2870,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { OAUTH_PROVIDERS } = await import("./oauthConfig");
       const connections = await storage.getAllIntegrationTokens();
-      const tenantConnections = connections.filter(c => c.tenantId === tenantId);
+      const tenantConnections = connections.filter((c: IntegrationToken) => c.tenantId === tenantId);
 
       const status = Object.keys(OAUTH_PROVIDERS).map(provider => {
-        const connection = tenantConnections.find(c => c.integrationType === provider);
+        const connection = tenantConnections.find((c: IntegrationToken) => c.integrationType === provider);
         
         if (!connection) {
           return {

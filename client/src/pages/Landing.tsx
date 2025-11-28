@@ -133,7 +133,7 @@ export default function Landing() {
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">ORBIT Talent Exchange</h2>
             <p className="text-xs sm:text-sm text-muted-foreground">Two-way job marketplace connecting employers with pre-vetted, GPS-verified workers</p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4">
             <Link href="/jobs" className="p-3 sm:p-5 rounded-lg border border-emerald-500/30 bg-emerald-900/20 hover:bg-emerald-900/40 hover:border-emerald-400/60 transition-all flex flex-col items-center text-center" data-testid="link-job-board">
               <div className="text-2xl sm:text-4xl mb-2">💼</div>
               <div className="font-semibold text-white text-xs sm:text-sm">Job Board</div>
@@ -153,6 +153,16 @@ export default function Landing() {
               <div className="text-2xl sm:text-4xl mb-2">👷</div>
               <div className="font-semibold text-white text-xs sm:text-sm">Join ORBIT</div>
               <div className="text-[10px] sm:text-xs text-gray-400">Worker application</div>
+            </Link>
+            <Link href="/employee-hub" className="p-3 sm:p-5 rounded-lg border border-violet-500/30 bg-violet-900/20 hover:bg-violet-900/40 hover:border-violet-400/60 transition-all flex flex-col items-center text-center" data-testid="link-employee-hub">
+              <div className="text-2xl sm:text-4xl mb-2">🧑‍💼</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">My Hub</div>
+              <div className="text-[10px] sm:text-xs text-gray-400">Worker self-service</div>
+            </Link>
+            <Link href="/owner-hub" className="p-3 sm:p-5 rounded-lg border border-violet-500/30 bg-violet-900/20 hover:bg-violet-900/40 hover:border-violet-400/60 transition-all flex flex-col items-center text-center" data-testid="link-owner-hub">
+              <div className="text-2xl sm:text-4xl mb-2">👔</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Owner Portal</div>
+              <div className="text-[10px] sm:text-xs text-gray-400">Company dashboard</div>
             </Link>
           </div>
         </div>
@@ -190,6 +200,79 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* NEXT WAVE - UPCOMING FEATURES */}
+      <section className="bg-gradient-to-br from-violet-950/40 via-purple-900/30 to-violet-950/40 border-b border-violet-500/30 py-8 sm:py-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-600/10 via-transparent to-transparent pointer-events-none"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 relative z-10">
+          <div className="text-center mb-6 sm:mb-8">
+            <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/40 text-xs sm:text-sm mb-3" data-testid="badge-next-wave">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> The Next Wave
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 sm:mb-3">What's on the Horizon</h2>
+            <p className="text-xs sm:text-sm text-violet-200/70 max-w-2xl mx-auto">Powerful new capabilities already in development to accelerate your staffing operations</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-300 group" data-testid="card-ai-scheduling">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">🤖</div>
+                <h3 className="text-sm sm:text-lg font-bold text-violet-200 mb-1 sm:mb-2">AI-Powered Scheduling</h3>
+                <p className="text-[10px] sm:text-xs text-violet-300/70">Predictive shift optimization using machine learning to match workers with jobs automatically</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-300 group" data-testid="card-background-checks">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">⚡</div>
+                <h3 className="text-sm sm:text-lg font-bold text-violet-200 mb-1 sm:mb-2">Instant Background Checks</h3>
+                <p className="text-[10px] sm:text-xs text-violet-300/70">Same-day verification with integrated criminal, employment, and credential screening</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-300 group" data-testid="card-multi-state">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">🌎</div>
+                <h3 className="text-sm sm:text-lg font-bold text-violet-200 mb-1 sm:mb-2">Multi-State Expansion</h3>
+                <p className="text-[10px] sm:text-xs text-violet-300/70">Nationwide compliance engine with automatic tax and labor law handling for all 50 states</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-300 group" data-testid="card-mobile-parity">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">📱</div>
+                <h3 className="text-sm sm:text-lg font-bold text-violet-200 mb-1 sm:mb-2">Mobile Parity</h3>
+                <p className="text-[10px] sm:text-xs text-violet-300/70">Full-featured iOS and Android apps with offline mode, biometric auth, and push notifications</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-300 group" data-testid="card-advanced-analytics">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">📊</div>
+                <h3 className="text-sm sm:text-lg font-bold text-violet-200 mb-1 sm:mb-2">Advanced Analytics</h3>
+                <p className="text-[10px] sm:text-xs text-violet-300/70">AI-driven insights with predictive revenue forecasting and workforce demand modeling</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.2)] transition-all duration-300 group" data-testid="card-franchise-tooling">
+              <CardContent className="p-4 sm:p-6">
+                <div className="text-3xl sm:text-4xl mb-3 group-hover:scale-110 transition-transform">🏗️</div>
+                <h3 className="text-sm sm:text-lg font-bold text-violet-200 mb-1 sm:mb-2">Franchise Tooling</h3>
+                <p className="text-[10px] sm:text-xs text-violet-300/70">White-label rapid deployment with brand customization and multi-tenant architecture</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="text-center mt-6 sm:mt-8">
+            <Link href="/roadmap" className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 hover:border-violet-400/60 text-violet-200 font-semibold text-xs sm:text-sm transition-all" data-testid="link-view-roadmap">
+              View Full Roadmap <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ACCESS BOXES - OWNER / CUSTOMER / ADMIN */}
       <section className="bg-gradient-to-b from-background to-slate-900/30 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-3 sm:px-6">
@@ -198,26 +281,26 @@ export default function Landing() {
             <p className="text-xs sm:text-base text-muted-foreground">Choose your role to access the platform</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
             {/* Business Owner Login */}
             <Link href="/admin" className="group">
               <Card className="h-full border-2 border-violet-400/40 hover:border-violet-300/70 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 hover:to-purple-400/15 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto">
-                <CardContent className="p-4 sm:p-8 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                <CardContent className="p-4 sm:p-6 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
                   <div>
-                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">🏢</div>
-                    <h3 className="text-lg sm:text-xl font-bold text-violet-300 mb-1 sm:mb-2">Business Owner</h3>
-                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-6">Manage your staffing operations, workers, clients, and billing</p>
-                    <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400 flex-shrink-0" />
+                    <div className="text-4xl sm:text-5xl mb-2 sm:mb-3">🏢</div>
+                    <h3 className="text-base sm:text-lg font-bold text-violet-300 mb-1 sm:mb-2">Business Owner</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mb-3 sm:mb-4">Manage staffing operations, workers, and billing</p>
+                    <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-violet-400 flex-shrink-0" />
                         <span>Worker & client management</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-violet-400 flex-shrink-0" />
                         <span>Real-time scheduling</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-violet-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-violet-400 flex-shrink-0" />
                         <span>Payroll & invoicing</span>
                       </div>
                     </div>
@@ -232,22 +315,22 @@ export default function Landing() {
             {/* Customer/Client Login */}
             <Link href="/worker" className="group">
               <Card className="h-full border-2 border-blue-600/30 hover:border-blue-400/60 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto">
-                <CardContent className="p-4 sm:p-8 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                <CardContent className="p-4 sm:p-6 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
                   <div>
-                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">👥</div>
-                    <h3 className="text-lg sm:text-xl font-bold text-blue-300 mb-1 sm:mb-2">Customer/Client</h3>
-                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-6">Submit staffing requests, manage assignments, and track performance</p>
-                    <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                    <div className="text-4xl sm:text-5xl mb-2 sm:mb-3">👥</div>
+                    <h3 className="text-base sm:text-lg font-bold text-blue-300 mb-1 sm:mb-2">Customer/Client</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mb-3 sm:mb-4">Submit requests, manage assignments, track performance</p>
+                    <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-blue-400 flex-shrink-0" />
                         <span>Request workers on-demand</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-blue-400 flex-shrink-0" />
                         <span>Track assignments</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-blue-400 flex-shrink-0" />
                         <span>Rate workers</span>
                       </div>
                     </div>
@@ -259,25 +342,55 @@ export default function Landing() {
               </Card>
             </Link>
 
+            {/* Employee Self-Service */}
+            <Link href="/employee-hub" className="group">
+              <Card className="h-full border-2 border-emerald-600/30 hover:border-emerald-400/60 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 hover:to-emerald-900/20 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto" data-testid="card-employee-self-service">
+                <CardContent className="p-4 sm:p-6 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                  <div>
+                    <div className="text-4xl sm:text-5xl mb-2 sm:mb-3">📋</div>
+                    <h3 className="text-base sm:text-lg font-bold text-emerald-300 mb-1 sm:mb-2">Employee Self-Service</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mb-3 sm:mb-4">Access your documents, timecards, and payment history</p>
+                    <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        <span>Tax documents & W-2s</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        <span>Pay stubs & earnings</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                        <span>Time cards & history</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm min-h-[44px]" data-testid="button-employee-self-service">
+                    Employee Hub <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+
             {/* Admin Access */}
             <Link href="/developer" className="group">
               <Card className="h-full border-2 border-cyan-600/30 hover:border-cyan-400/60 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 hover:to-cyan-900/20 transition-all duration-300 cursor-pointer min-h-[300px] sm:min-h-auto">
-                <CardContent className="p-4 sm:p-8 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
+                <CardContent className="p-4 sm:p-6 text-center flex flex-col justify-between h-full min-h-[300px] sm:min-h-auto">
                   <div>
-                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">⚙️</div>
-                    <h3 className="text-lg sm:text-xl font-bold text-cyan-300 mb-1 sm:mb-2">System Admin</h3>
-                    <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-6">Full platform control, employee registry, and settings</p>
-                    <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6">
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                    <div className="text-4xl sm:text-5xl mb-2 sm:mb-3">⚙️</div>
+                    <h3 className="text-base sm:text-lg font-bold text-cyan-300 mb-1 sm:mb-2">System Admin</h3>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mb-3 sm:mb-4">Full platform control, registry, and settings</p>
+                    <div className="space-y-1 sm:space-y-2 mb-3 sm:mb-4">
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-400 flex-shrink-0" />
                         <span>Employee registry</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-400 flex-shrink-0" />
                         <span>Contact notes & history</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                      <div className="flex items-center gap-2 text-[10px] sm:text-xs text-gray-300">
+                        <CheckCircle2 className="w-3 h-3 text-cyan-400 flex-shrink-0" />
                         <span>API testing</span>
                       </div>
                     </div>

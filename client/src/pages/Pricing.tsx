@@ -2,56 +2,83 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, CreditCard, Bitcoin, ArrowLeft } from 'lucide-react';
+import { Check, CreditCard, Bitcoin, ArrowLeft, TrendingDown } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { Link } from 'wouter';
 
-const PRICING_TIERS = [
+interface PricingTier {
+  id: string;
+  name: string;
+  price: number | null;
+  description: string;
+  workers: string;
+  features: string[];
+  priceId?: string;
+  featured?: boolean;
+  competitorComparison?: {
+    competitor: string;
+    savings: string;
+  };
+}
+
+const PRICING_TIERS: PricingTier[] = [
   {
-    id: 'solo',
-    name: 'Solo/Micro',
-    price: 199,
-    description: 'Just starting out',
-    workers: '1-25 workers',
+    id: 'starter',
+    name: 'Starter',
+    price: 39,
+    description: 'Perfect for small teams',
+    workers: '1-10 workers',
+    competitorComparison: {
+      competitor: 'Indeed',
+      savings: '68% less',
+    },
     features: [
       'Job posting & matching',
-      'Mobile time tracking',
-      '1-2 active clients',
+      'GPS time tracking',
       'Basic payroll export',
+      'Employee Hub access',
       'Email support'
     ],
     priceId: 'price_1SWpbXBJN5j7Sqn0zOGmvG8c',
   },
   {
-    id: 'small',
-    name: 'Small Agency',
-    price: 499,
-    description: 'For established staffing agencies',
-    workers: '25-150 workers',
+    id: 'growth',
+    name: 'Growth',
+    price: 99,
+    description: 'For growing staffing agencies',
+    workers: '10-50 workers',
     featured: true,
+    competitorComparison: {
+      competitor: 'ZipRecruiter',
+      savings: '67% less',
+    },
     features: [
-      'Everything in Solo',
-      'Unlimited clients',
+      'Everything in Starter',
+      'Owner Hub access',
       'Full payroll automation',
-      'GPS verification',
-      'Compliance reports',
-      'Priority email support'
+      'Reports API',
+      'Unlimited clients',
+      'Priority support'
     ],
     priceId: 'price_1SWpbXBJN5j7Sqn097nk0sua',
   },
   {
-    id: 'growth',
-    name: 'Growth Agency',
-    price: 999,
-    description: 'Multi-location scaling',
-    workers: '150-500 workers',
+    id: 'professional',
+    name: 'Professional',
+    price: 249,
+    description: 'Multi-location operations',
+    workers: '50-200 workers',
+    competitorComparison: {
+      competitor: 'Bullhorn',
+      savings: '60% less',
+    },
     features: [
-      'Everything in Small',
+      'Everything in Growth',
       'Multi-location management',
       'Advanced analytics',
-      'Custom integrations',
-      'Dedicated support',
-      'API access'
+      'Full API access',
+      'Weather verification',
+      'Dedicated support'
     ],
     priceId: 'price_1SWpbXBJN5j7Sqn0iaE4uiPM',
   },
@@ -60,13 +87,13 @@ const PRICING_TIERS = [
     name: 'Enterprise',
     price: null,
     description: 'White-label & franchises',
-    workers: '500+ workers',
+    workers: '200+ workers',
     features: [
-      'Everything in Growth',
+      'Everything in Professional',
       'White-label platform',
       'Custom branding',
       'Multi-tenant support',
-      'Account manager',
+      'Dedicated account manager',
       '24/7 phone support'
     ],
   },
@@ -151,14 +178,23 @@ export default function Pricing() {
                 </div>
 
                 {tier.price !== null ? (
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <span className="text-4xl font-bold">${tier.price}</span>
                     <span className="text-muted-foreground">/month</span>
                   </div>
                 ) : (
-                  <div className="mb-6">
+                  <div className="mb-4">
                     <span className="text-2xl font-bold text-primary">Custom</span>
                     <p className="text-sm text-muted-foreground">Contact us</p>
+                  </div>
+                )}
+
+                {tier.competitorComparison && (
+                  <div className="mb-4" data-testid={`comparison-badge-${tier.id}`}>
+                    <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/30 text-xs">
+                      <TrendingDown className="w-3 h-3 mr-1" />
+                      {tier.competitorComparison.savings} than {tier.competitorComparison.competitor}
+                    </Badge>
                   </div>
                 )}
 
@@ -171,10 +207,10 @@ export default function Pricing() {
                   ))}
                 </div>
 
-                {'priceId' in tier ? (
+                {tier.priceId ? (
                   <div className="space-y-3">
                     <Button
-                      onClick={() => handleCheckout(tier.priceId, 'stripe')}
+                      onClick={() => handleCheckout(tier.priceId!, 'stripe')}
                       disabled={checkoutMutation.isPending}
                       className="w-full"
                       variant={tier.featured ? 'default' : 'outline'}
@@ -184,7 +220,7 @@ export default function Pricing() {
                       {checkoutMutation.isPending ? 'Processing...' : 'Pay with Card'}
                     </Button>
                     <Button
-                      onClick={() => handleCheckout(tier.priceId, 'coinbase')}
+                      onClick={() => handleCheckout(tier.priceId!, 'coinbase')}
                       disabled={checkoutMutation.isPending}
                       variant="outline"
                       className="w-full"
