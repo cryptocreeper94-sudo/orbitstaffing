@@ -21,6 +21,7 @@ import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
 import { HomeSlideshow } from "@/components/HomeSlideshow";
 import { Accordion } from "@/components/Accordion";
+import { V2SignupModal } from "@/components/V2SignupModal";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 
@@ -75,6 +76,9 @@ export default function Landing() {
 
       {/* Demo Request Form */}
       {showDemoForm && <DemoRequestForm onClose={() => setShowDemoForm(false)} />}
+
+      {/* V2 Signup Modal - Shows after 30 seconds on first visit */}
+      <V2SignupModal triggerAfterSeconds={30} />
 
       {/* Saturn Watermark - Fixed Centered Background - Transparent */}
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">

@@ -60,6 +60,14 @@ Additional products in development:
 - **Dark Wave Pulse:** Operational heartbeat platform
 - **GarageBot:** Auto parts AI assistant (Coming 2026)
 
+### 2.5 Version 2 Features (Coming Q1-Q2 2026)
+- **Skill-Based Matching:** AI-powered worker recommendations
+- **Real-Time Notifications:** Instant job alerts via push/SMS
+- **Remote Support & Co-Browsing:** Live screen viewing for customer support
+- **Customer Analytics Dashboard:** ROI tracking, heatmaps, custom reports
+- **Native Mobile App:** iOS & Android with offline mode
+- **Blockchain Credentials:** Portable, verified worker certifications
+
 ---
 
 ## 3. Market Analysis

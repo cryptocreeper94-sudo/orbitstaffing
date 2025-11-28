@@ -129,12 +129,29 @@ ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-marke
 - [ ] Public beta launch
 - [ ] First 10 paying customers
 - [ ] Mobile app store releases
+- [ ] Skill-based job matching
+- [ ] Real-time job notifications
 
 ### Q2 2026
+- [ ] **Remote Support & Co-Browsing** - Live screen viewing for customer support
 - [ ] Blockchain credential verification
 - [ ] 50 customer milestone
 - [ ] Franchise program launch
 - [ ] Geographic expansion
+- [ ] Customer analytics dashboard
+
+---
+
+## Version 2 Preview (Coming Q1-Q2 2026)
+
+Sign up for V2 updates at **orbitstaffing.net** to get early access to:
+
+1. **Skill-Based Matching** - AI-powered worker-to-job recommendations
+2. **Real-Time Notifications** - Instant push alerts for new jobs
+3. **Remote Support** - Live co-browsing for customer assistance
+4. **Advanced Analytics** - Heatmaps, ROI tracking, custom reports
+5. **Native Mobile App** - iOS & Android with offline mode
+6. **Blockchain Credentials** - Portable, verified worker certifications
 
 ---
 

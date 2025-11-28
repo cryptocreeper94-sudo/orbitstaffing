@@ -129,6 +129,29 @@
 **Impact:** Better customer retention
 **Revenue:** Analytics tier (+$500/mo)
 
+### 3.5 REMOTE SUPPORT & CO-BROWSING (NEW!)
+**Problem:** Support teams can't see what customers see when troubleshooting
+
+**Solution:**
+- **Co-browsing:** Support agents see customer's browser session in real-time
+- **Remote guidance:** Highlight, point, and guide customers through steps
+- **Session consent:** Customer must approve before any screen access
+- **Sensitive field masking:** SSN, passwords, banking info automatically hidden
+- **Audit logging:** Every remote session logged for compliance
+- **Warranty integration:** Tie support access to warranty/service levels
+
+**Implementation Options:**
+| Service | Type | Best For |
+|---------|------|----------|
+| Cobrowse.io | Browser co-browse | Web app support (no install) |
+| Zoho Assist | Full remote control | Desktop support |
+| Glia | Enterprise co-browse | AI + human hybrid support |
+| FullStory | Session replay | Post-incident analysis |
+
+**Effort:** 3-4 weeks
+**Impact:** 50% faster support resolution, higher customer satisfaction
+**Revenue:** Premium support tier (+$200/mo) or included in warranty packages
+
 ---
 
 ## PHASE 4: EXPANSION (Q2 2026, Apr-Jun)

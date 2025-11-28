@@ -104,6 +104,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(parseJSON);
 
   // ========================
+  // V2 SIGNUP (Early Access Waitlist)
+  // ========================
+  app.post("/api/v2-signup", async (req: Request, res: Response) => {
+    try {
+      const { contactMethod, email, phone } = req.body;
+      
+      if (!contactMethod || (contactMethod === 'email' && !email) || (contactMethod === 'sms' && !phone)) {
+        return res.status(400).json({ error: "Contact information required" });
+      }
+
+      console.log(`[V2 SIGNUP] New signup: ${contactMethod} - ${email || phone}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Thank you for signing up! We'll notify you when V2 launches."
+      });
+    } catch (error) {
+      console.error("[V2 SIGNUP] Error:", error);
+      res.status(500).json({ error: "Failed to process signup" });
+    }
+  });
+
+  // ========================
   // AUTH ROUTES (ORBIT Payroll System)
   // ========================
   app.post("/api/auth/register", async (req: Request, res: Response) => {
