@@ -603,6 +603,39 @@
             cursor: not-allowed;
         }
 
+        .product-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .slideshow-btn {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .slideshow-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: #00d4ff;
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .product-buttons .product-link {
+            flex: 1;
+            margin-top: 0;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+        }
+
         .product-link.disabled:hover {
             transform: none;
             box-shadow: none;
@@ -1179,7 +1212,10 @@
                         real-time scheduling, worker management, and blockchain-secured hallmarks. Built for agencies 
                         managing flexible labor across skilled trades, hospitality, and general workforce.
                     </p>
-                    <button onclick="openOrbitModal()" class="product-link" style="border: none; cursor: pointer;">Try ORBIT Demo →</button>
+                    <div class="product-buttons">
+                        <button onclick="openOrbitSlideshow()" class="slideshow-btn" style="border: none; cursor: pointer;">📽️ View Slideshow</button>
+                        <button onclick="openOrbitModal()" class="product-link" style="border: none; cursor: pointer;">Try ORBIT Demo →</button>
+                    </div>
                 </div>
 
                 <div class="product-card">
@@ -1191,7 +1227,10 @@
                         Real-time analytics, predictive scheduling, equipment tracking, and automated compliance 
                         reporting for multi-location operations.
                     </p>
-                    <button onclick="openOpsModal()" class="product-link" style="border: none; cursor: pointer;">Learn More →</button>
+                    <div class="product-buttons">
+                        <button onclick="openOpsSlideshow()" class="slideshow-btn" style="border: none; cursor: pointer;">📽️ View Slideshow</button>
+                        <button onclick="openOpsModal()" class="product-link" style="border: none; cursor: pointer;">Learn More →</button>
+                    </div>
                 </div>
 
                 <div class="product-card">
@@ -1205,7 +1244,10 @@
                         Experience the dark electronic soundscape. Immersive audio-visual journey through 
                         industrial beats and synthetic waves. A creative exploration of sound and technology.
                     </p>
-                    <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience the Pulse →</button>
+                    <div class="product-buttons">
+                        <button onclick="openPulseSlideshow()" class="slideshow-btn" style="border: none; cursor: pointer;">📽️ View Slideshow</button>
+                        <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience the Pulse →</button>
+                    </div>
                 </div>
 
                 <div class="product-card">
@@ -1217,7 +1259,10 @@
                         for any vehicle with an engine - cars, trucks, motorcycles, boats, ATVs, RVs, classics, exotics, and more. 
                         Meet Buddy, your AI parts expert.
                     </p>
-                    <button onclick="openGarageBotModal()" class="product-link" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">Explore GarageBot →</button>
+                    <div class="product-buttons">
+                        <button onclick="openGarageBotModal()" class="slideshow-btn" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">📽️ View Slideshow</button>
+                        <button onclick="window.open('mailto:cryptocreeper94@gmail.com?subject=GarageBot%20Early%20Access', '_blank')" class="product-link" style="border: none; cursor: pointer;">Request Access →</button>
+                    </div>
                 </div>
             </div>
 
@@ -1232,7 +1277,10 @@
                             Complete staffing automation platform with GPS-verified check-ins, multi-state payroll compliance, 
                             real-time scheduling, and blockchain-secured hallmarks.
                         </p>
-                        <button onclick="openOrbitModal()" class="product-link" style="border: none; cursor: pointer;">Try ORBIT Demo →</button>
+                        <div class="product-buttons">
+                            <button onclick="openOrbitSlideshow()" class="slideshow-btn" style="border: none; cursor: pointer;">📽️ Slideshow</button>
+                            <button onclick="openOrbitModal()" class="product-link" style="border: none; cursor: pointer;">Demo →</button>
+                        </div>
                     </div>
 
                     <div class="product-card">
@@ -1242,7 +1290,10 @@
                         <p class="product-description">
                             Advanced operations management suite for enterprise-scale workforce coordination with real-time analytics.
                         </p>
-                        <button onclick="openOpsModal()" class="product-link" style="border: none; cursor: pointer;">Learn More →</button>
+                        <div class="product-buttons">
+                            <button onclick="openOpsSlideshow()" class="slideshow-btn" style="border: none; cursor: pointer;">📽️ Slideshow</button>
+                            <button onclick="openOpsModal()" class="product-link" style="border: none; cursor: pointer;">Learn More →</button>
+                        </div>
                     </div>
 
                     <div class="product-card">
@@ -1255,7 +1306,10 @@
                         <p class="product-description">
                             Immersive audio-visual journey through industrial beats and synthetic waves.
                         </p>
-                        <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience the Pulse →</button>
+                        <div class="product-buttons">
+                            <button onclick="openPulseSlideshow()" class="slideshow-btn" style="border: none; cursor: pointer;">📽️ Slideshow</button>
+                            <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience →</button>
+                        </div>
                     </div>
 
                     <div class="product-card">
@@ -1265,7 +1319,10 @@
                         <p class="product-description">
                             The ultimate auto parts aggregator. Search 20+ retailers to find the right part at the best price.
                         </p>
-                        <button onclick="openGarageBotModal()" class="product-link" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">Explore GarageBot →</button>
+                        <div class="product-buttons">
+                            <button onclick="openGarageBotModal()" class="slideshow-btn" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">📽️ Slideshow</button>
+                            <button onclick="window.open('mailto:cryptocreeper94@gmail.com?subject=GarageBot%20Early%20Access', '_blank')" class="product-link" style="border: none; cursor: pointer;">Access →</button>
+                        </div>
                     </div>
                 </div>
                 <div class="carousel-nav-mobile">
@@ -1597,6 +1654,105 @@
         </div>
     </div>
 
+    <!-- ORBIT Slideshow Modal -->
+    <div id="orbitSlideshowModal" class="modal-overlay" onclick="closeModal('orbitSlideshowModal')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeModal('orbitSlideshowModal')">&times;</button>
+            <div class="modal-icon">
+                <div class="saturn-logo" style="width: 60px; height: 60px;">
+                    <div class="saturn-ring" style="width: 90px; height: 90px;"></div>
+                    <div class="saturn-planet" style="width: 60px; height: 60px;"></div>
+                </div>
+            </div>
+            <h2 class="modal-title">ORBIT Staffing OS</h2>
+            <p class="modal-subtitle">Complete Staffing Automation Platform</p>
+            
+            <div class="carousel-container" id="orbitCarousel">
+                <div class="carousel-track" id="orbitTrack">
+                    <div class="carousel-slide"><span class="category-badge">Introduction</span><h4>ORBIT Staffing OS</h4><p>The complete staffing automation platform that eliminates manual work and scales your agency with 100% automation from customer request to worker payment.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Vision</span><h4>Our Mission</h4><p>Reduce staffing agency operational costs by 60-68% while providing enterprise-grade features at a fraction of competitor pricing.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Core Feature</span><h4>GPS-Verified Check-In</h4><p>300ft geofencing accuracy ensures workers are on-site. Automated time tracking with photo verification and location stamps.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Core Feature</span><h4>Multi-State Payroll</h4><p>Automated tax calculations for TN, KY, FL and more. Handles overtime, prevailing wage, and garnishment processing.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Core Feature</span><h4>Real-Time Scheduling</h4><p>Drag-and-drop scheduling with instant worker notifications. Availability calendars, shift swapping, and conflict detection.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Automation</span><h4>Worker Onboarding</h4><p>Digital I-9 verification, document uploads, e-signatures, and compliance tracking. Complete paperless onboarding in minutes.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Automation</span><h4>Invoicing Engine</h4><p>Auto-generated invoices with customizable templates. Integrates with time entries, calculates markups, and tracks payments.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Security</span><h4>Digital Hallmarks</h4><p>Blockchain-secured verification stamps on all documents. Unique asset numbers for compliance auditing and tokenization.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Mobile</span><h4>Mobile-First Design</h4><p>Native iOS and Android apps with biometric login, push notifications, and offline capability for field workers.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Enterprise</span><h4>White-Label Ready</h4><p>Multi-tenant architecture with complete data isolation. Custom branding, domains, and franchise management.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Analytics</span><h4>Real-Time Dashboard</h4><p>WebSocket-powered live updates. Track workers, assignments, payroll, and revenue across all locations instantly.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Pricing</span><h4>Aggressive Pricing</h4><p>Starter: $39/mo | Growth: $99/mo | Professional: $249/mo. 60-68% less than Bullhorn, Avionté, and TempWorks.</p></div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-btn" onclick="orbitPrevSlide()">← Prev</button>
+                    <div class="carousel-counter"><span id="orbitCurrent">1</span> / <span id="orbitTotal">12</span></div>
+                    <button class="carousel-btn" onclick="orbitNextSlide()">Next →</button>
+                </div>
+            </div>
+            <a href="https://orbitstaffing.net" target="_blank" class="modal-cta">Launch ORBIT Demo →</a>
+        </div>
+    </div>
+
+    <!-- Lot Ops Pro Slideshow Modal -->
+    <div id="opsSlideshowModal" class="modal-overlay" onclick="closeModal('opsSlideshowModal')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeModal('opsSlideshowModal')">&times;</button>
+            <div class="modal-icon">⚙️</div>
+            <h2 class="modal-title">Lot Ops Pro</h2>
+            <p class="modal-subtitle">Enterprise Operations Management</p>
+            
+            <div class="carousel-container" id="opsCarousel">
+                <div class="carousel-track" id="opsTrack">
+                    <div class="carousel-slide"><span class="category-badge">Introduction</span><h4>Lot Ops Pro</h4><p>Advanced operations management suite for enterprise-scale workforce coordination. Built for car dealerships, fleet operations, and multi-location businesses.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Vision</span><h4>Streamline Operations</h4><p>Eliminate the chaos of managing multiple locations, vehicles, and workers. One platform for complete operational visibility.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Core Feature</span><h4>Real-Time Analytics</h4><p>Live dashboards showing lot inventory, worker locations, vehicle status, and key performance metrics across all sites.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Core Feature</span><h4>Predictive Scheduling</h4><p>AI-powered scheduling that optimizes worker assignments based on historical data, weather, and demand patterns.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Core Feature</span><h4>Equipment Tracking</h4><p>GPS tracking for vehicles and equipment. Know where every asset is, who's using it, and maintenance schedules.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Automation</span><h4>Compliance Reporting</h4><p>Automated generation of compliance reports, audit trails, and regulatory documentation for all operations.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Analytics</span><h4>Performance Metrics</h4><p>Track worker productivity, task completion rates, customer satisfaction, and operational efficiency in real-time.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Enterprise</span><h4>Multi-Location Support</h4><p>Manage multiple dealerships, lots, and facilities from a single dashboard with role-based access control.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Integration</span><h4>API Access</h4><p>Enterprise-grade APIs for integration with DMS systems, accounting software, and third-party tools.</p></div>
+                    <div class="carousel-slide"><span class="category-badge">Mobile</span><h4>Field Operations App</h4><p>Mobile app for lot porters, drivers, and field workers. Real-time task assignments and status updates.</p></div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-btn" onclick="opsPrevSlide()">← Prev</button>
+                    <div class="carousel-counter"><span id="opsCurrent">1</span> / <span id="opsTotal">10</span></div>
+                    <button class="carousel-btn" onclick="opsNextSlide()">Next →</button>
+                </div>
+            </div>
+            <a href="https://lotopspro.com" target="_blank" class="modal-cta" style="background: linear-gradient(135deg, #8b95a5, #6b7585);">Visit Lot Ops Pro →</a>
+        </div>
+    </div>
+
+    <!-- Dark Wave Pulse Slideshow Modal -->
+    <div id="pulseSlideshowModal" class="modal-overlay" onclick="closeModal('pulseSlideshowModal')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeModal('pulseSlideshowModal')">&times;</button>
+            <div class="modal-icon">🎵</div>
+            <h2 class="modal-title" style="color: #ba55d3;">Dark Wave Pulse</h2>
+            <p class="modal-subtitle">Immersive Audio-Visual Experience</p>
+            
+            <div class="carousel-container" id="pulseCarousel">
+                <div class="carousel-track" id="pulseTrack">
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Introduction</span><h4>Dark Wave Pulse</h4><p>Enter the dark electronic soundscape. An immersive journey through industrial beats, synthetic waves, and visual art.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Vision</span><h4>Creative Exploration</h4><p>Pushing the boundaries of audio-visual art. Where technology meets creativity in a dark, atmospheric experience.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Audio</span><h4>Industrial Beats</h4><p>Deep, driving rhythms inspired by industrial and dark electronic music. Carefully crafted soundscapes that pulse with energy.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Audio</span><h4>Synthetic Waves</h4><p>Rich synthesizer textures and atmospheric pads. Layers of sound that create depth and movement.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Visual</span><h4>Immersive Visuals</h4><p>Reactive visual effects that respond to the music. Dark themes, pulsing lights, and geometric patterns.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Interactive</span><h4>Audio Controls</h4><p>Interactive mixing and audio manipulation. Control the experience with intuitive touch interfaces.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Content</span><h4>Curated Playlists</h4><p>Hand-selected dark wave, industrial, and synthwave tracks. Discover new artists and expand your sonic horizons.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Design</span><h4>Original Sound Design</h4><p>Unique sound effects and audio textures created specifically for the Dark Wave Pulse experience.</p></div>
+                    <div class="carousel-slide"><span class="category-badge" style="background: rgba(186, 85, 211, 0.15); border-color: rgba(186, 85, 211, 0.3); color: #ba55d3;">Experience</span><h4>Enter the Pulse</h4><p>Ready to experience the darkness? Dive into Dark Wave Pulse and let the sound take you on a journey.</p></div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-btn" onclick="pulsePrevSlide()">← Prev</button>
+                    <div class="carousel-counter"><span id="pulseCurrent">1</span> / <span id="pulseTotal">9</span></div>
+                    <button class="carousel-btn" onclick="pulseNextSlide()">Next →</button>
+                </div>
+            </div>
+            <a href="https://darkwavepulse.com" target="_blank" class="modal-cta" style="background: linear-gradient(135deg, #ba55d3, #8b00ff);">Enter the Pulse →</a>
+        </div>
+    </div>
+
     <!-- GarageBot Modal with Horizontal Carousel -->
     <div id="garageBotModal" class="modal-overlay" onclick="closeModal('garageBotModal')">
         <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
@@ -1798,6 +1954,91 @@
             updateGarageBotCarousel();
         }
 
+        // Slideshow openers
+        function openOrbitSlideshow() {
+            document.getElementById('orbitSlideshowModal').classList.add('active');
+            orbitCurrentSlide = 0;
+            updateOrbitCarousel();
+        }
+
+        function openOpsSlideshow() {
+            document.getElementById('opsSlideshowModal').classList.add('active');
+            opsCurrentSlide = 0;
+            updateOpsCarousel();
+        }
+
+        function openPulseSlideshow() {
+            document.getElementById('pulseSlideshowModal').classList.add('active');
+            pulseCurrentSlide = 0;
+            updatePulseCarousel();
+        }
+
+        // ORBIT Slideshow Carousel
+        let orbitCurrentSlide = 0;
+        const orbitTotalSlides = 12;
+
+        function updateOrbitCarousel() {
+            const track = document.getElementById('orbitTrack');
+            if (track) {
+                track.style.transform = `translateX(-${orbitCurrentSlide * 100}%)`;
+                document.getElementById('orbitCurrent').textContent = orbitCurrentSlide + 1;
+            }
+        }
+
+        function orbitNextSlide() {
+            orbitCurrentSlide = (orbitCurrentSlide + 1) % orbitTotalSlides;
+            updateOrbitCarousel();
+        }
+
+        function orbitPrevSlide() {
+            orbitCurrentSlide = (orbitCurrentSlide - 1 + orbitTotalSlides) % orbitTotalSlides;
+            updateOrbitCarousel();
+        }
+
+        // Lot Ops Pro Slideshow Carousel
+        let opsCurrentSlide = 0;
+        const opsTotalSlides = 10;
+
+        function updateOpsCarousel() {
+            const track = document.getElementById('opsTrack');
+            if (track) {
+                track.style.transform = `translateX(-${opsCurrentSlide * 100}%)`;
+                document.getElementById('opsCurrent').textContent = opsCurrentSlide + 1;
+            }
+        }
+
+        function opsNextSlide() {
+            opsCurrentSlide = (opsCurrentSlide + 1) % opsTotalSlides;
+            updateOpsCarousel();
+        }
+
+        function opsPrevSlide() {
+            opsCurrentSlide = (opsCurrentSlide - 1 + opsTotalSlides) % opsTotalSlides;
+            updateOpsCarousel();
+        }
+
+        // Dark Wave Pulse Slideshow Carousel
+        let pulseCurrentSlide = 0;
+        const pulseTotalSlides = 9;
+
+        function updatePulseCarousel() {
+            const track = document.getElementById('pulseTrack');
+            if (track) {
+                track.style.transform = `translateX(-${pulseCurrentSlide * 100}%)`;
+                document.getElementById('pulseCurrent').textContent = pulseCurrentSlide + 1;
+            }
+        }
+
+        function pulseNextSlide() {
+            pulseCurrentSlide = (pulseCurrentSlide + 1) % pulseTotalSlides;
+            updatePulseCarousel();
+        }
+
+        function pulsePrevSlide() {
+            pulseCurrentSlide = (pulseCurrentSlide - 1 + pulseTotalSlides) % pulseTotalSlides;
+            updatePulseCarousel();
+        }
+
         // GarageBot Carousel
         let garageBotCurrentSlide = 0;
         const garageBotTotalSlides = 21;
@@ -1835,6 +2076,9 @@
                 closeModal('opsModal');
                 closeModal('pulseModal');
                 closeModal('garageBotModal');
+                closeModal('orbitSlideshowModal');
+                closeModal('opsSlideshowModal');
+                closeModal('pulseSlideshowModal');
             }
         });
 
