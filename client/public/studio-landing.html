@@ -680,6 +680,119 @@
             box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
         }
 
+        /* GarageBot Carousel Styles */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: rgba(10, 15, 30, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s ease;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        .carousel-slide h4 {
+            color: #00d4ff;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .carousel-slide .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            color: #00d4ff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .carousel-slide p {
+            color: #c0c8d0;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(10, 15, 30, 0.8);
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .carousel-btn {
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.6);
+        }
+
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.2);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-dot.active {
+            background: #00d4ff;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .carousel-counter {
+            color: #8b95a5;
+            font-size: 0.9rem;
+        }
+
+        .carousel-counter span {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .garagebot-gradient {
+            background: linear-gradient(135deg, #00d4ff 0%, #20b2aa 50%, #008080 100%);
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -734,6 +847,23 @@
 
             .modal-subtitle {
                 font-size: 1rem;
+            }
+
+            .carousel-slide h4 {
+                font-size: 1.1rem;
+            }
+
+            .carousel-slide p {
+                font-size: 0.85rem;
+            }
+
+            .carousel-nav {
+                padding: 10px 15px;
+            }
+
+            .carousel-btn {
+                padding: 6px 12px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -797,6 +927,18 @@
                         industrial beats and synthetic waves. A creative exploration of sound and technology.
                     </p>
                     <button onclick="openPulseModal()" class="product-link" style="border: none; cursor: pointer;">Experience the Pulse →</button>
+                </div>
+
+                <div class="product-card">
+                    <div style="font-size: 4rem; text-align: center; margin-bottom: 15px;">🔧</div>
+                    <h3 class="product-title" style="color: #20b2aa;">GarageBot</h3>
+                    <span class="product-status coming-soon">COMING SOON</span>
+                    <p class="product-description">
+                        The ultimate auto parts aggregator. Search 20+ retailers to find the right part at the best price 
+                        for any vehicle with an engine - cars, trucks, motorcycles, boats, ATVs, RVs, classics, exotics, and more. 
+                        Meet Buddy, your AI parts expert.
+                    </p>
+                    <button onclick="openGarageBotModal()" class="product-link" style="border: none; cursor: pointer; background: linear-gradient(135deg, #00d4ff, #20b2aa);">Explore GarageBot →</button>
                 </div>
             </div>
         </section>
@@ -1009,6 +1151,168 @@
         </div>
     </div>
 
+    <!-- GarageBot Modal with Horizontal Carousel -->
+    <div id="garageBotModal" class="modal-overlay" onclick="closeModal('garageBotModal')">
+        <div class="modal-content" onclick="event.stopPropagation()" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeModal('garageBotModal')">&times;</button>
+            <div class="modal-icon">🔧</div>
+            <h2 class="modal-title" style="color: #20b2aa;">GarageBot</h2>
+            <p class="modal-subtitle">Right Part. First Time. Every Engine.</p>
+            
+            <!-- Horizontal Carousel Slideshow -->
+            <div class="carousel-container" id="garageBotCarousel">
+                <div class="carousel-track" id="garageBotTrack">
+                    <!-- Slide 1: Intro -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Introduction</span>
+                        <h4>GarageBot</h4>
+                        <p>The only parts platform built for every vehicle with an engine. Search 20+ retailers instantly to find the right part at the best price.</p>
+                    </div>
+                    <!-- Slide 2: Vision -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Vision</span>
+                        <h4>The Vision</h4>
+                        <p>Eliminate the frustration of parts hunting. One search, every retailer, every vehicle type - from daily drivers to rare classics.</p>
+                    </div>
+                    <!-- Slide 3: Universal Coverage -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Core Feature</span>
+                        <h4>Universal Vehicle Coverage</h4>
+                        <p>Cars, trucks, motorcycles, ATVs, boats, RVs, diesel rigs, classics, exotics, kit cars, and Chinese imports - all in one platform.</p>
+                    </div>
+                    <!-- Slide 4: Retailer Network -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Core Feature</span>
+                        <h4>20+ Retailer Network</h4>
+                        <p>Aggregates inventory from AutoZone, O'Reilly, RockAuto, Advance Auto, Amazon, NAPA, Summit Racing, and specialty suppliers.</p>
+                    </div>
+                    <!-- Slide 5: AI Buddy -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Core Feature</span>
+                        <h4>Meet Buddy - Your AI Parts Expert</h4>
+                        <p>Natural language parts search powered by AI. Describe your problem, snap a photo, or use voice - Buddy finds the right part.</p>
+                    </div>
+                    <!-- Slide 6: Photo Recognition -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Automation</span>
+                        <h4>Smart Photo Recognition</h4>
+                        <p>Upload a photo of any part and Buddy identifies it instantly. Works for worn parts, damaged components, and mystery pieces.</p>
+                    </div>
+                    <!-- Slide 7: VIN Decode -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Automation</span>
+                        <h4>VIN Decode Integration</h4>
+                        <p>Scan or enter your VIN for guaranteed fitment. NHTSA-verified decoding ensures every part matches your exact vehicle.</p>
+                    </div>
+                    <!-- Slide 8: My Garage -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Core Feature</span>
+                        <h4>My Garage - Fleet Management</h4>
+                        <p>Save unlimited vehicles with full specs. Track maintenance schedules, get AI-powered service reminders, and build maintenance history.</p>
+                    </div>
+                    <!-- Slide 9: Local Pickup -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Core Feature</span>
+                        <h4>Local Pickup Priority</h4>
+                        <p>Need it now? GarageBot shows local store availability first, with real-time stock status and same-day pickup options.</p>
+                    </div>
+                    <!-- Slide 10: Price Comparison -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Analytics</span>
+                        <h4>Price Comparison Engine</h4>
+                        <p>Compare prices across all retailers instantly. See shipping costs, estimated delivery, and total landed cost before you buy.</p>
+                    </div>
+                    <!-- Slide 11: DIY Guides -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Automation</span>
+                        <h4>DIY Repair Guides</h4>
+                        <p>AI-generated step-by-step repair instructions tailored to your specific vehicle. Includes tool lists and difficulty ratings.</p>
+                    </div>
+                    <!-- Slide 12: Mechanic Estimates -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Analytics</span>
+                        <h4>Mechanic Cost Estimates</h4>
+                        <p>Get instant labor estimates for any repair. Compare DIY savings vs professional shop costs in your local market.</p>
+                    </div>
+                    <!-- Slide 13: Maintenance Alerts -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Automation</span>
+                        <h4>Proactive Maintenance Alerts</h4>
+                        <p>Buddy monitors your vehicles and sends timely reminders for oil changes, tire rotations, seasonal prep, and recall notices.</p>
+                    </div>
+                    <!-- Slide 14: Insurance -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Integration</span>
+                        <h4>Insurance Comparison</h4>
+                        <p>Compare auto, motorcycle, boat, and RV insurance quotes from multiple carriers. Integrated Insurify partnership for instant quotes.</p>
+                    </div>
+                    <!-- Slide 15: NFT -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Integration</span>
+                        <h4>Genesis Hallmark NFT</h4>
+                        <p>Early adopters receive blockchain-verified vehicle badges. Permanent proof of ownership, service history, and platform loyalty.</p>
+                    </div>
+                    <!-- Slide 16: Shop Portal -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Enterprise</span>
+                        <h4>Shop Portal for Mechanics</h4>
+                        <p>Professional-grade tools for repair shops. Bulk ordering, customer vehicle management, and wholesale pricing access.</p>
+                    </div>
+                    <!-- Slide 17: Mobile -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Mobile</span>
+                        <h4>Mobile-First Design</h4>
+                        <p>Full functionality on any device. Scan VINs, snap photos, and order parts from your phone in the garage or on the road.</p>
+                    </div>
+                    <!-- Slide 18: Checkout -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Security</span>
+                        <h4>Secure Checkout</h4>
+                        <p>Stripe-powered payments with saved payment methods. Future support for cryptocurrency via Coinbase Commerce.</p>
+                    </div>
+                    <!-- Slide 19: Affiliate -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Integration</span>
+                        <h4>Affiliate Rewards</h4>
+                        <p>Earn commissions by sharing deals. Track referrals, view earnings, and get paid monthly through our affiliate program.</p>
+                    </div>
+                    <!-- Slide 20: Pro -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Pricing</span>
+                        <h4>GarageBot Pro - $2.99/month</h4>
+                        <p>Priority AI responses, unlimited photo IDs, exclusive deals, early access to features, and premium support.</p>
+                    </div>
+                    <!-- Slide 21: CTA -->
+                    <div class="carousel-slide">
+                        <span class="category-badge">Get Started</span>
+                        <h4>Start Your Garage Today</h4>
+                        <p>Join thousands of vehicle owners who trust GarageBot to find the right part, first time, every time.</p>
+                    </div>
+                </div>
+                <div class="carousel-nav">
+                    <button class="carousel-btn" id="garageBotPrev" onclick="garageBotPrevSlide()">← Prev</button>
+                    <div class="carousel-counter">
+                        <span id="garageBotCurrent">1</span> / <span id="garageBotTotal">21</span>
+                    </div>
+                    <button class="carousel-btn" id="garageBotNext" onclick="garageBotNextSlide()">Next →</button>
+                </div>
+            </div>
+
+            <div class="modal-sandbox" style="border-color: rgba(32, 178, 170, 0.4); background: rgba(32, 178, 170, 0.1);">
+                <h4 style="color: #20b2aa;">🚗 Coming Soon</h4>
+                <p>
+                    GarageBot is currently in development. We're building the most comprehensive auto parts aggregator 
+                    that covers every vehicle with an engine - from daily drivers to rare classics.
+                </p>
+                <p style="margin-top: 10px;">
+                    <strong>Interested in early access?</strong> Contact us to join the beta program and be the first to experience GarageBot.
+                </p>
+            </div>
+
+            <a href="mailto:cryptocreeper94@gmail.com?subject=GarageBot%20Early%20Access" class="modal-cta" style="background: linear-gradient(135deg, #00d4ff, #20b2aa);">Request Early Access →</a>
+        </div>
+    </div>
+
     <script>
         function createStars() {
             const starsContainer = document.getElementById('stars');
@@ -1042,14 +1346,74 @@
             document.getElementById(modalId).classList.remove('active');
         }
 
+        function openGarageBotModal() {
+            document.getElementById('garageBotModal').classList.add('active');
+            garageBotCurrentSlide = 0;
+            updateGarageBotCarousel();
+        }
+
+        // GarageBot Carousel
+        let garageBotCurrentSlide = 0;
+        const garageBotTotalSlides = 21;
+
+        function updateGarageBotCarousel() {
+            const track = document.getElementById('garageBotTrack');
+            track.style.transform = `translateX(-${garageBotCurrentSlide * 100}%)`;
+            document.getElementById('garageBotCurrent').textContent = garageBotCurrentSlide + 1;
+        }
+
+        function garageBotNextSlide() {
+            if (garageBotCurrentSlide < garageBotTotalSlides - 1) {
+                garageBotCurrentSlide++;
+                updateGarageBotCarousel();
+            } else {
+                garageBotCurrentSlide = 0;
+                updateGarageBotCarousel();
+            }
+        }
+
+        function garageBotPrevSlide() {
+            if (garageBotCurrentSlide > 0) {
+                garageBotCurrentSlide--;
+                updateGarageBotCarousel();
+            } else {
+                garageBotCurrentSlide = garageBotTotalSlides - 1;
+                updateGarageBotCarousel();
+            }
+        }
+
         // Close modal on Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal('orbitModal');
                 closeModal('opsModal');
                 closeModal('pulseModal');
+                closeModal('garageBotModal');
             }
         });
+
+        // Swipe support for GarageBot carousel
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.getElementById('garageBotCarousel').addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.getElementById('garageBotCarousel').addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleGarageBotSwipe();
+        }, false);
+
+        function handleGarageBotSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                garageBotNextSlide();
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                garageBotPrevSlide();
+            }
+        }
 
         createStars();
     </script>
