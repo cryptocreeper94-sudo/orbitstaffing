@@ -15,6 +15,7 @@ import HourCounter from '@/components/HourCounter';
 import UniversalEmployeeRegistry from '@/components/UniversalEmployeeRegistry';
 import { AdminWorkerAvailabilityManager } from './AdminWorkerAvailabilityManager';
 import { SidonieWelcomeModal } from '@/components/SidonieWelcomeModal';
+import { PinChangeModal } from '@/components/PinChangeModal';
 import { getValidSession, setSessionWithExpiry, clearSession } from '@/lib/sessionUtils';
 import { AssetTracker } from '@/components/AssetTracker';
 import { CompanyHallmarkManager } from '@/components/CompanyHallmarkManager';
@@ -54,6 +55,7 @@ export default function AdminPanel() {
   const [developerPin, setDeveloperPin] = useState('');
   const [developerError, setDeveloperError] = useState('');
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
+  const [showPinChangeModal, setShowPinChangeModal] = useState(false);
 
   // Check if already authenticated
   useEffect(() => {
@@ -406,7 +408,26 @@ export default function AdminPanel() {
           setShowWelcomeMessage(false);
           // Mark automation update as seen
           localStorage.setItem('sidonieV1AutomationUpdate', 'seen');
+          
+          // Check if Sidonie needs to change her PIN (first time login)
+          const hasChangedPin = localStorage.getItem('sidonieChangedPin') === 'true';
+          const hasSkippedPinChange = localStorage.getItem('sidonieSkippedPinChange') === 'true';
+          
+          if (adminName === 'Sidonie' && !hasChangedPin && !hasSkippedPinChange) {
+            // Show PIN change modal after welcome modal closes
+            setTimeout(() => {
+              setShowPinChangeModal(true);
+            }, 300);
+          }
         }} 
+      />
+      
+      {/* PIN Change Modal (for first-time login) */}
+      <PinChangeModal
+        isOpen={showPinChangeModal}
+        onClose={() => setShowPinChangeModal(false)}
+        onSkip={() => setShowPinChangeModal(false)}
+        adminName={adminName}
       />
       
       <div className="max-w-6xl mx-auto">

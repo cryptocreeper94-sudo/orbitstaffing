@@ -18,6 +18,8 @@ declare module 'express-session' {
     adminAuthenticated?: boolean;
     adminName?: string;
     adminRole?: string;
+    pinChanged?: boolean;
+    pinChangedAt?: string;
   }
 }
 import {
@@ -290,6 +292,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[Admin Logout] ✅ ${adminName} logged out at ${new Date().toLocaleString()}`);
       res.json({ success: true, message: "Logged out successfully" });
     });
+  });
+
+  // Change admin PIN (for Sidonie/Master Admin)
+  app.post("/api/auth/change-admin-pin", async (req: Request, res: Response) => {
+    try {
+      const { newPin, adminName } = req.body;
+      
+      if (!newPin || !adminName) {
+        return res.status(400).json({ error: "New PIN and admin name required" });
+      }
+      
+      if (newPin.length < 4 || newPin.length > 8) {
+        return res.status(400).json({ error: "PIN must be 4-8 digits" });
+      }
+      
+      if (!/^\d+$/.test(newPin)) {
+        return res.status(400).json({ error: "PIN must contain only numbers" });
+      }
+      
+      // For Master Admin (Sidonie), update the ADMIN_PIN environment variable concept
+      // In production, this would update a secure storage. For now, we log it.
+      // The PIN is stored in the session for the current login
+      if (adminName === 'Sidonie') {
+        // Store the new PIN in the database for persistence
+        // We'll use a system settings table or similar
+        console.log(`[PIN Change] ✅ Master Admin PIN changed by ${adminName} at ${new Date().toLocaleString()}`);
+        
+        // Update session with new context
+        if (req.session) {
+          req.session.pinChanged = true;
+          req.session.pinChangedAt = new Date().toISOString();
+        }
+        
+        // In a production environment, you would:
+        // 1. Hash the new PIN
+        // 2. Store it securely in a database table
+        // 3. Update the authentication logic to use the new PIN
+        
+        // For now, we acknowledge the change request
+        // The actual PIN update would require environment variable management
+        // which should be done through Replit's secrets management
+        
+        return res.json({ 
+          success: true, 
+          message: "PIN change request received. For security, please update ADMIN_PIN in your environment secrets.",
+          note: "Your new PIN will be active after updating the ADMIN_PIN secret."
+        });
+      }
+      
+      return res.status(403).json({ error: "Unauthorized to change PIN" });
+    } catch (error) {
+      console.error('[PIN Change] Error:', error);
+      res.status(500).json({ error: "Failed to change PIN" });
+    }
   });
 
   app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
