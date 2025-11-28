@@ -186,6 +186,16 @@ This opens the **$50B+ enterprise staffing market** and demonstrates technical c
 
 ---
 
+## Investor Information
+
+**Seeking:** $500K-$1M seed funding  
+**Valuation:** $5M post-money  
+**Use of Funds:** 40% sales/marketing, 33% engineering, 13% ops, 14% other  
+**Projected ROI:** 4-12x in 3-5 years (acquisition exit)  
+**Full Roadmap:** See `docs/INVESTOR_ROADMAP.md` for complete investment details
+
+---
+
 ## Contact
 
 **Website:** orbitstaffing.net  
