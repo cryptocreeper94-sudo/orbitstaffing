@@ -3133,3 +3133,685 @@ export const insertBetaTesterAccessLogSchema = createInsertSchema(betaTesterAcce
 
 export type InsertBetaTesterAccessLog = z.infer<typeof insertBetaTesterAccessLogSchema>;
 export type BetaTesterAccessLog = typeof betaTesterAccessLogs.$inferSelect;
+
+// ========================
+// ORBIT TALENT EXCHANGE
+// ========================
+
+// ========================
+// Worker Performance & Ratings
+// ========================
+export const workerFeedback = pgTable(
+  "worker_feedback",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    assignmentId: varchar("assignment_id").references(() => assignments.id),
+    clientId: varchar("client_id").references(() => clients.id),
+    
+    // Ratings (1-5 scale)
+    overallRating: integer("overall_rating").notNull(), // 1-5
+    punctualityRating: integer("punctuality_rating"), // 1-5
+    qualityRating: integer("quality_rating"), // 1-5
+    attitudeRating: integer("attitude_rating"), // 1-5
+    communicationRating: integer("communication_rating"), // 1-5
+    safetyRating: integer("safety_rating"), // 1-5
+    
+    // Feedback
+    wouldHireAgain: boolean("would_hire_again"),
+    feedback: text("feedback"),
+    highlightedStrengths: jsonb("highlighted_strengths"), // ["punctual", "skilled", "professional"]
+    areasForImprovement: jsonb("areas_for_improvement"), // ["communication", "speed"]
+    
+    // Source
+    feedbackSource: varchar("feedback_source", { length: 50 }).default("client"), // client, supervisor, auto
+    submittedBy: varchar("submitted_by").references(() => users.id),
+    
+    // Visibility
+    isPublic: boolean("is_public").default(true), // Visible to external employers
+    isVerified: boolean("is_verified").default(false), // Verified by admin
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_worker_feedback_worker").on(table.workerId),
+    tenantIdx: index("idx_worker_feedback_tenant").on(table.tenantId),
+    assignmentIdx: index("idx_worker_feedback_assignment").on(table.assignmentId),
+    ratingIdx: index("idx_worker_feedback_rating").on(table.overallRating),
+  })
+);
+
+export const insertWorkerFeedbackSchema = createInsertSchema(workerFeedback).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertWorkerFeedback = z.infer<typeof insertWorkerFeedbackSchema>;
+export type WorkerFeedback = typeof workerFeedback.$inferSelect;
+
+// ========================
+// Worker Performance Scores (Cached composite metrics)
+// ========================
+export const workerPerformanceScores = pgTable(
+  "worker_performance_scores",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    workerId: varchar("worker_id").notNull().unique().references(() => workers.id),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    // Composite Scores (0-100)
+    overallScore: decimal("overall_score", { precision: 5, scale: 2 }).default("0"), // Weighted average
+    customerFeedbackScore: decimal("customer_feedback_score", { precision: 5, scale: 2 }).default("0"), // 40% weight
+    reliabilityScore: decimal("reliability_score", { precision: 5, scale: 2 }).default("0"), // 25% weight
+    availabilityScore: decimal("availability_score", { precision: 5, scale: 2 }).default("0"), // 15% weight
+    productivityScore: decimal("productivity_score", { precision: 5, scale: 2 }).default("0"), // 15% weight
+    loyaltyScore: decimal("loyalty_score", { precision: 5, scale: 2 }).default("0"), // 5% weight
+    
+    // Raw Metrics
+    totalAssignmentsCompleted: integer("total_assignments_completed").default(0),
+    totalHoursWorked: decimal("total_hours_worked", { precision: 10, scale: 2 }).default("0"),
+    onTimeArrivalRate: decimal("on_time_arrival_rate", { precision: 5, scale: 2 }).default("0"), // Percentage
+    assignmentCompletionRate: decimal("assignment_completion_rate", { precision: 5, scale: 2 }).default("0"),
+    noShowCount: integer("no_show_count").default(0),
+    earlyDepartureCount: integer("early_departure_count").default(0),
+    averageCustomerRating: decimal("average_customer_rating", { precision: 3, scale: 2 }).default("0"), // 1-5
+    totalFeedbackCount: integer("total_feedback_count").default(0),
+    wouldHireAgainRate: decimal("would_hire_again_rate", { precision: 5, scale: 2 }).default("0"),
+    
+    // Availability Metrics
+    responseTimeMinutes: integer("response_time_minutes"), // Average response to shift offers
+    availabilityPercentage: decimal("availability_percentage", { precision: 5, scale: 2 }).default("0"),
+    shiftAcceptanceRate: decimal("shift_acceptance_rate", { precision: 5, scale: 2 }).default("0"),
+    
+    // Tenure
+    tenureMonths: integer("tenure_months").default(0),
+    firstAssignmentDate: timestamp("first_assignment_date"),
+    
+    // Badges & Recognition
+    badges: jsonb("badges"), // ["top_performer", "reliable", "safety_star", "client_favorite"]
+    currentStreak: integer("current_streak").default(0), // Consecutive successful assignments
+    longestStreak: integer("longest_streak").default(0),
+    
+    // Visibility Settings
+    isVisibleToEmployers: boolean("is_visible_to_employers").default(true),
+    profileHighlights: jsonb("profile_highlights"), // Top 3 strengths for public view
+    
+    // Last Calculation
+    lastCalculatedAt: timestamp("last_calculated_at").default(sql`NOW()`),
+    calculationWindow: varchar("calculation_window", { length: 20 }).default("90_days"), // 30_days, 90_days, all_time
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_worker_perf_worker").on(table.workerId),
+    tenantIdx: index("idx_worker_perf_tenant").on(table.tenantId),
+    overallScoreIdx: index("idx_worker_perf_overall").on(table.overallScore),
+    visibleIdx: index("idx_worker_perf_visible").on(table.isVisibleToEmployers),
+  })
+);
+
+export const insertWorkerPerformanceScoreSchema = createInsertSchema(workerPerformanceScores).omit({
+  id: true,
+  lastCalculatedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerPerformanceScore = z.infer<typeof insertWorkerPerformanceScoreSchema>;
+export type WorkerPerformanceScore = typeof workerPerformanceScores.$inferSelect;
+
+// ========================
+// Talent Exchange Employers (External Companies)
+// ========================
+export const talentExchangeEmployers = pgTable(
+  "talent_exchange_employers",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Company Info
+    companyName: varchar("company_name", { length: 255 }).notNull(),
+    industry: varchar("industry", { length: 100 }),
+    companySize: varchar("company_size", { length: 50 }), // 1-10, 11-50, 51-200, 201-500, 500+
+    website: varchar("website", { length: 255 }),
+    logoUrl: varchar("logo_url", { length: 500 }),
+    description: text("description"),
+    
+    // Contact
+    contactName: varchar("contact_name", { length: 255 }).notNull(),
+    contactEmail: varchar("contact_email", { length: 255 }).notNull().unique(),
+    contactPhone: varchar("contact_phone", { length: 20 }),
+    contactTitle: varchar("contact_title", { length: 100 }),
+    
+    // Address
+    addressLine1: varchar("address_line1", { length: 255 }),
+    addressLine2: varchar("address_line2", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    
+    // Authentication
+    passwordHash: text("password_hash").notNull(),
+    emailVerified: boolean("email_verified").default(false),
+    emailVerifiedAt: timestamp("email_verified_at"),
+    verificationToken: varchar("verification_token", { length: 255 }),
+    
+    // Verification Status
+    verificationStatus: varchar("verification_status", { length: 50 }).default("pending"), // pending, verified, rejected
+    verificationDocuments: jsonb("verification_documents"), // [{type, url, uploadedAt}]
+    verifiedBy: varchar("verified_by").references(() => users.id),
+    verifiedAt: timestamp("verified_at"),
+    rejectionReason: text("rejection_reason"),
+    
+    // Billing
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+    paymentMethodOnFile: boolean("payment_method_on_file").default(false),
+    billingEmail: varchar("billing_email", { length: 255 }),
+    
+    // Subscription
+    subscriptionTier: varchar("subscription_tier", { length: 50 }).default("free"), // free, starter, growth, enterprise
+    subscriptionStatus: varchar("subscription_status", { length: 50 }).default("active"),
+    subscriptionStartDate: timestamp("subscription_start_date"),
+    subscriptionEndDate: timestamp("subscription_end_date"),
+    
+    // Credits (for pay-per-post model)
+    jobPostCredits: integer("job_post_credits").default(0),
+    talentSearchCredits: integer("talent_search_credits").default(0),
+    featuredPostCredits: integer("featured_post_credits").default(0),
+    
+    // Limits
+    activeJobPostsLimit: integer("active_job_posts_limit").default(1), // Free tier = 1
+    talentSearchesPerMonth: integer("talent_searches_per_month").default(5),
+    
+    // Stats
+    totalJobsPosted: integer("total_jobs_posted").default(0),
+    totalApplicationsReceived: integer("total_applications_received").default(0),
+    totalHires: integer("total_hires").default(0),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("active"), // active, suspended, banned
+    
+    // Terms
+    termsAcceptedAt: timestamp("terms_accepted_at"),
+    privacyAcceptedAt: timestamp("privacy_accepted_at"),
+    
+    lastLoginAt: timestamp("last_login_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_te_employer_email").on(table.contactEmail),
+    companyNameIdx: index("idx_te_employer_company").on(table.companyName),
+    statusIdx: index("idx_te_employer_status").on(table.status),
+    verificationIdx: index("idx_te_employer_verification").on(table.verificationStatus),
+    tierIdx: index("idx_te_employer_tier").on(table.subscriptionTier),
+  })
+);
+
+export const insertTalentExchangeEmployerSchema = createInsertSchema(talentExchangeEmployers).omit({
+  id: true,
+  emailVerifiedAt: true,
+  verifiedAt: true,
+  lastLoginAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTalentExchangeEmployer = z.infer<typeof insertTalentExchangeEmployerSchema>;
+export type TalentExchangeEmployer = typeof talentExchangeEmployers.$inferSelect;
+
+// ========================
+// Talent Exchange Pricing Plans
+// ========================
+export const talentExchangePricingPlans = pgTable(
+  "talent_exchange_pricing_plans",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    name: varchar("name", { length: 100 }).notNull(), // Starter, Growth, Enterprise
+    slug: varchar("slug", { length: 50 }).notNull().unique(), // starter, growth, enterprise
+    description: text("description"),
+    
+    // Pricing
+    monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }).notNull(),
+    annualPrice: decimal("annual_price", { precision: 10, scale: 2 }), // Discounted annual
+    
+    // Limits
+    activeJobPostsLimit: integer("active_job_posts_limit").notNull(),
+    talentSearchesPerMonth: integer("talent_searches_per_month").notNull(),
+    featuredPostsPerMonth: integer("featured_posts_per_month").default(0),
+    candidateContactsPerMonth: integer("candidate_contacts_per_month"), // null = unlimited
+    
+    // Features
+    features: jsonb("features"), // ["priority_support", "analytics", "bulk_posting"]
+    
+    // Stripe
+    stripePriceIdMonthly: varchar("stripe_price_id_monthly", { length: 255 }),
+    stripePriceIdAnnual: varchar("stripe_price_id_annual", { length: 255 }),
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    isPopular: boolean("is_popular").default(false), // Highlight in UI
+    sortOrder: integer("sort_order").default(0),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    slugIdx: index("idx_te_plan_slug").on(table.slug),
+    activeIdx: index("idx_te_plan_active").on(table.isActive),
+  })
+);
+
+export const insertTalentExchangePricingPlanSchema = createInsertSchema(talentExchangePricingPlans).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTalentExchangePricingPlan = z.infer<typeof insertTalentExchangePricingPlanSchema>;
+export type TalentExchangePricingPlan = typeof talentExchangePricingPlans.$inferSelect;
+
+// ========================
+// Talent Exchange Job Posts (Public Listings)
+// ========================
+export const talentExchangeJobPosts = pgTable(
+  "talent_exchange_job_posts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    employerId: varchar("employer_id").notNull().references(() => talentExchangeEmployers.id),
+    
+    // Job Details
+    title: varchar("title", { length: 255 }).notNull(),
+    slug: varchar("slug", { length: 300 }).unique(), // SEO-friendly URL
+    description: text("description").notNull(),
+    requirements: text("requirements"),
+    responsibilities: text("responsibilities"),
+    benefits: text("benefits"),
+    
+    // Category & Type
+    category: varchar("category", { length: 100 }), // construction, hospitality, general_labor, skilled_trades
+    subcategory: varchar("subcategory", { length: 100 }),
+    jobType: varchar("job_type", { length: 50 }).notNull(), // full_time, part_time, temporary, contract, per_diem
+    experienceLevel: varchar("experience_level", { length: 50 }), // entry, mid, senior
+    
+    // Required Skills
+    requiredSkills: jsonb("required_skills"), // ["forklift", "welding", "first_aid"]
+    preferredSkills: jsonb("preferred_skills"),
+    certifications: jsonb("certifications"), // Required certifications
+    
+    // Location
+    workLocation: varchar("work_location", { length: 50 }).default("on_site"), // on_site, remote, hybrid
+    addressLine1: varchar("address_line1", { length: 255 }),
+    city: varchar("city", { length: 100 }).notNull(),
+    state: varchar("state", { length: 2 }).notNull(),
+    zipCode: varchar("zip_code", { length: 10 }),
+    latitude: decimal("latitude", { precision: 9, scale: 6 }),
+    longitude: decimal("longitude", { precision: 9, scale: 6 }),
+    
+    // Compensation
+    compensationType: varchar("compensation_type", { length: 50 }).default("hourly"), // hourly, salary, daily
+    payRangeMin: decimal("pay_range_min", { precision: 10, scale: 2 }),
+    payRangeMax: decimal("pay_range_max", { precision: 10, scale: 2 }),
+    showPayRange: boolean("show_pay_range").default(true),
+    
+    // Schedule
+    scheduleType: varchar("schedule_type", { length: 50 }), // day_shift, night_shift, rotating, flexible
+    hoursPerWeek: integer("hours_per_week"),
+    startDate: date("start_date"),
+    endDate: date("end_date"), // For temporary positions
+    isUrgent: boolean("is_urgent").default(false),
+    
+    // Positions
+    positionsAvailable: integer("positions_available").default(1),
+    positionsFilled: integer("positions_filled").default(0),
+    
+    // Screening Questions
+    screeningQuestions: jsonb("screening_questions"), // [{question, type, required}]
+    
+    // Status & Moderation
+    status: varchar("status", { length: 50 }).default("draft"), // draft, pending_review, approved, rejected, active, paused, filled, expired
+    moderationNotes: text("moderation_notes"),
+    moderatedBy: varchar("moderated_by").references(() => users.id),
+    moderatedAt: timestamp("moderated_at"),
+    rejectionReason: text("rejection_reason"),
+    
+    // Visibility
+    isFeatured: boolean("is_featured").default(false),
+    featuredUntil: timestamp("featured_until"),
+    expiresAt: timestamp("expires_at"),
+    
+    // Stats
+    viewCount: integer("view_count").default(0),
+    applicationCount: integer("application_count").default(0),
+    saveCount: integer("save_count").default(0),
+    
+    // SEO
+    metaTitle: varchar("meta_title", { length: 255 }),
+    metaDescription: varchar("meta_description", { length: 500 }),
+    
+    publishedAt: timestamp("published_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    employerIdx: index("idx_te_job_employer").on(table.employerId),
+    statusIdx: index("idx_te_job_status").on(table.status),
+    categoryIdx: index("idx_te_job_category").on(table.category),
+    cityStateIdx: index("idx_te_job_location").on(table.city, table.state),
+    featuredIdx: index("idx_te_job_featured").on(table.isFeatured),
+    publishedIdx: index("idx_te_job_published").on(table.publishedAt),
+    slugIdx: index("idx_te_job_slug").on(table.slug),
+  })
+);
+
+export const insertTalentExchangeJobPostSchema = createInsertSchema(talentExchangeJobPosts).omit({
+  id: true,
+  moderatedAt: true,
+  publishedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTalentExchangeJobPost = z.infer<typeof insertTalentExchangeJobPostSchema>;
+export type TalentExchangeJobPost = typeof talentExchangeJobPosts.$inferSelect;
+
+// ========================
+// Talent Exchange Candidate Profiles (Job Seekers)
+// ========================
+export const talentExchangeCandidates = pgTable(
+  "talent_exchange_candidates",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Link to existing worker (if applicable)
+    workerId: varchar("worker_id").references(() => workers.id),
+    
+    // Personal Info
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    phone: varchar("phone", { length: 20 }),
+    
+    // Authentication (for external candidates)
+    passwordHash: text("password_hash"),
+    emailVerified: boolean("email_verified").default(false),
+    
+    // Location
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    willingToRelocate: boolean("willing_to_relocate").default(false),
+    travelRadius: integer("travel_radius"), // Miles willing to travel
+    
+    // Professional Info
+    headline: varchar("headline", { length: 255 }), // "Experienced Welder | 10+ Years"
+    summary: text("summary"),
+    skills: jsonb("skills"), // ["welding", "forklift", "OSHA_10"]
+    certifications: jsonb("certifications"), // [{name, issuer, date, expires}]
+    yearsExperience: integer("years_experience"),
+    
+    // Work Preferences
+    preferredJobTypes: jsonb("preferred_job_types"), // ["full_time", "contract"]
+    preferredCategories: jsonb("preferred_categories"), // ["construction", "skilled_trades"]
+    preferredSchedule: varchar("preferred_schedule", { length: 50 }), // day, night, any
+    desiredPayMin: decimal("desired_pay_min", { precision: 10, scale: 2 }),
+    availableToStart: varchar("available_to_start", { length: 50 }), // immediately, 1_week, 2_weeks
+    
+    // Resume
+    resumeUrl: varchar("resume_url", { length: 500 }),
+    resumeFileName: varchar("resume_file_name", { length: 255 }),
+    resumeUploadedAt: timestamp("resume_uploaded_at"),
+    
+    // Profile Visibility
+    profileVisibility: varchar("profile_visibility", { length: 50 }).default("public"), // public, limited, private
+    showContactInfo: boolean("show_contact_info").default(false),
+    allowEmployerContact: boolean("allow_employer_contact").default(true),
+    
+    // Stats
+    profileViews: integer("profile_views").default(0),
+    applicationCount: integer("application_count").default(0),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("active"), // active, inactive, suspended
+    
+    lastActiveAt: timestamp("last_active_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_te_candidate_email").on(table.email),
+    workerIdx: index("idx_te_candidate_worker").on(table.workerId),
+    locationIdx: index("idx_te_candidate_location").on(table.city, table.state),
+    statusIdx: index("idx_te_candidate_status").on(table.status),
+  })
+);
+
+export const insertTalentExchangeCandidateSchema = createInsertSchema(talentExchangeCandidates).omit({
+  id: true,
+  resumeUploadedAt: true,
+  lastActiveAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTalentExchangeCandidate = z.infer<typeof insertTalentExchangeCandidateSchema>;
+export type TalentExchangeCandidate = typeof talentExchangeCandidates.$inferSelect;
+
+// ========================
+// Talent Exchange Applications
+// ========================
+export const talentExchangeApplications = pgTable(
+  "talent_exchange_applications",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    jobPostId: varchar("job_post_id").notNull().references(() => talentExchangeJobPosts.id),
+    candidateId: varchar("candidate_id").notNull().references(() => talentExchangeCandidates.id),
+    employerId: varchar("employer_id").notNull().references(() => talentExchangeEmployers.id),
+    
+    // Application Details
+    coverLetter: text("cover_letter"),
+    screeningAnswers: jsonb("screening_answers"), // [{questionId, answer}]
+    resumeUrl: varchar("resume_url", { length: 500 }), // Application-specific resume
+    
+    // Source
+    source: varchar("source", { length: 50 }).default("direct"), // direct, referral, orbit_worker
+    referredByWorkerId: varchar("referred_by_worker_id").references(() => workers.id),
+    
+    // Status Workflow
+    status: varchar("status", { length: 50 }).default("submitted"), // submitted, reviewed, shortlisted, interviewing, offered, hired, rejected, withdrawn
+    statusHistory: jsonb("status_history"), // [{status, timestamp, note}]
+    
+    // Employer Actions
+    viewedAt: timestamp("viewed_at"),
+    viewedBy: varchar("viewed_by", { length: 255 }),
+    notes: text("notes"), // Internal employer notes
+    rating: integer("rating"), // Internal employer rating 1-5
+    
+    // Interview
+    interviewScheduledAt: timestamp("interview_scheduled_at"),
+    interviewType: varchar("interview_type", { length: 50 }), // phone, video, in_person
+    interviewNotes: text("interview_notes"),
+    
+    // Offer
+    offerMadeAt: timestamp("offer_made_at"),
+    offerDetails: jsonb("offer_details"), // {salary, startDate, etc}
+    offerAcceptedAt: timestamp("offer_accepted_at"),
+    offerRejectedAt: timestamp("offer_rejected_at"),
+    offerRejectionReason: text("offer_rejection_reason"),
+    
+    // Rejection
+    rejectedAt: timestamp("rejected_at"),
+    rejectionReason: varchar("rejection_reason", { length: 255 }),
+    rejectionFeedback: text("rejection_feedback"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    jobPostIdx: index("idx_te_app_job").on(table.jobPostId),
+    candidateIdx: index("idx_te_app_candidate").on(table.candidateId),
+    employerIdx: index("idx_te_app_employer").on(table.employerId),
+    statusIdx: index("idx_te_app_status").on(table.status),
+  })
+);
+
+export const insertTalentExchangeApplicationSchema = createInsertSchema(talentExchangeApplications).omit({
+  id: true,
+  viewedAt: true,
+  offerMadeAt: true,
+  offerAcceptedAt: true,
+  offerRejectedAt: true,
+  rejectedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTalentExchangeApplication = z.infer<typeof insertTalentExchangeApplicationSchema>;
+export type TalentExchangeApplication = typeof talentExchangeApplications.$inferSelect;
+
+// ========================
+// Talent Exchange Worker Requests (External employers requesting ORBIT workers)
+// ========================
+export const talentExchangeWorkerRequests = pgTable(
+  "talent_exchange_worker_requests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    employerId: varchar("employer_id").notNull().references(() => talentExchangeEmployers.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Request Details
+    requestType: varchar("request_type", { length: 50 }).default("hire"), // hire, interview, contact
+    message: text("message"),
+    jobPostId: varchar("job_post_id").references(() => talentExchangeJobPosts.id),
+    
+    // Status
+    status: varchar("status", { length: 50 }).default("pending"), // pending, approved, rejected, converted
+    
+    // Approval
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    reviewNotes: text("review_notes"),
+    
+    // Conversion (if worker becomes direct hire)
+    conversionType: varchar("conversion_type", { length: 50 }), // temp_to_perm, direct_hire, contract
+    conversionDate: date("conversion_date"),
+    conversionFee: decimal("conversion_fee", { precision: 10, scale: 2 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    employerIdx: index("idx_te_wreq_employer").on(table.employerId),
+    workerIdx: index("idx_te_wreq_worker").on(table.workerId),
+    statusIdx: index("idx_te_wreq_status").on(table.status),
+  })
+);
+
+export const insertTalentExchangeWorkerRequestSchema = createInsertSchema(talentExchangeWorkerRequests).omit({
+  id: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTalentExchangeWorkerRequest = z.infer<typeof insertTalentExchangeWorkerRequestSchema>;
+export type TalentExchangeWorkerRequest = typeof talentExchangeWorkerRequests.$inferSelect;
+
+// ========================
+// Talent Exchange Saved Jobs & Alerts
+// ========================
+export const talentExchangeSavedJobs = pgTable(
+  "talent_exchange_saved_jobs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    candidateId: varchar("candidate_id").notNull().references(() => talentExchangeCandidates.id),
+    jobPostId: varchar("job_post_id").notNull().references(() => talentExchangeJobPosts.id),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    candidateIdx: index("idx_te_saved_candidate").on(table.candidateId),
+    jobIdx: index("idx_te_saved_job").on(table.jobPostId),
+    uniqueIdx: index("idx_te_saved_unique").on(table.candidateId, table.jobPostId),
+  })
+);
+
+export const talentExchangeJobAlerts = pgTable(
+  "talent_exchange_job_alerts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    candidateId: varchar("candidate_id").notNull().references(() => talentExchangeCandidates.id),
+    
+    // Alert Criteria
+    keywords: jsonb("keywords"), // ["welder", "construction"]
+    categories: jsonb("categories"),
+    cities: jsonb("cities"),
+    states: jsonb("states"),
+    jobTypes: jsonb("job_types"),
+    payMin: decimal("pay_min", { precision: 10, scale: 2 }),
+    
+    // Notification Settings
+    frequency: varchar("frequency", { length: 20 }).default("daily"), // instant, daily, weekly
+    emailEnabled: boolean("email_enabled").default(true),
+    smsEnabled: boolean("sms_enabled").default(false),
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    lastSentAt: timestamp("last_sent_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    candidateIdx: index("idx_te_alert_candidate").on(table.candidateId),
+    activeIdx: index("idx_te_alert_active").on(table.isActive),
+  })
+);
+
+// ========================
+// Talent Exchange Analytics
+// ========================
+export const talentExchangeAnalytics = pgTable(
+  "talent_exchange_analytics",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    // Entity
+    entityType: varchar("entity_type", { length: 50 }).notNull(), // job_post, employer, candidate, worker_profile
+    entityId: varchar("entity_id", { length: 255 }).notNull(),
+    
+    // Event
+    eventType: varchar("event_type", { length: 50 }).notNull(), // view, click, apply, save, share, contact
+    
+    // Source
+    sourceType: varchar("source_type", { length: 50 }), // organic, featured, search, email, referral
+    searchQuery: varchar("search_query", { length: 500 }),
+    referrer: varchar("referrer", { length: 500 }),
+    
+    // User Info (anonymized)
+    visitorId: varchar("visitor_id", { length: 255 }), // Anonymous tracking
+    candidateId: varchar("candidate_id").references(() => talentExchangeCandidates.id),
+    employerId: varchar("employer_id").references(() => talentExchangeEmployers.id),
+    
+    // Device/Location
+    deviceType: varchar("device_type", { length: 50 }), // desktop, mobile, tablet
+    userAgent: text("user_agent"),
+    ipCity: varchar("ip_city", { length: 100 }),
+    ipState: varchar("ip_state", { length: 2 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    entityIdx: index("idx_te_analytics_entity").on(table.entityType, table.entityId),
+    eventIdx: index("idx_te_analytics_event").on(table.eventType),
+    createdIdx: index("idx_te_analytics_created").on(table.createdAt),
+  })
+);
+
+export const insertTalentExchangeAnalyticsSchema = createInsertSchema(talentExchangeAnalytics).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTalentExchangeAnalytics = z.infer<typeof insertTalentExchangeAnalyticsSchema>;
+export type TalentExchangeAnalytics = typeof talentExchangeAnalytics.$inferSelect;
