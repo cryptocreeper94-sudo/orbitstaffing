@@ -47,6 +47,8 @@ import {
   betaTesters,
   betaTesterAccessLogs,
   insertBetaTesterSchema,
+  reportRequests,
+  insertReportRequestSchema,
 } from "@shared/schema";
 
 // ========================
@@ -4466,6 +4468,328 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get feedback error:", error);
       res.status(500).json({ error: "Failed to fetch feedback" });
+    }
+  });
+
+  // ========================
+  // SELF-SERVICE REPORTS
+  // ========================
+
+  // Report types catalog based on user role
+  const reportCatalog = {
+    worker: [
+      { type: 'timecard', name: 'Weekly Time Card', description: 'Your weekly hours and clock-in/out records', formats: ['pdf', 'csv'] },
+      { type: 'pay-history', name: 'Pay Stubs', description: 'Your earnings and deductions history', formats: ['pdf'] },
+      { type: 'assignments', name: 'Work History', description: 'Your assignment and job history', formats: ['pdf', 'csv'] },
+      { type: 'tax-documents', name: 'Tax Documents', description: 'W-2, W-4 and other tax forms', formats: ['pdf'] },
+    ],
+    manager: [
+      { type: 'timecard', name: 'Weekly Time Card', description: 'Worker time cards for your team', formats: ['pdf', 'csv'] },
+      { type: 'pay-history', name: 'Pay History', description: 'Pay stub records for workers', formats: ['pdf'] },
+      { type: 'assignments', name: 'Assignment Reports', description: 'Work order and assignment history', formats: ['pdf', 'csv'] },
+      { type: 'utilization', name: 'Utilization Report', description: 'Worker utilization and availability', formats: ['pdf', 'csv'] },
+    ],
+    admin: [
+      { type: 'timecard', name: 'Weekly Time Card', description: 'Time cards for any worker', formats: ['pdf', 'csv'] },
+      { type: 'pay-history', name: 'Pay History', description: 'Complete pay stub records', formats: ['pdf', 'csv'] },
+      { type: 'assignments', name: 'Assignment Reports', description: 'Full assignment history', formats: ['pdf', 'csv'] },
+      { type: 'tax-documents', name: 'Tax Documents', description: 'W-2, W-4 and tax forms', formats: ['pdf'] },
+      { type: 'payroll-summary', name: 'Payroll Summary', description: 'Payroll totals and summaries', formats: ['pdf', 'csv'] },
+      { type: 'compliance', name: 'Compliance Report', description: 'Worker compliance status', formats: ['pdf', 'csv'] },
+    ],
+  };
+
+  // GET /api/reports/catalog - Returns available reports based on user role
+  app.get("/api/reports/catalog", async (req: Request, res: Response) => {
+    try {
+      const role = (req.query.role as string) || 'worker';
+      const validRoles = ['worker', 'manager', 'admin', 'master_admin'];
+      
+      const effectiveRole = role === 'master_admin' ? 'admin' : role;
+      if (!validRoles.includes(role)) {
+        return res.status(400).json({ error: "Invalid role specified" });
+      }
+      
+      const catalog = reportCatalog[effectiveRole as keyof typeof reportCatalog] || reportCatalog.worker;
+      res.json({ reports: catalog, role: effectiveRole });
+    } catch (error) {
+      console.error("[Reports] Catalog error:", error);
+      res.status(500).json({ error: "Failed to fetch report catalog" });
+    }
+  });
+
+  // POST /api/reports/generate - Generate a report
+  app.post("/api/reports/generate", async (req: Request, res: Response) => {
+    try {
+      const { reportType, dateRangeStart, dateRangeEnd, workerId, format = 'pdf' } = req.body;
+      
+      // Validation
+      if (!reportType) {
+        return res.status(400).json({ error: "reportType is required" });
+      }
+      
+      const validTypes = ['timecard', 'pay-history', 'assignments', 'tax-documents', 'payroll-summary', 'compliance', 'utilization'];
+      if (!validTypes.includes(reportType)) {
+        return res.status(400).json({ error: `Invalid reportType. Must be one of: ${validTypes.join(', ')}` });
+      }
+      
+      const validFormats = ['pdf', 'csv'];
+      if (!validFormats.includes(format)) {
+        return res.status(400).json({ error: "Format must be 'pdf' or 'csv'" });
+      }
+      
+      // Get tenant and user info from request
+      const tenantId = getTenantIdFromRequest(req);
+      const user = (req as any).user;
+      const requestedBy = user?.id || null;
+      const requestedByType = user?.role || 'worker';
+      
+      // Generate report name
+      const reportNames: Record<string, string> = {
+        'timecard': 'Weekly Time Card',
+        'pay-history': 'Pay History Report',
+        'assignments': 'Assignment History',
+        'tax-documents': 'Tax Documents',
+        'payroll-summary': 'Payroll Summary',
+        'compliance': 'Compliance Report',
+        'utilization': 'Utilization Report',
+      };
+      const reportName = `${reportNames[reportType]} - ${new Date().toLocaleDateString()}`;
+      
+      // Create report request record
+      const [reportRecord] = await db.insert(reportRequests).values({
+        tenantId,
+        requestedBy,
+        requestedByType,
+        requestedByEntityId: workerId || requestedBy,
+        reportType,
+        reportName,
+        dateRangeStart: dateRangeStart || null,
+        dateRangeEnd: dateRangeEnd || null,
+        filterParams: { workerId },
+        format,
+        status: 'generating',
+      }).returning();
+      
+      // Generate mock report data based on type
+      let mockData: any;
+      
+      switch (reportType) {
+        case 'timecard':
+          mockData = {
+            workerId: workerId || 'W-001',
+            workerName: 'Sample Worker',
+            weekEnding: dateRangeEnd || new Date().toISOString().split('T')[0],
+            entries: [
+              { date: '2024-01-15', clockIn: '08:00', clockOut: '16:30', hoursWorked: 8.5, location: 'Main Site' },
+              { date: '2024-01-16', clockIn: '07:45', clockOut: '16:15', hoursWorked: 8.5, location: 'Main Site' },
+              { date: '2024-01-17', clockIn: '08:00', clockOut: '17:00', hoursWorked: 9.0, location: 'Remote Site A' },
+              { date: '2024-01-18', clockIn: '08:00', clockOut: '16:00', hoursWorked: 8.0, location: 'Main Site' },
+              { date: '2024-01-19', clockIn: '07:30', clockOut: '15:30', hoursWorked: 8.0, location: 'Main Site' },
+            ],
+            totalHours: 42.0,
+            regularHours: 40.0,
+            overtimeHours: 2.0,
+          };
+          break;
+          
+        case 'pay-history':
+          mockData = {
+            workerId: workerId || 'W-001',
+            workerName: 'Sample Worker',
+            payStubs: [
+              { payDate: '2024-01-19', periodStart: '2024-01-08', periodEnd: '2024-01-14', grossPay: 1680.00, netPay: 1344.00, deductions: 336.00 },
+              { payDate: '2024-01-12', periodStart: '2024-01-01', periodEnd: '2024-01-07', grossPay: 1600.00, netPay: 1280.00, deductions: 320.00 },
+              { payDate: '2024-01-05', periodStart: '2023-12-25', periodEnd: '2023-12-31', grossPay: 1520.00, netPay: 1216.00, deductions: 304.00 },
+            ],
+            ytdGross: 4800.00,
+            ytdNet: 3840.00,
+            ytdDeductions: 960.00,
+          };
+          break;
+          
+        case 'assignments':
+          mockData = {
+            workerId: workerId || 'W-001',
+            workerName: 'Sample Worker',
+            assignments: [
+              { id: 'A-001', client: 'ABC Corp', startDate: '2024-01-15', endDate: '2024-01-19', status: 'completed', hoursWorked: 42 },
+              { id: 'A-002', client: 'XYZ Industries', startDate: '2024-01-08', endDate: '2024-01-12', status: 'completed', hoursWorked: 40 },
+              { id: 'A-003', client: 'Tech Solutions', startDate: '2024-01-22', endDate: null, status: 'active', hoursWorked: 16 },
+            ],
+            totalAssignments: 3,
+            activeAssignments: 1,
+          };
+          break;
+          
+        case 'tax-documents':
+          mockData = {
+            workerId: workerId || 'W-001',
+            workerName: 'Sample Worker',
+            taxYear: new Date().getFullYear() - 1,
+            documents: [
+              { type: 'W-2', year: 2023, status: 'available', downloadUrl: `/api/reports/${reportRecord.id}/download?doc=w2-2023` },
+              { type: 'W-4', year: 2024, status: 'on-file', lastUpdated: '2024-01-02' },
+            ],
+            w2Summary: {
+              wagesTipsCompensation: 52000.00,
+              federalTaxWithheld: 7800.00,
+              socialSecurityWages: 52000.00,
+              socialSecurityTaxWithheld: 3224.00,
+              medicareWages: 52000.00,
+              medicareTaxWithheld: 754.00,
+            },
+          };
+          break;
+          
+        default:
+          mockData = {
+            reportType,
+            generatedAt: new Date().toISOString(),
+            message: 'Report data placeholder - connect to real data source',
+          };
+      }
+      
+      // Update report with completed status
+      const fileUrl = `/api/reports/${reportRecord.id}/download`;
+      await db.update(reportRequests)
+        .set({
+          status: 'completed',
+          fileUrl,
+          generatedAt: new Date(),
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days expiry
+        })
+        .where(eq(reportRequests.id, reportRecord.id));
+      
+      res.status(201).json({
+        id: reportRecord.id,
+        reportType,
+        reportName,
+        format,
+        status: 'completed',
+        fileUrl,
+        data: mockData,
+        generatedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      });
+    } catch (error) {
+      console.error("[Reports] Generate error:", error);
+      res.status(500).json({ error: "Failed to generate report" });
+    }
+  });
+
+  // GET /api/reports/history - Get user's report history
+  app.get("/api/reports/history", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req);
+      const user = (req as any).user;
+      const userId = user?.id || (req.query.userId as string);
+      const { limit = '20', reportType } = req.query;
+      
+      let query = db.select()
+        .from(reportRequests)
+        .orderBy(desc(reportRequests.createdAt))
+        .limit(parseInt(limit as string));
+      
+      // Build conditions
+      const conditions: any[] = [];
+      if (tenantId) {
+        conditions.push(eq(reportRequests.tenantId, tenantId));
+      }
+      if (userId) {
+        conditions.push(eq(reportRequests.requestedBy, userId));
+      }
+      if (reportType) {
+        conditions.push(eq(reportRequests.reportType, reportType as string));
+      }
+      
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions)) as any;
+      }
+      
+      const reports = await query;
+      
+      res.json({
+        reports: reports.map(r => ({
+          id: r.id,
+          reportType: r.reportType,
+          reportName: r.reportName,
+          format: r.format,
+          status: r.status,
+          fileUrl: r.fileUrl,
+          dateRangeStart: r.dateRangeStart,
+          dateRangeEnd: r.dateRangeEnd,
+          generatedAt: r.generatedAt,
+          expiresAt: r.expiresAt,
+          downloadCount: r.downloadCount,
+          createdAt: r.createdAt,
+        })),
+        total: reports.length,
+      });
+    } catch (error) {
+      console.error("[Reports] History error:", error);
+      res.status(500).json({ error: "Failed to fetch report history" });
+    }
+  });
+
+  // GET /api/reports/:id/download - Download a generated report
+  app.get("/api/reports/:id/download", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { doc } = req.query; // Optional specific document (for tax docs)
+      
+      // Fetch report record
+      const [report] = await db.select()
+        .from(reportRequests)
+        .where(eq(reportRequests.id, id))
+        .limit(1);
+      
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+      
+      if (report.status !== 'completed') {
+        return res.status(400).json({ error: "Report is not ready for download", status: report.status });
+      }
+      
+      // Check expiration
+      if (report.expiresAt && new Date(report.expiresAt) < new Date()) {
+        return res.status(410).json({ error: "Report has expired. Please generate a new one." });
+      }
+      
+      // Increment download count
+      await db.update(reportRequests)
+        .set({ downloadCount: (report.downloadCount || 0) + 1 })
+        .where(eq(reportRequests.id, id));
+      
+      // Generate placeholder PDF/CSV content
+      const format = report.format || 'pdf';
+      
+      if (format === 'csv') {
+        // Mock CSV content
+        const csvContent = `Report: ${report.reportName}\nGenerated: ${report.generatedAt}\nType: ${report.reportType}\n\nDate,Description,Hours,Amount\n2024-01-15,Regular Work,8.5,$340.00\n2024-01-16,Regular Work,8.5,$340.00\n2024-01-17,Regular Work,9.0,$360.00\n2024-01-18,Regular Work,8.0,$320.00\n2024-01-19,Regular Work,8.0,$320.00\nTotal,,42.0,$1680.00`;
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="${report.reportType}-${id}.csv"`);
+        return res.send(csvContent);
+      }
+      
+      // Mock PDF response (placeholder)
+      const pdfPlaceholder = {
+        message: "PDF generation placeholder",
+        reportId: id,
+        reportType: report.reportType,
+        reportName: report.reportName,
+        generatedAt: report.generatedAt,
+        note: "In production, this would return actual PDF binary data",
+        downloadInstructions: "Integrate with a PDF library like jspdf or pdfkit for actual PDF generation",
+      };
+      
+      res.setHeader('Content-Type', 'application/json');
+      res.json(pdfPlaceholder);
+    } catch (error) {
+      console.error("[Reports] Download error:", error);
+      res.status(500).json({ error: "Failed to download report" });
     }
   });
 
