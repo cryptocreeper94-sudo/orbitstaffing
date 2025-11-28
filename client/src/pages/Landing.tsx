@@ -123,6 +123,41 @@ export default function Landing() {
         </div>
       </header>
 
+      {/* TALENT EXCHANGE SECTION */}
+      <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6">
+          <div className="text-center mb-4 sm:mb-6">
+            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-xs sm:text-sm mb-2">
+              NEW - Talent Exchange
+            </Badge>
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">ORBIT Talent Exchange</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Two-way job marketplace connecting employers with pre-vetted, GPS-verified workers</p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+            <Link href="/jobs" className="p-3 sm:p-5 rounded-lg border border-emerald-500/30 bg-emerald-900/20 hover:bg-emerald-900/40 hover:border-emerald-400/60 transition-all flex flex-col items-center text-center" data-testid="link-job-board">
+              <div className="text-2xl sm:text-4xl mb-2">💼</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Job Board</div>
+              <div className="text-[10px] sm:text-xs text-gray-400">Browse open positions</div>
+            </Link>
+            <Link href="/talent-pool" className="p-3 sm:p-5 rounded-lg border border-emerald-500/30 bg-emerald-900/20 hover:bg-emerald-900/40 hover:border-emerald-400/60 transition-all flex flex-col items-center text-center" data-testid="link-talent-pool">
+              <div className="text-2xl sm:text-4xl mb-2">⭐</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Talent Pool</div>
+              <div className="text-[10px] sm:text-xs text-gray-400">Find vetted workers</div>
+            </Link>
+            <Link href="/employer/register" className="p-3 sm:p-5 rounded-lg border border-cyan-500/30 bg-cyan-900/20 hover:bg-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center text-center" data-testid="link-employer-register">
+              <div className="text-2xl sm:text-4xl mb-2">🏢</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Post Jobs</div>
+              <div className="text-[10px] sm:text-xs text-gray-400">Employer signup</div>
+            </Link>
+            <Link href="/apply" className="p-3 sm:p-5 rounded-lg border border-cyan-500/30 bg-cyan-900/20 hover:bg-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center text-center" data-testid="link-apply">
+              <div className="text-2xl sm:text-4xl mb-2">👷</div>
+              <div className="font-semibold text-white text-xs sm:text-sm">Join ORBIT</div>
+              <div className="text-[10px] sm:text-xs text-gray-400">Worker application</div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* SANDBOX SHOWCASE SECTION - PLAY WITH FEATURES */}
       <section className="bg-slate-900/50 border-b border-cyan-500/20 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto px-3 sm:px-6">
