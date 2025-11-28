@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2 } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -1800,26 +1800,19 @@ export default function DeveloperPanel() {
           </div>
 
           {/* Navigation Buttons - Beautiful Grid with Hover Effects */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-            {/* Incidents Button */}
-            <button
-              onClick={() => navigateTo('/incident-reporting')}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
-              data-testid="button-dev-incident-report"
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+            {/* REPLIT AGENT - Talk to Me Button (PRIORITY) */}
+            <a
+              href="https://replit.com/@JasonDark/ORBIT-Staffing-OS"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-400 hover:border-cyan-300 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/40 hover:scale-105 hover:-translate-y-1 group animate-pulse"
+              data-testid="button-replit-agent"
             >
-              <AlertTriangle className="w-6 h-6 md:w-7 md:h-7 text-red-400 group-hover:text-red-300 transition-colors" />
-              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Incidents</span>
-            </button>
-
-            {/* Workers Comp Button */}
-            <button
-              onClick={() => navigateTo('/workers-comp-admin')}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-orange-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 hover:scale-105 hover:-translate-y-1 group"
-              data-testid="button-dev-workers-comp"
-            >
-              <Shield className="w-6 h-6 md:w-7 md:h-7 text-orange-400 group-hover:text-orange-300 transition-colors" />
-              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Workers Comp</span>
-            </button>
+              <Bot className="w-7 h-7 md:w-8 md:h-8 text-white group-hover:text-cyan-100 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-white group-hover:text-cyan-100 transition-colors text-center leading-tight">Talk to Agent</span>
+              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
+            </a>
 
             {/* Admin Button */}
             <button
@@ -1831,6 +1824,26 @@ export default function DeveloperPanel() {
               <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Admin</span>
             </button>
 
+            {/* Employee Hub Button */}
+            <button
+              onClick={() => navigateTo('/employee-hub')}
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-blue-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-employee-hub"
+            >
+              <Users className="w-6 h-6 md:w-7 md:h-7 text-blue-400 group-hover:text-blue-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Employee</span>
+            </button>
+
+            {/* Owner Hub Button */}
+            <button
+              onClick={() => navigateTo('/owner-hub')}
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-violet-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-owner-hub"
+            >
+              <Briefcase className="w-6 h-6 md:w-7 md:h-7 text-violet-400 group-hover:text-violet-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Owner</span>
+            </button>
+
             {/* App Button */}
             <button
               onClick={() => navigateTo('/dashboard')}
@@ -1838,17 +1851,7 @@ export default function DeveloperPanel() {
               data-testid="button-dev-to-app"
             >
               <BarChart3 className="w-6 h-6 md:w-7 md:h-7 text-green-400 group-hover:text-green-300 transition-colors" />
-              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">App</span>
-            </button>
-
-            {/* Bug Report Button */}
-            <button
-              onClick={() => setShowBugReport(true)}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-amber-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-105 hover:-translate-y-1 group"
-              data-testid="button-report-bug"
-            >
-              <AlertCircle className="w-6 h-6 md:w-7 md:h-7 text-amber-400 group-hover:text-amber-300 transition-colors" />
-              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Report Bug</span>
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Dashboard</span>
             </button>
 
             {/* Device Settings Button */}
@@ -1860,15 +1863,68 @@ export default function DeveloperPanel() {
               <Key className="w-6 h-6 md:w-7 md:h-7 text-purple-400 group-hover:text-purple-300 transition-colors" />
               <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Settings</span>
             </button>
+          </div>
+
+          {/* Second Row - More Actions */}
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 mt-3">
+            {/* Incidents Button */}
+            <button
+              onClick={() => navigateTo('/incident-reporting')}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-incident-report"
+            >
+              <AlertTriangle className="w-5 h-5 md:w-6 md:h-6 text-red-400 group-hover:text-red-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Incidents</span>
+            </button>
+
+            {/* Workers Comp Button */}
+            <button
+              onClick={() => navigateTo('/workers-comp-admin')}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-orange-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-workers-comp"
+            >
+              <Shield className="w-5 h-5 md:w-6 md:h-6 text-orange-400 group-hover:text-orange-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Workers Comp</span>
+            </button>
+
+            {/* Bug Report Button */}
+            <button
+              onClick={() => setShowBugReport(true)}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-amber-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-report-bug"
+            >
+              <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-amber-400 group-hover:text-amber-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Report Bug</span>
+            </button>
+
+            {/* Talent Exchange Button */}
+            <button
+              onClick={() => navigateTo('/talent-exchange')}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-emerald-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-talent-exchange"
+            >
+              <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Talent Exchange</span>
+            </button>
+
+            {/* Job Board Button */}
+            <button
+              onClick={() => navigateTo('/jobs')}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-teal-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-job-board"
+            >
+              <Database className="w-5 h-5 md:w-6 md:h-6 text-teal-400 group-hover:text-teal-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Job Board</span>
+            </button>
 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
+              className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-developer-logout"
             >
-              <LogOut className="w-6 h-6 md:w-7 md:h-7 text-red-400 group-hover:text-red-300 transition-colors" />
-              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Logout</span>
+              <LogOut className="w-5 h-5 md:w-6 md:h-6 text-red-400 group-hover:text-red-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Logout</span>
             </button>
           </div>
         </div>

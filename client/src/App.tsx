@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -9,6 +9,7 @@ import AdminPanel from "@/pages/AdminPanel";
 import WorkerPortal from "@/pages/WorkerPortal";
 import Landing from "@/pages/Landing";
 import DeveloperPanel from "@/pages/DeveloperPanel";
+import { shouldBypassDeveloperLogin } from "@/lib/deviceFingerprint";
 import DeveloperLanding from "@/pages/DeveloperLanding";
 import Pricing from "@/pages/Pricing";
 import EquipmentTrackingAdmin from "@/pages/EquipmentTrackingAdmin";
@@ -56,11 +57,17 @@ import EmployeeHub from "@/pages/EmployeeHub";
 import OwnerHub from "@/pages/OwnerHub";
 
 function RootPage() {
+  const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Auto-redirect to Developer Panel if bypass is enabled (Jason's devices)
+    if (shouldBypassDeveloperLogin()) {
+      setLocation('/developer');
+      return;
+    }
     setLoading(false);
-  }, []);
+  }, [setLocation]);
 
   if (loading) return null;
   // Main landing page for everyone - devs can go to /dev-landing to skip
