@@ -396,6 +396,268 @@ Investors typically exit via:
 3. **Conference Pitch** (ok): TechCrunch Disrupt, SaaS conferences
 4. **Demo Day** (ok if joining accelerator): Y Combinator, Techstars
 
+---
+
+## Investor-Targeted Marketing Strategy (Social Media)
+
+### Dual Marketing Approach
+
+ORBIT needs **two separate marketing streams:**
+1. **User Marketing:** Target staffing agencies (acquisition, product demos)
+2. **Investor Marketing:** Target VCs, angels, funds (credibility, interest)
+
+### Investor-Targeted Social Media Strategy
+
+**Goal:** Create "founder halo" + demonstrate traction to investors who follow industry conversations
+
+#### Platform Strategy:
+
+| Platform | Content Type | Frequency | Audience | Goal |
+|---|---|---|---|---|
+| **LinkedIn** | Company updates, funding news, industry trends | 3x/week | VCs, angels, HR tech community | Lead generation, credibility |
+| **Twitter/X** | Hot takes on staffing industry, product launches, milestones | Daily | Startup investors, HR tech community | Viral reach, thought leadership |
+| **TechCrunch** | Press releases when fundraising, hitting milestones | Quarterly | Mainstream tech investors | PR coverage, credibility |
+| **YouTube** | Founder Q&As, product roadmap videos, investor talks | Monthly | VC education, founder community | Education, accessibility |
+| **Email Newsletter** | Monthly investor updates (optional) | Monthly | Subscribed investors & prospects | Keep warm pipeline |
+
+---
+
+### Content Pillars for Investor Marketing:
+
+#### 1. **Traction & Metrics** (50% of content)
+- Monthly revenue milestones ("Hit $25K MRR this month!")
+- Customer testimonials from paying clients
+- Growth trends ("200% MoM growth in Q1 2026")
+- Product launches that move the needle
+
+**Example LinkedIn Post:**
+```
+🚀 ORBIT hitting $25K MRR this month—2 months ahead of plan
+
+What we learned: Staffing agencies will pay premium prices for 
+automation that actually works. 60% cheaper than competitors + 
+100% hands-free = retention, not churn.
+
+2 more enterprise pilots kicking off next week with ISO 20022 
+integration. Fortune 500 pipeline forming.
+
+#Startup #Staffing #SaaS #FundRaising
+```
+
+#### 2. **Industry Problem-Solving** (30% of content)
+- Highlight broken staffing workflows (ADP pain, legacy systems)
+- Show how ORBIT fixes them (before/after)
+- Compare our solution to competitors (without naming them)
+- Market trends (staffing industry shifting to digital-first)
+
+**Example Twitter/X Post:**
+```
+ADP charges staffing agencies $99-$799/month for features built in 1995.
+
+ORBIT: $39-$249/month, fully automated, built for 2025.
+
+Problem: Agencies have to choose between paying for compliance 
+or paying for growth.
+
+Our solution: Pay for both. At half the price. 
+
+#Staffing #Automation #Startups
+```
+
+#### 3. **Founder Story & Vision** (20% of content)
+- Why founder is building this (personal journey)
+- Long-term vision (ISO 20022, Fortune 500, global expansion)
+- Team building highlights
+- Behind-the-scenes (shipping updates, pivots, learnings)
+
+**Example YouTube Video:** "Why I'm building ORBIT - Staffing Industry Broken for 20 Years"
+
+---
+
+### Investor-Focused Content Calendar:
+
+**Week 1:** Revenue/traction update → Share investor roadmap highlights  
+**Week 2:** Product feature launch → Before/after problem-solving  
+**Week 3:** Industry trend commentary → Why ORBIT is timely  
+**Week 4:** Founder interview/AMA → Why we're building this  
+
+**Quarterly:**
+- Press release when fundraising starts
+- Major milestone announcement (Series A, $1M ARR, enterprise customer)
+- Industry conference talk/appearance
+
+---
+
+### LinkedIn Strategy (Highest ROI for Investor Marketing):
+
+**Audience Build:**
+- Follow 200-300 VCs, angels, HR tech investors over 2-3 months
+- Engage with their content (likes, thoughtful comments)
+- Build network of 5K+ followers by time you pitch
+
+**Content Cadence:**
+- 3x/week posts (Monday, Wednesday, Friday)
+- Mix: 50% metrics, 30% industry insights, 20% personal/team
+- Respond to all comments within 2 hours
+- Tag relevant investors in posts about fundraising
+
+**Post Format:**
+- Headline hooks attention
+- 3-4 bullet points (easy to scan)
+- Call-to-action (CTA): "What's your take?" or "DM for full roadmap"
+- Hashtags: #Startup #Staffing #SaaS #Fundraising #VentureCapital
+
+---
+
+### Twitter/X Strategy (Thought Leadership):
+
+**Goal:** Establish founder as industry expert + get retweeted by VCs
+
+**Content Types:**
+1. **Hot Takes:** "Staffing platforms have been sleeping for 20 years"
+2. **Metrics:** "We're 60% cheaper than ADP. Here's why."
+3. **Trends:** Comment on news (ADP earnings, staffing shortages, automation news)
+4. **Product News:** Major launches, partnerships, investor interest
+5. **Thread:** Deep-dive on staffing industry broken workflows
+
+**Posting Cadence:**
+- 1-2 tweets/day (not every hour, but consistent presence)
+- Retweet investor/founder content relevant to staffing
+- Engage: Reply to threads from VCs, angels, founder accounts
+
+**Example Thread:**
+```
+Thread: Why staffing platforms are broken (and why ORBIT is different)
+
+1/ ADP charges $99-$799/month. Built in 1995. Updated in 2005.
+Legacy tech = legacy problems.
+
+2/ Staffing agencies still:
+- Manually post jobs
+- Manually screen workers
+- Manually assign shifts
+- Manually verify compliance
+- Manually run payroll
+
+This is 2025. Nothing should be manual.
+
+3/ We built ORBIT different:
+- $39-$249/month (60-68% cheaper)
+- 100% automated (request → pay)
+- White-label ready (franchises)
+- ISO 20022 banking (enterprise)
+- Real-time (WebSocket infrastructure)
+
+4/ Result: Staffing agencies are switching. We hit $1M ARR in year 1.
+3 enterprise pilots for Fortune 500.
+
+Why? Because automation that ACTUALLY works is worth it.
+
+5/ We're fundraising $500K-$1M to accelerate this.
+Looking for investors who get it:
+- The staffing industry is broken
+- Digital transformation = $217B opportunity
+- Automation = margin expansion for agencies
+- Fortune 500 = 50x bigger market
+
+DM for investor roadmap. 🚀
+```
+
+---
+
+### Press & PR Strategy:
+
+**Timing:** Only announce when you have real news
+- Seed fundraising announcement (when funded)
+- $1M ARR milestone (end of Q4 2026 or Q1 2027)
+- Enterprise customer win (if high-profile)
+- ISO 20022 certification (major credibility milestone)
+
+**Outlets:**
+- TechCrunch (reach 500K+ startup investors)
+- Forbes (HR tech angle)
+- VentureBeat (SaaS focus)
+- Staffing Industry Analysts (trade publication)
+- LinkedIn Newsletter (founder POV)
+
+---
+
+### Email Strategy (Optional - for warm pipeline):
+
+**Monthly "Investor Letter"** (only if you build an email list)
+
+Send to:
+- 50-100 VCs who've shown interest
+- Angels who've attended your demo
+- Industry analysts
+- Strategic partners
+
+**Content:**
+- Monthly metrics update (MRR, customer count, churn)
+- Product update (what shipped this month)
+- Market intelligence (industry trends, competitive moves)
+- Investor ask (still fundraising? Update here)
+
+**Tone:** Founder's voice, honest about wins and challenges
+
+---
+
+### Metrics to Track (Investor Marketing):
+
+| Metric | Target | Timeline |
+|---|---|---|
+| LinkedIn followers | 5,000+ | By fundraising pitch |
+| Twitter followers | 2,000+ | By fundraising pitch |
+| Monthly social media reach | 50K+ impressions | Ongoing |
+| Press mentions | 3-5 major outlets | During fundraising |
+| Investor DMs/inquiries | 10-20 per month | Ongoing |
+| Warm introductions generated | 5-10 per month | Via social presence |
+
+---
+
+### Budget (Investor Marketing):
+
+**If bootstrapping (minimal cost):**
+- LinkedIn Premium: $39/month
+- Social media scheduling tool (Buffer): $15/month
+- Design tool (Canva): Free
+- **Total:** $54/month (or free organic)
+
+**If allocating from seed funds:**
+- PR agency (optional): $2-5K/month
+- Paid LinkedIn ads (investor targeting): $1-2K/month
+- Video production (quarterly): $1-2K per video
+- **Total:** $4-9K/month (for aggressive investor marketing)
+
+---
+
+### Key Rules for Investor-Focused Marketing:
+
+✅ **DO:**
+- Post consistently (builds credibility)
+- Share real metrics (traction impresses investors)
+- Engage with investor content (they notice)
+- Be authentic (founders invest in founders they respect)
+- Show momentum (growing MRR, happy customers)
+
+❌ **DON'T:**
+- Overhype or fake metrics (investors will call you out)
+- Post complaints about competitors (looks weak)
+- Go dark for months (kills momentum)
+- Post about non-business stuff (this is B2B investor marketing)
+- Use robot-like corporate tone (be human)
+
+---
+
+### Timeline to Investor Readiness:
+
+**Month 1-2:** Build social presence, post regularly, engage with VCs  
+**Month 2-3:** Hit measurable milestones ($50K+ MRR, 20+ customers)  
+**Month 3:** Start pitching investors via warm intros + social credibility  
+**Month 4:** Close seed round
+
+By the time you pitch, investors already know you and your metrics via your social presence. That's unfair advantage.
+
 **Pitch Deck Elements:**
 - 1 slide: Problem + market size
 - 1 slide: Solution (ORBIT)
