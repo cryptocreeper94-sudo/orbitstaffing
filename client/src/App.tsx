@@ -56,6 +56,8 @@ import AdminTalentExchange from "@/pages/AdminTalentExchange";
 import EmployeeHub from "@/pages/EmployeeHub";
 import OwnerHub from "@/pages/OwnerHub";
 import CRMDashboard from "@/pages/CRMDashboard";
+import { TutorialProvider } from "@/components/PageTutorial";
+import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -141,8 +143,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router />
-        <Toaster />
+        <TutorialProvider>
+          <Router />
+          <FloatingTutorialButton />
+          <Toaster />
+        </TutorialProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
