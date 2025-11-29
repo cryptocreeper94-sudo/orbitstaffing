@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PoweredByOrbit } from "@/components/PoweredByOrbit";
 import { useLocation } from 'wouter';
+import { useEffect, useRef } from "react";
+import { useOrbit } from "@/components/OrbitExperience";
 import { 
   Users, 
   DollarSign, 
@@ -39,6 +41,20 @@ import HourCounter from '@/components/HourCounter';
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
+  const { showWelcome } = useOrbit();
+  const hasShownWelcome = useRef(false);
+
+  useEffect(() => {
+    const hasSeenDashboardWelcome = localStorage.getItem('orbit_dashboard_welcome');
+    if (!hasSeenDashboardWelcome && !hasShownWelcome.current) {
+      hasShownWelcome.current = true;
+      const timer = setTimeout(() => {
+        showWelcome();
+        localStorage.setItem('orbit_dashboard_welcome', 'true');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [showWelcome]);
 
   return (
     <Shell>

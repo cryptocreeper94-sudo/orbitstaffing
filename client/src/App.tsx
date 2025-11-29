@@ -58,6 +58,8 @@ import OwnerHub from "@/pages/OwnerHub";
 import CRMDashboard from "@/pages/CRMDashboard";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
+import { OrbitExperienceProvider } from "@/components/OrbitExperience";
+import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -143,11 +145,14 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <TutorialProvider>
-          <Router />
-          <FloatingTutorialButton />
-          <Toaster />
-        </TutorialProvider>
+        <OrbitExperienceProvider>
+          <TutorialProvider>
+            <Router />
+            <FloatingTutorialButton />
+            <OrbitChatAssistant />
+            <Toaster />
+          </TutorialProvider>
+        </OrbitExperienceProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

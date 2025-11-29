@@ -1,6 +1,4 @@
 import { motion } from "framer-motion";
-import orbitWave from "@assets/generated_images/orbit_mascot_cyan_saturn_style.png";
-import orbitPoint from "@assets/generated_images/orbit_mascot_pointing_helpful.png";
 
 export type OrbitPose = "wave" | "point" | "think";
 
@@ -9,12 +7,19 @@ interface OrbitMascotProps {
   size?: "sm" | "md" | "lg";
   animate?: boolean;
   className?: string;
+  transparent?: boolean;
 }
 
 const poseImages: Record<OrbitPose, string> = {
-  wave: orbitWave,
-  point: orbitPoint,
-  think: orbitWave,
+  wave: "/mascot/orbit_mascot_cyan_saturn_style_transparent.png",
+  point: "/mascot/orbit_mascot_pointing_helpful_transparent.png",
+  think: "/mascot/orbit_mascot_thinking_pose_transparent.png",
+};
+
+const originalPoseImages: Record<OrbitPose, string> = {
+  wave: "/attached_assets/generated_images/orbit_mascot_cyan_saturn_style.png",
+  point: "/attached_assets/generated_images/orbit_mascot_pointing_helpful.png",
+  think: "/attached_assets/generated_images/orbit_mascot_thinking_pose.png",
 };
 
 const sizeClasses = {
@@ -27,9 +32,10 @@ export function OrbitMascot({
   pose = "wave", 
   size = "md", 
   animate = true,
-  className = "" 
+  className = "",
+  transparent = true
 }: OrbitMascotProps) {
-  const imageSrc = poseImages[pose];
+  const imageSrc = transparent ? poseImages[pose] : originalPoseImages[pose];
 
   return (
     <motion.div
