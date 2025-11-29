@@ -254,11 +254,11 @@ const EMAIL_TEMPLATES: Record<CampaignType, EmailTemplate> = {
       
       <div class="pay-summary">
         <p style="text-align: center; color: #666;">Net Pay</p>
-        <div class="amount">${{netPay}}</div>
+        <div class="amount">$` + `{{netPay}}</div>
         <hr style="margin: 15px 0;">
-        <p><strong>Gross Pay:</strong> ${{grossPay}}</p>
+        <p><strong>Gross Pay:</strong> $` + `{{grossPay}}</p>
         <p><strong>Hours Worked:</strong> {{hoursWorked}}</p>
-        <p><strong>Deductions:</strong> ${{deductions}}</p>
+        <p><strong>Deductions:</strong> $` + `{{deductions}}</p>
         <p><strong>Deposit Date:</strong> {{depositDate}}</p>
       </div>
       
@@ -330,7 +330,7 @@ const EMAIL_TEMPLATES: Record<CampaignType, EmailTemplate> = {
     id: 'tpl_job_broadcast',
     name: 'Job Opportunity Broadcast',
     type: 'job_broadcast',
-    subject: '🔥 New Job Alert: {{jobTitle}} - ${{payRate}}/hr',
+    subject: '🔥 New Job Alert: {{jobTitle}} - {{currencySymbol}}{{payRate}}/hr',
     htmlContent: `
 <!DOCTYPE html>
 <html>
@@ -356,7 +356,7 @@ const EMAIL_TEMPLATES: Record<CampaignType, EmailTemplate> = {
       
       <div class="job-card">
         <h2>{{jobTitle}}</h2>
-        <span class="pay-badge">${{payRate}}/hr</span>
+        <span class="pay-badge">$` + `{{payRate}}/hr</span>
         
         <p style="margin-top: 15px;"><strong>📍 Location:</strong> {{jobLocation}}</p>
         <p><strong>📅 Start Date:</strong> {{startDate}}</p>

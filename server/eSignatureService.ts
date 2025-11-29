@@ -116,7 +116,7 @@ const DOCUMENT_TEMPLATES: Record<DocumentType, DocumentTemplate> = {
         <h2>Position Details</h2>
         <ul>
           <li><strong>Start Date:</strong> {{startDate}}</li>
-          <li><strong>Pay Rate:</strong> ${{payRate}}/hour</li>
+          <li><strong>Pay Rate:</strong> ` + `$` + `{{payRate}}/hour</li>
           <li><strong>Work Location:</strong> {{workLocation}}</li>
           <li><strong>Schedule:</strong> {{schedule}}</li>
         </ul>
