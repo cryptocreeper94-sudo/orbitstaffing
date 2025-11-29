@@ -3,6 +3,19 @@ import Stripe from 'stripe';
 let connectionSettings: any;
 
 async function getCredentials() {
+  // First, check for direct environment variables (user's own Stripe keys)
+  const directSecretKey = process.env.STRIPE_SECRET_KEY;
+  const directPublishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
+  
+  if (directSecretKey && directPublishableKey) {
+    console.log('[Stripe] Using direct API keys from environment variables');
+    return {
+      publishableKey: directPublishableKey,
+      secretKey: directSecretKey,
+    };
+  }
+
+  // Fallback to Replit connector API
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY
     ? 'repl ' + process.env.REPL_IDENTITY
@@ -11,7 +24,7 @@ async function getCredentials() {
       : null;
 
   if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
+    throw new Error('Stripe keys not configured. Add STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY to secrets.');
   }
 
   const connectorName = 'stripe';

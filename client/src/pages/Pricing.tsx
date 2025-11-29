@@ -39,7 +39,7 @@ const PRICING_TIERS: PricingTier[] = [
       'Employee Hub access',
       'Email support'
     ],
-    priceId: 'price_1SWpbXBJN5j7Sqn0zOGmvG8c',
+    priceId: 'price_1SYoQkPQpkkF93FKsLEssZzb',
   },
   {
     id: 'growth',
@@ -60,7 +60,7 @@ const PRICING_TIERS: PricingTier[] = [
       'Unlimited clients',
       'Priority support'
     ],
-    priceId: 'price_1SWpbXBJN5j7Sqn097nk0sua',
+    priceId: 'price_1SYoQlPQpkkF93FKh9pRxrdL',
   },
   {
     id: 'professional',
@@ -80,7 +80,7 @@ const PRICING_TIERS: PricingTier[] = [
       'Weather verification',
       'Dedicated support'
     ],
-    priceId: 'price_1SWpbXBJN5j7Sqn0iaE4uiPM',
+    priceId: 'price_1SYoQlPQpkkF93FKaNLqc6T6',
   },
   {
     id: 'enterprise',
