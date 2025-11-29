@@ -2,7 +2,7 @@
 
 **Company:** DarkWave Studios  
 **Product:** ORBIT Staffing OS  
-**Date:** November 28, 2025  
+**Date:** November 29, 2025  
 **Status:** Seeking Series Seed Funding
 
 ---
@@ -10,7 +10,12 @@
 ## Executive Summary for Investors
 
 **The Opportunity:**
-ORBIT Staffing OS is a **$1M+ ARR SaaS platform** for mid-market staffing agencies (100-1,000 workers). We're addressing a **$217B market** with a product that's **60-68% cheaper** than competitors (Bullhorn, ADP, Avionté) while offering 100% automation from job request to worker payment.
+ORBIT Staffing OS is a **$1M+ ARR SaaS platform** for mid-market staffing agencies (100-1,000 workers). We're addressing a **$217B market** with a product that's **60-95% cheaper** than competitors (Bullhorn, ADP, Avionté, HubSpot, Indeed) while offering 100% automation from job request to worker payment.
+
+**New in November 2025:**
+- **ORBIT CRM:** HubSpot-competitive CRM at 62% less cost
+- **Standalone Tools:** 5 individual tools from $15-$39/mo
+- **Affiliate Program:** 20-40% recurring commissions for partners
 
 **The Ask:**
 $500K - $1M seed funding to accelerate customer acquisition and build enterprise features (ISO 20022 banking compliance).
@@ -45,15 +50,33 @@ $500K - $1M seed funding to accelerate customer acquisition and build enterprise
 
 ### Revenue Model (Year 1):
 
-| Revenue Stream | Tier | Monthly | Count | Monthly Revenue |
-|---|---|---|---|---|
-| **Subscriptions** | Starter | $39 | 500 | $19,500 |
-| | Growth | $99 | 200 | $19,800 |
-| | Professional | $249 | 100 | $24,900 |
-| **Franchise Licensing** | One-time + Monthly | $2-5K + $200 | 10 | $15,000 |
-| **Usage-Based** | SMS, background checks | $0.02-5 | 1000+ | $5,000 |
-| | | | **Total MRR** | **$84,200** |
-| | | | **Year 1 ARR** | **$1,010,400** |
+**Standalone Tools:**
+| Tool | Monthly | Target Customers | Monthly Revenue |
+|---|---|---|---|
+| ORBIT CRM | $19 | 500 | $9,500 |
+| Talent Exchange | $29 | 300 | $8,700 |
+| Payroll | $39 | 400 | $15,600 |
+| Time & GPS | $15 | 600 | $9,000 |
+| Compliance | $25 | 400 | $10,000 |
+| | | **Standalone Total** | **$52,800** |
+
+**Platform Bundles:**
+| Bundle | Monthly | Count | Monthly Revenue |
+|---|---|---|---|
+| Starter | $99 | 150 | $14,850 |
+| Growth | $149 | 100 | $14,900 |
+| Professional | $249 | 50 | $12,450 |
+| | | **Bundles Total** | **$42,200** |
+
+**Additional Revenue:**
+| Stream | Details | Monthly |
+|---|---|---|
+| Franchise Licensing | 10 franchises @ $2-5K + $200/mo | $15,000 |
+| Usage-Based (SMS, checks) | Volume pricing | $5,000 |
+| Affiliate Payouts | (20-40% of referral revenue) | -$15,000 |
+| | | |
+| **Total MRR** | | **$100,000** |
+| **Year 1 ARR** | | **$1,200,000** |
 
 ### Growth Projection (3 Years):
 

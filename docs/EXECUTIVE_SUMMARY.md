@@ -1,14 +1,43 @@
 # ORBIT Staffing OS - Executive Summary
 
-**Date:** November 28, 2025  
-**Version:** 1.0 (Production Ready)  
-**Company:** DarkWave Studios
+**Date:** November 29, 2025  
+**Version:** 1.1 (Production Ready + CRM)  
+**Company:** DarkWave Studios  
+**Website:** orbitstaffing.io
 
 ---
 
 ## Vision
 
 ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-market agencies managing 100-1000 workers. Our mission is to provide **100% automation** from customer request to worker payment with zero manual intervention.
+
+---
+
+## What's New (November 2025)
+
+### ORBIT CRM System
+- **HubSpot-competitive** CRM built specifically for staffing agencies
+- Deal pipeline with drag-and-drop
+- Activity timeline and email tracking
+- Meeting scheduler and duplicate detection
+- Workflow automation
+- **70-75% HubSpot feature parity** at a fraction of the cost
+
+### Standalone Tool Pricing
+Each tool now available separately for maximum flexibility:
+
+| Tool | Price/mo | Competitor | Savings |
+|------|----------|------------|---------|
+| ORBIT CRM | $19 | HubSpot ($50+) | 62% less |
+| Talent Exchange | $29 | Indeed ($400) | 93% less |
+| Payroll | $39 | ADP ($39+$5/emp) | 60-80% less |
+| Time & GPS | $15 | Deputy ($4/user) | Flat rate |
+| Compliance | $25 | Checkr ($35+) | Unlimited |
+
+### Affiliate/MLM Program
+- Referral Partner: 20% recurring commission
+- Agency Partner: 30% recurring commission
+- Franchise Partner: 40%+ with territory exclusivity
 
 ---
 
@@ -27,9 +56,10 @@ ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-marke
 ### Competitive Advantage
 | Feature | ORBIT | Competitors |
 |---------|-------|-------------|
-| Pricing | $39-$249/mo | $99-$799/mo |
-| Savings | **60-68% less** | - |
+| Pricing | $15-$249/mo | $99-$799/mo |
+| Savings | **60-95% less** | - |
 | Automation | 100% hands-free | 30-50% manual |
+| CRM Included | Yes (HubSpot-level) | Extra cost |
 | White-label | Full customization | Limited/none |
 | Compliance | Multi-state built-in | Add-on costs |
 
@@ -37,19 +67,49 @@ ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-marke
 
 ## Product Suite
 
-### ORBIT Staffing OS (Core Platform)
-- **100% Automation:** Request → Match → Assign → Clock-in → Pay
-- **GPS Verification:** 300ft geofence accuracy
-- **Multi-Tenant:** Complete data isolation
-- **Compliance:** TN/KY/FL state rules, I-9, prevailing wage
+### Core Platform Tools (Available Standalone or Bundled)
 
-### ORBIT Talent Exchange
-- **Two-Way Marketplace:** Workers find jobs, employers find talent
-- **Aggressive Pricing:**
-  - Starter: $39/month (vs $99-125 competitors)
-  - Growth: $99/month (vs $249-399 competitors)
-  - Professional: $249/month (vs $599-799 competitors)
-- **SEO Optimized:** Full Schema.org structured data
+**ORBIT CRM ($19/mo)**
+- Deal pipeline management
+- Activity timeline
+- Meeting scheduler
+- Email tracking
+- Duplicate detection
+- Workflow automation
+
+**ORBIT Talent Exchange ($29/mo)**
+- Two-way job marketplace
+- Unlimited job postings
+- Smart job matching
+- Application tracking
+- Indeed-style search
+
+**ORBIT Payroll ($39/mo)**
+- Automated multi-state payroll
+- Garnishment processing
+- Direct deposit
+- Tax calculations
+- Paystub generation
+
+**ORBIT Time & GPS ($15/mo)**
+- GPS-verified clock-in/out
+- 300ft geofence accuracy
+- Timesheet management
+- Photo verification
+
+**ORBIT Compliance ($25/mo)**
+- I-9 verification tracking
+- Certification management
+- Expiration alerts
+- Audit-ready reports
+
+### Platform Bundles (Best Value)
+| Bundle | Price | Includes |
+|--------|-------|----------|
+| Starter | $99/mo | CRM + Time/GPS + Compliance |
+| Growth | $149/mo | All 5 tools |
+| Professional | $249/mo | All 5 tools + Multi-location + API |
+| Enterprise | Custom | White-label + Dedicated support |
 
 ### Self-Service Portals
 - **Employee Hub:** Full data access, onboarding, schedules, pay stubs
@@ -67,48 +127,59 @@ ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-marke
 | Mobile | React Native + Expo (iOS/Android) |
 | Real-time | WebSocket |
 | SMS | Twilio (templates ready) |
-| Payments | Stripe (integration planned) |
+| Payments | Stripe (live integration) |
+| CRM | 11 database tables, full REST API |
 
 ---
 
 ## Revenue Model
 
-### Subscription Tiers
-| Tier | Monthly | Features |
-|------|---------|----------|
-| Starter | $39 | Basic marketplace, 50 workers |
-| Growth | $99 | Full automation, 200 workers |
-| Professional | $249 | Enterprise features, unlimited |
+### Subscription Revenue (Primary)
+
+**Standalone Tools:**
+| Tool | Monthly | Annual | Target Customers |
+|------|---------|--------|------------------|
+| CRM | $19 | $228 | 500 |
+| Talent | $29 | $348 | 300 |
+| Payroll | $39 | $468 | 400 |
+| Time/GPS | $15 | $180 | 600 |
+| Compliance | $25 | $300 | 400 |
+
+**Bundles:**
+| Tier | Monthly | Annual | Target |
+|------|---------|--------|--------|
+| Starter | $99 | $1,188 | 200 |
+| Growth | $149 | $1,788 | 150 |
+| Professional | $249 | $2,988 | 100 |
+
+### Affiliate Revenue (New!)
+- 20-40% commissions paid to partners
+- Grows customer base without marketing spend
+- Expected 30% of new customers via referrals by Q2 2026
 
 ### Additional Revenue Streams
 - Franchise licensing: $2K-$15K one-time + monthly fees
 - SMS notifications: Usage-based
 - Premium features: Pay cards, instant payouts
-- Data marketplace: Labor insights (future)
+- Enterprise ISO 20022 banking (Q3-Q4 2026)
 
 ### Financial Projections
-- **Year 1:** $500K ARR (50 customers avg $833/mo)
-- **Year 2:** $2M ARR (150 customers + franchises)
-- **Year 3:** $5M ARR (scale + enterprise deals)
+- **Year 1:** $1.0-1.5M ARR
+- **Year 2:** $3M ARR (with affiliate program)
+- **Year 3:** $7M ARR (enterprise + franchises)
 
 ---
 
 ## Key Differentiators
 
 1. **100% Automation** - Zero manual intervention
-2. **60-68% Cost Savings** - Aggressive competitive pricing
-3. **White-Label Ready** - Full customization for franchises
-4. **Multi-State Compliance** - Built-in, not add-on
-5. **Modern Tech Stack** - React, TypeScript, real-time updates
-6. **ORBIT Hallmark** - Unique asset verification system
-
----
-
-## Team
-
-- **Product Development:** Full-stack engineering team
-- **Operations:** Staffing industry veterans
-- **Compliance:** State-specific regulatory expertise
+2. **60-95% Cost Savings** - Aggressive competitive pricing
+3. **Standalone Tools** - Mix and match what you need
+4. **HubSpot-Level CRM** - Built for staffing at fraction of cost
+5. **Affiliate Program** - 20-40% recurring commissions
+6. **White-Label Ready** - Full customization for franchises
+7. **Multi-State Compliance** - Built-in, not add-on
+8. **Modern Tech Stack** - React, TypeScript, real-time updates
 
 ---
 
@@ -116,83 +187,51 @@ ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-marke
 
 ### Completed (November 2025)
 - ✅ Core automation (100% hands-free)
+- ✅ ORBIT CRM system (HubSpot-competitive)
+- ✅ Standalone tool pricing model
+- ✅ Affiliate/MLM program structure
 - ✅ ORBIT Talent Exchange marketplace
 - ✅ Employee & Owner self-service hubs
 - ✅ Mobile-optimized UI
 - ✅ Multi-tenant data isolation
 - ✅ GPS verification with geofencing
+- ✅ Stripe payment integration (live)
 - ✅ SMS notification templates
-- ✅ DarkWave Studios product showcase
 
 ### Q1 2026
-- [ ] Stripe payment integration
 - [ ] Public beta launch
-- [ ] First 10 paying customers
+- [ ] First 50 paying customers
 - [ ] Mobile app store releases
 - [ ] Skill-based job matching
 - [ ] Real-time job notifications
+- [ ] Affiliate dashboard launch
 
 ### Q2 2026
-- [ ] **Remote Support & Co-Browsing** - Live screen viewing for customer support
-- [ ] Blockchain credential verification
-- [ ] 50 customer milestone
+- [ ] 200 customer milestone
 - [ ] Franchise program launch
 - [ ] Geographic expansion
 - [ ] Customer analytics dashboard
+- [ ] Blockchain credential verification
 
----
-
-## Version 2 Preview (Coming Q1-Q2 2026)
-
-Sign up for V2 updates at **orbitstaffing.io** to get early access to:
-
-1. **Skill-Based Matching** - AI-powered worker-to-job recommendations
-2. **Real-Time Notifications** - Instant push alerts for new jobs
-3. **Remote Support** - Live co-browsing for customer assistance
-4. **Advanced Analytics** - Heatmaps, ROI tracking, custom reports
-5. **Native Mobile App** - iOS & Android with offline mode
-6. **Blockchain Credentials** - Portable, verified worker certifications
-
-## Enterprise Features (Q3-Q4 2026)
-
-### ISO 20022 Banking Compliance ⭐
-**Coming Q3-Q4 2026** — Direct bank connectivity for Fortune 500 enterprises
-
-ORBIT will become **ISO 20022 compliant**, enabling:
-- Direct SWIFT/ACH network integration
-- Enterprise-grade payroll processing
-- Automated bank reconciliation
-- Treasury system compatibility
-- **Positions ORBIT as enterprise platform competitive with ADP/Workday**
-
-This opens the **$50B+ enterprise staffing market** and demonstrates technical credibility at the highest level.
+### Q3-Q4 2026
+- [ ] ISO 20022 banking compliance
+- [ ] Enterprise tier launch
+- [ ] Fortune 500 customer acquisition
 
 ---
 
 ## Investment Opportunity
 
-### Use of Funds
-- **40%** - Engineering & product development
-- **30%** - Sales & marketing
-- **20%** - Operations & compliance
-- **10%** - Infrastructure & security
-
-### Key Metrics to Track
-- Customer acquisition cost (CAC)
-- Monthly recurring revenue (MRR)
-- Customer lifetime value (LTV)
-- Automation rate (% hands-free operations)
-- Net promoter score (NPS)
-
----
-
-## Investor Information
-
 **Seeking:** $500K-$1M seed funding  
 **Valuation:** $5M post-money  
-**Use of Funds:** 40% sales/marketing, 33% engineering, 13% ops, 14% other  
+**Use of Funds:**
+- 40% Engineering & product development
+- 30% Sales & marketing (including affiliate payouts)
+- 20% Operations & compliance
+- 10% Infrastructure & security
+
 **Projected ROI:** 4-12x in 3-5 years (acquisition exit)  
-**Full Roadmap:** See `docs/INVESTOR_ROADMAP.md` for complete investment details
+**Full Roadmap:** See `docs/INVESTOR_ROADMAP.md`
 
 ---
 

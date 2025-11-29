@@ -1,7 +1,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Lock, Zap, Users, Shield, Sparkles, Rocket, Bot, MapPin, DollarSign, Calendar, FileCheck, Globe, Smartphone, Briefcase, Building2, Cloud, Wrench } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  CheckCircle2, Lock, Zap, Users, Shield, Sparkles, Rocket, Bot, MapPin, 
+  DollarSign, Calendar, FileCheck, Globe, Smartphone, Briefcase, Building2, 
+  Cloud, Wrench, BarChart3, Package, Gift, Target, Clock, CreditCard, 
+  TrendingUp, Star, ChevronRight, ExternalLink
+} from "lucide-react";
+import { Link } from "wouter";
 
 interface SidonieWelcomeModalProps {
   isOpen: boolean;
@@ -11,468 +19,283 @@ interface SidonieWelcomeModalProps {
 export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-950 border border-cyan-500/30">
-        <DialogHeader className="pb-4 border-b border-cyan-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-slate-950 border border-cyan-500/30 p-0">
+        <DialogHeader className="p-6 pb-4 border-b border-cyan-500/20 bg-gradient-to-r from-cyan-900/30 to-blue-900/30">
           <div className="flex items-center gap-3 mb-3">
-            <Sparkles className="w-8 h-8 text-cyan-400 animate-pulse" />
-            <DialogTitle className="text-3xl font-bold text-cyan-300">
-              🎉 Welcome Back, Sidonie!
-            </DialogTitle>
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-white animate-pulse" />
+            </div>
+            <div>
+              <DialogTitle className="text-2xl font-bold text-white">
+                Welcome Back, Sidonie!
+              </DialogTitle>
+              <DialogDescription className="text-cyan-300">
+                ORBIT Staffing OS - November 2025 Update
+              </DialogDescription>
+            </div>
           </div>
-          <DialogDescription className="text-slate-300 text-lg">
-            Latest Updates: November 2025 - Major New Features!
-          </DialogDescription>
+          <div className="flex gap-2 flex-wrap">
+            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+              <Rocket className="w-3 h-3 mr-1" />
+              100% Automated
+            </Badge>
+            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+              <BarChart3 className="w-3 h-3 mr-1" />
+              CRM Added
+            </Badge>
+            <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
+              <Package className="w-3 h-3 mr-1" />
+              Standalone Tools
+            </Badge>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-6 py-6">
-          {/* BIG NEWS - 100% Automation */}
-          <Card className="bg-gradient-to-br from-green-950/60 to-emerald-950/60 border border-green-500/50 shadow-lg shadow-green-500/20">
-            <CardHeader>
-              <CardTitle className="text-green-300 flex items-center gap-2 text-xl">
-                <Rocket className="w-6 h-6" />
-                🚀 BREAKTHROUGH: 100% Automation Achieved!
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-green-100 font-semibold text-lg">
-                Zero manual intervention from customer request → worker payment!
-              </p>
-              <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
-                <p className="text-slate-300">✅ Customer creates request</p>
-                <p className="text-slate-300">✅ AI auto-matches top workers</p>
-                <p className="text-slate-300">✅ Workers notified instantly (SMS + in-app)</p>
-                <p className="text-slate-300">✅ Onboarding deadlines enforced automatically</p>
-                <p className="text-slate-300">✅ GPS clock-ins create timesheets</p>
-                <p className="text-slate-300">✅ Timesheets auto-approve when valid</p>
-                <p className="text-slate-300">✅ Payroll runs on schedule (no admin needed)</p>
-                <p className="text-slate-300">✅ Paystubs generated & workers notified</p>
-                <p className="text-green-400 font-bold mt-2">🎯 Runs 24/7 - Completely hands-free!</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* NEW: ORBIT Talent Exchange */}
-          <Card className="bg-gradient-to-br from-blue-950/60 to-indigo-950/60 border border-blue-500/50 shadow-lg shadow-blue-500/20">
-            <CardHeader>
-              <CardTitle className="text-blue-300 flex items-center gap-2 text-xl">
-                <Briefcase className="w-6 h-6" />
-                NEW: ORBIT Talent Exchange
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-blue-100 font-semibold text-lg">
-                Two-Way Job Marketplace with Aggressive Competitive Pricing!
-              </p>
-              <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
-                <p className="text-slate-300">💰 <strong className="text-green-400">60-68% Less</strong> than competitors:</p>
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  <div className="bg-blue-900/30 rounded p-2 text-center">
-                    <p className="text-lg font-bold text-blue-300">$39</p>
-                    <p className="text-xs text-slate-400">Starter</p>
+        <ScrollArea className="max-h-[calc(90vh-180px)]">
+          <div className="p-6 space-y-6">
+            
+            <Card className="bg-gradient-to-br from-green-950/60 to-emerald-950/60 border border-green-500/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-green-300 flex items-center gap-2 text-lg">
+                  <Rocket className="w-5 h-5" />
+                  NEW: Standalone Tool Pricing
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-green-100 text-sm">
+                  Each tool now available separately - mix and match as needed!
+                </p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <BarChart3 className="w-5 h-5 text-cyan-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-cyan-300">$19</p>
+                    <p className="text-xs text-slate-400">ORBIT CRM</p>
                   </div>
-                  <div className="bg-blue-900/30 rounded p-2 text-center">
-                    <p className="text-lg font-bold text-blue-300">$99</p>
-                    <p className="text-xs text-slate-400">Growth</p>
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <Users className="w-5 h-5 text-purple-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-purple-300">$29</p>
+                    <p className="text-xs text-slate-400">Talent Exchange</p>
                   </div>
-                  <div className="bg-blue-900/30 rounded p-2 text-center">
-                    <p className="text-lg font-bold text-blue-300">$249</p>
-                    <p className="text-xs text-slate-400">Professional</p>
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <DollarSign className="w-5 h-5 text-green-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-green-300">$39</p>
+                    <p className="text-xs text-slate-400">Payroll</p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <MapPin className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-amber-300">$15</p>
+                    <p className="text-xs text-slate-400">Time & GPS</p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-center">
+                    <Shield className="w-5 h-5 text-red-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-red-300">$25</p>
+                    <p className="text-xs text-slate-400">Compliance</p>
+                  </div>
+                  <div className="bg-slate-900/50 rounded-lg p-3 text-center border border-cyan-500/30">
+                    <Package className="w-5 h-5 text-cyan-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-cyan-300">$99-249</p>
+                    <p className="text-xs text-slate-400">Full Bundle</p>
                   </div>
                 </div>
-                <p className="text-slate-300 mt-2">✅ Workers find jobs • Employers find talent</p>
-                <p className="text-slate-300">✅ Full SEO optimization with Schema.org</p>
-              </div>
-            </CardContent>
-          </Card>
+                <p className="text-xs text-green-400 text-center">
+                  60-95% less than competitors (Bullhorn, HubSpot, Indeed, ADP)
+                </p>
+              </CardContent>
+            </Card>
 
-          {/* NEW: Self-Service Portals */}
-          <Card className="bg-gradient-to-br from-purple-950/60 to-violet-950/60 border border-purple-500/50 shadow-lg shadow-purple-500/20">
-            <CardHeader>
-              <CardTitle className="text-purple-300 flex items-center gap-2 text-xl">
-                <Building2 className="w-6 h-6" />
-                NEW: Self-Service Portals
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-purple-300 font-semibold">
-                    <Users className="w-5 h-5" />
-                    Employee Hub
+            <Card className="bg-gradient-to-br from-cyan-950/60 to-blue-950/60 border border-cyan-500/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-cyan-300 flex items-center gap-2 text-lg">
+                  <BarChart3 className="w-5 h-5" />
+                  NEW: ORBIT CRM System
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-cyan-100 text-sm mb-3">
+                  HubSpot-competitive CRM built for staffing agencies!
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Deal pipeline (drag & drop)
                   </div>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• Full employee data access</li>
-                    <li>• Onboarding acknowledgments</li>
-                    <li>• Schedule & availability</li>
-                    <li>• Pay stubs & documents</li>
-                  </ul>
-                </div>
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-violet-300 font-semibold">
-                    <Building2 className="w-5 h-5" />
-                    Owner Hub
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Activity timeline
                   </div>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• Full admin visibility</li>
-                    <li>• Weather verification</li>
-                    <li>• Business analytics</li>
-                    <li>• Team management</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* NEW: Mobile & UI Improvements */}
-          <Card className="bg-gradient-to-br from-teal-950/60 to-cyan-950/60 border border-teal-500/50">
-            <CardHeader>
-              <CardTitle className="text-teal-300 flex items-center gap-2 text-xl">
-                <Smartphone className="w-6 h-6" />
-                Mobile-Optimized UI
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-slate-900/50 rounded-lg p-3">
-                  <p className="text-teal-300 font-semibold mb-1">Compact Controls</p>
-                  <p className="text-xs text-slate-400">Reduced padding, optimized buttons for mobile</p>
-                </div>
-                <div className="bg-slate-900/50 rounded-lg p-3">
-                  <p className="text-teal-300 font-semibold mb-1">Multi-Column Grids</p>
-                  <p className="text-xs text-slate-400">3-col Talent Exchange, 4-col Sandbox, 2-col Access</p>
-                </div>
-                <div className="bg-slate-900/50 rounded-lg p-3">
-                  <p className="text-teal-300 font-semibold mb-1">Touch-Friendly</p>
-                  <p className="text-xs text-slate-400">Swipe gestures, larger tap targets</p>
-                </div>
-                <div className="bg-slate-900/50 rounded-lg p-3">
-                  <p className="text-teal-300 font-semibold mb-1">Responsive Design</p>
-                  <p className="text-xs text-slate-400">Perfect on any screen size</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* NEW: DarkWave Studios & GarageBot */}
-          <Card className="bg-gradient-to-br from-slate-900/80 to-gray-950/80 border border-slate-600/50">
-            <CardHeader>
-              <CardTitle className="text-slate-300 flex items-center gap-2 text-xl">
-                <Wrench className="w-6 h-6" />
-                DarkWave Studios Products
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/30">
-                  <p className="text-cyan-300 font-semibold">ORBIT Staffing OS</p>
-                  <p className="text-xs text-slate-400 mt-1">Full staffing automation platform</p>
-                </div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-amber-500/30">
-                  <p className="text-amber-300 font-semibold">Lot Ops Pro</p>
-                  <p className="text-xs text-slate-400 mt-1">Car dealership operations</p>
-                </div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-purple-500/30">
-                  <p className="text-purple-300 font-semibold">Dark Wave Pulse</p>
-                  <p className="text-xs text-slate-400 mt-1">Operational heartbeat platform</p>
-                </div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-teal-500/30">
-                  <p className="text-teal-300 font-semibold">GarageBot (Coming Soon)</p>
-                  <p className="text-xs text-slate-400 mt-1">Auto parts AI assistant - 21-slide showcase</p>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 mt-2">Visit /studio-landing.html for full product showcase</p>
-            </CardContent>
-          </Card>
-
-          {/* What's New Section */}
-          <Card className="bg-cyan-950/40 border border-cyan-500/30">
-            <CardHeader>
-              <CardTitle className="text-cyan-300 flex items-center gap-2 text-xl">
-                <Sparkles className="w-6 h-6" />
-                Core Automation Features
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Worker Matching Engine */}
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-cyan-300 font-semibold">
-                    <Bot className="w-5 h-5" />
-                    AI Worker Matching
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Meeting scheduler
                   </div>
-                  <p className="text-sm text-slate-300">
-                    5-criteria scoring algorithm auto-matches workers:
-                  </p>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• Skills match (40 points)</li>
-                    <li>• Availability (20 points)</li>
-                    <li>• Insurance status (15 points)</li>
-                    <li>• Location proximity (15 points)</li>
-                    <li>• Experience level (10 points)</li>
-                  </ul>
-                </div>
-
-                {/* GPS Automation */}
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-green-300 font-semibold">
-                    <MapPin className="w-5 h-5" />
-                    GPS → Timesheet Automation
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Email tracking
                   </div>
-                  <p className="text-sm text-slate-300">
-                    Workers clock in/out with GPS verification
-                  </p>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• 300ft geofence validation</li>
-                    <li>• Auto-creates timesheet entries</li>
-                    <li>• Auto-approves when GPS verified</li>
-                    <li>• Flags edge cases for review</li>
-                  </ul>
-                </div>
-
-                {/* Automated Payroll */}
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-emerald-300 font-semibold">
-                    <DollarSign className="w-5 h-5" />
-                    Automated Payroll Scheduler
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Duplicate detection
                   </div>
-                  <p className="text-sm text-slate-300">
-                    Payroll runs automatically on pay day
-                  </p>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• Daily background job</li>
-                    <li>• Configurable pay schedule</li>
-                    <li>• 2025 tax calculations (TN/KY)</li>
-                    <li>• PDF paystubs with hallmark</li>
-                  </ul>
-                </div>
-
-                {/* Onboarding Enforcement */}
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-amber-300 font-semibold">
-                    <Calendar className="w-5 h-5" />
-                    Onboarding Deadlines
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Workflow automation
                   </div>
-                  <p className="text-sm text-slate-300">
-                    Automatic deadline enforcement
-                  </p>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• 3 business days for application</li>
-                    <li>• 1 business day after assignment</li>
-                    <li>• Auto-reassigns if incomplete</li>
-                    <li>• Hourly background checks</li>
-                  </ul>
                 </div>
+                <Link href="/crm">
+                  <Button size="sm" className="mt-3 bg-cyan-600 hover:bg-cyan-700 text-xs">
+                    Open CRM Dashboard
+                    <ChevronRight className="w-3 h-3 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
 
-                {/* CSA System */}
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-purple-300 font-semibold">
-                    <FileCheck className="w-5 h-5" />
-                    CSA Digital Signing
+            <Card className="bg-gradient-to-br from-purple-950/60 to-violet-950/60 border border-purple-500/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-purple-300 flex items-center gap-2 text-lg">
+                  <Gift className="w-5 h-5" />
+                  NEW: Affiliate/MLM Program
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-slate-900/50 rounded-lg p-2">
+                    <p className="text-xl font-bold text-green-400">20%</p>
+                    <p className="text-xs text-slate-400">Referral</p>
                   </div>
-                  <p className="text-sm text-slate-300">
-                    Complete customer agreements system
-                  </p>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• 1.45x transparent markup</li>
-                    <li>• Electronic signatures</li>
-                    <li>• Version control</li>
-                    <li>• Payment terms (Net 7/15/30)</li>
-                  </ul>
-                </div>
-
-                {/* OAuth Integration */}
-                <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-2 text-blue-300 font-semibold">
-                    <Globe className="w-5 h-5" />
-                    OAuth Connection Wizard
+                  <div className="bg-slate-900/50 rounded-lg p-2">
+                    <p className="text-xl font-bold text-cyan-400">30%</p>
+                    <p className="text-xs text-slate-400">Agency</p>
                   </div>
-                  <p className="text-sm text-slate-300">
-                    Connect 16 business systems
-                  </p>
-                  <ul className="text-xs text-slate-400 space-y-1 pl-4">
-                    <li>• QuickBooks, ADP, Paychex</li>
-                    <li>• Stripe, Square, PayPal</li>
-                    <li>• Multi-step wizard UI</li>
-                    <li>• Secure token management</li>
-                  </ul>
+                  <div className="bg-slate-900/50 rounded-lg p-2">
+                    <p className="text-xl font-bold text-purple-400">40%+</p>
+                    <p className="text-xs text-slate-400">Franchise</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                <p className="text-xs text-slate-400 mt-2 text-center">
+                  Recurring commissions on all referrals!
+                </p>
+              </CardContent>
+            </Card>
 
-          {/* Dual Referral Systems */}
-          <Card className="bg-yellow-950/40 border border-yellow-500/30">
-            <CardHeader>
-              <CardTitle className="text-yellow-300 flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                💰 Dual Referral Bonus Systems
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-yellow-200 font-semibold">Worker-to-Worker: $100 Bonus</p>
-                  <p className="text-slate-400 text-xs">Paid after referred worker completes 40 hours</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-yellow-200 font-semibold">Public Referrals: $50 Bonus</p>
-                  <p className="text-slate-400 text-xs">Anyone can refer workers for $50 after 80 hours (viral marketing!)</p>
-                </div>
-              </div>
-              <p className="text-xs text-slate-500 mt-2">Payment via Venmo, CashApp, or Zelle</p>
-            </CardContent>
-          </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="bg-slate-900/50 border-slate-700/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-white flex items-center gap-2 text-sm">
+                    <Building2 className="w-4 h-4 text-purple-400" />
+                    Self-Service Portals
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <Users className="w-3 h-3 text-cyan-400" />
+                    Employee Hub - Full data access
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <Building2 className="w-3 h-3 text-purple-400" />
+                    Owner Hub - Admin dashboard
+                  </div>
+                </CardContent>
+              </Card>
 
-          {/* Security Notice */}
-          <Card className="bg-violet-950/40 border border-violet-500/30">
-            <CardHeader>
-              <CardTitle className="text-violet-300 flex items-center gap-2">
-                <Lock className="w-5 h-5" />
-                🔐 Security Reminder
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-slate-300">
-              <p>✓ Your current PIN: <span className="font-mono font-bold text-violet-300">4444</span></p>
-              <p>⚠️ Recommended: Change to a secure PIN you'll remember</p>
-              <p>🔐 Dev team has emergency override access if needed</p>
-            </CardContent>
-          </Card>
+              <Card className="bg-slate-900/50 border-slate-700/50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-white flex items-center gap-2 text-sm">
+                    <Bot className="w-4 h-4 text-cyan-400" />
+                    100% Automation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    AI worker matching
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Auto payroll processing
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    GPS timesheet creation
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* How To Use */}
-          <Card className="bg-cyan-950/40 border border-cyan-500/30">
-            <CardHeader>
-              <CardTitle className="text-cyan-300 flex items-center gap-2">
-                <Sparkles className="w-5 h-5" />
-                How to Use ORBIT Sandbox
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-cyan-200 flex items-center gap-2">
-                    <Users className="w-4 h-4" />
-                    Staffing Operations
-                  </h4>
-                  <ul className="space-y-1 text-slate-300 pl-6">
-                    <li>✓ Create and manage workers</li>
-                    <li>✓ Post jobs and assignments</li>
-                    <li>✓ Schedule worker availability</li>
-                    <li>✓ Track assignments in real-time</li>
-                  </ul>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-cyan-200 flex items-center gap-2">
-                    <Zap className="w-4 h-4" />
-                    Financial Management
-                  </h4>
-                  <ul className="space-y-1 text-slate-300 pl-6">
-                    <li>✓ Process payroll instantly</li>
-                    <li>✓ Calculate worker bonuses</li>
-                    <li>✓ Generate invoices</li>
-                    <li>✓ Track revenue & expenses</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Version 2 Roadmap */}
-          <Card className="bg-amber-950/40 border border-amber-500/30">
-            <CardHeader>
-              <CardTitle className="text-amber-300 flex items-center gap-2">
-                <Rocket className="w-5 h-5" />
-                Coming in Version 2.0 (Q1 2026)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+            <Card className="bg-gradient-to-br from-amber-950/40 to-orange-950/40 border border-amber-500/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-amber-300 flex items-center gap-2 text-lg">
+                  <TrendingUp className="w-5 h-5" />
+                  Platform Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
                   <div>
-                    <h5 className="font-semibold text-green-200">SMS Notifications ✓</h5>
-                    <p className="text-xs text-slate-400">Twilio ready - templates configured</p>
+                    <p className="text-2xl font-bold text-white">11</p>
+                    <p className="text-xs text-slate-400">CRM Tables</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-green-200">Mobile App ✓</h5>
-                    <p className="text-xs text-slate-400">iOS & Android ready for app stores</p>
+                    <p className="text-2xl font-bold text-white">5</p>
+                    <p className="text-xs text-slate-400">Standalone Tools</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-amber-200">Stripe Payouts</h5>
-                    <p className="text-xs text-slate-400">Coming: Instant worker payments</p>
+                    <p className="text-2xl font-bold text-white">75%</p>
+                    <p className="text-xs text-slate-400">HubSpot Parity</p>
                   </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h5 className="font-semibold text-amber-200">Blockchain Hallmarks</h5>
-                    <p className="text-xs text-slate-400">Coming: On-chain verification</p>
+                    <p className="text-2xl font-bold text-green-400">Live</p>
+                    <p className="text-xs text-slate-400">orbitstaffing.io</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h5 className="font-semibold text-green-200">Equipment Tracking ✓</h5>
-                    <p className="text-xs text-slate-400">PPE & asset management live</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h5 className="font-semibold text-green-200">Advanced Analytics ✓</h5>
-                    <p className="text-xs text-slate-400">Dashboard & reports live</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Key Features */}
-          <Card className="bg-green-950/40 border border-green-500/30">
-            <CardHeader>
-              <CardTitle className="text-green-300 flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Key Capabilities
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm text-slate-300">
-                <p>✓ <span className="text-green-200 font-semibold">Multi-tenant white-label</span> - Supports unlimited franchises</p>
-                <p>✓ <span className="text-green-200 font-semibold">Complete compliance</span> - State-specific rules, I-9 tracking, prevailing wage</p>
-                <p>✓ <span className="text-green-200 font-semibold">Real-time dashboard</span> - See all operations at a glance</p>
-                <p>✓ <span className="text-green-200 font-semibold">100% secure</span> - Encrypted data, RBAC, audit trails</p>
-                <p>✓ <span className="text-green-200 font-semibold">ORBIT Hallmark</span> - Unique asset number on all outputs</p>
-              </div>
-            </CardContent>
-          </Card>
+            <Card className="bg-slate-800/50 border-slate-700/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-white flex items-center gap-2 text-sm">
+                  <Zap className="w-4 h-4 text-yellow-400" />
+                  Quick Access
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <Link href="/crm">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
+                      <BarChart3 className="w-3 h-3 mr-1" />
+                      CRM
+                    </Button>
+                  </Link>
+                  <Link href="/pricing">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-green-500/30 text-green-400 hover:bg-green-500/10">
+                      <CreditCard className="w-3 h-3 mr-1" />
+                      Pricing
+                    </Button>
+                  </Link>
+                  <Link href="/jobs">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                      <Briefcase className="w-3 h-3 mr-1" />
+                      Jobs
+                    </Button>
+                  </Link>
+                  <Link href="/talent-pool">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-amber-500/30 text-amber-400 hover:bg-amber-500/10">
+                      <Users className="w-3 h-3 mr-1" />
+                      Talent
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* CTA */}
-          <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-            <p className="text-sm text-slate-300 mb-3">
-              Ready to explore? Start by creating a test company and staffing a demo assignment.
-            </p>
-            <p className="text-xs text-slate-500">
-              Questions? Email: support@orbitstaffing.io | Docs: https://orbitstaffing.io/docs
-            </p>
           </div>
-        </div>
+        </ScrollArea>
 
-        <div className="flex gap-3 pt-4 border-t border-slate-700">
-          <Button
-            onClick={onClose}
-            className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white"
-            data-testid="button-close-welcome"
-          >
-            Let's Go! 🚀
+        <div className="p-4 border-t border-cyan-500/20 bg-slate-900/50 flex items-center justify-between">
+          <p className="text-xs text-slate-500">
+            Powered by ORBIT - orbitstaffing.io
+          </p>
+          <Button onClick={onClose} className="bg-gradient-to-r from-cyan-500 to-blue-600">
+            Let's Go!
+            <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </div>
       </DialogContent>

@@ -2,421 +2,262 @@
 
 **Vision:** Become the #1 staffing platform for mid-market agencies (100-1000 workers)
 
-**Last Updated:** November 28, 2025
+**Last Updated:** November 29, 2025
 
 ---
 
 ## RECENT ACCOMPLISHMENTS (November 2025)
 
-### Completed This Week:
-- ✅ **ORBIT Talent Exchange** - Two-way job marketplace with aggressive competitive pricing ($39/$99/$249)
-- ✅ **Employee Hub** - Full self-service portal for workers with data access, onboarding acknowledgments
-- ✅ **Owner Hub** - Complete business owner portal with weather verification and analytics
-- ✅ **Mobile-Optimized UI** - Compact buttons, multi-column grids, touch-friendly design
-- ✅ **GarageBot Integration** - 21-slide horizontal carousel showcase on DarkWave Studios
-- ✅ **SEO Optimization** - Full Schema.org structured data with pricing markup
-- ✅ **Saturn Watermark** - True transparency with Python-based background removal
-- ✅ **Developer PIN Access** - Mobile-first redirect (0424) to Developer Panel
+### Just Completed:
+- ✅ **ORBIT CRM System** - HubSpot-competitive CRM with 11 database tables
+  - Deal pipeline with drag-and-drop
+  - Activity timeline tracking
+  - Meeting scheduler
+  - Email open/click tracking
+  - Duplicate detection
+  - Workflow automation
+- ✅ **Standalone Tool Pricing** - Each tool available separately
+  - ORBIT CRM: $19/mo
+  - Talent Exchange: $29/mo
+  - Payroll: $39/mo
+  - Time & GPS: $15/mo
+  - Compliance: $25/mo
+- ✅ **Affiliate/MLM Program** - 20-40% recurring commissions
+- ✅ **Updated Pricing Page** - Bundles + standalone + affiliate tabs
+- ✅ **Sidonie Welcome Modal** - Updated with all new features
 
-### Production Checklist:
-- [x] Core automation (100% hands-free from request to payment)
+### Previously Completed:
+- ✅ **ORBIT Talent Exchange** - Two-way job marketplace
+- ✅ **Employee Hub** - Full self-service portal for workers
+- ✅ **Owner Hub** - Complete business owner portal
+- ✅ **Mobile-Optimized UI** - Touch-friendly design
+- ✅ **SEO Optimization** - Full Schema.org structured data
+- ✅ **100% Automation** - Request → Match → Assign → Clock-in → Pay
+
+### Production Status:
+- [x] Core automation (100% hands-free)
 - [x] Multi-tenant data isolation
 - [x] GPS verification with geofencing
-- [x] Employee & Owner self-service portals
-- [x] Two-way job marketplace with pricing
-- [x] Mobile-responsive UI
-- [x] Twilio SMS templates (ready for credentials)
-- [x] DarkWave Studios product showcase
-- [ ] Stripe payment integration (Q1 2026)
+- [x] CRM system (70-75% HubSpot parity)
+- [x] Standalone tool pricing
+- [x] Affiliate program structure
+- [x] Stripe payment integration (live)
+- [x] SMS templates (Twilio-ready)
+- [ ] Mini help slideshows on all pages (in progress)
 - [ ] Blockchain credential verification (Q2 2026)
 
 ---
 
-## PHASE 1: MVP → PRODUCTION (Weeks 1-4, Launching Now)
+## CURRENT PRICING MODEL
 
-**Goal:** Stable, reliable platform for beta testing
-- ✅ Core features (worker management, assignments, compliance)
-- ✅ Admin dashboard
-- ✅ Drug testing integration
-- ✅ GPS verification
-- ✅ Privacy/legal compliance
-- ✅ **Multi-tenant isolation architecture (Nov 25, 2025)** - Complete data separation between ORBIT, franchisees, and white-label customers with database-enforced constraints and API-level validation
-- ✅ **ORBIT Talent Exchange (Nov 28, 2025)** - Two-way job marketplace with competitive pricing
-- ✅ **Self-Service Portals (Nov 28, 2025)** - Employee Hub and Owner Hub with full data access
+### Standalone Tools
+| Tool | Monthly | Features |
+|------|---------|----------|
+| ORBIT CRM | $19 | Pipeline, activities, meetings, email tracking |
+| Talent Exchange | $29 | Job board, talent pool, applications |
+| Payroll | $39 | Multi-state, garnishments, direct deposit |
+| Time & GPS | $15 | Clock-in/out, geofencing, timesheets |
+| Compliance | $25 | I-9, certifications, background checks |
 
-**Target Launch:** December 2025 ✓ ON TRACK
+### Platform Bundles
+| Bundle | Monthly | Includes |
+|--------|---------|----------|
+| Starter | $99 | CRM + Time/GPS + Compliance |
+| Growth | $149 | All 5 tools |
+| Professional | $249 | All 5 + Multi-location + API |
+| Enterprise | Custom | White-label + Dedicated support |
+
+### Affiliate Commissions
+| Tier | Commission | Requirements |
+|------|------------|--------------|
+| Referral | 20% recurring | Share link, earn on signups |
+| Agency | 30% recurring | Staffing agencies/consultants |
+| Franchise | 40%+ | Territory exclusivity |
 
 ---
 
-## PHASE 2: BETA FEEDBACK (Weeks 5-8, January 2026)
+## PHASE 1: POLISH & LAUNCH (December 2025)
 
-**Goal:** Validate with Mike, Dan, and early users
+### In Progress:
+- [ ] Mini help slideshows on all major pages
+- [ ] Child-friendly UI improvements throughout
+- [ ] Contextual task shortcuts
+- [ ] Tenant separation verification
+
+### To Complete:
+- [ ] First 10 paying customers
+- [ ] Affiliate dashboard for partners
+- [ ] Email marketing integration
+- [ ] Customer onboarding flow
+
+**Target Launch:** December 2025
+
+---
+
+## PHASE 2: BETA FEEDBACK (January 2026)
+
+**Goal:** Validate with early users
 
 **Key Metrics to Track:**
+- Customer acquisition cost (CAC)
 - Time saved per month
-- Cost reduction
-- Feature adoption rates
+- Tool adoption rates
+- Affiliate referral rates
 - Bug reports
-- User feedback
 
 **Based on Feedback, Prioritize:**
-1. Skill-based job matching (if users request)
-2. Real-time job notifications (if workers request)
-3. Advanced payroll (if franchisees request)
-4. Mobile app (if critical for workers)
-
-**Timeline:** January 2026
+1. Skill-based job matching
+2. Real-time job notifications
+3. Advanced payroll features
+4. Mobile app launch
 
 ---
 
-## PHASE 3: VERSION 2 FEATURES (Q1 2026, Feb-Mar)
+## PHASE 3: VERSION 2 FEATURES (Q1 2026)
 
-### 3.1 SKILL-BASED MATCHING (HIGHEST PRIORITY)
-**Problem:** No way to recommend best workers for specific jobs
-
-**Solution:**
-- Worker skill profiles (trades, certifications, experience)
+### 3.1 SKILL-BASED MATCHING (HIGH PRIORITY)
+- Worker skill profiles
 - Job skill requirements
-- Auto-matching algorithm
-- Recommended worker list per job
-- Skill verification workflow
+- AI auto-matching algorithm
+- Recommended worker list
 
 **Effort:** 2-3 weeks
 **Impact:** 40% improvement in job fill rates
-**Revenue:** Upsell to existing customers (+$200/mo each)
 
-### 3.2 REAL-TIME JOB ASSIGNMENT
-**Problem:** Workers don't get instant job notifications
-
-**Solution:**
-- WebSocket-based real-time updates
-- Push notifications for new jobs
-- Worker accept/decline workflow
-- Confirmation & proof-of-acceptance
-- Manager visibility into assignment status
+### 3.2 REAL-TIME NOTIFICATIONS
+- WebSocket-based updates
+- Push notifications for jobs
+- Accept/decline workflow
+- SMS alerts (Twilio)
 
 **Effort:** 2 weeks
-**Impact:** Better fill rates, happier workers
-**Revenue:** Premium feature tier (+$300/mo)
+**Impact:** Better fill rates
 
-### 3.3 ADVANCED PAYROLL INTEGRATION
-**Problem:** Manual payroll processing is time-consuming
+### 3.3 AFFILIATE DASHBOARD
+- Partner login portal
+- Commission tracking
+- Referral link management
+- Payout history
 
-**Solution:**
-- Automated time entry aggregation (from GPS clock-in)
-- Wage calculation (hourly, overtime, bonuses)
-- Automatic payroll runs
-- Direct deposit processing
-- W2/1099 generation
-- Tax withholding calculation
+**Effort:** 2 weeks
+**Impact:** 30%+ new customers via referrals
 
-**Effort:** 3-4 weeks
-**Impact:** Save 20 hours/month for each franchise
-**Revenue:** Payroll fee ($50/payrun) or tier increase
-
-### 3.4 CUSTOMER ANALYTICS DASHBOARD
-**Problem:** Customers don't see their staffing ROI
-
-**Solution:**
-- Heatmaps of worker availability
+### 3.4 CUSTOMER ANALYTICS
+- Staffing ROI dashboard
+- Heatmaps of availability
 - Job fulfillment rates
-- Cost per hire trending
-- Worker retention metrics
-- Predictive staffing recommendations
-- Custom report builder
+- Custom reports
 
 **Effort:** 2 weeks
 **Impact:** Better customer retention
-**Revenue:** Analytics tier (+$500/mo)
-
-### 3.5 REMOTE SUPPORT & CO-BROWSING (NEW!)
-**Problem:** Support teams can't see what customers see when troubleshooting
-
-**Solution:**
-- **Co-browsing:** Support agents see customer's browser session in real-time
-- **Remote guidance:** Highlight, point, and guide customers through steps
-- **Session consent:** Customer must approve before any screen access
-- **Sensitive field masking:** SSN, passwords, banking info automatically hidden
-- **Audit logging:** Every remote session logged for compliance
-- **Warranty integration:** Tie support access to warranty/service levels
-
-**Implementation Options:**
-| Service | Type | Best For |
-|---------|------|----------|
-| Cobrowse.io | Browser co-browse | Web app support (no install) |
-| Zoho Assist | Full remote control | Desktop support |
-| Glia | Enterprise co-browse | AI + human hybrid support |
-| FullStory | Session replay | Post-incident analysis |
-
-**Effort:** 3-4 weeks
-**Impact:** 50% faster support resolution, higher customer satisfaction
-**Revenue:** Premium support tier (+$200/mo) or included in warranty packages
 
 ---
 
-## PHASE 4: EXPANSION (Q2 2026, Apr-Jun)
+## PHASE 4: MOBILE & EXPANSION (Q2 2026)
 
 ### 4.1 NATIVE MOBILE APP
-**Problem:** Workers want native app (not just web)
-
-**Android Solution:**
 - React Native + Expo
-- Offline mode (sync when online)
-- Biometric login (fingerprint)
-- GPS-verified clock-in with photo proof
-- Push notifications
-- Favorite jobs list
-- Real-time job alerts
+- iOS and Android
+- Biometric login
+- GPS clock-in with photo
+- Offline mode
 
-**iOS Solution:**
-- Same features via App Store
-- iCloud backup of preferences
-- Home Screen widgets (time until next job)
+**Timeline:** 4-6 weeks
+**Cost:** $15-30K
 
-**Timeline:** 4-6 weeks (Android first, iOS follow)
-**Cost:** $15-30K (developer or outsource)
-**Revenue:** Premium app features + in-app purchases
-
-### 4.2 PARTNER ECOSYSTEM
-**Problem:** Need integrations with other platforms
-
-**Integrations to Build:**
-- ADP payroll (2-way sync)
-- QuickBooks (invoice sync)
-- Slack (notifications)
-- Zapier (workflow automation)
-- Twilio (SMS notifications)
-- Calendly (scheduling)
-
-**Timeline:** 2-3 weeks per integration
-**Cost:** $0 (internal development)
-**Revenue:** API licensing ($1K-5K per partner)
-
-### 4.3 FRANCHISE MANAGEMENT
-**Problem:** Help franchise owners scale
-
-**Solution:**
+### 4.2 FRANCHISE MANAGEMENT
 - Franchise owner portal
-- Sub-customer management
 - Revenue sharing dashboard
-- Automated licensing workflow
-- Compliance checklist per franchise
-- Franchise billing & invoicing
+- Compliance checklists
+- Automated licensing
 
 **Timeline:** 3 weeks
-**Cost:** $0 (internal)
-**Revenue:** Franchise licensing ($2-5K per franchise)
 
----
-
-## PHASE 5: ENTERPRISE (Q3 2026, Jul-Sep)
-
-### 5.1 DATA MARKETPLACE
-**Problem:** Staffing data is valuable, but individual companies don't benefit
-
-**Solution:**
-- Anonymized labor market insights
-- Wage trend reports (by region, skill, industry)
-- Worker supply/demand forecasting
-- Staffing efficiency benchmarks
-- Industry reports (email monthly)
-
-**Timeline:** 2 weeks
-**Cost:** Data scientists to build models ($0 if internal)
-**Revenue:** $500-2K/month per customer
-
-### 5.2 AI-POWERED RECOMMENDATIONS
-**Problem:** Manual matching is slow; ML can improve
-
-**Solution:**
-- Job recommendation engine (which jobs best for which workers)
-- Worker recommendation engine (which workers best for which jobs)
-- Churn prediction (which workers likely to leave)
-- Optimal pricing suggestions (what rate to offer jobs)
-- Fraud detection (suspicious activity flags)
-
-**Timeline:** 4-6 weeks (ML engineer needed)
-**Cost:** $10-20K (contract ML engineer or hire)
-**Revenue:** AI tier (+$1K/mo per customer)
-
-### 5.3 BLOCKCHAIN CREDENTIALS
-**Problem:** Worker certifications verified once, but portable nowhere
-
-**Solution:**
-- Immutable credential wallet (on-chain)
-- Background check verification (verifiable credential)
-- Drug test proof (with timestamp)
-- Skill certifications
-- Workers own their credentials (portable across platforms)
+### 4.3 BLOCKCHAIN CREDENTIALS
+- Portable worker certifications
+- Verification on blockchain
+- Cross-employer recognition
 
 **Timeline:** 4 weeks
-**Cost:** Blockchain developer ($20K contract work)
-**Revenue:** Credential licensing ($100-500/mo per worker)
-
-### 5.4 ISO 20022 BANKING COMPLIANCE ⭐ ENTERPRISE CREDIBILITY
-**Problem:** Enterprise customers need direct bank connectivity; can't compete with ADP/Workday without banking standards
-
-**Solution:**
-- **ISO 20022 Message Generation** - Credit Transfer (Pain.001), Payment Status (Pain.002), Bank Statements (Camt.053)
-- **Bank Network Connectivity** - SWIFT/ACH direct integration via gateway partner
-- **Compliance Certification** - Third-party audit & verified ISO 20022 compliance badge
-- **Reconciliation Engine** - Automated bank statement matching & clearing
-- **Treasury Integration** - Enterprise treasury system compatibility
-
-**Why This Matters:**
-- Opens Fortune 500 market segment
-- Positions ORBIT as enterprise-grade platform
-- Creates competitive moat vs. smaller competitors
-- Enables $5K-10K/mo enterprise tier
-
-**Funding Model (IMPORTANT):**
-- Phase 1: Build message generator ($0 internal dev)
-- Phase 2: Partner gateway integration ($5-10K)
-- Phase 3: Compliance certification ($8-12K) — **Must be revenue-funded**
-- Total: $13-22K over 16 weeks
-
-**Timeline:** 16 weeks (4 weeks + 8 weeks partner + 4 weeks cert)
-**Cost:** $13-22K (requires revenue to fund)
-**Revenue:** Enterprise tier (+$3K-8K/mo per customer)
-**ROI:** Break-even at 3-4 enterprise customers
 
 ---
 
-## PHASE 6: SCALE (Q4 2026 & Beyond)
+## PHASE 5: ENTERPRISE (Q3-Q4 2026)
 
-### Strategic Decisions:
-1. **Geographic Expansion**
-   - Add more states (currently TN/KY/FL)
-   - International expansion (Canada, UK)
-   - Local compliance teams per region
+### 5.1 ISO 20022 BANKING COMPLIANCE
+- Direct SWIFT/ACH integration
+- Enterprise-grade payroll
+- Treasury system compatibility
+- Fortune 500 targeting
 
-2. **Vertical Expansion**
-   - Healthcare staffing (nurses, med techs)
-   - IT staffing (contractors, consultants)
-   - Executive recruiting
-   - On-demand gig economy
+**Impact:** Opens $50B+ enterprise market
+**Revenue:** $5K-10K/month per enterprise customer
 
-3. **Financial Services**
-   - Worker loans (advance pay)
-   - Franchise financing
-   - Invoice factoring for customers
+### 5.2 DATA MARKETPLACE
+- Anonymized labor insights
+- Wage trend reports
+- Staffing benchmarks
 
-4. **Acquisition Targets**
-   - Background check company
-   - Drug testing lab
-   - Competitor platform
-   - Niche vertical player
+### 5.3 WHITE-LABEL ENTERPRISE
+- Full platform customization
+- Dedicated infrastructure
+- Custom integrations
+- SLA guarantees
 
 ---
 
-## FINANCIAL PROJECTIONS (VERSION 2+)
+## COMPETITIVE COMPARISON
 
-| Quarter | SaaS ARR | Features | Customers | Notes |
-|---------|----------|----------|-----------|-------|
-| Q4 2025 | $205K | MVP | 3-5 | Launch (Mike, Dan, others) |
-| Q1 2026 | $500K | Skills + Matching | 10-15 | Early adoption phase |
-| Q2 2026 | $1.2M | Mobile app | 25-30 | App Store launch |
-| Q3 2026 | $2.2M | Enterprise features | 40-50 | Data marketplace launch |
-| Q4 2026 | $3.5M | AI + Blockchain | 60-75 | Premium tier adoption |
-| 2027 | $7M+ | Multi-vertical | 150+ | Acquisition / IPO conversations |
-
----
-
-## SUCCESS METRICS (Version 2)
-
-**Platform Metrics:**
-- Uptime: 99.9%+ (5 nines)
-- Average response time: <200ms
-- Bug fix time: <24 hours
-- User retention: 85%+ (monthly)
-- NPS: 50+
-
-**Business Metrics:**
-- Customer acquisition cost: <$3K
-- Customer lifetime value: >$50K
-- Payback period: <6 months
-- Churn: <2% monthly
-- Revenue per customer: $2K-5K/month
-
-**Market Metrics:**
-- Market share in target region: 5-10%
-- Customer base: 100+ franchises/agencies
-- Workers using platform: 10,000+
-- Total payroll volume: $500M+ annually
+| Feature | ORBIT | Bullhorn | HubSpot | Indeed |
+|---------|-------|----------|---------|--------|
+| CRM | $19/mo | $99+/user | $50+/user | N/A |
+| Job Board | $29/mo | Add-on | N/A | $400/mo |
+| Payroll | $39/mo flat | N/A | N/A | N/A |
+| Time Tracking | $15/mo | Add-on | N/A | N/A |
+| Full Platform | $99-249/mo | $99-199/user | N/A | N/A |
+| **Savings** | **60-95%** | - | - | - |
 
 ---
 
-## FUNDING ROADMAP
+## SUCCESS METRICS
 
-| Round | Amount | Use | Timeline |
-|-------|--------|-----|----------|
-| Seed | $500K | MVP launch + team | Dec 2025 |
-| Series A | $2-3M | Mobile app + marketing | Q2 2026 |
-| Series B | $10-15M | Enterprise sales + acquisition | Q4 2026 |
-| Series C | $25-50M | IPO preparation | 2027 |
+### Q4 2025 (Current)
+- [ ] CRM system launched ✅
+- [ ] Standalone pricing live ✅
+- [ ] Affiliate program structured ✅
+- [ ] 10 beta customers
 
----
+### Q1 2026
+- [ ] 50 paying customers
+- [ ] $50K MRR
+- [ ] Mobile app beta
+- [ ] 20 affiliate partners
 
-## TEAM BUILD-OUT (Version 2+)
+### Q2 2026
+- [ ] 200 customers
+- [ ] $150K MRR
+- [ ] 50 affiliates
+- [ ] First franchise
 
-**Current:** Founder (you) + temp devs
-
-**By Q1 2026:**
-- CTO (full-time, $120-150K)
-- VP Sales (full-time, $100-150K + commission)
-- Product Manager (full-time, $100-120K)
-
-**By Q2 2026:**
-- ML Engineer (full-time, $130-180K)
-- Mobile Developer (full-time, $120-150K)
-- Customer Success Manager (full-time, $60-80K)
-
-**By 2027:**
-- CFO/Finance Director
-- Head of Compliance
-- Regional Sales Reps (commission-based)
-- Support team (3-5 people)
+### Q3-Q4 2026
+- [ ] 500 customers
+- [ ] $500K MRR
+- [ ] ISO 20022 certified
+- [ ] First enterprise customer
 
 ---
 
-## DECISION GATES (Go/No-Go)
+## RISK MITIGATION
 
-**Before Series A Funding (Q2 2026):**
-- [ ] Product-market fit validated (NPS 50+, >80% retention)
-- [ ] 10+ customers paying (not friends)
-- [ ] Clear path to $2M ARR by end of 2026
-- [ ] No major compliance issues
-
-**Before Series B Funding (Q4 2026):**
-- [ ] 50+ customers, $2M+ ARR
-- [ ] Mobile app live (both platforms)
-- [ ] Enterprise features adopted
-- [ ] Acquisition offers on table
+| Risk | Mitigation |
+|------|------------|
+| Slow adoption | Aggressive pricing, free trials |
+| Competition | Better automation, lower cost |
+| Technical debt | Clean architecture, TypeScript |
+| Compliance changes | Built-in compliance engine |
+| Churn | Affiliate commissions create lock-in |
 
 ---
 
-## COMPETITIVE ADVANTAGES TO MAINTAIN
-
-1. **GPS Verification** - Only us + enterprise (ADP)
-2. **Multi-Provider Drug Testing** - Best rates + flexibility
-3. **Compliance-First Architecture** - Built-in, not bolt-on
-4. **Franchise Model** - Scalable white-label with bulletproof multi-tenant isolation
-5. **Blockchain Credentials** - Future-proof worker verification
-6. **Enterprise-Grade Data Isolation (Nov 25, 2025)** - Database-enforced tenantId fields + API validation ensure zero cross-tenant data leakage; independent of payment provider
-
----
-
-## VISION STATEMENT
-
-*"By 2027, ORBIT will be the operating system for staffing agencies worldwide—automating compliance, powering smart matching, and freeing humans to do what humans do best: think, connect, and create."*
-
----
-
-**Questions for Your Friend (Partner)?**
-- Market access (which verticals/regions first?)
-- Sales strategy (direct, partnerships, channels?)
-- Funding readiness (when to raise Series A?)
-- Team composition (hire or outsource early?)
-- Competitive threats (who's your main competitor?)
-
-Discuss these in your partnership conversations 🎯
+*Last updated: November 29, 2025*
+*Contact: support@orbitstaffing.io*
