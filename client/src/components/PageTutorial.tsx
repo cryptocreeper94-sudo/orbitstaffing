@@ -131,7 +131,7 @@ function TutorialModal() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-2 sm:p-4"
         onClick={handleClose}
       >
         <motion.div
@@ -139,10 +139,10 @@ function TutorialModal() {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden shadow-2xl shadow-cyan-500/20"
+          className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl shadow-cyan-500/20 flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative h-2 bg-slate-700">
+          <div className="relative h-1.5 sm:h-2 bg-slate-700 flex-shrink-0">
             <motion.div
               className="absolute inset-y-0 left-0 bg-gradient-to-r from-cyan-500 to-blue-500"
               initial={{ width: 0 }}
@@ -153,15 +153,15 @@ function TutorialModal() {
             />
           </div>
 
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-cyan-500/20 text-cyan-400">
+          <div className="p-3 sm:p-6 flex-1 overflow-y-auto">
+            <div className="flex items-center justify-between mb-3 sm:mb-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-cyan-500/20 text-cyan-400">
                   {currentContent.pageIcon}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">{currentContent.pageTitle}</h2>
-                  <p className="text-sm text-slate-400">
+                  <h2 className="text-base sm:text-xl font-bold text-white">{currentContent.pageTitle}</h2>
+                  <p className="text-xs sm:text-sm text-slate-400">
                     {showIntro ? 'Getting Started' : `Step ${currentSlide + 1} of ${totalSlides}`}
                   </p>
                 </div>
@@ -170,10 +170,10 @@ function TutorialModal() {
                 variant="ghost" 
                 size="icon" 
                 onClick={handleClose}
-                className="text-slate-400 hover:text-white hover:bg-slate-700"
+                className="text-slate-400 hover:text-white hover:bg-slate-700 h-8 w-8 sm:h-10 sm:w-10"
                 data-testid="button-close-tutorial"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </div>
 
@@ -184,32 +184,32 @@ function TutorialModal() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
-                  className="min-h-[300px] flex flex-col items-center justify-center text-center"
+                  className="min-h-[180px] sm:min-h-[250px] flex flex-col items-center justify-center text-center py-2"
                 >
-                  <OrbitMascot pose="wave" size="lg" />
+                  <OrbitMascot pose="wave" size="md" />
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="mt-4 bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-4 max-w-sm"
+                    className="mt-3 sm:mt-4 bg-slate-800/50 border border-cyan-500/20 rounded-xl sm:rounded-2xl p-2 sm:p-4 max-w-sm"
                   >
-                    <p className="text-cyan-300 font-medium text-sm mb-1">Hey there! I'm Orbit!</p>
-                    <p className="text-slate-400 text-xs">Your friendly guide to {currentContent.pageTitle}</p>
+                    <p className="text-cyan-300 font-medium text-xs sm:text-sm mb-0.5 sm:mb-1">Hey there! I'm Orbit!</p>
+                    <p className="text-slate-400 text-xs">Your guide to {currentContent.pageTitle}</p>
                   </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-4 mt-6">
+                  <h3 className="text-lg sm:text-2xl font-bold text-white mb-2 sm:mb-4 mt-4 sm:mt-6">
                     Welcome to {currentContent.pageTitle}
                   </h3>
-                  <p className="text-slate-300 text-lg max-w-md leading-relaxed">
+                  <p className="text-slate-300 text-sm sm:text-lg max-w-md leading-relaxed px-2">
                     {currentContent.introduction}
                   </p>
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="mt-8 flex items-center gap-2 text-cyan-400"
+                    className="mt-4 sm:mt-8 flex items-center gap-2 text-cyan-400"
                   >
-                    <Play className="w-4 h-4" />
-                    <span className="text-sm">Click Next to start the tutorial</span>
+                    <Play className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="text-xs sm:text-sm">Click Next to start</span>
                   </motion.div>
                 </motion.div>
               ) : (
@@ -218,64 +218,64 @@ function TutorialModal() {
                   initial={{ opacity: 0, x: 30 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -30 }}
-                  className="min-h-[300px]"
+                  className="min-h-[180px] sm:min-h-[250px]"
                 >
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="shrink-0">
+                  <div className="flex items-start gap-2 sm:gap-4 mb-3 sm:mb-6">
+                    <div className="shrink-0 hidden sm:block">
                       <OrbitMascot pose="point" size="sm" />
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2">
                         {slide.icon && (
-                          <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400">
+                          <div className="p-1.5 sm:p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400">
                             {slide.icon}
                           </div>
                         )}
-                        <h3 className="text-xl font-semibold text-white">{slide.title}</h3>
+                        <h3 className="text-base sm:text-xl font-semibold text-white">{slide.title}</h3>
                       </div>
-                      <p className="text-slate-300 leading-relaxed">{slide.description}</p>
+                      <p className="text-slate-300 text-sm sm:text-base leading-relaxed">{slide.description}</p>
                     </div>
                   </div>
 
                   {slide.highlight && (
-                    <div className="mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                      <div className="flex items-center gap-2 text-amber-400 mb-1">
-                        <Lightbulb className="w-4 h-4" />
-                        <span className="font-medium text-sm">Pro Tip</span>
+                    <div className="mb-3 sm:mb-4 p-2 sm:p-4 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-500/30">
+                      <div className="flex items-center gap-2 text-amber-400 mb-0.5 sm:mb-1">
+                        <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="font-medium text-xs sm:text-sm">Pro Tip</span>
                       </div>
-                      <p className="text-amber-200/80 text-sm">{slide.highlight}</p>
+                      <p className="text-amber-200/80 text-xs sm:text-sm">{slide.highlight}</p>
                     </div>
                   )}
 
                   {slide.tips && slide.tips.length > 0 && (
-                    <div className="mb-4 space-y-2">
-                      <p className="text-sm font-medium text-slate-400 mb-2">Key Features:</p>
+                    <div className="mb-3 sm:mb-4 space-y-1.5 sm:space-y-2">
+                      <p className="text-xs sm:text-sm font-medium text-slate-400 mb-1 sm:mb-2">Key Features:</p>
                       {slide.tips.map((tip, i) => (
                         <motion.div
                           key={i}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: i * 0.1 }}
-                          className="flex items-start gap-2"
+                          className="flex items-start gap-1.5 sm:gap-2"
                         >
-                          <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />
-                          <span className="text-slate-300 text-sm">{tip}</span>
+                          <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 mt-0.5 shrink-0" />
+                          <span className="text-slate-300 text-xs sm:text-sm">{tip}</span>
                         </motion.div>
                       ))}
                     </div>
                   )}
 
                   {slide.connections && slide.connections.length > 0 && (
-                    <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700">
-                      <p className="text-sm font-medium text-slate-400 mb-2 flex items-center gap-2">
-                        <ArrowRight className="w-4 h-4" />
+                    <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-slate-800/50 border border-slate-700">
+                      <p className="text-xs sm:text-sm font-medium text-slate-400 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2">
+                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
                         Connects To:
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {slide.connections.map((conn, i) => (
                           <span 
                             key={i}
-                            className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-medium"
+                            className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-medium"
                           >
                             {conn}
                           </span>
@@ -286,43 +286,44 @@ function TutorialModal() {
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
 
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-700">
-              <div className="flex gap-1.5">
-                {[...Array(totalSlides)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setShowIntro(false); setCurrentSlide(i); }}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      !showIntro && i === currentSlide 
-                        ? 'bg-cyan-400 w-6' 
-                        : 'bg-slate-600 hover:bg-slate-500'
-                    }`}
-                    data-testid={`button-slide-${i}`}
-                  />
-                ))}
-              </div>
+          <div className="flex-shrink-0 flex items-center justify-between p-3 sm:p-4 border-t border-slate-700 bg-slate-900/50">
+            <div className="flex gap-1 sm:gap-1.5 flex-wrap max-w-[100px] sm:max-w-none">
+              {[...Array(totalSlides)].map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setShowIntro(false); setCurrentSlide(i); }}
+                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all ${
+                    !showIntro && i === currentSlide 
+                      ? 'bg-cyan-400 w-4 sm:w-6' 
+                      : 'bg-slate-600 hover:bg-slate-500'
+                  }`}
+                  data-testid={`button-slide-${i}`}
+                />
+              ))}
+            </div>
 
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handlePrev}
-                  disabled={showIntro}
-                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
-                  data-testid="button-tutorial-prev"
-                >
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Back
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
-                  data-testid="button-tutorial-next"
-                >
-                  {showIntro ? 'Start Tour' : currentSlide === totalSlides - 1 ? 'Finish' : 'Next'}
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
+            <div className="flex gap-1.5 sm:gap-2">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                disabled={showIntro}
+                className="border-slate-600 text-slate-300 hover:bg-slate-700 text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10"
+                data-testid="button-tutorial-prev"
+              >
+                <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-0.5 sm:mr-1" />
+                <span className="hidden sm:inline">Back</span>
+              </Button>
+              <Button
+                onClick={handleNext}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white text-xs sm:text-sm px-2 sm:px-4 h-8 sm:h-10"
+                data-testid="button-tutorial-next"
+              >
+                <span className="sm:hidden">{showIntro ? 'Start' : currentSlide === totalSlides - 1 ? 'Done' : 'Next'}</span>
+                <span className="hidden sm:inline">{showIntro ? 'Start Tour' : currentSlide === totalSlides - 1 ? 'Finish' : 'Next'}</span>
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ml-0.5 sm:ml-1" />
+              </Button>
             </div>
           </div>
         </motion.div>

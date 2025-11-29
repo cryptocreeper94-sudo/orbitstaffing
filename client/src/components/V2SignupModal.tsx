@@ -80,88 +80,80 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-cyan-500/40">
-        <DialogHeader className="pb-4 border-b border-cyan-500/20">
-          <div className="flex items-center gap-3 mb-2">
-            <Rocket className="w-8 h-8 text-cyan-400 animate-bounce" />
-            <DialogTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">
+      <DialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 border border-cyan-500/40 p-4 sm:p-6">
+        <DialogHeader className="pb-3 border-b border-cyan-500/20">
+          <div className="flex items-center gap-2 mb-1">
+            <Rocket className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 animate-bounce flex-shrink-0" />
+            <DialogTitle className="text-lg sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400">
               Version 2 Coming Soon!
             </DialogTitle>
           </div>
-          <DialogDescription className="text-slate-300">
+          <DialogDescription className="text-slate-300 text-sm">
             Get early access to game-changing features
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4 space-y-4">
-          <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="py-3 space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
             <div className="flex items-center gap-2 text-slate-300">
-              <Smartphone className="w-4 h-4 text-cyan-400" />
-              <span>Native Mobile App (iOS/Android)</span>
+              <Smartphone className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+              <span>Native Mobile App</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span>Instant/Daily Pay (2.5% fee)</span>
+              <Zap className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+              <span>Instant/Daily Pay</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <Users className="w-4 h-4 text-green-400" />
-              <span>Worker Community & Leaderboards</span>
+              <Users className="w-4 h-4 text-green-400 flex-shrink-0" />
+              <span>Worker Community</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <Globe className="w-4 h-4 text-purple-400" />
-              <span>Multi-Currency & International</span>
+              <Globe className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <span>Multi-Currency</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <Link2 className="w-4 h-4 text-pink-400" />
-              <span>Zapier & API Integrations</span>
+              <Link2 className="w-4 h-4 text-pink-400 flex-shrink-0" />
+              <span>Zapier Integration</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <Camera className="w-4 h-4 text-amber-400" />
-              <span>VR Training Platform</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <Brain className="w-4 h-4 text-rose-400" />
-              <span>Predictive No-Show Detection</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <Shield className="w-4 h-4 text-emerald-400" />
-              <span>Blockchain Credentials</span>
+              <Brain className="w-4 h-4 text-rose-400 flex-shrink-0" />
+              <span>No-Show Prediction</span>
             </div>
           </div>
           
           <p className="text-xs text-cyan-400/80 text-center font-medium">
-            Launching Q2-Q3 2026 - Be the first to know!
+            Launching Q2-Q3 2026
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div className="flex gap-2">
               <Button
                 type="button"
                 onClick={() => setContactMethod('email')}
-                className={`flex-1 ${contactMethod === 'email' 
+                className={`flex-1 text-xs sm:text-sm py-2 ${contactMethod === 'email' 
                   ? 'bg-cyan-600 text-white' 
                   : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
                 data-testid="button-contact-email"
               >
-                <Mail className="w-4 h-4 mr-2" />
+                <Mail className="w-4 h-4 mr-1 sm:mr-2" />
                 Email
               </Button>
               <Button
                 type="button"
                 onClick={() => setContactMethod('sms')}
-                className={`flex-1 ${contactMethod === 'sms' 
+                className={`flex-1 text-xs sm:text-sm py-2 ${contactMethod === 'sms' 
                   ? 'bg-cyan-600 text-white' 
                   : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
                 data-testid="button-contact-sms"
               >
-                <Phone className="w-4 h-4 mr-2" />
+                <Phone className="w-4 h-4 mr-1 sm:mr-2" />
                 SMS
               </Button>
             </div>
 
             {contactMethod === 'email' ? (
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-slate-300">Email Address</Label>
+              <div className="space-y-1">
+                <Label htmlFor="email" className="text-slate-300 text-xs sm:text-sm">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -169,13 +161,13 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-slate-800 border-slate-700 text-white text-sm h-9"
                   data-testid="input-v2-email"
                 />
               </div>
             ) : (
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-slate-300">Phone Number</Label>
+              <div className="space-y-1">
+                <Label htmlFor="phone" className="text-slate-300 text-xs sm:text-sm">Phone</Label>
                 <Input
                   id="phone"
                   type="tel"
@@ -183,7 +175,7 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(555) 123-4567"
                   required
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-slate-800 border-slate-700 text-white text-sm h-9"
                   data-testid="input-v2-phone"
                 />
               </div>
@@ -192,7 +184,7 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
             <Button
               type="submit"
               disabled={isSubmitting || (contactMethod === 'email' ? !email : !phone)}
-              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3"
+              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 text-sm"
               data-testid="button-v2-signup-submit"
             >
               {isSubmitting ? (
@@ -210,7 +202,7 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
           </form>
 
           <p className="text-xs text-slate-500 text-center">
-            No spam. We'll only notify you about V2 launch and major updates.
+            No spam - V2 updates only
           </p>
         </div>
       </DialogContent>
