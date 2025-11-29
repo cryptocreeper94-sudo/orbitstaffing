@@ -24,6 +24,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { AdminLoginHistory } from '@/components/AdminLoginHistory';
 import { LegalDocs } from '@/components/LegalDocs';
 import { FloatingHelpButton } from '@/components/HelpCenter';
+import { ReceiptScanner } from '@/components/ReceiptScanner';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
@@ -1640,7 +1641,7 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal' | 'llc-docs' | 'monitoring' | 'login-logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal' | 'llc-docs' | 'monitoring' | 'login-logs' | 'receipts'>('overview');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -2268,6 +2269,17 @@ export default function DeveloperPanel() {
             <Shield className="w-4 h-4" />
             Login History
           </button>
+          <button
+            onClick={() => setActiveTab('receipts')}
+            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'receipts'
+                ? 'border-green-400 text-green-400'
+                : 'border-transparent text-gray-400 hover:text-gray-300'
+            }`}
+            data-testid="button-tab-dev-receipts"
+          >
+            🧾 Receipt Scanner
+          </button>
           <div className="ml-auto flex items-center">
             <button
               onClick={() => setShowChat(!showChat)}
@@ -2703,6 +2715,13 @@ export default function DeveloperPanel() {
         {activeTab === 'login-logs' && (
           <div>
             <AdminLoginHistory />
+          </div>
+        )}
+
+        {/* RECEIPT SCANNER TAB */}
+        {activeTab === 'receipts' && (
+          <div>
+            <ReceiptScanner />
           </div>
         )}
       </div>

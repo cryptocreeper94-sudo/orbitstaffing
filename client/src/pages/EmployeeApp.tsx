@@ -19,7 +19,13 @@ import {
   Reply,
   Zap,
   TrendingUp,
-  Star
+  Star,
+  Camera,
+  Video,
+  Upload,
+  AlertTriangle,
+  X,
+  Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,6 +38,20 @@ export default function EmployeeApp() {
     { id: "1", from: "Manager", text: "You're scheduled for 8am tomorrow at Metro Construction", time: "2 hours ago" }
   ]);
   const [newMessage, setNewMessage] = useState("");
+  const [incidentType, setIncidentType] = useState<string>("");
+  const [incidentDescription, setIncidentDescription] = useState("");
+  const [incidentPhotos, setIncidentPhotos] = useState<string[]>([]);
+  const [incidentVideos, setIncidentVideos] = useState<string[]>([]);
+  const [showIncidentForm, setShowIncidentForm] = useState(false);
+  const [submittedIncidents, setSubmittedIncidents] = useState<Array<{
+    id: string;
+    type: string;
+    description: string;
+    photos: string[];
+    videos: string[];
+    timestamp: string;
+    status: string;
+  }>>([]);
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -75,6 +95,89 @@ export default function EmployeeApp() {
     }
   };
 
+  const handlePhotoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      Array.from(files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            if (event.target?.result) {
+              setIncidentPhotos(prev => [...prev, event.target!.result as string]);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
+
+  const handleVideoCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      Array.from(files).forEach(file => {
+        if (file.type.startsWith('video/')) {
+          if (file.size > 50 * 1024 * 1024) {
+            toast.error("Video must be under 50MB");
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            if (event.target?.result) {
+              setIncidentVideos(prev => [...prev, event.target!.result as string]);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setIncidentPhotos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeVideo = (index: number) => {
+    setIncidentVideos(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmitIncident = () => {
+    if (!incidentType) {
+      toast.error("Please select an incident type");
+      return;
+    }
+    if (!incidentDescription.trim()) {
+      toast.error("Please describe the incident");
+      return;
+    }
+
+    const newIncident = {
+      id: Date.now().toString(),
+      type: incidentType,
+      description: incidentDescription,
+      photos: incidentPhotos,
+      videos: incidentVideos,
+      timestamp: new Date().toISOString(),
+      status: "submitted"
+    };
+
+    setSubmittedIncidents(prev => [newIncident, ...prev]);
+    setIncidentType("");
+    setIncidentDescription("");
+    setIncidentPhotos([]);
+    setIncidentVideos([]);
+    setShowIncidentForm(false);
+    toast.success("Incident report submitted successfully! Management has been notified.");
+  };
+
+  const incidentTypes = [
+    { value: "safety", label: "Safety Hazard", icon: "⚠️" },
+    { value: "equipment", label: "Equipment Issue", icon: "🔧" },
+    { value: "injury", label: "Injury", icon: "🏥" },
+    { value: "property", label: "Property Damage", icon: "🏗️" },
+    { value: "other", label: "Other", icon: "📋" }
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
       {/* Header */}
@@ -91,9 +194,10 @@ export default function EmployeeApp() {
       {/* Tabs */}
       <div className="max-w-2xl mx-auto px-4">
         <Tabs defaultValue="home" className="mt-6" onValueChange={setActiveTab}>
-          <TabsList className="bg-card border border-border/50 w-full">
+          <TabsList className="bg-card border border-border/50 w-full flex-wrap h-auto gap-1">
             <TabsTrigger value="home" className="flex-1">Home</TabsTrigger>
             <TabsTrigger value="jobs" className="flex-1">Jobs</TabsTrigger>
+            <TabsTrigger value="report" className="flex-1 text-red-500 data-[state=active]:text-red-500">Report</TabsTrigger>
             <TabsTrigger value="bonuses" className="flex-1">Bonuses</TabsTrigger>
             <TabsTrigger value="messages" className="flex-1">Messages</TabsTrigger>
             <TabsTrigger value="pay" className="flex-1">Pay</TabsTrigger>
@@ -255,6 +359,253 @@ export default function EmployeeApp() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Incident Report Tab */}
+          <TabsContent value="report" className="space-y-4 mt-6">
+            {!showIncidentForm ? (
+              <>
+                <Card className="bg-red-500/10 border-red-500/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-red-500">
+                      <AlertTriangle className="w-5 h-5" />
+                      Report an Incident
+                    </CardTitle>
+                    <CardDescription>
+                      Safety issue, injury, equipment problem, or property damage? Report it here with photos/videos.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      onClick={() => setShowIncidentForm(true)} 
+                      className="w-full bg-red-500 hover:bg-red-600 text-white"
+                      data-testid="button-new-incident"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Create New Report
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {submittedIncidents.length > 0 && (
+                  <Card className="bg-card/50 border-border/50">
+                    <CardHeader>
+                      <CardTitle className="text-base">Your Reports</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {submittedIncidents.map((incident) => (
+                        <div 
+                          key={incident.id} 
+                          className="p-3 bg-background/50 rounded-lg border border-border/50"
+                          data-testid={`incident-${incident.id}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span>{incidentTypes.find(t => t.value === incident.type)?.icon}</span>
+                                <span className="font-medium capitalize">{incident.type}</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                {incident.description}
+                              </p>
+                              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                                {incident.photos.length > 0 && (
+                                  <span className="flex items-center gap-1">
+                                    <ImageIcon className="w-3 h-3" />
+                                    {incident.photos.length} photo{incident.photos.length > 1 ? 's' : ''}
+                                  </span>
+                                )}
+                                {incident.videos.length > 0 && (
+                                  <span className="flex items-center gap-1">
+                                    <Video className="w-3 h-3" />
+                                    {incident.videos.length} video{incident.videos.length > 1 ? 's' : ''}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <Badge className="bg-green-500/20 text-green-600 capitalize">
+                              {incident.status}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {new Date(incident.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {submittedIncidents.length === 0 && (
+                  <div className="text-center text-muted-foreground py-8">
+                    <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-green-500" />
+                    <p className="font-medium">No incidents reported</p>
+                    <p className="text-sm">If you see something, say something!</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <Card className="bg-card/50 border-border/50">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-red-500" />
+                      New Incident Report
+                    </CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => {
+                        setShowIncidentForm(false);
+                        setIncidentType("");
+                        setIncidentDescription("");
+                        setIncidentPhotos([]);
+                        setIncidentVideos([]);
+                      }}
+                      data-testid="button-cancel-incident"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Incident Type *</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {incidentTypes.map((type) => (
+                        <Button
+                          key={type.value}
+                          variant={incidentType === type.value ? "default" : "outline"}
+                          className={`justify-start ${incidentType === type.value ? 'bg-red-500 hover:bg-red-600' : ''}`}
+                          onClick={() => setIncidentType(type.value)}
+                          data-testid={`incident-type-${type.value}`}
+                        >
+                          <span className="mr-2">{type.icon}</span>
+                          {type.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Description *</label>
+                    <textarea
+                      value={incidentDescription}
+                      onChange={(e) => setIncidentDescription(e.target.value)}
+                      placeholder="Describe what happened, where, and when..."
+                      className="w-full min-h-[100px] p-3 bg-background border border-border/50 rounded-lg text-sm resize-none focus:outline-none focus:border-primary/50"
+                      data-testid="input-incident-description"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Photos & Videos (optional)</label>
+                    <div className="flex gap-2 mb-3">
+                      <label className="flex-1">
+                        <div className="flex items-center justify-center gap-2 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg cursor-pointer hover:bg-blue-500/20 transition-all">
+                          <Camera className="w-5 h-5 text-blue-500" />
+                          <span className="text-sm text-blue-500 font-medium">Take Photo</span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={handlePhotoCapture}
+                          className="hidden"
+                          data-testid="input-photo-capture"
+                        />
+                      </label>
+                      <label className="flex-1">
+                        <div className="flex items-center justify-center gap-2 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg cursor-pointer hover:bg-purple-500/20 transition-all">
+                          <Video className="w-5 h-5 text-purple-500" />
+                          <span className="text-sm text-purple-500 font-medium">Record Video</span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          capture="environment"
+                          onChange={handleVideoCapture}
+                          className="hidden"
+                          data-testid="input-video-capture"
+                        />
+                      </label>
+                    </div>
+                    <label className="block">
+                      <div className="flex items-center justify-center gap-2 p-3 bg-background border border-border/50 rounded-lg cursor-pointer hover:border-primary/50 transition-all">
+                        <Upload className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Upload from gallery</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        onChange={(e) => {
+                          const files = e.target.files;
+                          if (files) {
+                            Array.from(files).forEach(file => {
+                              if (file.type.startsWith('image/')) {
+                                handlePhotoCapture({ target: { files: [file] } } as any);
+                              } else if (file.type.startsWith('video/')) {
+                                handleVideoCapture({ target: { files: [file] } } as any);
+                              }
+                            });
+                          }
+                        }}
+                        className="hidden"
+                        data-testid="input-upload-media"
+                      />
+                    </label>
+                  </div>
+
+                  {(incidentPhotos.length > 0 || incidentVideos.length > 0) && (
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Attached Media</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {incidentPhotos.map((photo, index) => (
+                          <div key={`photo-${index}`} className="relative">
+                            <img 
+                              src={photo} 
+                              alt={`Photo ${index + 1}`} 
+                              className="w-full h-20 object-cover rounded-lg"
+                            />
+                            <button
+                              onClick={() => removePhoto(index)}
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                              data-testid={`remove-photo-${index}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                        {incidentVideos.map((video, index) => (
+                          <div key={`video-${index}`} className="relative">
+                            <div className="w-full h-20 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                              <Video className="w-6 h-6 text-purple-500" />
+                            </div>
+                            <button
+                              onClick={() => removeVideo(index)}
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                              data-testid={`remove-video-${index}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <Button 
+                    onClick={handleSubmitIncident}
+                    className="w-full bg-red-500 hover:bg-red-600 text-white"
+                    data-testid="button-submit-incident"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    Submit Incident Report
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Bonuses Tab */}

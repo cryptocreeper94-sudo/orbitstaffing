@@ -60,6 +60,8 @@ import {
 import { Label } from "@/components/ui/label";
 import { Shell } from "@/components/layout/Shell";
 import { Separator } from "@/components/ui/separator";
+import { ReceiptScanner } from "@/components/ReceiptScanner";
+import { Receipt } from "lucide-react";
 
 interface Employee {
   id: number;
@@ -536,6 +538,14 @@ export default function OwnerHub() {
             >
               <Shield className="w-4 h-4 mr-2" />
               Compliance
+            </TabsTrigger>
+            <TabsTrigger
+              value="receipts"
+              className="data-[state=active]:bg-green-600 data-[state=active]:text-white text-slate-400"
+              data-testid="tab-receipts"
+            >
+              <Receipt className="w-4 h-4 mr-2" />
+              Receipts
             </TabsTrigger>
           </TabsList>
 
@@ -1118,6 +1128,23 @@ export default function OwnerHub() {
                     );
                   })}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="receipts" className="space-y-6">
+            <Card className="bg-slate-800/50 border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Receipt className="w-5 h-5 text-green-400" />
+                  Business Expense Scanner
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Scan gas receipts, office supplies, and business expenses for tax deductions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ReceiptScanner />
               </CardContent>
             </Card>
           </TabsContent>

@@ -35,6 +35,7 @@ import { CredentialTracker } from '@/components/CredentialTracker';
 import { WorkerPerformanceDashboard } from '@/components/WorkerPerformanceDashboard';
 import { BetaTesterDashboard } from '@/components/BetaTesterDashboard';
 import { BetaTesterManagement } from '@/components/BetaTesterManagement';
+import { ReceiptScanner } from '@/components/ReceiptScanner';
 
 const ADMIN_SESSION_KEY = 'admin';
 const BETA_SESSION_KEY = 'beta_tester';
@@ -854,6 +855,17 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
           <Search className="w-4 h-4 inline mr-2" />
           User Data Access
         </button>
+        <button
+          onClick={() => setActiveSection('receipts')}
+          className={`px-4 py-2 font-bold border-b-2 transition-all ${
+            activeSection === 'receipts'
+              ? 'border-green-500 text-green-400'
+              : 'border-transparent text-gray-400 hover:text-gray-300'
+          }`}
+          data-testid="button-tab-receipts"
+        >
+          🧾 Receipt Scanner
+        </button>
       </div>
 
       {activeSection === 'admin-mgmt' && <AdminManagement />}
@@ -929,6 +941,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       {activeSection === 'beta-testers' && <BetaTesterManagement />}
 
       {activeSection === 'user-data-access' && <UserDataAccessSection />}
+
+      {activeSection === 'receipts' && <ReceiptScanner />}
 
       {activeSection === 'checklist' && (
       <div className="space-y-8">
