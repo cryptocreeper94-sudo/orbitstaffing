@@ -101,17 +101,29 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
             </div>
             <div className="flex items-center gap-2 text-slate-300">
               <Zap className="w-4 h-4 text-yellow-400" />
-              <span>Real-Time Alerts</span>
+              <span>Real-Time Push Alerts</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
               <Shield className="w-4 h-4 text-green-400" />
-              <span>Remote Support</span>
+              <span>Remote Support & Co-Browsing</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
               <BarChart3 className="w-4 h-4 text-purple-400" />
-              <span>Advanced Analytics</span>
+              <span>Advanced Analytics Dashboard</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Sparkles className="w-4 h-4 text-pink-400" />
+              <span>Native Mobile App (iOS/Android)</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>Blockchain Credentials</span>
             </div>
           </div>
+          
+          <p className="text-xs text-cyan-400/80 text-center font-medium">
+            Launching Q1-Q2 2026 - Be the first to know!
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex gap-2">
