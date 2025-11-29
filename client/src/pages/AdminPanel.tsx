@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera, ChevronLeft, Search, User, Mail, Phone, FileText, ExternalLink, Cloud, ChevronDown, ChevronUp } from 'lucide-react';
+import { Lock, LogOut, CheckCircle2, AlertCircle, Shield, Building2, Users, Trash2, AlertTriangle, Eye, Code, Activity, MessageCircle, Camera, ChevronLeft, Search, User, Mail, Phone, FileText, ExternalLink, Cloud, ChevronDown, ChevronUp, BarChart3, Settings, Briefcase, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -36,6 +36,7 @@ import { WorkerPerformanceDashboard } from '@/components/WorkerPerformanceDashbo
 import { BetaTesterDashboard } from '@/components/BetaTesterDashboard';
 import { BetaTesterManagement } from '@/components/BetaTesterManagement';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const ADMIN_SESSION_KEY = 'admin';
 const BETA_SESSION_KEY = 'beta_tester';
@@ -502,7 +503,8 @@ export default function AdminPanel() {
 // MASTER ADMIN DASHBOARD (System Owner)
 // ==========================================
 function MasterAdminDashboard({ adminName }: { adminName: string }) {
-  const [activeSection, setActiveSection] = useState<'checklist' | 'admin-mgmt' | 'dnr' | 'health' | 'contingency' | 'messaging' | 'onboarding' | 'availability' | 'professional' | 'analytics' | 'bulk-ops' | 'search' | 'compliance' | 'invoices' | 'forecasting' | 'currency' | 'ocr' | 'client-portal' | 'ratings' | 'shift-marketplace' | 'credentials' | 'worker-performance' | 'beta-testers' | 'user-data-access'>('checklist');
+  const [openCategory, setOpenCategory] = useState<string>('overview');
+  const [activeFeature, setActiveFeature] = useState<string>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
