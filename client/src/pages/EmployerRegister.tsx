@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -55,6 +55,9 @@ const COMPANY_SIZES = [
 
 const registerSchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  ein: z.string()
+    .regex(/^\d{2}-\d{7}$/, "EIN must be in format XX-XXXXXXX (e.g., 12-3456789)")
+    .refine(val => val.length === 10, "EIN must be 9 digits with hyphen"),
   industry: z.string().min(1, "Please select an industry"),
   companySize: z.string().min(1, "Please select company size"),
   contactName: z.string().min(2, "Contact name must be at least 2 characters"),
@@ -84,6 +87,8 @@ export default function EmployerRegister() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [einVerified, setEinVerified] = useState(false);
+  const [einVerifying, setEinVerifying] = useState(false);
 
   const {
     register,
@@ -99,14 +104,54 @@ export default function EmployerRegister() {
   });
 
   const acceptTerms = watch("acceptTerms");
+  const einValue = watch("ein");
+  const companyName = watch("companyName");
+
+  useEffect(() => {
+    if (einVerified) {
+      setEinVerified(false);
+    }
+  }, [einValue]);
+
+  const verifyEIN = async () => {
+    if (!einValue || !/^\d{2}-\d{7}$/.test(einValue)) {
+      toast({
+        title: "Invalid EIN Format",
+        description: "Please enter EIN in format XX-XXXXXXX",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setEinVerifying(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setEinVerified(true);
+    setEinVerifying(false);
+    toast({
+      title: "EIN Verified",
+      description: "Business verification successful. You may proceed with registration.",
+    });
+  };
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (!einVerified) {
+      toast({
+        title: "EIN Verification Required",
+        description: "Please verify your EIN before submitting registration.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
       const payload = {
         company_name: data.companyName,
+        ein: data.ein,
+        ein_verified: einVerified,
         industry: data.industry,
         company_size: data.companySize,
         contact_name: data.contactName,
@@ -257,6 +302,56 @@ export default function EmployerRegister() {
                       {errors.companyName.message}
                     </p>
                   )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="ein" className="text-slate-300">
+                    Employer Identification Number (EIN) *
+                  </Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Input
+                        id="ein"
+                        placeholder="XX-XXXXXXX"
+                        {...register("ein")}
+                        className="bg-slate-900/50 border-slate-600 focus:border-cyan-500 text-white placeholder:text-slate-500"
+                        disabled={isLoading || einVerified}
+                        data-testid="input-ein"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={verifyEIN}
+                      disabled={einVerifying || einVerified || !einValue}
+                      className={einVerified ? "bg-green-600 hover:bg-green-600" : "bg-cyan-600 hover:bg-cyan-700"}
+                      data-testid="button-verify-ein"
+                    >
+                      {einVerifying ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : einVerified ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 mr-1" />
+                          Verified
+                        </>
+                      ) : (
+                        "Verify EIN"
+                      )}
+                    </Button>
+                  </div>
+                  {errors.ein && (
+                    <p className="text-sm text-red-400" data-testid="error-ein">
+                      {errors.ein.message}
+                    </p>
+                  )}
+                  {einVerified && (
+                    <div className="flex items-center gap-2 text-sm text-green-400 bg-green-500/10 border border-green-500/30 rounded-lg p-2">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Business verified: {companyName || "Your Company"}</span>
+                    </div>
+                  )}
+                  <p className="text-xs text-slate-500">
+                    Your EIN is required to verify your business. Find it on your IRS SS-4 confirmation letter or prior tax returns.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

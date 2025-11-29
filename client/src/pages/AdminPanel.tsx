@@ -581,322 +581,100 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
 
   const stats = getStats();
 
-  return (
-    <div className="space-y-8">
-      {/* Section Tabs */}
-      <div className="flex gap-2 border-b border-slate-700 pb-4">
-        <button
-          onClick={() => setActiveSection('checklist')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'checklist'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-checklist"
-        >
-          Launch Checklist
-        </button>
-        <button
-          onClick={() => setActiveSection('admin-mgmt')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'admin-mgmt'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-admin-mgmt"
-        >
-          <Users className="w-4 h-4 inline mr-2" />
-          Admin Management
-        </button>
-        <button
-          onClick={() => setActiveSection('dnr')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'dnr'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-dnr"
-        >
-          Do Not Rehire
-        </button>
-        <button
-          onClick={() => setActiveSection('health')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'health'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-health"
-        >
-          <Activity className="w-4 h-4 inline mr-2" />
-          System Health
-        </button>
-        <button
-          onClick={() => setActiveSection('contingency')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'contingency'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-contingency"
-        >
-          <AlertTriangle className="w-4 h-4 inline mr-2" />
-          Contingency
-        </button>
-        <button
-          onClick={() => setActiveSection('onboarding')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'onboarding'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-onboarding"
-        >
-          <Users className="w-4 h-4 inline mr-2" />
-          Onboarding
-        </button>
-        <button
-          onClick={() => setActiveSection('messaging')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'messaging'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-messaging"
-        >
-          <MessageCircle className="w-4 h-4 inline mr-2" />
-          Secure Messaging
-        </button>
-        <button
-          onClick={() => setActiveSection('availability')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'availability'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-availability"
-        >
-          <Eye className="w-4 h-4 inline mr-2" />
-          Worker Availability
-        </button>
-        <button
-          onClick={() => setActiveSection('professional')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'professional'
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-professional"
-        >
-          <Lock className="w-4 h-4 inline mr-2" />
-          Professional Division (V2)
-        </button>
-        <button
-          onClick={() => setActiveSection('analytics')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'analytics'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-analytics"
-        >
-          Advanced Analytics
-        </button>
-        <button
-          onClick={() => setActiveSection('bulk-ops')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'bulk-ops'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-bulk-ops"
-        >
-          Bulk Operations
-        </button>
-        <button
-          onClick={() => setActiveSection('search')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'search'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-search"
-        >
-          Advanced Search
-        </button>
-        <button
-          onClick={() => setActiveSection('compliance')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'compliance'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-compliance"
-        >
-          Compliance Reports
-        </button>
-        <button
-          onClick={() => setActiveSection('invoices')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'invoices'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-invoices"
-        >
-          Invoice Templates
-        </button>
-        <button
-          onClick={() => setActiveSection('forecasting')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'forecasting'
-              ? 'border-purple-500 text-purple-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-forecasting"
-        >
-          AI Forecasting
-        </button>
-        <button
-          onClick={() => setActiveSection('currency')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'currency'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-currency"
-        >
-          Multi-Currency
-        </button>
-        <button
-          onClick={() => setActiveSection('ocr')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'ocr'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-ocr"
-        >
-          Document OCR
-        </button>
-        <button
-          onClick={() => setActiveSection('client-portal')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'client-portal'
-              ? 'border-green-500 text-green-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-client-portal"
-        >
-          Client Portal
-        </button>
-        <button
-          onClick={() => setActiveSection('ratings')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'ratings'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-ratings"
-        >
-          Worker Ratings
-        </button>
-        <button
-          onClick={() => setActiveSection('shift-marketplace')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'shift-marketplace'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-marketplace"
-        >
-          Shift Marketplace
-        </button>
-        <button
-          onClick={() => setActiveSection('credentials')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'credentials'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-credentials"
-        >
-          Credential Tracker
-        </button>
-        <button
-          onClick={() => setActiveSection('worker-performance')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'worker-performance'
-              ? 'border-cyan-500 text-cyan-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-worker-performance"
-        >
-          Worker Performance
-        </button>
-        <button
-          onClick={() => setActiveSection('beta-testers')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'beta-testers'
-              ? 'border-yellow-500 text-yellow-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-beta-testers"
-        >
-          🧪 Beta Testers
-        </button>
-        <button
-          onClick={() => setActiveSection('user-data-access')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'user-data-access'
-              ? 'border-emerald-500 text-emerald-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-user-data-access"
-        >
-          <Search className="w-4 h-4 inline mr-2" />
-          User Data Access
-        </button>
-        <button
-          onClick={() => setActiveSection('receipts')}
-          className={`px-4 py-2 font-bold border-b-2 transition-all ${
-            activeSection === 'receipts'
-              ? 'border-green-500 text-green-400'
-              : 'border-transparent text-gray-400 hover:text-gray-300'
-          }`}
-          data-testid="button-tab-receipts"
-        >
-          🧾 Receipt Scanner
-        </button>
-      </div>
+  const menuCategories = [
+    {
+      id: 'overview',
+      title: 'Overview',
+      icon: <BarChart3 className="w-5 h-5" />,
+      color: 'cyan',
+      items: [
+        { id: 'checklist', label: 'Launch Checklist', icon: <CheckCircle2 className="w-4 h-4" /> },
+      ]
+    },
+    {
+      id: 'people',
+      title: 'People Management',
+      icon: <Users className="w-5 h-5" />,
+      color: 'blue',
+      items: [
+        { id: 'admin-mgmt', label: 'Admin Management', icon: <Users className="w-4 h-4" /> },
+        { id: 'dnr', label: 'Do Not Rehire', icon: <AlertTriangle className="w-4 h-4" /> },
+        { id: 'user-data-access', label: 'User Data Access', icon: <Search className="w-4 h-4" /> },
+        { id: 'beta-testers', label: 'Beta Testers', icon: <Eye className="w-4 h-4" /> },
+        { id: 'onboarding', label: 'Onboarding', icon: <Users className="w-4 h-4" /> },
+        { id: 'availability', label: 'Worker Availability', icon: <Eye className="w-4 h-4" /> },
+      ]
+    },
+    {
+      id: 'analytics',
+      title: 'Analytics & Reporting',
+      icon: <BarChart3 className="w-5 h-5" />,
+      color: 'green',
+      items: [
+        { id: 'analytics', label: 'Advanced Analytics', icon: <BarChart3 className="w-4 h-4" /> },
+        { id: 'compliance', label: 'Compliance Reports', icon: <Shield className="w-4 h-4" /> },
+        { id: 'worker-performance', label: 'Worker Performance', icon: <BarChart3 className="w-4 h-4" /> },
+        { id: 'ratings', label: 'Worker Ratings', icon: <CheckCircle2 className="w-4 h-4" /> },
+        { id: 'forecasting', label: 'AI Forecasting', icon: <BarChart3 className="w-4 h-4" /> },
+      ]
+    },
+    {
+      id: 'operations',
+      title: 'Operations',
+      icon: <Settings className="w-5 h-5" />,
+      color: 'amber',
+      items: [
+        { id: 'shift-marketplace', label: 'Shift Marketplace', icon: <Briefcase className="w-4 h-4" /> },
+        { id: 'credentials', label: 'Credential Tracker', icon: <Shield className="w-4 h-4" /> },
+        { id: 'bulk-ops', label: 'Bulk Operations', icon: <Settings className="w-4 h-4" /> },
+        { id: 'search', label: 'Advanced Search', icon: <Search className="w-4 h-4" /> },
+        { id: 'invoices', label: 'Invoice Templates', icon: <FileText className="w-4 h-4" /> },
+      ]
+    },
+    {
+      id: 'tools',
+      title: 'Tools',
+      icon: <Settings className="w-5 h-5" />,
+      color: 'purple',
+      items: [
+        { id: 'messaging', label: 'Secure Messaging', icon: <MessageCircle className="w-4 h-4" /> },
+        { id: 'ocr', label: 'Document OCR', icon: <FileText className="w-4 h-4" /> },
+        { id: 'receipts', label: 'Receipt Scanner', icon: <Receipt className="w-4 h-4" /> },
+        { id: 'health', label: 'System Health', icon: <Activity className="w-4 h-4" /> },
+        { id: 'contingency', label: 'Contingency Plans', icon: <AlertTriangle className="w-4 h-4" /> },
+      ]
+    },
+    {
+      id: 'business',
+      title: 'Business',
+      icon: <Briefcase className="w-5 h-5" />,
+      color: 'emerald',
+      items: [
+        { id: 'client-portal', label: 'Client Portal', icon: <Building2 className="w-4 h-4" /> },
+        { id: 'currency', label: 'Multi-Currency', icon: <Briefcase className="w-4 h-4" /> },
+        { id: 'professional', label: 'Professional Division (V2)', icon: <Lock className="w-4 h-4" /> },
+      ]
+    },
+  ];
 
-      {activeSection === 'admin-mgmt' && <AdminManagement />}
-
-      {activeSection === 'dnr' && <DNRSection />}
-
-      {activeSection === 'health' && <HealthDashboard />}
-
-      {activeSection === 'contingency' && <ContingencyManual />}
-
-      {activeSection === 'onboarding' && <OnboardingTracker />}
-
-      {activeSection === 'messaging' && (
+  const renderFeatureContent = () => {
+    switch (activeFeature) {
+      case 'admin-mgmt': return <AdminManagement />;
+      case 'dnr': return <DNRSection />;
+      case 'health': return <HealthDashboard />;
+      case 'contingency': return <ContingencyManual />;
+      case 'onboarding': return <OnboardingTracker />;
+      case 'messaging': return (
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-          <EnhancedAdminMessaging
-            currentUserId="admin-test-001"
-            currentUserName={adminName}
-            currentUserRole="admin"
-          />
+          <EnhancedAdminMessaging currentUserId="admin-test-001" currentUserName={adminName} currentUserRole="admin" />
         </div>
-      )}
-
-      {activeSection === 'availability' && (
+      );
+      case 'availability': return (
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
           <AdminWorkerAvailabilityManager />
         </div>
-      )}
-
-      {activeSection === 'professional' && (
+      );
+      case 'professional': return (
         <div className="bg-slate-800 border border-purple-600/50 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-6">
             <Lock className="w-6 h-6 text-purple-400" />
@@ -906,47 +684,78 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
             </div>
           </div>
           <p className="text-gray-300 mb-6">
-            Preview the Professional Staffing Division interface and features planned for Q3 2026. This includes nursing placements, executive recruiting, specialized contracting, and high-margin professional services.
+            Preview the Professional Staffing Division interface and features planned for Q3 2026.
           </p>
           <Button onClick={() => window.location.href = '/professional-staffing'} className="bg-purple-600 hover:bg-purple-700">
             View Professional Division Preview
           </Button>
         </div>
-      )}
+      );
+      case 'analytics': return <AdvancedAnalyticsDashboard />;
+      case 'bulk-ops': return <BulkOperations />;
+      case 'search': return <AdvancedSearch />;
+      case 'compliance': return <ComplianceReports />;
+      case 'invoices': return <InvoiceCustomization />;
+      case 'forecasting': return <WorkforceForecastingAI />;
+      case 'currency': return <MultiCurrencySupport />;
+      case 'ocr': return <DocumentOCR />;
+      case 'client-portal': return <ClientPortal />;
+      case 'ratings': return <WorkerRatingSystem />;
+      case 'shift-marketplace': return <ShiftMarketplace />;
+      case 'credentials': return <CredentialTracker />;
+      case 'worker-performance': return <WorkerPerformanceDashboard />;
+      case 'beta-testers': return <BetaTesterManagement />;
+      case 'user-data-access': return <UserDataAccessSection />;
+      case 'receipts': return <ReceiptScanner />;
+      default: return null;
+    }
+  };
 
-      {activeSection === 'analytics' && <AdvancedAnalyticsDashboard />}
+  return (
+    <div className="space-y-6">
+      {/* Accordion Navigation - Mobile Friendly */}
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+        <Accordion type="single" collapsible value={openCategory} onValueChange={setOpenCategory} className="w-full">
+          {menuCategories.map((category) => (
+            <AccordionItem key={category.id} value={category.id} className="border-b border-slate-700 last:border-b-0">
+              <AccordionTrigger 
+                className="px-4 py-3 hover:bg-slate-700/50 transition-colors [&[data-state=open]]:bg-slate-700/30"
+                data-testid={`accordion-${category.id}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`text-${category.color}-400`}>{category.icon}</span>
+                  <span className="font-bold text-white">{category.title}</span>
+                  <span className="text-xs text-gray-500 ml-2">({category.items.length})</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {category.items.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveFeature(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${
+                        activeFeature === item.id
+                          ? 'bg-cyan-600 text-white'
+                          : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'
+                      }`}
+                      data-testid={`btn-${item.id}`}
+                    >
+                      {item.icon}
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
 
-      {activeSection === 'bulk-ops' && <BulkOperations />}
+      {/* Feature Content */}
+      {activeFeature !== 'checklist' && renderFeatureContent()}
 
-      {activeSection === 'search' && <AdvancedSearch />}
-
-      {activeSection === 'compliance' && <ComplianceReports />}
-
-      {activeSection === 'invoices' && <InvoiceCustomization />}
-
-      {activeSection === 'forecasting' && <WorkforceForecastingAI />}
-
-      {activeSection === 'currency' && <MultiCurrencySupport />}
-
-      {activeSection === 'ocr' && <DocumentOCR />}
-
-      {activeSection === 'client-portal' && <ClientPortal />}
-
-      {activeSection === 'ratings' && <WorkerRatingSystem />}
-
-      {activeSection === 'shift-marketplace' && <ShiftMarketplace />}
-
-      {activeSection === 'credentials' && <CredentialTracker />}
-
-      {activeSection === 'worker-performance' && <WorkerPerformanceDashboard />}
-
-      {activeSection === 'beta-testers' && <BetaTesterManagement />}
-
-      {activeSection === 'user-data-access' && <UserDataAccessSection />}
-
-      {activeSection === 'receipts' && <ReceiptScanner />}
-
-      {activeSection === 'checklist' && (
+      {activeFeature === 'checklist' && (
       <div className="space-y-8">
       {/* System Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

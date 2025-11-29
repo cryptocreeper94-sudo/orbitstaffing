@@ -52,6 +52,14 @@ export default function EmployeeApp() {
     timestamp: string;
     status: string;
   }>>([]);
+  
+  const [onBreak, setOnBreak] = useState(false);
+  const [breakStartTime, setBreakStartTime] = useState<string | null>(null);
+  const [breaks, setBreaks] = useState<Array<{start: string; end: string | null; type: string}>>([]);
+  const [showCertification, setShowCertification] = useState(false);
+  const [certificationAgreed, setCertificationAgreed] = useState(false);
+  const [clockInTime, setClockInTime] = useState<string | null>(null);
+  const [totalHoursToday, setTotalHoursToday] = useState("0h 0m");
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
@@ -68,18 +76,60 @@ export default function EmployeeApp() {
     }
   };
 
+  const getCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  };
+
   const handleClockIn = () => {
     if (!gpsVerified) {
       toast.error("Please verify your location first");
       return;
     }
+    const time = getCurrentTime();
     setClockedIn(true);
-    toast.success("Clocked in at 8:32 AM");
+    setClockInTime(time);
+    setBreaks([]);
+    toast.success(`Clocked in at ${time}`);
   };
 
   const handleClockOut = () => {
+    if (onBreak) {
+      toast.error("Please end your break before clocking out");
+      return;
+    }
+    setShowCertification(true);
+  };
+
+  const handleConfirmClockOut = () => {
+    if (!certificationAgreed) {
+      toast.error("Please certify your hours before clocking out");
+      return;
+    }
     setClockedIn(false);
-    toast.success("Clocked out - 8 hours worked");
+    setClockInTime(null);
+    setTotalHoursToday("8h 0m");
+    setCertificationAgreed(false);
+    setShowCertification(false);
+    toast.success("Hours certified and clocked out successfully!");
+  };
+
+  const handleStartBreak = (breakType: string) => {
+    const time = getCurrentTime();
+    setOnBreak(true);
+    setBreakStartTime(time);
+    setBreaks([...breaks, { start: time, end: null, type: breakType }]);
+    toast.success(`${breakType} break started at ${time}`);
+  };
+
+  const handleEndBreak = () => {
+    const time = getCurrentTime();
+    setOnBreak(false);
+    setBreaks(breaks.map((b, i) => 
+      i === breaks.length - 1 ? { ...b, end: time } : b
+    ));
+    setBreakStartTime(null);
+    toast.success(`Break ended at ${time}`);
   };
 
   const handleSendMessage = () => {
@@ -276,15 +326,149 @@ export default function EmployeeApp() {
                     <span className="font-bold">Metro Construction</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg border border-border/50">
+                    <span className="text-sm">Clocked In</span>
+                    <span className="font-bold text-green-500">{clockInTime}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg border border-border/50">
                     <span className="text-sm">Hourly Rate</span>
                     <span className="font-bold">$45/hr</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-background/50 rounded-lg border border-border/50">
-                    <span className="text-sm">Breaks Remaining</span>
-                    <span className="font-bold">Lunch (30 min)</span>
-                  </div>
                 </CardContent>
               </Card>
+            )}
+
+            {clockedIn && (
+              <Card className={`border-border/50 ${onBreak ? 'bg-amber-500/10 border-amber-500/30' : 'bg-card/50'}`}>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Break Management
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {onBreak ? (
+                    <div className="space-y-3">
+                      <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Clock className="w-5 h-5 text-amber-500 animate-pulse" />
+                          <span className="font-bold text-amber-500">On Break</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Started at {breakStartTime}</p>
+                      </div>
+                      <Button 
+                        onClick={handleEndBreak} 
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                        data-testid="button-end-break"
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        End Break
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleStartBreak("Lunch")}
+                        className="border-amber-500/30 text-amber-600 hover:bg-amber-500/10"
+                        data-testid="button-lunch-break"
+                      >
+                        🍽️ Lunch Break
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleStartBreak("Rest")}
+                        className="border-blue-500/30 text-blue-600 hover:bg-blue-500/10"
+                        data-testid="button-rest-break"
+                      >
+                        ☕ Rest Break
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {breaks.length > 0 && (
+                    <div className="mt-4 pt-3 border-t border-border/50">
+                      <p className="text-sm font-medium mb-2 text-muted-foreground">Today's Breaks:</p>
+                      <div className="space-y-1">
+                        {breaks.map((b, idx) => (
+                          <div key={idx} className="flex justify-between text-sm p-2 bg-background/50 rounded">
+                            <span>{b.type}</span>
+                            <span className="text-muted-foreground">
+                              {b.start} - {b.end || 'ongoing'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {showCertification && (
+              <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                <Card className="w-full max-w-md bg-card border-primary/30">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                      <FileCheck className="w-6 h-6" />
+                      Certify Your Hours
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="bg-background/50 rounded-lg p-4 space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Clock In:</span>
+                        <span className="font-bold">{clockInTime}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Clock Out:</span>
+                        <span className="font-bold">{getCurrentTime()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Breaks Taken:</span>
+                        <span className="font-bold">{breaks.length}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-border/50 pt-2 mt-2">
+                        <span className="text-muted-foreground">Total Hours:</span>
+                        <span className="font-bold text-green-500">8h 0m</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3 p-3 bg-primary/10 rounded-lg border border-primary/30">
+                      <input
+                        type="checkbox"
+                        id="certify"
+                        checked={certificationAgreed}
+                        onChange={(e) => setCertificationAgreed(e.target.checked)}
+                        className="mt-1 w-5 h-5 accent-primary"
+                        data-testid="checkbox-certify"
+                      />
+                      <label htmlFor="certify" className="text-sm">
+                        I certify that the hours shown above are accurate and represent the actual time I worked today. I understand this is my digital signature.
+                      </label>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowCertification(false)}
+                        className="flex-1"
+                        data-testid="button-cancel-certification"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        onClick={handleConfirmClockOut}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                        disabled={!certificationAgreed}
+                        data-testid="button-confirm-clockout"
+                      >
+                        <CheckCircle2 className="w-4 h-4 mr-2" />
+                        Certify & Clock Out
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             )}
 
             {/* Quick Actions */}

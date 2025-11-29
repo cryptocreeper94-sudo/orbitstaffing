@@ -547,6 +547,14 @@ export default function OwnerHub() {
               <Receipt className="w-4 h-4 mr-2" />
               Receipts
             </TabsTrigger>
+            <TabsTrigger
+              value="live-dashboard"
+              className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-slate-400"
+              data-testid="tab-live-dashboard"
+            >
+              <Clock className="w-4 h-4 mr-2" />
+              Live Dashboard
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -1145,6 +1153,205 @@ export default function OwnerHub() {
               </CardHeader>
               <CardContent>
                 <ReceiptScanner />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="live-dashboard" className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  <Clock className="w-6 h-6 text-emerald-400" />
+                  Live Employee Dashboard
+                </h2>
+                <p className="text-slate-400 mt-1">Real-time clock-in/out status for all employees</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  Live - Updates every 30 seconds
+                </div>
+                <Button variant="outline" size="sm" className="border-slate-600 text-slate-300" data-testid="button-refresh-dashboard">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Card className="bg-emerald-900/30 border-emerald-700/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-600/30 flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-emerald-400" data-testid="count-clocked-in">12</p>
+                      <p className="text-sm text-slate-400">Clocked In</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-slate-800/50 border-slate-700/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-600/30 flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-slate-400" />
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-slate-300" data-testid="count-clocked-out">5</p>
+                      <p className="text-sm text-slate-400">Clocked Out</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-amber-900/30 border-amber-700/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-amber-600/30 flex items-center justify-center">
+                      <AlertTriangle className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-amber-400" data-testid="count-on-break">3</p>
+                      <p className="text-sm text-slate-400">On Break</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="bg-blue-900/30 border-blue-700/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-blue-600/30 flex items-center justify-center">
+                      <MapPin className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-3xl font-bold text-blue-400" data-testid="count-job-sites">4</p>
+                      <p className="text-sm text-slate-400">Active Job Sites</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="bg-slate-800/50 border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-cyan-400" />
+                  Employee Status (Live)
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Click on an employee to view more details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[
+                    { id: 1, name: "John Smith", status: "clocked-in", clockInTime: "7:32 AM", location: "Metro Construction - Downtown", hoursToday: "4h 28m", gpsVerified: true },
+                    { id: 2, name: "Maria Garcia", status: "clocked-in", clockInTime: "7:45 AM", location: "Office Complex B", hoursToday: "4h 15m", gpsVerified: true },
+                    { id: 3, name: "James Wilson", status: "on-break", clockInTime: "6:00 AM", location: "Industrial Park", hoursToday: "6h 00m", gpsVerified: true, breakStarted: "11:30 AM" },
+                    { id: 4, name: "Sarah Johnson", status: "clocked-in", clockInTime: "8:00 AM", location: "Metro Construction - Downtown", hoursToday: "4h 00m", gpsVerified: true },
+                    { id: 5, name: "Mike Brown", status: "clocked-out", clockInTime: "6:00 AM", clockOutTime: "2:00 PM", location: "Warehouse District", hoursToday: "8h 00m", gpsVerified: true, certified: true },
+                    { id: 6, name: "Emily Davis", status: "clocked-in", clockInTime: "7:00 AM", location: "Office Complex B", hoursToday: "5h 00m", gpsVerified: true },
+                    { id: 7, name: "Robert Taylor", status: "on-break", clockInTime: "6:30 AM", location: "Industrial Park", hoursToday: "5h 30m", gpsVerified: true, breakStarted: "11:45 AM" },
+                    { id: 8, name: "Lisa Anderson", status: "clocked-out", clockInTime: "5:00 AM", clockOutTime: "1:00 PM", location: "Metro Construction - Eastside", hoursToday: "8h 00m", gpsVerified: true, certified: false },
+                  ].map((emp) => (
+                    <div 
+                      key={emp.id}
+                      className={`p-4 rounded-lg border transition-all cursor-pointer hover:border-cyan-500/50 ${
+                        emp.status === 'clocked-in' ? 'bg-emerald-900/20 border-emerald-700/30' :
+                        emp.status === 'on-break' ? 'bg-amber-900/20 border-amber-700/30' :
+                        'bg-slate-700/30 border-slate-600/30'
+                      }`}
+                      data-testid={`employee-row-${emp.id}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                            emp.status === 'clocked-in' ? 'bg-emerald-600' :
+                            emp.status === 'on-break' ? 'bg-amber-600' :
+                            'bg-slate-600'
+                          }`}>
+                            {emp.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-white">{emp.name}</p>
+                              {emp.gpsVerified && (
+                                <Badge className="bg-blue-600/20 text-blue-300 text-xs">
+                                  <MapPin className="w-3 h-3 mr-1" />
+                                  GPS
+                                </Badge>
+                              )}
+                              {emp.certified && (
+                                <Badge className="bg-green-600/20 text-green-300 text-xs">
+                                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                                  Certified
+                                </Badge>
+                              )}
+                              {emp.status === 'clocked-out' && !emp.certified && (
+                                <Badge className="bg-red-600/20 text-red-300 text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" />
+                                  Needs Certification
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-400">{emp.location}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center gap-2">
+                            <Badge className={`${
+                              emp.status === 'clocked-in' ? 'bg-emerald-600/30 text-emerald-300' :
+                              emp.status === 'on-break' ? 'bg-amber-600/30 text-amber-300' :
+                              'bg-slate-600/30 text-slate-300'
+                            }`}>
+                              {emp.status === 'clocked-in' ? '🟢 Working' : 
+                               emp.status === 'on-break' ? '🟡 On Break' : 
+                               '⚪ Clocked Out'}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-slate-400 mt-1">
+                            {emp.status === 'on-break' ? (
+                              <span>Break started: {emp.breakStarted}</span>
+                            ) : emp.status === 'clocked-out' ? (
+                              <span>Out: {emp.clockOutTime}</span>
+                            ) : (
+                              <span>In: {emp.clockInTime}</span>
+                            )}
+                          </div>
+                          <p className="text-sm font-medium text-cyan-400">{emp.hoursToday} today</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-blue-400" />
+                  Active Job Sites
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { name: "Metro Construction - Downtown", employees: 4, address: "123 Main St, Nashville TN" },
+                    { name: "Office Complex B", employees: 3, address: "456 Business Blvd, Nashville TN" },
+                    { name: "Industrial Park", employees: 3, address: "789 Industrial Way, Nashville TN" },
+                    { name: "Warehouse District", employees: 2, address: "321 Warehouse Rd, Nashville TN" },
+                  ].map((site, idx) => (
+                    <div key={idx} className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium text-white">{site.name}</p>
+                        <Badge className="bg-cyan-600/20 text-cyan-300">{site.employees} workers</Badge>
+                      </div>
+                      <p className="text-sm text-slate-400">{site.address}</p>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

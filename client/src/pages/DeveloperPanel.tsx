@@ -1641,7 +1641,8 @@ export default function DeveloperPanel() {
   });
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'apis' | 'examples' | 'messaging' | 'asset-tracker' | 'secrets' | 'legal' | 'llc-docs' | 'monitoring' | 'login-logs' | 'receipts'>('overview');
+  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [openCategory, setOpenCategory] = useState<string>('main');
   const [copied, setCopied] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -2162,134 +2163,119 @@ export default function DeveloperPanel() {
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-slate-700 flex-wrap">
+        {/* Accordion Navigation - Mobile Friendly */}
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden mb-8">
+          <Accordion type="single" collapsible value={openCategory} onValueChange={setOpenCategory} className="w-full">
+            <AccordionItem value="main" className="border-b border-slate-700">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors" data-testid="accordion-dev-main">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="w-5 h-5 text-cyan-400" />
+                  <span className="font-bold text-white">Main</span>
+                  <span className="text-xs text-gray-500 ml-2">(3)</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'overview', label: 'Overview', icon: <BarChart3 className="w-4 h-4" /> },
+                    { id: 'apis', label: 'API Endpoints', icon: <Code className="w-4 h-4" /> },
+                    { id: 'examples', label: 'Examples & Assets', icon: <Zap className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="security" className="border-b border-slate-700">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors" data-testid="accordion-dev-security">
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-red-400" />
+                  <span className="font-bold text-white">Security</span>
+                  <span className="text-xs text-gray-500 ml-2">(3)</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'secrets', label: 'Secrets Manager', icon: <Key className="w-4 h-4" /> },
+                    { id: 'login-logs', label: 'Login History', icon: <Shield className="w-4 h-4" /> },
+                    { id: 'messaging', label: 'Secure Messaging', icon: <MessageCircle className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="documents" className="border-b border-slate-700">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors" data-testid="accordion-dev-documents">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-5 h-5 text-purple-400" />
+                  <span className="font-bold text-white">Documents</span>
+                  <span className="text-xs text-gray-500 ml-2">(3)</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'legal', label: 'CSA Manager', icon: <FileText className="w-4 h-4" /> },
+                    { id: 'llc-docs', label: 'LLC Docs', icon: <Building2 className="w-4 h-4" /> },
+                    { id: 'receipts', label: 'Receipt Scanner', icon: <FileText className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="operations" className="border-b-0">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors" data-testid="accordion-dev-operations">
+                <div className="flex items-center gap-3">
+                  <Clock className="w-5 h-5 text-green-400" />
+                  <span className="font-bold text-white">Operations</span>
+                  <span className="text-xs text-gray-500 ml-2">(1)</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { id: 'monitoring', label: 'Background Jobs', icon: <Clock className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+
+        {/* AI Chat Button */}
+        <div className="flex justify-end mb-4">
           <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all ${
-              activeTab === 'overview'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-overview"
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('apis')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all ${
-              activeTab === 'apis'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-apis"
-          >
-            API Endpoints
-          </button>
-          <button
-            onClick={() => setActiveTab('examples')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all ${
-              activeTab === 'examples'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-examples"
-          >
-            Examples & Assets
-          </button>
-          <button
-            onClick={() => setActiveTab('messaging')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'messaging'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-messaging"
+            onClick={() => setShowChat(!showChat)}
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded transition-all text-sm flex items-center gap-2"
+            data-testid="button-tab-ask-ai"
           >
             <MessageCircle className="w-4 h-4" />
-            Secure Messaging
+            Ask AI
           </button>
-          <button
-            onClick={() => setActiveTab('secrets')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'secrets'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-secrets"
-          >
-            <Key className="w-4 h-4" />
-            Secrets Manager
-          </button>
-          <button
-            onClick={() => setActiveTab('legal')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'legal'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-legal"
-          >
-            <FileText className="w-4 h-4" />
-            CSA Manager
-          </button>
-          <button
-            onClick={() => setActiveTab('llc-docs')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'llc-docs'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-llc-docs"
-          >
-            <Building2 className="w-4 h-4" />
-            LLC Docs
-          </button>
-          <button
-            onClick={() => setActiveTab('monitoring')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'monitoring'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-monitoring"
-          >
-            <Clock className="w-4 h-4" />
-            Monitoring
-          </button>
-          <button
-            onClick={() => setActiveTab('login-logs')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'login-logs'
-                ? 'border-cyan-400 text-cyan-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-login-logs"
-          >
-            <Shield className="w-4 h-4" />
-            Login History
-          </button>
-          <button
-            onClick={() => setActiveTab('receipts')}
-            className={`px-4 py-3 font-bold border-b-2 transition-all flex items-center gap-2 ${
-              activeTab === 'receipts'
-                ? 'border-green-400 text-green-400'
-                : 'border-transparent text-gray-400 hover:text-gray-300'
-            }`}
-            data-testid="button-tab-dev-receipts"
-          >
-            🧾 Receipt Scanner
-          </button>
-          <div className="ml-auto flex items-center">
-            <button
-              onClick={() => setShowChat(!showChat)}
-              className="px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded transition-all text-sm flex items-center gap-2"
-              data-testid="button-tab-ask-ai"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Ask AI
-            </button>
-          </div>
         </div>
 
         {/* OVERVIEW TAB */}
