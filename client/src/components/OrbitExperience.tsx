@@ -206,7 +206,7 @@ function OrbitPopup({
       exit={{ opacity: 0 }}
     >
       <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto"
+        className={`absolute inset-0 bg-black/40 backdrop-blur-sm ${message.dismissable !== false ? 'pointer-events-auto cursor-pointer' : 'pointer-events-none'}`}
         onClick={message.dismissable !== false ? onClose : undefined}
       />
       
