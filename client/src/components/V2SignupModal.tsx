@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Rocket, Mail, Phone, CheckCircle2, Sparkles, Zap, Bot, Shield, BarChart3 } from "lucide-react";
+import { Rocket, Mail, Phone, CheckCircle2, Sparkles, Zap, Bot, Shield, BarChart3, Users, Globe, Smartphone, Link2, Camera, Brain } from "lucide-react";
 
 interface V2SignupModalProps {
   triggerAfterSeconds?: number;
@@ -96,33 +96,41 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
         <div className="py-4 space-y-4">
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 text-slate-300">
-              <Bot className="w-4 h-4 text-cyan-400" />
-              <span>AI Job Matching</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span>Real-Time Push Alerts</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <Shield className="w-4 h-4 text-green-400" />
-              <span>Remote Support & Co-Browsing</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <BarChart3 className="w-4 h-4 text-purple-400" />
-              <span>Advanced Analytics Dashboard</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300">
-              <Sparkles className="w-4 h-4 text-pink-400" />
+              <Smartphone className="w-4 h-4 text-cyan-400" />
               <span>Native Mobile App (iOS/Android)</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <Zap className="w-4 h-4 text-yellow-400" />
+              <span>Instant/Daily Pay (2.5% fee)</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Users className="w-4 h-4 text-green-400" />
+              <span>Worker Community & Leaderboards</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Globe className="w-4 h-4 text-purple-400" />
+              <span>Multi-Currency & International</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Link2 className="w-4 h-4 text-pink-400" />
+              <span>Zapier & API Integrations</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Camera className="w-4 h-4 text-amber-400" />
+              <span>VR Training Platform</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Brain className="w-4 h-4 text-rose-400" />
+              <span>Predictive No-Show Detection</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300">
+              <Shield className="w-4 h-4 text-emerald-400" />
               <span>Blockchain Credentials</span>
             </div>
           </div>
           
           <p className="text-xs text-cyan-400/80 text-center font-medium">
-            Launching Q1-Q2 2026 - Be the first to know!
+            Launching Q2-Q3 2026 - Be the first to know!
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
