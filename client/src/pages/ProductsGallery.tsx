@@ -1,14 +1,35 @@
 import { useState } from 'react';
 import { ChevronRight, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
 import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides } from '@/data/slidesData';
 
+const ORBIT_GREETINGS = [
+  "Hey there! I'm Orbit, your staffing AI assistant!",
+  "Welcome to ORBIT! Ready to revolutionize your staffing?",
+  "Hi! Click me to learn about automated staffing!",
+  "Need help managing workers? That's my specialty!",
+  "GPS tracking, payroll, compliance - I handle it all!",
+];
+
 export default function ProductsGallery() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [showSlideshow, setShowSlideshow] = useState<string | null>(null);
+  const [orbitGreeting, setOrbitGreeting] = useState<string | null>(null);
+  const [orbitClicked, setOrbitClicked] = useState(false);
+
+  const handleOrbitClick = () => {
+    const randomGreeting = ORBIT_GREETINGS[Math.floor(Math.random() * ORBIT_GREETINGS.length)];
+    setOrbitGreeting(randomGreeting);
+    setOrbitClicked(true);
+    setTimeout(() => {
+      setOrbitGreeting(null);
+      setOrbitClicked(false);
+    }, 4000);
+  };
 
   const products = [
     {
@@ -74,6 +95,60 @@ export default function ProductsGallery() {
             >
               {/* Gradient background */}
               <div className={`absolute inset-0 bg-gradient-to-br ${product.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+
+              {/* Interactive Orbit Mascot - only for ORBIT product */}
+              {product.id === 'ORBIT' && (
+                <div className="absolute top-2 right-2 z-10">
+                  <motion.div
+                    className="relative cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOrbitClick();
+                    }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    data-testid="button-orbit-mascot"
+                  >
+                    <motion.img
+                      src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png"
+                      alt="Orbit Mascot"
+                      className="w-16 h-16 object-contain drop-shadow-lg"
+                      animate={{
+                        y: [0, -4, 0],
+                        rotate: orbitClicked ? [0, 10, -10, 0] : 0,
+                      }}
+                      transition={{
+                        y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                        rotate: { duration: 0.5 },
+                      }}
+                    />
+                    <motion.div
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-10 h-2 bg-cyan-500/30 rounded-full blur-sm"
+                      animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  </motion.div>
+                  
+                  {/* Speech Bubble */}
+                  <AnimatePresence>
+                    {orbitGreeting && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-20"
+                      >
+                        <div className="relative bg-white rounded-xl p-3 shadow-xl border-2 border-cyan-500 min-w-48 max-w-56">
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-cyan-500" />
+                          <p className="text-slate-800 text-xs font-medium text-center">
+                            {orbitGreeting}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
 
               <div className="relative p-6 h-full flex flex-col">
                 {/* Header */}

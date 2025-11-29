@@ -2,14 +2,22 @@
 
 **Company:** DarkWave Studios  
 **Product:** ORBIT Staffing OS  
-**Date:** November 28, 2025  
-**Status:** Production Ready
+**Date:** November 29, 2025  
+**Status:** Production Ready  
+**Version:** 2.0 (with Orbit AI Assistant)
 
 ---
 
 ## 1. Executive Overview
 
-ORBIT Staffing OS is a comprehensive, white-label staffing automation platform designed to reduce operational costs by 60-68% compared to competitors while providing 100% automation from customer request to worker payment.
+ORBIT Staffing OS is a comprehensive, white-label staffing automation platform designed to reduce operational costs by 60-95% compared to competitors while providing 100% automation from customer request to worker payment.
+
+### NEW: Orbit AI Mascot System
+- **Orbit** - Friendly cyan Saturn mascot that guides users throughout the platform
+- AI-powered chat assistant with contextual help for payroll, compliance, jobs, and pricing
+- Animated popups with comic-book style dialogs
+- Transparent background mascot (processed via Python rembg) for seamless integration
+- Interactive click/hover responses on DarkWave Studios homepage
 
 ### Mission Statement
 *"Automate your staffing. Scale your business. Zero friction."*
@@ -34,21 +42,30 @@ ORBIT Staffing OS is a comprehensive, white-label staffing automation platform d
 - Compliance (TN/KY/FL, I-9, prevailing wage)
 - Real-time dashboard with WebSocket updates
 
-### 2.2 ORBIT Talent Exchange
-**Target Users:** Job seekers and employers
+### 2.2 Modular SaaS Pricing (Standalone Tools)
 
-**Pricing Tiers:**
-| Tier | Monthly | Target Customer |
-|------|---------|-----------------|
-| Starter | $39 | Small agencies, 1-50 workers |
-| Growth | $99 | Growing agencies, 51-200 workers |
-| Professional | $249 | Enterprise, unlimited workers |
+| Tool | Price/mo | Features | Competitor | Savings |
+|------|----------|----------|------------|---------|
+| **ORBIT CRM** | $19 | Pipeline, activities, meetings, email tracking, duplicates | HubSpot ($50+) | 62% less |
+| **Talent Exchange** | $29 | Job board, talent pool, smart matching, applications | Indeed ($400) | 93% less |
+| **Payroll** | $39 | Multi-state, garnishments, direct deposit, paystubs | ADP ($39+$5/emp) | 60-80% less |
+| **Time & GPS** | $15 | GPS clock-in, geofencing, timesheets, overtime | Deputy ($4/user) | Flat rate |
+| **Compliance** | $25 | I-9 tracking, certifications, background checks, audits | Checkr ($35+) | Unlimited |
+
+### 2.3 Platform Bundles
+
+| Bundle | Monthly | Includes | Target |
+|--------|---------|----------|--------|
+| **Starter** | $99 | CRM + Time/GPS + Compliance | Small agencies, 1-50 workers |
+| **Growth** | $149 | All 5 tools | Growing agencies, 51-200 workers |
+| **Professional** | $249 | All 5 tools + Multi-location + API | Enterprise, unlimited |
+| **Enterprise** | Custom | White-label + Dedicated support | Large operations |
 
 **Competitive Analysis:**
 - Indeed: $99-$399/mo for similar features
 - Bullhorn: $249-$599/mo
 - ZipRecruiter: $299-$799/mo
-- **ORBIT Savings: 60-68% less**
+- **ORBIT Savings: 60-95% less**
 
 ### 2.3 Self-Service Portals
 **Employee Hub:** Worker self-service for schedules, pay stubs, onboarding

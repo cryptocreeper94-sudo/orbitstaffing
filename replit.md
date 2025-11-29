@@ -29,7 +29,7 @@ The ORBIT Staffing OS is a unified, multi-tenant white-label platform with a thr
 - **Modular Design:** Organized file structure for maintainability.
 
 ### Feature Specifications
-- **CRM:** Worker, client, and company management.
+- **CRM:** HubSpot-competitive with deal pipeline, activity tracking, meetings, email analytics, duplicate detection, workflows
 - **Payroll & Invoicing:** Automated, multi-state compliant payroll and customizable invoices with garnishment processing and PDF paystub generation.
 - **Scheduling & Assignments:** Job posting, worker assignment, bulk operations, real-time updates.
 - **GPS Verification:** Geofencing (200-300ft radius) for accurate clock-in/out.
@@ -47,6 +47,53 @@ The ORBIT Staffing OS is a unified, multi-tenant white-label platform with a thr
 - **Insurance & Worker Request System:** Management of worker and company insurance, document uploads, and an auto-matching engine for worker requests.
 - **Document Management:** Uploads for garnishment orders and other documents with hallmark verification and virus scanning.
 - **Background Checks & Drug Testing:** Integration with third-party services for criminal, motor vehicle, employment history checks, and drug testing.
+
+### Orbit AI Mascot System (NEW - November 2025)
+A comprehensive mascot guidance system featuring "Orbit," a friendly cyan Saturn character:
+
+**Components:**
+- `OrbitExperience.tsx` - Context provider for mascot popup system with directional animations
+- `OrbitChatAssistant.tsx` - AI-powered floating chat assistant with keyword responses
+- `OrbitMascot.tsx` - Reusable mascot component with poses (wave, point, think)
+
+**Mascot Assets (Transparent Backgrounds via Python rembg):**
+- `/mascot/orbit_mascot_cyan_saturn_style_transparent.png` - Main wave pose
+- `/mascot/orbit_mascot_pointing_helpful_transparent.png` - Pointing/teaching pose
+- `/mascot/orbit_mascot_thinking_pose_transparent.png` - Thinking pose
+- `/mascot/orbit_saturn_mascot_waving_transparent.png` - Alternative wave
+
+**Features:**
+- Welcome popups on first Dashboard visit (localStorage-tracked)
+- Floating chat bubble on all pages with AI responses for payroll, workers, compliance, jobs, pricing
+- Comic-book style dialog boxes with animated entry/exit from all directions
+- Interactive mascot on DarkWave Studios homepage (click for random greetings)
+- Dismissable overlays with proper pointer-events handling
+
+**AI Response Categories:**
+- Payroll: Processing instructions, pay period navigation
+- Workers: Adding workers, talent pool search
+- Compliance: I-9 status, background checks, certifications
+- Jobs: Job posting, talent matching
+- Pricing: Plan options, bundle recommendations
+- General help and onboarding guidance
+
+### Modular SaaS Pricing Model
+**Standalone Tools:**
+| Tool | Price/mo | Features |
+|------|----------|----------|
+| CRM | $19 | Pipeline, activities, meetings, email tracking, duplicates |
+| Talent Exchange | $29 | Job board, talent pool, smart matching, applications |
+| Payroll | $39 | Multi-state, garnishments, direct deposit, paystubs |
+| Time & GPS | $15 | GPS clock-in, geofencing, timesheets, overtime |
+| Compliance | $25 | I-9 tracking, certifications, background checks |
+
+**Platform Bundles:**
+| Bundle | Price/mo | Includes |
+|--------|----------|----------|
+| Starter | $99 | CRM + Time/GPS + Compliance |
+| Growth | $149 | All 5 tools |
+| Professional | $249 | All 5 + Multi-location + API |
+| Enterprise | Custom | White-label + Dedicated support |
 
 ### Twilio SMS Placeholder System (Production-Ready)
 The SMS notification system is fully implemented as a placeholder ready for Twilio credentials. It includes:
