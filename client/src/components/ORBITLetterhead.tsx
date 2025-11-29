@@ -14,7 +14,7 @@ export function ORBITLetterhead({
     name: "ORBIT Staffing OS",
     address: "Tech Hub, United States",
     phone: "(555) 000-ORBIT",
-    email: "support@orbitstaffing.net"
+    email: "support@orbitstaffing.io"
   }
 }: LetterheadProps) {
   return (

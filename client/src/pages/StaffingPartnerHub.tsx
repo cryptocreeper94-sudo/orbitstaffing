@@ -27,7 +27,7 @@ export default function StaffingPartnerHub() {
       assignments: 120,
       email: 'admin@prostaffing.com',
       connectedAt: new Date(Date.now() - 2592000000),
-      integrationLink: 'https://orbitstaffing.net/partner/connect/abc123xyz'
+      integrationLink: 'https://orbitstaffing.io/partner/connect/abc123xyz'
     },
     {
       id: '2',
@@ -37,7 +37,7 @@ export default function StaffingPartnerHub() {
       assignments: 67,
       email: 'contact@abcstaff.com',
       connectedAt: new Date(Date.now() - 604800000),
-      integrationLink: 'https://orbitstaffing.net/partner/connect/def456uvw'
+      integrationLink: 'https://orbitstaffing.io/partner/connect/def456uvw'
     }
   ]);
 
@@ -56,7 +56,7 @@ export default function StaffingPartnerHub() {
       employees: 0,
       assignments: 0,
       email: partnerEmail,
-      integrationLink: `https://orbitstaffing.net/partner/connect/${Math.random().toString(36).substring(7)}`
+      integrationLink: `https://orbitstaffing.io/partner/connect/${Math.random().toString(36).substring(7)}`
     };
 
     setPartners([...partners, newPartner]);

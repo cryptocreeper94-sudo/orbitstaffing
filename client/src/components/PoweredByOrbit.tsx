@@ -97,7 +97,7 @@ export function HallmarkAsset({
           {/* Verification Info */}
           <div className="text-xs text-gray-400 text-center max-w-xs">
             <p>This is a legitimate ORBIT licensed asset.</p>
-            <p className="mt-1 text-cyan-400">Verify at orbitstaffing.net/verify</p>
+            <p className="mt-1 text-cyan-400">Verify at orbitstaffing.io/verify</p>
           </div>
         </div>
       </div>

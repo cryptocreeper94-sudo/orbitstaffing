@@ -43,7 +43,7 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
     fullName: userName,
     title: cardType === 'admin' ? 'Admin' : 'Developer',
     companyName: 'ORBIT Staffing',
-    email: `${cardType}@orbitstaffing.net`,
+    email: `${cardType}@orbitstaffing.io`,
     phone: '',
     location: '',
     brandColor: '#06B6D4',

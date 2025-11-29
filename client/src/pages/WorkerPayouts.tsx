@@ -40,7 +40,7 @@ export default function WorkerPayouts() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           workerId,
-          email: "worker@orbitstaffing.net", // Get from user context
+          email: "worker@orbitstaffing.io", // Get from user context
           country: "US",
         }),
       });
@@ -61,8 +61,8 @@ export default function WorkerPayouts() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           workerId,
-          returnUrl: "https://orbitstaffing.net/worker/payouts/success",
-          refreshUrl: "https://orbitstaffing.net/worker/payouts/refresh",
+          returnUrl: "https://orbitstaffing.io/worker/payouts/success",
+          refreshUrl: "https://orbitstaffing.io/worker/payouts/refresh",
         }),
       });
       const data = await res.json();

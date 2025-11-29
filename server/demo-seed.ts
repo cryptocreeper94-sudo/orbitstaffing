@@ -93,7 +93,7 @@ export async function seedDemoData() {
         companyId: company[0].id,
         firstName: `Worker${i}`,
         lastName: `Demo${i}`,
-        email: `worker${i}@demo.orbitstaffing.net`,
+        email: `worker${i}@demo.orbitstaffing.io`,
         phone: `615-555-${String(1000 + i).slice(-4)}`,
         hourlyRate: `${(20 + Math.random() * 15).toFixed(2)}`,
         ssn: "XXX-XX-1234",

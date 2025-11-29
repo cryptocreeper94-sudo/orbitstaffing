@@ -37,7 +37,7 @@ export async function serveStatic(app: Express, server: Server) {
       return res.sendFile(path.resolve(distPath, "studio-landing.html"));
     }
     
-    // Serve ORBIT app for all other domains (replit.app, orbitstaffing.net, etc)
+    // Serve ORBIT app for all other domains (replit.app, orbitstaffing.io, etc)
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }

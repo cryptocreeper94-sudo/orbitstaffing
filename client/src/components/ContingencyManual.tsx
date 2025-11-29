@@ -233,7 +233,7 @@ const CONTINGENCY_RUNBOOKS: RunbookItem[] = [
       '7. Document incident timeline and notify users'
     ],
     escalation: 'Security breach: Notify all affected parties + legal team',
-    contactInfo: 'Security Team: security@orbitstaffing.net'
+    contactInfo: 'Security Team: security@orbitstaffing.io'
   }
 ];
 
@@ -408,8 +408,8 @@ export function ContingencyManual() {
             For any incident not covered by these runbooks or requiring immediate attention:
           </p>
           <div className="space-y-1 text-sm">
-            <p><span className="font-bold text-red-300">Critical Issues:</span> Contact: support@orbitstaffing.net</p>
-            <p><span className="font-bold text-red-300">Security Breach:</span> Notify security@orbitstaffing.net immediately</p>
+            <p><span className="font-bold text-red-300">Critical Issues:</span> Contact: support@orbitstaffing.io</p>
+            <p><span className="font-bold text-red-300">Security Breach:</span> Notify security@orbitstaffing.io immediately</p>
             <p><span className="font-bold text-red-300">Data Loss:</span> Activate disaster recovery protocol</p>
           </div>
         </CardContent>

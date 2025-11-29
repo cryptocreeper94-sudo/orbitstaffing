@@ -12,7 +12,7 @@ interface HallmarkBadgeProps {
 export function HallmarkBadge({ 
   serialNumber = '000', 
   size = 'md',
-  verificationUrl = 'https://orbitstaffing.net/verify'
+  verificationUrl = 'https://orbitstaffing.io/verify'
 }: HallmarkBadgeProps) {
   const [showQRModal, setShowQRModal] = useState(false);
   

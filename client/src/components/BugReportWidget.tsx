@@ -15,7 +15,7 @@ interface BugReportWidgetProps {
 export function BugReportWidget({ 
   isOpen, 
   onClose, 
-  userEmail = 'developer@orbitstaffing.net',
+  userEmail = 'developer@orbitstaffing.io',
   userName = 'Developer'
 }: BugReportWidgetProps) {
   const [step, setStep] = useState<'form' | 'review'>('form');

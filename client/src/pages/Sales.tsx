@@ -71,10 +71,10 @@ export default function Sales() {
           fullName="Your Name"
           title="Sales Director"
           companyName="ORBIT Staffing OS"
-          email="you@orbitstaffing.net"
+          email="you@orbitstaffing.io"
           phone="+1 (615) 555-0123"
           location="Nashville, TN"
-          website="orbitstaffing.net"
+          website="orbitstaffing.io"
           brandColor="#06B6D4"
           onSave={(card) => {
             console.log('Business card saved:', card);

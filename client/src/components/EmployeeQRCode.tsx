@@ -21,7 +21,7 @@ export function EmployeeQRCode({
   const [copied, setCopied] = useState(false);
 
   // QR code should link to verification portal
-  const qrData = qrValue || `https://orbitstaffing.net/verify/${verificationCode}`;
+  const qrData = qrValue || `https://orbitstaffing.io/verify/${verificationCode}`;
 
   const downloadQR = () => {
     const element = document.getElementById('employee-qr-code');

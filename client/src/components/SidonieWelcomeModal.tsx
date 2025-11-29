@@ -461,7 +461,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
               Ready to explore? Start by creating a test company and staffing a demo assignment.
             </p>
             <p className="text-xs text-slate-500">
-              Questions? Email: support@orbitstaffing.net | Docs: https://orbitstaffing.net/docs
+              Questions? Email: support@orbitstaffing.io | Docs: https://orbitstaffing.io/docs
             </p>
           </div>
         </div>

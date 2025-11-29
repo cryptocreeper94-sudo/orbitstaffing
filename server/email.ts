@@ -11,7 +11,7 @@ interface EmailOptions {
 }
 
 class EmailService {
-  private from = process.env.EMAIL_FROM || "noreply@orbitstaffing.net";
+  private from = process.env.EMAIL_FROM || "noreply@orbitstaffing.io";
   private smtpHost = process.env.SMTP_HOST;
   private smtpPort = process.env.SMTP_PORT;
   private smtpUser = process.env.SMTP_USER;
@@ -113,7 +113,7 @@ class EmailService {
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
             
             <p style="color: #999; font-size: 12px; margin: 0;">
-              Questions? Contact support@orbitstaffing.net
+              Questions? Contact support@orbitstaffing.io
             </p>
           </div>
         </div>
@@ -185,7 +185,7 @@ class EmailService {
             <div style="background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
               <p style="margin: 0; color: #0c4a6e; font-size: 14px;">
                 <strong>Need immediate help?</strong><br>
-                Contact us directly at support@orbitstaffing.net
+                Contact us directly at support@orbitstaffing.io
               </p>
             </div>
             

@@ -257,7 +257,7 @@ const TODO_TASKS = [
   },
   {
     id: 'domain-setup',
-    name: '🌐 Custom Domain (orbitstaffing.net)',
+    name: '🌐 Custom Domain (orbitstaffing.io)',
     priority: 'LOW',
     priorityBadge: '📌 WHEN READY',
     priorityColor: 'blue',
@@ -271,7 +271,7 @@ const TODO_TASKS = [
       '1. Deploy app on Replit first',
       '2. In Replit: Go to Deployments → Settings',
       '3. Click "Link a domain"',
-      '4. Enter: orbitstaffing.net',
+      '4. Enter: orbitstaffing.io',
       '5. Copy the CNAME record shown',
       '6. Go to your domain registrar (GoDaddy, Namecheap, etc.)',
       '7. Add CNAME record pointing to Replit',
@@ -2711,7 +2711,7 @@ export default function DeveloperPanel() {
       <BugReportWidget 
         isOpen={showBugReport}
         onClose={() => setShowBugReport(false)}
-        userEmail="developer@orbitstaffing.net"
+        userEmail="developer@orbitstaffing.io"
         userName="Developer"
       />
     </div>

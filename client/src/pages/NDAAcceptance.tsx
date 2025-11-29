@@ -367,7 +367,7 @@ export default function NDAAcceptance() {
           <strong>Legal Notice:</strong> This NDA is a functional framework created on November 22, 2025. ORBIT will engage legal counsel to ensure full enforceability under Tennessee and federal law. Future updates may be required. By signing, you agree to execute updated versions if requested.
         </p>
         <p className="text-xs text-muted-foreground">
-          Questions? Contact legal@orbitstaffing.net before signing.
+          Questions? Contact legal@orbitstaffing.io before signing.
         </p>
       </div>
     </Shell>

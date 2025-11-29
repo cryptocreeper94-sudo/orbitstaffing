@@ -64,7 +64,7 @@ export function EmployeeWelcomeModal({ isOpen, onClose, employeeName = "Team Mem
 
           <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
             <p className="text-sm text-slate-300">
-              Questions? Contact your manager or support@orbitstaffing.net
+              Questions? Contact your manager or support@orbitstaffing.io
             </p>
           </div>
         </div>

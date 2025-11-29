@@ -18,7 +18,7 @@ Getting started:
 
 We believe in transparency, fair compensation, and treating our workers like partners. Your success is our success.
 
-If you have any questions, please reach out to your manager or contact support@orbitstaffing.net.
+If you have any questions, please reach out to your manager or contact support@orbitstaffing.io.
 
 Looking forward to working with you!`,
 
@@ -65,7 +65,7 @@ Key features:
 
 As an admin, you're essential to your organization's success. The ORBIT platform gives you the tools to manage at scale while maintaining complete data security and compliance.
 
-For technical support or questions, contact the ORBIT team at support@orbitstaffing.net.`,
+For technical support or questions, contact the ORBIT team at support@orbitstaffing.io.`,
 
   sandboxDemo: (userName: string) => `Welcome to ORBIT Sandbox
 
