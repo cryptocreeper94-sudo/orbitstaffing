@@ -3365,6 +3365,140 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch pricing plans" });
     }
   });
+
+  // ========================
+  // QUICK SIGNUP (Founding Member) ROUTES
+  // ========================
+  
+  // Worker Quick Signup - Just email for founding members
+  app.post("/api/talent-exchange/quick-signup/worker", async (req: Request, res: Response) => {
+    try {
+      const { email, isFoundingMember } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      // Check if email already exists in workers table
+      const existingWorker = await db.execute(sql`
+        SELECT id FROM workers WHERE email = ${email}
+      `);
+      
+      if (existingWorker.rows.length > 0) {
+        return res.status(409).json({ error: "Email already registered. Please log in or complete your profile." });
+      }
+      
+      // Create a minimal worker record for quick signup
+      const verificationToken = crypto.randomUUID();
+      const result = await db.execute(sql`
+        INSERT INTO workers (
+          email, 
+          full_name,
+          status,
+          onboarding_status,
+          is_founding_member,
+          founding_member_since,
+          verification_token,
+          created_at
+        ) VALUES (
+          ${email},
+          'Pending Profile',
+          'pending',
+          'not_started',
+          ${isFoundingMember ? true : false},
+          ${isFoundingMember ? new Date() : null},
+          ${verificationToken},
+          NOW()
+        )
+        RETURNING id, email, is_founding_member
+      `);
+      
+      console.log(`[Quick Signup] Worker founding member registered: ${email}`);
+      
+      res.status(201).json({
+        success: true,
+        message: "Welcome, Founding Member! Check your email to complete your profile.",
+        worker: result.rows[0],
+        nextStep: "/apply",
+      });
+    } catch (error: any) {
+      console.error("Worker quick signup error:", error);
+      res.status(500).json({ error: "Failed to register. Please try again." });
+    }
+  });
+  
+  // Employer Quick Signup - Just email for founding employers
+  app.post("/api/talent-exchange/quick-signup/employer", async (req: Request, res: Response) => {
+    try {
+      const { email, isFoundingMember } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      // Check if email already exists
+      const existing = await db.execute(sql`
+        SELECT id FROM talent_exchange_employers WHERE contact_email = ${email}
+      `);
+      
+      if (existing.rows.length > 0) {
+        return res.status(409).json({ error: "Email already registered. Please log in or complete your profile." });
+      }
+      
+      // Create a minimal employer record for quick signup
+      const verificationToken = crypto.randomUUID();
+      const tempPassword = crypto.randomUUID().substring(0, 12); // Temporary password
+      const passwordHash = await bcrypt.hash(tempPassword, 10);
+      
+      const result = await db.execute(sql`
+        INSERT INTO talent_exchange_employers (
+          company_name,
+          contact_email,
+          contact_name,
+          password_hash,
+          verification_token,
+          verification_status,
+          is_founding_member,
+          founding_member_since,
+          job_post_credits,
+          active_job_posts_limit,
+          talent_searches_per_month,
+          created_at
+        ) VALUES (
+          'Company (Setup Pending)',
+          ${email},
+          'Setup Pending',
+          ${passwordHash},
+          ${verificationToken},
+          'pending',
+          ${isFoundingMember ? true : false},
+          ${isFoundingMember ? new Date() : null},
+          ${isFoundingMember ? 3 : 1},
+          ${isFoundingMember ? 5 : 2},
+          ${isFoundingMember ? 100 : 25},
+          NOW()
+        )
+        RETURNING id, contact_email, is_founding_member
+      `);
+      
+      console.log(`[Quick Signup] Employer founding member registered: ${email}`);
+      
+      res.status(201).json({
+        success: true,
+        message: "Welcome, Founding Employer! Check your email to set up your company and post your first job FREE.",
+        employer: result.rows[0],
+        nextStep: "/employer/register",
+        benefits: {
+          freeJobPosts: isFoundingMember ? 3 : 1,
+          foundingBadge: isFoundingMember,
+          prioritySupport: isFoundingMember,
+        },
+      });
+    } catch (error: any) {
+      console.error("Employer quick signup error:", error);
+      res.status(500).json({ error: "Failed to register. Please try again." });
+    }
+  });
   
   // Employer Registration
   app.post("/api/talent-exchange/employers/register", async (req: Request, res: Response) => {

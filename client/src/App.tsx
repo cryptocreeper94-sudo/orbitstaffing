@@ -52,6 +52,7 @@ import EmployerPortal from "@/pages/EmployerPortal";
 import EmployerLogin from "@/pages/EmployerLogin";
 import EmployerRegister from "@/pages/EmployerRegister";
 import TalentPool from "@/pages/TalentPool";
+import TalentExchangeLanding from "@/pages/TalentExchangeLanding";
 import AdminTalentExchange from "@/pages/AdminTalentExchange";
 import EmployeeHub from "@/pages/EmployeeHub";
 import OwnerHub from "@/pages/OwnerHub";
@@ -128,6 +129,8 @@ function Router() {
       <Route path="/slideshow" component={Slideshow} />
       <Route path="/jobs" component={JobBoard} />
       <Route path="/jobs/:jobId" component={JobDetails} />
+      <Route path="/talent-exchange" component={TalentExchangeLanding} />
+      <Route path="/join" component={TalentExchangeLanding} />
       <Route path="/talent-pool" component={TalentPool} />
       <Route path="/employer-portal" component={EmployerPortal} />
       <Route path="/employer/portal" component={EmployerPortal} />

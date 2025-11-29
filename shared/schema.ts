@@ -313,6 +313,14 @@ export const workers = pgTable(
     // Referral Tracking
     referredBy: varchar("referred_by").references(() => workers.id),
 
+    // Founding Member Status
+    isFoundingMember: boolean("is_founding_member").default(false),
+    foundingMemberSince: timestamp("founding_member_since"),
+    verificationToken: varchar("verification_token", { length: 255 }),
+
+    // Onboarding Status
+    onboardingStatus: varchar("onboarding_status", { length: 50 }).default("not_started"),
+
     // Compliance
     i9Verified: boolean("i9_verified").default(false),
     i9VerifiedDate: timestamp("i9_verified_date"),
@@ -3354,6 +3362,10 @@ export const talentExchangeEmployers = pgTable(
     
     // Status
     status: varchar("status", { length: 50 }).default("active"), // active, suspended, banned
+
+    // Founding Member Status
+    isFoundingMember: boolean("is_founding_member").default(false),
+    foundingMemberSince: timestamp("founding_member_since"),
     
     // Terms
     termsAcceptedAt: timestamp("terms_accepted_at"),
