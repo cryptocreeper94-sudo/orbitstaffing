@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle2, AlertCircle, Loader2, DollarSign, TrendingUp } from "lucide-react";
+
+interface Payout {
+  id: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  bankAccountLastFour?: string;
+}
 
 export default function WorkerPayouts() {
   const queryClient = useQueryClient();
@@ -189,7 +197,7 @@ export default function WorkerPayouts() {
         <Card className="p-6 bg-slate-900/50 border-slate-700">
           <h2 className="text-xl font-bold text-slate-200 mb-4">Payout History</h2>
           <div className="space-y-3">
-            {payouts.map((payout) => (
+            {payouts.map((payout: Payout) => (
               <div
                 key={payout.id}
                 className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700"
