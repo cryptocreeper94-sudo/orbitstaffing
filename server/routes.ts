@@ -1790,6 +1790,187 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // SUBSCRIPTION CHECKOUT ROUTES
+  // ========================
+  
+  // Pricing lookup table - single source of truth for all plans
+  const PRICING_LOOKUP: Record<string, { 
+    id: string;
+    name: string; 
+    type: 'tool' | 'bundle';
+    price: number;
+    tools: string[];
+    workers?: string;
+  }> = {
+    // Platform Bundles
+    'price_1SYoQkPQpkkF93FKsLEssZzb': { 
+      id: 'starter', name: 'Starter Bundle', type: 'bundle', price: 99, 
+      tools: ['crm', 'time', 'compliance'], workers: '1-25' 
+    },
+    'price_1SYoQlPQpkkF93FKh9pRxrdL': { 
+      id: 'growth', name: 'Growth Bundle', type: 'bundle', price: 149, 
+      tools: ['crm', 'time', 'compliance', 'talent', 'payroll'], workers: '25-100' 
+    },
+    'price_1SYoQlPQpkkF93FKaNLqc6T6': { 
+      id: 'professional', name: 'Professional Bundle', type: 'bundle', price: 249, 
+      tools: ['crm', 'time', 'compliance', 'talent', 'payroll', 'weather', 'api'], workers: '100-500' 
+    },
+    // Standalone tools - priceIds will be populated after running seed-products.ts
+    // 'price_xxx': { id: 'crm', name: 'ORBIT CRM', type: 'tool', price: 19, tools: ['crm'] },
+    // 'price_xxx': { id: 'talent', name: 'ORBIT Talent Exchange', type: 'tool', price: 29, tools: ['talent'] },
+    // 'price_xxx': { id: 'payroll', name: 'ORBIT Payroll', type: 'tool', price: 39, tools: ['payroll'] },
+    // 'price_xxx': { id: 'time', name: 'ORBIT Time & GPS', type: 'tool', price: 15, tools: ['time'] },
+    // 'price_xxx': { id: 'compliance', name: 'ORBIT Compliance', type: 'tool', price: 25, tools: ['compliance'] },
+  };
+
+  // Main checkout endpoint for platform bundles and standalone tools
+  app.post("/api/checkout", async (req: Request, res: Response) => {
+    try {
+      const { priceId, productType, paymentMethod } = req.body;
+      
+      if (!priceId) {
+        return res.status(400).json({ error: "Price ID is required" });
+      }
+
+      // Validate priceId exists in our lookup
+      const planInfo = PRICING_LOOKUP[priceId];
+      if (!planInfo) {
+        return res.status(400).json({ error: "Invalid price ID" });
+      }
+
+      if (paymentMethod === 'stripe') {
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        
+        // Create a Stripe checkout session
+        const session = await stripeService.createCheckoutSession(
+          null, // Will create customer on completion
+          priceId,
+          `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          `${baseUrl}/pricing?canceled=true`
+        );
+        
+        return res.json({ url: session.url });
+      } else if (paymentMethod === 'coinbase') {
+        // Placeholder for Coinbase Commerce integration
+        return res.status(501).json({ 
+          error: "Crypto payments coming soon",
+          message: "Coinbase Commerce integration requires API credentials. Please use card payment for now."
+        });
+      }
+      
+      return res.status(400).json({ error: "Invalid payment method" });
+    } catch (error) {
+      console.error("Checkout error:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  // Checkout success handler
+  app.get("/api/checkout/success", async (req: Request, res: Response) => {
+    try {
+      const { session_id } = req.query;
+      
+      if (!session_id) {
+        return res.status(400).json({ error: "Session ID required" });
+      }
+      
+      // Retrieve session and create subscription record
+      const session = await stripeService.retrieveCheckoutSession(session_id as string);
+      const stripePriceId = session.line_items?.data[0]?.price?.id;
+      
+      // Look up the plan details from our pricing table
+      const planInfo = stripePriceId ? PRICING_LOOKUP[stripePriceId] : null;
+      
+      if (session.payment_status === 'paid' && session.customer) {
+        // Create or update subscription customer record with proper plan data
+        await db.execute(sql`
+          INSERT INTO monthly_subscription_customers (
+            company_name, contact_email, subscription_plan, subscription_type,
+            monthly_price, enabled_tools,
+            stripe_customer_id, stripe_subscription_id, stripe_price_id,
+            status, billing_status, current_period_start, orbit_support_access
+          ) VALUES (
+            ${session.customer_details?.name || 'New Customer'},
+            ${session.customer_details?.email || ''},
+            ${planInfo?.id || 'professional'},
+            ${planInfo?.type || 'bundle'},
+            ${planInfo?.price || (session.amount_total || 0) / 100},
+            ${JSON.stringify(planInfo?.tools || [])},
+            ${session.customer as string},
+            ${session.subscription as string || null},
+            ${stripePriceId || null},
+            'active',
+            'current',
+            NOW(),
+            true
+          )
+          ON CONFLICT (contact_email) DO UPDATE SET
+            subscription_plan = EXCLUDED.subscription_plan,
+            subscription_type = EXCLUDED.subscription_type,
+            monthly_price = EXCLUDED.monthly_price,
+            enabled_tools = EXCLUDED.enabled_tools,
+            stripe_customer_id = EXCLUDED.stripe_customer_id,
+            stripe_subscription_id = EXCLUDED.stripe_subscription_id,
+            stripe_price_id = EXCLUDED.stripe_price_id,
+            status = 'active',
+            billing_status = 'current',
+            current_period_start = NOW(),
+            updated_at = NOW()
+        `);
+      }
+      
+      res.json({ 
+        success: true, 
+        status: session.payment_status,
+        customerEmail: session.customer_details?.email,
+        plan: planInfo?.name || 'Professional',
+        tools: planInfo?.tools || []
+      });
+    } catch (error) {
+      console.error("Checkout success error:", error);
+      res.status(500).json({ error: "Failed to process checkout completion" });
+    }
+  });
+
+  // Get available pricing plans (uses same source of truth)
+  app.get("/api/pricing/plans", async (req: Request, res: Response) => {
+    try {
+      const tools = [
+        { id: 'crm', name: 'ORBIT CRM', price: 19, description: 'Complete CRM', priceId: null },
+        { id: 'talent', name: 'ORBIT Talent Exchange', price: 29, description: 'Job board & talent pool', priceId: null },
+        { id: 'payroll', name: 'ORBIT Payroll', price: 39, description: 'Multi-state payroll', priceId: null },
+        { id: 'time', name: 'ORBIT Time & GPS', price: 15, description: 'GPS-verified time tracking', priceId: null },
+        { id: 'compliance', name: 'ORBIT Compliance', price: 25, description: 'I-9 & certifications', priceId: null },
+      ];
+
+      const bundles = Object.entries(PRICING_LOOKUP)
+        .filter(([_, plan]) => plan.type === 'bundle')
+        .map(([priceId, plan]) => ({
+          id: plan.id,
+          name: plan.name,
+          price: plan.price,
+          workers: plan.workers,
+          tools: plan.tools,
+          priceId
+        }));
+
+      // Add enterprise (no priceId - custom pricing)
+      bundles.push({
+        id: 'enterprise',
+        name: 'Enterprise',
+        price: null as any,
+        workers: '500+',
+        tools: ['all'],
+        priceId: null as any
+      });
+      
+      res.json({ tools, bundles });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch pricing plans" });
+    }
+  });
+
+  // ========================
   // PAYMENT/STRIPE ROUTES
   // ========================
   app.post("/api/payments/stripe/create", async (req: Request, res: Response) => {

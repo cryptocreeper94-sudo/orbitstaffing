@@ -10,15 +10,31 @@ export class StripeService {
     });
   }
 
-  async createCheckoutSession(customerId: string, priceId: string, successUrl: string, cancelUrl: string) {
+  async createCheckoutSession(customerId: string | null, priceId: string, successUrl: string, cancelUrl: string) {
     const stripe = await getUncachableStripeClient();
-    return await stripe.checkout.sessions.create({
-      customer: customerId,
+    
+    const sessionParams: any = {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       success_url: successUrl,
       cancel_url: cancelUrl,
+    };
+    
+    // Only add customer if provided, otherwise Stripe will create one
+    if (customerId) {
+      sessionParams.customer = customerId;
+    } else {
+      sessionParams.customer_creation = 'always';
+    }
+    
+    return await stripe.checkout.sessions.create(sessionParams);
+  }
+
+  async retrieveCheckoutSession(sessionId: string) {
+    const stripe = await getUncachableStripeClient();
+    return await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items', 'customer'],
     });
   }
 

@@ -178,7 +178,7 @@ export type InsertFranchise = z.infer<typeof insertFranchiseSchema>;
 export type Franchise = typeof franchises.$inferSelect;
 
 // ========================
-// Monthly Subscription Customers
+// Monthly Subscription Customers (SaaS Subscribers)
 // ========================
 export const monthlySubscriptionCustomers = pgTable(
   "monthly_subscription_customers",
@@ -188,11 +188,27 @@ export const monthlySubscriptionCustomers = pgTable(
     contactEmail: varchar("contact_email", { length: 255 }).notNull(),
     contactPhone: varchar("contact_phone", { length: 20 }),
     
+    // Linked Company (tenant)
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
     // Subscription Details
-    subscriptionPlan: varchar("subscription_plan", { length: 50 }).notNull(), // starter, professional, enterprise
+    subscriptionPlan: varchar("subscription_plan", { length: 50 }).notNull(), // starter, growth, professional, enterprise
+    subscriptionType: varchar("subscription_type", { length: 50 }).default("bundle"), // tool, bundle
     monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }).notNull(),
+    
+    // Stripe Integration
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+    stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
+    stripePriceId: varchar("stripe_price_id", { length: 255 }),
+    
+    // Enabled Tools (for tool-based subscriptions)
+    enabledTools: jsonb("enabled_tools"), // ['crm', 'payroll', 'time', etc.]
+    
+    // Auto-backup for ORBIT Support Access
     autoBackupEnabled: boolean("auto_backup_enabled").default(true),
     backupFrequency: varchar("backup_frequency", { length: 50 }).default("weekly"), // daily, weekly, monthly
+    lastBackupAt: timestamp("last_backup_at"),
+    orbitSupportAccess: boolean("orbit_support_access").default(true), // Allow ORBIT to view data for support
     
     // File Storage
     fileStorageQuotaMB: integer("file_storage_quota_mb").default(5120), // 5GB default
@@ -202,12 +218,19 @@ export const monthlySubscriptionCustomers = pgTable(
     status: varchar("status", { length: 50 }).default("active"), // active, suspended, canceled
     billingStatus: varchar("billing_status", { length: 50 }).default("current"), // current, overdue, past_due
     
+    // Billing Dates
+    currentPeriodStart: timestamp("current_period_start"),
+    currentPeriodEnd: timestamp("current_period_end"),
+    canceledAt: timestamp("canceled_at"),
+    
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
   (table) => ({
     emailIdx: index("idx_customer_email").on(table.contactEmail),
     statusIdx: index("idx_customer_status").on(table.status),
+    tenantIdx: index("idx_subscription_tenant").on(table.tenantId),
+    stripeIdx: index("idx_subscription_stripe").on(table.stripeCustomerId),
   })
 );
 
