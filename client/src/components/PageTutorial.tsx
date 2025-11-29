@@ -7,6 +7,7 @@ import {
   FileText, Shield, Clock, MapPin, MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { OrbitMascot } from "./OrbitMascot";
 
 export interface TutorialSlide {
   title: string;
@@ -185,15 +186,17 @@ function TutorialModal() {
                   exit={{ opacity: 0, x: -20 }}
                   className="min-h-[300px] flex flex-col items-center justify-center text-center"
                 >
+                  <OrbitMascot pose="wave" size="lg" />
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring" }}
-                    className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center mb-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-4 bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-4 max-w-sm"
                   >
-                    <Sparkles className="w-10 h-10 text-white" />
+                    <p className="text-cyan-300 font-medium text-sm mb-1">Hey there! I'm Orbit!</p>
+                    <p className="text-slate-400 text-xs">Your friendly guide to {currentContent.pageTitle}</p>
                   </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-4">
+                  <h3 className="text-2xl font-bold text-white mb-4 mt-6">
                     Welcome to {currentContent.pageTitle}
                   </h3>
                   <p className="text-slate-300 text-lg max-w-md leading-relaxed">
@@ -218,13 +221,18 @@ function TutorialModal() {
                   className="min-h-[300px]"
                 >
                   <div className="flex items-start gap-4 mb-6">
-                    {slide.icon && (
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400 shrink-0">
-                        {slide.icon}
+                    <div className="shrink-0">
+                      <OrbitMascot pose="point" size="sm" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {slide.icon && (
+                          <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-400">
+                            {slide.icon}
+                          </div>
+                        )}
+                        <h3 className="text-xl font-semibold text-white">{slide.title}</h3>
                       </div>
-                    )}
-                    <div>
-                      <h3 className="text-xl font-semibold text-white mb-2">{slide.title}</h3>
                       <p className="text-slate-300 leading-relaxed">{slide.description}</p>
                     </div>
                   </div>
