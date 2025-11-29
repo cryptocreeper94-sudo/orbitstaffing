@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronRight, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
@@ -20,16 +20,29 @@ export default function ProductsGallery() {
   const [showSlideshow, setShowSlideshow] = useState<string | null>(null);
   const [orbitGreeting, setOrbitGreeting] = useState<string | null>(null);
   const [orbitClicked, setOrbitClicked] = useState(false);
+  const orbitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleOrbitClick = () => {
+    if (orbitTimeoutRef.current) {
+      clearTimeout(orbitTimeoutRef.current);
+    }
     const randomGreeting = ORBIT_GREETINGS[Math.floor(Math.random() * ORBIT_GREETINGS.length)];
     setOrbitGreeting(randomGreeting);
     setOrbitClicked(true);
-    setTimeout(() => {
+    orbitTimeoutRef.current = setTimeout(() => {
       setOrbitGreeting(null);
       setOrbitClicked(false);
+      orbitTimeoutRef.current = null;
     }, 4000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (orbitTimeoutRef.current) {
+        clearTimeout(orbitTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const products = [
     {
