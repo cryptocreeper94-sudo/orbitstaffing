@@ -258,8 +258,8 @@ Additional products in development:
 - NPS (Net Promoter Score > 50)
 
 ### B. Contact Information
-- **Website:** orbitstaffing.net
-- **Email:** support@orbitstaffing.net
+- **Website:** orbitstaffing.io
+- **Email:** support@orbitstaffing.io
 - **Support:** In-app chat + email
 
 ### C. Legal Structure

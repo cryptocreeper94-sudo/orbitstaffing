@@ -57,7 +57,7 @@ ORBIT-[TYPE]-[SEQUENCE]-[CHECKSUM]
 ## Verification Process
 
 To verify any hallmark, visit:  
-`https://orbitstaffing.net/verify/{hallmarkId}`
+`https://orbitstaffing.io/verify/{hallmarkId}`
 
 **Verification includes:**
 - ✅ Asset authenticity confirmation

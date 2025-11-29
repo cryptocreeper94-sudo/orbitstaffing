@@ -141,13 +141,13 @@ See `APP_STORE_DESCRIPTION.md` - Already written, copy-paste
 - **Secondary:** Productivity
 
 ### 5.4 Contact Information
-- **Website:** orbitstaffing.net (after DNS configured)
-- **Email:** support@orbitstaffing.net
+- **Website:** orbitstaffing.io (after DNS configured)
+- **Email:** support@orbitstaffing.io
 - **Phone:** [Your contact number]
 
 ### 5.5 Links
-- [ ] Privacy Policy: https://orbitstaffing.net/privacy
-- [ ] Terms: https://orbitstaffing.net/terms
+- [ ] Privacy Policy: https://orbitstaffing.io/privacy
+- [ ] Terms: https://orbitstaffing.io/terms
 
 ---
 

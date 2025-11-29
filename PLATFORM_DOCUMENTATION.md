@@ -3,7 +3,7 @@
 ## Current Status: Frontend Mockup Ready for Demonstration
 
 **Version:** Beta 1.0 (Mockup)  
-**Domain:** orbitstaffing.net  
+**Domain:** orbitstaffing.io  
 **Branding:** ORBIT by DarkWave Studios  
 **Last Updated:** November 22, 2025
 
@@ -160,7 +160,7 @@ Integrations (Later)
 ## DEPLOYMENT CHECKLIST
 
 ### Before Demo:
-- [ ] Domain orbitstaffing.net purchased and ready
+- [ ] Domain orbitstaffing.io purchased and ready
 - [ ] Verify all mockup pages load correctly
 - [ ] Test on mobile and desktop
 - [ ] Prepare talking points for each section
@@ -212,7 +212,7 @@ Integrations (Later)
 
 **Hosting:**
 - Replit (current)
-- Deploy to custom domain (orbitstaffing.net)
+- Deploy to custom domain (orbitstaffing.io)
 
 ---
 

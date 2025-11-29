@@ -38,7 +38,7 @@ Let's partner up and make this happen! 🚀
 Share with her:
 - **Document**: `SIDONIE_TEST_LOGIN.md` (created in project root)
 - **PIN**: `4444`
-- **Login URL**: https://orbitstaffing.net/admin (or localhost:5000/admin for dev)
+- **Login URL**: https://orbitstaffing.io/admin (or localhost:5000/admin for dev)
 
 ### Step 2: She Logs In
 1. Goes to Admin Panel (/admin)
@@ -161,7 +161,7 @@ Everything is implemented and ready:
 1. **Share the login details**
    - Email: SIDONIE_TEST_LOGIN.md to her
    - PIN: 4444 (mention in email/message)
-   - URL: https://orbitstaffing.net/admin
+   - URL: https://orbitstaffing.io/admin
 
 2. **She explores and tests**
    - Full platform access

@@ -64,7 +64,7 @@ This creates an Android App Bundle (.aab) which Google Play requires.
   • No payment information stored on device
   • GDPR and CCPA compliant
   
-  Questions? Contact support@orbitstaffing.net
+  Questions? Contact support@orbitstaffing.io
   ```
 
 - **Category:** Lifestyle
@@ -112,7 +112,7 @@ This creates an Android App Bundle (.aab) which Google Play requires.
 ## Privacy Policy
 
 1. Create privacy policy on website:
-   - URL: `https://orbitstaffing.net/privacy-policy`
+   - URL: `https://orbitstaffing.io/privacy-policy`
    - Must cover:
      - Data collection (location, personal info)
      - Data usage (GPS verification, payroll)
@@ -121,7 +121,7 @@ This creates an Android App Bundle (.aab) which Google Play requires.
      - Third-party sharing (none unless applicable)
 
 2. In Play Console:
-   - **Privacy policy URL:** https://orbitstaffing.net/privacy-policy
+   - **Privacy policy URL:** https://orbitstaffing.io/privacy-policy
    - **Data safety form:** Complete questionnaire
      - Collect location: Yes
      - Collect personal info: Yes
@@ -167,7 +167,7 @@ This creates an Android App Bundle (.aab) which Google Play requires.
 • Real-time assignment updates
 • Sandbox/test mode for training
 
-Questions? Contact support@orbitstaffing.net
+Questions? Contact support@orbitstaffing.io
 ```
 
 ---
@@ -300,5 +300,5 @@ Once Android is live:
 ## Questions?
 
 **Developer Support:** https://support.google.com/googleplay  
-**ORBIT Support:** support@orbitstaffing.net
+**ORBIT Support:** support@orbitstaffing.io
 

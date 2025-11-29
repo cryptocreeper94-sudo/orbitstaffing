@@ -9,9 +9,9 @@
 - Allows expansion across verticals
 
 ### Level 2: Vertical-Specific Brands (Current)
-**ORBIT Staffing** (orbitstaffing.net)
+**ORBIT Staffing** (orbitstaffing.io)
 - Mobile app: "ORBIT Staffing" (Play Store)
-- Web platform: orbitstaffing.net
+- Web platform: orbitstaffing.io
 - Target: Temporary workers, staffing agencies
 
 ### Level 3: Future Expansion
@@ -31,16 +31,16 @@
 - ❌ NOT: "Staffing by ORBIT" (reverse order)
 
 ### Domain Names
-- ✅ orbitstaffing.net (current, primary)
+- ✅ orbitstaffing.io (current, primary)
 - ✅ orbithealth.net (reserved for healthcare)
 - ✅ orbit.com (reserved for parent brand - future)
 - ❌ NOT: orbitstaffing.com (too expensive, unnecessary)
 
 ### Web Properties
-- ✅ Master Admin: ORBIT Control Panel (system.orbitstaffing.net)
+- ✅ Master Admin: ORBIT Control Panel (system.orbitstaffing.io)
 - ✅ Franchisee Portal: ORBIT Dashboard
 - ✅ Worker App: ORBIT Staffing (mobile)
-- ✅ Support: support@orbitstaffing.net
+- ✅ Support: support@orbitstaffing.io
 
 ### Marketing/Legal
 - ✅ Document heading: "ORBIT Staffing OS"
@@ -64,7 +64,7 @@
 
 ### ✅ Configuration
 - mobile/app.json: slug = "orbit-staffing"
-- API endpoints: orbitstaffing.net
+- API endpoints: orbitstaffing.io
 - Permissions descriptions: reference ORBIT
 
 ---
@@ -104,7 +104,7 @@
 - [ ] Business documents use consistent terminology
 - [ ] Meta tags updated (og:title, twitter:title)
 - [ ] Admin panels reference correct company name
-- [ ] Support email consistent (support@orbitstaffing.net)
+- [ ] Support email consistent (support@orbitstaffing.io)
 - [ ] Privacy policy references "ORBIT Staffing"
 - [ ] Terms of service reference "ORBIT Staffing"
 - [ ] Logo assets labeled correctly
@@ -126,6 +126,6 @@
 ---
 
 **Brand Owner**: DarkWave Studios LLC  
-**Primary Domain**: orbitstaffing.net  
+**Primary Domain**: orbitstaffing.io  
 **Parent Brand**: ORBIT (orbit.com - reserved)  
 **Last Updated**: November 23, 2025

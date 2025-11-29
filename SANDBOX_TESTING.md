@@ -28,7 +28,7 @@ Everything is shareable, deployable, and demonstrates complete platform function
 ### 1. Login as Sidonie (Admin)
 ```
 PIN: 4444
-Email: sidonie@orbitstaffing.net
+Email: sidonie@orbitstaffing.io
 ```
 
 **You'll see:**
@@ -39,7 +39,7 @@ After PIN login, reset password to access full admin sandbox:
 ```
 POST /api/auth/reset-password
 {
-  "email": "sidonie@orbitstaffing.net",
+  "email": "sidonie@orbitstaffing.io",
   "newPassword": "YourPassword123!"
 }
 ```
@@ -54,7 +54,7 @@ Navigate to `/admin` → Full read-only access to entire system
 ### User 1: Sidonie (Admin)
 ```
 PIN: 4444
-Email: sidonie@orbitstaffing.net
+Email: sidonie@orbitstaffing.io
 Role: System Admin
 Access: Read-only view of all data
 Demo: Full system overview + reporting
@@ -106,7 +106,7 @@ Demo: Job creation, worker assignment, payroll
 
 ### User 3: Employee/Worker
 ```
-Email: worker@orbitstaffing.net
+Email: worker@orbitstaffing.io
 Password: (set by worker)
 Role: Temporary Worker
 Access: Personal dashboard only
@@ -306,7 +306,7 @@ POST /api/auth/login
 
 # Password Reset
 POST /api/auth/reset-password
-{ "email": "sidonie@orbitstaffing.net", "newPassword": "NewPass123!" }
+{ "email": "sidonie@orbitstaffing.io", "newPassword": "NewPass123!" }
 
 # Email/Password Login
 POST /api/auth/login
@@ -425,7 +425,7 @@ docker run -p 5000:5000 orbit-sandbox
 ### Option 3: Custom Domain
 1. Configure domain (see CUSTOM_DOMAIN_SETUP.md)
 2. Point to Replit deployment
-3. Use branded URL: `https://demo.orbitstaffing.net`
+3. Use branded URL: `https://demo.orbitstaffing.io`
 
 ---
 
@@ -544,7 +544,7 @@ Show them these key differentiators:
 ## 📞 Support
 
 **Questions about sandbox?**
-- Email: dev@orbitstaffing.net
+- Email: dev@orbitstaffing.io
 - Check DEMO_INSTRUCTIONS.md for more workflows
 - Review API endpoints in server/routes.ts
 

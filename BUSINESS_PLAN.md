@@ -3,7 +3,7 @@
 ## COMPANY OVERVIEW
 
 **Company Name:** ORBIT Staffing OS  
-**Domain:** orbitstaffing.net  
+**Domain:** orbitstaffing.io  
 **Product:** White-label, fully-automated staffing platform with GPS verification, loyalty bonuses, and franchise capability  
 **Launch Date:** Q1 2025  
 **Target Market:** Staffing agencies (small to enterprise), staffing franchisees, enterprise staffing divisions  

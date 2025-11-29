@@ -124,7 +124,7 @@ Bug Fixes:
 ### Review Questionnaire
 - **Content Rating**: PEGI 3 (12+)
 - **Privacy Policy**: Link to your policy
-- **Support Email**: support@orbitstaffing.net
+- **Support Email**: support@orbitstaffing.io
 - **Target Audience**: Workers in staffing industry
 
 ## Step 7: Submit for Review

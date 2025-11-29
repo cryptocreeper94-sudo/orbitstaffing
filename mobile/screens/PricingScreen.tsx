@@ -229,7 +229,7 @@ export default function PricingScreen({ navigation }: any) {
               <TouchableOpacity
                 style={[styles.button, styles.contactButton]}
                 onPress={() =>
-                  Alert.alert('Contact Sales', 'Email: sales@orbitstaffing.net')
+                  Alert.alert('Contact Sales', 'Email: sales@orbitstaffing.io')
                 }
               >
                 <Text style={styles.buttonText}>Contact Sales</Text>
@@ -273,7 +273,7 @@ export default function PricingScreen({ navigation }: any) {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Questions? Contact support@orbitstaffing.net
+            Questions? Contact support@orbitstaffing.io
           </Text>
         </View>
       </ScrollView>

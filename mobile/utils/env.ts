@@ -18,8 +18,8 @@ export async function getAppConfig(): Promise<AppConfig> {
     isSandbox,
     sandboxMode: sandboxMode as 'sandbox' | 'live',
     apiUrl: isSandbox
-      ? Constants.expoConfig?.extra?.sandboxApiUrl || 'https://sandbox.orbitstaffing.net/api'
-      : Constants.expoConfig?.extra?.apiUrl || 'https://orbitstaffing.net/api',
+      ? Constants.expoConfig?.extra?.sandboxApiUrl || 'https://sandbox.orbitstaffing.io/api'
+      : Constants.expoConfig?.extra?.apiUrl || 'https://orbitstaffing.io/api',
   };
 }
 

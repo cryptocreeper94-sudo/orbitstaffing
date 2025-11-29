@@ -371,7 +371,7 @@ ORBIT may update this agreement with:
 ## 12. DISPUTE RESOLUTION
 
 ### 12.1 Informal Resolution
-- Contact ORBIT at support@orbitstaffing.net
+- Contact ORBIT at support@orbitstaffing.io
 - Provide detailed explanation of dispute
 - ORBIT responds within 5 business days
 - Good faith negotiation for 30 days
@@ -611,15 +611,15 @@ If consolidated but wanting separate invoices:
 ## 15. CONTACT & SUPPORT
 
 **ORBIT Staffing OS Support**  
-Email: support@orbitstaffing.net  
+Email: support@orbitstaffing.io  
 Phone: [Support Number - TBD]  
-Website: orbitstaffing.net
+Website: orbitstaffing.io
 
 **Billing Questions:**  
-billing@orbitstaffing.net
+billing@orbitstaffing.io
 
 **Security/Privacy Concerns:**  
-security@orbitstaffing.net  
+security@orbitstaffing.io  
 DarkWave Studios LLC  
 TN, USA
 
@@ -719,9 +719,9 @@ Staffing is inherently unpredictable:
 **Workers should:**
 - Always verify they're communicating with legitimate ORBIT staff
 - Cross-reference manager names and contact info
-- Check email addresses (official: @orbitstaffing.net)
+- Check email addresses (official: @orbitstaffing.io)
 - Never send payment upfront or provide personal financial info
-- Report suspicious requests to support@orbitstaffing.net
+- Report suspicious requests to support@orbitstaffing.io
 
 ### 15.7 System Managers & Escalation
 **For disputes or issues:**

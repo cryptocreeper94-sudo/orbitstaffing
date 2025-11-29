@@ -55,6 +55,7 @@ import TalentPool from "@/pages/TalentPool";
 import AdminTalentExchange from "@/pages/AdminTalentExchange";
 import EmployeeHub from "@/pages/EmployeeHub";
 import OwnerHub from "@/pages/OwnerHub";
+import CRMDashboard from "@/pages/CRMDashboard";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -113,6 +114,8 @@ function Router() {
       <Route path="/admin/compliance" component={ComplianceDashboard} />
       <Route path="/admin/timesheet-approval" component={TimesheetApproval} />
       <Route path="/admin/talent-exchange" component={AdminTalentExchange} />
+      <Route path="/crm" component={CRMDashboard} />
+      <Route path="/admin/crm" component={CRMDashboard} />
       <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />

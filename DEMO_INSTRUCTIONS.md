@@ -9,7 +9,7 @@
 
 ### Step 2: Reset Password
 After login, you'll be prompted to set a permanent password:
-- Email: `sidonie@orbitstaffing.net`
+- Email: `sidonie@orbitstaffing.io`
 - New Password: `YourSecurePassword123!`
 - Role: **Admin** (full read-only access to all data)
 
@@ -37,7 +37,7 @@ After login, you'll be prompted to set a permanent password:
 ### Demo Roles & Users
 
 #### Admin Sandbox
-- **Email**: sidonie@orbitstaffing.net
+- **Email**: sidonie@orbitstaffing.io
 - **PIN**: 4444 (first time only)
 - **Access**: View all companies, workers, assignments, analytics
 - **Actions**: Read-only (no modifications)
@@ -49,7 +49,7 @@ After login, you'll be prompted to set a permanent password:
 - **Actions**: Create/edit jobs, assign workers, view analytics
 
 #### Employee Sandbox
-- **Email**: worker@orbitstaffing.net
+- **Email**: worker@orbitstaffing.io
 - **Role**: Worker
 - **Access**: Personal dashboard, assignments, earnings
 - **Actions**: Clock in/out, view pay history, track bonuses
@@ -82,7 +82,7 @@ After login, you'll be prompted to set a permanent password:
 ✓ Generate invoices
 ```
 
-### Worker View (worker@orbitstaffing.net)
+### Worker View (worker@orbitstaffing.io)
 ```
 ✓ See assigned jobs
 ✓ Clock in with GPS
@@ -107,7 +107,7 @@ After login, you'll be prompted to set a permanent password:
 6. ✅ Job appears in worker's dashboard
 
 ### Workflow 2: GPS Check-In (Worker Sandbox)
-1. Login as worker: `worker@orbitstaffing.net`
+1. Login as worker: `worker@orbitstaffing.io`
 2. Go to **My Assignments**
 3. Find active job
 4. Click **Clock In**
@@ -322,7 +322,7 @@ Show prospects these capabilities:
 - Check browser console for errors
 - Try clearing local storage: `localStorage.clear()`
 - Refresh page with Ctrl+Shift+R (hard refresh)
-- Contact: dev@orbitstaffing.net
+- Contact: dev@orbitstaffing.io
 
 **Want to add demo data?**
 - All data can be customized
@@ -349,4 +349,4 @@ Show prospects these capabilities:
 
 ---
 
-**Ready to go live?** Contact us at partner@orbitstaffing.net 🚀
+**Ready to go live?** Contact us at partner@orbitstaffing.io 🚀

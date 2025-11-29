@@ -11,7 +11,7 @@
 ### Brand Structure
 ```
 ORBIT (parent brand, orbit.com - future expansion)
-└── ORBIT Staffing (current platform, orbitstaffing.net)
+└── ORBIT Staffing (current platform, orbitstaffing.io)
     ├── Mobile App (Play Store: "ORBIT Staffing")
     ├── Web Platform (ORBIT Staffing OS)
     ├── Admin Dashboard (ORBIT Control Panel)
@@ -107,8 +107,8 @@ FRANCHISE_MODEL_STRATEGY.md
 - Admin: ORBIT Control Panel ✅
 - Legal/Contracts: ORBIT Staffing OS ✅
 - Parent Brand: ORBIT (reserved) ✅
-- Email: support@orbitstaffing.net ✅
-- Domain: orbitstaffing.net ✅
+- Email: support@orbitstaffing.io ✅
+- Domain: orbitstaffing.io ✅
 
 ### ✅ All 51 Web Pages
 - Spot checked key pages (Landing, Admin, Dashboard, etc.)
@@ -154,8 +154,8 @@ FRANCHISE_MODEL_STRATEGY.md
 - [x] HTTPS configured
 - [x] JWT authentication ready
 - [x] Secure token storage (Expo SecureStore)
-- [x] Privacy policy: orbitstaffing.net/privacy-policy
-- [x] Terms of service: orbitstaffing.net/terms
+- [x] Privacy policy: orbitstaffing.io/privacy-policy
+- [x] Terms of service: orbitstaffing.io/terms
 - [x] No hardcoded secrets
 - [x] All permissions actually used
 
@@ -304,8 +304,8 @@ You have a **production-ready staffing platform** that:
 
 ---
 
-**Contact**: support@orbitstaffing.net  
-**Domain**: orbitstaffing.net  
+**Contact**: support@orbitstaffing.io  
+**Domain**: orbitstaffing.io  
 **Brand**: DarkWave Studios LLC  
 **Status**: 🚀 READY FOR LAUNCH  
 

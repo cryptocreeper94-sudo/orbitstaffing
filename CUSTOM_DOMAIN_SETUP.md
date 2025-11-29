@@ -1,7 +1,7 @@
-# Custom Domain Setup (orbitstaffing.net)
+# Custom Domain Setup (orbitstaffing.io)
 
 ## Prerequisites
-- ✅ Domain registered (orbitstaffing.net)
+- ✅ Domain registered (orbitstaffing.io)
 - ✅ Domain registrar access
 - ⏳ App published on Replit (must do before configuring domain)
 
@@ -21,7 +21,7 @@
 
 ### Step 3: Add Custom Domain
 1. Click **"Link a domain"** → "Manually connect from another registrar"
-2. Enter your domain: `orbitstaffing.net`
+2. Enter your domain: `orbitstaffing.io`
 3. Replit will display DNS records you need to add
 
 ### Step 4: Configure DNS Records
@@ -55,7 +55,7 @@ Value: verification-token-here
 5. **Add CNAME for www** (optional):
    - Name: `www`
    - Type: `CNAME`
-   - Value: `orbitstaffing.net`
+   - Value: `orbitstaffing.io`
 
 ### Step 5: Wait for DNS Propagation
 - **Time**: 1-48 hours (usually 5-30 minutes)
@@ -76,13 +76,13 @@ Value: verification-token-here
 
 ### Subdomain Setup (if needed)
 
-**For `api.orbitstaffing.net`**:
+**For `api.orbitstaffing.io`**:
 1. Add A record:
    - Name: `api`
    - Type: `A`
    - Value: `12.345.67.89`
 
-**For `admin.orbitstaffing.net`**:
+**For `admin.orbitstaffing.io`**:
 1. Add A record:
    - Name: `admin`
    - Type: `A`
@@ -90,12 +90,12 @@ Value: verification-token-here
 
 ### Email MX Records (if hosting email)
 
-If you want to use email at orbitstaffing.net:
+If you want to use email at orbitstaffing.io:
 
 ```
 Type: MX
 Name: @
-Value: 10 mail.orbitstaffing.net
+Value: 10 mail.orbitstaffing.io
 Priority: 10
 ```
 
@@ -104,7 +104,7 @@ Priority: 10
 ## Troubleshooting
 
 ### Domain Not Resolving
-- **Check**: Run `nslookup orbitstaffing.net`
+- **Check**: Run `nslookup orbitstaffing.io`
 - **Wait**: DNS can take up to 48 hours
 - **Flush**: Clear your local DNS cache
   - Windows: `ipconfig /flushdns`
@@ -117,7 +117,7 @@ Priority: 10
 - **Check**: https://www.ssl-shopper.com/ssl-checker.html
 
 ### Still Not Working?
-1. Verify A record in DNS Settings: `ping orbitstaffing.net`
+1. Verify A record in DNS Settings: `ping orbitstaffing.io`
 2. Check Replit domain verification status
 3. Contact Replit support if issue persists
 
@@ -127,7 +127,7 @@ Priority: 10
 - [ ] TXT record added (for SSL verification)
 - [ ] DNS propagation complete (check whatsmydns.net)
 - [ ] Domain shows as verified in Replit
-- [ ] Website accessible at orbitstaffing.net
+- [ ] Website accessible at orbitstaffing.io
 - [ ] SSL certificate valid (green lock)
 - [ ] App loads correctly
 
@@ -137,15 +137,15 @@ Priority: 10
 If needed, update API URLs:
 ```
 OLD: https://project-name.replit.dev/api
-NEW: https://orbitstaffing.net/api
+NEW: https://orbitstaffing.io/api
 ```
 
 ### Update Mobile App Config
 In `mobile/app.json`:
 ```json
 "extra": {
-  "apiUrl": "https://orbitstaffing.net/api",
-  "sandboxApiUrl": "https://sandbox.orbitstaffing.net/api"
+  "apiUrl": "https://orbitstaffing.io/api",
+  "sandboxApiUrl": "https://sandbox.orbitstaffing.io/api"
 }
 ```
 

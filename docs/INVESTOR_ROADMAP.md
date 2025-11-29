@@ -755,7 +755,7 @@ A: Typical startup journey. We adjust timeline but stay profitable. Worst case: 
 **Contact:**  
 DarkWave Studios  
 Email: [your email]  
-Website: orbitstaffing.net
+Website: orbitstaffing.io
 
 ---
 

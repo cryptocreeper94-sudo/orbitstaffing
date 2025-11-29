@@ -11,6 +11,7 @@ import { stripeService } from "./stripeService";
 import { calculatePayroll } from "./payrollCalculator";
 import type { PayrollCalculationInput } from "./payrollCalculator";
 import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
+import { registerCrmRoutes } from "./crmRoutes";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -102,6 +103,9 @@ function validateTenantAccess(req: Request, res: Response): string | false {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use(parseJSON);
+  
+  // Register CRM routes (Activity Timeline, Notes, Deals, Meetings, etc.)
+  registerCrmRoutes(app);
 
   // ========================
   // V2 SIGNUP (Early Access Waitlist)

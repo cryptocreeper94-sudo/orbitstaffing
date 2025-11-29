@@ -177,7 +177,7 @@ export default function AboutScreen() {
               <MessageSquare color="#ffffff" size={20} />
               <Text style={styles.contactButtonText}>Send Feedback</Text>
             </TouchableOpacity>
-            <Text style={styles.contactEmail}>support@orbitstaffing.net</Text>
+            <Text style={styles.contactEmail}>support@orbitstaffing.io</Text>
           </View>
         </View>
       ) : (

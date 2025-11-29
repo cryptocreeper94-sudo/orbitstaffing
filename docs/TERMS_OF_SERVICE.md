@@ -114,7 +114,7 @@ We may update these terms with 30 days notice. Continued use = acceptance of new
 ## 14. Contact
 
 **Legal Questions:**
-- Email: legal@orbitstaffing.net
+- Email: legal@orbitstaffing.io
 - Response Time: 30 days
 
 ---

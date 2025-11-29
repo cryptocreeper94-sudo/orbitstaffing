@@ -152,7 +152,7 @@ ORBIT provides a mobile platform that allows you to:
 - Right to Delete: Request deletion of personal data
 - Right to Correct: Request corrections to inaccurate data
 - Right to Opt-Out: Opt out of non-essential communications
-- Contact: privacy@orbitstaffing.net
+- Contact: privacy@orbitstaffing.io
 
 ---
 
@@ -300,7 +300,7 @@ ORBIT provides a mobile platform that allows you to:
 - Data retained per legal requirements
 
 ### You Can Request Account Closure:
-- Email support@orbitstaffing.net
+- Email support@orbitstaffing.io
 - Request permanent deletion of data
 - Account closes within 5 business days
 - Final paycheck issued if balance owed
@@ -367,7 +367,7 @@ Continued use after the effective date means you accept the new terms.
 
 **Questions about these terms?**
 
-📧 Email: support@orbitstaffing.net  
+📧 Email: support@orbitstaffing.io  
 📞 Phone: +1-800-ORBIT-NOW  
 🏢 Address: [ORBIT HQ Address]  
 💬 In-app Chat: Available 24/7

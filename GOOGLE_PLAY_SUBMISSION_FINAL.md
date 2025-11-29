@@ -70,7 +70,7 @@ ORBIT rewards your loyalty.
 - Your email
 
 ### Privacy Policy:
-- Use this: `https://orbitstaffing.net/privacy`
+- Use this: `https://orbitstaffing.io/privacy`
 - Or copy content from `GPS_VERIFICATION_POLICY.md`
 
 ---

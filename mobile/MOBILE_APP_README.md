@@ -113,7 +113,7 @@ mobile/
 
 ### Sandbox Mode
 - **Use**: Testing, development, training
-- **API**: `https://sandbox.orbitstaffing.net/api`
+- **API**: `https://sandbox.orbitstaffing.io/api`
 - **Badge**: Shows "TEST MODE" badge on app
 - **Features**: All features fully functional
 - **Data**: Test workers, test jobs, test assignments
@@ -121,7 +121,7 @@ mobile/
 
 ### Live Mode
 - **Use**: Production with real clients
-- **API**: `https://orbitstaffing.net/api`
+- **API**: `https://orbitstaffing.io/api`
 - **Badge**: No badge
 - **Features**: All features fully functional
 - **Data**: Real workers, real clients, real jobs
@@ -263,7 +263,7 @@ GET    /assignments/:id/gps-history   # Get check-in history
 ---
 
 ## Contact
-**Support**: support@orbitstaffing.net  
+**Support**: support@orbitstaffing.io  
 **Developer**: Jason (DarkWave Studios LLC)  
-**Privacy**: https://orbitstaffing.net/privacy-policy
+**Privacy**: https://orbitstaffing.io/privacy-policy
 

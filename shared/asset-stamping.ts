@@ -42,7 +42,7 @@ export class AssetStampingService {
     }
   ): StampedAsset {
     const assetNumber = generateAssetNumber();
-    const verificationUrl = `${process.env.APP_URL || 'https://orbitstaffing.net'}/verify/${assetNumber}`;
+    const verificationUrl = `${process.env.APP_URL || 'https://orbitstaffing.io'}/verify/${assetNumber}`;
     
     return {
       assetNumber,
@@ -157,6 +157,6 @@ export function formatAssetNumber(assetNumber: string): string {
  * Returns the URL that should be encoded in the QR code
  */
 export function getAssetQRCodeData(assetNumber: string): string {
-  const domain = process.env.ASSET_VERIFICATION_URL || 'https://verify.orbitstaffing.net';
+  const domain = process.env.ASSET_VERIFICATION_URL || 'https://verify.orbitstaffing.io';
   return `${domain}/${assetNumber}`;
 }

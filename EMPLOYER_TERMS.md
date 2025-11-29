@@ -398,7 +398,7 @@ You must:
 - All worker data must be exported
 
 ### You Can Request Closure:
-- Email support@orbitstaffing.net
+- Email support@orbitstaffing.io
 - 30-day wind-down period
 - All outstanding invoices due
 - Final data export provided
@@ -465,12 +465,12 @@ ORBIT may update these terms:
 ## 17. Contact Information
 
 **For Support:**  
-📧 Email: support@orbitstaffing.net  
+📧 Email: support@orbitstaffing.io  
 📞 Phone: +1-800-ORBIT-NOW  
 💬 Chat: In-app (business hours)
 
 **For Legal/Compliance:**  
-📧 Email: legal@orbitstaffing.net  
+📧 Email: legal@orbitstaffing.io  
 🏢 Address: [ORBIT HQ Address]
 
 ---

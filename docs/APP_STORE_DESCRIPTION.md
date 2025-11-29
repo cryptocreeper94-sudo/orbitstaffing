@@ -135,8 +135,8 @@ Automate your staffing operations. Save 50+ hours per month. Scale your agency w
 - Enterprise-grade security with isolated multi-tenant architecture
 
 **Contact & Support:**
-- Email: support@orbitstaffing.net
-- Website: orbitstaffing.net
+- Email: support@orbitstaffing.io
+- Website: orbitstaffing.io
 - Response time: 24 hours
 
 **Legal:**

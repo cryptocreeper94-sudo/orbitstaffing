@@ -81,10 +81,10 @@ Download ORBIT Staffing today and get paid for the work you do.
 - Data retention policies
 
 ### Support Email
-**support@orbitstaffing.net**
+**support@orbitstaffing.io**
 
 ### Contact Email
-**contact@orbitstaffing.net**
+**contact@orbitstaffing.io**
 
 ## Review Guidelines
 - ✅ No ads or in-app purchases

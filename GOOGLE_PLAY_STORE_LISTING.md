@@ -109,22 +109,22 @@ Ready to work somewhere that values transparency? Download ORBIT.
 
 **Website URL:**
 ```
-https://orbitstaffing.net
+https://orbitstaffing.io
 ```
 
 **Support Email:**
 ```
-support@orbitstaffing.net
+support@orbitstaffing.io
 ```
 
 **Privacy Policy URL:**
 ```
-https://orbitstaffing.net/privacy
+https://orbitstaffing.io/privacy
 ```
 
 **Terms of Service URL:**
 ```
-https://orbitstaffing.net/terms
+https://orbitstaffing.io/terms
 ```
 
 ---

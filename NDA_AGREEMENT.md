@@ -407,7 +407,7 @@ When ORBIT engages legal counsel:
 
 **Date Signed:** _________________________________
 
-**ORBIT Contact Email:** support@orbitstaffing.net
+**ORBIT Contact Email:** support@orbitstaffing.io
 
 ---
 
@@ -421,7 +421,7 @@ When ORBIT engages legal counsel:
 4. **Retain confirmation** - Screenshot or PDF receipt of acceptance
 5. **Comply fully** - Abide by all restrictions from date of signature
 
-**Questions?** Contact ORBIT legal at legal@orbitstaffing.net before signing.
+**Questions?** Contact ORBIT legal at legal@orbitstaffing.io before signing.
 
 **Future Updates:** ORBIT may update this NDA. By signing, you agree to execute updated versions if requested.
 

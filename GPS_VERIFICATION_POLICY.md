@@ -312,13 +312,13 @@ Workers and employers will be notified of changes 30 days before they take effec
 
 **Worker questions:**
 - Contact your employer or ORBIT support
-- support@orbitstaffing.net
+- support@orbitstaffing.io
 - +1-800-ORBIT-NOW
 
 **Employer questions:**
 - See Employer Handbook
 - Contact dedicated account manager
-- legal@orbitstaffing.net
+- legal@orbitstaffing.io
 
 ---
 
@@ -356,7 +356,7 @@ Some states require additional disclosures:
 - **New York:** Data breach notification required
 - **Texas:** Opt-out available for certain data uses
 
-Contact legal@orbitstaffing.net for state-specific terms.
+Contact legal@orbitstaffing.io for state-specific terms.
 
 ---
 

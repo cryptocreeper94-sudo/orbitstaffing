@@ -15,7 +15,7 @@
 VITE_FRANCHISE_NAME="Superior Staffing"
 VITE_FRANCHISE_ID="superior-staffing-001"
 VITE_BRAND_COLOR="#FF6B35"  (Their brand color)
-VITE_CUSTOM_DOMAIN="superiorfstaffing.orbitstaffing.net"
+VITE_CUSTOM_DOMAIN="superiorfstaffing.orbitstaffing.io"
 DATABASE_URL="..." (Replit provides this automatically)
 VITE_ADMIN_PIN="7777"  (Their admin PIN)
 ```

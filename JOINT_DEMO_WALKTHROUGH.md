@@ -20,7 +20,7 @@ You both login simultaneously and run a complete job cycle from assignment throu
 3. At PIN prompt: `4444`
 4. When prompted to reset password:
    ```
-   Email: sidonie@orbitstaffing.net
+   Email: sidonie@orbitstaffing.io
    New Password: sidonie123
    ```
 5. She's now logged in as **System Admin** (read-only)
@@ -82,7 +82,7 @@ You both login simultaneously and run a complete job cycle from assignment throu
 
 **In a third browser/tab (Employee):**
 
-1. Email: `worker@orbitstaffing.net` 
+1. Email: `worker@orbitstaffing.io` 
 2. Password: `worker123`
 3. Dashboard shows: "1 Assigned Job"
 4. Click **"Clock In"**

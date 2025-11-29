@@ -259,9 +259,9 @@ curl -X POST http://localhost:5000/api/ios-interest \
 # Set environment variables:
 export SMTP_HOST="smtp.example.com"
 export SMTP_PORT="587"
-export SMTP_USER="noreply@orbitstaffing.net"
+export SMTP_USER="noreply@orbitstaffing.io"
 export SMTP_PASS="your-app-password"
-export EMAIL_FROM="noreply@orbitstaffing.net"
+export EMAIL_FROM="noreply@orbitstaffing.io"
 
 npm run build
 npm start

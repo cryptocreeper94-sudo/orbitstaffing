@@ -4082,3 +4082,606 @@ export const insertWeatherLogSchema = createInsertSchema(weatherLogs).omit({
 
 export type InsertWeatherLog = z.infer<typeof insertWeatherLogSchema>;
 export type WeatherLog = typeof weatherLogs.$inferSelect;
+
+// ========================
+// CRM - Activity Timeline (Interaction History)
+// ========================
+export const crmActivities = pgTable(
+  "crm_activities",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Polymorphic association - can be linked to any entity
+    entityType: varchar("entity_type", { length: 50 }).notNull(), // 'worker', 'client', 'company', 'lead', 'deal'
+    entityId: varchar("entity_id").notNull(),
+    
+    // Activity details
+    activityType: varchar("activity_type", { length: 50 }).notNull(), // 'email', 'call', 'meeting', 'note', 'task', 'sms', 'status_change', 'document'
+    subject: varchar("subject", { length: 255 }),
+    description: text("description"),
+    
+    // Email-specific fields
+    emailFrom: varchar("email_from", { length: 255 }),
+    emailTo: varchar("email_to", { length: 255 }),
+    emailOpened: boolean("email_opened").default(false),
+    emailOpenedAt: timestamp("email_opened_at"),
+    emailClicked: boolean("email_clicked").default(false),
+    emailClickedAt: timestamp("email_clicked_at"),
+    
+    // Call-specific fields
+    callDuration: integer("call_duration"), // seconds
+    callOutcome: varchar("call_outcome", { length: 50 }), // 'answered', 'no_answer', 'voicemail', 'busy'
+    callRecordingUrl: varchar("call_recording_url", { length: 500 }),
+    
+    // Meeting-specific fields
+    meetingStartTime: timestamp("meeting_start_time"),
+    meetingEndTime: timestamp("meeting_end_time"),
+    meetingLocation: varchar("meeting_location", { length: 255 }),
+    meetingAttendees: text("meeting_attendees").array(),
+    
+    // Metadata
+    metadata: jsonb("metadata"),
+    createdBy: varchar("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_activities_tenant").on(table.tenantId),
+    entityIdx: index("idx_crm_activities_entity").on(table.entityType, table.entityId),
+    typeIdx: index("idx_crm_activities_type").on(table.activityType),
+    createdAtIdx: index("idx_crm_activities_created").on(table.createdAt),
+  })
+);
+
+export const insertCrmActivitySchema = createInsertSchema(crmActivities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCrmActivity = z.infer<typeof insertCrmActivitySchema>;
+export type CrmActivity = typeof crmActivities.$inferSelect;
+
+// ========================
+// CRM - Notes
+// ========================
+export const crmNotes = pgTable(
+  "crm_notes",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    entityType: varchar("entity_type", { length: 50 }).notNull(),
+    entityId: varchar("entity_id").notNull(),
+    
+    content: text("content").notNull(),
+    isPinned: boolean("is_pinned").default(false),
+    color: varchar("color", { length: 20 }).default("default"), // 'default', 'yellow', 'green', 'blue', 'red'
+    
+    createdBy: varchar("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_notes_tenant").on(table.tenantId),
+    entityIdx: index("idx_crm_notes_entity").on(table.entityType, table.entityId),
+    pinnedIdx: index("idx_crm_notes_pinned").on(table.isPinned),
+  })
+);
+
+export const insertCrmNoteSchema = createInsertSchema(crmNotes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmNote = z.infer<typeof insertCrmNoteSchema>;
+export type CrmNote = typeof crmNotes.$inferSelect;
+
+// ========================
+// CRM - Deals (Sales Pipeline)
+// ========================
+export const crmDeals = pgTable(
+  "crm_deals",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    
+    // Pipeline stage
+    stage: varchar("stage", { length: 50 }).notNull().default("lead"), // 'lead', 'qualified', 'proposal', 'negotiation', 'closed_won', 'closed_lost'
+    stageOrder: integer("stage_order").default(0),
+    
+    // Deal value
+    value: decimal("value", { precision: 15, scale: 2 }),
+    currency: varchar("currency", { length: 3 }).default("USD"),
+    probability: integer("probability").default(0), // 0-100%
+    
+    // Associated entities
+    companyId: varchar("company_id").references(() => companies.id),
+    clientId: varchar("client_id").references(() => clients.id),
+    contactName: varchar("contact_name", { length: 255 }),
+    contactEmail: varchar("contact_email", { length: 255 }),
+    contactPhone: varchar("contact_phone", { length: 20 }),
+    
+    // Timeline
+    expectedCloseDate: date("expected_close_date"),
+    actualCloseDate: date("actual_close_date"),
+    
+    // Assignment
+    ownerId: varchar("owner_id").references(() => users.id),
+    
+    // Source
+    source: varchar("source", { length: 100 }), // 'website', 'referral', 'cold_call', 'trade_show', etc.
+    
+    // Custom fields (JSON)
+    customFields: jsonb("custom_fields"),
+    
+    lostReason: varchar("lost_reason", { length: 255 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_deals_tenant").on(table.tenantId),
+    stageIdx: index("idx_crm_deals_stage").on(table.stage),
+    ownerIdx: index("idx_crm_deals_owner").on(table.ownerId),
+    closeDateIdx: index("idx_crm_deals_close_date").on(table.expectedCloseDate),
+  })
+);
+
+export const insertCrmDealSchema = createInsertSchema(crmDeals).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmDeal = z.infer<typeof insertCrmDealSchema>;
+export type CrmDeal = typeof crmDeals.$inferSelect;
+
+// ========================
+// CRM - Meetings
+// ========================
+export const crmMeetings = pgTable(
+  "crm_meetings",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    
+    // Schedule
+    startTime: timestamp("start_time").notNull(),
+    endTime: timestamp("end_time").notNull(),
+    timezone: varchar("timezone", { length: 50 }).default("America/New_York"),
+    
+    // Location
+    locationType: varchar("location_type", { length: 20 }).default("virtual"), // 'virtual', 'in_person', 'phone'
+    location: varchar("location", { length: 500 }),
+    meetingUrl: varchar("meeting_url", { length: 500 }),
+    
+    // Participants
+    organizerId: varchar("organizer_id").references(() => users.id),
+    attendees: jsonb("attendees"), // [{email, name, status: 'pending'|'accepted'|'declined'}]
+    
+    // Associated entities
+    entityType: varchar("entity_type", { length: 50 }),
+    entityId: varchar("entity_id"),
+    dealId: varchar("deal_id").references(() => crmDeals.id),
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("scheduled"), // 'scheduled', 'completed', 'cancelled', 'rescheduled'
+    
+    // Reminders
+    reminderMinutes: integer("reminder_minutes").default(15),
+    reminderSent: boolean("reminder_sent").default(false),
+    
+    // Notes and outcomes
+    notes: text("notes"),
+    outcome: varchar("outcome", { length: 255 }),
+    
+    // Calendar integration
+    externalCalendarId: varchar("external_calendar_id", { length: 255 }),
+    externalEventId: varchar("external_event_id", { length: 255 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_meetings_tenant").on(table.tenantId),
+    organizerIdx: index("idx_crm_meetings_organizer").on(table.organizerId),
+    startTimeIdx: index("idx_crm_meetings_start").on(table.startTime),
+    statusIdx: index("idx_crm_meetings_status").on(table.status),
+    entityIdx: index("idx_crm_meetings_entity").on(table.entityType, table.entityId),
+  })
+);
+
+export const insertCrmMeetingSchema = createInsertSchema(crmMeetings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmMeeting = z.infer<typeof insertCrmMeetingSchema>;
+export type CrmMeeting = typeof crmMeetings.$inferSelect;
+
+// ========================
+// CRM - Custom Fields Definition
+// ========================
+export const crmCustomFields = pgTable(
+  "crm_custom_fields",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    entityType: varchar("entity_type", { length: 50 }).notNull(), // 'worker', 'client', 'company', 'deal', 'lead'
+    fieldName: varchar("field_name", { length: 100 }).notNull(),
+    fieldLabel: varchar("field_label", { length: 255 }).notNull(),
+    fieldType: varchar("field_type", { length: 50 }).notNull(), // 'text', 'number', 'date', 'boolean', 'select', 'multiselect', 'url', 'email', 'phone'
+    
+    // For select/multiselect types
+    options: jsonb("options"), // [{value, label}]
+    
+    // Validation
+    isRequired: boolean("is_required").default(false),
+    defaultValue: text("default_value"),
+    
+    // Display
+    displayOrder: integer("display_order").default(0),
+    isVisible: boolean("is_visible").default(true),
+    section: varchar("section", { length: 100 }), // Group fields into sections
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_custom_fields_tenant").on(table.tenantId),
+    entityTypeIdx: index("idx_crm_custom_fields_entity").on(table.entityType),
+    fieldNameIdx: index("idx_crm_custom_fields_name").on(table.tenantId, table.entityType, table.fieldName),
+  })
+);
+
+export const insertCrmCustomFieldSchema = createInsertSchema(crmCustomFields).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmCustomField = z.infer<typeof insertCrmCustomFieldSchema>;
+export type CrmCustomField = typeof crmCustomFields.$inferSelect;
+
+// ========================
+// CRM - Custom Field Values
+// ========================
+export const crmCustomFieldValues = pgTable(
+  "crm_custom_field_values",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    customFieldId: varchar("custom_field_id").references(() => crmCustomFields.id).notNull(),
+    entityType: varchar("entity_type", { length: 50 }).notNull(),
+    entityId: varchar("entity_id").notNull(),
+    
+    value: text("value"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_field_values_tenant").on(table.tenantId),
+    entityIdx: index("idx_crm_field_values_entity").on(table.entityType, table.entityId),
+    fieldIdx: index("idx_crm_field_values_field").on(table.customFieldId),
+  })
+);
+
+export const insertCrmCustomFieldValueSchema = createInsertSchema(crmCustomFieldValues).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmCustomFieldValue = z.infer<typeof insertCrmCustomFieldValueSchema>;
+export type CrmCustomFieldValue = typeof crmCustomFieldValues.$inferSelect;
+
+// ========================
+// CRM - Automation Workflows
+// ========================
+export const crmWorkflows = pgTable(
+  "crm_workflows",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    
+    // Trigger configuration
+    triggerType: varchar("trigger_type", { length: 50 }).notNull(), // 'event', 'schedule', 'manual'
+    triggerEvent: varchar("trigger_event", { length: 100 }), // 'deal_created', 'lead_status_changed', 'worker_assigned', etc.
+    triggerConditions: jsonb("trigger_conditions"), // Filter conditions for when to run
+    
+    // Schedule (for scheduled triggers)
+    schedule: varchar("schedule", { length: 100 }), // Cron expression
+    
+    // Actions - stored as JSON array
+    actions: jsonb("actions").notNull(), // [{type, config}]
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    
+    // Stats
+    runCount: integer("run_count").default(0),
+    lastRunAt: timestamp("last_run_at"),
+    lastRunStatus: varchar("last_run_status", { length: 20 }),
+    
+    createdBy: varchar("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_workflows_tenant").on(table.tenantId),
+    activeIdx: index("idx_crm_workflows_active").on(table.isActive),
+    triggerIdx: index("idx_crm_workflows_trigger").on(table.triggerType, table.triggerEvent),
+  })
+);
+
+export const insertCrmWorkflowSchema = createInsertSchema(crmWorkflows).omit({
+  id: true,
+  runCount: true,
+  lastRunAt: true,
+  lastRunStatus: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmWorkflow = z.infer<typeof insertCrmWorkflowSchema>;
+export type CrmWorkflow = typeof crmWorkflows.$inferSelect;
+
+// ========================
+// CRM - Workflow Execution Log
+// ========================
+export const crmWorkflowLogs = pgTable(
+  "crm_workflow_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    workflowId: varchar("workflow_id").references(() => crmWorkflows.id).notNull(),
+    
+    status: varchar("status", { length: 20 }).notNull(), // 'running', 'completed', 'failed', 'cancelled'
+    triggeredBy: varchar("triggered_by", { length: 50 }), // 'event', 'schedule', 'manual', 'api'
+    
+    entityType: varchar("entity_type", { length: 50 }),
+    entityId: varchar("entity_id"),
+    
+    startedAt: timestamp("started_at").default(sql`NOW()`),
+    completedAt: timestamp("completed_at"),
+    
+    actionsExecuted: jsonb("actions_executed"), // Log of each action result
+    errorMessage: text("error_message"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_workflow_logs_tenant").on(table.tenantId),
+    workflowIdx: index("idx_crm_workflow_logs_workflow").on(table.workflowId),
+    statusIdx: index("idx_crm_workflow_logs_status").on(table.status),
+    createdAtIdx: index("idx_crm_workflow_logs_created").on(table.createdAt),
+  })
+);
+
+export const insertCrmWorkflowLogSchema = createInsertSchema(crmWorkflowLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCrmWorkflowLog = z.infer<typeof insertCrmWorkflowLogSchema>;
+export type CrmWorkflowLog = typeof crmWorkflowLogs.$inferSelect;
+
+// ========================
+// CRM - Duplicate Detection
+// ========================
+export const crmDuplicates = pgTable(
+  "crm_duplicates",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    entityType: varchar("entity_type", { length: 50 }).notNull(),
+    primaryEntityId: varchar("primary_entity_id").notNull(),
+    duplicateEntityId: varchar("duplicate_entity_id").notNull(),
+    
+    // Confidence score (0-100)
+    confidenceScore: integer("confidence_score").notNull(),
+    
+    // Match reasons
+    matchReasons: jsonb("match_reasons"), // ['email_match', 'phone_match', 'name_similarity']
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("pending"), // 'pending', 'merged', 'not_duplicate', 'ignored'
+    
+    // Merge info
+    mergedAt: timestamp("merged_at"),
+    mergedBy: varchar("merged_by").references(() => users.id),
+    survivingEntityId: varchar("surviving_entity_id"), // Which record survived the merge
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_duplicates_tenant").on(table.tenantId),
+    entityTypeIdx: index("idx_crm_duplicates_entity").on(table.entityType),
+    statusIdx: index("idx_crm_duplicates_status").on(table.status),
+    primaryIdx: index("idx_crm_duplicates_primary").on(table.primaryEntityId),
+    duplicateIdx: index("idx_crm_duplicates_duplicate").on(table.duplicateEntityId),
+  })
+);
+
+export const insertCrmDuplicateSchema = createInsertSchema(crmDuplicates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmDuplicate = z.infer<typeof insertCrmDuplicateSchema>;
+export type CrmDuplicate = typeof crmDuplicates.$inferSelect;
+
+// ========================
+// CRM - Live Chat Conversations
+// ========================
+export const crmChatConversations = pgTable(
+  "crm_chat_conversations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Visitor info
+    visitorId: varchar("visitor_id", { length: 255 }),
+    visitorName: varchar("visitor_name", { length: 255 }),
+    visitorEmail: varchar("visitor_email", { length: 255 }),
+    visitorPhone: varchar("visitor_phone", { length: 20 }),
+    
+    // Associated entity (if identified)
+    entityType: varchar("entity_type", { length: 50 }),
+    entityId: varchar("entity_id"),
+    
+    // Assignment
+    assignedTo: varchar("assigned_to").references(() => users.id),
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("active"), // 'active', 'waiting', 'closed', 'archived'
+    
+    // Source
+    source: varchar("source", { length: 50 }).default("website"), // 'website', 'mobile_app', 'api'
+    pageUrl: varchar("page_url", { length: 500 }),
+    
+    // Stats
+    messageCount: integer("message_count").default(0),
+    
+    // Satisfaction
+    rating: integer("rating"), // 1-5
+    feedback: text("feedback"),
+    
+    startedAt: timestamp("started_at").default(sql`NOW()`),
+    closedAt: timestamp("closed_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_chat_tenant").on(table.tenantId),
+    visitorIdx: index("idx_crm_chat_visitor").on(table.visitorId),
+    assignedIdx: index("idx_crm_chat_assigned").on(table.assignedTo),
+    statusIdx: index("idx_crm_chat_status").on(table.status),
+    entityIdx: index("idx_crm_chat_entity").on(table.entityType, table.entityId),
+  })
+);
+
+export const insertCrmChatConversationSchema = createInsertSchema(crmChatConversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmChatConversation = z.infer<typeof insertCrmChatConversationSchema>;
+export type CrmChatConversation = typeof crmChatConversations.$inferSelect;
+
+// ========================
+// CRM - Chat Messages
+// ========================
+export const crmChatMessages = pgTable(
+  "crm_chat_messages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    conversationId: varchar("conversation_id").references(() => crmChatConversations.id).notNull(),
+    
+    senderType: varchar("sender_type", { length: 20 }).notNull(), // 'visitor', 'agent', 'bot'
+    senderId: varchar("sender_id"),
+    senderName: varchar("sender_name", { length: 255 }),
+    
+    messageType: varchar("message_type", { length: 20 }).default("text"), // 'text', 'file', 'image', 'system'
+    content: text("content").notNull(),
+    
+    // For file/image messages
+    attachmentUrl: varchar("attachment_url", { length: 500 }),
+    attachmentName: varchar("attachment_name", { length: 255 }),
+    
+    isRead: boolean("is_read").default(false),
+    readAt: timestamp("read_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    conversationIdx: index("idx_crm_chat_msg_conversation").on(table.conversationId),
+    senderIdx: index("idx_crm_chat_msg_sender").on(table.senderType, table.senderId),
+    createdAtIdx: index("idx_crm_chat_msg_created").on(table.createdAt),
+  })
+);
+
+export const insertCrmChatMessageSchema = createInsertSchema(crmChatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCrmChatMessage = z.infer<typeof insertCrmChatMessageSchema>;
+export type CrmChatMessage = typeof crmChatMessages.$inferSelect;
+
+// ========================
+// CRM - Email Tracking
+// ========================
+export const crmEmailTracking = pgTable(
+  "crm_email_tracking",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Email details
+    emailId: varchar("email_id", { length: 255 }).notNull().unique(), // Message ID or tracking ID
+    subject: varchar("subject", { length: 500 }),
+    toEmail: varchar("to_email", { length: 255 }).notNull(),
+    fromEmail: varchar("from_email", { length: 255 }),
+    
+    // Associated entity
+    entityType: varchar("entity_type", { length: 50 }),
+    entityId: varchar("entity_id"),
+    
+    // Tracking events
+    sentAt: timestamp("sent_at"),
+    deliveredAt: timestamp("delivered_at"),
+    openedAt: timestamp("opened_at"),
+    clickedAt: timestamp("clicked_at"),
+    bouncedAt: timestamp("bounced_at"),
+    unsubscribedAt: timestamp("unsubscribed_at"),
+    
+    // Detailed tracking
+    openCount: integer("open_count").default(0),
+    clickCount: integer("click_count").default(0),
+    clickedLinks: jsonb("clicked_links"), // [{url, clickedAt}]
+    
+    // Metadata
+    campaignId: varchar("campaign_id"),
+    userAgent: varchar("user_agent", { length: 500 }),
+    ipAddress: varchar("ip_address", { length: 45 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_crm_email_tracking_tenant").on(table.tenantId),
+    emailIdIdx: index("idx_crm_email_tracking_email").on(table.emailId),
+    toEmailIdx: index("idx_crm_email_tracking_to").on(table.toEmail),
+    entityIdx: index("idx_crm_email_tracking_entity").on(table.entityType, table.entityId),
+    sentAtIdx: index("idx_crm_email_tracking_sent").on(table.sentAt),
+  })
+);
+
+export const insertCrmEmailTrackingSchema = createInsertSchema(crmEmailTracking).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCrmEmailTracking = z.infer<typeof insertCrmEmailTrackingSchema>;
+export type CrmEmailTracking = typeof crmEmailTracking.$inferSelect;

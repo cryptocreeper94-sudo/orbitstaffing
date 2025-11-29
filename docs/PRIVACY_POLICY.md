@@ -106,7 +106,7 @@ Workers have the right to:
 - Opt-out of non-essential communications
 - File complaints with state labor board
 
-**Data Access Request**: Email support@orbitstaffing.net with "Data Request" in subject
+**Data Access Request**: Email support@orbitstaffing.io with "Data Request" in subject
 
 ## 9. HIPAA & Health Information
 
@@ -123,7 +123,7 @@ We may update this Privacy Policy periodically. Significant changes will be comm
 ## 12. Contact Us
 
 **Privacy Questions or Data Requests:**
-- Email: privacy@orbitstaffing.net
+- Email: privacy@orbitstaffing.io
 - Address: [Your Business Address]
 - Response Time: 30 days
 

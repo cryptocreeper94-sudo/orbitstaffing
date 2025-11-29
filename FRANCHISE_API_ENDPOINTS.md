@@ -9,7 +9,7 @@ POST /api/franchises
   "name": "Superior Staffing",
   "ownerId": "user-id-here",
   "logoUrl": "https://example.com/logo.png",
-  "customDomain": "superiortaffing.orbitstaffing.net",
+  "customDomain": "superiortaffing.orbitstaffing.io",
   "brandColor": "#FF6B35",
   "billingModel": "fixed",
   "monthlyFee": 499.00,
@@ -181,7 +181,7 @@ Response: (for their .env setup)
   "VITE_FRANCHISE_NAME": "Superior Staffing",
   "VITE_FRANCHISE_ID": "superior-staffing-001",
   "VITE_BRAND_COLOR": "#FF6B35",
-  "VITE_CUSTOM_DOMAIN": "superiorstaffing.orbitstaffing.net",
+  "VITE_CUSTOM_DOMAIN": "superiorstaffing.orbitstaffing.io",
   "VITE_ADMIN_PIN": "7777",
   "COMPLIANCE_STATE": "TN",
   "BILLING_MODEL": "fixed"

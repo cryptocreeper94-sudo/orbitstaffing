@@ -22,9 +22,9 @@
 ### Fill Required Information
 - [ ] Short description: "GPS-verified staffing platform for workers"
 - [ ] Full description (copy from docs/APP_STORE_DESCRIPTION.md)
-- [ ] Add contact email: support@orbitstaffing.net
-- [ ] Add website: https://orbitstaffing.net
-- [ ] Add privacy policy: https://orbitstaffing.net/privacy-policy
+- [ ] Add contact email: support@orbitstaffing.io
+- [ ] Add website: https://orbitstaffing.io
+- [ ] Add privacy policy: https://orbitstaffing.io/privacy-policy
 
 ### Graphics (Must Upload)
 - [ ] App icon (512x512px PNG) → `mobile/assets/adaptive-icon.png`
@@ -55,8 +55,8 @@
 - [ ] Countries: United States (expand later)
 
 ### Privacy & Compliance
-- [ ] Privacy policy accessible at: https://orbitstaffing.net/privacy-policy
-- [ ] Terms of service accessible at: https://orbitstaffing.net/terms
+- [ ] Privacy policy accessible at: https://orbitstaffing.io/privacy-policy
+- [ ] Terms of service accessible at: https://orbitstaffing.io/terms
 - [ ] Data storage: PostgreSQL (US-based via Neon)
 - [ ] GPS data use: Documented in privacy policy
 - [ ] User can request data deletion: Yes
@@ -216,7 +216,7 @@ WEDNESDAY+ (Nov 27+):
 
 ### 3. Privacy Policy Missing
 **Why**: Can't access privacy policy from app  
-**Fix**: Policy accessible at https://orbitstaffing.net/privacy-policy  
+**Fix**: Policy accessible at https://orbitstaffing.io/privacy-policy  
 **Status**: ✅ Good
 
 ### 4. Misleading Functionality

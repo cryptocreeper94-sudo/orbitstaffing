@@ -135,9 +135,9 @@ Short description:
 Full description:
 [Copy from docs/APP_STORE_DESCRIPTION.md]
 
-Email: support@orbitstaffing.net
-Website: https://orbitstaffing.net
-Privacy Policy: https://orbitstaffing.net/privacy-policy
+Email: support@orbitstaffing.io
+Website: https://orbitstaffing.io
+Privacy Policy: https://orbitstaffing.io/privacy-policy
 ```
 
 ### STEP 5: Add Graphics (15 min)
@@ -323,7 +323,7 @@ The app:
 
 **Timeline**: Submit this weekend, live by Tuesday.
 
-**Contact**: support@orbitstaffing.net
+**Contact**: support@orbitstaffing.io
 
 ---
 

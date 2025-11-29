@@ -144,7 +144,7 @@ ORBIT Staffing OS is positioned to become the #1 staffing platform for mid-marke
 
 ## Version 2 Preview (Coming Q1-Q2 2026)
 
-Sign up for V2 updates at **orbitstaffing.net** to get early access to:
+Sign up for V2 updates at **orbitstaffing.io** to get early access to:
 
 1. **Skill-Based Matching** - AI-powered worker-to-job recommendations
 2. **Real-Time Notifications** - Instant push alerts for new jobs
@@ -198,8 +198,8 @@ This opens the **$50B+ enterprise staffing market** and demonstrates technical c
 
 ## Contact
 
-**Website:** orbitstaffing.net  
-**Email:** support@orbitstaffing.net  
+**Website:** orbitstaffing.io  
+**Email:** support@orbitstaffing.io  
 **Platform:** ORBIT Staffing OS by DarkWave Studios
 
 ---

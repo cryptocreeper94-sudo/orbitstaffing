@@ -188,7 +188,7 @@ What to show:
 ### Step 4: Set Privacy Policy
 
 1. In Console: "App Content" → "Privacy Policy"
-2. Add your URL: https://orbitstaffing.net/privacy
+2. Add your URL: https://orbitstaffing.io/privacy
 3. Or embed: Copy-paste from GPS_VERIFICATION_POLICY.md
 
 **What to include:**
@@ -382,7 +382,7 @@ WEEK 2:
 | Play Console Registration | $25 | Today (one-time) |
 | App Listing | Free | Included |
 | Hosting (for web backend) | ~$20-50/month | Ongoing |
-| Domain (orbitstaffing.net) | ~$12/year | Ongoing |
+| Domain (orbitstaffing.io) | ~$12/year | Ongoing |
 | **Total to Launch** | **$25 + monthly costs** | |
 
 ---

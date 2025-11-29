@@ -546,9 +546,9 @@ Add-ons:
 
 **Questions?**
 
-📧 **Legal/Compliance:** legal@orbitstaffing.net  
+📧 **Legal/Compliance:** legal@orbitstaffing.io  
 📧 **Insurance Help:** We can connect you with brokers  
-💬 **General Support:** support@orbitstaffing.net  
+💬 **General Support:** support@orbitstaffing.io  
 
 ---
 

@@ -27,7 +27,7 @@
 ## Architecture Diagram
 
 ```
-ORBIT Main System (orbitstaffing.net)
+ORBIT Main System (orbitstaffing.io)
 ├── Database (ORBIT data)
 ├── Admin Dashboard
 ├── Licensing Manager
@@ -100,7 +100,7 @@ COMPLETELY ISOLATED - Can't access ORBIT data or other franchisees
 ## Deployment Model
 
 ### ORBIT Main System
-- **Domain:** orbitstaffing.net
+- **Domain:** orbitstaffing.io
 - **Database:** Hosted on Replit + Neon (or equivalent)
 - **Purpose:** Licensing, billing, support, admin functions
 - **No customer data here**
@@ -174,7 +174,7 @@ Mike's admin can now:
 
 ## CRM Separation
 
-### ORBIT's CRM (orbitstaffing.net)
+### ORBIT's CRM (orbitstaffing.io)
 ```
 ORBIT contacts (for licensing, support, etc.):
 - Companies (franchisees)
@@ -300,7 +300,7 @@ Mike's Worker → Superior Staffing App → superiostaffing.com/api
                                     Superior Staffing Database
                                     (Completely separate from ORBIT)
 
-ORBIT User → ORBIT App → orbitstaffing.net/api
+ORBIT User → ORBIT App → orbitstaffing.io/api
                               ↓
                         ORBIT Main Database
                         (No worker/client/job data)

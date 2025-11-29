@@ -12,7 +12,7 @@ SMTP_HOST=your-smtp-server.com
 SMTP_PORT=587
 SMTP_USER=your-email@example.com
 SMTP_PASS=your-app-password
-EMAIL_FROM=noreply@orbitstaffing.net
+EMAIL_FROM=noreply@orbitstaffing.io
 ```
 
 ## Setup Instructions
@@ -31,7 +31,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=xxxx-xxxx-xxxx-xxxx
-EMAIL_FROM=support@orbitstaffing.net
+EMAIL_FROM=support@orbitstaffing.io
 ```
 
 ### Option 2: SendGrid (Production Recommended)
@@ -44,7 +44,7 @@ SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
 SMTP_USER=apikey
 SMTP_PASS=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-EMAIL_FROM=noreply@orbitstaffing.net
+EMAIL_FROM=noreply@orbitstaffing.io
 ```
 
 ### Option 3: AWS SES
@@ -57,7 +57,7 @@ SMTP_HOST=email-smtp.region.amazonaws.com
 SMTP_PORT=587
 SMTP_USER=your-ses-username
 SMTP_PASS=your-ses-password
-EMAIL_FROM=noreply@orbitstaffing.net
+EMAIL_FROM=noreply@orbitstaffing.io
 ```
 
 ## Email Templates Active
@@ -140,17 +140,17 @@ const emailService = new EmailService();
 
 ## Support Email Address
 
-**For Users**: support@orbitstaffing.net
+**For Users**: support@orbitstaffing.io
 - Questions about platform
 - Account issues
 - Billing inquiries
 
-**For Franchisees**: partner@orbitstaffing.net
+**For Franchisees**: partner@orbitstaffing.io
 - Partnership questions
 - License management
 - White-label customization
 
-**For Developers**: dev@orbitstaffing.net
+**For Developers**: dev@orbitstaffing.io
 - API questions
 - Integration support
 - Technical issues

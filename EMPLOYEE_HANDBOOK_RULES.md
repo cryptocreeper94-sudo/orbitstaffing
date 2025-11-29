@@ -587,6 +587,6 @@ ORBIT may update this handbook:
 ---
 
 **Questions or concerns?**  
-📧 Email: support@orbitstaffing.net  
+📧 Email: support@orbitstaffing.io  
 📞 Phone: +1-800-ORBIT-NOW  
 💬 In-app Chat: Available 24/7
