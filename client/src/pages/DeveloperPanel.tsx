@@ -2025,9 +2025,9 @@ export default function DeveloperPanel() {
 
           {/* Second Row - More Actions */}
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 mt-3">
-            {/* Incidents Button */}
+            {/* Incidents Button - goes to Employee Hub Report tab */}
             <button
-              onClick={() => navigateTo('/incident-reporting')}
+              onClick={() => navigateTo('/employee-hub')}
               className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-red-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-incident-report"
             >
@@ -2035,9 +2035,9 @@ export default function DeveloperPanel() {
               <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Incidents</span>
             </button>
 
-            {/* Workers Comp Button */}
+            {/* Workers Comp Button - goes to Compliance Monitor */}
             <button
-              onClick={() => navigateTo('/workers-comp-admin')}
+              onClick={() => navigateTo('/admin/compliance-monitor')}
               className="relative h-20 md:h-24 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-orange-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-workers-comp"
             >
