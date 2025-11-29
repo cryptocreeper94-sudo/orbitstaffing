@@ -353,6 +353,47 @@ export function TutorialButton({
 }
 
 export const TUTORIAL_CONTENT: Record<string, PageTutorialContent> = {
+  landing: {
+    pageTitle: "Welcome to ORBIT",
+    pageIcon: <Sparkles className="w-5 h-5" />,
+    introduction: "ORBIT Staffing OS is your complete solution for managing temporary workers. Let's take a quick tour of what you can do here.",
+    slides: [
+      {
+        title: "Choose Your Path",
+        description: "ORBIT serves three types of users: Workers looking for jobs, Employers hiring talent, and Agency Owners managing operations. Select your role to get started.",
+        icon: <Users className="w-6 h-6" />,
+        tips: [
+          "Workers: Find shifts, track hours, get paid",
+          "Employers: Post jobs, hire fast, manage teams",
+          "Owners: Full staffing agency management"
+        ],
+        connections: ["Job Board", "Employer Portal", "Owner Hub"]
+      },
+      {
+        title: "Explore Our Tools",
+        description: "Each module is designed to work standalone or together. Start with what you need, add more as you grow.",
+        icon: <LayoutDashboard className="w-6 h-6" />,
+        tips: [
+          "CRM - Manage contacts and relationships",
+          "Payroll - Multi-state compliant processing",
+          "Time & GPS - Accurate hour tracking",
+          "Compliance - Stay audit-ready"
+        ],
+        highlight: "Save up to 95% compared to competitors like Bullhorn!"
+      },
+      {
+        title: "Ready to Start?",
+        description: "Create a free account to explore all features. No credit card required. Upgrade anytime as your needs grow.",
+        icon: <CheckCircle2 className="w-6 h-6" />,
+        tips: [
+          "Free 14-day trial on all bundles",
+          "No long-term contracts required",
+          "24/7 support available"
+        ],
+        connections: ["Pricing", "Free Trial", "Contact Sales"]
+      }
+    ]
+  },
   dashboard: {
     pageTitle: "Dashboard",
     pageIcon: <LayoutDashboard className="w-5 h-5" />,
@@ -674,6 +715,126 @@ export const TUTORIAL_CONTENT: Record<string, PageTutorialContent> = {
           "Waiver tracking for long shifts"
         ],
         connections: ["Compliance", "Payroll", "Workers"]
+      }
+    ]
+  },
+  employeeHub: {
+    pageTitle: "Employee Hub",
+    pageIcon: <Users className="w-5 h-5" />,
+    introduction: "Your personal dashboard for managing your work life. View shifts, track hours, see earnings, and stay connected with your agency.",
+    slides: [
+      {
+        title: "Your Schedule",
+        description: "See all your upcoming shifts in one place. Accept or decline new offers, request time off, and set your availability for the week.",
+        icon: <Calendar className="w-6 h-6" />,
+        tips: [
+          "Swipe to accept or decline shifts",
+          "Set recurring availability patterns",
+          "Get notified of new opportunities"
+        ],
+        connections: ["Shift Offers", "Availability", "Time Off"]
+      },
+      {
+        title: "Time & Earnings",
+        description: "Track your hours and see your earnings in real-time. View paystubs, understand deductions, and track your work history.",
+        icon: <DollarSign className="w-6 h-6" />,
+        tips: [
+          "Clock in/out with GPS verification",
+          "View detailed pay breakdowns",
+          "Download paystubs anytime"
+        ],
+        highlight: "Enable direct deposit for fastest payments!"
+      },
+      {
+        title: "Profile & Documents",
+        description: "Keep your profile updated with current certifications, contact info, and skills. Upload required documents and track expiration dates.",
+        icon: <FileText className="w-6 h-6" />,
+        tips: [
+          "Add skills to get more job matches",
+          "Upload certifications for verification",
+          "Update contact info anytime"
+        ],
+        connections: ["Compliance", "Job Matching", "Profile"]
+      }
+    ]
+  },
+  jobBoard: {
+    pageTitle: "Job Board",
+    pageIcon: <Calendar className="w-5 h-5" />,
+    introduction: "Find your next opportunity! Browse available shifts, filter by location and pay, and apply with one click.",
+    slides: [
+      {
+        title: "Browse Opportunities",
+        description: "See all available jobs in your area. Filter by industry, pay rate, distance, and schedule to find the perfect fit.",
+        icon: <Calendar className="w-6 h-6" />,
+        tips: [
+          "Save your favorite filters",
+          "Set alerts for new postings",
+          "View detailed job requirements"
+        ],
+        connections: ["My Applications", "Saved Jobs", "Profile"]
+      },
+      {
+        title: "Apply Instantly",
+        description: "One-click applications for jobs you qualify for. Your profile, certifications, and availability are shared automatically.",
+        icon: <CheckCircle2 className="w-6 h-6" />,
+        tips: [
+          "Complete your profile for instant apply",
+          "Track application status in real-time",
+          "Employers can contact you directly"
+        ],
+        highlight: "Workers with complete profiles get 3x more offers!"
+      },
+      {
+        title: "Smart Matching",
+        description: "Our AI matches you with jobs based on your skills, location, and preferences. Get personalized recommendations every day.",
+        icon: <Sparkles className="w-6 h-6" />,
+        tips: [
+          "Rate jobs to improve matches",
+          "Set preferred industries and shifts",
+          "Get notified of perfect matches"
+        ],
+        connections: ["Profile", "Preferences", "Notifications"]
+      }
+    ]
+  },
+  ownerHub: {
+    pageTitle: "Owner Hub",
+    pageIcon: <Building2 className="w-5 h-5" />,
+    introduction: "Your business command center. Monitor revenue, manage clients, oversee staff, and make data-driven decisions.",
+    slides: [
+      {
+        title: "Business Overview",
+        description: "See your key metrics at a glance: revenue, active workers, client satisfaction, and profit margins. Track trends over time.",
+        icon: <LayoutDashboard className="w-6 h-6" />,
+        tips: [
+          "Customize your dashboard widgets",
+          "Set goals and track progress",
+          "Compare to industry benchmarks"
+        ],
+        connections: ["Reports", "Analytics", "Goals"]
+      },
+      {
+        title: "Client Management",
+        description: "Manage all your client relationships. Track contracts, monitor satisfaction, and identify growth opportunities.",
+        icon: <Building2 className="w-6 h-6" />,
+        tips: [
+          "View client profitability",
+          "Track contract renewals",
+          "Manage multiple locations"
+        ],
+        highlight: "Use the CRM to automate follow-ups and close more deals!"
+      },
+      {
+        title: "Team Performance",
+        description: "Monitor your internal team and field workers. Track productivity, manage payroll costs, and identify top performers.",
+        icon: <Users className="w-6 h-6" />,
+        tips: [
+          "View worker reliability scores",
+          "Track payroll as % of revenue",
+          "Identify training opportunities"
+        ],
+        connections: ["Workers", "Payroll", "Reports"]
       }
     ]
   }
