@@ -4,9 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle2, XCircle, Clock, MapPin, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, MapPin, AlertTriangle, Cloud, Thermometer, Wind, Droplets, AlertOctagon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
+
+interface WeatherSnapshot {
+  temp: number;
+  feelsLike: number;
+  condition: string;
+  description: string;
+  humidity: number;
+  windSpeed: number;
+  windDirection: string;
+  precipitation: number;
+  alerts: string[];
+  capturedAt: string;
+}
 
 interface Timesheet {
   id: string;
@@ -18,10 +31,12 @@ interface Timesheet {
   clockInLatitude: string;
   clockInLongitude: string;
   clockInVerified: boolean;
+  clockInWeather?: WeatherSnapshot;
   clockOutTime: string;
   clockOutLatitude: string;
   clockOutLongitude: string;
   clockOutVerified: boolean;
+  clockOutWeather?: WeatherSnapshot;
   totalHoursWorked: string;
   status: string;
   notes?: string;
@@ -133,9 +148,48 @@ export default function TimesheetApproval() {
     });
   };
 
+  const WeatherDisplay = ({ weather, label }: { weather?: WeatherSnapshot; label: string }) => {
+    if (!weather) return null;
+    
+    return (
+      <div className="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 rounded-lg p-3 border border-cyan-500/20">
+        <div className="flex items-center gap-2 mb-2">
+          <Cloud className="w-4 h-4 text-cyan-400" />
+          <span className="text-xs font-medium text-cyan-300">{label} Weather</span>
+        </div>
+        <div className="grid grid-cols-4 gap-2 text-xs">
+          <div className="flex items-center gap-1">
+            <Thermometer className="w-3 h-3 text-orange-400" />
+            <span className="text-white">{weather.temp}°F</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Wind className="w-3 h-3 text-blue-400" />
+            <span className="text-white">{weather.windSpeed} mph {weather.windDirection}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Droplets className="w-3 h-3 text-cyan-400" />
+            <span className="text-white">{weather.humidity}%</span>
+          </div>
+          <div className="text-white">{weather.condition}</div>
+        </div>
+        {weather.alerts && weather.alerts.length > 0 && (
+          <div className="mt-2 flex gap-1 flex-wrap">
+            {weather.alerts.map((alert, idx) => (
+              <Badge key={idx} variant="destructive" className="text-xs">
+                <AlertOctagon className="w-2 h-2 mr-1" />
+                {alert}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const TimesheetCard = ({ timesheet }: { timesheet: Timesheet }) => {
     const bothGPSVerified = timesheet.clockInVerified && timesheet.clockOutVerified;
     const hours = parseFloat(timesheet.totalHoursWorked || '0');
+    const hasWeatherData = timesheet.clockInWeather || timesheet.clockOutWeather;
 
     return (
       <Card key={timesheet.id} className="mb-4">
@@ -145,11 +199,17 @@ export default function TimesheetApproval() {
               <CardTitle className="text-lg">{timesheet.workerName}</CardTitle>
               <p className="text-sm text-muted-foreground">{timesheet.workerPhone}</p>
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center flex-wrap">
               <Badge variant={bothGPSVerified ? 'default' : 'destructive'}>
                 <MapPin className="w-3 h-3 mr-1" />
                 {bothGPSVerified ? 'GPS Verified' : 'GPS Failed'}
               </Badge>
+              {hasWeatherData && (
+                <Badge variant="outline" className="border-cyan-500 text-cyan-400">
+                  <Cloud className="w-3 h-3 mr-1" />
+                  Weather Logged
+                </Badge>
+              )}
               {timesheet.status === 'requires_review' && (
                 <Badge variant="outline">
                   <AlertTriangle className="w-3 h-3 mr-1 text-yellow-500" />
@@ -172,20 +232,22 @@ export default function TimesheetApproval() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Clock In</p>
               <p className="text-sm">{formatDateTime(timesheet.clockInTime)}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mb-2">
                 {timesheet.clockInVerified ? '✓ Verified' : '✗ Not Verified'}
               </p>
+              <WeatherDisplay weather={timesheet.clockInWeather} label="Clock-In" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">Clock Out</p>
               <p className="text-sm">{formatDateTime(timesheet.clockOutTime)}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mb-2">
                 {timesheet.clockOutVerified ? '✓ Verified' : '✗ Not Verified'}
               </p>
+              <WeatherDisplay weather={timesheet.clockOutWeather} label="Clock-Out" />
             </div>
           </div>
 
