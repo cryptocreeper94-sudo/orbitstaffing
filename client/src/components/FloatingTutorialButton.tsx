@@ -71,7 +71,7 @@ export function FloatingTutorialButton() {
   };
 
   return (
-    <div className="fixed bottom-8 left-6 z-50">
+    <div className="fixed bottom-14 left-6 z-50">
       <AnimatePresence>
         {isExpanded && (
           <motion.div
