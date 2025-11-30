@@ -6,16 +6,30 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useAuthStore } from '../store';
 import { worker } from '../utils/api';
-import { format, addDays, startOfWeek } from 'date-fns';
+import { format, addDays } from 'date-fns';
+
+const theme = {
+  dark: '#0f172a',
+  darker: '#020617',
+  primary: '#06b6d4',
+  text: '#f8fafc',
+  textMuted: '#94a3b8',
+  border: '#1e293b',
+  success: '#22c55e',
+  error: '#ef4444',
+};
 
 export function AvailabilityScreen() {
   const { workerId } = useAuthStore();
-  const [availability, setAvailability] = useState<any[]>([]);
+  const [dates, setDates] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [selectedDays, setSelectedDays] = useState<Set<string>>(new Set());
+  const [preferredTimes, setPreferredTimes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadAvailability();
@@ -23,14 +37,12 @@ export function AvailabilityScreen() {
 
   const loadAvailability = async () => {
     try {
-      if (!workerId) return;
-      const dates = [];
+      const dateList = [];
       for (let i = 0; i < 14; i++) {
         const date = format(addDays(new Date(), i), 'yyyy-MM-dd');
-        dates.push(date);
+        dateList.push(date);
       }
-      // Load availability for each date
-      setAvailability(dates);
+      setDates(dateList);
     } catch (error) {
       console.error('Load error:', error);
     } finally {
@@ -48,10 +60,37 @@ export function AvailabilityScreen() {
     setSelectedDays(newSelected);
   };
 
+  const toggleTime = (time: string) => {
+    const newTimes = new Set(preferredTimes);
+    if (newTimes.has(time)) {
+      newTimes.delete(time);
+    } else {
+      newTimes.add(time);
+    }
+    setPreferredTimes(newTimes);
+  };
+
+  const saveAvailability = async () => {
+    setSaving(true);
+    try {
+      if (workerId) {
+        for (const date of selectedDays) {
+          await worker.setAvailability(workerId, date, true);
+        }
+      }
+      Alert.alert('Saved', 'Your availability has been updated');
+    } catch (error) {
+      console.error('Save error:', error);
+      Alert.alert('Error', 'Failed to save availability. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#06b6d4" />
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -60,30 +99,31 @@ export function AvailabilityScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Your Availability</Text>
-        <Text style={styles.subtitle}>Select days you're available to work</Text>
+        <Text style={styles.subtitle}>Tap days you're available to work</Text>
       </View>
 
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#06b6d4' }]} />
-          <Text style={styles.legendText}>Selected</Text>
+          <View style={[styles.legendDot, { backgroundColor: theme.primary }]} />
+          <Text style={styles.legendText}>Available</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#1a1a2e' }]} />
+          <View style={[styles.legendDot, { backgroundColor: theme.border }]} />
           <Text style={styles.legendText}>Not Selected</Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#ef4444' }]} />
-          <Text style={styles.legendText}>Unavailable</Text>
+          <View style={[styles.legendDot, { backgroundColor: theme.success }]} />
+          <Text style={styles.legendText}>Today</Text>
         </View>
       </View>
 
       <View style={styles.calendar}>
-        {availability.map((date) => {
+        {dates.map((date) => {
           const isSelected = selectedDays.has(date);
           const dateObj = new Date(date);
           const dayName = format(dateObj, 'EEE');
           const dayNum = format(dateObj, 'd');
+          const monthName = format(dateObj, 'MMM');
           const isToday = format(new Date(), 'yyyy-MM-dd') === date;
 
           return (
@@ -95,26 +135,73 @@ export function AvailabilityScreen() {
                 isToday && styles.dayCardToday,
               ]}
               onPress={() => toggleDay(date)}
+              activeOpacity={0.7}
             >
               <Text style={styles.dayName}>{dayName}</Text>
-              <Text style={[styles.dayNum, isToday && styles.dayNumToday]}>
-                {dayNum}
-              </Text>
-              <Text style={styles.checkmark}>{isSelected ? '✓' : ''}</Text>
+              <Text style={[styles.dayNum, isToday && styles.dayNumToday]}>{dayNum}</Text>
+              <Text style={styles.monthName}>{monthName}</Text>
+              {isSelected && <Text style={styles.checkmark}>✓</Text>}
             </TouchableOpacity>
           );
         })}
       </View>
 
-      <View style={styles.timeSlots}>
-        <Text style={styles.sectionTitle}>Preferred Times</Text>
-        <TimeSlotToggle label="Early (6am - 12pm)" />
-        <TimeSlotToggle label="Mid (12pm - 6pm)" />
-        <TimeSlotToggle label="Late (6pm - 12am)" />
+      <View style={styles.timeSection}>
+        <Text style={styles.sectionTitle}>Preferred Shift Times</Text>
+        
+        <TouchableOpacity
+          style={[styles.timeSlot, preferredTimes.has('early') && styles.timeSlotSelected]}
+          onPress={() => toggleTime('early')}
+        >
+          <Text style={styles.timeIcon}>🌅</Text>
+          <View style={styles.timeContent}>
+            <Text style={[styles.timeLabel, preferredTimes.has('early') && styles.timeLabelSelected]}>
+              Early Shift
+            </Text>
+            <Text style={styles.timeRange}>6:00 AM - 12:00 PM</Text>
+          </View>
+          {preferredTimes.has('early') && <Text style={styles.timeCheck}>✓</Text>}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.timeSlot, preferredTimes.has('mid') && styles.timeSlotSelected]}
+          onPress={() => toggleTime('mid')}
+        >
+          <Text style={styles.timeIcon}>☀️</Text>
+          <View style={styles.timeContent}>
+            <Text style={[styles.timeLabel, preferredTimes.has('mid') && styles.timeLabelSelected]}>
+              Mid Shift
+            </Text>
+            <Text style={styles.timeRange}>12:00 PM - 6:00 PM</Text>
+          </View>
+          {preferredTimes.has('mid') && <Text style={styles.timeCheck}>✓</Text>}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.timeSlot, preferredTimes.has('late') && styles.timeSlotSelected]}
+          onPress={() => toggleTime('late')}
+        >
+          <Text style={styles.timeIcon}>🌙</Text>
+          <View style={styles.timeContent}>
+            <Text style={[styles.timeLabel, preferredTimes.has('late') && styles.timeLabelSelected]}>
+              Late Shift
+            </Text>
+            <Text style={styles.timeRange}>6:00 PM - 12:00 AM</Text>
+          </View>
+          {preferredTimes.has('late') && <Text style={styles.timeCheck}>✓</Text>}
+        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Save Availability</Text>
+      <TouchableOpacity 
+        style={[styles.saveButton, saving && styles.saveButtonDisabled]} 
+        onPress={saveAvailability}
+        disabled={saving}
+      >
+        {saving ? (
+          <ActivityIndicator color={theme.darker} />
+        ) : (
+          <Text style={styles.saveButtonText}>Save Availability</Text>
+        )}
       </TouchableOpacity>
 
       <View style={styles.spacer} />
@@ -122,152 +209,168 @@ export function AvailabilityScreen() {
   );
 }
 
-function TimeSlotToggle({ label }: { label: string }) {
-  const [selected, setSelected] = useState(false);
-  return (
-    <TouchableOpacity
-      style={[
-        styles.timeSlot,
-        selected && styles.timeSlotSelected,
-      ]}
-      onPress={() => setSelected(!selected)}
-    >
-      <Text style={[styles.timeSlotText, selected && styles.timeSlotTextSelected]}>
-        {selected ? '✓' : ''} {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: theme.darker,
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    borderBottomColor: '#06b6d4',
     borderBottomWidth: 1,
+    borderBottomColor: theme.border,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#06b6d4',
+    color: theme.primary,
   },
   subtitle: {
     fontSize: 14,
-    color: '#888',
+    color: theme.textMuted,
     marginTop: 4,
   },
   legend: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     backgroundColor: 'rgba(6, 182, 212, 0.05)',
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   legendDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
+    marginRight: 8,
   },
   legendText: {
     fontSize: 12,
-    color: '#888',
+    color: theme.textMuted,
   },
   calendar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 16,
     paddingVertical: 16,
-    gap: 8,
+    gap: 10,
   },
   dayCard: {
-    width: '31%',
-    aspectRatio: 1,
-    backgroundColor: '#1a1a2e',
+    width: '30%',
+    aspectRatio: 0.85,
+    backgroundColor: theme.dark,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    borderColor: '#334155',
     borderWidth: 1,
+    borderColor: theme.border,
   },
   dayCardSelected: {
     backgroundColor: 'rgba(6, 182, 212, 0.2)',
-    borderColor: '#06b6d4',
+    borderColor: theme.primary,
+    borderWidth: 2,
   },
   dayCardToday: {
-    borderColor: '#10b981',
+    borderColor: theme.success,
     borderWidth: 2,
   },
   dayName: {
     fontSize: 12,
-    color: '#888',
+    color: theme.textMuted,
     textTransform: 'uppercase',
   },
   dayNum: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: theme.text,
     marginVertical: 4,
   },
   dayNumToday: {
-    color: '#10b981',
+    color: theme.success,
+  },
+  monthName: {
+    fontSize: 11,
+    color: theme.textMuted,
   },
   checkmark: {
     fontSize: 16,
-    color: '#06b6d4',
+    color: theme.primary,
     marginTop: 4,
+    fontWeight: 'bold',
   },
-  timeSlots: {
+  timeSection: {
     paddingHorizontal: 16,
     paddingVertical: 16,
-    borderTopColor: '#334155',
     borderTopWidth: 1,
+    borderTopColor: theme.border,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#06b6d4',
-    marginBottom: 12,
+    color: theme.primary,
+    marginBottom: 16,
   },
   timeSlot: {
-    backgroundColor: '#1a1a2e',
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.dark,
+    borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginBottom: 8,
-    borderColor: '#334155',
+    paddingVertical: 14,
+    marginBottom: 10,
     borderWidth: 1,
+    borderColor: theme.border,
   },
   timeSlotSelected: {
-    backgroundColor: 'rgba(6, 182, 212, 0.2)',
-    borderColor: '#06b6d4',
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+    borderColor: theme.primary,
   },
-  timeSlotText: {
-    color: '#ccc',
+  timeIcon: {
+    fontSize: 24,
+    marginRight: 14,
+  },
+  timeContent: {
+    flex: 1,
+  },
+  timeLabel: {
+    fontSize: 16,
     fontWeight: '600',
+    color: theme.text,
   },
-  timeSlotTextSelected: {
-    color: '#06b6d4',
+  timeLabelSelected: {
+    color: theme.primary,
+  },
+  timeRange: {
+    fontSize: 12,
+    color: theme.textMuted,
+    marginTop: 2,
+  },
+  timeCheck: {
+    fontSize: 18,
+    color: theme.primary,
+    fontWeight: 'bold',
   },
   saveButton: {
     marginHorizontal: 16,
     marginVertical: 16,
-    backgroundColor: '#06b6d4',
+    backgroundColor: theme.primary,
     paddingVertical: 16,
-    borderRadius: 8,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    opacity: 0.7,
   },
   saveButtonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 16,
+    color: theme.darker,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   spacer: {

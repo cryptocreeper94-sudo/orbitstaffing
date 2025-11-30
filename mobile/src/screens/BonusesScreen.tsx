@@ -5,15 +5,27 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useAuthStore } from '../store';
 import { worker } from '../utils/api';
 import { format, startOfWeek } from 'date-fns';
 
+const theme = {
+  dark: '#0f172a',
+  darker: '#020617',
+  primary: '#06b6d4',
+  text: '#f8fafc',
+  textMuted: '#94a3b8',
+  border: '#1e293b',
+  success: '#22c55e',
+};
+
 export function BonusesScreen() {
   const { workerId } = useAuthStore();
   const [bonuses, setBonuses] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadBonuses();
@@ -21,38 +33,57 @@ export function BonusesScreen() {
 
   const loadBonuses = async () => {
     try {
-      if (!workerId) return;
+      if (!workerId) {
+        setBonuses({ performanceBonus: 0, referralBonus: 0, attendanceBonus: 0, speedBonus: 0 });
+        return;
+      }
       const weekStart = format(startOfWeek(new Date()), 'yyyy-MM-dd');
       const res = await worker.getBonuses(workerId, weekStart);
       setBonuses(res.data);
     } catch (error) {
       console.error('Load error:', error);
+      setBonuses({ performanceBonus: 0, referralBonus: 0, attendanceBonus: 0, speedBonus: 0 });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadBonuses();
   };
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#06b6d4" />
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
   const bonusTypes = [
-    { name: 'Performance', amount: bonuses?.performanceBonus || 0, icon: '⭐' },
-    { name: 'Referral', amount: bonuses?.referralBonus || 0, icon: '👥' },
-    { name: 'Attendance', amount: bonuses?.attendanceBonus || 0, icon: '✓' },
-    { name: 'Speed', amount: bonuses?.speedBonus || 0, icon: '⚡' },
+    { name: 'Performance', amount: bonuses?.performanceBonus || 0, icon: '⭐', desc: 'Quality ratings' },
+    { name: 'Referral', amount: bonuses?.referralBonus || 0, icon: '👥', desc: 'Friend sign-ups' },
+    { name: 'Attendance', amount: bonuses?.attendanceBonus || 0, icon: '✓', desc: 'Perfect week' },
+    { name: 'Speed', amount: bonuses?.speedBonus || 0, icon: '⚡', desc: 'Early completion' },
   ];
 
   const totalBonus = bonusTypes.reduce((sum, b) => sum + b.amount, 0);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={theme.primary}
+        />
+      }
+    >
       <View style={styles.header}>
-        <Text style={styles.title}>Bonuses This Week</Text>
+        <Text style={styles.headerLabel}>Bonuses This Week</Text>
         <Text style={styles.total}>${totalBonus.toFixed(2)}</Text>
       </View>
 
@@ -62,6 +93,7 @@ export function BonusesScreen() {
             <Text style={styles.bonusIcon}>{bonus.icon}</Text>
             <Text style={styles.bonusName}>{bonus.name}</Text>
             <Text style={styles.bonusAmount}>${bonus.amount.toFixed(2)}</Text>
+            <Text style={styles.bonusDesc}>{bonus.desc}</Text>
           </View>
         ))}
       </View>
@@ -73,13 +105,13 @@ export function BonusesScreen() {
             number="1"
             title="Perfect Attendance"
             description="Show up on time for all shifts"
-            bonus="+$25"
+            bonus="+$25/week"
           />
           <TipCard
             number="2"
             title="5-Star Rating"
             description="Complete jobs with high quality"
-            bonus="+$50"
+            bonus="+$50/week"
           />
           <TipCard
             number="3"
@@ -119,23 +151,27 @@ function TipCard({ number, title, description, bonus }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: theme.darker,
+  },
+  centered: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     paddingHorizontal: 16,
     paddingVertical: 24,
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    borderBottomColor: '#10b981',
+    backgroundColor: 'rgba(34, 197, 94, 0.1)',
     borderBottomWidth: 2,
+    borderBottomColor: theme.success,
   },
-  title: {
-    fontSize: 20,
-    color: '#888',
+  headerLabel: {
+    fontSize: 16,
+    color: theme.textMuted,
   },
   total: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: theme.success,
     marginTop: 8,
   },
   grid: {
@@ -146,14 +182,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   bonusCard: {
-    flex: 1,
-    minWidth: '48%',
-    backgroundColor: '#1a1a2e',
-    borderRadius: 12,
+    width: '47%',
+    backgroundColor: theme.dark,
+    borderRadius: 16,
     paddingVertical: 20,
+    paddingHorizontal: 12,
     alignItems: 'center',
-    borderColor: '#10b981',
     borderWidth: 1,
+    borderColor: theme.success,
   },
   bonusIcon: {
     fontSize: 32,
@@ -161,13 +197,19 @@ const styles = StyleSheet.create({
   },
   bonusName: {
     fontSize: 14,
-    color: '#888',
+    color: theme.textMuted,
     marginBottom: 4,
   },
   bonusAmount: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: theme.success,
+  },
+  bonusDesc: {
+    fontSize: 11,
+    color: theme.textMuted,
+    marginTop: 4,
+    textAlign: 'center',
   },
   section: {
     paddingHorizontal: 16,
@@ -176,30 +218,30 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#06b6d4',
-    marginBottom: 12,
+    color: theme.primary,
+    marginBottom: 16,
   },
   tipsContainer: {
     gap: 12,
   },
   tipCard: {
     flexDirection: 'row',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: theme.dark,
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
-    borderColor: '#06b6d4',
     borderWidth: 1,
+    borderColor: theme.border,
   },
   tipNumber: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#06b6d4',
+    backgroundColor: theme.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   tipNumberText: {
     color: '#fff',
@@ -210,19 +252,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tipTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: 'bold',
-    color: '#fff',
+    color: theme.text,
   },
   tipDescription: {
     fontSize: 12,
-    color: '#888',
+    color: theme.textMuted,
     marginTop: 2,
   },
   tipBonus: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#10b981',
+    color: theme.success,
   },
   spacer: {
     height: 40,

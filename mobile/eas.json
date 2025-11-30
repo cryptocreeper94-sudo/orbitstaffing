@@ -1,37 +1,31 @@
 {
+  "cli": {
+    "version": ">= 7.0.0"
+  },
   "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
     "preview": {
       "android": {
         "buildType": "apk"
       }
     },
-    "preview2": {
-      "android": {
-        "buildType": "aab"
-      }
-    },
-    "preview3": {
-      "developmentClient": true
-    },
     "production": {
-      "ios": {
-        "image": "latest"
-      },
       "android": {
+        "buildType": "app-bundle"
+      },
+      "ios": {
         "image": "latest"
       }
     }
   },
   "submit": {
     "production": {
-      "ios": {
-        "appleId": "your-apple-id@example.com",
-        "ascAppId": "1234567890",
-        "appleTeamId": "XXXXXXXXXX"
-      },
       "android": {
-        "serviceAccount": "path/to/service-account.json",
-        "track": "internal"
+        "track": "internal",
+        "releaseStatus": "draft"
       }
     }
   }

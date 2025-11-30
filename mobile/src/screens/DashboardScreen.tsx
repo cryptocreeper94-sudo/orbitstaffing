@@ -5,18 +5,30 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Image,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
-import { useAuthStore } from '../store';
+import { useAuthStore, useGPSStore } from '../store';
 import { worker } from '../utils/api';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
+
+const theme = {
+  dark: '#0f172a',
+  darker: '#020617',
+  primary: '#06b6d4',
+  text: '#f8fafc',
+  textMuted: '#94a3b8',
+  border: '#1e293b',
+  success: '#22c55e',
+  warning: '#f59e0b',
+};
 
 export function DashboardScreen({ navigation }: any) {
-  const { companyName, workerId } = useAuthStore();
-  const [profile, setProfile] = useState<any>(null);
-  const [bonuses, setBonuses] = useState<any>(null);
+  const { user, workerId } = useAuthStore();
+  const { isClockedIn } = useGPSStore();
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -24,114 +36,133 @@ export function DashboardScreen({ navigation }: any) {
 
   const loadData = async () => {
     try {
-      if (!workerId) return;
-      const profileRes = await worker.getProfile(workerId);
-      setProfile(profileRes.data);
-
+      if (!workerId) {
+        setStats({
+          weeklyEarnings: 0,
+          hoursWorked: 0,
+          shiftsCompleted: 0,
+          rating: 4.8,
+        });
+        return;
+      }
+      
       const weekStart = format(new Date(), 'yyyy-MM-dd');
-      const bonusRes = await worker.getBonuses(workerId, weekStart);
-      setBonuses(bonusRes.data);
+      const res = await worker.getBonuses(workerId, weekStart);
+      setStats(res.data);
     } catch (error) {
       console.error('Load error:', error);
+      setStats({
+        weeklyEarnings: 0,
+        hoursWorked: 0,
+        shiftsCompleted: 0,
+        rating: 4.8,
+      });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadData();
   };
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#06b6d4" />
+      <View style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* App Store Coming Soon Banner */}
-      <View style={styles.banner}>
-        <Text style={styles.bannerIcon}>📱</Text>
-        <View style={styles.bannerContent}>
-          <Text style={styles.bannerTitle}>Coming Soon to App Stores</Text>
-          <Text style={styles.bannerSubtitle}>Google Play Store & Apple App Store native apps</Text>
-        </View>
-      </View>
-
-      {/* Header */}
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl 
+          refreshing={refreshing} 
+          onRefresh={onRefresh}
+          tintColor={theme.primary}
+        />
+      }
+    >
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Hello, {profile?.firstName || 'Worker'}</Text>
-          <Text style={styles.company}>{companyName || 'ORBIT Staffing'}</Text>
+          <Text style={styles.greeting}>Hello, {user?.firstName || 'Worker'}</Text>
+          <Text style={styles.date}>{format(new Date(), 'EEEE, MMMM d')}</Text>
         </View>
-        <Image source={require('../assets/orbit-logo.png')} style={styles.headerLogo} />
-      </View>
-
-      {/* Quick Actions */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
-        <View style={styles.grid}>
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => navigation.navigate('GPSClockIn')}
-          >
-            <Text style={styles.actionIcon}>📍</Text>
-            <Text style={styles.actionText}>Clock In</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => navigation.navigate('Assignments')}
-          >
-            <Text style={styles.actionIcon}>📋</Text>
-            <Text style={styles.actionText}>Shifts</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => navigation.navigate('Bonuses')}
-          >
-            <Text style={styles.actionIcon}>🎁</Text>
-            <Text style={styles.actionText}>Bonuses</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => navigation.navigate('Availability')}
-          >
-            <Text style={styles.actionIcon}>📅</Text>
-            <Text style={styles.actionText}>Calendar</Text>
-          </TouchableOpacity>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoEmoji}>🪐</Text>
         </View>
       </View>
 
-      {/* Stats */}
-      <View style={styles.section}>
+      <View style={styles.clockStatus}>
+        <View style={[styles.statusDot, { backgroundColor: isClockedIn ? theme.success : theme.textMuted }]} />
+        <Text style={styles.statusText}>
+          {isClockedIn ? 'Currently Clocked In' : 'Not Clocked In'}
+        </Text>
+      </View>
+
+      <View style={styles.quickActions}>
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={() => navigation.navigate('GPSClockIn')}
+        >
+          <Text style={styles.actionIcon}>📍</Text>
+          <Text style={styles.actionText}>{isClockedIn ? 'Clock Out' : 'Clock In'}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={() => navigation.navigate('Assignments')}
+        >
+          <Text style={styles.actionIcon}>📋</Text>
+          <Text style={styles.actionText}>Shifts</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={() => navigation.navigate('Timesheets')}
+        >
+          <Text style={styles.actionIcon}>⏰</Text>
+          <Text style={styles.actionText}>Hours</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={() => navigation.navigate('Profile')}
+        >
+          <Text style={styles.actionIcon}>👤</Text>
+          <Text style={styles.actionText}>Profile</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.statsSection}>
         <Text style={styles.sectionTitle}>This Week</Text>
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
+            <Text style={styles.statValue}>${stats?.weeklyEarnings || '0'}</Text>
             <Text style={styles.statLabel}>Earnings</Text>
-            <Text style={styles.statValue}>${bonuses?.weeklyEarnings || '0'}</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Bonuses</Text>
-            <Text style={styles.statValue}>${bonuses?.totalBonuses || '0'}</Text>
-          </View>
-          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats?.hoursWorked || '0'}h</Text>
             <Text style={styles.statLabel}>Hours</Text>
-            <Text style={styles.statValue}>{bonuses?.hoursWorked || '0'}h</Text>
           </View>
           <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats?.shiftsCompleted || '0'}</Text>
+            <Text style={styles.statLabel}>Shifts</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{stats?.rating || '4.8'}⭐</Text>
             <Text style={styles.statLabel}>Rating</Text>
-            <Text style={styles.statValue}>{profile?.rating || '4.8'}⭐</Text>
           </View>
         </View>
       </View>
 
-      {/* Hallmark */}
-      <View style={styles.section}>
-        <Image source={require('../assets/orbit-verification-badge.png')} style={styles.hallmark} />
-        <Text style={styles.hallmarkText}>Powered by ORBIT Staffing OS</Text>
-        <Text style={styles.hallmarkId}>Asset #{profile?.assetNumber || 'N/A'}</Text>
+      <View style={styles.footer}>
+        <Text style={styles.footerLogo}>🪐</Text>
+        <Text style={styles.footerText}>Powered by ORBIT Staffing OS</Text>
       </View>
 
       <View style={styles.spacer} />
@@ -142,95 +173,100 @@ export function DashboardScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: theme.darker,
   },
-  banner: {
-    backgroundColor: 'rgba(6, 182, 212, 0.15)',
-    borderColor: '#06b6d4',
-    borderWidth: 2,
-    borderRadius: 8,
-    marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
+  centered: {
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 10,
-  },
-  bannerIcon: {
-    fontSize: 20,
-  },
-  bannerContent: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#06b6d4',
-  },
-  bannerSubtitle: {
-    fontSize: 10,
-    color: '#06b6d4',
-    opacity: 0.8,
-    marginTop: 2,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 24,
-    borderBottomColor: '#06b6d4',
+    paddingVertical: 20,
     borderBottomWidth: 1,
+    borderBottomColor: theme.border,
   },
   greeting: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: theme.text,
   },
-  company: {
+  date: {
     fontSize: 14,
-    color: '#888',
+    color: theme.textMuted,
     marginTop: 4,
   },
-  headerLogo: {
-    width: 60,
-    height: 60,
+  logoContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: theme.dark,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: theme.primary,
   },
-  section: {
-    paddingHorizontal: 16,
+  logoEmoji: {
+    fontSize: 28,
+  },
+  clockStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 16,
+    backgroundColor: theme.dark,
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.border,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#06b6d4',
-    marginBottom: 12,
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
   },
-  grid: {
+  statusText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.text,
+  },
+  quickActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     gap: 12,
   },
   actionCard: {
-    flex: 1,
-    minWidth: '48%',
-    backgroundColor: '#1a1a2e',
+    width: '47%',
+    backgroundColor: theme.dark,
     borderRadius: 12,
-    paddingVertical: 20,
+    paddingVertical: 24,
     alignItems: 'center',
-    borderColor: '#06b6d4',
     borderWidth: 1,
+    borderColor: theme.primary,
   },
   actionIcon: {
     fontSize: 32,
     marginBottom: 8,
   },
   actionText: {
-    color: '#ccc',
+    color: theme.text,
     fontWeight: '600',
+    fontSize: 14,
+  },
+  statsSection: {
+    paddingHorizontal: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: theme.primary,
+    marginBottom: 12,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -238,44 +274,38 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   statCard: {
-    flex: 1,
-    minWidth: '48%',
+    width: '47%',
     backgroundColor: 'rgba(6, 182, 212, 0.1)',
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 16,
-    borderColor: '#06b6d4',
+    padding: 16,
+    alignItems: 'center',
     borderWidth: 1,
+    borderColor: theme.border,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.primary,
   },
   statLabel: {
     fontSize: 12,
-    color: '#888',
-    marginBottom: 8,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#06b6d4',
-  },
-  hallmark: {
-    width: 120,
-    height: 120,
-    alignSelf: 'center',
-    marginVertical: 16,
-  },
-  hallmarkText: {
-    textAlign: 'center',
-    color: '#06b6d4',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  hallmarkId: {
-    textAlign: 'center',
-    color: '#666',
-    fontSize: 12,
+    color: theme.textMuted,
     marginTop: 4,
   },
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  footerLogo: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  footerText: {
+    color: theme.primary,
+    fontWeight: '600',
+    fontSize: 12,
+  },
   spacer: {
-    height: 40,
+    height: 20,
   },
 });

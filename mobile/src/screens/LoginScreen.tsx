@@ -4,187 +4,289 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { useAuthStore } from '../store';
-import { auth } from '../utils/api';
+import { auth, setAuthToken } from '../utils/api';
 
-export function LoginScreen({ navigation }: any) {
-  const [phone, setPhone] = useState('');
-  const [pin, setPin] = useState('');
+const theme = {
+  dark: '#0f172a',
+  darker: '#020617',
+  primary: '#06b6d4',
+  text: '#f8fafc',
+  textMuted: '#94a3b8',
+  border: '#1e293b',
+  inputBg: '#1e293b',
+  error: '#ef4444',
+};
+
+export function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const setAuth = useAuthStore((state) => state.setAuth);
 
   const handleLogin = async () => {
-    if (!phone || !pin) {
-      Alert.alert('Error', 'Please enter phone and PIN');
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter email and password');
       return;
     }
 
     setLoading(true);
-    try {
-      const response = await auth.login(phone, pin);
-      const { token, workerId, companyName } = response.data;
+    setError('');
 
-      await SecureStore.setItemAsync('authToken', token);
-      setAuth(token, workerId, companyName);
+    try {
+      const response = await auth.loginEmail(email.trim(), password);
+      const { token, user } = response.data;
       
-      navigation.replace('Dashboard');
-    } catch (error: any) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'Invalid credentials');
+      await setAuthToken(token);
+      setAuth(token, user);
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleBiometricLogin = async () => {
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      if (!hasHardware) {
+        Alert.alert('Not Available', 'Biometric authentication is not available on this device');
+        return;
+      }
+
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!isEnrolled) {
+        Alert.alert('Not Set Up', 'Please set up biometric authentication in your device settings');
+        return;
+      }
+
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Login to ORBIT',
+        fallbackLabel: 'Use Password',
+      });
+
+      if (result.success) {
+        const { restoreSession } = useAuthStore.getState();
+        const restored = await restoreSession();
+        if (!restored) {
+          Alert.alert('Session Expired', 'Please login with your credentials first.');
+        }
+      }
+    } catch (err) {
+      console.error('Biometric error:', err);
+      Alert.alert('Error', 'Biometric authentication failed');
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      {/* App Store Coming Soon Banner */}
-      <View style={styles.banner}>
-        <Text style={styles.bannerIcon}>📱</Text>
-        <View style={styles.bannerContent}>
-          <Text style={styles.bannerTitle}>Coming Soon to App Stores</Text>
-          <Text style={styles.bannerSubtitle}>Native iOS & Android apps launching now</Text>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoEmoji}>🪐</Text>
+          <Text style={styles.logoText}>ORBIT</Text>
+          <Text style={styles.tagline}>Staffing OS</Text>
         </View>
-      </View>
 
-      <Image source={require('../assets/orbit-logo.png')} style={styles.logo} />
-      <Text style={styles.title}>ORBIT Staffing</Text>
-      <Text style={styles.subtitle}>Worker Portal</Text>
+        <View style={styles.formContainer}>
+          <Text style={styles.welcomeText}>Welcome Back</Text>
+          <Text style={styles.subtitleText}>Sign in to access your shifts</Text>
 
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          placeholderTextColor="#888"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
-          editable={!loading}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="4-Digit PIN"
-          placeholderTextColor="#888"
-          value={pin}
-          onChangeText={setPin}
-          secureTextEntry
-          keyboardType="numeric"
-          maxLength={4}
-          editable={!loading}
-        />
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign In</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="your@email.com"
+              placeholderTextColor={theme.textMuted}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading}
+            />
+          </View>
 
-      <Text style={styles.footer}>
-        Secure JWT Auth • Biometric Ready
-      </Text>
-    </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="••••••••"
+              placeholderTextColor={theme.textMuted}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              editable={!loading}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color={theme.darker} />
+            ) : (
+              <Text style={styles.buttonText}>Sign In</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.biometricButton}
+            onPress={handleBiometricLogin}
+          >
+            <Text style={styles.biometricText}>🔐 Use Biometric Login</Text>
+          </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Powered by</Text>
+            <Text style={styles.footerBrand}>ORBIT Staffing OS</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
-    paddingHorizontal: 20,
+    backgroundColor: theme.darker,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
+    padding: 24,
   },
-  banner: {
-    backgroundColor: 'rgba(6, 182, 212, 0.15)',
-    borderColor: '#06b6d4',
-    borderWidth: 2,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 30,
-    flexDirection: 'row',
+  logoContainer: {
     alignItems: 'center',
-    gap: 10,
+    marginBottom: 40,
   },
-  bannerIcon: {
-    fontSize: 24,
+  logoEmoji: {
+    fontSize: 72,
+    marginBottom: 12,
   },
-  bannerContent: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontSize: 13,
+  logoText: {
+    fontSize: 42,
     fontWeight: 'bold',
-    color: '#06b6d4',
+    color: theme.primary,
+    letterSpacing: 6,
   },
-  bannerSubtitle: {
-    fontSize: 11,
-    color: '#06b6d4',
-    opacity: 0.8,
-    marginTop: 2,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#06b6d4',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
+  tagline: {
+    fontSize: 14,
+    color: theme.textMuted,
     marginTop: 8,
+    letterSpacing: 3,
   },
-  form: {
-    marginTop: 40,
-    gap: 16,
+  formContainer: {
+    backgroundColor: theme.dark,
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: theme.border,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitleText: {
+    fontSize: 14,
+    color: theme.textMuted,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: theme.error,
+  },
+  errorText: {
+    color: theme.error,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 8,
   },
   input: {
-    backgroundColor: '#1e293b',
-    borderColor: '#334155',
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    color: '#fff',
+    backgroundColor: theme.inputBg,
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
+    color: theme.text,
+    borderWidth: 1,
+    borderColor: theme.border,
   },
   button: {
-    backgroundColor: '#06b6d4',
-    paddingVertical: 14,
-    borderRadius: 8,
-    marginTop: 24,
+    backgroundColor: theme.primary,
+    borderRadius: 12,
+    padding: 18,
+    alignItems: 'center',
+    marginTop: 8,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    opacity: 0.7,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: theme.darker,
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
+  },
+  biometricButton: {
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  biometricText: {
+    color: theme.primary,
+    fontSize: 16,
   },
   footer: {
-    marginTop: 40,
-    color: '#666',
-    textAlign: 'center',
+    marginTop: 32,
+    alignItems: 'center',
+  },
+  footerText: {
     fontSize: 12,
+    color: theme.textMuted,
+  },
+  footerBrand: {
+    fontSize: 12,
+    color: theme.primary,
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
