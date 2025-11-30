@@ -71,7 +71,16 @@ ORBIT Staffing OS is a comprehensive, white-label staffing automation platform d
 **Employee Hub:** Worker self-service for schedules, pay stubs, onboarding
 **Owner Hub:** Business analytics, weather verification, team management
 
-### 2.4 DarkWave Studios Ecosystem
+### 2.4 ORBIT Pay Card (Coming Soon)
+Branded Visa debit card for workers powered by Stripe Issuing.
+- **Instant Pay:** Workers get paid same day - no waiting for payroll cycles
+- **No Fees:** No monthly fees, no maintenance charges, no hidden costs
+- **Mobile Wallet:** Apple Pay, Google Pay, Samsung Pay integration
+- **55,000+ ATMs:** Free cash withdrawals nationwide
+- **2% Cashback:** Rewards on everyday purchases
+- **Status:** UI complete, waitlist active, awaiting Stripe Issuing approval
+
+### 2.5 DarkWave Studios Ecosystem
 Additional products in development:
 - **Lot Ops Pro:** Car dealership operations
 - **Dark Wave Pulse:** Operational heartbeat platform

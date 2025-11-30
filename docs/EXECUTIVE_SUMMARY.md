@@ -39,6 +39,14 @@ Each tool now available separately for maximum flexibility:
 - Agency Partner: 30% recurring commission
 - Franchise Partner: 40%+ with territory exclusivity
 
+### ORBIT Pay Card (Coming Soon)
+Branded Visa debit card for instant worker payments:
+- Same-day pay access (no payroll wait)
+- No monthly fees, 55K+ free ATMs
+- Mobile wallet integration
+- 2% cashback rewards
+- **Status:** Waitlist active, awaiting Stripe Issuing approval
+
 ---
 
 ## Market Opportunity

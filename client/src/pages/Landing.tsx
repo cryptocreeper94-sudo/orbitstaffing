@@ -862,7 +862,7 @@ export default function Landing() {
               {
                 title: "Time & Payroll",
                 icon: "💰",
-                description: "Mobile timesheets, client approval workflows, payroll processing, tax withholding, W-2s, direct deposit, compliance reporting."
+                description: "Mobile timesheets, client approval workflows, payroll processing, tax withholding, W-2s, direct deposit, ORBIT Pay Card, and compliance reporting."
               },
               {
                 title: "Billing & Revenue",
@@ -966,7 +966,7 @@ export default function Landing() {
                 "Everything in Starter",
                 "Owner Hub access",
                 "Full payroll automation",
-                "Reports API",
+                "ORBIT Pay Card access",
                 "Unlimited clients",
                 "Priority support"
               ]}
@@ -982,8 +982,8 @@ export default function Landing() {
               features={[
                 "Everything in Growth",
                 "Multi-location",
+                "Instant Pay via Pay Card",
                 "Advanced analytics",
-                "Weather verification",
                 "Full API access",
                 "Dedicated support"
               ]}
