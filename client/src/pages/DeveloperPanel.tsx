@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -2001,6 +2001,16 @@ export default function DeveloperPanel() {
             >
               <Briefcase className="w-6 h-6 md:w-7 md:h-7 text-violet-400 group-hover:text-violet-300 transition-colors" />
               <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Owner</span>
+            </button>
+
+            {/* Marketing Hub Button */}
+            <button
+              onClick={() => navigateTo('/marketing')}
+              className="relative h-24 md:h-28 bg-gradient-to-br from-pink-700 to-purple-800 border border-pink-600 hover:border-pink-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-marketing"
+            >
+              <Megaphone className="w-6 h-6 md:w-7 md:h-7 text-pink-400 group-hover:text-pink-300 transition-colors" />
+              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Marketing</span>
             </button>
 
             {/* App Button */}

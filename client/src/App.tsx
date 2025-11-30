@@ -58,6 +58,7 @@ import EmployeeHub from "@/pages/EmployeeHub";
 import OwnerHub from "@/pages/OwnerHub";
 import CRMDashboard from "@/pages/CRMDashboard";
 import OrbitPayCard from "@/pages/OrbitPayCard";
+import MarketingHub from "@/pages/MarketingHub";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
@@ -142,6 +143,8 @@ function Router() {
       <Route path="/owner-hub" component={OwnerHub} />
       <Route path="/orbit-pay-card" component={OrbitPayCard} />
       <Route path="/pay-card" component={OrbitPayCard} />
+      <Route path="/marketing" component={MarketingHub} />
+      <Route path="/marketing-hub" component={MarketingHub} />
       <Route component={NotFound} />
     </Switch>
   );
