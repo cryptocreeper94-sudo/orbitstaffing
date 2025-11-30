@@ -3,7 +3,7 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import { X } from "lucide-react";
 
 export type OrbitPose = "wave" | "point" | "think";
-export type OrbitDirection = "left" | "right" | "top" | "bottom";
+export type OrbitDirection = "left" | "right" | "top" | "bottom" | "top-left" | "top-right" | "bottom-left" | "bottom-right";
 export type OrbitChannel = "welcome" | "success" | "empty" | "error" | "tip" | "help";
 
 const POSE_IMAGES: Record<OrbitPose, string> = {
@@ -47,19 +47,32 @@ export function useOrbit() {
 
 const getEntryVariants = (direction: OrbitDirection): Variants => {
   const distance = 400;
+  const diagDistance = distance * 0.7;
   const positions: Record<OrbitDirection, { x: number; y: number }> = {
     left: { x: -distance, y: 0 },
     right: { x: distance, y: 0 },
     top: { x: 0, y: -distance },
     bottom: { x: 0, y: distance },
+    "top-left": { x: -diagDistance, y: -diagDistance },
+    "top-right": { x: diagDistance, y: -diagDistance },
+    "bottom-left": { x: -diagDistance, y: diagDistance },
+    "bottom-right": { x: diagDistance, y: diagDistance },
+  };
+
+  const getRotation = (dir: OrbitDirection): number => {
+    const rotations: Record<OrbitDirection, number> = {
+      left: -20, right: 20, top: -10, bottom: 10,
+      "top-left": -25, "top-right": 25, "bottom-left": -15, "bottom-right": 15,
+    };
+    return rotations[dir];
   };
 
   return {
     hidden: {
       ...positions[direction],
       opacity: 0,
-      scale: 0.5,
-      rotate: direction === "left" ? -20 : direction === "right" ? 20 : 0,
+      scale: 0.3,
+      rotate: getRotation(direction),
     },
     visible: {
       x: 0,
@@ -69,9 +82,9 @@ const getEntryVariants = (direction: OrbitDirection): Variants => {
       rotate: 0,
       transition: {
         type: "spring",
-        damping: 20,
-        stiffness: 200,
-        duration: 0.6,
+        damping: 18,
+        stiffness: 180,
+        duration: 0.7,
       },
     },
   };
@@ -79,23 +92,36 @@ const getEntryVariants = (direction: OrbitDirection): Variants => {
 
 const getExitVariants = (direction: OrbitDirection) => {
   const distance = 400;
+  const diagDistance = distance * 0.7;
   const positions: Record<OrbitDirection, { x: number; y: number }> = {
     left: { x: -distance, y: 0 },
     right: { x: distance, y: 0 },
     top: { x: 0, y: -distance },
     bottom: { x: 0, y: distance },
+    "top-left": { x: -diagDistance, y: -diagDistance },
+    "top-right": { x: diagDistance, y: -diagDistance },
+    "bottom-left": { x: -diagDistance, y: diagDistance },
+    "bottom-right": { x: diagDistance, y: diagDistance },
+  };
+
+  const getRotation = (dir: OrbitDirection): number => {
+    const rotations: Record<OrbitDirection, number> = {
+      left: -20, right: 20, top: -10, bottom: 10,
+      "top-left": -25, "top-right": 25, "bottom-left": -15, "bottom-right": 15,
+    };
+    return rotations[dir];
   };
 
   return {
     ...positions[direction],
     opacity: 0,
-    scale: 0.5,
-    rotate: direction === "left" ? -20 : direction === "right" ? 20 : 0,
+    scale: 0.3,
+    rotate: getRotation(direction),
     transition: {
       type: "spring" as const,
       damping: 25,
       stiffness: 300,
-      duration: 0.4,
+      duration: 0.5,
     },
   };
 };
@@ -261,7 +287,10 @@ export function OrbitExperienceProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getRandomDirection = (): OrbitDirection => {
-    const directions: OrbitDirection[] = ["left", "right", "top", "bottom"];
+    const directions: OrbitDirection[] = [
+      "left", "right", "top", "bottom",
+      "top-left", "top-right", "bottom-left", "bottom-right"
+    ];
     return directions[Math.floor(Math.random() * directions.length)];
   };
 
@@ -271,6 +300,10 @@ export function OrbitExperienceProvider({ children }: { children: ReactNode }) {
       right: "left",
       top: "bottom",
       bottom: "top",
+      "top-left": "bottom-right",
+      "top-right": "bottom-left",
+      "bottom-left": "top-right",
+      "bottom-right": "top-left",
     };
     return opposites[dir];
   };
@@ -284,7 +317,7 @@ export function OrbitExperienceProvider({ children }: { children: ReactNode }) {
       pose: "wave",
       enterFrom,
       exitTo: getOppositeDirection(enterFrom),
-      timeout: 6000,
+      timeout: 8000,
       dismissable: true,
     });
   }, [showOrbit]);
@@ -298,7 +331,7 @@ export function OrbitExperienceProvider({ children }: { children: ReactNode }) {
       pose: "wave",
       enterFrom,
       exitTo: getOppositeDirection(enterFrom),
-      timeout: 4000,
+      timeout: 8000,
       dismissable: true,
     });
   }, [showOrbit]);
@@ -326,7 +359,7 @@ export function OrbitExperienceProvider({ children }: { children: ReactNode }) {
       pose: "point",
       enterFrom,
       exitTo: getOppositeDirection(enterFrom),
-      timeout: 5000,
+      timeout: 8000,
       dismissable: true,
     });
   }, [showOrbit]);
@@ -340,7 +373,7 @@ export function OrbitExperienceProvider({ children }: { children: ReactNode }) {
       pose: "point",
       enterFrom,
       exitTo: getOppositeDirection(enterFrom),
-      timeout: 7000,
+      timeout: 8000,
       dismissable: true,
     });
   }, [showOrbit]);
