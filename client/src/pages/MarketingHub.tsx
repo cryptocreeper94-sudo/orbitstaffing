@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { 
   Calendar, Clock, Copy, Check, Image, Twitter, Facebook, 
   Zap, Target, TrendingUp, Sparkles, ExternalLink, ChevronRight,
-  Bell, RefreshCw, Eye, MessageSquare, Hash, Megaphone
+  Bell, RefreshCw, Eye, MessageSquare, Hash, Megaphone, Upload,
+  X, Send, ImagePlus, Loader2, AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostTemplate {
   id: string;
@@ -287,11 +290,173 @@ const screenshotGuide = [
 export default function MarketingHub() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'twitter' | 'facebook'>('all');
+  const [composerContent, setComposerContent] = useState('');
+  const [composerImage, setComposerImage] = useState<string | null>(null);
+  const [composerImageFile, setComposerImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
+  const [postingPlatform, setPostingPlatform] = useState<'twitter' | 'facebook' | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const loadTemplate = (template: PostTemplate) => {
+    setComposerContent(template.content);
+    toast({
+      title: "Template loaded",
+      description: `"${template.title}" ready to edit and post`,
+    });
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select an image under 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setComposerImageFile(file);
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('/api/marketing/upload-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const data = await response.json();
+      setComposerImage(data.imageUrl);
+      toast({
+        title: "Image uploaded",
+        description: "Your image is ready to include in your post",
+      });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: "Could not upload image. Please try again.",
+        variant: "destructive",
+      });
+      setComposerImageFile(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setComposerImage(null);
+    setComposerImageFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const postToTwitter = async () => {
+    if (!composerContent.trim()) {
+      toast({
+        title: "No content",
+        description: "Please write something to post",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPosting(true);
+    setPostingPlatform('twitter');
+
+    try {
+      const response = await fetch('/api/marketing/post/twitter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: composerContent,
+          imageUrl: composerImage,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.method === 'browser') {
+        navigator.clipboard.writeText(composerContent);
+        window.open(data.url, '_blank');
+        toast({
+          title: "Opening X/Twitter",
+          description: "Content copied! Paste it in the tweet composer.",
+        });
+      } else {
+        toast({
+          title: "Posted to X/Twitter",
+          description: "Your post is live!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Post failed",
+        description: "Could not post to X/Twitter",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPosting(false);
+      setPostingPlatform(null);
+    }
+  };
+
+  const postToFacebook = async () => {
+    if (!composerContent.trim()) {
+      toast({
+        title: "No content",
+        description: "Please write something to post",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPosting(true);
+    setPostingPlatform('facebook');
+
+    try {
+      const response = await fetch('/api/marketing/post/facebook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: composerContent,
+          imageUrl: composerImage,
+        }),
+      });
+
+      const data = await response.json();
+
+      navigator.clipboard.writeText(composerContent);
+      window.open(data.url, '_blank');
+      toast({
+        title: "Opening Facebook",
+        description: "Content copied! Paste it in your Facebook post.",
+      });
+    } catch (error) {
+      toast({
+        title: "Post failed",
+        description: "Could not post to Facebook",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPosting(false);
+      setPostingPlatform(null);
+    }
   };
 
   const filteredTemplates = postTemplates.filter(t => 
@@ -306,6 +471,10 @@ export default function MarketingHub() {
     }
     return 7;
   };
+
+  const characterCount = composerContent.length;
+  const twitterLimit = 280;
+  const isOverTwitterLimit = characterCount > twitterLimit;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-6">
@@ -333,6 +502,140 @@ export default function MarketingHub() {
             </Badge>
           </div>
         </div>
+
+        {/* Post Composer */}
+        <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-cyan-500/30 shadow-lg shadow-cyan-500/10">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-white flex items-center gap-2 text-lg">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600">
+                <Send className="w-4 h-4 text-white" />
+              </div>
+              Post Composer
+              <Badge className="ml-2 bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                Live
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="relative">
+              <Textarea
+                placeholder="Write your post here... or click a template below to load it."
+                value={composerContent}
+                onChange={(e) => setComposerContent(e.target.value)}
+                className="min-h-[120px] bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 resize-none"
+                data-testid="textarea-composer"
+              />
+              <div className="absolute bottom-2 right-2 flex items-center gap-2">
+                <span className={`text-xs ${isOverTwitterLimit ? 'text-red-400' : 'text-slate-500'}`}>
+                  {characterCount}/{twitterLimit}
+                </span>
+                {isOverTwitterLimit && (
+                  <AlertCircle className="w-4 h-4 text-red-400" />
+                )}
+              </div>
+            </div>
+
+            {/* Image Upload Section */}
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageSelect}
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                className="hidden"
+                data-testid="input-image-upload"
+              />
+              
+              {!composerImage ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                  data-testid="button-add-image"
+                >
+                  {isUploading ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <ImagePlus className="w-4 h-4 mr-2" />
+                  )}
+                  {isUploading ? 'Uploading...' : 'Add Image'}
+                </Button>
+              ) : (
+                <div className="flex items-center gap-2 p-2 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <img
+                    src={composerImage}
+                    alt="Upload preview"
+                    className="w-12 h-12 object-cover rounded"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-slate-300 truncate">
+                      {composerImageFile?.name || 'Uploaded image'}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {composerImageFile ? `${(composerImageFile.size / 1024).toFixed(1)} KB` : ''}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeImage}
+                    className="text-slate-400 hover:text-red-400 p-1 h-auto"
+                    data-testid="button-remove-image"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex-1" />
+
+              {/* Post Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={postToTwitter}
+                  disabled={isPosting || !composerContent.trim()}
+                  className="bg-sky-600 hover:bg-sky-700 text-white"
+                  data-testid="button-post-twitter"
+                >
+                  {isPosting && postingPlatform === 'twitter' ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Twitter className="w-4 h-4 mr-2" />
+                  )}
+                  Post to X
+                </Button>
+                <Button
+                  onClick={postToFacebook}
+                  disabled={isPosting || !composerContent.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  data-testid="button-post-facebook"
+                >
+                  {isPosting && postingPlatform === 'facebook' ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Facebook className="w-4 h-4 mr-2" />
+                  )}
+                  Post to FB
+                </Button>
+              </div>
+            </div>
+
+            {isOverTwitterLimit && (
+              <div className="flex items-center gap-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                <p className="text-xs text-red-300">
+                  Your post exceeds Twitter's 280 character limit. Consider shortening it for X/Twitter.
+                </p>
+              </div>
+            )}
+
+            <p className="text-xs text-slate-500">
+              Tip: Click any template below to load it into the composer. Add an image, edit the text, then post!
+            </p>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
@@ -457,24 +760,36 @@ export default function MarketingHub() {
                             </Badge>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          onClick={() => copyToClipboard(template.content, template.id)}
-                          className={copiedId === template.id ? 'bg-green-600' : 'bg-cyan-600 hover:bg-cyan-700'}
-                          data-testid={`button-copy-${template.id}`}
-                        >
-                          {copiedId === template.id ? (
-                            <>
-                              <Check className="w-3 h-3 mr-1" />
-                              Copied!
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3 mr-1" />
-                              Copy
-                            </>
-                          )}
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => loadTemplate(template)}
+                            className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20"
+                            data-testid={`button-use-${template.id}`}
+                          >
+                            <Send className="w-3 h-3 mr-1" />
+                            Use
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => copyToClipboard(template.content, template.id)}
+                            className={copiedId === template.id ? 'bg-green-600' : 'bg-slate-700 hover:bg-slate-600'}
+                            data-testid={`button-copy-${template.id}`}
+                          >
+                            {copiedId === template.id ? (
+                              <>
+                                <Check className="w-3 h-3 mr-1" />
+                                Copied!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3 mr-1" />
+                                Copy
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                       
                       <pre className="text-xs text-slate-300 whitespace-pre-wrap font-sans bg-slate-900/50 rounded-lg p-3 max-h-32 overflow-y-auto">

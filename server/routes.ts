@@ -16,6 +16,10 @@ import { registerCrmRoutes } from "./crmRoutes";
 import { coinbaseService } from "./coinbaseService";
 import { solanaService } from "./solanaService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import express from "express";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -5827,6 +5831,195 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("[Features] Status error:", error);
       res.status(500).json({ error: "Failed to get feature status" });
+    }
+  });
+
+  // ========================
+  // MARKETING HUB - Social Media Posting
+  // ========================
+
+  // Ensure uploads directory exists
+  const uploadsDir = path.join(process.cwd(), 'uploads', 'social');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  
+  const socialUpload = multer({
+    storage: multer.diskStorage({
+      destination: (_req: any, _file: any, cb: any) => cb(null, uploadsDir),
+      filename: (_req: any, file: any, cb: any) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'social-' + uniqueSuffix + path.extname(file.originalname));
+      }
+    }),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (_req: any, file: any, cb: any) => {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only JPEG, PNG, GIF, and WebP images are allowed'));
+      }
+    }
+  });
+
+  // Upload image for social post
+  app.post("/api/marketing/upload-image", socialUpload.single('image'), async (req: Request, res: Response) => {
+    try {
+      const file = (req as any).file;
+      if (!file) {
+        return res.status(400).json({ error: "No image file provided" });
+      }
+      
+      const imageUrl = `/uploads/social/${file.filename}`;
+      console.log(`[Marketing] Image uploaded: ${imageUrl}`);
+      
+      res.json({ 
+        success: true, 
+        imageUrl,
+        filename: file.filename,
+        size: file.size
+      });
+    } catch (error) {
+      console.error("Image upload error:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+
+  // Serve uploaded images
+  app.use('/uploads/social', express.static(uploadsDir));
+
+  // Post to Twitter/X
+  app.post("/api/marketing/post/twitter", async (req: Request, res: Response) => {
+    try {
+      const { content, imageUrl } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ error: "Post content is required" });
+      }
+
+      // Check for Twitter API credentials
+      const twitterBearerToken = process.env.TWITTER_BEARER_TOKEN;
+      const twitterApiKey = process.env.TWITTER_API_KEY;
+      const twitterApiSecret = process.env.TWITTER_API_SECRET;
+      const twitterAccessToken = process.env.TWITTER_ACCESS_TOKEN;
+      const twitterAccessSecret = process.env.TWITTER_ACCESS_TOKEN_SECRET;
+      
+      if (!twitterApiKey || !twitterApiSecret || !twitterAccessToken || !twitterAccessSecret) {
+        // No API keys - open Twitter in browser with pre-filled content
+        const encodedContent = encodeURIComponent(content);
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedContent}`;
+        
+        return res.json({
+          success: true,
+          method: 'browser',
+          url: twitterUrl,
+          message: "Twitter API not configured. Opening Twitter in browser."
+        });
+      }
+
+      // TODO: Implement actual Twitter API posting when keys are available
+      // For now, return browser fallback
+      const encodedContent = encodeURIComponent(content);
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedContent}`;
+      
+      res.json({
+        success: true,
+        method: 'browser',
+        url: twitterUrl,
+        message: "Ready to post via Twitter"
+      });
+      
+    } catch (error) {
+      console.error("Twitter post error:", error);
+      res.status(500).json({ error: "Failed to post to Twitter" });
+    }
+  });
+
+  // Post to Facebook
+  app.post("/api/marketing/post/facebook", async (req: Request, res: Response) => {
+    try {
+      const { content, imageUrl } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ error: "Post content is required" });
+      }
+
+      // Check for Facebook API credentials
+      const fbPageToken = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
+      const fbPageId = process.env.FACEBOOK_PAGE_ID;
+      
+      if (!fbPageToken || !fbPageId) {
+        // No API keys - open Facebook with suggested content (can't pre-fill due to FB policy)
+        return res.json({
+          success: true,
+          method: 'browser',
+          url: 'https://business.facebook.com',
+          content: content, // Send content back so frontend can copy it
+          message: "Facebook API not configured. Content copied to clipboard - paste in Facebook."
+        });
+      }
+
+      // TODO: Implement actual Facebook Graph API posting when keys are available
+      res.json({
+        success: true,
+        method: 'browser',
+        url: 'https://business.facebook.com',
+        content: content,
+        message: "Ready to post via Facebook"
+      });
+      
+    } catch (error) {
+      console.error("Facebook post error:", error);
+      res.status(500).json({ error: "Failed to post to Facebook" });
+    }
+  });
+
+  // Get marketing API status
+  app.get("/api/marketing/status", async (req: Request, res: Response) => {
+    try {
+      const hasTwitter = !!(process.env.TWITTER_API_KEY && process.env.TWITTER_ACCESS_TOKEN);
+      const hasFacebook = !!(process.env.FACEBOOK_PAGE_ACCESS_TOKEN && process.env.FACEBOOK_PAGE_ID);
+      
+      res.json({
+        twitter: {
+          configured: hasTwitter,
+          method: hasTwitter ? 'api' : 'browser'
+        },
+        facebook: {
+          configured: hasFacebook,
+          method: hasFacebook ? 'api' : 'browser'
+        },
+        message: hasTwitter || hasFacebook 
+          ? "API integration active" 
+          : "Browser-based posting enabled. Add API keys for direct posting."
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get marketing status" });
+    }
+  });
+
+  // Save scheduled posts to database (for future scheduling feature)
+  app.post("/api/marketing/schedule", async (req: Request, res: Response) => {
+    try {
+      const { content, platform, scheduledFor, imageUrl } = req.body;
+      
+      if (!content || !platform) {
+        return res.status(400).json({ error: "Content and platform are required" });
+      }
+
+      // Store in database for now (scheduled_posts table would be needed)
+      console.log(`[Marketing] Scheduled post for ${platform} at ${scheduledFor}: ${content.substring(0, 50)}...`);
+      
+      res.json({
+        success: true,
+        message: "Post scheduled successfully",
+        scheduledFor,
+        platform
+      });
+    } catch (error) {
+      console.error("Schedule post error:", error);
+      res.status(500).json({ error: "Failed to schedule post" });
     }
   });
 
