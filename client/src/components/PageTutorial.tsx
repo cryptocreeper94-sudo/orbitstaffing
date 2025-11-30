@@ -27,6 +27,20 @@ const connectionRoutes: Record<string, string> = {
   "Reports": "/admin/reports",
   "Scheduling": "/admin/scheduling",
   "Dashboard": "/dashboard",
+  "Time Tracking": "/gps-clock-in",
+  "Onboarding": "/admin/workers",
+  "Security": "/settings",
+  "Shift Offers": "/worker/shift-offers",
+  "Availability": "/worker/availability",
+  "Time Off": "/worker/availability",
+  "My Applications": "/worker-portal",
+  "Saved Jobs": "/jobs",
+  "Profile": "/worker-portal",
+  "Preferences": "/settings",
+  "Notifications": "/settings",
+  "Analytics": "/admin/reports",
+  "Goals": "/crm",
+  "Job Matching": "/admin/worker-matching",
 };
 
 export interface TutorialSlide {
