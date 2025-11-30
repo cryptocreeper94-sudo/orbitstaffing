@@ -878,7 +878,15 @@ export const invoices = pgTable(
     // Status
     status: varchar("status", { length: 50 }).default("draft"), // draft, sent, viewed, paid, overdue
     paidAt: timestamp("paid_at"),
-    paymentMethod: varchar("payment_method", { length: 50 }),
+    paymentMethod: varchar("payment_method", { length: 50 }), // stripe, crypto, check, wire, ach
+
+    // Crypto Payment Tracking
+    cryptoChargeCode: varchar("crypto_charge_code", { length: 100 }), // Coinbase charge code
+    cryptoChargeUrl: text("crypto_charge_url"), // Hosted payment URL
+    cryptoPaymentStatus: varchar("crypto_payment_status", { length: 50 }), // pending, completed, expired, failed
+    cryptoCurrency: varchar("crypto_currency", { length: 20 }), // BTC, ETH, USDC, etc.
+    cryptoAmountPaid: decimal("crypto_amount_paid", { precision: 20, scale: 8 }), // Amount in crypto
+    cryptoTransactionId: varchar("crypto_transaction_id", { length: 255 }), // Blockchain tx hash
 
     // Hallmark
     hallmarkId: varchar("hallmark_id"),

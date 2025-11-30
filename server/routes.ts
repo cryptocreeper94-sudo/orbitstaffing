@@ -13,6 +13,7 @@ import { calculatePayroll } from "./payrollCalculator";
 import type { PayrollCalculationInput } from "./payrollCalculator";
 import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
 import { registerCrmRoutes } from "./crmRoutes";
+import { coinbaseService } from "./coinbaseService";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -110,6 +111,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Pay Card routes (ORBIT Pay Card waitlist and preferences)
   registerPayCardRoutes(app);
+  
+  // Register Crypto Payment routes (Coinbase Commerce for invoice payments)
+  registerCryptoPaymentRoutes(app);
 
   // ========================
   // V2 SIGNUP (Early Access Waitlist)
@@ -5902,6 +5906,228 @@ async function recalculateWorkerPerformance(workerId: string, tenantId: string) 
 }
 
 // Worker matching is handled by ./matchingService - see autoMatchWorkers and autoReassignWorkerRequest exports
+
+// ========================
+// Crypto Invoice Payments (Coinbase Commerce)
+// ========================
+
+export function registerCryptoPaymentRoutes(app: Express) {
+  // Check if crypto payments are available
+  app.get("/api/crypto/status", async (req: Request, res: Response) => {
+    res.json({ 
+      enabled: coinbaseService.isConfigured(),
+      provider: "coinbase_commerce",
+      supportedCurrencies: ["BTC", "ETH", "USDC", "LTC", "DOGE", "DAI"]
+    });
+  });
+
+  // Create crypto payment for an invoice
+  app.post("/api/invoices/:invoiceId/pay-crypto", async (req: Request, res: Response) => {
+    try {
+      if (!coinbaseService.isConfigured()) {
+        return res.status(503).json({ error: "Crypto payments not configured" });
+      }
+
+      const { invoiceId } = req.params;
+      const { returnUrl, cancelUrl } = req.body;
+      
+      // Get invoice details
+      const invoice = await db.execute(sql`
+        SELECT i.*, c.company_name, cl.company as client_name
+        FROM invoices i
+        LEFT JOIN companies c ON i.company_id = c.id
+        LEFT JOIN clients cl ON i.client_id = cl.id
+        WHERE i.id = ${invoiceId}
+      `);
+      
+      if (invoice.rows.length === 0) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+      
+      const inv = invoice.rows[0] as any;
+      
+      if (inv.status === 'paid') {
+        return res.status(400).json({ error: "Invoice already paid" });
+      }
+      
+      // Create Coinbase charge
+      const charge = await coinbaseService.createCharge({
+        name: `Invoice ${inv.invoice_number || invoiceId}`,
+        description: `Payment for ${inv.client_name || 'services'} - Invoice ${inv.invoice_number || invoiceId}`,
+        amount: inv.total?.toString() || "0",
+        currency: "USD",
+        metadata: {
+          invoiceId: invoiceId,
+          invoiceNumber: inv.invoice_number || "",
+          tenantId: inv.tenant_id || ""
+        },
+        redirect_url: returnUrl,
+        cancel_url: cancelUrl
+      });
+      
+      // Update invoice with crypto charge info
+      await db.execute(sql`
+        UPDATE invoices SET
+          crypto_charge_code = ${charge.code},
+          crypto_charge_url = ${charge.hosted_url},
+          crypto_payment_status = 'pending',
+          updated_at = NOW()
+        WHERE id = ${invoiceId}
+      `);
+      
+      console.log(`[Crypto] Created charge ${charge.code} for invoice ${invoiceId}`);
+      
+      res.json({
+        success: true,
+        chargeCode: charge.code,
+        hostedUrl: charge.hosted_url,
+        expiresAt: charge.expires_at,
+        addresses: charge.addresses
+      });
+    } catch (error) {
+      console.error("Crypto payment error:", error);
+      res.status(500).json({ error: "Failed to create crypto payment" });
+    }
+  });
+
+  // Check crypto payment status
+  app.get("/api/invoices/:invoiceId/crypto-status", async (req: Request, res: Response) => {
+    try {
+      if (!coinbaseService.isConfigured()) {
+        return res.status(503).json({ error: "Crypto payments not configured" });
+      }
+
+      const { invoiceId } = req.params;
+      
+      // Get invoice crypto info
+      const invoice = await db.execute(sql`
+        SELECT crypto_charge_code, crypto_payment_status, crypto_currency,
+               crypto_amount_paid, crypto_transaction_id, status
+        FROM invoices WHERE id = ${invoiceId}
+      `);
+      
+      if (invoice.rows.length === 0) {
+        return res.status(404).json({ error: "Invoice not found" });
+      }
+      
+      const inv = invoice.rows[0] as any;
+      
+      if (!inv.crypto_charge_code) {
+        return res.json({ status: "no_crypto_payment" });
+      }
+      
+      // Check with Coinbase for latest status
+      const charge = await coinbaseService.getCharge(inv.crypto_charge_code);
+      const status = coinbaseService.getChargeStatus(charge);
+      
+      // Update if status changed
+      if (status !== inv.crypto_payment_status) {
+        const payment = charge.payments?.[0];
+        await db.execute(sql`
+          UPDATE invoices SET
+            crypto_payment_status = ${status},
+            crypto_currency = ${payment?.value?.currency || null},
+            crypto_amount_paid = ${payment?.value?.amount || null},
+            crypto_transaction_id = ${payment?.transaction_id || null},
+            status = ${status === 'completed' ? 'paid' : inv.status},
+            paid_at = ${status === 'completed' ? sql`NOW()` : null},
+            payment_method = ${status === 'completed' ? 'crypto' : inv.payment_method},
+            updated_at = NOW()
+          WHERE id = ${invoiceId}
+        `);
+        
+        if (status === 'completed') {
+          console.log(`[Crypto] Invoice ${invoiceId} paid with ${payment?.value?.currency}`);
+        }
+      }
+      
+      res.json({
+        chargeCode: inv.crypto_charge_code,
+        status: status,
+        currency: charge.payments?.[0]?.value?.currency,
+        amountPaid: charge.payments?.[0]?.value?.amount,
+        transactionId: charge.payments?.[0]?.transaction_id,
+        invoicePaid: status === 'completed'
+      });
+    } catch (error) {
+      console.error("Crypto status check error:", error);
+      res.status(500).json({ error: "Failed to check payment status" });
+    }
+  });
+
+  // Coinbase webhook handler
+  app.post("/api/webhooks/coinbase", async (req: Request, res: Response) => {
+    try {
+      const signature = req.headers['x-cc-webhook-signature'] as string;
+      const webhookSecret = process.env.COINBASE_WEBHOOK_SECRET;
+      
+      // Verify signature if webhook secret is configured
+      if (webhookSecret && signature) {
+        const isValid = coinbaseService.verifyWebhookSignature(
+          JSON.stringify(req.body),
+          signature,
+          webhookSecret
+        );
+        if (!isValid) {
+          console.warn('[Crypto Webhook] Invalid signature');
+          return res.status(401).json({ error: "Invalid signature" });
+        }
+      }
+      
+      const event = coinbaseService.parseWebhookEvent(req.body);
+      console.log(`[Crypto Webhook] ${event.type} for charge ${event.chargeCode}`);
+      
+      if (event.invoiceId) {
+        // Update invoice based on webhook event
+        const status = event.status;
+        
+        if (status === 'completed') {
+          await db.execute(sql`
+            UPDATE invoices SET
+              crypto_payment_status = 'completed',
+              status = 'paid',
+              paid_at = NOW(),
+              payment_method = 'crypto',
+              updated_at = NOW()
+            WHERE crypto_charge_code = ${event.chargeCode}
+          `);
+          console.log(`[Crypto Webhook] Invoice ${event.invoiceId} marked as paid`);
+        } else if (status === 'expired' || status === 'failed') {
+          await db.execute(sql`
+            UPDATE invoices SET
+              crypto_payment_status = ${status},
+              updated_at = NOW()
+            WHERE crypto_charge_code = ${event.chargeCode}
+          `);
+        }
+      }
+      
+      res.json({ received: true });
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // List all crypto-enabled invoices for a tenant
+  app.get("/api/crypto/invoices", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT id, invoice_number, total, status, crypto_charge_code, 
+               crypto_payment_status, crypto_currency, crypto_amount_paid,
+               crypto_transaction_id, created_at
+        FROM invoices 
+        WHERE crypto_charge_code IS NOT NULL
+        ORDER BY created_at DESC
+        LIMIT 100
+      `);
+      
+      res.json({ invoices: result.rows });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to list crypto invoices" });
+    }
+  });
+}
 
 // ========================
 // ORBIT Pay Card API Routes
