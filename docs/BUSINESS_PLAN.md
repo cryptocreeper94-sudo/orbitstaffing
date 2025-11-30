@@ -2,9 +2,9 @@
 
 **Company:** DarkWave Studios  
 **Product:** ORBIT Staffing OS  
-**Date:** November 29, 2025  
+**Date:** November 30, 2025  
 **Status:** Production Ready  
-**Version:** 2.0 (with Orbit AI Assistant)
+**Version:** 2.1 (with Blockchain + Enhanced UI)
 
 ---
 
@@ -15,9 +15,26 @@ ORBIT Staffing OS is a comprehensive, white-label staffing automation platform d
 ### NEW: Orbit AI Mascot System
 - **Orbit** - Friendly cyan Saturn mascot that guides users throughout the platform
 - AI-powered chat assistant with contextual help for payroll, compliance, jobs, and pricing
-- Animated popups with comic-book style dialogs
+- **8-directional animated entries** (diagonal, up, down, sides) with spring physics
+- 8-second auto-timeout on all mascot popups
 - Transparent background mascot (processed via Python rembg) for seamless integration
 - Interactive click/hover responses on DarkWave Studios homepage
+- OrbitTooltip component with built-in terminology dictionary
+
+### NEW: Blockchain Document Verification
+- **Solana blockchain anchoring** for tamper-proof document verification
+- Connected to Solana mainnet via Helius RPC
+- Selective anchoring for 10 high-value document types (invoices, contracts, paystubs, certifications, etc.)
+- Merkle tree batching for cost-efficient transactions
+- Database-persisted queue and batch history
+- **Status:** Ready mode - operational, awaiting wallet funding
+
+### NEW: Enhanced UI/UX
+- Sparkle/glow effects on buttons and cards
+- Mobile-optimized touch targets (44px minimum)
+- Responsive typography scaling
+- Enhanced hover effects with 3D transforms
+- Accessibility improvements (focus states, reduced motion support)
 
 ### Mission Statement
 *"Automate your staffing. Scale your business. Zero friction."*

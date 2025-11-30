@@ -2,7 +2,7 @@
 
 **Company:** DarkWave Studios  
 **Product:** ORBIT Staffing OS  
-**Date:** November 29, 2025  
+**Date:** November 30, 2025  
 **Status:** Seeking Series Seed Funding
 
 ---
@@ -16,6 +16,8 @@ ORBIT Staffing OS is a **$1M+ ARR SaaS platform** for mid-market staffing agenci
 - **ORBIT CRM:** HubSpot-competitive CRM at 62% less cost
 - **Standalone Tools:** 5 individual tools from $15-$39/mo
 - **Affiliate Program:** 20-40% recurring commissions for partners
+- **Blockchain Integration:** Solana-based document verification (tamper-proof)
+- **Enhanced UI:** 8-directional mascot animations, sparkle effects, mobile polish
 
 **The Ask:**
 $500K - $1M seed funding to accelerate customer acquisition and build enterprise features (ISO 20022 banking compliance).
