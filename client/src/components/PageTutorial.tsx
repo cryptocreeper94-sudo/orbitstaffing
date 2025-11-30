@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "wouter";
 import { 
   X, ChevronLeft, ChevronRight, Play, HelpCircle, 
   Lightbulb, ArrowRight, CheckCircle2, Sparkles,
@@ -8,6 +9,25 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrbitMascot } from "./OrbitMascot";
+
+const connectionRoutes: Record<string, string> = {
+  "Job Board": "/talent-exchange",
+  "Employer Portal": "/employer/register",
+  "Owner Hub": "/owner-hub",
+  "Pricing": "/pricing",
+  "Free Trial": "/pricing",
+  "Contact Sales": "/sales",
+  "Workers": "/admin/workers",
+  "Assignments": "/admin/assignments",
+  "Payroll": "/admin/payroll",
+  "Settings": "/settings",
+  "Compliance": "/admin/compliance",
+  "Clients": "/admin/clients",
+  "Invoicing": "/admin/invoicing",
+  "Reports": "/admin/reports",
+  "Scheduling": "/admin/scheduling",
+  "Dashboard": "/dashboard",
+};
 
 export interface TutorialSlide {
   title: string;
@@ -87,6 +107,16 @@ function TutorialModal() {
   const { isOpen, closeTutorial, currentContent, markTutorialSeen } = useTutorial();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showIntro, setShowIntro] = useState(true);
+  const [, navigate] = useLocation();
+
+  const handleConnectionClick = (connectionName: string) => {
+    const route = connectionRoutes[connectionName];
+    if (route) {
+      markTutorialSeen(currentContent?.pageTitle || '');
+      closeTutorial();
+      navigate(route);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -273,12 +303,14 @@ function TutorialModal() {
                       </p>
                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {slide.connections.map((conn, i) => (
-                          <span 
+                          <button 
                             key={i}
-                            className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-medium"
+                            onClick={() => handleConnectionClick(conn)}
+                            className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-medium hover:bg-cyan-500/40 hover:text-white transition-all cursor-pointer active:scale-95"
+                            data-testid={`button-connection-${conn.toLowerCase().replace(/\s+/g, '-')}`}
                           >
                             {conn}
-                          </span>
+                          </button>
                         ))}
                       </div>
                     </div>
