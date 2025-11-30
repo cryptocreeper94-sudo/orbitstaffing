@@ -564,6 +564,10 @@ export const timesheets = pgTable(
     clockOutLongitude: decimal("clock_out_longitude", { precision: 9, scale: 6 }),
     clockOutVerified: boolean("clock_out_verified"),
 
+    // Weather conditions at clock-in/out for job site reporting
+    clockInWeather: jsonb("clock_in_weather"), // {temp, feelsLike, condition, humidity, windSpeed, windDirection, precipitation, visibility, uvIndex, pressure, alerts[]}
+    clockOutWeather: jsonb("clock_out_weather"), // Same structure as clockInWeather
+
     // Breaks
     lunchStart: timestamp("lunch_start"),
     lunchEnd: timestamp("lunch_end"),

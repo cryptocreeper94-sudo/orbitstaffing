@@ -1072,6 +1072,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   
   /**
+   * Helper function to fetch current weather data for job site reporting
+   */
+  async function fetchWeatherData(lat: number, lon: number): Promise<Record<string, unknown> | null> {
+    try {
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,surface_pressure&hourly=precipitation_probability&timezone=auto`
+      );
+      
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      const current = data.current;
+      
+      const weatherCodes: Record<number, { condition: string; description: string }> = {
+        0: { condition: 'Clear', description: 'Clear sky' },
+        1: { condition: 'Mainly Clear', description: 'Mainly clear' },
+        2: { condition: 'Partly Cloudy', description: 'Partly cloudy' },
+        3: { condition: 'Overcast', description: 'Overcast' },
+        45: { condition: 'Fog', description: 'Fog' },
+        48: { condition: 'Rime Fog', description: 'Depositing rime fog' },
+        51: { condition: 'Light Drizzle', description: 'Light drizzle' },
+        53: { condition: 'Drizzle', description: 'Moderate drizzle' },
+        55: { condition: 'Heavy Drizzle', description: 'Dense drizzle' },
+        61: { condition: 'Light Rain', description: 'Slight rain' },
+        63: { condition: 'Rain', description: 'Moderate rain' },
+        65: { condition: 'Heavy Rain', description: 'Heavy rain' },
+        66: { condition: 'Freezing Rain', description: 'Light freezing rain' },
+        67: { condition: 'Heavy Freezing Rain', description: 'Heavy freezing rain' },
+        71: { condition: 'Light Snow', description: 'Slight snow' },
+        73: { condition: 'Snow', description: 'Moderate snow' },
+        75: { condition: 'Heavy Snow', description: 'Heavy snow' },
+        80: { condition: 'Rain Showers', description: 'Slight rain showers' },
+        81: { condition: 'Rain Showers', description: 'Moderate rain showers' },
+        82: { condition: 'Heavy Showers', description: 'Violent rain showers' },
+        95: { condition: 'Thunderstorm', description: 'Thunderstorm' },
+        96: { condition: 'Thunderstorm', description: 'Thunderstorm with hail' },
+        99: { condition: 'Severe Thunderstorm', description: 'Thunderstorm with heavy hail' },
+      };
+
+      const code = current.weather_code || 0;
+      const weatherInfo = weatherCodes[code] || { condition: 'Unknown', description: 'Unknown' };
+      
+      const windDirections = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+      const windIndex = Math.round(current.wind_direction_10m / 22.5) % 16;
+      
+      const precip = data.hourly?.precipitation_probability?.[0] || 0;
+      
+      const alerts: string[] = [];
+      if (current.weather_code >= 95) alerts.push('Thunderstorm Warning');
+      if (current.wind_speed_10m > 40) alerts.push('High Wind Advisory');
+      if (current.temperature_2m < 0) alerts.push('Freezing Conditions');
+      if (current.temperature_2m > 35) alerts.push('Extreme Heat Warning');
+      
+      return {
+        temp: Math.round(current.temperature_2m * 9/5 + 32), // Convert to Fahrenheit
+        feelsLike: Math.round(current.apparent_temperature * 9/5 + 32),
+        condition: weatherInfo.condition,
+        description: weatherInfo.description,
+        humidity: current.relative_humidity_2m,
+        windSpeed: Math.round(current.wind_speed_10m * 0.621371), // Convert km/h to mph
+        windDirection: windDirections[windIndex],
+        precipitation: precip,
+        visibility: 10, // Default
+        pressure: Math.round(current.surface_pressure * 0.02953), // Convert hPa to inHg
+        alerts,
+        capturedAt: new Date().toISOString(),
+        latitude: lat,
+        longitude: lon,
+      };
+    } catch (error) {
+      console.error('Weather fetch error:', error);
+      return null;
+    }
+  }
+
+  /**
    * GPS Clock-In - Creates timesheet entry
    * Verifies worker is at job site using GPS geofence
    */
@@ -1114,7 +1190,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Create timesheet entry
+      // Fetch current weather conditions for job site reporting
+      const weatherData = await fetchWeatherData(latitude, longitude);
+      
+      // Create timesheet entry with weather data
       const timesheet = await storage.createTimesheet({
         workerId,
         tenantId,
@@ -1123,16 +1202,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         clockInLatitude: latitude.toString(),
         clockInLongitude: longitude.toString(),
         clockInVerified: true,
+        clockInWeather: weatherData,
         status: 'draft',
       });
       
       console.log(`[GPS Clock-In] ✅ Worker ${workerId} clocked in at assignment ${assignmentId}`);
+      if (weatherData) {
+        console.log(`[GPS Clock-In] 🌤️ Weather captured: ${weatherData.temp}°F, ${weatherData.condition}`);
+      }
       
       res.json({
         success: true,
         timesheetId: timesheet.id,
         clockInTime: timesheet.clockInTime,
         verified: true,
+        weather: weatherData,
       });
     } catch (error) {
       console.error('GPS clock-in error:', error);
@@ -1177,12 +1261,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         geofenceRadiusFeet
       );
       
-      // Update timesheet with clock-out info
+      // Fetch current weather conditions for job site reporting
+      const weatherData = await fetchWeatherData(latitude, longitude);
+      
+      // Update timesheet with clock-out info and weather
       await storage.updateTimesheet(timesheetId, {
         clockOutTime: new Date(),
         clockOutLatitude: latitude.toString(),
         clockOutLongitude: longitude.toString(),
         clockOutVerified: isWithinGeofence,
+        clockOutWeather: weatherData,
       });
       
       // AUTO-APPROVE if GPS verified and hours reasonable
@@ -1192,6 +1280,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedTimesheet = await storage.getTimesheet(timesheetId);
       
       console.log(`[GPS Clock-Out] ✅ Worker ${timesheet.workerId} clocked out from assignment ${timesheet.assignmentId}`);
+      if (weatherData) {
+        console.log(`[GPS Clock-Out] 🌤️ Weather captured: ${weatherData.temp}°F, ${weatherData.condition}`);
+      }
       
       res.json({
         success: true,
@@ -1199,6 +1290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hoursWorked: updatedTimesheet?.totalHoursWorked,
         status: updatedTimesheet?.status,
         verified: isWithinGeofence,
+        weather: weatherData,
       });
     } catch (error) {
       console.error('GPS clock-out error:', error);
