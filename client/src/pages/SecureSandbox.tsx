@@ -1,9 +1,13 @@
 /**
- * Secure Sandbox - Hidden PIN 4444 Access
- * Access all three sandboxes: Owner, Admin, Employee
- * Developer Playground for testing integrations
+ * Secure Sandbox - Multi-PIN Access System
+ * 
+ * PIN STRUCTURE:
+ * - 4444 = Sidonie (read-only access to all views)
+ * - 0424 = Dev PIN (full access - Jason uses this)
+ * - Jason bypasses login → direct to /developer-panel
+ * 
+ * Access: Owner, Admin, Employee sandboxes
  * Only accessible via /sandbox-secure (not publicly visible)
- * Both users can access all views - Sidonie read-only, You full control
  */
 import React, { useState } from 'react';
 import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft, 
@@ -620,9 +624,10 @@ export default function SecureSandbox() {
               </div>
               <h3 className="font-bold text-white text-lg mb-1">Jason</h3>
               <p className="text-xs text-gray-400">DarkWave Studios founder</p>
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
-                <span className="px-2 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded">vanity: /jason</span>
+                <span className="px-2 py-0.5 text-[10px] bg-green-600/20 text-green-300 rounded">PIN: 0424</span>
+                <span className="px-2 py-0.5 text-[10px] bg-cyan-600/20 text-cyan-300 rounded">bypass → dev</span>
               </div>
             </div>
 
@@ -638,9 +643,10 @@ export default function SecureSandbox() {
               </div>
               <h3 className="font-bold text-white text-lg mb-1">Sidonie</h3>
               <p className="text-xs text-gray-400">Core team member</p>
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
-                <span className="px-2 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded">vanity: /sidonie</span>
+                <span className="px-2 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded">PIN: 4444</span>
+                <span className="px-2 py-0.5 text-[10px] bg-orange-600/20 text-orange-300 rounded">read-only</span>
               </div>
             </div>
           </div>

@@ -218,6 +218,10 @@ export function isReservedRange(masterNumber: number): boolean {
 
 /**
  * Founding assets - permanently reserved with special edition formatting
+ * 
+ * ACCESS STRUCTURE:
+ * - Jason (PIN: 0424) → bypasses login → /developer-panel (full access)
+ * - Sidonie (PIN: 4444) → sandbox access (read-only)
  */
 export const FOUNDING_ASSETS = {
   ORBIT_PLATFORM: { 
@@ -227,6 +231,7 @@ export const FOUNDING_ASSETS = {
     type: 'platform',
     vanity: 'origin',
     badge: 'Genesis Platform',
+    access: 'public',
   },
   JASON_FOUNDER: { 
     number: formatAssetNumber(2, 0), 
@@ -235,6 +240,7 @@ export const FOUNDING_ASSETS = {
     type: 'founder',
     vanity: 'jason',
     badge: 'Founding Developer',
+    access: 'dev-bypass', // PIN 0424, bypasses to /developer-panel
   },
   SIDONIE_TEAM: { 
     number: formatAssetNumber(3, 0), 
@@ -243,6 +249,7 @@ export const FOUNDING_ASSETS = {
     type: 'team',
     vanity: 'sidonie',
     badge: 'Founding Team',
+    access: 'read-only', // PIN 4444, sandbox access
   },
 };
 
