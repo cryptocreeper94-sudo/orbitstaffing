@@ -188,6 +188,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // HALLMARK SYSTEM (100 Billion Capacity)
+  // ========================
+  app.get("/api/hallmark/info", async (req: Request, res: Response) => {
+    try {
+      const { 
+        RESERVED_RANGES, 
+        EDITION_PREFIXES, 
+        FOUNDING_ASSETS 
+      } = await import('./hallmarkService');
+      
+      res.json({
+        format: {
+          standard: '#XXXXXXXXX-YY',
+          special: '#XX-XXXXXXXXX-YY',
+          capacity: '100 billion total hallmarks',
+        },
+        ranges: RESERVED_RANGES,
+        prefixes: EDITION_PREFIXES,
+        foundingAssets: Object.values(FOUNDING_ASSETS),
+      });
+    } catch (error) {
+      console.error("[Hallmark] Error:", error);
+      res.status(500).json({ error: "Failed to get hallmark info" });
+    }
+  });
+
+  app.get("/api/hallmark/vanity/:name", async (req: Request, res: Response) => {
+    try {
+      const { resolveVanityName, getAssetBadge } = await import('./hallmarkService');
+      const { name } = req.params;
+      
+      const asset = resolveVanityName(name);
+      if (!asset) {
+        return res.status(404).json({ error: "Vanity name not found" });
+      }
+      
+      const badge = getAssetBadge(asset.number);
+      
+      res.json({
+        ...asset,
+        badge,
+        verifyUrl: `https://orbitstaffing.io/verify/${asset.number}`,
+      });
+    } catch (error) {
+      console.error("[Hallmark] Vanity lookup error:", error);
+      res.status(500).json({ error: "Failed to resolve vanity name" });
+    }
+  });
+
+  app.get("/api/hallmark/parse/:hallmark", async (req: Request, res: Response) => {
+    try {
+      const { parseHallmark, getAssetBadge } = await import('./hallmarkService');
+      const { hallmark } = req.params;
+      
+      const parsed = parseHallmark(decodeURIComponent(hallmark));
+      if (!parsed) {
+        return res.status(400).json({ error: "Invalid hallmark format" });
+      }
+      
+      const badge = getAssetBadge(decodeURIComponent(hallmark));
+      
+      res.json({
+        ...parsed,
+        badge,
+        verifyUrl: `https://orbitstaffing.io/verify/${hallmark}`,
+      });
+    } catch (error) {
+      console.error("[Hallmark] Parse error:", error);
+      res.status(500).json({ error: "Failed to parse hallmark" });
+    }
+  });
+
+  app.get("/api/hallmark/founders", async (req: Request, res: Response) => {
+    try {
+      const { FOUNDING_ASSETS, getAssetBadge } = await import('./hallmarkService');
+      
+      const founders = Object.entries(FOUNDING_ASSETS).map(([key, asset]) => ({
+        key,
+        ...asset,
+        badge: getAssetBadge(asset.number),
+      }));
+      
+      res.json({ founders });
+    } catch (error) {
+      console.error("[Hallmark] Founders error:", error);
+      res.status(500).json({ error: "Failed to get founders" });
+    }
+  });
+
+  // ========================
   // V2 SIGNUP (Early Access Waitlist)
   // ========================
   app.post("/api/v2-signup", async (req: Request, res: Response) => {
