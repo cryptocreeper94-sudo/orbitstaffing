@@ -71,14 +71,14 @@ export function FloatingTutorialButton() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 left-6 z-50">
       <AnimatePresence>
         {isExpanded && (
           <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.9 }}
-            className="absolute bottom-16 right-0 w-64 p-4 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/30 shadow-xl shadow-cyan-500/10"
+            className="absolute bottom-16 left-0 w-64 p-4 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/30 shadow-xl shadow-cyan-500/10"
           >
             <button 
               onClick={() => setIsExpanded(false)}
