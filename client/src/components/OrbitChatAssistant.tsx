@@ -89,7 +89,7 @@ export function OrbitChatAssistant() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Hey! I'm Orbit, your AI assistant. Ask me anything about the platform - payroll, workers, compliance, jobs, or pricing. I'm here to help!",
+      content: "Hey! I'm Orby, your AI assistant! Ask me anything about the platform - payroll, workers, compliance, jobs, or pricing. I'm floating here to help! 🪐",
       timestamp: new Date(),
     },
   ]);
@@ -153,7 +153,7 @@ export function OrbitChatAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-28 right-8 z-[150] w-[380px] max-w-[calc(100vw-48px)]"
+            className="fixed bottom-32 right-6 z-[150] w-[380px] max-w-[calc(100vw-48px)]"
           >
             <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 overflow-hidden">
               <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
@@ -167,8 +167,8 @@ export function OrbitChatAssistant() {
                     <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white">Orbit Assistant</h3>
-                    <p className="text-xs text-cyan-400">AI-powered help</p>
+                    <h3 className="font-bold text-white">Orby</h3>
+                    <p className="text-xs text-cyan-400">Your AI Assistant</p>
                   </div>
                 </div>
                 <Button
@@ -254,7 +254,7 @@ export function OrbitChatAssistant() {
                   </Button>
                 </div>
                 <p className="text-xs text-slate-500 mt-2 text-center">
-                  Powered by ORBIT AI
+                  Powered by Orby AI 🪐
                 </p>
               </div>
             </div>
@@ -262,46 +262,89 @@ export function OrbitChatAssistant() {
         )}
       </AnimatePresence>
 
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-8 right-8 z-[150] w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 flex items-center justify-center text-white hover:shadow-cyan-500/50 transition-shadow border-2 border-cyan-400/50"
-        data-testid="button-orbit-chat"
-        style={{ boxShadow: '0 0 30px rgba(6, 182, 212, 0.5)' }}
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
+      {/* Floating Orby Mascot - True AI Representative */}
+      <div className="fixed bottom-6 right-6 z-[150]" data-testid="floating-orby-container">
+        {/* Speech Bubble - Shows when chat is closed */}
+        <AnimatePresence>
+          {!isOpen && (
             <motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
+              initial={{ opacity: 0, scale: 0.8, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 10 }}
+              className="absolute -top-16 right-0 bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/50 rounded-2xl px-4 py-2 shadow-lg shadow-cyan-500/20 whitespace-nowrap"
+              style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.3))' }}
             >
-              <ChevronDown className="w-6 h-6" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="chat"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
-              className="relative"
-            >
-              <img 
-                src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
-                alt="Orbit" 
-                className="w-10 h-10 object-contain"
-              />
-              <motion.span
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-cyan-500"
-              />
+              <p className="text-sm text-cyan-300 font-medium">Need help? Ask Orby!</p>
+              <div className="absolute -bottom-2 right-8 w-4 h-4 bg-slate-900 border-r border-b border-cyan-500/50 transform rotate-45" />
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.button>
+
+        {/* Floating Orby Character */}
+        <motion.button
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative bg-transparent border-none cursor-pointer p-0 outline-none focus:outline-none"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          data-testid="button-orbit-chat"
+          aria-label={isOpen ? "Close Orby chat" : "Open Orby chat"}
+          aria-expanded={isOpen}
+        >
+          {/* Glow effect underneath Orby */}
+          <motion.div
+            className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-full bg-cyan-500/30 blur-xl"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          
+          {/* Orby floating animation */}
+          <motion.div
+            animate={{ 
+              y: [0, -8, 0],
+              rotate: isOpen ? 0 : [0, 3, -3, 0]
+            }}
+            transition={{ 
+              y: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
+              rotate: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="relative"
+          >
+            {/* The actual Orby mascot image */}
+            <img 
+              src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
+              alt="Orby - AI Assistant" 
+              className="w-24 h-24 object-contain drop-shadow-[0_0_25px_rgba(6,182,212,0.6)]"
+              style={{
+                filter: 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.5)) drop-shadow(0 0 40px rgba(6, 182, 212, 0.3))'
+              }}
+            />
+            
+            {/* Online indicator */}
+            <motion.div
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 shadow-lg shadow-green-500/50"
+            />
+            
+            {/* Close X overlay when open */}
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  className="absolute inset-0 flex items-center justify-center bg-slate-900/80 rounded-full"
+                >
+                  <X className="w-8 h-8 text-cyan-400" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.button>
+      </div>
     </>
   );
 }
