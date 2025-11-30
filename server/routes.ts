@@ -5920,7 +5920,7 @@ export function registerBlockchainRoutes(app: Express) {
   // Get blockchain anchoring status and stats
   app.get("/api/blockchain/status", async (req: Request, res: Response) => {
     try {
-      const stats = solanaService.getStats();
+      const stats = await solanaService.getStats();
       res.json({
         ...stats,
         configured: solanaService.isConfigured(),
@@ -5937,7 +5937,7 @@ export function registerBlockchainRoutes(app: Express) {
   // View current hash queue
   app.get("/api/blockchain/queue", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
-      const queue = solanaService.getQueuedHashes();
+      const queue = await solanaService.getQueuedHashes();
       res.json({ 
         queueSize: queue.length,
         hashes: queue,
@@ -5971,10 +5971,10 @@ export function registerBlockchainRoutes(app: Express) {
   // View anchored batches history
   app.get("/api/blockchain/batches", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
-      const batches = solanaService.getAnchoredBatches();
+      const batches = await solanaService.getAnchoredBatches();
       res.json({ 
         totalBatches: batches.length,
-        batches: batches.slice(-20).reverse() // Last 20, newest first
+        batches: batches.slice(0, 20) // Already sorted DESC in the query
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to get batches" });

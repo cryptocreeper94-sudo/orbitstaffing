@@ -4865,3 +4865,69 @@ export const insertWorkerPaymentPreferencesSchema = createInsertSchema(workerPay
 
 export type InsertWorkerPaymentPreferences = z.infer<typeof insertWorkerPaymentPreferencesSchema>;
 export type WorkerPaymentPreferences = typeof workerPaymentPreferences.$inferSelect;
+
+// ========================
+// Blockchain Hash Anchoring Queue
+// ========================
+export const blockchainHashQueue = pgTable(
+  "blockchain_hash_queue",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    hallmarkId: varchar("hallmark_id").notNull(),
+    contentHash: varchar("content_hash", { length: 128 }).notNull(),
+    assetType: varchar("asset_type", { length: 50 }).notNull(),
+    
+    status: varchar("status", { length: 20 }).default("queued"),
+    merkleRoot: varchar("merkle_root", { length: 128 }),
+    batchId: varchar("batch_id"),
+    
+    queuedAt: timestamp("queued_at").default(sql`NOW()`),
+    anchoredAt: timestamp("anchored_at"),
+  },
+  (table) => ({
+    statusIdx: index("idx_blockchain_queue_status").on(table.status),
+    hallmarkIdx: index("idx_blockchain_queue_hallmark").on(table.hallmarkId),
+    batchIdx: index("idx_blockchain_queue_batch").on(table.batchId),
+  })
+);
+
+export const insertBlockchainHashQueueSchema = createInsertSchema(blockchainHashQueue).omit({
+  id: true,
+  queuedAt: true,
+  anchoredAt: true,
+});
+
+export type InsertBlockchainHashQueue = z.infer<typeof insertBlockchainHashQueueSchema>;
+export type BlockchainHashQueue = typeof blockchainHashQueue.$inferSelect;
+
+// ========================
+// Blockchain Anchor Batches
+// ========================
+export const blockchainAnchorBatches = pgTable(
+  "blockchain_anchor_batches",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    merkleRoot: varchar("merkle_root", { length: 128 }).notNull(),
+    transactionSignature: varchar("transaction_signature", { length: 128 }),
+    hashCount: integer("hash_count").notNull().default(0),
+    
+    mode: varchar("mode", { length: 20 }).default("simulation"),
+    explorerUrl: varchar("explorer_url", { length: 255 }),
+    
+    anchoredAt: timestamp("anchored_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    modeIdx: index("idx_blockchain_batch_mode").on(table.mode),
+    anchoredAtIdx: index("idx_blockchain_batch_anchored").on(table.anchoredAt),
+  })
+);
+
+export const insertBlockchainAnchorBatchSchema = createInsertSchema(blockchainAnchorBatches).omit({
+  id: true,
+  anchoredAt: true,
+});
+
+export type InsertBlockchainAnchorBatch = z.infer<typeof insertBlockchainAnchorBatchSchema>;
+export type BlockchainAnchorBatch = typeof blockchainAnchorBatches.$inferSelect;

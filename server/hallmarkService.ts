@@ -121,6 +121,6 @@ export async function queueForBlockchain(
 /**
  * Get blockchain anchoring statistics
  */
-export function getBlockchainStats() {
-  return solanaService.getStats();
+export async function getBlockchainStats() {
+  return await solanaService.getStats();
 }
