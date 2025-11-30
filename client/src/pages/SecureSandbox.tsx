@@ -576,7 +576,88 @@ export default function SecureSandbox() {
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
               </div>
               <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Hallmarks</h3>
-              <p className="text-[10px] sm:text-xs text-gray-500">Blockchain</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">100B capacity</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Founding Assets Registry */}
+        <div className="mt-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">👑</span>
+            <h2 className="text-xl font-bold text-white">Founding Asset Registry</h2>
+            <span className="px-2 py-0.5 text-xs bg-yellow-600/30 text-yellow-300 rounded-full">Reserved</span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* ORBIT Platform */}
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-yellow-500/30 rounded-lg p-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-500/10 rounded-full -mr-10 -mt-10"></div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xl">🪐</span>
+                <div>
+                  <p className="font-mono text-yellow-400 text-sm">#000000001-00</p>
+                  <p className="text-[10px] text-gray-500">Genesis Platform</p>
+                </div>
+              </div>
+              <h3 className="font-bold text-white text-lg mb-1">ORBIT Staffing OS</h3>
+              <p className="text-xs text-gray-400">The origin of all hallmarks</p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
+                <span className="px-2 py-0.5 text-[10px] bg-cyan-600/20 text-cyan-300 rounded">Solana Verified</span>
+              </div>
+            </div>
+
+            {/* Jason - Founder */}
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-yellow-500/30 rounded-lg p-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-500/10 rounded-full -mr-10 -mt-10"></div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xl">👨‍💻</span>
+                <div>
+                  <p className="font-mono text-yellow-400 text-sm">#000000002-00</p>
+                  <p className="text-[10px] text-gray-500">Founding Developer</p>
+                </div>
+              </div>
+              <h3 className="font-bold text-white text-lg mb-1">Jason</h3>
+              <p className="text-xs text-gray-400">DarkWave Studios founder</p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
+                <span className="px-2 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded">vanity: /jason</span>
+              </div>
+            </div>
+
+            {/* Sidonie - Team */}
+            <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-yellow-500/30 rounded-lg p-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-500/10 rounded-full -mr-10 -mt-10"></div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xl">👩‍💼</span>
+                <div>
+                  <p className="font-mono text-yellow-400 text-sm">#000000003-00</p>
+                  <p className="text-[10px] text-gray-500">Founding Team</p>
+                </div>
+              </div>
+              <h3 className="font-bold text-white text-lg mb-1">Sidonie</h3>
+              <p className="text-xs text-gray-400">Core team member</p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
+                <span className="px-2 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded">vanity: /sidonie</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Capacity Info */}
+          <div className="mt-4 bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-white font-semibold">100 Billion Hallmark Capacity</p>
+                <p className="text-xs text-gray-500">Format: #XXXXXXXXX-YY (9 digits + 2 sub-sequence)</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="px-2 py-1 text-xs bg-yellow-600/20 text-yellow-300 rounded border border-yellow-500/30">1-99: Founders</span>
+                <span className="px-2 py-1 text-xs bg-purple-600/20 text-purple-300 rounded border border-purple-500/30">100-999: Special</span>
+                <span className="px-2 py-1 text-xs bg-cyan-600/20 text-cyan-300 rounded border border-cyan-500/30">1000-1999: Genesis</span>
+                <span className="px-2 py-1 text-xs bg-green-600/20 text-green-300 rounded border border-green-500/30">3000+: General</span>
+              </div>
             </div>
           </div>
         </div>
