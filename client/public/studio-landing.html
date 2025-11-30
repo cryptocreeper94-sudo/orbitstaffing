@@ -1203,50 +1203,91 @@
                 Tell us what you need, and we'll engineer the solution.
             </p>
             
-            <!-- Blockchain Hallmark Badge -->
+            <!-- Blockchain Hallmark Badge - Compact Thumbnail -->
             <div style="display: flex; justify-content: center; margin-top: 30px;">
-                <a href="/hallmark-seal" style="text-decoration: none;">
-                    <div style="display: flex; flex-direction: column; align-items: center; padding: 20px; background: linear-gradient(135deg, rgba(10,15,30,0.9), rgba(20,30,50,0.9)); border: 2px solid rgba(6,182,212,0.5); border-radius: 16px; box-shadow: 0 0 40px rgba(6,182,212,0.3), inset 0 0 20px rgba(6,182,212,0.1); cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 60px rgba(6,182,212,0.5), inset 0 0 30px rgba(6,182,212,0.2)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 40px rgba(6,182,212,0.3), inset 0 0 20px rgba(6,182,212,0.1)';">
-                        <!-- Saturn with QR -->
-                        <div style="position: relative; width: 120px; height: 120px;">
-                            <img src="/orbit-saturn-logo.png" alt="ORBIT Hallmark" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 20px rgba(6,182,212,0.6));">
-                            <!-- QR Code in center -->
-                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; background: white; border-radius: 6px; padding: 3px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-                                <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
-                                    <rect x="0" y="0" width="30" height="30" fill="#000"/>
-                                    <rect x="70" y="0" width="30" height="30" fill="#000"/>
-                                    <rect x="0" y="70" width="30" height="30" fill="#000"/>
-                                    <rect x="10" y="10" width="10" height="10" fill="#fff"/>
-                                    <rect x="80" y="10" width="10" height="10" fill="#fff"/>
-                                    <rect x="10" y="80" width="10" height="10" fill="#fff"/>
-                                    <rect x="40" y="0" width="20" height="10" fill="#000"/>
-                                    <rect x="40" y="20" width="10" height="10" fill="#000"/>
-                                    <rect x="0" y="40" width="10" height="20" fill="#000"/>
-                                    <rect x="20" y="40" width="10" height="10" fill="#000"/>
-                                    <rect x="40" y="40" width="20" height="20" fill="#000"/>
-                                    <rect x="70" y="40" width="10" height="10" fill="#000"/>
-                                    <rect x="90" y="40" width="10" height="20" fill="#000"/>
-                                    <rect x="40" y="70" width="10" height="10" fill="#000"/>
-                                    <rect x="60" y="70" width="10" height="10" fill="#000"/>
-                                    <rect x="80" y="70" width="20" height="10" fill="#000"/>
-                                    <rect x="70" y="80" width="10" height="20" fill="#000"/>
-                                    <rect x="90" y="90" width="10" height="10" fill="#000"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <!-- Powered by ORBIT -->
-                        <div style="margin-top: 8px; text-align: center;">
-                            <div style="font-size: 0.65rem; color: #06b6d4; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">Powered by ORBIT</div>
-                            <div style="font-size: 1.2rem; font-family: monospace; font-weight: bold; color: #fbbf24; letter-spacing: 0.15em;">#00000</div>
-                        </div>
-                        <!-- Solana Badge -->
-                        <div style="margin-top: 8px; background: linear-gradient(135deg, #9945FF, #14F195); padding: 4px 12px; border-radius: 12px; font-size: 0.65rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 4px;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                            SOLANA VERIFIED
-                        </div>
+                <div onclick="openHallmarkModal()" style="display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: linear-gradient(135deg, rgba(10,15,30,0.9), rgba(20,30,50,0.9)); border: 2px solid rgba(6,182,212,0.5); border-radius: 12px; box-shadow: 0 0 30px rgba(6,182,212,0.2); cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='scale(1.03)'; this.style.boxShadow='0 0 40px rgba(6,182,212,0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 30px rgba(6,182,212,0.2)';">
+                    <!-- Small Saturn Icon -->
+                    <img src="/orbit-saturn-logo.png" alt="ORBIT" style="width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(6,182,212,0.6));">
+                    <!-- Text -->
+                    <div style="text-align: left;">
+                        <div style="font-size: 0.75rem; color: #06b6d4; font-weight: 600;">Blockchain Verified</div>
+                        <div style="font-size: 0.65rem; color: #9ca3af;">Click to view Hallmark QR</div>
                     </div>
-                </a>
+                    <!-- Solana Badge -->
+                    <div style="background: linear-gradient(135deg, #9945FF, #14F195); padding: 4px 10px; border-radius: 8px; font-size: 0.6rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 4px;">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        SOLANA
+                    </div>
+                </div>
             </div>
+            
+            <!-- Hallmark QR Modal -->
+            <div id="hallmarkModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; align-items: center; justify-content: center;">
+                <div style="background: linear-gradient(135deg, rgba(10,15,30,0.98), rgba(20,30,50,0.98)); border: 2px solid rgba(6,182,212,0.5); border-radius: 20px; padding: 30px; max-width: 380px; width: 90%; text-align: center; position: relative; box-shadow: 0 0 60px rgba(6,182,212,0.4);">
+                    <!-- Close Button -->
+                    <button onclick="closeHallmarkModal()" style="position: absolute; top: 15px; right: 15px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.5); color: #ef4444; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">×</button>
+                    
+                    <!-- Saturn Logo -->
+                    <img src="/orbit-saturn-logo.png" alt="ORBIT Hallmark" style="width: 80px; height: 80px; margin: 0 auto 15px; filter: drop-shadow(0 0 20px rgba(6,182,212,0.6));">
+                    
+                    <!-- Title -->
+                    <h3 style="color: #06b6d4; font-size: 1.3rem; margin-bottom: 5px;">Digital Hallmark™</h3>
+                    <p style="color: #9ca3af; font-size: 0.8rem; margin-bottom: 20px;">Scan to verify on Solana blockchain</p>
+                    
+                    <!-- QR Code - Proper Size -->
+                    <div style="background: white; border-radius: 12px; padding: 15px; display: inline-block; margin-bottom: 20px;">
+                        <svg viewBox="0 0 100 100" style="width: 180px; height: 180px;">
+                            <rect x="0" y="0" width="30" height="30" fill="#000"/>
+                            <rect x="70" y="0" width="30" height="30" fill="#000"/>
+                            <rect x="0" y="70" width="30" height="30" fill="#000"/>
+                            <rect x="10" y="10" width="10" height="10" fill="#fff"/>
+                            <rect x="80" y="10" width="10" height="10" fill="#fff"/>
+                            <rect x="10" y="80" width="10" height="10" fill="#fff"/>
+                            <rect x="40" y="0" width="20" height="10" fill="#000"/>
+                            <rect x="40" y="20" width="10" height="10" fill="#000"/>
+                            <rect x="0" y="40" width="10" height="20" fill="#000"/>
+                            <rect x="20" y="40" width="10" height="10" fill="#000"/>
+                            <rect x="40" y="40" width="20" height="20" fill="#000"/>
+                            <rect x="70" y="40" width="10" height="10" fill="#000"/>
+                            <rect x="90" y="40" width="10" height="20" fill="#000"/>
+                            <rect x="40" y="70" width="10" height="10" fill="#000"/>
+                            <rect x="60" y="70" width="10" height="10" fill="#000"/>
+                            <rect x="80" y="70" width="20" height="10" fill="#000"/>
+                            <rect x="70" y="80" width="10" height="20" fill="#000"/>
+                            <rect x="90" y="90" width="10" height="10" fill="#000"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Hallmark ID -->
+                    <div style="margin-bottom: 15px;">
+                        <div style="font-size: 0.7rem; color: #06b6d4; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">Powered by ORBIT</div>
+                        <div style="font-size: 1.4rem; font-family: monospace; font-weight: bold; color: #fbbf24; letter-spacing: 0.15em;">#00000</div>
+                    </div>
+                    
+                    <!-- Solana Badge -->
+                    <div style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #9945FF, #14F195); padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: white;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        SOLANA BLOCKCHAIN VERIFIED
+                    </div>
+                    
+                    <!-- View Full Details Link -->
+                    <a href="/hallmark-seal" style="display: block; margin-top: 20px; color: #06b6d4; font-size: 0.8rem; text-decoration: none;">View Full Verification Details →</a>
+                </div>
+            </div>
+            
+            <script>
+                function openHallmarkModal() {
+                    document.getElementById('hallmarkModal').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+                function closeHallmarkModal() {
+                    document.getElementById('hallmarkModal').style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+                document.getElementById('hallmarkModal').addEventListener('click', function(e) {
+                    if (e.target === this) closeHallmarkModal();
+                });
+            </script>
         </section>
 
         <section>
