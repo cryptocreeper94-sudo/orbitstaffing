@@ -219,25 +219,34 @@ export default function InteractiveWeatherRadar({
   }, [fetchWeatherByCoords]);
 
   const searchByZip = async (saveToStorage = true) => {
-    if (!zipCode || zipCode.length !== 5) return;
+    if (!zipCode || zipCode.length !== 5 || !/^\d{5}$/.test(zipCode)) {
+      setError('Enter a valid 5-digit ZIP code');
+      return;
+    }
     
     setLoading(true);
     setError(null);
     setIsLocationSaved(false);
     
     try {
-      const response = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${zipCode}&count=1&language=en&format=json`
-      );
+      // Use Zippopotam.us API for US zip code lookup
+      const response = await fetch(`https://api.zippopotam.us/us/${zipCode}`);
+      
+      if (!response.ok) {
+        setError('ZIP code not found');
+        setLoading(false);
+        return;
+      }
+      
       const data = await response.json();
       
-      if (data.results && data.results.length > 0) {
-        const result = data.results[0];
+      if (data.places && data.places.length > 0) {
+        const place = data.places[0];
         const loc = {
-          lat: result.latitude,
-          lon: result.longitude,
-          city: result.name,
-          state: result.admin1,
+          lat: parseFloat(place.latitude),
+          lon: parseFloat(place.longitude),
+          city: place['place name'],
+          state: place['state abbreviation'],
         };
         setLocation(loc);
         await fetchWeatherByCoords(loc.lat, loc.lon);
@@ -257,7 +266,7 @@ export default function InteractiveWeatherRadar({
         setLoading(false);
       }
     } catch (err) {
-      setError('Search failed');
+      setError('Search failed - check ZIP code');
       setLoading(false);
     }
   };
