@@ -35,6 +35,35 @@ interface LocationData {
 }
 
 const RAINVIEWER_API = 'https://api.rainviewer.com/public/weather-maps.json';
+const WEATHER_STORAGE_KEY = 'orbit_weather_location';
+
+interface SavedLocation {
+  zipCode: string;
+  lat: number;
+  lon: number;
+  city?: string;
+  state?: string;
+}
+
+const getSavedLocation = (): SavedLocation | null => {
+  try {
+    if (typeof window === 'undefined') return null;
+    const saved = localStorage.getItem(WEATHER_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+};
+
+const saveLocation = (data: SavedLocation) => {
+  try {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(WEATHER_STORAGE_KEY, JSON.stringify(data));
+    }
+  } catch {
+    console.error('Failed to save location');
+  }
+};
 
 export default function InteractiveWeatherRadar({
   onWeatherCapture,
@@ -54,6 +83,8 @@ export default function InteractiveWeatherRadar({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [zipCode, setZipCode] = useState('');
+  const [isLocationSaved, setIsLocationSaved] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -187,10 +218,13 @@ export default function InteractiveWeatherRadar({
     }
   }, [fetchWeatherByCoords]);
 
-  const searchByZip = async () => {
+  const searchByZip = async (saveToStorage = true) => {
     if (!zipCode || zipCode.length !== 5) return;
     
     setLoading(true);
+    setError(null);
+    setIsLocationSaved(false);
+    
     try {
       const response = await fetch(
         `https://geocoding-api.open-meteo.com/v1/search?name=${zipCode}&count=1&language=en&format=json`
@@ -206,14 +240,26 @@ export default function InteractiveWeatherRadar({
           state: result.admin1,
         };
         setLocation(loc);
-        fetchWeatherByCoords(loc.lat, loc.lon);
+        await fetchWeatherByCoords(loc.lat, loc.lon);
+        
+        if (saveToStorage) {
+          saveLocation({
+            zipCode,
+            lat: loc.lat,
+            lon: loc.lon,
+            city: loc.city,
+            state: loc.state,
+          });
+          setIsLocationSaved(true);
+        }
       } else {
         setError('Location not found');
+        setLoading(false);
       }
     } catch (err) {
       setError('Search failed');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -225,6 +271,19 @@ export default function InteractiveWeatherRadar({
   useEffect(() => {
     if (initialLocation) {
       fetchWeatherByCoords(initialLocation.lat, initialLocation.lon);
+    } else {
+      const saved = getSavedLocation();
+      if (saved) {
+        setZipCode(saved.zipCode);
+        setIsLocationSaved(true);
+        setLocation({
+          lat: saved.lat,
+          lon: saved.lon,
+          city: saved.city,
+          state: saved.state,
+        });
+        fetchWeatherByCoords(saved.lat, saved.lon);
+      }
     }
   }, [initialLocation, fetchWeatherByCoords]);
 
@@ -354,9 +413,16 @@ export default function InteractiveWeatherRadar({
 
             {/* Location Display */}
             {location && (
-              <div className="px-2 py-1 bg-slate-800/50 text-xs text-gray-400 flex items-center gap-1 shrink-0">
-                <MapPin className="w-3 h-3" />
-                {location.city ? `${location.city}, ${location.state}` : `${location.lat.toFixed(2)}, ${location.lon.toFixed(2)}`}
+              <div className="px-2 py-1 bg-slate-800/50 text-xs text-gray-400 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-cyan-400" />
+                  {location.city ? `${location.city}, ${location.state}` : `${location.lat.toFixed(2)}, ${location.lon.toFixed(2)}`}
+                </div>
+                {isLocationSaved && (
+                  <span className="text-[10px] text-green-400 flex items-center gap-1">
+                    ✓ Saved
+                  </span>
+                )}
               </div>
             )}
 

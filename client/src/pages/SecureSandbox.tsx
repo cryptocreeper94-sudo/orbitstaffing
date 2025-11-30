@@ -1,11 +1,14 @@
 /**
  * Secure Sandbox - Hidden PIN 4444 Access
  * Access all three sandboxes: Owner, Admin, Employee
+ * Developer Playground for testing integrations
  * Only accessible via /sandbox-secure (not publicly visible)
  * Both users can access all views - Sidonie read-only, You full control
  */
 import React, { useState } from 'react';
-import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft } from 'lucide-react';
+import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft, 
+  Zap, Database, Cloud, TestTube, Sparkles, PlayCircle, Settings, 
+  Globe, Wallet, CreditCard, MapPin, Bell, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -183,9 +186,9 @@ export default function SecureSandbox() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Admin Dashboard */}
+            {/* Back to Sandbox Selection */}
             <div
-              onClick={() => handleLogout() || setIsAuthenticated(false)}
+              onClick={() => { handleLogout(); setIsAuthenticated(false); }}
               className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-cyan-500 transition-all group"
             >
               <Shield className="w-8 h-8 text-cyan-400 mb-4" />
@@ -468,6 +471,159 @@ export default function SecureSandbox() {
             <p className="text-xs text-gray-500 text-center">
               Worker view experience
             </p>
+          </div>
+        </div>
+
+        {/* Developer Playground Section */}
+        <div className="mt-8 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Code className="w-6 h-6 text-cyan-400" />
+            <h2 className="text-xl font-bold text-white">Developer Playground</h2>
+            <span className="px-2 py-0.5 text-xs bg-cyan-600/30 text-cyan-300 rounded-full">Demo Mode</span>
+          </div>
+          
+          <div className="grid grid-cols-2 min-[480px]:grid-cols-3 md:grid-cols-4 gap-2 min-[480px]:gap-3 md:gap-4">
+            {/* API Testing */}
+            <div 
+              onClick={() => setLocation('/developer-panel')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-cyan-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-600/20 mb-2 sm:mb-3">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">API Explorer</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Test endpoints</p>
+            </div>
+
+            {/* Database Viewer */}
+            <div 
+              onClick={() => setLocation('/developer-panel')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-green-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-600/20 mb-2 sm:mb-3">
+                <Database className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Database</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Schema & data</p>
+            </div>
+
+            {/* Weather Demo */}
+            <div 
+              onClick={() => setLocation('/')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-blue-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-600/20 mb-2 sm:mb-3">
+                <Cloud className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Weather</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">HD radar</p>
+            </div>
+
+            {/* GPS Clock Demo */}
+            <div 
+              onClick={() => setLocation('/gps-clock-in')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-purple-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-600/20 mb-2 sm:mb-3">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">GPS Clock</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Geofence test</p>
+            </div>
+
+            {/* Payment Testing */}
+            <div 
+              onClick={() => setLocation('/pay-card')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-yellow-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-yellow-600/20 mb-2 sm:mb-3">
+                <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Pay Card</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Payments</p>
+            </div>
+
+            {/* Crypto Wallet */}
+            <div 
+              onClick={() => setLocation('/crypto-wallet')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-orange-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-600/20 mb-2 sm:mb-3">
+                <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Crypto</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Solana</p>
+            </div>
+
+            {/* Notifications */}
+            <div 
+              onClick={() => setLocation('/notifications')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-pink-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-pink-600/20 mb-2 sm:mb-3">
+                <Bell className="w-4 h-4 sm:w-5 sm:h-5 text-pink-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Alerts</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Notifications</p>
+            </div>
+
+            {/* Document Hallmark */}
+            <div 
+              onClick={() => setLocation('/digital-hallmark')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-indigo-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-600/20 mb-2 sm:mb-3">
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Hallmarks</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Blockchain</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <PlayCircle className="w-5 h-5 text-green-400" />
+            <h3 className="text-lg font-bold text-white">Quick Demo Actions</h3>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              onClick={() => setLocation('/workflow-demo')}
+              variant="outline"
+              className="border-slate-600 hover:border-cyan-500 text-gray-300"
+              data-testid="button-workflow-demo"
+            >
+              <Sparkles className="w-4 h-4 mr-2 text-cyan-400" />
+              Workflow Demo
+            </Button>
+            <Button
+              onClick={() => setLocation('/job-board')}
+              variant="outline"
+              className="border-slate-600 hover:border-green-500 text-gray-300"
+              data-testid="button-job-board-demo"
+            >
+              <Globe className="w-4 h-4 mr-2 text-green-400" />
+              Job Board
+            </Button>
+            <Button
+              onClick={() => setLocation('/pricing')}
+              variant="outline"
+              className="border-slate-600 hover:border-purple-500 text-gray-300"
+              data-testid="button-pricing-demo"
+            >
+              <Settings className="w-4 h-4 mr-2 text-purple-400" />
+              Pricing Config
+            </Button>
+            <Button
+              onClick={() => setLocation('/integrations')}
+              variant="outline"
+              className="border-slate-600 hover:border-yellow-500 text-gray-300"
+              data-testid="button-integrations-demo"
+            >
+              <TestTube className="w-4 h-4 mr-2 text-yellow-400" />
+              Integrations
+            </Button>
           </div>
         </div>
 
