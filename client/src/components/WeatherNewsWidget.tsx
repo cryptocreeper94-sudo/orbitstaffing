@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Cloud, CloudRain, AlertTriangle, Newspaper, Wind, Droplets, Eye, X } from 'lucide-react';
+import { Cloud, CloudRain, AlertTriangle, Newspaper, Wind, Droplets, Eye, X, Minimize2, Maximize2 } from 'lucide-react';
 
 interface WeatherData {
   temp: number;
@@ -67,18 +67,29 @@ export default function WeatherNewsWidget({
       ) : (
         <div className="bg-slate-900 border border-cyan-500/30 rounded-xl shadow-2xl w-80 overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-4 flex justify-between items-center border-b border-cyan-500/20">
-            <h3 className="text-white font-bold flex items-center gap-2">
-              <Cloud className="w-5 h-5 text-cyan-400" />
-              Weather & News Hub
+          <div className="bg-gradient-to-r from-slate-800 to-slate-700 p-3 flex justify-between items-center border-b border-cyan-500/20">
+            <h3 className="text-white font-bold flex items-center gap-2 text-sm">
+              <Cloud className="w-4 h-4 text-cyan-400" />
+              Weather Hub
             </h3>
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="text-gray-400 hover:text-white transition-colors"
-              data-testid="button-weather-close"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setIsExpanded(false)}
+                className="p-1.5 rounded-lg bg-slate-600/50 text-gray-300 hover:bg-cyan-600 hover:text-white transition-all"
+                data-testid="button-weather-minimize"
+                title="Minimize"
+              >
+                <Minimize2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setIsExpanded(false)}
+                className="p-1.5 rounded-lg bg-red-600/30 text-red-300 hover:bg-red-600 hover:text-white transition-all"
+                data-testid="button-weather-close"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Zip Code Input */}
