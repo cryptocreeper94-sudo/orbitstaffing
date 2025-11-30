@@ -80,47 +80,47 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
 
             <div className="text-center">
               <p className="text-cyan-400 font-semibold mb-4">Select Your Role</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <button
                   onClick={() => handleRoleSelect('employee')}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-4 rounded-lg border-2 transition-all text-center min-w-0 ${
                     selectedRole === 'employee'
                       ? 'border-cyan-500 bg-cyan-500/20'
                       : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
                   }`}
                   data-testid="button-role-employee"
                 >
-                  <Users className="w-8 h-8 text-green-400 mb-2" />
-                  <div className="font-bold text-white">I'm a Worker</div>
-                  <p className="text-xs text-slate-400">Find jobs, track hours, get paid</p>
+                  <Users className="w-8 h-8 text-green-400 mb-2 mx-auto" />
+                  <div className="font-bold text-white text-sm">I'm a Worker</div>
+                  <p className="text-xs text-slate-400 mt-1">Find jobs, track hours, get paid</p>
                 </button>
 
                 <button
                   onClick={() => handleRoleSelect('owner')}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-4 rounded-lg border-2 transition-all text-center min-w-0 ${
                     selectedRole === 'owner'
                       ? 'border-cyan-500 bg-cyan-500/20'
                       : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
                   }`}
                   data-testid="button-role-owner"
                 >
-                  <Building2 className="w-8 h-8 text-purple-400 mb-2" />
-                  <div className="font-bold text-white">I'm a Business Owner</div>
-                  <p className="text-xs text-slate-400">Manage staff, payroll, scheduling</p>
+                  <Building2 className="w-8 h-8 text-purple-400 mb-2 mx-auto" />
+                  <div className="font-bold text-white text-sm">Business Owner</div>
+                  <p className="text-xs text-slate-400 mt-1">Manage staff, payroll, scheduling</p>
                 </button>
 
                 <button
                   onClick={() => handleRoleSelect('employer')}
-                  className={`p-4 rounded-lg border-2 transition-all text-left ${
+                  className={`p-4 rounded-lg border-2 transition-all text-center min-w-0 ${
                     selectedRole === 'employer'
                       ? 'border-cyan-500 bg-cyan-500/20'
                       : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
                   }`}
                   data-testid="button-role-employer"
                 >
-                  <Briefcase className="w-8 h-8 text-amber-400 mb-2" />
-                  <div className="font-bold text-white">I Need Workers</div>
-                  <p className="text-xs text-slate-400">Post jobs, hire talent quickly</p>
+                  <Briefcase className="w-8 h-8 text-amber-400 mb-2 mx-auto" />
+                  <div className="font-bold text-white text-sm">I Need Workers</div>
+                  <p className="text-xs text-slate-400 mt-1">Post jobs, hire talent quickly</p>
                 </button>
               </div>
             </div>
@@ -293,7 +293,7 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <Card className="max-w-lg w-full bg-gradient-to-br from-slate-900 to-slate-950 border border-cyan-500/30 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <Card className="max-w-2xl w-full bg-gradient-to-br from-slate-900 to-slate-950 border border-cyan-500/30 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex gap-1">
