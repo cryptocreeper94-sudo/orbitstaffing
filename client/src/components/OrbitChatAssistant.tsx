@@ -153,7 +153,7 @@ export function OrbitChatAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 right-6 z-[150] w-[380px] max-w-[calc(100vw-48px)]"
+            className="fixed bottom-28 right-8 z-[150] w-[380px] max-w-[calc(100vw-48px)]"
           >
             <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 overflow-hidden">
               <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
@@ -266,8 +266,9 @@ export function OrbitChatAssistant() {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-[150] w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 flex items-center justify-center text-white hover:shadow-cyan-500/50 transition-shadow"
+        className="fixed bottom-8 right-8 z-[150] w-16 h-16 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/30 flex items-center justify-center text-white hover:shadow-cyan-500/50 transition-shadow border-2 border-cyan-400/50"
         data-testid="button-orbit-chat"
+        style={{ boxShadow: '0 0 30px rgba(6, 182, 212, 0.5)' }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -287,7 +288,11 @@ export function OrbitChatAssistant() {
               exit={{ rotate: -90, opacity: 0 }}
               className="relative"
             >
-              <MessageCircle className="w-6 h-6" />
+              <img 
+                src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
+                alt="Orbit" 
+                className="w-10 h-10 object-contain"
+              />
               <motion.span
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
