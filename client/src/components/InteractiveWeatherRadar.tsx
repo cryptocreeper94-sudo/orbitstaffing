@@ -329,7 +329,7 @@ export default function InteractiveWeatherRadar({
 
   const panelClasses = isFullscreen
     ? 'w-full h-full'
-    : 'w-80 sm:w-96 max-h-[80vh]';
+    : 'w-[90vw] max-w-3xl max-h-[80vh]';
 
   return (
     <div className={containerClasses}>
@@ -443,151 +443,188 @@ export default function InteractiveWeatherRadar({
               </div>
             )}
 
-            {/* Layer Tabs */}
-            <div className="flex border-b border-slate-700 shrink-0">
-              {(['radar', 'satellite', 'temperature'] as const).map((layer) => (
-                <button
-                  key={layer}
-                  onClick={() => setActiveLayer(layer)}
-                  className={`flex-1 py-1.5 sm:py-2 px-2 text-[10px] sm:text-xs font-medium transition-colors ${
-                    activeLayer === layer
-                      ? 'bg-cyan-600/20 text-cyan-400 border-b-2 border-cyan-400'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {layer === 'radar' && <CloudRain className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-0.5" />}
-                  {layer === 'satellite' && <Cloud className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-0.5" />}
-                  {layer === 'temperature' && <Thermometer className="w-3 h-3 sm:w-4 sm:h-4 mx-auto mb-0.5" />}
-                  <span className="capitalize">{layer}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Radar Map */}
-            <div 
-              ref={mapRef}
-              className={`relative bg-slate-800 ${isFullscreen ? 'flex-1' : 'h-40 sm:h-48'}`}
-            >
-              {radarFrames.length > 0 && location ? (
-                <>
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(https://tile.openstreetmap.org/${Math.floor(8)}/${Math.floor((location.lon + 180) / 360 * 256)}/${Math.floor((1 - Math.log(Math.tan(location.lat * Math.PI / 180) + 1 / Math.cos(location.lat * Math.PI / 180)) / Math.PI) / 2 * 256)}.png)`,
-                      filter: 'brightness(0.4) saturate(0.5)',
-                    }}
-                  />
-                  
-                  <img
-                    src={`https://tilecache.rainviewer.com${radarFrames[currentFrame]?.path}/256/8/${Math.floor((location.lon + 180) / 360 * 256)}/${Math.floor((1 - Math.log(Math.tan(location.lat * Math.PI / 180) + 1 / Math.cos(location.lat * Math.PI / 180)) / Math.PI) / 2 * 256)}/2/1_1.png`}
-                    alt="Radar"
-                    className="absolute inset-0 w-full h-full object-cover opacity-80"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  
-                  <div className="absolute top-2 left-2 bg-black/60 px-2 py-1 rounded text-[10px] text-white">
-                    {radarFrames[currentFrame] && formatTime(radarFrames[currentFrame].time)}
-                  </div>
-                  
-                  <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 bg-black/60 p-1 rounded">
-                    <button
-                      onClick={() => setIsPlaying(!isPlaying)}
-                      className="p-1 text-white hover:text-cyan-400"
-                    >
-                      {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                    </button>
-                    <button
-                      onClick={() => setCurrentFrame((prev) => (prev - 1 + radarFrames.length) % radarFrames.length)}
-                      className="p-1 text-white hover:text-cyan-400"
-                    >
-                      <ChevronLeft className="w-3 h-3" />
-                    </button>
-                    <div className="flex-1 h-1 bg-slate-600 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-cyan-400 transition-all"
-                        style={{ width: `${((currentFrame + 1) / radarFrames.length) * 100}%` }}
-                      />
+            {/* Side-by-Side Layout */}
+            <div className={`flex flex-col md:flex-row ${isFullscreen ? 'flex-1 overflow-hidden' : ''}`}>
+              {/* Left Side - Weather Data */}
+              <div className={`md:w-1/2 p-3 overflow-y-auto border-b md:border-b-0 md:border-r border-slate-700 ${isFullscreen ? '' : 'max-h-64 md:max-h-none'}`}>
+                {weather ? (
+                  <div className="space-y-3">
+                    {/* Main Temperature */}
+                    <div className="flex items-center gap-4">
+                      <div className="text-5xl">{weather.icon}</div>
+                      <div>
+                        <div className="text-4xl font-bold text-white">{weather.temp}°F</div>
+                        <div className="text-sm text-gray-400">Feels like {weather.feelsLike}°F</div>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => setCurrentFrame((prev) => (prev + 1) % radarFrames.length)}
-                      className="p-1 text-white hover:text-cyan-400"
-                    >
-                      <ChevronRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">
-                  {loading ? (
-                    <RefreshCw className="w-6 h-6 animate-spin" />
-                  ) : (
-                    <span>Enter location to view radar</span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Current Conditions */}
-            {weather && (
-              <div className={`p-2 sm:p-3 ${isFullscreen ? 'overflow-y-auto' : 'overflow-y-auto max-h-48'}`}>
-                <div className="grid grid-cols-2 gap-2 mb-2">
-                  <div className="bg-slate-800 rounded p-2 text-center">
-                    <div className="text-2xl sm:text-3xl">{weather.icon}</div>
-                    <div className="text-lg sm:text-xl font-bold text-white">{weather.temp}°F</div>
-                    <div className="text-[10px] text-gray-400">Feels like {weather.feelsLike}°F</div>
-                  </div>
-                  <div className="bg-slate-800 rounded p-2">
-                    <div className="text-xs text-gray-400">Conditions</div>
-                    <div className="text-sm font-bold text-white">{weather.condition}</div>
-                    <div className="text-[10px] text-gray-400">{weather.description}</div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-4 gap-1 sm:gap-2 text-center">
-                  <div className="bg-slate-800 rounded p-1.5 sm:p-2">
-                    <Droplets className="w-3 h-3 sm:w-4 sm:h-4 mx-auto text-blue-400" />
-                    <div className="text-xs sm:text-sm font-bold text-white">{weather.humidity}%</div>
-                    <div className="text-[8px] sm:text-[10px] text-gray-400">Humidity</div>
-                  </div>
-                  <div className="bg-slate-800 rounded p-1.5 sm:p-2">
-                    <Wind className="w-3 h-3 sm:w-4 sm:h-4 mx-auto text-cyan-400" />
-                    <div className="text-xs sm:text-sm font-bold text-white">{weather.windSpeed}</div>
-                    <div className="text-[8px] sm:text-[10px] text-gray-400">mph {weather.windDirection}</div>
-                  </div>
-                  <div className="bg-slate-800 rounded p-1.5 sm:p-2">
-                    <CloudRain className="w-3 h-3 sm:w-4 sm:h-4 mx-auto text-purple-400" />
-                    <div className="text-xs sm:text-sm font-bold text-white">{weather.precipitation}%</div>
-                    <div className="text-[8px] sm:text-[10px] text-gray-400">Precip</div>
-                  </div>
-                  <div className="bg-slate-800 rounded p-1.5 sm:p-2">
-                    <Eye className="w-3 h-3 sm:w-4 sm:h-4 mx-auto text-green-400" />
-                    <div className="text-xs sm:text-sm font-bold text-white">{weather.pressure}</div>
-                    <div className="text-[8px] sm:text-[10px] text-gray-400">inHg</div>
-                  </div>
-                </div>
-
-                {weather.alerts.length > 0 && (
-                  <div className="mt-2 bg-red-900/30 border border-red-600/50 rounded p-2">
-                    <div className="flex items-center gap-1 text-red-400 text-xs font-bold mb-1">
-                      <AlertTriangle className="w-3 h-3" />
-                      Weather Alerts
+                    
+                    {/* Condition */}
+                    <div className="bg-slate-800/50 rounded-lg p-3">
+                      <div className="text-lg font-bold text-white">{weather.condition}</div>
+                      <div className="text-sm text-gray-400">{weather.description}</div>
                     </div>
-                    {weather.alerts.map((alert, i) => (
-                      <div key={i} className="text-[10px] text-red-300">{alert}</div>
-                    ))}
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-slate-800 rounded-lg p-3 flex items-center gap-3">
+                        <Droplets className="w-6 h-6 text-blue-400" />
+                        <div>
+                          <div className="text-lg font-bold text-white">{weather.humidity}%</div>
+                          <div className="text-xs text-gray-400">Humidity</div>
+                        </div>
+                      </div>
+                      <div className="bg-slate-800 rounded-lg p-3 flex items-center gap-3">
+                        <Wind className="w-6 h-6 text-cyan-400" />
+                        <div>
+                          <div className="text-lg font-bold text-white">{weather.windSpeed} mph</div>
+                          <div className="text-xs text-gray-400">{weather.windDirection}</div>
+                        </div>
+                      </div>
+                      <div className="bg-slate-800 rounded-lg p-3 flex items-center gap-3">
+                        <CloudRain className="w-6 h-6 text-purple-400" />
+                        <div>
+                          <div className="text-lg font-bold text-white">{weather.precipitation}%</div>
+                          <div className="text-xs text-gray-400">Precipitation</div>
+                        </div>
+                      </div>
+                      <div className="bg-slate-800 rounded-lg p-3 flex items-center gap-3">
+                        <Eye className="w-6 h-6 text-green-400" />
+                        <div>
+                          <div className="text-lg font-bold text-white">{weather.pressure} inHg</div>
+                          <div className="text-xs text-gray-400">Pressure</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Weather Alerts */}
+                    {weather.alerts.length > 0 && (
+                      <div className="bg-red-900/30 border border-red-600/50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 text-red-400 font-bold mb-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          Weather Alerts
+                        </div>
+                        {weather.alerts.map((alert, i) => (
+                          <div key={i} className="text-sm text-red-300">{alert}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="h-48 flex items-center justify-center text-gray-400">
+                    {loading ? (
+                      <div className="text-center">
+                        <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-2" />
+                        <span className="text-sm">Loading weather...</span>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <Thermometer className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                        <span className="text-sm">Enter ZIP code to view weather</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
 
-            {/* Radar Legend */}
-            <div className="p-2 border-t border-slate-700 shrink-0">
-              <div className="flex items-center justify-between text-[8px] sm:text-[10px] text-gray-400">
-                <span>Light</span>
-                <div className="flex-1 mx-2 h-2 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 via-orange-500 to-red-600" />
-                <span>Heavy</span>
+              {/* Right Side - Radar Map */}
+              <div className="md:w-1/2 flex flex-col">
+                {/* Layer Tabs */}
+                <div className="flex border-b border-slate-700 shrink-0">
+                  {(['radar', 'satellite', 'temperature'] as const).map((layer) => (
+                    <button
+                      key={layer}
+                      onClick={() => setActiveLayer(layer)}
+                      className={`flex-1 py-2 px-2 text-xs font-medium transition-colors ${
+                        activeLayer === layer
+                          ? 'bg-cyan-600/20 text-cyan-400 border-b-2 border-cyan-400'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {layer === 'radar' && <CloudRain className="w-4 h-4 mx-auto mb-0.5" />}
+                      {layer === 'satellite' && <Cloud className="w-4 h-4 mx-auto mb-0.5" />}
+                      {layer === 'temperature' && <Thermometer className="w-4 h-4 mx-auto mb-0.5" />}
+                      <span className="capitalize">{layer}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Map */}
+                <div 
+                  ref={mapRef}
+                  className={`relative bg-slate-800 flex-1 ${isFullscreen ? '' : 'min-h-[200px] md:min-h-[250px]'}`}
+                >
+                  {radarFrames.length > 0 && location ? (
+                    <>
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center"
+                        style={{
+                          backgroundImage: `url(https://tile.openstreetmap.org/${Math.floor(8)}/${Math.floor((location.lon + 180) / 360 * 256)}/${Math.floor((1 - Math.log(Math.tan(location.lat * Math.PI / 180) + 1 / Math.cos(location.lat * Math.PI / 180)) / Math.PI) / 2 * 256)}.png)`,
+                          filter: 'brightness(0.4) saturate(0.5)',
+                        }}
+                      />
+                      
+                      <img
+                        src={`https://tilecache.rainviewer.com${radarFrames[currentFrame]?.path}/256/8/${Math.floor((location.lon + 180) / 360 * 256)}/${Math.floor((1 - Math.log(Math.tan(location.lat * Math.PI / 180) + 1 / Math.cos(location.lat * Math.PI / 180)) / Math.PI) / 2 * 256)}/2/1_1.png`}
+                        alt="Radar"
+                        className="absolute inset-0 w-full h-full object-cover opacity-80"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      
+                      <div className="absolute top-2 left-2 bg-black/60 px-2 py-1 rounded text-xs text-white">
+                        {radarFrames[currentFrame] && formatTime(radarFrames[currentFrame].time)}
+                      </div>
+                      
+                      <div className="absolute bottom-2 left-2 right-2 flex items-center gap-2 bg-black/60 p-2 rounded">
+                        <button
+                          onClick={() => setIsPlaying(!isPlaying)}
+                          className="p-1.5 text-white hover:text-cyan-400"
+                        >
+                          {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        </button>
+                        <button
+                          onClick={() => setCurrentFrame((prev) => (prev - 1 + radarFrames.length) % radarFrames.length)}
+                          className="p-1 text-white hover:text-cyan-400"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <div className="flex-1 h-1.5 bg-slate-600 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-cyan-400 transition-all"
+                            style={{ width: `${((currentFrame + 1) / radarFrames.length) * 100}%` }}
+                          />
+                        </div>
+                        <button
+                          onClick={() => setCurrentFrame((prev) => (prev + 1) % radarFrames.length)}
+                          className="p-1 text-white hover:text-cyan-400"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                      {loading ? (
+                        <RefreshCw className="w-8 h-8 animate-spin" />
+                      ) : (
+                        <div className="text-center">
+                          <MapPin className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                          <span className="text-sm">Enter location to view radar</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Radar Legend */}
+                <div className="p-2 border-t border-slate-700 shrink-0">
+                  <div className="flex items-center justify-between text-[10px] text-gray-400">
+                    <span>Light</span>
+                    <div className="flex-1 mx-2 h-2 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 via-orange-500 to-red-600" />
+                    <span>Heavy</span>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
