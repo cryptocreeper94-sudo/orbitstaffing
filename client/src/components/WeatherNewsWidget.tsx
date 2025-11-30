@@ -51,7 +51,7 @@ export default function WeatherNewsWidget({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-40">
+    <div className="fixed bottom-32 left-6 z-40">
       {!isExpanded ? (
         <button
           onClick={() => setIsExpanded(true)}
