@@ -80,10 +80,10 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
 
             <div className="text-center">
               <p className="text-cyan-400 font-semibold mb-4">Select Your Role</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => handleRoleSelect('employee')}
-                  className={`p-4 rounded-lg border-2 transition-all text-center min-w-0 ${
+                  className={`flex-1 p-4 rounded-lg border-2 transition-all text-center ${
                     selectedRole === 'employee'
                       ? 'border-cyan-500 bg-cyan-500/20'
                       : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
@@ -91,13 +91,13 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                   data-testid="button-role-employee"
                 >
                   <Users className="w-8 h-8 text-green-400 mb-2 mx-auto" />
-                  <div className="font-bold text-white text-sm">I'm a Worker</div>
-                  <p className="text-xs text-slate-400 mt-1">Find jobs, track hours, get paid</p>
+                  <div className="font-bold text-white text-sm whitespace-nowrap">Worker</div>
+                  <p className="text-xs text-slate-400 mt-1 whitespace-nowrap">Find jobs & get paid</p>
                 </button>
 
                 <button
                   onClick={() => handleRoleSelect('owner')}
-                  className={`p-4 rounded-lg border-2 transition-all text-center min-w-0 ${
+                  className={`flex-1 p-4 rounded-lg border-2 transition-all text-center ${
                     selectedRole === 'owner'
                       ? 'border-cyan-500 bg-cyan-500/20'
                       : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
@@ -105,13 +105,13 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                   data-testid="button-role-owner"
                 >
                   <Building2 className="w-8 h-8 text-purple-400 mb-2 mx-auto" />
-                  <div className="font-bold text-white text-sm">Business Owner</div>
-                  <p className="text-xs text-slate-400 mt-1">Manage staff, payroll, scheduling</p>
+                  <div className="font-bold text-white text-sm whitespace-nowrap">Business Owner</div>
+                  <p className="text-xs text-slate-400 mt-1 whitespace-nowrap">Manage staff & payroll</p>
                 </button>
 
                 <button
                   onClick={() => handleRoleSelect('employer')}
-                  className={`p-4 rounded-lg border-2 transition-all text-center min-w-0 ${
+                  className={`flex-1 p-4 rounded-lg border-2 transition-all text-center ${
                     selectedRole === 'employer'
                       ? 'border-cyan-500 bg-cyan-500/20'
                       : 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
@@ -119,8 +119,8 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                   data-testid="button-role-employer"
                 >
                   <Briefcase className="w-8 h-8 text-amber-400 mb-2 mx-auto" />
-                  <div className="font-bold text-white text-sm">I Need Workers</div>
-                  <p className="text-xs text-slate-400 mt-1">Post jobs, hire talent quickly</p>
+                  <div className="font-bold text-white text-sm whitespace-nowrap">Need Workers</div>
+                  <p className="text-xs text-slate-400 mt-1 whitespace-nowrap">Post jobs & hire fast</p>
                 </button>
               </div>
             </div>
