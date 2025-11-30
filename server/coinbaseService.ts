@@ -1,6 +1,8 @@
 // Coinbase Commerce API Integration for Crypto Invoice Payments
 // Documentation: https://docs.cloud.coinbase.com/commerce/reference
 
+import { createHmac, timingSafeEqual } from 'crypto';
+
 const COINBASE_API_URL = 'https://api.commerce.coinbase.com';
 
 interface CoinbaseCharge {
@@ -145,13 +147,11 @@ export class CoinbaseService {
   }
 
   verifyWebhookSignature(payload: string, signature: string, webhookSecret: string): boolean {
-    const crypto = require('crypto');
-    const computedSignature = crypto
-      .createHmac('sha256', webhookSecret)
+    const computedSignature = createHmac('sha256', webhookSecret)
       .update(payload)
       .digest('hex');
     
-    return crypto.timingSafeEqual(
+    return timingSafeEqual(
       Buffer.from(signature),
       Buffer.from(computedSignature)
     );
