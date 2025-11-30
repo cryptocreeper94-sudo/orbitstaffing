@@ -1,17 +1,110 @@
 import crypto from 'crypto';
 import { solanaService } from './solanaService';
+import { db } from './db';
+import { sql } from 'drizzle-orm';
 
 /**
  * ORBIT Hallmark Service - Automatic stamping & tracking
  * Every asset gets a unique, permanent identifier
  * Now with optional Solana blockchain anchoring for immutable verification
+ * 
+ * ASSET NUMBER FORMAT: #XXXXXXXXX-YY
+ * - 9 digits for master asset (1 billion capacity)
+ * - 2 digits for sub-sequence (100 per asset)
+ * - Total capacity: 100 BILLION hallmarks
+ * 
+ * FOUNDING ASSETS:
+ * #000000001-00 = ORBIT Staffing OS (Platform)
+ * #000000002-00 = Jason (Developer/Founder)
+ * #000000003-00 = Sidonie (Team Member)
  */
 
+// Global counter for asset numbers (loaded from database on startup)
+let currentAssetCounter = 0;
+
+/**
+ * Format asset number with 9-digit master + 2-digit sub-sequence
+ * Capacity: 1 billion master assets × 100 sub-docs = 100 billion total
+ */
+export function formatAssetNumber(masterNumber: number, subSequence: number = 0): string {
+  const master = String(masterNumber).padStart(9, '0');
+  const sub = String(subSequence).padStart(2, '0');
+  return `#${master}-${sub}`;
+}
+
+/**
+ * Parse an asset number back to its components
+ */
+export function parseAssetNumber(assetNumber: string): { master: number; sub: number } | null {
+  const match = assetNumber.match(/^#(\d{9})-(\d{2})$/);
+  if (!match) return null;
+  return {
+    master: parseInt(match[1], 10),
+    sub: parseInt(match[2], 10),
+  };
+}
+
+/**
+ * Get the next available master asset number
+ */
+export async function getNextAssetNumber(): Promise<string> {
+  try {
+    // Get current max asset number from database
+    const result = await db.execute(sql`
+      SELECT MAX(CAST(SUBSTRING(asset_number FROM 2 FOR 9) AS INTEGER)) as max_num 
+      FROM orbit_assets 
+      WHERE asset_number ~ '^#[0-9]{9}-[0-9]{2}$'
+    `);
+    
+    const maxNum = (result.rows[0] as any)?.max_num || 0;
+    const nextNum = maxNum + 1;
+    
+    return formatAssetNumber(nextNum, 0);
+  } catch (error) {
+    console.error('[Hallmark] Error getting next asset number:', error);
+    // Fallback to timestamp-based if DB query fails
+    currentAssetCounter++;
+    return formatAssetNumber(currentAssetCounter, 0);
+  }
+}
+
+/**
+ * Get next sub-sequence for an existing master asset
+ */
+export async function getNextSubSequence(masterNumber: number): Promise<string> {
+  try {
+    const masterStr = String(masterNumber).padStart(9, '0');
+    const result = await db.execute(sql`
+      SELECT MAX(CAST(SUBSTRING(asset_number FROM 12 FOR 2) AS INTEGER)) as max_sub 
+      FROM orbit_assets 
+      WHERE asset_number LIKE ${'#' + masterStr + '-%'}
+    `);
+    
+    const maxSub = (result.rows[0] as any)?.max_sub || 0;
+    return formatAssetNumber(masterNumber, maxSub + 1);
+  } catch (error) {
+    console.error('[Hallmark] Error getting next sub-sequence:', error);
+    return formatAssetNumber(masterNumber, 1);
+  }
+}
+
+/**
+ * Legacy hallmark number generator (for backwards compatibility)
+ */
 export function generateHallmarkNumber(): string {
   const date = new Date().toISOString().replace(/[-:]/g, '').substring(0, 8);
   const random = Math.random().toString(36).substring(2, 8).toUpperCase();
   return `ORBIT-${date}-${random}`;
 }
+
+/**
+ * Founding assets - permanently reserved
+ */
+export const FOUNDING_ASSETS = {
+  ORBIT_PLATFORM: { number: formatAssetNumber(1, 0), name: 'ORBIT Staffing OS', type: 'platform' },
+  JASON_FOUNDER: { number: formatAssetNumber(2, 0), name: 'Jason', type: 'founder' },
+  SIDONIE_TEAM: { number: formatAssetNumber(3, 0), name: 'Sidonie', type: 'team' },
+};
 
 export function generateContentHash(content: string): string {
   return crypto.createHash('sha256').update(content).digest('hex');
