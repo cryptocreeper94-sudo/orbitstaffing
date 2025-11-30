@@ -263,7 +263,7 @@ export function OrbitChatAssistant() {
       </AnimatePresence>
 
       {/* Floating Orby Mascot - True AI Representative */}
-      <div className="fixed bottom-8 right-6 z-[150]" data-testid="floating-orby-container">
+      <div className="fixed bottom-3 right-6 z-[150]" data-testid="floating-orby-container">
         {/* Speech Bubble - Shows when chat is closed */}
         <AnimatePresence>
           {!isOpen && (
