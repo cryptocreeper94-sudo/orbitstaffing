@@ -44,10 +44,10 @@ export function LoginScreen() {
 
     try {
       const response = await auth.loginEmail(email.trim(), password);
-      const { token, user } = response.data;
+      const { token, user, workerId } = response.data;
       
       await setAuthToken(token);
-      setAuth(token, user);
+      setAuth(token, user, workerId);
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please check your credentials.');

@@ -38,7 +38,7 @@ function AuthStack() {
   );
 }
 
-function EmployeeHub() {
+function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -105,11 +105,27 @@ function EmployeeHub() {
         component={ProfileScreen}
         options={{
           title: 'My Profile',
-          tabBarLabel: 'Profile',
+          tabBarLabel: 'More',
           tabBarIcon: ({ color, size }) => <Text style={{ color, fontSize: size }}>👤</Text>,
         }}
       />
     </Tab.Navigator>
+  );
+}
+
+function EmployeeHub() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: theme.darker },
+        headerTintColor: theme.primary,
+        headerTitleStyle: { color: theme.text },
+      }}
+    >
+      <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+      <Stack.Screen name="Bonuses" component={BonusesScreen} options={{ title: 'My Bonuses' }} />
+      <Stack.Screen name="Availability" component={AvailabilityScreen} options={{ title: 'Availability' }} />
+    </Stack.Navigator>
   );
 }
 

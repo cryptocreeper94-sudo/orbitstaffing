@@ -123,18 +123,18 @@ export function DashboardScreen({ navigation }: any) {
 
         <TouchableOpacity
           style={styles.actionCard}
-          onPress={() => navigation.navigate('Timesheets')}
+          onPress={() => navigation.navigate('Bonuses')}
         >
-          <Text style={styles.actionIcon}>⏰</Text>
-          <Text style={styles.actionText}>Hours</Text>
+          <Text style={styles.actionIcon}>💰</Text>
+          <Text style={styles.actionText}>Bonuses</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.actionCard}
-          onPress={() => navigation.navigate('Profile')}
+          onPress={() => navigation.navigate('Availability')}
         >
-          <Text style={styles.actionIcon}>👤</Text>
-          <Text style={styles.actionText}>Profile</Text>
+          <Text style={styles.actionIcon}>📅</Text>
+          <Text style={styles.actionText}>Schedule</Text>
         </TouchableOpacity>
       </View>
 

@@ -16,7 +16,7 @@ interface AuthStore {
   workerId: string | null;
   companyName: string | null;
   isLoading: boolean;
-  setAuth: (token: string, user: User) => void;
+  setAuth: (token: string, user: User, workerId?: string) => void;
   setLoading: (loading: boolean) => void;
   logout: () => Promise<void>;
   restoreSession: () => Promise<boolean>;
@@ -29,13 +29,15 @@ export const useAuthStore = create<AuthStore>((set) => ({
   companyName: null,
   isLoading: true,
   
-  setAuth: (token, user) => {
+  setAuth: (token, user, workerId?: string) => {
     SecureStore.setItemAsync('authToken', token);
     SecureStore.setItemAsync('user', JSON.stringify(user));
+    const workerIdValue = workerId || user.id;
+    SecureStore.setItemAsync('workerId', workerIdValue);
     set({ 
       token, 
       user, 
-      workerId: user.id,
+      workerId: workerIdValue,
       companyName: 'ORBIT Staffing',
       isLoading: false 
     });
@@ -46,6 +48,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   logout: async () => {
     await SecureStore.deleteItemAsync('authToken');
     await SecureStore.deleteItemAsync('user');
+    await SecureStore.deleteItemAsync('workerId');
     set({ token: null, user: null, workerId: null, companyName: null });
   },
   
@@ -53,12 +56,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
     try {
       const token = await SecureStore.getItemAsync('authToken');
       const userStr = await SecureStore.getItemAsync('user');
+      const storedWorkerId = await SecureStore.getItemAsync('workerId');
       if (token && userStr) {
         const user = JSON.parse(userStr);
         set({ 
           token, 
           user, 
-          workerId: user.id,
+          workerId: storedWorkerId || user.id,
           companyName: 'ORBIT Staffing',
           isLoading: false 
         });

@@ -37,10 +37,8 @@
         "CAMERA",
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
-        "RECEIVE_BOOT_COMPLETED",
         "VIBRATE"
-      ],
-      "googleServicesFile": "./google-services.json"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -62,11 +60,7 @@
       "expo-secure-store"
     ],
     "extra": {
-      "apiUrl": "https://orbitstaffing.io/api",
-      "eas": {
-        "projectId": "orbit-staffing"
-      }
-    },
-    "owner": "darkwavestudios"
+      "apiUrl": "https://orbitstaffing.io/api"
+    }
   }
 }
