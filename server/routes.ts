@@ -14,6 +14,8 @@ import type { PayrollCalculationInput } from "./payrollCalculator";
 import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
 import { registerCrmRoutes } from "./crmRoutes";
 import { coinbaseService } from "./coinbaseService";
+import { solanaService } from "./solanaService";
+import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -114,6 +116,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Crypto Payment routes (Coinbase Commerce for invoice payments)
   registerCryptoPaymentRoutes(app);
+  
+  // Register Blockchain routes (Solana hash anchoring for Hallmarks)
+  registerBlockchainRoutes(app);
 
   // ========================
   // V2 SIGNUP (Early Access Waitlist)
@@ -5906,6 +5911,100 @@ async function recalculateWorkerPerformance(workerId: string, tenantId: string) 
 }
 
 // Worker matching is handled by ./matchingService - see autoMatchWorkers and autoReassignWorkerRequest exports
+
+// ========================
+// Blockchain Hash Anchoring (Solana)
+// ========================
+
+export function registerBlockchainRoutes(app: Express) {
+  // Get blockchain anchoring status and stats
+  app.get("/api/blockchain/status", async (req: Request, res: Response) => {
+    try {
+      const stats = solanaService.getStats();
+      res.json({
+        ...stats,
+        configured: solanaService.isConfigured(),
+        simulationMode: solanaService.isSimulationMode(),
+        message: solanaService.isSimulationMode() 
+          ? "Running in simulation mode - add HELIUS_API_KEY to enable live mode"
+          : "Connected to Solana mainnet via Helius"
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get blockchain status" });
+    }
+  });
+
+  // View current hash queue
+  app.get("/api/blockchain/queue", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const queue = solanaService.getQueuedHashes();
+      res.json({ 
+        queueSize: queue.length,
+        hashes: queue,
+        nextBatchEstimate: queue.length > 0 ? "Ready to anchor" : "Queue empty"
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get queue" });
+    }
+  });
+
+  // Manually trigger batch anchoring
+  app.post("/api/blockchain/anchor-batch", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await solanaService.anchorBatch();
+      if (!result) {
+        return res.json({ success: false, message: "No hashes in queue to anchor" });
+      }
+      res.json({ 
+        success: true, 
+        batch: result,
+        message: solanaService.isSimulationMode() 
+          ? "Batch anchored (simulation mode)" 
+          : "Batch anchored to Solana mainnet"
+      });
+    } catch (error) {
+      console.error("Batch anchoring error:", error);
+      res.status(500).json({ error: "Failed to anchor batch" });
+    }
+  });
+
+  // View anchored batches history
+  app.get("/api/blockchain/batches", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const batches = solanaService.getAnchoredBatches();
+      res.json({ 
+        totalBatches: batches.length,
+        batches: batches.slice(-20).reverse() // Last 20, newest first
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get batches" });
+    }
+  });
+
+  // Queue a specific hallmark for anchoring (for testing)
+  app.post("/api/blockchain/queue-hallmark", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hallmarkId, contentHash, assetType } = req.body;
+      
+      if (!hallmarkId || !contentHash || !assetType) {
+        return res.status(400).json({ error: "hallmarkId, contentHash, and assetType required" });
+      }
+
+      const result = await queueForBlockchain(hallmarkId, contentHash, assetType);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to queue hallmark" });
+    }
+  });
+
+  // Get anchorable document types
+  app.get("/api/blockchain/anchorable-types", async (req: Request, res: Response) => {
+    res.json({ 
+      types: solanaService.getAnchorableTypes(),
+      description: "Document types that are automatically queued for blockchain anchoring"
+    });
+  });
+}
 
 // ========================
 // Crypto Invoice Payments (Coinbase Commerce)

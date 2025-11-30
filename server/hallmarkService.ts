@@ -1,8 +1,10 @@
 import crypto from 'crypto';
+import { solanaService } from './solanaService';
 
 /**
  * ORBIT Hallmark Service - Automatic stamping & tracking
  * Every asset gets a unique, permanent identifier
+ * Now with optional Solana blockchain anchoring for immutable verification
  */
 
 export function generateHallmarkNumber(): string {
@@ -66,6 +68,10 @@ export function createHallmarkData(
 }
 
 export function formatHallmarkForCert(hallmark: any): string {
+  const blockchainStatus = hallmark.blockchainTxSignature 
+    ? `║ Blockchain: Verified on Solana            ║\n║ TX: ${hallmark.blockchainTxSignature.substring(0, 38)}... ║\n`
+    : `║ Blockchain: Pending anchoring             ║\n`;
+    
   return `
 ╔════════════════════════════════════════════╗
 ║          ORBIT HALLMARK CERTIFICATE        ║
@@ -75,9 +81,46 @@ export function formatHallmarkForCert(hallmark: any): string {
 ║ Issued: ${new Date(hallmark.createdAt).toLocaleDateString().padEnd(40)} ║
 ║ Recipient: ${hallmark.recipientName.substring(0, 32).padEnd(35)} ║
 ║ Content Hash: ${hallmark.contentHash.substring(0, 32)}... ║
-╠════════════════════════════════════════════╣
+${blockchainStatus}╠════════════════════════════════════════════╣
 ║ This asset has been cataloged and verified ║
 ║ Powered by ORBIT Staffing OS               ║
 ╚════════════════════════════════════════════╝
   `;
+}
+
+/**
+ * Queue a hallmark for blockchain anchoring if it's an anchorable type
+ */
+export async function queueForBlockchain(
+  hallmarkId: string,
+  contentHash: string,
+  assetType: string
+): Promise<{ queued: boolean; message: string }> {
+  if (!solanaService.shouldAnchor(assetType)) {
+    return { 
+      queued: false, 
+      message: `Asset type '${assetType}' not configured for blockchain anchoring` 
+    };
+  }
+
+  try {
+    await solanaService.queueForAnchoring(hallmarkId, contentHash, assetType);
+    return { 
+      queued: true, 
+      message: `Queued for blockchain anchoring (${solanaService.isSimulationMode() ? 'simulation' : 'live'} mode)` 
+    };
+  } catch (error) {
+    console.error('[Hallmark] Failed to queue for blockchain:', error);
+    return { 
+      queued: false, 
+      message: 'Failed to queue for blockchain anchoring' 
+    };
+  }
+}
+
+/**
+ * Get blockchain anchoring statistics
+ */
+export function getBlockchainStats() {
+  return solanaService.getStats();
 }
