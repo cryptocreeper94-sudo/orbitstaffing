@@ -375,6 +375,39 @@ const TODO_TASKS = [
   },
 ];
 
+// Integration status mapping to task IDs
+const INTEGRATION_MAP: Record<string, string> = {
+  'stripe-payments': 'stripe',
+  'stripe-webhook': 'stripe',
+  'twilio-sms': 'twilio',
+  'coinbase-commerce': 'coinbase',
+  'email-service': 'sendgrid',
+  'openai-api': 'openai',
+  'checkr-api': 'checkr',
+};
+
+interface IntegrationStatus {
+  status: {
+    stripe: { configured: boolean; webhook: boolean };
+    twilio: { configured: boolean };
+    coinbase: { configured: boolean };
+    sendgrid: { configured: boolean };
+    openai: { configured: boolean };
+    checkr: { configured: boolean };
+    solana: { configured: boolean };
+    helius: { configured: boolean };
+    database: { configured: boolean };
+    github: { configured: boolean };
+  };
+  summary: {
+    criticalReady: boolean;
+    optionalConfigured: number;
+    totalOptional: number;
+    readyForProduction: boolean;
+  };
+  lastChecked: string;
+}
+
 // Jason's To-Do List Component
 function JasonsTodoList() {
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(() => {
@@ -386,6 +419,63 @@ function JasonsTodoList() {
   });
 
   const [showCelebration, setShowCelebration] = useState(false);
+  const [integrationStatus, setIntegrationStatus] = useState<IntegrationStatus | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+
+  // Fetch integration status from API
+  const fetchIntegrationStatus = async () => {
+    try {
+      const response = await fetch('/api/system/integration-status');
+      if (response.ok) {
+        const data = await response.json();
+        setIntegrationStatus(data);
+        setLastRefresh(new Date());
+        
+        // Auto-update completed tasks based on live status
+        const newCompleted = new Set(completedTasks);
+        
+        // Stripe payments
+        if (data.status.stripe.configured) {
+          newCompleted.add('stripe-payments');
+        }
+        // Stripe webhook
+        if (data.status.stripe.webhook) {
+          newCompleted.add('stripe-webhook');
+        }
+        // Twilio
+        if (data.status.twilio.configured) {
+          newCompleted.add('twilio-sms');
+        }
+        // Coinbase
+        if (data.status.coinbase.configured) {
+          newCompleted.add('coinbase-commerce');
+        }
+        // SendGrid
+        if (data.status.sendgrid.configured) {
+          newCompleted.add('email-service');
+        }
+        // OpenAI
+        if (data.status.openai.configured) {
+          newCompleted.add('openai-api');
+        }
+        // Checkr
+        if (data.status.checkr.configured) {
+          newCompleted.add('checkr-api');
+        }
+        
+        setCompletedTasks(newCompleted);
+      }
+    } catch (error) {
+      console.error('Failed to fetch integration status:', error);
+    }
+  };
+
+  // Initial fetch and auto-refresh every 30 seconds
+  useEffect(() => {
+    fetchIntegrationStatus();
+    const interval = setInterval(fetchIntegrationStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -452,9 +542,36 @@ function JasonsTodoList() {
             <Trophy className="w-8 h-8 text-yellow-400" />
             <h2 className="text-2xl font-bold text-white">🎯 Jason's To-Do List - Production Setup</h2>
           </div>
-          <p className="text-orange-100 mb-4">
+          <p className="text-orange-100 mb-2">
             Critical items to get ORBIT fully operational
           </p>
+          
+          {/* Live Status Indicator */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-2 bg-slate-900/50 px-3 py-1.5 rounded-full border border-cyan-500/30">
+              <div className={`w-2 h-2 rounded-full ${integrationStatus ? 'bg-green-400 animate-pulse' : 'bg-yellow-400'}`} />
+              <span className="text-xs text-cyan-300">
+                {integrationStatus ? 'Live Status' : 'Checking...'}
+              </span>
+              {lastRefresh && (
+                <span className="text-xs text-gray-400">
+                  Updated {lastRefresh.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+            <button
+              onClick={fetchIntegrationStatus}
+              className="flex items-center gap-1 bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border border-cyan-500/30"
+            >
+              <Clock className="w-3 h-3" />
+              Refresh Status
+            </button>
+            {integrationStatus?.summary.readyForProduction && (
+              <span className="bg-green-600/30 text-green-300 px-3 py-1.5 rounded-full text-xs font-bold border border-green-500/50">
+                ✅ Production Ready
+              </span>
+            )}
+          </div>
           
           {/* Progress Bar */}
           <div className="bg-slate-900/50 rounded-lg p-4 border border-orange-500/30">

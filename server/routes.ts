@@ -125,6 +125,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerBlockchainRoutes(app);
 
   // ========================
+  // SYSTEM STATUS CHECK (For Developer Checklist Auto-Update)
+  // ========================
+  app.get("/api/system/integration-status", async (req: Request, res: Response) => {
+    try {
+      // Check which integrations are configured (boolean only - no secret values exposed)
+      const status = {
+        stripe: {
+          configured: !!(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PUBLISHABLE_KEY),
+          webhook: !!process.env.STRIPE_WEBHOOK_SECRET,
+        },
+        twilio: {
+          configured: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER),
+        },
+        coinbase: {
+          configured: !!(process.env.COINBASE_API_KEY || process.env.COINBASE_COMMERCE_API_KEY),
+        },
+        sendgrid: {
+          configured: !!process.env.SENDGRID_API_KEY,
+        },
+        openai: {
+          configured: !!(process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY),
+        },
+        checkr: {
+          configured: !!process.env.CHECKR_API_KEY,
+        },
+        solana: {
+          configured: !!process.env.SOLANA_WALLET_PRIVATE_KEY,
+        },
+        helius: {
+          configured: !!process.env.HELIUS_API_KEY,
+        },
+        database: {
+          configured: !!process.env.DATABASE_URL,
+        },
+        github: {
+          configured: !!process.env.ORBIT_GITHUB_TOKEN,
+        },
+      };
+
+      // Calculate overall readiness
+      const criticalServices = ['stripe', 'database'];
+      const criticalReady = criticalServices.every(s => (status as any)[s]?.configured);
+      
+      const optionalServices = ['twilio', 'coinbase', 'sendgrid', 'openai', 'checkr'];
+      const optionalConfigured = optionalServices.filter(s => (status as any)[s]?.configured).length;
+
+      res.json({
+        status,
+        summary: {
+          criticalReady,
+          optionalConfigured,
+          totalOptional: optionalServices.length,
+          readyForProduction: criticalReady,
+        },
+        lastChecked: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[System Status] Error:", error);
+      res.status(500).json({ error: "Failed to check system status" });
+    }
+  });
+
+  // ========================
   // V2 SIGNUP (Early Access Waitlist)
   // ========================
   app.post("/api/v2-signup", async (req: Request, res: Response) => {
