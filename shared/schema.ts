@@ -6,6 +6,7 @@ import {
   date,
   timestamp,
   decimal,
+  numeric,
   boolean,
   integer,
   jsonb,
@@ -4720,3 +4721,139 @@ export const insertCrmEmailTrackingSchema = createInsertSchema(crmEmailTracking)
 
 export type InsertCrmEmailTracking = z.infer<typeof insertCrmEmailTrackingSchema>;
 export type CrmEmailTracking = typeof crmEmailTracking.$inferSelect;
+
+// ========================
+// ORBIT Pay Card Waitlist
+// ========================
+export const payCardWaitlist = pgTable(
+  "pay_card_waitlist",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 20 }),
+    workerId: varchar("worker_id").references(() => workers.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    source: varchar("source", { length: 50 }).default("website"),
+    status: varchar("status", { length: 50 }).default("pending"),
+    
+    notifiedAt: timestamp("notified_at"),
+    convertedAt: timestamp("converted_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_pay_card_waitlist_email").on(table.email),
+    workerIdx: index("idx_pay_card_waitlist_worker").on(table.workerId),
+    statusIdx: index("idx_pay_card_waitlist_status").on(table.status),
+  })
+);
+
+export const insertPayCardWaitlistSchema = createInsertSchema(payCardWaitlist).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPayCardWaitlist = z.infer<typeof insertPayCardWaitlistSchema>;
+export type PayCardWaitlist = typeof payCardWaitlist.$inferSelect;
+
+// ========================
+// ORBIT Pay Card Applications (Future - Stripe Issuing)
+// ========================
+export const payCardApplications = pgTable(
+  "pay_card_applications",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    status: varchar("status", { length: 50 }).default("pending"),
+    
+    firstName: varchar("first_name", { length: 100 }),
+    lastName: varchar("last_name", { length: 100 }),
+    dateOfBirth: date("date_of_birth"),
+    ssn4: varchar("ssn_last_4", { length: 4 }),
+    
+    addressLine1: varchar("address_line1", { length: 255 }),
+    addressLine2: varchar("address_line2", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 2 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    
+    stripeCardholderId: varchar("stripe_cardholder_id", { length: 100 }),
+    stripeCardId: varchar("stripe_card_id", { length: 100 }),
+    cardStatus: varchar("card_status", { length: 50 }),
+    cardLast4: varchar("card_last_4", { length: 4 }),
+    
+    approvedAt: timestamp("approved_at"),
+    activatedAt: timestamp("activated_at"),
+    cancelledAt: timestamp("cancelled_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_pay_card_app_worker").on(table.workerId),
+    tenantIdx: index("idx_pay_card_app_tenant").on(table.tenantId),
+    statusIdx: index("idx_pay_card_app_status").on(table.status),
+    stripeCardholderIdx: index("idx_pay_card_app_stripe_ch").on(table.stripeCardholderId),
+  })
+);
+
+export const insertPayCardApplicationSchema = createInsertSchema(payCardApplications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPayCardApplication = z.infer<typeof insertPayCardApplicationSchema>;
+export type PayCardApplication = typeof payCardApplications.$inferSelect;
+
+// ========================
+// Worker Payment Preferences
+// ========================
+export const workerPaymentPreferences = pgTable(
+  "worker_payment_preferences",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    workerId: varchar("worker_id").notNull().references(() => workers.id).unique(),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    preferredMethod: varchar("preferred_method", { length: 50 }).default("direct_deposit"),
+    
+    bankAccountId: varchar("bank_account_id", { length: 100 }),
+    bankAccountLast4: varchar("bank_account_last_4", { length: 4 }),
+    bankName: varchar("bank_name", { length: 100 }),
+    routingNumber: varchar("routing_number", { length: 9 }),
+    accountType: varchar("account_type", { length: 20 }),
+    
+    payCardEnabled: boolean("pay_card_enabled").default(false),
+    payCardId: varchar("pay_card_id").references(() => payCardApplications.id),
+    
+    instantPayEnabled: boolean("instant_pay_enabled").default(false),
+    instantPayFee: numeric("instant_pay_fee", { precision: 5, scale: 2 }),
+    
+    stripeConnectAccountId: varchar("stripe_connect_account_id", { length: 100 }),
+    stripeAccountStatus: varchar("stripe_account_status", { length: 50 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    workerIdx: index("idx_worker_pay_pref_worker").on(table.workerId),
+    tenantIdx: index("idx_worker_pay_pref_tenant").on(table.tenantId),
+    methodIdx: index("idx_worker_pay_pref_method").on(table.preferredMethod),
+  })
+);
+
+export const insertWorkerPaymentPreferencesSchema = createInsertSchema(workerPaymentPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerPaymentPreferences = z.infer<typeof insertWorkerPaymentPreferencesSchema>;
+export type WorkerPaymentPreferences = typeof workerPaymentPreferences.$inferSelect;

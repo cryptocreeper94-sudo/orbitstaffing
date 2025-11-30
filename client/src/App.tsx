@@ -57,6 +57,7 @@ import AdminTalentExchange from "@/pages/AdminTalentExchange";
 import EmployeeHub from "@/pages/EmployeeHub";
 import OwnerHub from "@/pages/OwnerHub";
 import CRMDashboard from "@/pages/CRMDashboard";
+import OrbitPayCard from "@/pages/OrbitPayCard";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
@@ -139,6 +140,8 @@ function Router() {
       <Route path="/employee-hub" component={EmployeeHub} />
       <Route path="/my-hub" component={EmployeeHub} />
       <Route path="/owner-hub" component={OwnerHub} />
+      <Route path="/orbit-pay-card" component={OrbitPayCard} />
+      <Route path="/pay-card" component={OrbitPayCard} />
       <Route component={NotFound} />
     </Switch>
   );

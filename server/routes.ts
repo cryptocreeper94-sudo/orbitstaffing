@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { sql, eq, desc, and, count, gte, lte } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import { z } from "zod";
 import { storage } from "./storage";
 import { db } from "./db";
 import { emailService } from "./email";
@@ -106,6 +107,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register CRM routes (Activity Timeline, Notes, Deals, Meetings, etc.)
   registerCrmRoutes(app);
+  
+  // Register Pay Card routes (ORBIT Pay Card waitlist and preferences)
+  registerPayCardRoutes(app);
 
   // ========================
   // V2 SIGNUP (Early Access Waitlist)
@@ -5898,3 +5902,232 @@ async function recalculateWorkerPerformance(workerId: string, tenantId: string) 
 }
 
 // Worker matching is handled by ./matchingService - see autoMatchWorkers and autoReassignWorkerRequest exports
+
+// ========================
+// ORBIT Pay Card API Routes
+// ========================
+
+export function registerPayCardRoutes(app: Express) {
+  // Join Pay Card waitlist
+  app.post("/api/pay-card/waitlist", async (req: Request, res: Response) => {
+    try {
+      const { email, phone, workerId, tenantId, source } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      
+      // Check if already on waitlist
+      const existing = await db.execute(sql`
+        SELECT id FROM pay_card_waitlist WHERE email = ${email}
+      `);
+      
+      if (existing.rows.length > 0) {
+        return res.json({ 
+          success: true, 
+          message: "You're already on the waitlist! We'll notify you when ORBIT Pay Card launches.",
+          alreadyRegistered: true
+        });
+      }
+      
+      // Add to waitlist
+      const result = await db.execute(sql`
+        INSERT INTO pay_card_waitlist (email, phone, worker_id, tenant_id, source, status)
+        VALUES (${email}, ${phone || null}, ${workerId || null}, ${tenantId || null}, ${source || 'website'}, 'pending')
+        RETURNING id, email, created_at
+      `);
+      
+      console.log(`[Pay Card] New waitlist signup: ${email}`);
+      
+      res.json({ 
+        success: true, 
+        message: "You're on the waitlist! We'll notify you when ORBIT Pay Card launches.",
+        id: result.rows[0].id
+      });
+    } catch (error) {
+      console.error("Pay Card waitlist error:", error);
+      res.status(500).json({ error: "Failed to join waitlist" });
+    }
+  });
+  
+  // Get waitlist count (for marketing)
+  app.get("/api/pay-card/waitlist/count", async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT COUNT(*) as count FROM pay_card_waitlist WHERE status = 'pending'
+      `);
+      
+      const count = parseInt(result.rows[0].count as string) || 0;
+      
+      res.json({ count, formatted: count > 1000 ? `${(count / 1000).toFixed(1)}k+` : count.toString() });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get count" });
+    }
+  });
+  
+  // Zod schema for payment preferences validation
+  const paymentPreferencesSchema = z.object({
+    preferredMethod: z.enum(['direct_deposit', 'pay_card', 'check', 'cash']).optional(),
+    bankName: z.string().max(100).optional().nullable(),
+    accountType: z.enum(['checking', 'savings']).optional().nullable(),
+    payCardEnabled: z.boolean().optional(),
+    instantPayEnabled: z.boolean().optional(),
+  }).strict();
+  
+  // Get worker payment preferences (requires admin authentication + tenant scoping)
+  app.get("/api/pay-card/preferences/:workerId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const requestTenantId = getTenantIdFromRequest(req);
+      
+      // Verify worker exists and get tenant
+      const workerCheck = await db.execute(sql`
+        SELECT id, tenant_id FROM workers WHERE id = ${workerId}
+      `);
+      
+      if (workerCheck.rows.length === 0) {
+        return res.status(404).json({ error: "Worker not found" });
+      }
+      
+      const worker = workerCheck.rows[0] as any;
+      
+      // Enforce tenant scoping - admin can only access workers within their tenant
+      // Master admins (role=master) bypass this check for platform-wide administration
+      if (requestTenantId && worker.tenant_id && requestTenantId !== worker.tenant_id) {
+        return res.status(403).json({ error: "Access denied. Worker belongs to a different organization." });
+      }
+      
+      const result = await db.execute(sql`
+        SELECT 
+          preferred_method, 
+          bank_name,
+          account_type,
+          pay_card_enabled,
+          instant_pay_enabled,
+          stripe_account_status,
+          created_at,
+          updated_at
+        FROM worker_payment_preferences 
+        WHERE worker_id = ${workerId}
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.json({ 
+          preferences: null,
+          message: "No payment preferences set. Default is direct deposit."
+        });
+      }
+      
+      res.json({ preferences: result.rows[0] });
+    } catch (error) {
+      console.error("Get payment preferences error:", error);
+      res.status(500).json({ error: "Failed to get preferences" });
+    }
+  });
+  
+  // Update worker payment preferences (requires admin authentication + tenant scoping + validation)
+  app.post("/api/pay-card/preferences/:workerId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const requestTenantId = getTenantIdFromRequest(req);
+      
+      // Validate input with Zod - rejects unexpected fields with .strict()
+      const validationResult = paymentPreferencesSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid request body", 
+          details: validationResult.error.issues.map((i: z.ZodIssue) => i.message) 
+        });
+      }
+      
+      const { preferredMethod, bankName, accountType, payCardEnabled, instantPayEnabled } = validationResult.data;
+      
+      // Verify worker exists and get tenant for scoping
+      const workerCheck = await db.execute(sql`
+        SELECT id, tenant_id FROM workers WHERE id = ${workerId}
+      `);
+      
+      if (workerCheck.rows.length === 0) {
+        return res.status(404).json({ error: "Worker not found" });
+      }
+      
+      const worker = workerCheck.rows[0] as any;
+      
+      // Enforce tenant scoping - admin can only modify workers within their tenant
+      if (requestTenantId && worker.tenant_id && requestTenantId !== worker.tenant_id) {
+        return res.status(403).json({ error: "Access denied. Worker belongs to a different organization." });
+      }
+      
+      // Upsert preferences with tenant scoping
+      await db.execute(sql`
+        INSERT INTO worker_payment_preferences (
+          worker_id, tenant_id, preferred_method, bank_name, 
+          account_type, pay_card_enabled, instant_pay_enabled
+        ) VALUES (
+          ${workerId}, ${worker.tenant_id}, ${preferredMethod || 'direct_deposit'},
+          ${bankName || null}, ${accountType || null}, ${payCardEnabled || false}, ${instantPayEnabled || false}
+        )
+        ON CONFLICT (worker_id) DO UPDATE SET
+          preferred_method = COALESCE(${preferredMethod}, worker_payment_preferences.preferred_method),
+          bank_name = COALESCE(${bankName}, worker_payment_preferences.bank_name),
+          account_type = COALESCE(${accountType}, worker_payment_preferences.account_type),
+          pay_card_enabled = COALESCE(${payCardEnabled}, worker_payment_preferences.pay_card_enabled),
+          instant_pay_enabled = COALESCE(${instantPayEnabled}, worker_payment_preferences.instant_pay_enabled),
+          updated_at = NOW()
+      `);
+      
+      console.log(`[Pay Card] Updated preferences for worker ${workerId} (tenant: ${worker.tenant_id})`);
+      
+      res.json({ success: true, message: "Payment preferences updated" });
+    } catch (error) {
+      console.error("Update payment preferences error:", error);
+      res.status(500).json({ error: "Failed to update preferences" });
+    }
+  });
+  
+  // Check Pay Card application status (requires admin authentication + tenant scoping)
+  app.get("/api/pay-card/application/:workerId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const requestTenantId = getTenantIdFromRequest(req);
+      
+      // Verify worker exists
+      const workerCheck = await db.execute(sql`
+        SELECT id, tenant_id FROM workers WHERE id = ${workerId}
+      `);
+      
+      if (workerCheck.rows.length === 0) {
+        return res.status(404).json({ error: "Worker not found" });
+      }
+      
+      const worker = workerCheck.rows[0] as any;
+      
+      // Enforce tenant scoping
+      if (requestTenantId && worker.tenant_id && requestTenantId !== worker.tenant_id) {
+        return res.status(403).json({ error: "Access denied. Worker belongs to a different organization." });
+      }
+      
+      // Only return non-sensitive fields
+      const result = await db.execute(sql`
+        SELECT id, status, card_status, card_last_4, created_at, approved_at, activated_at
+        FROM pay_card_applications 
+        WHERE worker_id = ${workerId}
+        ORDER BY created_at DESC
+        LIMIT 1
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.json({ 
+          application: null,
+          eligible: true,
+          message: "No Pay Card application found. Apply when available!"
+        });
+      }
+      
+      res.json({ application: result.rows[0] });
+    } catch (error) {
+      console.error("Get Pay Card application error:", error);
+      res.status(500).json({ error: "Failed to get application" });
+    }
+  });
+}

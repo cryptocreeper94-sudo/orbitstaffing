@@ -20,6 +20,7 @@ import { BenefitDetailsModal } from "@/components/BenefitDetailsModal";
 import { DemoRequestForm } from "@/components/DemoRequestForm";
 import { InteractiveOnboarding } from "@/components/InteractiveOnboarding";
 import { HomeSlideshow } from "@/components/HomeSlideshow";
+import { WelcomeSlideshow } from "@/components/WelcomeSlideshow";
 import { Accordion } from "@/components/Accordion";
 import { V2SignupModal } from "@/components/V2SignupModal";
 import { ISO20022Banner } from "@/components/ISO20022Banner";
@@ -30,15 +31,24 @@ export default function Landing() {
   const [showModal, setShowModal] = useState(false);
   const [showDemoForm, setShowDemoForm] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showWelcomeSlideshow, setShowWelcomeSlideshow] = useState(false);
   const [selectedBenefit, setSelectedBenefit] = useState<string | null>(null);
   const [showLotOpsSlideshow, setShowLotOpsSlideshow] = useState(false);
   const [showOrbitSlideshow, setShowOrbitSlideshow] = useState(false);
 
   useEffect(() => {
-    // Show interactive onboarding for first-time visitors
+    // Show welcome slideshow for first-time visitors (new enhanced version)
+    const hasSeenWelcome = localStorage.getItem("hasSeenWelcomeSlideshow");
+    if (!hasSeenWelcome) {
+      const timer = setTimeout(() => {
+        setShowWelcomeSlideshow(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+    
+    // Fallback to interactive onboarding if they've seen welcome but not onboarding
     const hasSeenOnboarding = localStorage.getItem("hasSeenInteractiveOnboarding");
     if (!hasSeenOnboarding) {
-      // Delay slightly to let page render
       const timer = setTimeout(() => {
         setShowOnboarding(true);
         localStorage.setItem("hasSeenInteractiveOnboarding", "true");
@@ -54,9 +64,23 @@ export default function Landing() {
     }
   }, []);
 
+  const handleWelcomeClose = () => {
+    setShowWelcomeSlideshow(false);
+    localStorage.setItem("hasSeenWelcomeSlideshow", "true");
+    localStorage.setItem("hasSeenInteractiveOnboarding", "true");
+    localStorage.setItem("hasSeenBusinessTypeModal", "true");
+    localStorage.setItem("hasSeenValueProposition", "true");
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
-      {/* Interactive Onboarding Tour */}
+      {/* Welcome Slideshow (Primary for new visitors) */}
+      <WelcomeSlideshow
+        isOpen={showWelcomeSlideshow}
+        onClose={handleWelcomeClose}
+      />
+
+      {/* Interactive Onboarding Tour (Fallback) */}
       <InteractiveOnboarding 
         isOpen={showOnboarding} 
         onClose={() => setShowOnboarding(false)}
