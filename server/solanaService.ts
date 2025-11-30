@@ -387,10 +387,31 @@ export class SolanaService {
     batch?: BatchResult;
     proof?: string[];
   }> {
-    // Check all batches for the hash
-    for (const batch of anchoredBatches) {
-      // In production, we'd store the full hash list per batch
-      // For now, return the batch if found in queue history
+    try {
+      const result = await db.execute(sql`
+        SELECT b.id, b.merkle_root, b.transaction_signature, b.hash_count, b.anchored_at
+        FROM blockchain_anchor_batches b
+        JOIN blockchain_hash_queue q ON q.batch_id = b.id
+        WHERE q.content_hash = ${contentHash}
+        LIMIT 1
+      `);
+      
+      if (result.rows.length > 0) {
+        const row = result.rows[0] as any;
+        return {
+          found: true,
+          batch: {
+            id: row.id,
+            merkleRoot: row.merkle_root,
+            transactionSignature: row.transaction_signature,
+            hashCount: parseInt(row.hash_count),
+            anchoredAt: new Date(row.anchored_at),
+            explorerUrl: `https://solscan.io/tx/${row.transaction_signature}`,
+          },
+        };
+      }
+    } catch (error) {
+      console.error('[Solana] Error verifying hash:', error);
     }
     
     return { found: false };
