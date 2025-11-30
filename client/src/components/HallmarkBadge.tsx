@@ -10,7 +10,7 @@ interface HallmarkBadgeProps {
 }
 
 export function HallmarkBadge({ 
-  serialNumber = '000', 
+  serialNumber = '000000001-00', 
   size = 'md',
   verificationUrl = 'https://orbitstaffing.io/verify'
 }: HallmarkBadgeProps) {
