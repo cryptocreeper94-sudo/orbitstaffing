@@ -43,9 +43,9 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
               <BarChart3 className="w-3 h-3 mr-1" />
               CRM Added
             </Badge>
-            <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
-              <Package className="w-3 h-3 mr-1" />
-              Standalone Tools
+            <Badge className="bg-pink-500/20 text-pink-400 border-pink-500/30">
+              <Target className="w-3 h-3 mr-1" />
+              Marketing Hub
             </Badge>
           </div>
         </DialogHeader>
@@ -148,11 +148,49 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
               </CardContent>
             </Card>
 
+            <Card className="bg-gradient-to-br from-pink-950/60 to-rose-950/60 border border-pink-500/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-pink-300 flex items-center gap-2 text-lg">
+                  <Target className="w-5 h-5" />
+                  NEW: Marketing Command Center
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-pink-100 text-sm mb-3">
+                  Social media posting hub with image uploads!
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    20+ post templates
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Image upload
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Post to X/Twitter
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-300">
+                    <CheckCircle2 className="w-3 h-3 text-green-400" />
+                    Post to Facebook
+                  </div>
+                </div>
+                <Link href="/marketing-hub">
+                  <Button size="sm" className="mt-3 bg-pink-600 hover:bg-pink-700 text-xs">
+                    Open Marketing Hub
+                    <ChevronRight className="w-3 h-3 ml-1" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
             <Card className="bg-gradient-to-br from-purple-950/60 to-violet-950/60 border border-purple-500/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-purple-300 flex items-center gap-2 text-lg">
                   <Gift className="w-5 h-5" />
-                  NEW: Affiliate/MLM Program
+                  Affiliate/MLM Program
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -228,7 +266,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
                   <div>
                     <p className="text-2xl font-bold text-white">11</p>
                     <p className="text-xs text-slate-400">CRM Tables</p>
@@ -238,7 +276,11 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                     <p className="text-xs text-slate-400">Standalone Tools</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-white">75%</p>
+                    <p className="text-2xl font-bold text-pink-400">20+</p>
+                    <p className="text-xs text-slate-400">Post Templates</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-white">80%</p>
                     <p className="text-xs text-slate-400">HubSpot Parity</p>
                   </div>
                   <div>
@@ -257,11 +299,17 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   <Link href="/crm">
                     <Button variant="outline" size="sm" className="w-full text-xs border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10">
                       <BarChart3 className="w-3 h-3 mr-1" />
                       CRM
+                    </Button>
+                  </Link>
+                  <Link href="/marketing-hub">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-pink-500/30 text-pink-400 hover:bg-pink-500/10">
+                      <Target className="w-3 h-3 mr-1" />
+                      Marketing
                     </Button>
                   </Link>
                   <Link href="/pricing">

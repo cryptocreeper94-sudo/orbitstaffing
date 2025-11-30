@@ -64,6 +64,7 @@ ORBIT Staffing OS is a comprehensive, white-label staffing automation platform d
 | Tool | Price/mo | Features | Competitor | Savings |
 |------|----------|----------|------------|---------|
 | **ORBIT CRM** | $19 | Pipeline, activities, meetings, email tracking, duplicates | HubSpot ($50+) | 62% less |
+| **Marketing Hub** | $19 | Social posting, 20+ templates, image uploads, multi-platform | Hootsuite ($99) | 81% less |
 | **Talent Exchange** | $29 | Job board, talent pool, smart matching, applications | Indeed ($400) | 93% less |
 | **Payroll** | $39 | Multi-state, garnishments, direct deposit, paystubs | ADP ($39+$5/emp) | 60-80% less |
 | **Time & GPS** | $15 | GPS clock-in, geofencing, timesheets, overtime | Deputy ($4/user) | Flat rate |
@@ -74,8 +75,8 @@ ORBIT Staffing OS is a comprehensive, white-label staffing automation platform d
 | Bundle | Monthly | Includes | Target |
 |--------|---------|----------|--------|
 | **Starter** | $99 | CRM + Time/GPS + Compliance | Small agencies, 1-50 workers |
-| **Growth** | $149 | All 5 tools | Growing agencies, 51-200 workers |
-| **Professional** | $249 | All 5 tools + Multi-location + API | Enterprise, unlimited |
+| **Growth** | $149 | All 6 tools (incl. Marketing Hub) | Growing agencies, 51-200 workers |
+| **Professional** | $249 | All 6 tools + Multi-location + API | Enterprise, unlimited |
 | **Enterprise** | Custom | White-label + Dedicated support | Large operations |
 
 **Competitive Analysis:**
@@ -101,7 +102,7 @@ Branded Visa debit card for workers powered by Stripe Issuing.
 Additional products in development:
 - **Lot Ops Pro:** Car dealership operations
 - **Dark Wave Pulse:** Operational heartbeat platform
-- **GarageBot:** Auto parts AI assistant (Coming 2026)
+- **GarageBot:** Auto parts AI assistant (LIVE NOW)
 
 ### 2.5 Version 2 Features (Coming Q1-Q2 2026)
 - **Skill-Based Matching:** AI-powered worker recommendations
