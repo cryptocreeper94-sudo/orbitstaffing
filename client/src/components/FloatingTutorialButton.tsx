@@ -48,26 +48,46 @@ export function FloatingTutorialButton() {
   const { openTutorial, hasSeenTutorial } = useTutorial();
   const [isExpanded, setIsExpanded] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
+  const [popupDismissed, setPopupDismissed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPopupDismissed(sessionStorage.getItem('tutorial-popup-dismissed') === 'true');
+    }
+  }, []);
 
   const tutorialKey = PAGE_TUTORIAL_MAP[location];
   const content = tutorialKey ? TUTORIAL_CONTENT[tutorialKey] : null;
 
   useEffect(() => {
-    if (content && !hasSeenTutorial(content.pageTitle)) {
+    if (content && !hasSeenTutorial(content.pageTitle) && !popupDismissed) {
       setShowPulse(true);
       const timer = setTimeout(() => {
         setIsExpanded(true);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [content, hasSeenTutorial]);
+  }, [content, hasSeenTutorial, popupDismissed]);
 
   if (!content) return null;
+
+  const handleDismissPopup = () => {
+    setIsExpanded(false);
+    setPopupDismissed(true);
+    setShowPulse(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('tutorial-popup-dismissed', 'true');
+    }
+  };
 
   const handleClick = () => {
     openTutorial(content);
     setShowPulse(false);
     setIsExpanded(false);
+    setPopupDismissed(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('tutorial-popup-dismissed', 'true');
+    }
   };
 
   return (
@@ -81,7 +101,7 @@ export function FloatingTutorialButton() {
             className="absolute bottom-16 left-0 w-64 p-4 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/30 shadow-xl shadow-cyan-500/10"
           >
             <button 
-              onClick={() => setIsExpanded(false)}
+              onClick={handleDismissPopup}
               className="absolute top-2 right-2 text-slate-400 hover:text-white"
             >
               <X className="w-4 h-4" />
@@ -110,7 +130,7 @@ export function FloatingTutorialButton() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleClick}
-        onMouseEnter={() => setIsExpanded(true)}
+        onMouseEnter={() => !popupDismissed && setIsExpanded(true)}
         className={`
           relative flex items-center justify-center w-14 h-14 rounded-full
           bg-gradient-to-br from-cyan-500 to-blue-600 text-white

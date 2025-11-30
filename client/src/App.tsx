@@ -61,6 +61,7 @@ import OrbitPayCard from "@/pages/OrbitPayCard";
 import MarketingHub from "@/pages/MarketingHub";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
+import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 
@@ -158,6 +159,7 @@ export default function App() {
           <TutorialProvider>
             <Router />
             <FloatingTutorialButton />
+            <FloatingHomeButton />
             <OrbitChatAssistant />
             <Toaster />
           </TutorialProvider>
