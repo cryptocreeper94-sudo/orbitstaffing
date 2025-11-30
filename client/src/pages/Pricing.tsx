@@ -278,31 +278,31 @@ export default function Pricing() {
 
       <div className="max-w-7xl mx-auto px-4 -mt-6">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
-          <div className="flex justify-center">
-            <TabsList className="bg-slate-800 border border-slate-700 p-1">
+          <div className="flex justify-center overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <TabsList className="bg-slate-800 border border-slate-700 p-1 flex-shrink-0">
               <TabsTrigger 
                 value="bundles" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-6 py-3 text-base"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-bundles"
               >
-                <Package className="w-4 h-4 mr-2" />
-                Platform Bundles
+                <Package className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Platform </span>Bundles
               </TabsTrigger>
               <TabsTrigger 
                 value="tools" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-6 py-3 text-base"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-tools"
               >
-                <Zap className="w-4 h-4 mr-2" />
-                Standalone Tools
+                <Zap className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Standalone </span>Tools
               </TabsTrigger>
               <TabsTrigger 
                 value="affiliate" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-6 py-3 text-base"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-affiliate"
               >
-                <Gift className="w-4 h-4 mr-2" />
-                Affiliate Program
+                <Gift className="w-4 h-4 mr-1 sm:mr-2" />
+                Affiliate
               </TabsTrigger>
             </TabsList>
           </div>

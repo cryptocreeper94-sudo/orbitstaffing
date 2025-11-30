@@ -863,44 +863,46 @@ export default function EmployerPortal() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-slate-800/50 border border-slate-700/50 p-1">
-            <TabsTrigger
-              value="dashboard"
-              className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white"
-              data-testid="tab-dashboard"
-            >
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger
-              value="jobs"
-              className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white"
-              data-testid="tab-jobs"
-            >
-              My Jobs ({jobs?.length || 0})
-            </TabsTrigger>
-            <TabsTrigger
-              value="applications"
-              className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white"
-              data-testid="tab-applications"
-            >
-              Applications ({pendingApplications} new)
-            </TabsTrigger>
-            <TabsTrigger
-              value="settings"
-              className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white"
-              data-testid="tab-settings"
-            >
-              Settings
-            </TabsTrigger>
-            <TabsTrigger
-              value="billing"
-              className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
-              data-testid="tab-billing"
-            >
-              <Crown className="w-4 h-4 mr-1" />
-              Plans & Billing
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
+            <TabsList className="bg-slate-800/50 border border-slate-700/50 p-1 inline-flex w-auto min-w-full sm:w-full">
+              <TabsTrigger
+                value="dashboard"
+                className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                data-testid="tab-dashboard"
+              >
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger
+                value="jobs"
+                className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                data-testid="tab-jobs"
+              >
+                Jobs ({jobs?.length || 0})
+              </TabsTrigger>
+              <TabsTrigger
+                value="applications"
+                className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                data-testid="tab-applications"
+              >
+                Apps ({pendingApplications})
+              </TabsTrigger>
+              <TabsTrigger
+                value="settings"
+                className="data-[state=active]:bg-cyan-600 data-[state=active]:text-white text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                data-testid="tab-settings"
+              >
+                Settings
+              </TabsTrigger>
+              <TabsTrigger
+                value="billing"
+                className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                data-testid="tab-billing"
+              >
+                <Crown className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <span className="hidden sm:inline">Plans & </span>Billing
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard" className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

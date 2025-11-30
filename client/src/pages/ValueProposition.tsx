@@ -49,57 +49,57 @@ export default function ValueProposition() {
             </div>
           </Card>
 
-          <Card className="bg-slate-800 border-purple-600/50 p-6">
-            <div className="flex items-start gap-4">
-              <TrendingUp className="w-8 h-8 text-purple-400 flex-shrink-0 mt-1" />
+          <Card className="bg-slate-800 border-purple-600/50 p-3 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-purple-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">Multi-Tier Bonuses</h3>
-                <p className="text-gray-300">Attendance, performance, referral, and milestone bonuses. Real-time calculations. Automatic payroll integration.</p>
-                <p className="text-sm text-purple-400 mt-2">✓ 34% higher worker retention</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-2">Multi-Tier Bonuses</h3>
+                <p className="text-xs sm:text-base text-gray-300">Attendance, performance, referral, and milestone bonuses. Real-time calculations. Automatic payroll integration.</p>
+                <p className="text-xs sm:text-sm text-purple-400 mt-2">✓ 34% higher worker retention</p>
               </div>
             </div>
           </Card>
 
-          <Card className="bg-slate-800 border-green-600/50 p-6">
-            <div className="flex items-start gap-4">
-              <Users className="w-8 h-8 text-green-400 flex-shrink-0 mt-1" />
+          <Card className="bg-slate-800 border-green-600/50 p-3 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-green-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">Equipment Tracking</h3>
-                <p className="text-gray-300">Real-time PPE inventory. 2-day return deadline. Auto-deductions for non-returns. Zero loss.</p>
-                <p className="text-sm text-green-400 mt-2">✓ Saves 15-20% on replacement costs</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-2">Equipment Tracking</h3>
+                <p className="text-xs sm:text-base text-gray-300">Real-time PPE inventory. 2-day return deadline. Auto-deductions for non-returns. Zero loss.</p>
+                <p className="text-xs sm:text-sm text-green-400 mt-2">✓ Saves 15-20% on replacement costs</p>
               </div>
             </div>
           </Card>
 
-          <Card className="bg-slate-800 border-blue-600/50 p-6">
-            <div className="flex items-start gap-4">
-              <Lock className="w-8 h-8 text-blue-400 flex-shrink-0 mt-1" />
+          <Card className="bg-slate-800 border-blue-600/50 p-3 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <Lock className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">Hallmark Traceability</h3>
-                <p className="text-gray-300">Every paystub, invoice, contract gets blockchain-ready UPC + QR codes. Verifiable authenticity.</p>
-                <p className="text-sm text-blue-400 mt-2">✓ Compliance-grade audit trail</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-2">Hallmark Traceability</h3>
+                <p className="text-xs sm:text-base text-gray-300">Every paystub, invoice, contract gets blockchain-ready UPC + QR codes. Verifiable authenticity.</p>
+                <p className="text-xs sm:text-sm text-blue-400 mt-2">✓ Compliance-grade audit trail</p>
               </div>
             </div>
           </Card>
 
-          <Card className="bg-slate-800 border-yellow-600/50 p-6">
-            <div className="flex items-start gap-4">
-              <Cpu className="w-8 h-8 text-yellow-400 flex-shrink-0 mt-1" />
+          <Card className="bg-slate-800 border-yellow-600/50 p-3 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <Cpu className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">Worker Availability Calendar</h3>
-                <p className="text-gray-300">2-week smart scheduling. Heatmap visualization. AI-powered shift recommendations. Real-time sync.</p>
-                <p className="text-sm text-yellow-400 mt-2">✓ 22% fewer no-shows</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-2">Worker Availability Calendar</h3>
+                <p className="text-xs sm:text-base text-gray-300">2-week smart scheduling. Heatmap visualization. AI-powered shift recommendations. Real-time sync.</p>
+                <p className="text-xs sm:text-sm text-yellow-400 mt-2">✓ 22% fewer no-shows</p>
               </div>
             </div>
           </Card>
 
-          <Card className="bg-slate-800 border-pink-600/50 p-6">
-            <div className="flex items-start gap-4">
-              <Globe className="w-8 h-8 text-pink-400 flex-shrink-0 mt-1" />
+          <Card className="bg-slate-800 border-pink-600/50 p-3 sm:p-6">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-pink-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">One-Click Shifts</h3>
-                <p className="text-gray-300">Workers accept/reject shifts instantly. Real-time tracking. No manual back-and-forth.</p>
-                <p className="text-sm text-pink-400 mt-2">✓ 5x faster assignments</p>
+                <h3 className="text-base sm:text-lg font-semibold mb-2">One-Click Shifts</h3>
+                <p className="text-xs sm:text-base text-gray-300">Workers accept/reject shifts instantly. Real-time tracking. No manual back-and-forth.</p>
+                <p className="text-xs sm:text-sm text-pink-400 mt-2">✓ 5x faster assignments</p>
               </div>
             </div>
           </Card>
@@ -107,11 +107,11 @@ export default function ValueProposition() {
       </div>
 
       {/* Competitor Comparison */}
-      <div className="max-w-6xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-12 text-center">How We Compare</h2>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-12 text-center">How We Compare</h2>
         
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
+          <table className="w-full text-xs sm:text-sm min-w-[500px]">
             <thead>
               <tr className="border-b border-slate-700">
                 <th className="text-left py-4 px-4 font-semibold">Feature</th>
@@ -156,8 +156,8 @@ export default function ValueProposition() {
       </div>
 
       {/* Why ORBIT Wins */}
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold mb-12 text-center">The ORBIT Advantage</h2>
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-12 text-center">The ORBIT Advantage</h2>
         
         <div className="space-y-6">
           <div className="flex gap-4">
@@ -203,12 +203,12 @@ export default function ValueProposition() {
       </div>
 
       {/* CTA */}
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-6">Ready to Scale Your Staffing Business?</h2>
-        <p className="text-xl text-gray-300 mb-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-12 sm:py-20 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Ready to Scale Your Staffing Business?</h2>
+        <p className="text-base sm:text-xl text-gray-300 mb-6 sm:mb-8">
           ORBIT Staffing OS is built for franchisees, regional managers, and growth-focused agencies.
         </p>
-        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 px-8 py-6 text-lg">
+        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg">
           Schedule a Demo <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </div>
