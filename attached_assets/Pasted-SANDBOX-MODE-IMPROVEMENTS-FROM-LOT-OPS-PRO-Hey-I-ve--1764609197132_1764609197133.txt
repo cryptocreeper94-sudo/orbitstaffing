@@ -1,0 +1,56 @@
+SANDBOX MODE IMPROVEMENTS FROM LOT OPS PRO
+==========================================
+
+Hey! I've been working on Lot Ops Pro which has an advanced sandbox system. Here are features you should consider adding to ORBIT's sandbox:
+
+1. ROLE-BASED WELCOME FLOW
+   - When user enters sandbox, show a welcome dialog with their name/role
+   - Offer "Start Guided Tour" or "Explore on my own" options
+   - Track if user has seen welcome to avoid repeating
+
+2. SHIFT CODE GATING FOR "GO LIVE"
+   - Sandbox users see "Go Live? Get shift code" CTA
+   - Supervisors generate daily shift codes
+   - Users must enter valid code to exit sandbox → live mode
+   - Prevents accidental production data writes
+
+3. SIMULATED AUTO-RESPONSES
+   - In sandbox, messages get simulated responses after delay
+   - Makes the app feel alive during training
+   - Example responses: "✅ Message received!", "👍 On it!", "📍 ETA 5 minutes"
+
+4. MULTIPLE VISUAL VARIANTS
+   - SandboxBanner (full-width top bar)
+   - SandboxStatusCard (fancy card with glow effects)
+   - SandboxStatusCompact (small inline badge)
+   - Use different ones based on page context
+
+5. INTEGRATED TOUR SYSTEM
+   - Sandbox welcome triggers interactive tour
+   - Role-specific tour steps (different for drivers vs supervisors)
+   - Highlights key UI elements with tooltips
+
+6. WORKFLOW TIPS BY PAGE
+   - Show contextual tips based on current page + user role
+   - Example: On scanner page → "💡 Scan multiple items to see batch processing"
+   - Helps users learn while exploring
+
+7. useSandboxDataWithFallback HOOK
+   - Enhanced version of useSandboxData
+   - Shows demo data during loading states too
+   - Signature: useSandboxDataWithFallback(realData, demoData, isLoading)
+
+VISUAL THEME SUGGESTION:
+- Keep cyan for ORBIT (different from Lot Ops Pro's purple)
+- Add subtle glow/pulse animations to sandbox indicators
+- Use gradient backgrounds for premium feel
+
+ARCHITECTURE:
+src/contexts/SandboxModeContext.tsx  → Provider + useSandboxMode hook
+src/components/SandboxWelcome.tsx    → First-time welcome dialog
+src/components/SandboxStatusBanner.tsx → Multiple visual variants
+src/hooks/useSandboxData.ts          → Data switching hooks
+src/data/sandbox/fixtures.ts         → Centralized demo data
+src/data/sandbox/simulation.ts       → Auto-responses, simulated movement
+
+The key insight: Sandbox isn't just about showing demo data - it's about TRAINING users safely before they touch real data. The welcome flow + tour + shift code gating creates a complete onboarding experience.
