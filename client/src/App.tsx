@@ -60,6 +60,7 @@ import CRMDashboard from "@/pages/CRMDashboard";
 import OrbitPayCard from "@/pages/OrbitPayCard";
 import MarketingHub from "@/pages/MarketingHub";
 import CryptoWallet from "@/pages/CryptoWallet";
+import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
@@ -153,6 +154,8 @@ function Router() {
       <Route path="/marketing-hub" component={MarketingHub} />
       <Route path="/crypto-wallet" component={CryptoWallet} />
       <Route path="/crypto" component={CryptoWallet} />
+      <Route path="/feature-inventory" component={FeatureInventoryPage} />
+      <Route path="/features" component={FeatureInventoryPage} />
       <Route component={NotFound} />
     </Switch>
   );
