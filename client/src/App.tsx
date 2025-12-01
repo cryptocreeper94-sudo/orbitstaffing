@@ -68,6 +68,7 @@ import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
 import { SandboxBanner } from "@/components/SandboxBanner";
+import { SandboxWelcome } from "@/components/SandboxWelcome";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -165,6 +166,7 @@ export default function App() {
           <OrbitExperienceProvider>
             <TutorialProvider>
               <SandboxBanner />
+              <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
               <Router />
               <FloatingTutorialButton />
