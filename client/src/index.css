@@ -4,9 +4,17 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Sandbox mode padding when banner is shown */
-.sandbox-padding:has(+ .sandbox-banner-active),
-body:has([data-testid="sandbox-banner"]) .sandbox-padding {
-  padding-top: 48px;
+body:has([data-testid="sandbox-banner"]) .sandbox-content {
+  padding-top: 52px;
+}
+
+.sandbox-banner-spacer {
+  height: 0;
+  transition: height 0.2s ease;
+}
+
+body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
+  height: 52px;
 }
 
 @theme inline {

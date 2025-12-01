@@ -165,9 +165,8 @@ export default function App() {
           <OrbitExperienceProvider>
             <TutorialProvider>
               <SandboxBanner />
-              <div className="sandbox-padding">
-                <Router />
-              </div>
+              <div className="sandbox-banner-spacer" />
+              <Router />
               <FloatingTutorialButton />
               <FloatingHomeButton />
               <InteractiveWeatherRadar />
