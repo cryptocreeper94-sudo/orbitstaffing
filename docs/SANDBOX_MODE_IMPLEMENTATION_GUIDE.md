@@ -1,5 +1,13 @@
-# Sandbox Mode Implementation Guide
+# Sandbox Mode Implementation Guide (Enhanced)
 ## For lotopspro (or any React/TypeScript project)
+
+**Features included:**
+- Role-based welcome dialog on first entry
+- Shift code gating for "Go Live" (optional)
+- Simulated auto-responses
+- Multiple visual variants (Banner, StatusCard, Compact)
+- Page-specific contextual tips
+- Enhanced data hooks with loading state support
 
 Copy and paste each section into your project in order.
 

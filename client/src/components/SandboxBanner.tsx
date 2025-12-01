@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useMode } from '@/contexts/ModeContext';
 import { Button } from '@/components/ui/button';
-import { FlaskConical, ArrowLeft, Sparkles, Lightbulb } from 'lucide-react';
+import { FlaskConical, ArrowLeft, Sparkles, Lightbulb, Key } from 'lucide-react';
 import { ShiftCodeGate, hasValidShiftCode } from './SandboxShiftCode';
 import { getRandomTip } from '@/data/sandbox/simulation';
 import { useLocation } from 'wouter';
 
+const REQUIRE_SHIFT_CODE = false;
+
 export function SandboxBanner() {
   const { isSandbox, exitSandbox, returnPath } = useMode();
   const [showShiftCode, setShowShiftCode] = useState(false);
+  const [showSupervisorCode, setShowSupervisorCode] = useState(false);
   const [location] = useLocation();
   const [tip, setTip] = useState('');
 
@@ -19,7 +22,7 @@ export function SandboxBanner() {
   }, [isSandbox, location]);
 
   const handleExitClick = () => {
-    if (hasValidShiftCode()) {
+    if (!REQUIRE_SHIFT_CODE || hasValidShiftCode()) {
       exitSandbox();
     } else {
       setShowShiftCode(true);
@@ -41,17 +44,30 @@ export function SandboxBanner() {
               Demo data active. Safe to explore!
             </span>
           </div>
-          <Button
-            onClick={handleExitClick}
-            variant="outline"
-            size="sm"
-            className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2"
-            data-testid="button-exit-sandbox"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Exit to Live</span>
-            <span className="sm:hidden">Exit</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            {REQUIRE_SHIFT_CODE && (
+              <Button
+                onClick={() => setShowSupervisorCode(true)}
+                variant="ghost"
+                size="sm"
+                className="text-white/70 hover:text-white hover:bg-white/10"
+                title="View shift code (supervisors)"
+              >
+                <Key className="w-4 h-4" />
+              </Button>
+            )}
+            <Button
+              onClick={handleExitClick}
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20 gap-2"
+              data-testid="button-exit-sandbox"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Exit to Live</span>
+              <span className="sm:hidden">Exit</span>
+            </Button>
+          </div>
         </div>
         {tip && (
           <div className="bg-cyan-700/50 px-4 py-1.5 text-center">
@@ -68,6 +84,13 @@ export function SandboxBanner() {
         onClose={() => setShowShiftCode(false)}
         onSuccess={exitSandbox}
       />
+      
+      <ShiftCodeGate
+        isOpen={showSupervisorCode}
+        onClose={() => setShowSupervisorCode(false)}
+        onSuccess={() => setShowSupervisorCode(false)}
+        isSupervisor={true}
+      />
     </>
   );
 }
@@ -75,40 +98,23 @@ export function SandboxBanner() {
 interface SandboxToggleProps {
   className?: string;
   size?: 'sm' | 'default';
-  showShiftGate?: boolean;
 }
 
-export function SandboxToggle({ className = '', size = 'sm', showShiftGate = true }: SandboxToggleProps) {
+export function SandboxToggle({ className = '', size = 'sm' }: SandboxToggleProps) {
   const { isSandbox, enterSandbox, exitSandbox } = useMode();
-  const [showShiftCode, setShowShiftCode] = useState(false);
-
-  const handleExit = () => {
-    if (showShiftGate && !hasValidShiftCode()) {
-      setShowShiftCode(true);
-    } else {
-      exitSandbox();
-    }
-  };
 
   if (isSandbox) {
     return (
-      <>
-        <Button
-          onClick={handleExit}
-          variant="outline"
-          size={size}
-          className={`gap-2 border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 ${className}`}
-          data-testid="button-exit-sandbox-toggle"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Live
-        </Button>
-        <ShiftCodeGate
-          isOpen={showShiftCode}
-          onClose={() => setShowShiftCode(false)}
-          onSuccess={exitSandbox}
-        />
-      </>
+      <Button
+        onClick={exitSandbox}
+        variant="outline"
+        size={size}
+        className={`gap-2 border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 ${className}`}
+        data-testid="button-exit-sandbox-toggle"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back to Live
+      </Button>
     );
   }
 
@@ -141,53 +147,37 @@ export function SandboxBadge() {
 
 export function SandboxStatusCard() {
   const { isSandbox, exitSandbox } = useMode();
-  const [showShiftCode, setShowShiftCode] = useState(false);
   
   if (!isSandbox) return null;
-
-  const handleExit = () => {
-    if (!hasValidShiftCode()) {
-      setShowShiftCode(true);
-    } else {
-      exitSandbox();
-    }
-  };
   
   return (
-    <>
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cyan-500/20 to-teal-500/10 border border-cyan-500/30 p-4 shadow-lg shadow-cyan-500/10" data-testid="sandbox-status-card">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-500/10 rounded-full blur-2xl" />
-        
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-              <FlaskConical className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="text-cyan-300 font-bold text-sm flex items-center gap-2">
-                Sandbox Mode
-                <Sparkles className="w-3 h-3 text-yellow-400" />
-              </div>
-              <div className="text-xs text-gray-400">Demo data • Safe to explore</div>
-            </div>
+    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-cyan-500/20 to-teal-500/10 border border-cyan-500/30 p-4 shadow-lg shadow-cyan-500/10" data-testid="sandbox-status-card">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-teal-500/10 rounded-full blur-2xl" />
+      
+      <div className="relative flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+            <FlaskConical className="w-5 h-5 text-white" />
           </div>
-          <Button
-            onClick={handleExit}
-            size="sm"
-            variant="outline"
-            className="border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
-          >
-            Go Live
-          </Button>
+          <div>
+            <div className="text-cyan-300 font-bold text-sm flex items-center gap-2">
+              Sandbox Mode
+              <Sparkles className="w-3 h-3 text-yellow-400" />
+            </div>
+            <div className="text-xs text-gray-400">Demo data • Safe to explore</div>
+          </div>
         </div>
+        <Button
+          onClick={exitSandbox}
+          size="sm"
+          variant="outline"
+          className="border-cyan-500/40 text-cyan-400 hover:bg-cyan-500/10"
+        >
+          Go Live
+        </Button>
       </div>
-      <ShiftCodeGate
-        isOpen={showShiftCode}
-        onClose={() => setShowShiftCode(false)}
-        onSuccess={exitSandbox}
-      />
-    </>
+    </div>
   );
 }
 
