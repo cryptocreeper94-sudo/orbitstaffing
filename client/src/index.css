@@ -3,6 +3,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Sandbox mode padding when banner is shown */
+.sandbox-padding:has(+ .sandbox-banner-active),
+body:has([data-testid="sandbox-banner"]) .sandbox-padding {
+  padding-top: 48px;
+}
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));

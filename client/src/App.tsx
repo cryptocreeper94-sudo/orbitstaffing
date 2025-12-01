@@ -66,6 +66,8 @@ import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import InteractiveWeatherRadar from "@/components/InteractiveWeatherRadar";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
+import { ModeProvider } from "@/contexts/ModeContext";
+import { SandboxBanner } from "@/components/SandboxBanner";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -159,16 +161,21 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <OrbitExperienceProvider>
-          <TutorialProvider>
-            <Router />
-            <FloatingTutorialButton />
-            <FloatingHomeButton />
-            <InteractiveWeatherRadar />
-            <OrbitChatAssistant />
-            <Toaster />
-          </TutorialProvider>
-        </OrbitExperienceProvider>
+        <ModeProvider>
+          <OrbitExperienceProvider>
+            <TutorialProvider>
+              <SandboxBanner />
+              <div className="sandbox-padding">
+                <Router />
+              </div>
+              <FloatingTutorialButton />
+              <FloatingHomeButton />
+              <InteractiveWeatherRadar />
+              <OrbitChatAssistant />
+              <Toaster />
+            </TutorialProvider>
+          </OrbitExperienceProvider>
+        </ModeProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
