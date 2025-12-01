@@ -12,7 +12,9 @@
 import React, { useState } from 'react';
 import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft, 
   Zap, Database, Cloud, TestTube, Sparkles, PlayCircle, Settings, 
-  Globe, Wallet, CreditCard, MapPin, Bell, FileText } from 'lucide-react';
+  Globe, Wallet, CreditCard, MapPin, Bell, FileText, Bot, 
+  Target, Megaphone, Building2, UserCircle, Map, Award, Stamp,
+  Users2, TrendingUp, Gift, Calendar, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -581,6 +583,162 @@ export default function SecureSandbox() {
               </div>
               <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Hallmarks</h3>
               <p className="text-[10px] sm:text-xs text-gray-500">100B capacity</p>
+            </div>
+
+            {/* Hallmark Seal */}
+            <div 
+              onClick={() => setLocation('/hallmark-seal')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-amber-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-600/20 mb-2 sm:mb-3">
+                <Stamp className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Seal</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">QR Verify</p>
+            </div>
+
+            {/* CRM Dashboard */}
+            <div 
+              onClick={() => setLocation('/crm')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-rose-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-rose-600/20 mb-2 sm:mb-3">
+                <Users2 className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">CRM</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Contacts</p>
+            </div>
+
+            {/* Marketing Hub */}
+            <div 
+              onClick={() => setLocation('/marketing-hub')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-fuchsia-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-fuchsia-600/20 mb-2 sm:mb-3">
+                <Megaphone className="w-4 h-4 sm:w-5 sm:h-5 text-fuchsia-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Marketing</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Campaigns</p>
+            </div>
+
+            {/* Talent Exchange */}
+            <div 
+              onClick={() => setLocation('/talent-exchange')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-teal-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-teal-600/20 mb-2 sm:mb-3">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-teal-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Exchange</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Talent pool</p>
+            </div>
+
+            {/* AI Assistant */}
+            <div 
+              onClick={() => setLocation('/ai-assistant')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-emerald-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-600/20 mb-2 sm:mb-3">
+                <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Orby AI</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Assistant</p>
+            </div>
+
+            {/* Owner Hub */}
+            <div 
+              onClick={() => setLocation('/owner-hub')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-lime-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-lime-600/20 mb-2 sm:mb-3">
+                <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-lime-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Owner Hub</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Business</p>
+            </div>
+
+            {/* Employee Hub */}
+            <div 
+              onClick={() => setLocation('/employee-hub')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-sky-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-sky-600/20 mb-2 sm:mb-3">
+                <UserCircle className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Employee</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Portal</p>
+            </div>
+
+            {/* Roadmap */}
+            <div 
+              onClick={() => setLocation('/roadmap')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-violet-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-violet-600/20 mb-2 sm:mb-3">
+                <Map className="w-4 h-4 sm:w-5 sm:h-5 text-violet-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Roadmap</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Features</p>
+            </div>
+
+            {/* Feature Requests */}
+            <div 
+              onClick={() => setLocation('/feature-requests')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-red-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-red-600/20 mb-2 sm:mb-3">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Requests</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Submit ideas</p>
+            </div>
+
+            {/* Worker Referrals */}
+            <div 
+              onClick={() => setLocation('/worker-referrals')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-amber-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-600/20 mb-2 sm:mb-3">
+                <Gift className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Referrals</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Earn bonuses</p>
+            </div>
+
+            {/* Shift Offers */}
+            <div 
+              onClick={() => setLocation('/worker-shift-offers')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-blue-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-600/20 mb-2 sm:mb-3">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Shifts</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Job offers</p>
+            </div>
+
+            {/* Compliance */}
+            <div 
+              onClick={() => setLocation('/compliance')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-orange-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-orange-600/20 mb-2 sm:mb-3">
+                <ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Compliance</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Documents</p>
+            </div>
+
+            {/* Sales */}
+            <div 
+              onClick={() => setLocation('/sales')}
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-green-500 transition-all cursor-pointer group"
+            >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-600/20 mb-2 sm:mb-3">
+                <Award className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+              </div>
+              <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Sales</h3>
+              <p className="text-[10px] sm:text-xs text-gray-500">Pitch deck</p>
             </div>
           </div>
         </div>
