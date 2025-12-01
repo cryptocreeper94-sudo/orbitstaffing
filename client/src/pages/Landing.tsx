@@ -232,61 +232,79 @@ export default function Landing() {
         
         <div className="max-w-7xl mx-auto px-2 sm:px-6 relative z-10">
           <div className="text-center mb-3 sm:mb-8">
-            <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/40 text-[10px] sm:text-sm mb-1 sm:mb-3" data-testid="badge-next-wave">
-              <Zap className="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1" /> Next Wave
+            <Badge className="bg-green-500/20 text-green-300 border-green-500/40 text-[10px] sm:text-sm mb-1 sm:mb-3" data-testid="badge-now-live">
+              <Zap className="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1" /> Now Live
             </Badge>
-            <h2 className="text-lg sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-3">What's on the Horizon</h2>
-            <p className="text-[10px] sm:text-sm text-violet-200/70 max-w-2xl mx-auto hidden sm:block">Powerful new capabilities already in development</p>
+            <h2 className="text-lg sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-3">Recently Launched</h2>
+            <p className="text-[10px] sm:text-sm text-green-200/70 max-w-2xl mx-auto hidden sm:block">These features are ready to use right now</p>
           </div>
           
           <div className="grid grid-cols-3 md:grid-cols-3 gap-1.5 sm:gap-4">
-            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 transition-all duration-300 group" data-testid="card-ai-scheduling">
-              <CardContent className="p-2 sm:p-6">
-                <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🤖</div>
-                <h3 className="text-[10px] sm:text-lg font-bold text-violet-200 mb-0.5 sm:mb-2">AI Scheduling</h3>
-                <p className="text-[8px] sm:text-xs text-violet-300/70 hidden sm:block">Predictive shift optimization with ML</p>
-              </CardContent>
-            </Card>
+            <Link href="/hallmark-seal">
+              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-hallmarks">
+                <CardContent className="p-2 sm:p-6">
+                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🔐</div>
+                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Hallmarks</h3>
+                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">100B blockchain verified</p>
+                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 transition-all duration-300 group" data-testid="card-background-checks">
-              <CardContent className="p-2 sm:p-6">
-                <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">⚡</div>
-                <h3 className="text-[10px] sm:text-lg font-bold text-violet-200 mb-0.5 sm:mb-2">BG Checks</h3>
-                <p className="text-[8px] sm:text-xs text-violet-300/70 hidden sm:block">Same-day verification</p>
-              </CardContent>
-            </Card>
+            <Link href="/crm">
+              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-crm">
+                <CardContent className="p-2 sm:p-6">
+                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">📇</div>
+                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">CRM</h3>
+                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">HubSpot-grade contacts</p>
+                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 transition-all duration-300 group" data-testid="card-multi-state">
-              <CardContent className="p-2 sm:p-6">
-                <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🌎</div>
-                <h3 className="text-[10px] sm:text-lg font-bold text-violet-200 mb-0.5 sm:mb-2">50 States</h3>
-                <p className="text-[8px] sm:text-xs text-violet-300/70 hidden sm:block">Nationwide compliance</p>
-              </CardContent>
-            </Card>
+            <Link href="/pay-card">
+              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-pay-card">
+                <CardContent className="p-2 sm:p-6">
+                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">💳</div>
+                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Pay Card</h3>
+                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">Instant worker pay</p>
+                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 transition-all duration-300 group" data-testid="card-mobile-parity">
-              <CardContent className="p-2 sm:p-6">
-                <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">📱</div>
-                <h3 className="text-[10px] sm:text-lg font-bold text-violet-200 mb-0.5 sm:mb-2">Mobile App</h3>
-                <p className="text-[8px] sm:text-xs text-violet-300/70 hidden sm:block">iOS & Android apps</p>
-              </CardContent>
-            </Card>
+            <Link href="/marketing-hub">
+              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-marketing">
+                <CardContent className="p-2 sm:p-6">
+                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">📢</div>
+                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Marketing</h3>
+                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">Campaign automation</p>
+                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 transition-all duration-300 group" data-testid="card-advanced-analytics">
-              <CardContent className="p-2 sm:p-6">
-                <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">📊</div>
-                <h3 className="text-[10px] sm:text-lg font-bold text-violet-200 mb-0.5 sm:mb-2">Analytics</h3>
-                <p className="text-[8px] sm:text-xs text-violet-300/70 hidden sm:block">AI-driven insights</p>
-              </CardContent>
-            </Card>
+            <Link href="/talent-exchange">
+              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-exchange">
+                <CardContent className="p-2 sm:p-6">
+                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🔄</div>
+                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Exchange</h3>
+                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">2-way talent pool</p>
+                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/30 hover:border-violet-400/60 transition-all duration-300 group" data-testid="card-franchise-tooling">
-              <CardContent className="p-2 sm:p-6">
-                <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🏗️</div>
-                <h3 className="text-[10px] sm:text-lg font-bold text-violet-200 mb-0.5 sm:mb-2">Franchise</h3>
-                <p className="text-[8px] sm:text-xs text-violet-300/70 hidden sm:block">White-label ready</p>
-              </CardContent>
-            </Card>
+            <Link href="/crypto-wallet">
+              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-crypto">
+                <CardContent className="p-2 sm:p-6">
+                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">⛓️</div>
+                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Crypto</h3>
+                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">Solana payments</p>
+                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
           
           <div className="text-center mt-3 sm:mt-8">
