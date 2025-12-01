@@ -1,22 +1,21 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, HTMLAttributes, ButtonHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 
-interface PremiumCardProps {
+interface PremiumCardProps extends Omit<HTMLMotionProps<'div'>, 'children'> {
   children: ReactNode;
-  className?: string;
   variant?: 'default' | 'glow' | 'gradient' | 'glass';
   hover?: boolean;
-  onClick?: () => void;
 }
 
-export function PremiumCard({ 
+export const PremiumCard = forwardRef<HTMLDivElement, PremiumCardProps>(({ 
   children, 
   className = '', 
   variant = 'default',
   hover = true,
-  onClick 
-}: PremiumCardProps) {
+  onClick,
+  ...props
+}, ref) => {
   const baseClasses = "rounded-xl border p-4 transition-all duration-200";
   
   const variantClasses = {
@@ -30,14 +29,17 @@ export function PremiumCard({
 
   return (
     <motion.div
+      ref={ref}
       className={cn(baseClasses, variantClasses[variant], hoverClasses, className)}
       onClick={onClick}
       whileTap={onClick ? { scale: 0.98 } : undefined}
+      {...props}
     >
       {children}
     </motion.div>
   );
-}
+});
+PremiumCard.displayName = 'PremiumCard';
 
 interface PremiumStatCardProps {
   label: string;
@@ -99,17 +101,13 @@ export function PremiumStatCard({
   );
 }
 
-interface PremiumButtonProps {
+interface PremiumButtonProps extends Omit<HTMLMotionProps<'button'>, 'children'> {
   children: ReactNode;
-  onClick?: () => void;
   variant?: 'primary' | 'secondary' | 'ghost' | 'glow';
   size?: 'sm' | 'md' | 'lg';
-  className?: string;
-  disabled?: boolean;
-  type?: 'button' | 'submit';
 }
 
-export function PremiumButton({
+export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>(({
   children,
   onClick,
   variant = 'primary',
@@ -117,7 +115,8 @@ export function PremiumButton({
   className = '',
   disabled = false,
   type = 'button',
-}: PremiumButtonProps) {
+  ...props
+}, ref) => {
   const baseClasses = "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 btn-squish focus-ring";
   
   const variantClasses = {
@@ -137,28 +136,36 @@ export function PremiumButton({
 
   return (
     <motion.button
+      ref={ref}
       type={type}
       onClick={onClick}
       disabled={disabled}
       className={cn(baseClasses, variantClasses[variant], sizeClasses[size], disabledClasses, className)}
       whileHover={!disabled ? { scale: 1.02 } : undefined}
       whileTap={!disabled ? { scale: 0.95 } : undefined}
+      {...props}
     >
       {children}
     </motion.button>
   );
-}
+});
+PremiumButton.displayName = 'PremiumButton';
 
-interface SectionHeaderProps {
+interface SectionHeaderProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   subtitle?: string;
   action?: ReactNode;
-  className?: string;
 }
 
-export function SectionHeader({ title, subtitle, action, className = '' }: SectionHeaderProps) {
+export const SectionHeader = forwardRef<HTMLDivElement, SectionHeaderProps>(({ 
+  title, 
+  subtitle, 
+  action, 
+  className = '',
+  ...props 
+}, ref) => {
   return (
-    <div className={cn("flex items-center justify-between mb-4", className)}>
+    <div ref={ref} className={cn("flex items-center justify-between mb-4", className)} {...props}>
       <div>
         <h2 className="text-xl font-bold text-white">{title}</h2>
         {subtitle && <p className="text-sm text-gray-400 mt-0.5">{subtitle}</p>}
@@ -166,7 +173,8 @@ export function SectionHeader({ title, subtitle, action, className = '' }: Secti
       {action}
     </div>
   );
-}
+});
+SectionHeader.displayName = 'SectionHeader';
 
 interface GlowDividerProps {
   className?: string;

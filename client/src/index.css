@@ -423,14 +423,14 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
     50% { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4), 0 0 40px rgba(34, 211, 238, 0.2); }
   }
   
-  /* Shimmer effect for loading states */
+  /* Shimmer effect for loading states - uses shimmer-bg for background-based shimmer */
   .shimmer {
     background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
     background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+    animation: shimmer-bg 2s infinite;
   }
   
-  @keyframes shimmer {
+  @keyframes shimmer-bg {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
