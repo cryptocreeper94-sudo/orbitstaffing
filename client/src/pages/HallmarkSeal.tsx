@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Copy, CheckCircle2, Download } from 'lucide-react';
 import { Link } from 'wouter';
-import { HallmarkBadge } from '@/components/HallmarkBadge';
+import { OrbyHallmark } from '@/components/OrbyHallmark';
 
 export default function HallmarkSeal() {
   const [copied, setCopied] = useState(false);
@@ -42,7 +42,7 @@ export default function HallmarkSeal() {
           <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-400/50 shadow-2xl flex items-center justify-center min-h-[500px]">
             <CardContent className="flex flex-col items-center justify-center p-12">
               <div className="mb-8">
-                <HallmarkBadge serialNumber={serialNumber} size="lg" verificationUrl={verificationUrl} />
+                <OrbyHallmark serialNumber={serialNumber} size="large" verificationUrl={verificationUrl} showExpand={false} />
               </div>
               <p className="text-center text-sm text-gray-400 max-w-xs">
                 This seal verifies authenticity, compliance, and ORBIT quality
@@ -124,18 +124,22 @@ export default function HallmarkSeal() {
             <CardTitle className="text-cyan-300">Seal Sizes</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid sm:grid-cols-3 gap-12 items-end justify-items-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 items-end justify-items-center">
               <div className="text-center">
-                <p className="text-xs text-gray-400 mb-4">Small (Business Card)</p>
-                <HallmarkBadge serialNumber={serialNumber} size="sm" />
+                <p className="text-xs text-gray-400 mb-4">Thumbnail</p>
+                <OrbyHallmark serialNumber={serialNumber} size="thumbnail" />
               </div>
               <div className="text-center">
-                <p className="text-xs text-gray-400 mb-4">Medium (Standard)</p>
-                <HallmarkBadge serialNumber={serialNumber} size="md" />
+                <p className="text-xs text-gray-400 mb-4">Small</p>
+                <OrbyHallmark serialNumber={serialNumber} size="small" />
               </div>
               <div className="text-center">
-                <p className="text-xs text-gray-400 mb-4">Large (Display)</p>
-                <HallmarkBadge serialNumber={serialNumber} size="lg" />
+                <p className="text-xs text-gray-400 mb-4">Medium</p>
+                <OrbyHallmark serialNumber={serialNumber} size="medium" />
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-gray-400 mb-4">Large</p>
+                <OrbyHallmark serialNumber={serialNumber} size="large" />
               </div>
             </div>
           </CardContent>
