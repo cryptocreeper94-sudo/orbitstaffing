@@ -740,32 +740,32 @@ export default function MarketingHub() {
                   {filteredTemplates.map((template) => (
                     <div 
                       key={template.id}
-                      className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-all"
+                      className="p-3 md:p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-all overflow-hidden"
                     >
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 min-w-0">
                           {template.platform === 'twitter' ? (
-                            <div className="p-1.5 rounded-lg bg-sky-500/20">
+                            <div className="p-1.5 rounded-lg bg-sky-500/20 flex-shrink-0">
                               <Twitter className="w-4 h-4 text-sky-400" />
                             </div>
                           ) : (
-                            <div className="p-1.5 rounded-lg bg-blue-500/20">
+                            <div className="p-1.5 rounded-lg bg-blue-500/20 flex-shrink-0">
                               <Facebook className="w-4 h-4 text-blue-400" />
                             </div>
                           )}
-                          <div>
-                            <h4 className="font-medium text-white text-sm">{template.title}</h4>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium text-white text-sm truncate">{template.title}</h4>
                             <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
                               {template.category}
                             </Badge>
                           </div>
                         </div>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-shrink-0">
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => loadTemplate(template)}
-                            className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20"
+                            className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 text-xs px-2"
                             data-testid={`button-use-${template.id}`}
                           >
                             <Send className="w-3 h-3 mr-1" />
@@ -774,7 +774,7 @@ export default function MarketingHub() {
                           <Button
                             size="sm"
                             onClick={() => copyToClipboard(template.content, template.id)}
-                            className={copiedId === template.id ? 'bg-green-600' : 'bg-slate-700 hover:bg-slate-600'}
+                            className={`text-xs px-2 ${copiedId === template.id ? 'bg-green-600' : 'bg-slate-700 hover:bg-slate-600'}`}
                             data-testid={`button-copy-${template.id}`}
                           >
                             {copiedId === template.id ? (
@@ -792,21 +792,21 @@ export default function MarketingHub() {
                         </div>
                       </div>
                       
-                      <pre className="text-xs text-slate-300 whitespace-pre-wrap font-sans bg-slate-900/50 rounded-lg p-3 max-h-32 overflow-y-auto">
+                      <pre className="text-xs text-slate-300 whitespace-pre-wrap break-words font-sans bg-slate-900/50 rounded-lg p-2 md:p-3 max-h-32 overflow-y-auto overflow-x-hidden">
                         {template.content}
                       </pre>
                       
                       {template.screenshotPath && (
-                        <div className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-                          <Image className="w-3 h-3" />
-                          <span>Screenshot: {template.screenshotDesc}</span>
+                        <div className="mt-2 flex flex-wrap items-center gap-1 md:gap-2 text-xs text-slate-500">
+                          <Image className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate max-w-[150px] md:max-w-none">Screenshot: {template.screenshotDesc}</span>
                           <a 
                             href={template.screenshotPath}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                            className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 flex-shrink-0"
                           >
-                            Open page <ExternalLink className="w-3 h-3" />
+                            Open <ExternalLink className="w-3 h-3" />
                           </a>
                         </div>
                       )}

@@ -459,6 +459,36 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
      MOBILE OPTIMIZATION
      ======================== */
   
+  /* CRITICAL: Prevent horizontal overflow on mobile */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  
+  /* Ensure all content respects viewport width */
+  *, *::before, *::after {
+    max-width: 100%;
+  }
+  
+  /* Force text to wrap properly */
+  p, span, div, h1, h2, h3, h4, h5, h6, li, td, th, label {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  
+  /* Pre-formatted text should scroll horizontally inside containers */
+  pre, code {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Cards must contain their content */
+  .card, [class*="Card"], [class*="card-"] {
+    overflow: hidden;
+  }
+  
   /* Touch-friendly tap targets (minimum 44px) */
   @media (max-width: 768px) {
     button,
@@ -468,6 +498,12 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
     select,
     textarea {
       min-height: 44px;
+    }
+    
+    /* Container must respect viewport */
+    .container, [class*="container"], main, section {
+      max-width: 100vw !important;
+      overflow-x: hidden;
     }
     
     /* Larger touch areas for interactive elements */
@@ -486,9 +522,9 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
     }
     
     /* Responsive text sizing */
-    h1 { font-size: 1.75rem !important; }
-    h2 { font-size: 1.5rem !important; }
-    h3 { font-size: 1.25rem !important; }
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.25rem !important; }
+    h3 { font-size: 1.1rem !important; }
     
     /* Reduce padding on mobile */
     .mobile-compact {
@@ -509,6 +545,7 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
     /* Card improvements for mobile */
     .card {
       border-radius: 1rem;
+      overflow: hidden;
     }
     
     /* Modal improvements for mobile */
@@ -516,6 +553,56 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
       max-height: 90vh;
       overflow-y: auto;
       margin: 1rem;
+      max-width: calc(100vw - 2rem) !important;
+    }
+    
+    /* Flex containers should wrap on mobile */
+    .flex {
+      flex-wrap: wrap;
+    }
+    
+    /* Badge improvements on mobile */
+    .badge, [class*="Badge"] {
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-size: 0.65rem;
+    }
+    
+    /* Button text should not overflow */
+    button span, [role="button"] span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Grid improvements for mobile */
+    .grid {
+      grid-template-columns: 1fr !important;
+    }
+    
+    .grid-cols-2 {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  
+  /* Small phones need extra care */
+  @media (max-width: 380px) {
+    h1 { font-size: 1.25rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    
+    /* Even smaller padding on tiny screens */
+    .p-4, .p-6 {
+      padding: 0.5rem !important;
+    }
+    
+    .px-4, .px-6 {
+      padding-left: 0.5rem !important;
+      padding-right: 0.5rem !important;
+    }
+    
+    /* Stack all flex layouts */
+    .flex:not(.flex-col) {
+      flex-direction: column !important;
+      align-items: stretch !important;
     }
   }
   

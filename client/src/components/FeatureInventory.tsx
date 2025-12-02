@@ -220,36 +220,36 @@ function FeatureInventory() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Card className="bg-gradient-to-br from-emerald-900 to-emerald-800 border-emerald-500">
-          <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-white">{totalFeatures}</div>
-            <div className="text-emerald-200 text-xs">Total Features</div>
+    <div className="space-y-4 overflow-x-hidden">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-3">
+        <Card className="bg-gradient-to-br from-emerald-900 to-emerald-800 border-emerald-500 overflow-hidden">
+          <CardContent className="p-2 sm:p-4 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-white">{totalFeatures}</div>
+            <div className="text-emerald-200 text-[10px] sm:text-xs truncate">Total</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-green-900 to-green-800 border-green-500">
-          <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-white">{completedFeatures}</div>
-            <div className="text-green-200 text-xs">Built & Ready</div>
+        <Card className="bg-gradient-to-br from-green-900 to-green-800 border-green-500 overflow-hidden">
+          <CardContent className="p-2 sm:p-4 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-white">{completedFeatures}</div>
+            <div className="text-green-200 text-[10px] sm:text-xs truncate">Built</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-yellow-900 to-yellow-800 border-yellow-500">
-          <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-white">{partialFeatures}</div>
-            <div className="text-yellow-200 text-xs">In Progress</div>
+        <Card className="bg-gradient-to-br from-yellow-900 to-yellow-800 border-yellow-500 overflow-hidden">
+          <CardContent className="p-2 sm:p-4 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-white">{partialFeatures}</div>
+            <div className="text-yellow-200 text-[10px] sm:text-xs truncate">WIP</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-blue-900 to-blue-800 border-blue-500">
-          <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-white">{checkedFeatures.length}</div>
-            <div className="text-blue-200 text-xs">Verified ✓</div>
+        <Card className="bg-gradient-to-br from-blue-900 to-blue-800 border-blue-500 overflow-hidden">
+          <CardContent className="p-2 sm:p-4 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-white">{checkedFeatures.length}</div>
+            <div className="text-blue-200 text-[10px] sm:text-xs truncate">Verified</div>
           </CardContent>
         </Card>
-        <Card className="bg-gradient-to-br from-purple-900 to-purple-800 border-purple-500">
-          <CardContent className="p-4 text-center">
-            <div className="text-3xl font-bold text-white">{PUBLISH_LOG.length}</div>
-            <div className="text-purple-200 text-xs">Publishes</div>
+        <Card className="bg-gradient-to-br from-purple-900 to-purple-800 border-purple-500 overflow-hidden">
+          <CardContent className="p-2 sm:p-4 text-center">
+            <div className="text-xl sm:text-3xl font-bold text-white">{PUBLISH_LOG.length}</div>
+            <div className="text-purple-200 text-[10px] sm:text-xs truncate">Publishes</div>
           </CardContent>
         </Card>
       </div>
@@ -261,17 +261,17 @@ function FeatureInventory() {
             ORBIT Publish History
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {[...PUBLISH_LOG].reverse().map((log, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                <div className="text-center min-w-[80px]">
-                  <div className="text-cyan-400 font-mono text-sm font-bold">{log.version}</div>
-                  <div className="text-slate-500 text-[10px]">{log.date}</div>
-                  <div className="text-slate-500 text-[10px]">{log.time}</div>
+              <div key={idx} className="flex items-start gap-2 sm:gap-3 p-2 bg-slate-800/50 rounded-lg border border-slate-700/50 overflow-hidden">
+                <div className="text-center min-w-[60px] sm:min-w-[80px] flex-shrink-0">
+                  <div className="text-cyan-400 font-mono text-xs sm:text-sm font-bold">{log.version}</div>
+                  <div className="text-slate-500 text-[9px] sm:text-[10px]">{log.date}</div>
+                  <div className="text-slate-500 text-[9px] sm:text-[10px] hidden sm:block">{log.time}</div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-slate-300 text-sm">{log.notes}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-300 text-xs sm:text-sm break-words">{log.notes}</p>
                 </div>
                 {idx === 0 && <Badge className="bg-green-600 text-white text-[10px]">LATEST</Badge>}
               </div>
@@ -283,45 +283,45 @@ function FeatureInventory() {
       <div className="space-y-3">
         {FEATURE_CATEGORIES.map((category) => (
           <Card key={category.name} className={`bg-gradient-to-br ${colorMap[category.color]} border overflow-hidden`}>
-            <CardHeader className="pb-2 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => toggleCategory(category.name)}>
-              <CardTitle className="text-white flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{category.icon}</span>
-                  {category.name}
-                  <Badge variant="outline" className="text-white/80 border-white/30 text-[10px] ml-2">
+            <CardHeader className="pb-2 px-3 sm:px-6 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => toggleCategory(category.name)}>
+              <CardTitle className="text-white flex items-center justify-between text-xs sm:text-sm">
+                <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+                  <span className="text-base sm:text-lg flex-shrink-0">{category.icon}</span>
+                  <span className="truncate">{category.name}</span>
+                  <Badge variant="outline" className="text-white/80 border-white/30 text-[9px] sm:text-[10px] ml-1 flex-shrink-0">
                     {category.features.filter(f => checkedFeatures.includes(f.id)).length}/{category.features.length}
                   </Badge>
                 </div>
-                {expandedCategories.includes(category.name) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                {expandedCategories.includes(category.name) ? <ChevronDown className="h-4 w-4 flex-shrink-0" /> : <ChevronRight className="h-4 w-4 flex-shrink-0" />}
               </CardTitle>
             </CardHeader>
             {expandedCategories.includes(category.name) && (
-              <CardContent className="pt-0">
+              <CardContent className="pt-0 px-2 sm:px-6 pb-3">
                 <div className="space-y-1.5">
                   {category.features.map((feature) => (
                     <div 
                       key={feature.id} 
-                      className={`flex items-start gap-2 p-2 rounded-lg transition-all cursor-pointer ${checkedFeatures.includes(feature.id) ? 'bg-green-900/40 border border-green-500/50' : 'bg-black/20 hover:bg-black/30'}`} 
+                      className={`flex items-start gap-2 p-2 rounded-lg transition-all cursor-pointer overflow-hidden ${checkedFeatures.includes(feature.id) ? 'bg-green-900/40 border border-green-500/50' : 'bg-black/20 hover:bg-black/30'}`} 
                       onClick={() => toggleFeature(feature.id)}
                       data-testid={`feature-${feature.id}`}
                     >
-                      <div className="mt-0.5">
+                      <div className="mt-0.5 flex-shrink-0">
                         {checkedFeatures.includes(feature.id) ? <CheckCircle2 className="h-4 w-4 text-green-400" /> : <Circle className="h-4 w-4 text-white/40" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium ${checkedFeatures.includes(feature.id) ? 'text-green-200' : 'text-white'}`}>{feature.name}</span>
-                          {feature.status === "complete" && <Badge className="bg-green-600/80 text-[9px] px-1.5 py-0">BUILT</Badge>}
-                          {feature.status === "partial" && <Badge className="bg-yellow-600/80 text-[9px] px-1.5 py-0">PARTIAL</Badge>}
-                          {feature.status === "planned" && <Badge className="bg-blue-600/80 text-[9px] px-1.5 py-0">PLANNED</Badge>}
+                        <div className="flex flex-wrap items-center gap-1">
+                          <span className={`text-xs sm:text-sm font-medium truncate ${checkedFeatures.includes(feature.id) ? 'text-green-200' : 'text-white'}`}>{feature.name}</span>
+                          {feature.status === "complete" && <Badge className="bg-green-600/80 text-[8px] sm:text-[9px] px-1 py-0">BUILT</Badge>}
+                          {feature.status === "partial" && <Badge className="bg-yellow-600/80 text-[8px] sm:text-[9px] px-1 py-0">PARTIAL</Badge>}
+                          {feature.status === "planned" && <Badge className="bg-blue-600/80 text-[8px] sm:text-[9px] px-1 py-0">PLANNED</Badge>}
                         </div>
-                        <p className="text-white/60 text-xs mt-0.5">{feature.description}</p>
+                        <p className="text-white/60 text-[10px] sm:text-xs mt-0.5 line-clamp-2">{feature.description}</p>
                       </div>
                       {feature.route && (
                         <Button 
                           size="sm" 
                           variant="ghost" 
-                          className="h-6 w-6 p-0 text-white/60 hover:text-white hover:bg-white/10" 
+                          className="h-6 w-6 p-0 text-white/60 hover:text-white hover:bg-white/10 flex-shrink-0" 
                           onClick={(e) => { e.stopPropagation(); window.location.href = feature.route!; }}
                           data-testid={`button-goto-${feature.id}`}
                         >
@@ -337,9 +337,9 @@ function FeatureInventory() {
         ))}
       </div>
 
-      <div className="flex justify-between items-center">
-        <div className="text-slate-400 text-xs">
-          Powered by ORBIT Staffing OS v2.5.0 • orbitstaffing.io
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div className="text-slate-400 text-[10px] sm:text-xs">
+          Powered by ORBIT v2.5.0
         </div>
         <Button 
           variant="outline" 
