@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   Calendar, Clock, Copy, Check, Image, Twitter, Facebook, 
   Zap, Target, TrendingUp, Sparkles, ExternalLink, ChevronRight,
   Bell, RefreshCw, Eye, MessageSquare, Hash, Megaphone, Upload,
-  X, Send, ImagePlus, Loader2, AlertCircle
+  X, Send, ImagePlus, Loader2, AlertCircle, Circle, RotateCcw
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -266,14 +267,20 @@ Reply below - we're always building.`,
   },
 ];
 
-const dailySchedule = [
-  { time: '7:00 AM', platform: 'twitter', type: 'Morning tip or insight', emoji: '🌅' },
-  { time: '9:00 AM', platform: 'facebook', type: 'Feature highlight', emoji: '✨' },
-  { time: '12:00 PM', platform: 'twitter', type: 'Engagement post', emoji: '💬' },
-  { time: '2:00 PM', platform: 'facebook', type: 'Pain point / solution', emoji: '🎯' },
-  { time: '5:00 PM', platform: 'twitter', type: 'End-of-day CTA', emoji: '🚀' },
-  { time: '7:00 PM', platform: 'facebook', type: 'Story or testimonial', emoji: '📖' },
+// Flexible posting tasks - no hardcoded dates, user adds completion date when done
+const postingTasks = [
+  { id: 'task-1', platform: 'twitter', type: 'Morning tip or insight', emoji: '🌅', order: 1 },
+  { id: 'task-2', platform: 'facebook', type: 'Feature highlight', emoji: '✨', order: 2 },
+  { id: 'task-3', platform: 'twitter', type: 'Engagement post', emoji: '💬', order: 3 },
+  { id: 'task-4', platform: 'facebook', type: 'Pain point / solution', emoji: '🎯', order: 4 },
+  { id: 'task-5', platform: 'twitter', type: 'End-of-day CTA', emoji: '🚀', order: 5 },
+  { id: 'task-6', platform: 'facebook', type: 'Story or testimonial', emoji: '📖', order: 6 },
 ];
+
+interface TaskCompletion {
+  completedDate: string; // User enters their own date
+  completedAt: number; // Timestamp for sorting
+}
 
 const screenshotGuide = [
   { page: 'Landing Page', path: '/', use: 'General posts, brand awareness' },
@@ -298,6 +305,49 @@ export default function MarketingHub() {
   const [postingPlatform, setPostingPlatform] = useState<'twitter' | 'facebook' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Flexible task completions - stored with user-entered dates
+  const [taskCompletions, setTaskCompletions] = useState<Record<string, TaskCompletion>>(() => {
+    const saved = localStorage.getItem('orbit_marketing_tasks');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [dateInput, setDateInput] = useState('');
+
+  // Save completions to localStorage
+  useEffect(() => {
+    localStorage.setItem('orbit_marketing_tasks', JSON.stringify(taskCompletions));
+  }, [taskCompletions]);
+
+  const completeTask = (taskId: string, date: string) => {
+    if (!date.trim()) return;
+    setTaskCompletions(prev => ({
+      ...prev,
+      [taskId]: { completedDate: date.trim(), completedAt: Date.now() }
+    }));
+    setEditingTask(null);
+    setDateInput('');
+    toast({
+      title: "Task completed!",
+      description: `Marked as done on ${date.trim()}`,
+    });
+  };
+
+  const uncompleteTask = (taskId: string) => {
+    setTaskCompletions(prev => {
+      const next = { ...prev };
+      delete next[taskId];
+      return next;
+    });
+  };
+
+  const clearAllTasks = () => {
+    setTaskCompletions({});
+    toast({
+      title: "Schedule reset",
+      description: "All tasks cleared for a fresh start",
+    });
+  };
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -463,16 +513,8 @@ export default function MarketingHub() {
     selectedPlatform === 'all' || t.platform === selectedPlatform || t.platform === 'both'
   );
 
-  const currentHour = new Date().getHours();
-  const getNextPostTime = () => {
-    const times = [7, 9, 12, 14, 17, 19];
-    for (const t of times) {
-      if (currentHour < t) return t;
-    }
-    return 7;
-  };
-
   const characterCount = composerContent.length;
+  const completedTaskCount = Object.keys(taskCompletions).length;
   const twitterLimit = 280;
   const isOverTwitterLimit = characterCount > twitterLimit;
 
@@ -491,14 +533,14 @@ export default function MarketingHub() {
             <p className="text-slate-400 mt-1">Your social media mission control</p>
           </div>
           
-          <div className="flex gap-2">
-            <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 px-3 py-1" data-testid="badge-next-post">
-              <Clock className="w-3 h-3 mr-1" />
-              Next post: {getNextPostTime()}:00
+          <div className="flex flex-wrap gap-2">
+            <Badge className={`${completedTaskCount === postingTasks.length ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'} px-3 py-1`} data-testid="badge-task-progress">
+              <Check className="w-3 h-3 mr-1" />
+              {completedTaskCount}/{postingTasks.length} Tasks Done
             </Badge>
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 px-3 py-1" data-testid="badge-template-count">
+            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 px-3 py-1" data-testid="badge-template-count">
               <Zap className="w-3 h-3 mr-1" />
-              {postTemplates.length} Templates Ready
+              {postTemplates.length} Templates
             </Badge>
           </div>
         </div>
@@ -641,54 +683,129 @@ export default function MarketingHub() {
           
           <Card className="lg:col-span-1 bg-slate-900/50 border-slate-700/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-white flex items-center gap-2 text-lg">
-                <Calendar className="w-5 h-5 text-cyan-400" />
-                Today's Schedule
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-white flex items-center gap-2 text-base sm:text-lg">
+                  <Calendar className="w-5 h-5 text-cyan-400" />
+                  Posting Tasks
+                </CardTitle>
+                {Object.keys(taskCompletions).length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={clearAllTasks}
+                    className="text-slate-400 hover:text-white h-7 px-2"
+                    data-testid="button-clear-tasks"
+                  >
+                    <RotateCcw className="w-3 h-3 mr-1" />
+                    Reset
+                  </Button>
+                )}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">Click to mark done & add date</p>
             </CardHeader>
             <CardContent className="space-y-2">
-              {dailySchedule.map((slot, i) => {
-                const slotHour = parseInt(slot.time.split(':')[0]) + (slot.time.includes('PM') && !slot.time.includes('12') ? 12 : 0);
-                const isPast = currentHour > slotHour;
-                const isCurrent = currentHour === slotHour;
+              {postingTasks.map((task) => {
+                const isCompleted = taskCompletions[task.id];
+                const isEditing = editingTask === task.id;
                 
                 return (
                   <div 
-                    key={i}
-                    data-testid={`schedule-slot-${i}`}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                      isCurrent 
-                        ? 'bg-cyan-500/20 border-cyan-500/50 ring-2 ring-cyan-500/30' 
-                        : isPast 
-                          ? 'bg-slate-800/30 border-slate-700/30 opacity-50' 
-                          : 'bg-slate-800/50 border-slate-700/50 hover:border-slate-600'
+                    key={task.id}
+                    data-testid={`task-${task.id}`}
+                    className={`p-2 sm:p-3 rounded-lg border transition-all overflow-hidden ${
+                      isCompleted 
+                        ? 'bg-green-900/30 border-green-500/50' 
+                        : 'bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/50 cursor-pointer'
                     }`}
+                    onClick={() => {
+                      if (!isCompleted && !isEditing) {
+                        setEditingTask(task.id);
+                        setDateInput('');
+                      }
+                    }}
                   >
-                    <span className="text-xl">{slot.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-white text-sm">{slot.time}</span>
-                        {slot.platform === 'twitter' ? (
-                          <Twitter className="w-3.5 h-3.5 text-sky-400" />
-                        ) : (
-                          <Facebook className="w-3.5 h-3.5 text-blue-500" />
+                    <div className="flex items-start gap-2">
+                      <span className="text-lg sm:text-xl flex-shrink-0">{task.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                          {task.platform === 'twitter' ? (
+                            <Twitter className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-400 flex-shrink-0" />
+                          ) : (
+                            <Facebook className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-500 flex-shrink-0" />
+                          )}
+                          <span className="text-xs sm:text-sm text-slate-300 truncate">{task.type}</span>
+                        </div>
+                        
+                        {isEditing && (
+                          <div className="mt-2 flex gap-1" onClick={(e) => e.stopPropagation()}>
+                            <Input
+                              placeholder="e.g., 12/2/25"
+                              value={dateInput}
+                              onChange={(e) => setDateInput(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  completeTask(task.id, dateInput);
+                                } else if (e.key === 'Escape') {
+                                  setEditingTask(null);
+                                  setDateInput('');
+                                }
+                              }}
+                              className="h-7 text-xs bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 flex-1"
+                              autoFocus
+                              data-testid={`input-date-${task.id}`}
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => completeTask(task.id, dateInput)}
+                              disabled={!dateInput.trim()}
+                              className="h-7 bg-green-600 hover:bg-green-700 px-2"
+                              data-testid={`button-save-${task.id}`}
+                            >
+                              <Check className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => { setEditingTask(null); setDateInput(''); }}
+                              className="h-7 px-2 text-slate-400"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {isCompleted && (
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-xs text-green-400">
+                              Done: {taskCompletions[task.id].completedDate}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => { e.stopPropagation(); uncompleteTask(task.id); }}
+                              className="h-5 px-1 text-slate-500 hover:text-red-400"
+                              data-testid={`button-undo-${task.id}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 truncate">{slot.type}</p>
+                      
+                      {!isEditing && !isCompleted && (
+                        <Circle className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                      )}
+                      {isCompleted && (
+                        <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      )}
                     </div>
-                    {isCurrent && (
-                      <Badge className="bg-cyan-500 text-white text-xs">NOW</Badge>
-                    )}
-                    {isPast && (
-                      <Check className="w-4 h-4 text-green-400" />
-                    )}
                   </div>
                 );
               })}
               
               <div className="pt-3 border-t border-slate-700/50">
                 <p className="text-xs text-slate-500 text-center">
-                  All times Eastern Time (ET)
+                  {Object.keys(taskCompletions).length}/{postingTasks.length} completed
                 </p>
               </div>
             </CardContent>
