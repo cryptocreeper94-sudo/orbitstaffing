@@ -263,19 +263,19 @@ export function OrbitChatAssistant() {
       </AnimatePresence>
 
       {/* Floating Orby Mascot - True AI Representative */}
-      <div className="fixed bottom-3 right-6 z-[150]" data-testid="floating-orby-container">
-        {/* Speech Bubble - Shows when chat is closed */}
+      <div className="fixed bottom-3 right-4 z-[150]" data-testid="floating-orby-container">
+        {/* Speech Bubble - Shows when chat is closed - positioned to not overflow */}
         <AnimatePresence>
           {!isOpen && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.8, y: 10 }}
-              className="absolute -top-16 right-0 bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/50 rounded-2xl px-4 py-2 shadow-lg shadow-cyan-500/20 whitespace-nowrap"
+              className="absolute -top-12 right-0 bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/50 rounded-xl px-3 py-1.5 shadow-lg shadow-cyan-500/20"
               style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.3))' }}
             >
-              <p className="text-sm text-cyan-300 font-medium">Need help? Ask Orby!</p>
-              <div className="absolute -bottom-2 right-8 w-4 h-4 bg-slate-900 border-r border-b border-cyan-500/50 transform rotate-45" />
+              <p className="text-xs text-cyan-300 font-medium">Ask Orby</p>
+              <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-slate-900 border-r border-b border-cyan-500/50 transform rotate-45" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -316,9 +316,9 @@ export function OrbitChatAssistant() {
             <img 
               src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
               alt="Orby - AI Assistant" 
-              className="w-24 h-24 object-contain drop-shadow-[0_0_25px_rgba(6,182,212,0.6)]"
+              className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]"
               style={{
-                filter: 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.5)) drop-shadow(0 0 40px rgba(6, 182, 212, 0.3))'
+                filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.2))'
               }}
             />
             

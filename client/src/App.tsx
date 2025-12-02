@@ -62,9 +62,7 @@ import MarketingHub from "@/pages/MarketingHub";
 import CryptoWallet from "@/pages/CryptoWallet";
 import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
 import { TutorialProvider } from "@/components/PageTutorial";
-import { FloatingTutorialButton } from "@/components/FloatingTutorialButton";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
-import InteractiveWeatherRadar from "@/components/InteractiveWeatherRadar";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
@@ -172,9 +170,7 @@ export default function App() {
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
               <Router />
-              <FloatingTutorialButton />
               <FloatingHomeButton />
-              <InteractiveWeatherRadar />
               <OrbitChatAssistant />
               <Toaster />
             </TutorialProvider>
