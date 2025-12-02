@@ -63,6 +63,7 @@ import CryptoWallet from "@/pages/CryptoWallet";
 import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
+import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
@@ -171,6 +172,7 @@ export default function App() {
               <div className="sandbox-banner-spacer" />
               <Router />
               <FloatingHomeButton />
+              <FloatingWeatherButton />
               <OrbitChatAssistant />
               <Toaster />
             </TutorialProvider>
