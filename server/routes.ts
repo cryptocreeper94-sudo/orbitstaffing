@@ -188,6 +188,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // WEATHER API (Open-Meteo, no API key required)
+  // ========================
+  
+  // Geocode ZIP code to coordinates (US only)
+  app.get("/api/weather/geocode/:zip", async (req: Request, res: Response) => {
+    try {
+      const { zip } = req.params;
+      
+      // Validate ZIP code format
+      if (!/^\d{5}$/.test(zip)) {
+        return res.status(400).json({ error: "Invalid ZIP code format" });
+      }
+      
+      // Use Open-Meteo geocoding API
+      const geoResponse = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${zip}&count=1&language=en&format=json&country_code=US`
+      );
+      
+      if (!geoResponse.ok) {
+        throw new Error("Geocoding service unavailable");
+      }
+      
+      const geoData = await geoResponse.json();
+      
+      if (!geoData.results || geoData.results.length === 0) {
+        // Try with city name approach for ZIP
+        const fallbackResponse = await fetch(
+          `https://geocoding-api.open-meteo.com/v1/search?name=United%20States%20${zip}&count=1&language=en&format=json`
+        );
+        const fallbackData = await fallbackResponse.json();
+        
+        if (!fallbackData.results || fallbackData.results.length === 0) {
+          return res.status(404).json({ error: "Location not found for ZIP code" });
+        }
+        
+        const location = fallbackData.results[0];
+        return res.json({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          name: location.name,
+          admin1: location.admin1,
+          country: location.country,
+        });
+      }
+      
+      const location = geoData.results[0];
+      res.json({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        name: location.name,
+        admin1: location.admin1,
+        country: location.country,
+      });
+    } catch (error) {
+      console.error("[Weather Geocode] Error:", error);
+      res.status(500).json({ error: "Failed to geocode ZIP code" });
+    }
+  });
+  
+  // Get weather data by coordinates
+  app.get("/api/weather", async (req: Request, res: Response) => {
+    try {
+      const { lat, lon } = req.query;
+      
+      if (!lat || !lon) {
+        return res.status(400).json({ error: "Latitude and longitude required" });
+      }
+      
+      const latitude = parseFloat(lat as string);
+      const longitude = parseFloat(lon as string);
+      
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return res.status(400).json({ error: "Invalid coordinates" });
+      }
+      
+      // Fetch current weather from Open-Meteo
+      const weatherResponse = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto`
+      );
+      
+      if (!weatherResponse.ok) {
+        throw new Error("Weather service unavailable");
+      }
+      
+      const weatherData = await weatherResponse.json();
+      const current = weatherData.current;
+      
+      // Map weather codes to conditions
+      // WMO Weather interpretation codes (WW)
+      // 0: Clear sky, 1-3: Mainly clear/partly cloudy/overcast
+      // 45-48: Fog, 51-57: Drizzle, 61-67: Rain, 71-77: Snow, 80-82: Rain showers
+      // 85-86: Snow showers, 95-99: Thunderstorm
+      let condition = 'clear';
+      let icon = 'sunny';
+      const code = current.weather_code;
+      const isDay = current.is_day === 1;
+      
+      if (code === 0) {
+        condition = isDay ? 'sunny' : 'clear';
+        icon = isDay ? 'sunny' : 'night';
+      } else if (code >= 1 && code <= 3) {
+        if (code === 1) {
+          condition = 'partly-cloudy';
+          icon = 'partly-cloudy';
+        } else {
+          condition = 'cloudy';
+          icon = 'cloudy';
+        }
+      } else if (code >= 45 && code <= 48) {
+        condition = 'foggy';
+        icon = 'foggy';
+      } else if (code >= 51 && code <= 67) {
+        condition = 'rainy';
+        icon = 'rainy';
+      } else if (code >= 71 && code <= 77 || code >= 85 && code <= 86) {
+        condition = 'snowy';
+        icon = 'snowy';
+      } else if (code >= 80 && code <= 82) {
+        condition = 'rainy';
+        icon = 'rainy';
+      } else if (code >= 95) {
+        condition = 'thunderstorm';
+        icon = 'thunderstorm';
+      }
+      
+      // Override icon for nighttime if not a severe weather condition
+      if (!isDay && ['sunny', 'partly-cloudy'].includes(icon)) {
+        icon = 'night';
+      }
+      
+      res.json({
+        temperature: Math.round(current.temperature_2m),
+        feelsLike: Math.round(current.apparent_temperature),
+        humidity: current.relative_humidity_2m,
+        windSpeed: Math.round(current.wind_speed_10m),
+        cloudCover: current.cloud_cover,
+        precipitation: current.precipitation,
+        condition,
+        icon,
+        isDay,
+        weatherCode: code,
+        timezone: weatherData.timezone,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[Weather API] Error:", error);
+      res.status(500).json({ error: "Failed to fetch weather data" });
+    }
+  });
+
+  // ========================
   // HALLMARK SYSTEM (100 Billion Capacity)
   // ========================
   app.get("/api/hallmark/info", async (req: Request, res: Response) => {
