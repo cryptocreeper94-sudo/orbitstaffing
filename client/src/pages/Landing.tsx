@@ -1069,8 +1069,8 @@ function BenefitCard({ icon, title, brief, onClick }: any) {
 
 function PricingCard({ tier, price, period, desc, workers, features, cta, featured }: any) {
   return (
-    <Card className={`border transition-all ${featured ? "border-primary bg-card/50 scale-105" : "border-border/50"}`}>
-      <CardContent className="p-6">
+    <Card className={`h-full border transition-all ${featured ? "border-primary bg-card/50 scale-105" : "border-border/50"}`}>
+      <CardContent className="p-6 h-full flex flex-col">
         {featured && (
           <Badge className="mb-3 bg-primary/20 text-primary border-primary/30 text-xs">Most Popular</Badge>
         )}
@@ -1086,7 +1086,7 @@ function PricingCard({ tier, price, period, desc, workers, features, cta, featur
           <div className="text-xs text-muted-foreground">{workers}</div>
         </div>
 
-        <ul className="space-y-2 mb-6">
+        <ul className="space-y-2 flex-1">
           {features.map((f: any, i: any) => (
             <li key={i} className="flex items-start gap-2 text-xs">
               <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
@@ -1095,7 +1095,7 @@ function PricingCard({ tier, price, period, desc, workers, features, cta, featur
           ))}
         </ul>
 
-        <Button className={`w-full h-9 text-xs ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border border-border/50 hover:bg-white/5"}`}>
+        <Button className={`w-full h-9 text-xs mt-6 ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border border-border/50 hover:bg-white/5"}`}>
           {cta}
         </Button>
       </CardContent>
