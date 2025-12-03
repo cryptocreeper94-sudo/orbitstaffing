@@ -9,16 +9,148 @@
  * Access: Owner, Admin, Employee sandboxes
  * Only accessible via /sandbox-secure (not publicly visible)
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft, 
   Zap, Database, Cloud, TestTube, Sparkles, PlayCircle, Settings, 
   Globe, Wallet, CreditCard, MapPin, Bell, FileText, Bot, 
   Target, Megaphone, Building2, UserCircle, Map, Award, Stamp,
-  Users2, TrendingUp, Gift, Calendar, ClipboardList } from 'lucide-react';
+  Users2, TrendingUp, Gift, Calendar, ClipboardList, X, CheckCircle2,
+  Rocket, Star, BookOpen, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
+
+function SidonieWelcomeModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/20">
+        <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+              <Star className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Welcome, Sidonie!</h2>
+              <p className="text-cyan-400 text-sm">ORBIT Staffing OS • v2.5.2</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-purple-300">Your Access Level</h3>
+                <p className="text-gray-400 text-sm mt-1">
+                  You have <span className="text-purple-300 font-medium">full read-only preview access</span> to the entire platform. 
+                  You can explore all features, dashboards, and views without making any changes.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <Rocket className="w-5 h-5 text-cyan-400" />
+              What ORBIT Does
+            </h3>
+            <div className="grid gap-2 text-sm">
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-300"><strong className="text-white">Staffing Automation</strong> - End-to-end temp worker management from recruitment to payroll</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-300"><strong className="text-white">Talent Exchange</strong> - Two-way marketplace connecting workers and employers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-300"><strong className="text-white">White-Label Franchise</strong> - Ready for licensing to staffing agencies worldwide</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-300"><strong className="text-white">ORBIT Pay Card</strong> - Branded debit cards for instant worker payments</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                <span className="text-gray-300"><strong className="text-white">Compliance & Payroll</strong> - Multi-state tax handling, garnishments, I-9 tracking</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-amber-400" />
+              Latest Updates (v2.5.2)
+            </h3>
+            <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-cyan-400">•</span>
+                <span className="text-gray-300">Desktop layouts now fill full width with zero white space</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-cyan-400">•</span>
+                <span className="text-gray-300">Orby mascot redesigned with side-by-side certificate presentation</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-cyan-400">•</span>
+                <span className="text-gray-300">Smoother animations across all floating elements</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-cyan-400">•</span>
+                <span className="text-gray-300">Weather button now shows real-time temperature</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-cyan-400">•</span>
+                <span className="text-gray-300">Mobile-first horizontal scroll carousels for all sections</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-green-400" />
+              What You Can Explore
+            </h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+                <span className="text-cyan-300 font-medium">Admin Dashboard</span>
+                <p className="text-gray-500 text-xs mt-1">Full system overview, analytics, user management</p>
+              </div>
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+                <span className="text-purple-300 font-medium">Owner Portal</span>
+                <p className="text-gray-500 text-xs mt-1">Company management, billing, worker assignments</p>
+              </div>
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+                <span className="text-green-300 font-medium">Employee App</span>
+                <p className="text-gray-500 text-xs mt-1">Worker experience, timesheets, availability</p>
+              </div>
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+                <span className="text-amber-300 font-medium">Talent Exchange</span>
+                <p className="text-gray-500 text-xs mt-1">Job marketplace, candidate matching</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 border-t border-slate-700 bg-slate-800/30">
+          <Button
+            onClick={onClose}
+            className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-bold py-3"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            Start Exploring
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SecureSandbox() {
   const [, setLocation] = useLocation();
@@ -27,46 +159,50 @@ export default function SecureSandbox() {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | 'employee' | null>(null);
   const [error, setError] = useState('');
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const loginMutation = useMutation({
     mutationFn: async (sandboxRole: 'admin' | 'owner' | 'employee') => {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/verify-admin-pin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           pin: '4444',
           sandboxRole: sandboxRole,
         }),
       });
-      if (!res.ok) throw new Error('Login failed');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Login failed');
+      }
       return res.json();
     },
-    onSuccess: (user, sandboxRole) => {
+    onSuccess: (data, sandboxRole) => {
+      const user = {
+        id: 'sidonie',
+        firstName: 'Sidonie',
+        role: data.role || sandboxRole,
+        isReadOnly: true,
+        name: data.name || 'Sidonie',
+      };
       setCurrentUser(user);
       setIsAuthenticated(true);
       localStorage.setItem('currentUser', JSON.stringify(user));
-      localStorage.setItem('userRole', user.role);
-      localStorage.setItem('isReadOnly', user.isReadOnly || false);
+      localStorage.setItem('userRole', sandboxRole);
+      localStorage.setItem('isReadOnly', 'true');
       localStorage.setItem('sandboxSecure', 'true');
-
-      // If user requires password change, show password modal
-      if (user.requiresPasswordChange || user.needsPasswordReset) {
-        setShowPasswordChange(true);
-      } else {
-        // Navigate to appropriate dashboard
-        if (sandboxRole === 'admin') {
-          setLocation('/admin');
-        } else if (sandboxRole === 'employee') {
-          setLocation('/employee-app');
-        } else {
-          setLocation('/dashboard');
-        }
+      
+      const hasSeenWelcome = localStorage.getItem('sidonie_welcome_seen');
+      if (!hasSeenWelcome) {
+        setShowWelcomeModal(true);
+        localStorage.setItem('sidonie_welcome_seen', 'true');
       }
     },
-    onError: () => {
-      setError('Failed to join sandbox. Please try again.');
+    onError: (err: Error) => {
+      setError(err.message || 'Failed to join sandbox. Please try again.');
       setSelectedRole(null);
     },
   });
@@ -169,6 +305,7 @@ export default function SecureSandbox() {
   if (isAuthenticated && currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+        {showWelcomeModal && <SidonieWelcomeModal onClose={() => setShowWelcomeModal(false)} />}
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-start mb-8">
             <div>
