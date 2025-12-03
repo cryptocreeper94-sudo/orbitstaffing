@@ -678,60 +678,30 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Product Showcases */}
+      {/* Product Showcase - ORBIT Only */}
       <section className="py-4 sm:py-8 border-t border-border/50 bg-slate-900/30">
         <div className="max-w-6xl mx-auto px-2 sm:px-6">
-          <div className="mb-3 sm:mb-6 text-center sm:text-left">
-            <h2 className="text-sm sm:text-3xl font-bold font-heading mb-1">Product Showcases</h2>
-            <p className="text-muted-foreground text-[9px] sm:text-sm">Click to explore detailed feature walkthroughs.</p>
+          <div className="mb-3 sm:mb-6 text-center">
+            <h2 className="text-sm sm:text-3xl font-bold font-heading mb-1">Product Showcase</h2>
+            <p className="text-muted-foreground text-[9px] sm:text-sm">Click to explore ORBIT Staffing OS features.</p>
           </div>
 
-          {/* Mobile: Horizontal scroll | Desktop: Grid */}
-          <div className="relative">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide mb-4 sm:mb-8"
+          {/* ORBIT Staffing OS Showcase Only */}
+          <div className="space-y-4">
+            <Button 
+              onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
+              className="w-full h-10 sm:h-12 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-700 hover:to-violet-600 text-white font-semibold text-xs sm:text-lg"
+              data-testid="button-show-orbit-slideshow"
             >
-              {/* Lot Ops Pro Showcase */}
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start space-y-2">
-                <Button 
-                  onClick={() => setShowLotOpsSlideshow(!showLotOpsSlideshow)}
-                  className="w-full h-10 sm:h-12 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold text-xs sm:text-lg"
-                  data-testid="button-show-lot-ops-slideshow"
-                >
-                  {showLotOpsSlideshow ? '▼' : '▶'} Lot Ops Pro
-                </Button>
-                {showLotOpsSlideshow && (
-                  <HomeSlideshow 
-                    slides={slidesData as any} 
-                    title="Lot Ops Pro Slides"
-                    product="Lot Ops Pro"
-                  />
-                )}
-              </div>
-
-              {/* ORBIT Staffing OS Showcase */}
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start space-y-2">
-                <Button 
-                  onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
-                  className="w-full h-10 sm:h-12 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-700 hover:to-violet-600 text-white font-semibold text-xs sm:text-lg"
-                  data-testid="button-show-orbit-slideshow"
-                >
-                  {showOrbitSlideshow ? '▼' : '▶'} ORBIT OS
-                </Button>
-                {showOrbitSlideshow && (
-                  <HomeSlideshow 
-                    slides={orbitSlides as any} 
-                    title="ORBIT Slides"
-                    product="ORBIT Staffing OS"
-                  />
-                )}
-              </div>
-            </div>
-            {/* Scroll indicator - mobile only */}
-            <div className="absolute right-0 top-0 h-12 w-10 bg-gradient-to-l from-slate-900/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
-              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
-            </div>
+              {showOrbitSlideshow ? '▼ Hide' : '▶ View'} ORBIT Staffing OS Walkthrough
+            </Button>
+            {showOrbitSlideshow && (
+              <HomeSlideshow 
+                slides={orbitSlides as any} 
+                title="ORBIT Slides"
+                product="ORBIT Staffing OS"
+              />
+            )}
           </div>
         </div>
       </section>
