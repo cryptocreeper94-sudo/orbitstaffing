@@ -225,7 +225,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
 
   if (!zipCode) {
     return (
-      <div className="fixed bottom-4 left-4 z-[140]" data-testid="floating-weather-container">
+      <div className="fixed bottom-[46px] left-4 z-[140]" data-testid="floating-weather-container">
         <AnimatePresence>
           {showZipInput ? (
             <motion.div
@@ -299,7 +299,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-[140]" data-testid="floating-weather-container">
+    <div className="fixed bottom-[46px] left-4 z-[140]" data-testid="floating-weather-container">
       <AnimatePresence>
         {isExpanded && weatherData && (
           <motion.div
