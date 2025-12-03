@@ -447,158 +447,151 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Hero */}
-      <section className="relative py-12 md:py-20 overflow-hidden">
+      {/* Hero - Compact Mobile */}
+      <section className="relative py-4 sm:py-12 md:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background"></div>
-        <div className="absolute top-10 right-10 w-60 h-60 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 right-10 w-60 h-60 bg-primary/10 rounded-full blur-3xl hidden sm:block"></div>
         
-        <div className="relative max-w-4xl mx-auto px-6 text-center">
-          <div className="mb-6 px-6 py-4 rounded-lg bg-primary/15 border border-primary/30 inline-block">
-            <Badge className="bg-primary/20 text-primary border-primary/30 text-sm">
-              <Zap className="w-4 h-4 mr-2" /> Automate Your Business
+        <div className="relative max-w-4xl mx-auto px-3 sm:px-6 text-center">
+          <div className="mb-3 sm:mb-6 px-3 sm:px-6 py-2 sm:py-4 rounded-lg bg-primary/15 border border-primary/30 inline-block">
+            <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px] sm:text-sm">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" /> Automate Your Business
             </Badge>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold font-heading mb-4 tracking-tight">
+          <h1 className="text-2xl sm:text-5xl md:text-7xl font-bold font-heading mb-2 sm:mb-4 tracking-tight">
             Staffing Reimagined
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
-            <span className="text-primary font-semibold">Full-Cycle Staffing Operations</span> in one platform. From recruit to payroll to invoice—complete control, complete compliance. Save up to 35% on staffing costs.
+          <p className="text-xs sm:text-lg md:text-xl text-muted-foreground mb-3 sm:mb-6 max-w-2xl mx-auto line-clamp-2 sm:line-clamp-none">
+            <span className="text-primary font-semibold">Full-Cycle Staffing</span> — recruit to payroll. Save up to 35%.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-3 justify-center mb-12">
+          <div className="flex flex-row gap-2 sm:gap-3 justify-center mb-4 sm:mb-12">
             <Button 
               onClick={() => setShowDemoForm(true)}
-              className="h-10 text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+              className="h-8 sm:h-10 text-xs sm:text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_20px_rgba(6,182,212,0.3)] px-3 sm:px-4"
               data-testid="button-landing-demo"
             >
-              Request Free Demo <ArrowRight className="w-4 h-4 ml-2" />
+              Demo <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
             </Button>
-            <Link href="/configure" className="h-10 text-sm px-4 rounded-md border border-primary/30 hover:bg-primary/10 inline-flex items-center">
-              Configure for Your Industry
+            <Link href="/configure" className="h-8 sm:h-10 text-xs sm:text-sm px-3 sm:px-4 rounded-md border border-primary/30 hover:bg-primary/10 inline-flex items-center">
+              Configure
             </Link>
           </div>
 
-          {/* Benefit Cards - Tap for Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {/* Benefit Cards - 2 cols on mobile */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-8">
             <BenefitCard 
               icon="⚡"
-              title="Automate Everything"
-              brief="Zero manual entry"
+              title="Automate"
+              brief="Zero entry"
               onClick={() => setSelectedBenefit("automate")}
             />
             <BenefitCard 
               icon="👥"
-              title="Keep Workers Longer"
-              brief="3x longer retention"
+              title="Retain"
+              brief="3x longer"
               onClick={() => setSelectedBenefit("workers")}
             />
             <BenefitCard 
               icon="💰"
-              title="Save Real Money"
-              brief="35% cost reduction"
+              title="Save"
+              brief="35% off"
               onClick={() => setSelectedBenefit("money")}
             />
             <BenefitCard 
               icon="📈"
-              title="Scale Without Limits"
-              brief="10x more capacity"
+              title="Scale"
+              brief="10x capacity"
               onClick={() => setSelectedBenefit("scale")}
             />
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <StatCard number="35%" label="Cost Savings vs Competitors" />
-            <StatCard number="2hrs" label="Complete Onboarding" />
-            <StatCard number="$0" label="Setup Fee" />
-            <StatCard number="24/7" label="Support" />
+          {/* Stats - Compact horizontal scroll on mobile */}
+          <div className="flex sm:grid sm:grid-cols-4 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory">
+            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="35%" label="Savings" /></div>
+            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="2hrs" label="Onboard" /></div>
+            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="$0" label="Setup" /></div>
+            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="24/7" label="Support" /></div>
           </div>
         </div>
       </section>
 
-      {/* CONNECT YOUR EXISTING SYSTEMS - HERO INTEGRATION CALLOUT */}
-      <section className="py-12 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-8">
-            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-sm mb-4">
-              <Zap className="w-4 h-4 mr-2" /> Seamless Integration
+      {/* CONNECT YOUR EXISTING SYSTEMS - Compact */}
+      <section className="py-4 sm:py-12 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6">
+          <div className="text-center mb-3 sm:mb-8">
+            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-[10px] sm:text-sm mb-2 sm:mb-4">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> Seamless Integration
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-white">
-              Keep Using Your Existing Systems
+            <h2 className="text-lg sm:text-4xl md:text-5xl font-bold font-heading mb-2 sm:mb-4 text-white">
+              Keep Your Existing Systems
             </h2>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-3">
-              Already using <span className="text-cyan-400 font-bold">QuickBooks, ADP, Google Workspace, or Microsoft 365?</span> No problem.
-            </p>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              ORBIT connects directly to your current payroll, accounting, productivity, and HR systems. <span className="text-white font-semibold">No data re-entry. No migration headaches.</span> Just sync and go.
+            <p className="text-[10px] sm:text-lg text-slate-400 max-w-2xl mx-auto hidden sm:block">
+              ORBIT connects to QuickBooks, ADP, Google Workspace, and 16 more. No data re-entry.
             </p>
           </div>
 
-          {/* Integration Logos/Names - Top 6 */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-2">📊</div>
-                <div className="text-sm font-bold text-white">QuickBooks</div>
-                <div className="text-xs text-slate-400 mt-1">Accounting & Invoicing</div>
+          {/* Integration Logos - Horizontal scroll on mobile */}
+          <div className="flex sm:grid sm:grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-8 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory">
+            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
+              <CardContent className="p-2 sm:p-4 text-center">
+                <div className="text-xl sm:text-3xl mb-1">📊</div>
+                <div className="text-[9px] sm:text-sm font-bold text-white">QuickBooks</div>
               </CardContent>
             </Card>
-            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-2">👥</div>
-                <div className="text-sm font-bold text-white">ADP Workforce Now</div>
-                <div className="text-xs text-slate-400 mt-1">Payroll & HR</div>
+            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
+              <CardContent className="p-2 sm:p-4 text-center">
+                <div className="text-xl sm:text-3xl mb-1">👥</div>
+                <div className="text-[9px] sm:text-sm font-bold text-white">ADP</div>
               </CardContent>
             </Card>
-            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-2">📅</div>
-                <div className="text-sm font-bold text-white">UKG Pro</div>
-                <div className="text-xs text-slate-400 mt-1">Scheduling & Time</div>
+            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
+              <CardContent className="p-2 sm:p-4 text-center">
+                <div className="text-xl sm:text-3xl mb-1">📅</div>
+                <div className="text-[9px] sm:text-sm font-bold text-white">UKG</div>
               </CardContent>
             </Card>
-            <Card className="bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/60 transition-all">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl mb-2">💼</div>
-                <div className="text-sm font-bold text-white">Paychex Flex</div>
-                <div className="text-xs text-slate-400 mt-1">Payroll Automation</div>
+            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
+              <CardContent className="p-2 sm:p-4 text-center">
+                <div className="text-xl sm:text-3xl mb-1">💼</div>
+                <div className="text-[9px] sm:text-sm font-bold text-white">Paychex</div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Benefits Grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">🔗</div>
+          {/* Benefits Grid - Horizontal scroll on mobile */}
+          <div className="flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-8 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory">
+            <Card className="flex-shrink-0 w-[70%] sm:w-auto snap-start bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <div className="text-xl sm:text-3xl">🔗</div>
                   <div>
-                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Connect in Minutes</h3>
-                    <p className="text-sm text-slate-400">One-click OAuth connection. ORBIT automatically syncs your data daily (or in real-time).</p>
+                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300">Connect Fast</h3>
+                    <p className="text-[9px] sm:text-sm text-slate-400 hidden sm:block">One-click OAuth sync</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">⚡</div>
+            <Card className="flex-shrink-0 w-[70%] sm:w-auto snap-start bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <div className="text-xl sm:text-3xl">⚡</div>
                   <div>
-                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Zero Manual Entry</h3>
-                    <p className="text-sm text-slate-400">Employees, pay rates, invoices, and schedules sync automatically. No duplicate data entry.</p>
+                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300">Zero Entry</h3>
+                    <p className="text-[9px] sm:text-sm text-slate-400 hidden sm:block">Auto-sync everything</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="text-3xl">🛡️</div>
+            <Card className="flex-shrink-0 w-[70%] sm:w-auto snap-start bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
+              <CardContent className="p-3 sm:p-6">
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <div className="text-xl sm:text-3xl">🛡️</div>
                   <div>
-                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Keep Your Data</h3>
-                    <p className="text-sm text-slate-400">Your existing systems stay active. ORBIT reads and syncs—you maintain complete control.</p>
+                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300">Your Data</h3>
+                    <p className="text-[9px] sm:text-sm text-slate-400 hidden sm:block">Complete control</p>
                   </div>
                 </div>
               </CardContent>
@@ -607,12 +600,9 @@ export default function Landing() {
 
           {/* Call to Action */}
           <div className="text-center">
-            <p className="text-sm text-slate-400 mb-4">
-              <span className="text-cyan-400 font-semibold">16 integrations ready</span> including Gusto, Rippling, Workday, Paylocity, Google Workspace, and Microsoft 365
-            </p>
             <Link href="/integrations">
-              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-                View All Integrations <ArrowRight className="w-4 h-4 ml-2" />
+              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-xs sm:text-sm h-8 sm:h-10">
+                16 Integrations <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
               </Button>
             </Link>
           </div>
