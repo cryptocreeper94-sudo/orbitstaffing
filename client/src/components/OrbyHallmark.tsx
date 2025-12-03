@@ -136,7 +136,7 @@ export function OrbyHallmark({
         }
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
+          50% { transform: translateY(-6px); }
         }
         @keyframes certGlow {
           0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.4), 0 0 30px rgba(6, 182, 212, 0.2); }
@@ -153,7 +153,7 @@ export function OrbyHallmark({
         <TwinklingStars count={config.stars} />
         
         {/* Orby positioned to the left, presenting the certificate */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20" style={{ animation: 'float 4s ease-in-out infinite' }}>
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20" style={{ animation: 'float 8s ease-in-out infinite' }}>
           <img 
             src="/mascot/clean/orbit_mascot_presenting_certificate.png" 
             alt="Orby" 
@@ -161,9 +161,9 @@ export function OrbyHallmark({
           />
         </div>
         
-        {/* Certificate positioned to the right, as if being presented by Orby */}
+        {/* Certificate positioned to the right, as if being presented by Orby - moved up 60px */}
         <div 
-          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform ml-auto`}
+          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform ml-auto -mt-[60px]`}
           style={{ animation: 'certGlow 3s ease-in-out infinite' }}
         >
           <div className={`${config.powered} text-cyan-400 font-bold tracking-wider mb-0.5`}>
@@ -227,7 +227,7 @@ export function OrbyHallmark({
 
             <div className="flex items-center justify-center gap-4 mb-6 relative z-10">
               {/* Orby on the left, presenting the certificate */}
-              <div style={{ animation: 'float 4s ease-in-out infinite' }}>
+              <div style={{ animation: 'float 8s ease-in-out infinite' }}>
                 <img 
                   src="/mascot/clean/orbit_mascot_presenting_certificate.png" 
                   alt="Orby presenting hallmark" 

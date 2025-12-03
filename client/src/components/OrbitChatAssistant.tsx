@@ -300,15 +300,15 @@ export function OrbitChatAssistant() {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
           
-          {/* Orby floating animation */}
+          {/* Orby floating animation - slowed down */}
           <motion.div
             animate={{ 
-              y: [0, -8, 0],
-              rotate: isOpen ? 0 : [0, 3, -3, 0]
+              y: [0, -6, 0],
+              rotate: isOpen ? 0 : [0, 2, -2, 0]
             }}
             transition={{ 
-              y: { duration: 2.5, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+              y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+              rotate: { duration: 8, repeat: Infinity, ease: "easeInOut" }
             }}
             className="relative"
           >
