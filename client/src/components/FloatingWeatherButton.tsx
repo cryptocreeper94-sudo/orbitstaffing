@@ -461,9 +461,9 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
               {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
             </span>
             <span 
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-sm font-black text-white leading-none"
+              className="absolute bottom-1 right-0 text-[10px] font-black text-white leading-none"
               style={{ 
-                textShadow: '0 0 6px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,1), -1px -1px 0 rgba(0,0,0,1), 1px -1px 0 rgba(0,0,0,1), -1px 1px 0 rgba(0,0,0,1), 1px 1px 0 rgba(0,0,0,1)'
+                textShadow: '0 0 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,1), 0 1px 2px rgba(0,0,0,1), -1px -1px 0 rgba(0,0,0,1), 1px -1px 0 rgba(0,0,0,1), -1px 1px 0 rgba(0,0,0,1), 1px 1px 0 rgba(0,0,0,1)'
               }}
             >
               {weatherData.temperature}°
