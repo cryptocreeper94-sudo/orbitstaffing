@@ -24,8 +24,8 @@ export function OrbyHallmark({
   
   const sizeConfig = {
     thumbnail: { 
-      container: 'w-24 h-28',
-      orby: 'w-20 h-20',
+      container: 'w-36 h-20',
+      orby: 'w-16 h-16',
       cert: 'w-14 h-16',
       qr: 28,
       serial: 'text-[6px]',
@@ -33,8 +33,8 @@ export function OrbyHallmark({
       stars: 6
     },
     small: { 
-      container: 'w-32 h-36',
-      orby: 'w-28 h-28',
+      container: 'w-48 h-24',
+      orby: 'w-20 h-20',
       cert: 'w-[72px] h-[80px]',
       qr: 36,
       serial: 'text-[8px]',
@@ -42,8 +42,8 @@ export function OrbyHallmark({
       stars: 8
     },
     medium: { 
-      container: 'w-48 h-56',
-      orby: 'w-40 h-40',
+      container: 'w-64 h-36',
+      orby: 'w-28 h-28',
       cert: 'w-28 h-32',
       qr: 56,
       serial: 'text-xs',
@@ -51,8 +51,8 @@ export function OrbyHallmark({
       stars: 10
     },
     large: { 
-      container: 'w-72 h-80',
-      orby: 'w-56 h-56',
+      container: 'w-96 h-48',
+      orby: 'w-40 h-40',
       cert: 'w-40 h-44',
       qr: 80,
       serial: 'text-sm',
@@ -145,15 +145,15 @@ export function OrbyHallmark({
       `}</style>
 
       <div 
-        className={`${config.container} relative inline-flex flex-col items-center justify-end cursor-pointer group ${className}`}
+        className={`${config.container} relative inline-flex items-center justify-center cursor-pointer group ${className}`}
         onClick={() => showExpand && setShowModal(true)}
         data-testid="orby-hallmark"
         title={showExpand ? "Click to view full hallmark" : undefined}
       >
         <TwinklingStars count={config.stars} />
         
-        {/* Orby positioned at top, holding the certificate */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10" style={{ animation: 'float 4s ease-in-out infinite' }}>
+        {/* Orby positioned to the left, presenting the certificate */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20" style={{ animation: 'float 4s ease-in-out infinite' }}>
           <img 
             src="/mascot/clean/orbit_mascot_pointing_helpful_transparent_clean.png" 
             alt="Orby" 
@@ -161,9 +161,9 @@ export function OrbyHallmark({
           />
         </div>
         
-        {/* Certificate positioned below Orby, as if being held/presented */}
+        {/* Certificate positioned to the right, as if being presented by Orby */}
         <div 
-          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform`}
+          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform ml-auto`}
           style={{ animation: 'certGlow 3s ease-in-out infinite' }}
         >
           <div className={`${config.powered} text-cyan-400 font-bold tracking-wider mb-0.5`}>
@@ -225,19 +225,19 @@ export function OrbyHallmark({
               </h3>
             </div>
 
-            <div className="flex flex-col items-center mb-6 relative z-10">
-              {/* Orby floating above, holding the certificate */}
+            <div className="flex items-center justify-center gap-4 mb-6 relative z-10">
+              {/* Orby on the left, presenting the certificate */}
               <div style={{ animation: 'float 4s ease-in-out infinite' }}>
                 <img 
                   src="/mascot/clean/orbit_mascot_pointing_helpful_transparent_clean.png" 
                   alt="Orby presenting hallmark" 
-                  className="w-32 h-32 object-contain drop-shadow-[0_0_30px_rgba(6,182,212,0.6)]"
+                  className="w-36 h-36 object-contain drop-shadow-[0_0_30px_rgba(6,182,212,0.6)]"
                 />
               </div>
               
-              {/* Certificate below Orby, as if being presented */}
+              {/* Certificate on the right, being presented by Orby */}
               <div 
-                className="w-44 h-52 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-xl border-2 border-amber-400 p-3 flex flex-col items-center justify-center -mt-4 relative"
+                className="w-44 h-52 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-xl border-2 border-amber-400 p-3 flex flex-col items-center justify-center relative"
                 style={{ animation: 'certGlow 3s ease-in-out infinite' }}
               >
                 <div className="text-[10px] text-cyan-400 font-bold tracking-wider mb-2 uppercase">
