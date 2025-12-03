@@ -698,15 +698,15 @@ export default function Landing() {
               {/* ORBIT Staffing OS */}
               <div style={{ flex: '0 0 260px', minWidth: '260px' }} className="sm:flex-auto sm:min-w-0 snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border-violet-500/50 hover:border-violet-400/80 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">
-                  <CardContent className="p-3 sm:p-6">
-                    <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                  <CardContent className="p-3 sm:p-6 flex flex-col h-full">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
                       <div className="text-2xl sm:text-4xl">🪐</div>
                       <div>
                         <h3 className="text-sm sm:text-xl font-bold text-violet-200">ORBIT Staffing OS</h3>
                         <p className="text-[8px] sm:text-xs text-violet-400">Full-Cycle Workforce Management</p>
                       </div>
                     </div>
-                    <ul className="space-y-1 mb-3 sm:mb-4 text-[8px] sm:text-xs text-slate-300">
+                    <ul className="space-y-1 text-[8px] sm:text-xs text-slate-300 flex-1">
                       <li>✓ Recruit → Match → Payroll</li>
                       <li>✓ Time & Attendance</li>
                       <li>✓ Compliance & I-9</li>
@@ -714,7 +714,7 @@ export default function Landing() {
                     </ul>
                     <Button 
                       onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
-                      className="w-full h-8 sm:h-10 bg-violet-600 hover:bg-violet-700 text-white text-[10px] sm:text-sm"
+                      className="w-full h-9 sm:h-10 bg-violet-600 hover:bg-violet-700 text-white text-[10px] sm:text-sm mt-3"
                       data-testid="button-show-orbit-slideshow"
                     >
                       {showOrbitSlideshow ? '▼ Hide' : '▶ View'} Walkthrough
@@ -726,29 +726,27 @@ export default function Landing() {
               {/* Orby Command Center */}
               <div style={{ flex: '0 0 260px', minWidth: '260px' }} className="sm:flex-auto sm:min-w-0 snap-start">
                 <Card className="h-full bg-gradient-to-br from-cyan-900/40 to-blue-900/30 border-cyan-500/50 hover:border-cyan-400/80 transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-                  <CardContent className="p-3 sm:p-6">
-                    <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                  <CardContent className="p-3 sm:p-6 flex flex-col h-full">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
                       <div className="text-2xl sm:text-4xl">🎯</div>
                       <div>
                         <h3 className="text-sm sm:text-xl font-bold text-cyan-200">Orby Command Center</h3>
                         <p className="text-[8px] sm:text-xs text-cyan-400">Real-Time Venue Operations</p>
                       </div>
                     </div>
-                    <ul className="space-y-1 mb-3 sm:mb-4 text-[8px] sm:text-xs text-slate-300">
+                    <ul className="space-y-1 text-[8px] sm:text-xs text-slate-300 flex-1">
                       <li>✓ Emergency Command</li>
                       <li>✓ Inventory Tracking + AI Scanner</li>
                       <li>✓ Team Communications</li>
                       <li>✓ Compliance Monitoring</li>
                     </ul>
-                    <a 
-                      href="https://getorby.io" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full h-8 sm:h-10 bg-cyan-600 hover:bg-cyan-700 text-white text-[10px] sm:text-sm rounded-md flex items-center justify-center font-medium"
+                    <Button 
+                      className="w-full h-9 sm:h-10 bg-cyan-600 hover:bg-cyan-700 text-white text-[10px] sm:text-sm mt-3"
                       data-testid="link-orby-command"
+                      onClick={() => window.open('https://getorby.io', '_blank')}
                     >
                       Visit getorby.io →
-                    </a>
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
