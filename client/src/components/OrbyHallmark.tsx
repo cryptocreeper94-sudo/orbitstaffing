@@ -155,7 +155,7 @@ export function OrbyHallmark({
         {/* Orby positioned to the left, presenting the certificate */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20" style={{ animation: 'float 4s ease-in-out infinite' }}>
           <img 
-            src="/mascot/clean/orbit_mascot_pointing_helpful_transparent_clean.png" 
+            src="/mascot/clean/orbit_mascot_presenting_certificate.png" 
             alt="Orby" 
             className={`${config.orby} object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300`}
           />
@@ -229,7 +229,7 @@ export function OrbyHallmark({
               {/* Orby on the left, presenting the certificate */}
               <div style={{ animation: 'float 4s ease-in-out infinite' }}>
                 <img 
-                  src="/mascot/clean/orbit_mascot_pointing_helpful_transparent_clean.png" 
+                  src="/mascot/clean/orbit_mascot_presenting_certificate.png" 
                   alt="Orby presenting hallmark" 
                   className="w-36 h-36 object-contain drop-shadow-[0_0_30px_rgba(6,182,212,0.6)]"
                 />
