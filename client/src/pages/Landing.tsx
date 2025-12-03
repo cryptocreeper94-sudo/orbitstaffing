@@ -222,11 +222,11 @@ export default function Landing() {
                 <div className="text-xl sm:text-3xl mb-0.5">📅</div>
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Schedule</div>
               </Link>
-              <Link href="/compliance-dashboard" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+              <Link href="/admin/compliance" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
                 <div className="text-xl sm:text-3xl mb-0.5">✅</div>
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Comply</div>
               </Link>
-              <Link href="/invoicing" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+              <Link href="/admin/payroll-dashboard" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
                 <div className="text-xl sm:text-3xl mb-0.5">🧾</div>
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Invoice</div>
               </Link>
@@ -234,9 +234,9 @@ export default function Landing() {
                 <div className="text-xl sm:text-3xl mb-0.5">📇</div>
                 <div className="font-semibold text-white text-[9px] sm:text-sm">CRM</div>
               </Link>
-              <Link href="/reports" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+              <Link href="/features" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
                 <div className="text-xl sm:text-3xl mb-0.5">📊</div>
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Reports</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Features</div>
               </Link>
             </div>
             {/* Scroll indicator arrow - mobile only */}
