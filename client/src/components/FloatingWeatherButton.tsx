@@ -44,6 +44,35 @@ const WEATHER_EMOJIS: Record<string, string> = {
   cold: '🥶',
 };
 
+const MOON_PHASES = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
+
+function getMoonPhase(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  
+  let c = 0, e = 0, jd = 0, b = 0;
+  
+  if (month < 3) {
+    c = year - 1;
+    e = month + 12;
+  } else {
+    c = year;
+    e = month;
+  }
+  
+  jd = Math.floor(365.25 * c) + Math.floor(30.6001 * (e + 1)) + day - 694039.09;
+  jd /= 29.53059;
+  b = Math.floor(jd);
+  jd -= b;
+  b = Math.round(jd * 8);
+  
+  if (b >= 8) b = 0;
+  
+  return MOON_PHASES[b];
+}
+
 const WEATHER_GLOWS: Record<string, { color: string; shadow: string; bg: string }> = {
   sunny: { 
     color: 'rgba(251, 191, 36, 0.8)', 
@@ -242,21 +271,24 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             <motion.button
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.92 }}
               onClick={() => setShowZipInput(true)}
-              className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 backdrop-blur-sm border border-cyan-500/40 shadow-lg flex items-center justify-center"
-              style={{ boxShadow: '0 0 25px rgba(6, 182, 212, 0.3)' }}
+              className="relative"
               data-testid="button-weather-setup"
             >
               <motion.span 
-                className="text-3xl"
+                className="text-5xl block"
                 animate={{ y: [0, -3, 0] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                style={{ filter: 'drop-shadow(0 0 12px rgba(6,182,212,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
               >
                 🌤️
               </motion.span>
-              <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-lg">
+              <span 
+                className="absolute -bottom-1 -right-1 text-[10px] font-bold text-white bg-cyan-500 rounded-full w-4 h-4 flex items-center justify-center"
+                style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+              >
                 +
               </span>
             </motion.button>
@@ -404,64 +436,54 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.92 }}
         onClick={() => {
           if (!showZipInput) {
             setIsExpanded(!isExpanded);
           }
         }}
-        className={`relative rounded-2xl backdrop-blur-sm border shadow-2xl transition-all overflow-hidden ${
-          weatherData 
-            ? `bg-gradient-to-br ${glow.bg} border-white/20` 
-            : 'bg-gradient-to-br from-slate-700/90 to-slate-800/90 border-slate-600/50'
-        }`}
-        style={{ 
-          boxShadow: weatherData ? glow.shadow : '0 0 20px rgba(0,0,0,0.3)',
-        }}
+        className="relative"
         data-testid="button-weather-toggle"
       >
         {weatherData ? (
-          <div className="flex items-center gap-1 px-2 py-1.5">
+          <div className="relative">
             <motion.span
-              className="text-4xl leading-none"
+              className="text-5xl leading-none block"
               animate={{ 
-                y: [0, -4, 0],
+                y: [0, -3, 0],
                 rotate: iconType === 'sunny' ? [0, 5, 0] : 0,
               }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               style={{ 
-                filter: `drop-shadow(0 0 12px ${glow.color})`,
-                textShadow: glow.shadow
+                filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
               }}
             >
-              {emoji}
+              {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
             </motion.span>
-            <div className="flex flex-col items-start pl-0.5 pr-1">
-              <span className="text-xl font-bold text-white leading-none" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                {weatherData.temperature}°
-              </span>
-              <span className="text-[9px] text-white/70 leading-tight mt-0.5 truncate max-w-[60px]">
-                {locationName.split(',')[0]}
-              </span>
-            </div>
+            <span 
+              className="absolute -bottom-1 -right-1 text-sm font-bold text-white px-1 rounded bg-black/40 backdrop-blur-sm leading-none"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}
+            >
+              {weatherData.temperature}°
+            </span>
           </div>
         ) : isLoading ? (
-          <div className="flex items-center gap-2 px-3 py-2">
-            <motion.span
-              className="text-2xl"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            >
-              🌀
-            </motion.span>
-            <span className="text-xs text-slate-300">Loading...</span>
-          </div>
+          <motion.span
+            className="text-4xl block"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.5))' }}
+          >
+            🌀
+          </motion.span>
         ) : (
-          <div className="flex items-center gap-2 px-3 py-2">
-            <Cloud className="w-5 h-5 text-cyan-400" />
-            <span className="text-xs text-slate-300">Weather</span>
-          </div>
+          <span 
+            className="text-4xl block"
+            style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.4))' }}
+          >
+            🌤️
+          </span>
         )}
       </motion.button>
     </div>

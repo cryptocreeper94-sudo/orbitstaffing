@@ -11,7 +11,8 @@ import {
   Users, 
   Shield,
   CheckCircle2,
-  Lock
+  Lock,
+  ChevronRight
 } from "lucide-react";
 import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
@@ -162,64 +163,82 @@ export default function Landing() {
             <p className="text-[9px] sm:text-sm text-muted-foreground hidden sm:block">Two-way job marketplace</p>
           </div>
           {/* Mobile: Horizontal carousel | Desktop: 6-col grid */}
-          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
-            <Link href="/jobs" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-job-board">
-              <div className="text-xl sm:text-3xl mb-0.5">💼</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Jobs</div>
-            </Link>
-            <Link href="/talent-pool" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-talent-pool">
-              <div className="text-xl sm:text-3xl mb-0.5">⭐</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Talent</div>
-            </Link>
-            <Link href="/employer/register" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-employer-register">
-              <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Post</div>
-            </Link>
-            <Link href="/apply" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-apply">
-              <div className="text-xl sm:text-3xl mb-0.5">👷</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Apply</div>
-            </Link>
-            <Link href="/employee-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-employee-hub">
-              <div className="text-xl sm:text-3xl mb-0.5">🧑‍💼</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Hub</div>
-            </Link>
-            <Link href="/owner-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-owner-hub">
-              <div className="text-xl sm:text-3xl mb-0.5">👔</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Owner</div>
-            </Link>
-          </div>
-          {/* Scroll indicator for mobile */}
-          <div className="flex justify-center gap-1 mt-2 sm:hidden">
-            <div className="w-8 h-0.5 bg-emerald-500/50 rounded-full"></div>
-            <div className="w-2 h-0.5 bg-emerald-500/20 rounded-full"></div>
-            <div className="w-2 h-0.5 bg-emerald-500/20 rounded-full"></div>
+          <div className="relative">
+            <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide pr-8 sm:pr-0">
+              <Link href="/jobs" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-job-board">
+                <div className="text-xl sm:text-3xl mb-0.5">💼</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Jobs</div>
+              </Link>
+              <Link href="/talent-pool" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-talent-pool">
+                <div className="text-xl sm:text-3xl mb-0.5">⭐</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Talent</div>
+              </Link>
+              <Link href="/employer/register" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-employer-register">
+                <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Post</div>
+              </Link>
+              <Link href="/apply" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-apply">
+                <div className="text-xl sm:text-3xl mb-0.5">👷</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Apply</div>
+              </Link>
+              <Link href="/employee-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-employee-hub">
+                <div className="text-xl sm:text-3xl mb-0.5">🧑‍💼</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Hub</div>
+              </Link>
+              <Link href="/owner-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-owner-hub">
+                <div className="text-xl sm:text-3xl mb-0.5">👔</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Owner</div>
+              </Link>
+            </div>
+            {/* Scroll indicator arrow - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-emerald-950/90 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-emerald-400 animate-pulse mr-1" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* SANDBOX - Compact 2x2 Bento Grid with sparkle */}
+      {/* SANDBOX - Horizontal Scroll Carousel */}
       <section className="bg-slate-900/50 border-b border-cyan-500/20 py-2 sm:py-6">
         <div className="max-w-7xl mx-auto px-2 sm:px-6">
           <div className="text-center mb-2 sm:mb-4">
             <h2 className="text-xs sm:text-xl font-bold text-cyan-300">Try Sandbox</h2>
           </div>
-          <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
-            <Link href="/equipment-tracking" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <div className="text-lg sm:text-2xl">📦</div>
-              <div className="font-semibold text-white text-[8px] sm:text-xs">Gear</div>
-            </Link>
-            <Link href="/gps-clock-in" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <div className="text-lg sm:text-2xl">📍</div>
-              <div className="font-semibold text-white text-[8px] sm:text-xs">GPS</div>
-            </Link>
-            <Link href="/payroll-processing" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <div className="text-lg sm:text-2xl">💰</div>
-              <div className="font-semibold text-white text-[8px] sm:text-xs">Pay</div>
-            </Link>
-            <Link href="/worker-availability" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <div className="text-lg sm:text-2xl">📅</div>
-              <div className="font-semibold text-white text-[8px] sm:text-xs">Schedule</div>
-            </Link>
+          <div className="relative">
+            <div className="flex flex-row flex-nowrap gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory pr-8 sm:pr-0">
+              <Link href="/equipment-tracking" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">📦</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Gear</div>
+              </Link>
+              <Link href="/gps-clock-in" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">📍</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">GPS</div>
+              </Link>
+              <Link href="/payroll-processing" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">💰</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Pay</div>
+              </Link>
+              <Link href="/worker-availability" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">📅</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Schedule</div>
+              </Link>
+              <Link href="/compliance-dashboard" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">✅</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Comply</div>
+              </Link>
+              <Link href="/invoicing" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">🧾</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Invoice</div>
+              </Link>
+              <Link href="/crm" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+                <div className="text-xl sm:text-2xl">📇</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">CRM</div>
+              </Link>
+            </div>
+            {/* Scroll indicator arrow - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-slate-900 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse mr-1" />
+            </div>
           </div>
         </div>
       </section>
@@ -237,73 +256,72 @@ export default function Landing() {
           </div>
           
           {/* Mobile: Horizontal carousel | Desktop: 3-col grid */}
-          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
-            <Link href="/hallmark-seal" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-hallmarks">
-                <CardContent className="p-2 sm:p-4">
-                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔐</div>
-                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Hallmarks</h3>
-                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link href="/crm" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crm">
-                <CardContent className="p-2 sm:p-4">
-                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📇</div>
-                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">CRM</h3>
-                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link href="/pay-card" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-pay-card">
-                <CardContent className="p-2 sm:p-4">
-                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">💳</div>
-                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Pay Card</h3>
-                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link href="/marketing-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-marketing">
-                <CardContent className="p-2 sm:p-4">
-                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📢</div>
-                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Marketing</h3>
-                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link href="/talent-exchange" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-exchange">
-                <CardContent className="p-2 sm:p-4">
-                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔄</div>
-                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Exchange</h3>
-                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
-                </CardContent>
-              </Card>
-            </Link>
-            
-            <Link href="/crypto-wallet" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crypto">
-                <CardContent className="p-2 sm:p-4">
-                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">⛓️</div>
-                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Crypto</h3>
-                  <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-          
-          {/* Scroll indicator for mobile */}
-          <div className="flex justify-center gap-1 mt-2 sm:hidden">
-            <div className="w-8 h-0.5 bg-green-500/50 rounded-full"></div>
-            <div className="w-2 h-0.5 bg-green-500/20 rounded-full"></div>
-            <div className="w-2 h-0.5 bg-green-500/20 rounded-full"></div>
+          <div className="relative">
+            <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide pr-8 sm:pr-0">
+              <Link href="/hallmark-seal" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-hallmarks">
+                  <CardContent className="p-2 sm:p-4">
+                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔐</div>
+                    <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Hallmarks</h3>
+                    <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link href="/crm" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crm">
+                  <CardContent className="p-2 sm:p-4">
+                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📇</div>
+                    <h3 className="text-[9px] sm:text-sm font-bold text-green-200">CRM</h3>
+                    <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link href="/pay-card" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-pay-card">
+                  <CardContent className="p-2 sm:p-4">
+                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">💳</div>
+                    <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Pay Card</h3>
+                    <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link href="/marketing-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-marketing">
+                  <CardContent className="p-2 sm:p-4">
+                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📢</div>
+                    <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Marketing</h3>
+                    <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link href="/talent-exchange" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-exchange">
+                  <CardContent className="p-2 sm:p-4">
+                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔄</div>
+                    <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Exchange</h3>
+                    <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                  </CardContent>
+                </Card>
+              </Link>
+              
+              <Link href="/crypto-wallet" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crypto">
+                  <CardContent className="p-2 sm:p-4">
+                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">⛓️</div>
+                    <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Crypto</h3>
+                    <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+            {/* Scroll indicator arrow - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-violet-950/90 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-green-400 animate-pulse mr-1" />
+            </div>
           </div>
           
           <div className="text-center mt-2 sm:mt-6">
