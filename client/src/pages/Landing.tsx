@@ -205,39 +205,43 @@ export default function Landing() {
             <h2 className="text-xs sm:text-xl font-bold text-cyan-300">Try Sandbox</h2>
           </div>
           <div className="relative">
-            <div className="flex flex-row flex-nowrap gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory pr-8 sm:pr-0">
-              <Link href="/equipment-tracking" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">📦</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Gear</div>
+            <div className="flex overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory" style={{ gap: '8px', flexWrap: 'nowrap' }}>
+              <Link href="/equipment-tracking" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">📦</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Gear</div>
               </Link>
-              <Link href="/gps-clock-in" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">📍</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">GPS</div>
+              <Link href="/gps-clock-in" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">📍</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">GPS</div>
               </Link>
-              <Link href="/payroll-processing" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">💰</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Pay</div>
+              <Link href="/payroll-processing" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">💰</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Pay</div>
               </Link>
-              <Link href="/worker-availability" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">📅</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Schedule</div>
+              <Link href="/worker-availability" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">📅</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Schedule</div>
               </Link>
-              <Link href="/compliance-dashboard" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">✅</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Comply</div>
+              <Link href="/compliance-dashboard" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">✅</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Comply</div>
               </Link>
-              <Link href="/invoicing" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">🧾</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">Invoice</div>
+              <Link href="/invoicing" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">🧾</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Invoice</div>
               </Link>
-              <Link href="/crm" className="flex-shrink-0 snap-start w-16 sm:w-24 p-2 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-                <div className="text-xl sm:text-2xl">📇</div>
-                <div className="font-semibold text-white text-[9px] sm:text-xs mt-1">CRM</div>
+              <Link href="/crm" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">📇</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">CRM</div>
+              </Link>
+              <Link href="/reports" className="snap-start flex-none p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" style={{ minWidth: '80px', width: '80px' }}>
+                <div className="text-xl sm:text-3xl mb-0.5">📊</div>
+                <div className="font-semibold text-white text-[9px] sm:text-sm">Reports</div>
               </Link>
             </div>
             {/* Scroll indicator arrow - mobile only */}
-            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-slate-900 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
-              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse mr-1" />
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-slate-900 via-slate-900/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-6 h-6 text-cyan-400 animate-pulse" />
             </div>
           </div>
         </div>
