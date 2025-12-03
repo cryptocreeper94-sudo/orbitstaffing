@@ -151,204 +151,185 @@ export default function Landing() {
       {/* ISO 20022 BANKING ROADMAP BANNER */}
       <ISO20022Banner />
 
-      {/* TALENT EXCHANGE SECTION */}
-      <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-4 sm:py-8">
+      {/* TALENT EXCHANGE SECTION - Carousel on mobile, grid on desktop */}
+      <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-3 sm:py-6">
         <div className="max-w-7xl mx-auto px-2 sm:px-6">
-          <div className="text-center mb-3 sm:mb-6">
-            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px] sm:text-sm mb-1">
+          <div className="text-center mb-2 sm:mb-4">
+            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[9px] sm:text-sm mb-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
               NEW - Talent Exchange
             </Badge>
-            <h2 className="text-lg sm:text-2xl font-bold text-white mb-0.5 sm:mb-2">ORBIT Talent Exchange</h2>
-            <p className="text-[10px] sm:text-sm text-muted-foreground">Two-way job marketplace connecting employers with pre-vetted workers</p>
+            <h2 className="text-sm sm:text-2xl font-bold text-white mb-0.5">ORBIT Talent Exchange</h2>
+            <p className="text-[9px] sm:text-sm text-muted-foreground hidden sm:block">Two-way job marketplace</p>
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-1.5 sm:gap-4">
-            <Link href="/jobs" className="p-2 sm:p-5 rounded-lg border border-emerald-500/30 bg-emerald-900/20 hover:bg-emerald-900/40 hover:border-emerald-400/60 transition-all flex flex-col items-center text-center" data-testid="link-job-board">
-              <div className="text-lg sm:text-4xl mb-1">💼</div>
-              <div className="font-semibold text-white text-[10px] sm:text-sm">Jobs</div>
-              <div className="text-[8px] sm:text-xs text-gray-400 hidden sm:block">Browse positions</div>
+          {/* Mobile: Horizontal carousel | Desktop: 6-col grid */}
+          <div className="flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            <Link href="/jobs" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="link-job-board">
+              <div className="text-xl sm:text-3xl mb-0.5">💼</div>
+              <div className="font-semibold text-white text-[9px] sm:text-sm">Jobs</div>
             </Link>
-            <Link href="/talent-pool" className="p-2 sm:p-5 rounded-lg border border-emerald-500/30 bg-emerald-900/20 hover:bg-emerald-900/40 hover:border-emerald-400/60 transition-all flex flex-col items-center text-center" data-testid="link-talent-pool">
-              <div className="text-lg sm:text-4xl mb-1">⭐</div>
-              <div className="font-semibold text-white text-[10px] sm:text-sm">Talent</div>
-              <div className="text-[8px] sm:text-xs text-gray-400 hidden sm:block">Find workers</div>
+            <Link href="/talent-pool" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="link-talent-pool">
+              <div className="text-xl sm:text-3xl mb-0.5">⭐</div>
+              <div className="font-semibold text-white text-[9px] sm:text-sm">Talent</div>
             </Link>
-            <Link href="/employer/register" className="p-2 sm:p-5 rounded-lg border border-cyan-500/30 bg-cyan-900/20 hover:bg-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center text-center" data-testid="link-employer-register">
-              <div className="text-lg sm:text-4xl mb-1">🏢</div>
-              <div className="font-semibold text-white text-[10px] sm:text-sm">Post</div>
-              <div className="text-[8px] sm:text-xs text-gray-400 hidden sm:block">Employer signup</div>
+            <Link href="/employer/register" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="link-employer-register">
+              <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
+              <div className="font-semibold text-white text-[9px] sm:text-sm">Post</div>
             </Link>
-            <Link href="/apply" className="p-2 sm:p-5 rounded-lg border border-cyan-500/30 bg-cyan-900/20 hover:bg-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center text-center" data-testid="link-apply">
-              <div className="text-lg sm:text-4xl mb-1">👷</div>
-              <div className="font-semibold text-white text-[10px] sm:text-sm">Apply</div>
-              <div className="text-[8px] sm:text-xs text-gray-400 hidden sm:block">Worker app</div>
+            <Link href="/apply" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="link-apply">
+              <div className="text-xl sm:text-3xl mb-0.5">👷</div>
+              <div className="font-semibold text-white text-[9px] sm:text-sm">Apply</div>
             </Link>
-            <Link href="/employee-hub" className="p-2 sm:p-5 rounded-lg border border-violet-500/30 bg-violet-900/20 hover:bg-violet-900/40 hover:border-violet-400/60 transition-all flex flex-col items-center text-center" data-testid="link-employee-hub">
-              <div className="text-lg sm:text-4xl mb-1">🧑‍💼</div>
-              <div className="font-semibold text-white text-[10px] sm:text-sm">My Hub</div>
-              <div className="text-[8px] sm:text-xs text-gray-400 hidden sm:block">Self-service</div>
+            <Link href="/employee-hub" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]" data-testid="link-employee-hub">
+              <div className="text-xl sm:text-3xl mb-0.5">🧑‍💼</div>
+              <div className="font-semibold text-white text-[9px] sm:text-sm">Hub</div>
             </Link>
-            <Link href="/owner-hub" className="p-2 sm:p-5 rounded-lg border border-violet-500/30 bg-violet-900/20 hover:bg-violet-900/40 hover:border-violet-400/60 transition-all flex flex-col items-center text-center" data-testid="link-owner-hub">
-              <div className="text-lg sm:text-4xl mb-1">👔</div>
-              <div className="font-semibold text-white text-[10px] sm:text-sm">Owner</div>
-              <div className="text-[8px] sm:text-xs text-gray-400 hidden sm:block">Dashboard</div>
+            <Link href="/owner-hub" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]" data-testid="link-owner-hub">
+              <div className="text-xl sm:text-3xl mb-0.5">👔</div>
+              <div className="font-semibold text-white text-[9px] sm:text-sm">Owner</div>
             </Link>
+          </div>
+          {/* Scroll indicator for mobile */}
+          <div className="flex justify-center gap-1 mt-2 sm:hidden">
+            <div className="w-8 h-0.5 bg-emerald-500/50 rounded-full"></div>
+            <div className="w-2 h-0.5 bg-emerald-500/20 rounded-full"></div>
+            <div className="w-2 h-0.5 bg-emerald-500/20 rounded-full"></div>
           </div>
         </div>
       </section>
 
-      {/* SANDBOX SHOWCASE SECTION - PLAY WITH FEATURES */}
-      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-3 sm:py-8">
+      {/* SANDBOX - Compact 2x2 Bento Grid with sparkle */}
+      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-2 sm:py-6">
         <div className="max-w-7xl mx-auto px-2 sm:px-6">
-          <div className="text-center mb-2 sm:mb-6">
-            <h2 className="text-base sm:text-2xl font-bold text-cyan-300 mb-0.5 sm:mb-2">Try ORBIT Sandbox</h2>
-            <p className="text-[10px] sm:text-sm text-muted-foreground">Play with live features risk-free</p>
+          <div className="text-center mb-2 sm:mb-4">
+            <h2 className="text-xs sm:text-xl font-bold text-cyan-300">Try Sandbox</h2>
           </div>
-          <div className="grid grid-cols-4 lg:grid-cols-4 gap-1.5 sm:gap-3">
-            <Link href="/equipment-tracking" className="p-1.5 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all flex flex-col items-center justify-center">
-              <div className="text-lg sm:text-3xl mb-0.5 sm:mb-2">📦</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Gear</div>
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
+            <Link href="/equipment-tracking" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <div className="text-lg sm:text-2xl">📦</div>
+              <div className="font-semibold text-white text-[8px] sm:text-xs">Gear</div>
             </Link>
-            <Link href="/gps-clock-in" className="p-1.5 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all flex flex-col items-center justify-center">
-              <div className="text-lg sm:text-3xl mb-0.5 sm:mb-2">📍</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">GPS</div>
+            <Link href="/gps-clock-in" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <div className="text-lg sm:text-2xl">📍</div>
+              <div className="font-semibold text-white text-[8px] sm:text-xs">GPS</div>
             </Link>
-            <Link href="/payroll-processing" className="p-1.5 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all flex flex-col items-center justify-center">
-              <div className="text-lg sm:text-3xl mb-0.5 sm:mb-2">💰</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Pay</div>
+            <Link href="/payroll-processing" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <div className="text-lg sm:text-2xl">💰</div>
+              <div className="font-semibold text-white text-[8px] sm:text-xs">Pay</div>
             </Link>
-            <Link href="/worker-availability" className="p-1.5 sm:p-4 rounded-lg border border-cyan-500/20 bg-cyan-900/10 hover:bg-cyan-900/20 hover:border-cyan-400/50 transition-all flex flex-col items-center justify-center">
-              <div className="text-lg sm:text-3xl mb-0.5 sm:mb-2">📅</div>
-              <div className="font-semibold text-white text-[9px] sm:text-sm">Schedule</div>
+            <Link href="/worker-availability" className="p-1.5 sm:p-3 rounded-lg border border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900/50 hover:from-cyan-900/40 hover:border-cyan-400/60 transition-all flex flex-col items-center justify-center shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <div className="text-lg sm:text-2xl">📅</div>
+              <div className="font-semibold text-white text-[8px] sm:text-xs">Schedule</div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* NEXT WAVE - UPCOMING FEATURES */}
-      <section className="bg-gradient-to-br from-violet-950/40 via-purple-900/30 to-violet-950/40 border-b border-violet-500/30 py-4 sm:py-12 relative overflow-hidden">
+      {/* RECENTLY LAUNCHED - Carousel on mobile, 3-col grid on desktop */}
+      <section className="bg-gradient-to-br from-violet-950/40 via-purple-900/30 to-violet-950/40 border-b border-violet-500/30 py-3 sm:py-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-600/10 via-transparent to-transparent pointer-events-none"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="max-w-7xl mx-auto px-2 sm:px-6 relative z-10">
-          <div className="text-center mb-3 sm:mb-8">
-            <Badge className="bg-green-500/20 text-green-300 border-green-500/40 text-[10px] sm:text-sm mb-1 sm:mb-3" data-testid="badge-now-live">
-              <Zap className="w-2.5 h-2.5 sm:w-4 sm:h-4 mr-1" /> Now Live
+          <div className="text-center mb-2 sm:mb-6">
+            <Badge className="bg-green-500/20 text-green-300 border-green-500/40 text-[9px] sm:text-sm mb-1 shadow-[0_0_10px_rgba(34,197,94,0.3)]" data-testid="badge-now-live">
+              <Zap className="w-2 h-2 sm:w-4 sm:h-4 mr-0.5" /> Live
             </Badge>
-            <h2 className="text-lg sm:text-3xl lg:text-4xl font-bold text-white mb-1 sm:mb-3">Recently Launched</h2>
-            <p className="text-[10px] sm:text-sm text-green-200/70 max-w-2xl mx-auto hidden sm:block">These features are ready to use right now</p>
+            <h2 className="text-sm sm:text-2xl font-bold text-white">Recently Launched</h2>
           </div>
           
-          <div className="grid grid-cols-3 md:grid-cols-3 gap-1.5 sm:gap-4">
-            <Link href="/hallmark-seal">
-              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-hallmarks">
-                <CardContent className="p-2 sm:p-6">
-                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🔐</div>
-                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Hallmarks</h3>
-                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">100B blockchain verified</p>
+          {/* Mobile: Horizontal carousel | Desktop: 3-col grid */}
+          <div className="flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            <Link href="/hallmark-seal" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-hallmarks">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔐</div>
+                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Hallmarks</h3>
                   <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                 </CardContent>
               </Card>
             </Link>
             
-            <Link href="/crm">
-              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-crm">
-                <CardContent className="p-2 sm:p-6">
-                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">📇</div>
-                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">CRM</h3>
-                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">HubSpot-grade contacts</p>
+            <Link href="/crm" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-crm">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📇</div>
+                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">CRM</h3>
                   <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                 </CardContent>
               </Card>
             </Link>
             
-            <Link href="/pay-card">
-              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-pay-card">
-                <CardContent className="p-2 sm:p-6">
-                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">💳</div>
-                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Pay Card</h3>
-                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">Instant worker pay</p>
+            <Link href="/pay-card" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-pay-card">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">💳</div>
+                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Pay Card</h3>
                   <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                 </CardContent>
               </Card>
             </Link>
             
-            <Link href="/marketing-hub">
-              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-marketing">
-                <CardContent className="p-2 sm:p-6">
-                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">📢</div>
-                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Marketing</h3>
-                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">Campaign automation</p>
+            <Link href="/marketing-hub" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-marketing">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📢</div>
+                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Marketing</h3>
                   <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                 </CardContent>
               </Card>
             </Link>
             
-            <Link href="/talent-exchange">
-              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-exchange">
-                <CardContent className="p-2 sm:p-6">
-                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">🔄</div>
-                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Exchange</h3>
-                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">2-way talent pool</p>
+            <Link href="/talent-exchange" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-exchange">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔄</div>
+                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Exchange</h3>
                   <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                 </CardContent>
               </Card>
             </Link>
             
-            <Link href="/crypto-wallet">
-              <Card className="bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/40 hover:border-green-400/60 transition-all duration-300 group" data-testid="card-crypto">
-                <CardContent className="p-2 sm:p-6">
-                  <div className="text-xl sm:text-4xl mb-1 sm:mb-3 group-hover:scale-110 transition-transform">⛓️</div>
-                  <h3 className="text-[10px] sm:text-lg font-bold text-green-200 mb-0.5 sm:mb-2 truncate">Crypto</h3>
-                  <p className="text-[8px] sm:text-xs text-green-300/70 hidden sm:block">Solana payments</p>
+            <Link href="/crypto-wallet" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-crypto">
+                <CardContent className="p-2 sm:p-4">
+                  <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">⛓️</div>
+                  <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Crypto</h3>
                   <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                 </CardContent>
               </Card>
             </Link>
           </div>
           
-          <div className="text-center mt-3 sm:mt-8">
-            <Link href="/roadmap" className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-1.5 sm:py-3 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 hover:border-violet-400/60 text-violet-200 font-semibold text-[10px] sm:text-sm transition-all" data-testid="link-view-roadmap">
-              View Roadmap <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
+          {/* Scroll indicator for mobile */}
+          <div className="flex justify-center gap-1 mt-2 sm:hidden">
+            <div className="w-8 h-0.5 bg-green-500/50 rounded-full"></div>
+            <div className="w-2 h-0.5 bg-green-500/20 rounded-full"></div>
+            <div className="w-2 h-0.5 bg-green-500/20 rounded-full"></div>
+          </div>
+          
+          <div className="text-center mt-2 sm:mt-6">
+            <Link href="/roadmap" className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 text-violet-200 font-semibold text-[9px] sm:text-sm transition-all" data-testid="link-view-roadmap">
+              Roadmap <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4" />
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ACCESS BOXES - OWNER / CUSTOMER / ADMIN */}
-      <section className="bg-gradient-to-b from-background to-slate-900/30 py-4 sm:py-12">
+      {/* ACCESS BOXES - Compact 2x2 on mobile with sparkle */}
+      <section className="bg-gradient-to-b from-background to-slate-900/30 py-3 sm:py-8">
         <div className="max-w-7xl mx-auto px-2 sm:px-6">
-          <div className="text-center mb-3 sm:mb-10">
-            <h2 className="text-lg sm:text-3xl font-bold text-white mb-0.5 sm:mb-2">Get Started with ORBIT</h2>
-            <p className="text-[10px] sm:text-base text-muted-foreground">Choose your role to access</p>
+          <div className="text-center mb-2 sm:mb-6">
+            <h2 className="text-sm sm:text-2xl font-bold text-white">Get Started</h2>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6 mb-4 sm:mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-4">
             {/* Business Owner Login */}
             <Link href="/admin" className="group">
-              <Card className="h-full border-2 border-violet-400/40 hover:border-violet-300/70 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 hover:to-purple-400/15 transition-all duration-300 cursor-pointer">
-                <CardContent className="p-2 sm:p-6 text-center flex flex-col justify-between h-full">
-                  <div>
-                    <div className="text-2xl sm:text-5xl mb-1 sm:mb-3">🏢</div>
-                    <h3 className="text-xs sm:text-lg font-bold text-violet-300 mb-0.5 sm:mb-2">Owner</h3>
-                    <p className="text-[8px] sm:text-xs text-gray-400 mb-1.5 sm:mb-4 hidden sm:block">Manage operations & billing</p>
-                    <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-4 hidden sm:block">
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-violet-400 flex-shrink-0" />
-                        <span>Workers & clients</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-violet-400 flex-shrink-0" />
-                        <span>Scheduling</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-violet-400 flex-shrink-0" />
-                        <span>Payroll</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button className="w-full bg-violet-500 hover:bg-violet-600 text-white text-[9px] sm:text-sm h-7 sm:min-h-[44px]" data-testid="button-owner-access">
-                    Login <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
+              <Card className="h-full border border-violet-400/50 hover:border-violet-300/80 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 transition-all cursor-pointer shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                <CardContent className="p-2 sm:p-4 text-center">
+                  <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
+                  <h3 className="text-[10px] sm:text-sm font-bold text-violet-300">Owner</h3>
+                  <Button className="w-full mt-1.5 bg-violet-500/80 hover:bg-violet-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-owner-access">
+                    Login
                   </Button>
                 </CardContent>
               </Card>
@@ -356,29 +337,12 @@ export default function Landing() {
 
             {/* Customer/Client Login */}
             <Link href="/worker" className="group">
-              <Card className="h-full border-2 border-blue-600/30 hover:border-blue-400/60 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 hover:to-blue-900/20 transition-all duration-300 cursor-pointer">
-                <CardContent className="p-2 sm:p-6 text-center flex flex-col justify-between h-full">
-                  <div>
-                    <div className="text-2xl sm:text-5xl mb-1 sm:mb-3">👥</div>
-                    <h3 className="text-xs sm:text-lg font-bold text-blue-300 mb-0.5 sm:mb-2">Client</h3>
-                    <p className="text-[8px] sm:text-xs text-gray-400 mb-1.5 sm:mb-4 hidden sm:block">Manage assignments</p>
-                    <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-4 hidden sm:block">
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-400 flex-shrink-0" />
-                        <span>Request workers</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-400 flex-shrink-0" />
-                        <span>Track progress</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-400 flex-shrink-0" />
-                        <span>Rate workers</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white text-[9px] sm:text-sm h-7 sm:min-h-[44px]" data-testid="button-customer-access">
-                    Login <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
+              <Card className="h-full border border-blue-500/50 hover:border-blue-400/80 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                <CardContent className="p-2 sm:p-4 text-center">
+                  <div className="text-xl sm:text-3xl mb-0.5">👥</div>
+                  <h3 className="text-[10px] sm:text-sm font-bold text-blue-300">Client</h3>
+                  <Button className="w-full mt-1.5 bg-blue-500/80 hover:bg-blue-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-customer-access">
+                    Login
                   </Button>
                 </CardContent>
               </Card>
@@ -386,29 +350,12 @@ export default function Landing() {
 
             {/* Employee Self-Service */}
             <Link href="/employee-hub" className="group">
-              <Card className="h-full border-2 border-emerald-600/30 hover:border-emerald-400/60 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 hover:to-emerald-900/20 transition-all duration-300 cursor-pointer" data-testid="card-employee-self-service">
-                <CardContent className="p-2 sm:p-6 text-center flex flex-col justify-between h-full">
-                  <div>
-                    <div className="text-2xl sm:text-5xl mb-1 sm:mb-3">📋</div>
-                    <h3 className="text-xs sm:text-lg font-bold text-emerald-300 mb-0.5 sm:mb-2">Employee</h3>
-                    <p className="text-[8px] sm:text-xs text-gray-400 mb-1.5 sm:mb-4 hidden sm:block">Self-service portal</p>
-                    <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-4 hidden sm:block">
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400 flex-shrink-0" />
-                        <span>Tax docs & W-2s</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400 flex-shrink-0" />
-                        <span>Pay stubs</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400 flex-shrink-0" />
-                        <span>Time cards</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] sm:text-sm h-7 sm:min-h-[44px]" data-testid="button-employee-self-service">
-                    My Hub <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
+              <Card className="h-full border border-emerald-500/50 hover:border-emerald-400/80 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
+                <CardContent className="p-2 sm:p-4 text-center">
+                  <div className="text-xl sm:text-3xl mb-0.5">📋</div>
+                  <h3 className="text-[10px] sm:text-sm font-bold text-emerald-300">Employee</h3>
+                  <Button className="w-full mt-1.5 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-employee-access">
+                    Hub
                   </Button>
                 </CardContent>
               </Card>
@@ -416,29 +363,12 @@ export default function Landing() {
 
             {/* Admin Access */}
             <Link href="/developer" className="group">
-              <Card className="h-full border-2 border-cyan-600/30 hover:border-cyan-400/60 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 hover:to-cyan-900/20 transition-all duration-300 cursor-pointer">
-                <CardContent className="p-2 sm:p-6 text-center flex flex-col justify-between h-full">
-                  <div>
-                    <div className="text-2xl sm:text-5xl mb-1 sm:mb-3">⚙️</div>
-                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300 mb-0.5 sm:mb-2">Admin</h3>
-                    <p className="text-[8px] sm:text-xs text-gray-400 mb-1.5 sm:mb-4 hidden sm:block">Platform control</p>
-                    <div className="space-y-0.5 sm:space-y-2 mb-1.5 sm:mb-4 hidden sm:block">
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400 flex-shrink-0" />
-                        <span>Registry</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400 flex-shrink-0" />
-                        <span>Contact notes</span>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-xs text-gray-300">
-                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400 flex-shrink-0" />
-                        <span>API testing</span>
-                      </div>
-                    </div>
-                  </div>
-                  <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white text-[9px] sm:text-sm h-7 sm:min-h-[44px]" data-testid="button-admin-access">
-                    Panel <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
+              <Card className="h-full border border-cyan-500/50 hover:border-cyan-400/80 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                <CardContent className="p-2 sm:p-4 text-center">
+                  <div className="text-xl sm:text-3xl mb-0.5">⚙️</div>
+                  <h3 className="text-[10px] sm:text-sm font-bold text-cyan-300">Admin</h3>
+                  <Button className="w-full mt-1.5 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-admin-access">
+                    Panel
                   </Button>
                 </CardContent>
               </Card>
@@ -518,82 +448,37 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CONNECT YOUR EXISTING SYSTEMS - Compact */}
-      <section className="py-4 sm:py-12 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
-        <div className="max-w-6xl mx-auto px-3 sm:px-6">
-          <div className="text-center mb-3 sm:mb-8">
-            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 text-[10px] sm:text-sm mb-2 sm:mb-4">
-              <Zap className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> Seamless Integration
-            </Badge>
-            <h2 className="text-lg sm:text-4xl md:text-5xl font-bold font-heading mb-2 sm:mb-4 text-white">
-              Keep Your Existing Systems
-            </h2>
-            <p className="text-[10px] sm:text-lg text-slate-400 max-w-2xl mx-auto hidden sm:block">
-              ORBIT connects to QuickBooks, ADP, Google Workspace, and 16 more. No data re-entry.
-            </p>
+      {/* CONNECT YOUR EXISTING SYSTEMS - Compact with sparkle */}
+      <section className="py-3 sm:py-8 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
+        <div className="max-w-6xl mx-auto px-2 sm:px-6">
+          <div className="text-center mb-2 sm:mb-6">
+            <h2 className="text-sm sm:text-2xl font-bold text-white">Connect Your Systems</h2>
           </div>
 
-          {/* Integration Logos - Horizontal scroll on mobile */}
-          <div className="flex sm:grid sm:grid-cols-4 gap-2 sm:gap-3 mb-3 sm:mb-8 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory">
-            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
-              <CardContent className="p-2 sm:p-4 text-center">
-                <div className="text-xl sm:text-3xl mb-1">📊</div>
-                <div className="text-[9px] sm:text-sm font-bold text-white">QuickBooks</div>
+          {/* Integration Logos - Horizontal scroll with sparkle */}
+          <div className="flex sm:grid sm:grid-cols-4 gap-1.5 sm:gap-3 mb-2 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-1.5 sm:p-3 text-center">
+                <div className="text-lg sm:text-2xl">📊</div>
+                <div className="text-[7px] sm:text-xs font-bold text-white">QB</div>
               </CardContent>
             </Card>
-            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
-              <CardContent className="p-2 sm:p-4 text-center">
-                <div className="text-xl sm:text-3xl mb-1">👥</div>
-                <div className="text-[9px] sm:text-sm font-bold text-white">ADP</div>
+            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-1.5 sm:p-3 text-center">
+                <div className="text-lg sm:text-2xl">👥</div>
+                <div className="text-[7px] sm:text-xs font-bold text-white">ADP</div>
               </CardContent>
             </Card>
-            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
-              <CardContent className="p-2 sm:p-4 text-center">
-                <div className="text-xl sm:text-3xl mb-1">📅</div>
-                <div className="text-[9px] sm:text-sm font-bold text-white">UKG</div>
+            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-1.5 sm:p-3 text-center">
+                <div className="text-lg sm:text-2xl">📅</div>
+                <div className="text-[7px] sm:text-xs font-bold text-white">UKG</div>
               </CardContent>
             </Card>
-            <Card className="flex-shrink-0 w-[30%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/30">
-              <CardContent className="p-2 sm:p-4 text-center">
-                <div className="text-xl sm:text-3xl mb-1">💼</div>
-                <div className="text-[9px] sm:text-sm font-bold text-white">Paychex</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Benefits Grid - Horizontal scroll on mobile */}
-          <div className="flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-8 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory">
-            <Card className="flex-shrink-0 w-[70%] sm:w-auto snap-start bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
-              <CardContent className="p-3 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-4">
-                  <div className="text-xl sm:text-3xl">🔗</div>
-                  <div>
-                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300">Connect Fast</h3>
-                    <p className="text-[9px] sm:text-sm text-slate-400 hidden sm:block">One-click OAuth sync</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="flex-shrink-0 w-[70%] sm:w-auto snap-start bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
-              <CardContent className="p-3 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-4">
-                  <div className="text-xl sm:text-3xl">⚡</div>
-                  <div>
-                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300">Zero Entry</h3>
-                    <p className="text-[9px] sm:text-sm text-slate-400 hidden sm:block">Auto-sync everything</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="flex-shrink-0 w-[70%] sm:w-auto snap-start bg-gradient-to-br from-cyan-950/40 to-slate-900 border border-cyan-500/30">
-              <CardContent className="p-3 sm:p-6">
-                <div className="flex items-center gap-2 sm:gap-4">
-                  <div className="text-xl sm:text-3xl">🛡️</div>
-                  <div>
-                    <h3 className="text-xs sm:text-lg font-bold text-cyan-300">Your Data</h3>
-                    <p className="text-[9px] sm:text-sm text-slate-400 hidden sm:block">Complete control</p>
-                  </div>
-                </div>
+            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-1.5 sm:p-3 text-center">
+                <div className="text-lg sm:text-2xl">💼</div>
+                <div className="text-[7px] sm:text-xs font-bold text-white">Paychex</div>
               </CardContent>
             </Card>
           </div>
@@ -601,288 +486,127 @@ export default function Landing() {
           {/* Call to Action */}
           <div className="text-center">
             <Link href="/integrations">
-              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-xs sm:text-sm h-8 sm:h-10">
-                16 Integrations <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] text-[9px] sm:text-sm h-7 sm:h-9 px-3">
+                16+ Integrations <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* MARKUP COMPARISON - Show 1.45x vs 1.6x Advantage */}
-      <section className="py-16 bg-gradient-to-br from-green-950/20 via-background to-emerald-950/10 border-y border-green-500/20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-sm mb-4">
-              <DollarSign className="w-4 h-4 mr-2" /> Transparent Pricing
-            </Badge>
-            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-3 text-white">
-              Lower Markup = More Savings
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              While most staffing agencies in Tennessee charge 1.6x markup, <span className="text-green-400 font-bold">ORBIT charges just 1.45x</span> — saving you real money on every hour worked.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            {/* Industry Average */}
-            <Card className="bg-gradient-to-br from-red-950/40 to-slate-900 border-2 border-red-500/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-bl-lg">
-                INDUSTRY AVERAGE
-              </div>
-              <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-4 opacity-50">🏢</div>
-                <h3 className="text-2xl font-bold text-red-300 mb-2">Typical Agencies</h3>
-                <div className="text-5xl font-bold text-red-400 mb-4">1.6x</div>
-                <p className="text-slate-400 text-sm mb-6">Markup on Worker Pay Rate</p>
-                <div className="bg-slate-950/50 rounded-lg p-4 border border-red-900/30">
-                  <div className="text-xs text-slate-400 mb-2">Example: $20/hr worker</div>
-                  <div className="text-2xl font-bold text-white">
-                    $32.00<span className="text-sm text-slate-400">/hr</span>
-                  </div>
-                  <div className="text-xs text-slate-500 mt-1">You pay to agency</div>
-                </div>
+      {/* MARKUP COMPARISON - Compact mobile, full desktop */}
+      <section className="py-3 sm:py-10 bg-gradient-to-br from-green-950/20 via-background to-emerald-950/10 border-y border-green-500/20">
+        <div className="max-w-6xl mx-auto px-2 sm:px-6">
+          {/* Mobile: Compact summary */}
+          <div className="sm:hidden">
+            <div className="text-center mb-3">
+              <h2 className="text-sm font-bold text-white">Save Up to 35%</h2>
+              <p className="text-[9px] text-slate-400">1.45x markup vs industry 1.6x</p>
+            </div>
+            <div className="flex gap-2 mb-2">
+              <Card className="flex-1 bg-red-950/30 border-red-500/40">
+                <CardContent className="p-2 text-center">
+                  <div className="text-[8px] text-red-400">Others</div>
+                  <div className="text-lg font-bold text-red-400">1.6x</div>
+                  <div className="text-[8px] text-slate-400">$32/hr</div>
+                </CardContent>
+              </Card>
+              <Card className="flex-1 bg-green-950/30 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                <CardContent className="p-2 text-center">
+                  <div className="text-[8px] text-green-400">ORBIT</div>
+                  <div className="text-lg font-bold text-green-400">1.45x</div>
+                  <div className="text-[8px] text-green-300">$29/hr</div>
+                </CardContent>
+              </Card>
+            </div>
+            <Card className="bg-amber-500/10 border-amber-500/40 mb-2">
+              <CardContent className="p-2 text-center">
+                <div className="text-[9px] text-amber-400">Your Savings</div>
+                <div className="text-xl font-bold text-green-400">$3/hr · $6K/yr</div>
               </CardContent>
             </Card>
-
-            {/* ORBIT */}
-            <Card className="bg-gradient-to-br from-green-950/40 to-emerald-900/30 border-2 border-green-500/50 relative overflow-hidden shadow-[0_0_40px_rgba(34,197,94,0.2)]">
-              <div className="absolute top-0 right-0 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg flex items-center gap-1">
-                <CheckCircle2 className="w-3 h-3" /> ORBIT ADVANTAGE
-              </div>
-              <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-4">✨</div>
-                <h3 className="text-2xl font-bold text-green-300 mb-2">ORBIT Staffing OS</h3>
-                <div className="text-5xl font-bold text-green-400 mb-4">1.45x</div>
-                <p className="text-slate-400 text-sm mb-6">Lower Markup, Same Quality</p>
-                <div className="bg-slate-950/50 rounded-lg p-4 border border-green-500/30">
-                  <div className="text-xs text-slate-400 mb-2">Example: $20/hr worker</div>
-                  <div className="text-2xl font-bold text-green-400">
-                    $29.00<span className="text-sm text-slate-400">/hr</span>
-                  </div>
-                  <div className="text-xs text-green-500 mt-1 font-semibold">You pay to ORBIT</div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="text-center">
+              <Link href="/pricing">
+                <Button className="bg-green-600/80 hover:bg-green-600 text-white text-[9px] h-7 px-3 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
+                  See Full Breakdown <ArrowRight className="w-2.5 h-2.5 ml-1" />
+                </Button>
+              </Link>
+            </div>
           </div>
 
-          {/* Savings Callout */}
-          <Card className="bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-green-500/10 border-2 border-amber-500/30">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="text-center md:text-left">
-                  <div className="text-sm text-amber-400 font-semibold mb-2">YOUR SAVINGS PER HOUR</div>
-                  <div className="text-5xl font-bold text-amber-300 mb-2">
-                    $3.00<span className="text-2xl text-slate-400">/hr</span>
-                  </div>
-                  <div className="text-sm text-slate-400">
-                    On a $20/hr worker • <span className="text-green-400 font-semibold">10% cost reduction</span>
-                  </div>
-                </div>
-                <div className="h-px md:h-16 w-full md:w-px bg-gradient-to-r md:bg-gradient-to-b from-transparent via-amber-500/50 to-transparent"></div>
-                <div className="text-center md:text-right">
-                  <div className="text-sm text-amber-400 font-semibold mb-2">ANNUAL SAVINGS</div>
-                  <div className="text-4xl font-bold text-green-400 mb-2">
-                    $6,240<span className="text-xl text-slate-400">/yr</span>
-                  </div>
-                  <div className="text-sm text-slate-400">
-                    Per full-time worker (40 hrs/week × 52 weeks)
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="text-center mt-8 mb-12">
-            <p className="text-slate-400 text-sm mb-4">
-              <Lock className="w-4 h-4 inline mr-2 text-amber-500" />
-              Our 1.45x markup is <span className="text-amber-300 font-semibold">locked and transparent</span> — no hidden fees, no surprises.
-            </p>
-          </div>
-
-          {/* TOTAL COST SAVINGS BREAKDOWN */}
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-cyan-500/40 rounded-2xl p-8 mb-8">
+          {/* Desktop: Full comparison */}
+          <div className="hidden sm:block">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-white mb-3">But Wait — There's More Savings</h3>
-              <p className="text-lg text-slate-300 max-w-3xl mx-auto">
-                The 1.45x markup is just the beginning. When you factor in <span className="text-cyan-400 font-semibold">everything ORBIT replaces</span>, your real savings are <span className="text-green-400 font-bold text-xl">35-50%+ of total operating costs.</span>
-              </p>
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-sm mb-3">
+                <DollarSign className="w-4 h-4 mr-2" /> Transparent Pricing
+              </Badge>
+              <h2 className="text-3xl font-bold text-white mb-2">Lower Markup = More Savings</h2>
+              <p className="text-sm text-slate-400">ORBIT charges just 1.45x vs industry 1.6x</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              {/* Traditional Agency Costs */}
-              <div>
-                <h4 className="text-lg font-bold text-red-300 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">💸</span> Traditional Agency Monthly Costs
-                </h4>
-                <div className="space-y-2 bg-slate-950/50 rounded-lg p-4 border border-red-900/30">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Payroll processing service</span>
-                    <span className="text-white font-mono">$500-2,000</span>
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <Card className="bg-red-950/30 border-red-500/30">
+                <CardContent className="p-6 text-center">
+                  <div className="text-3xl mb-2">🏢</div>
+                  <h3 className="text-lg font-bold text-red-300 mb-1">Typical Agencies</h3>
+                  <div className="text-4xl font-bold text-red-400 mb-2">1.6x</div>
+                  <div className="bg-slate-950/50 rounded p-3 border border-red-900/30">
+                    <div className="text-xs text-slate-400">$20/hr worker = <span className="text-white font-bold">$32/hr</span></div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Time tracking software</span>
-                    <span className="text-white font-mono">$300-500</span>
+                </CardContent>
+              </Card>
+              <Card className="bg-green-950/30 border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.15)]">
+                <CardContent className="p-6 text-center">
+                  <div className="text-3xl mb-2">✨</div>
+                  <h3 className="text-lg font-bold text-green-300 mb-1">ORBIT</h3>
+                  <div className="text-4xl font-bold text-green-400 mb-2">1.45x</div>
+                  <div className="bg-slate-950/50 rounded p-3 border border-green-500/30">
+                    <div className="text-xs text-slate-400">$20/hr worker = <span className="text-green-400 font-bold">$29/hr</span></div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Scheduling software</span>
-                    <span className="text-white font-mono">$200-400</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">HR/compliance software</span>
-                    <span className="text-white font-mono">$300-600</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Office space rent</span>
-                    <span className="text-white font-mono">$1,500-3,000</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Office manager salary</span>
-                    <span className="text-white font-mono">$3,333-5,000</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Admin assistant salary</span>
-                    <span className="text-white font-mono">$2,500-3,333</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Accounting fees</span>
-                    <span className="text-white font-mono">$500-1,500</span>
-                  </div>
-                  <div className="flex justify-between text-sm border-t border-red-900/30 pt-2 mt-2">
-                    <span className="text-red-300 font-bold">TOTAL MONTHLY:</span>
-                    <span className="text-red-400 font-bold font-mono">$9,000-16,000</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-red-400">
-                    <span>ANNUAL:</span>
-                    <span className="font-mono">$108,000-192,000</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ORBIT Cost */}
-              <div>
-                <h4 className="text-lg font-bold text-green-300 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">✨</span> ORBIT All-In-One Cost
-                </h4>
-                <div className="space-y-4 bg-slate-950/50 rounded-lg p-4 border border-green-500/30">
-                  <div>
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-slate-400 text-sm">ORBIT Subscription</span>
-                      <span className="text-green-400 font-bold font-mono">$499/mo</span>
-                    </div>
-                    <ul className="text-xs text-slate-500 space-y-1 ml-4">
-                      <li>✓ Payroll processing included</li>
-                      <li>✓ Time tracking included</li>
-                      <li>✓ Scheduling included</li>
-                      <li>✓ Compliance tools included</li>
-                      <li>✓ No office needed</li>
-                      <li>✓ No office staff needed</li>
-                      <li>✓ Run everything from phone</li>
-                      <li>✓ Unlimited users</li>
-                    </ul>
-                  </div>
-                  <div className="flex justify-between text-sm border-t border-green-900/30 pt-2">
-                    <span className="text-green-300 font-bold">TOTAL MONTHLY:</span>
-                    <span className="text-green-400 font-bold font-mono">$499</span>
-                  </div>
-                  <div className="flex justify-between text-xs text-green-400">
-                    <span>ANNUAL:</span>
-                    <span className="font-mono">$5,988</span>
-                  </div>
-                </div>
-
-                <div className="mt-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-lg p-4 border-2 border-green-500/50">
-                  <div className="text-center">
-                    <div className="text-xs text-green-400 font-semibold mb-1">YOUR OPERATIONAL SAVINGS</div>
-                    <div className="text-4xl font-bold text-green-400 mb-1">
-                      $102K-186K<span className="text-lg text-slate-400">/year</span>
-                    </div>
-                    <div className="text-sm text-slate-300">That's real money back in your pocket</div>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Total Savings Summary */}
-            <Card className="bg-gradient-to-r from-purple-950/40 via-blue-950/40 to-cyan-950/40 border-2 border-cyan-500/50">
-              <CardContent className="p-6">
-                <h4 className="text-2xl font-bold text-white mb-6 text-center">Total Cost Savings Breakdown</h4>
-                <div className="grid md:grid-cols-3 gap-6 text-center">
-                  <div>
-                    <div className="text-xs text-cyan-400 font-semibold mb-2">Lower Markup Savings</div>
-                    <div className="text-4xl font-bold text-cyan-300 mb-1">~10%</div>
-                    <div className="text-xs text-slate-400">On billable labor costs</div>
-                  </div>
-                  <div className="border-l border-r border-cyan-900/30">
-                    <div className="text-xs text-green-400 font-semibold mb-2">Operational Cost Savings</div>
-                    <div className="text-4xl font-bold text-green-400 mb-1">20-35%</div>
-                    <div className="text-xs text-slate-400">Eliminated overhead</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-amber-400 font-semibold mb-2">TOTAL SAVINGS</div>
-                    <div className="text-5xl font-bold bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent mb-1">35-50%+</div>
-                    <div className="text-xs text-slate-400">Of your total costs</div>
-                  </div>
+            <Card className="bg-amber-500/10 border-amber-500/30 mb-6">
+              <CardContent className="p-4 flex justify-between items-center">
+                <div>
+                  <div className="text-xs text-amber-400">Per Hour Savings</div>
+                  <div className="text-2xl font-bold text-amber-300">$3.00</div>
                 </div>
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-slate-300 mb-4">
-                    For a <span className="text-white font-semibold">$500K/year agency</span>, that's <span className="text-green-400 font-bold">$175K-250K in annual savings</span> — enough to hire 3-5 more salespeople or expand to new markets.
-                  </p>
-                  <Button 
-                    onClick={() => setShowDemoForm(true)}
-                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-xs sm:text-lg px-3 sm:px-8 py-3 sm:py-6 h-auto inline-flex items-center justify-center flex-wrap gap-1 sm:gap-2"
-                    data-testid="button-calculate-savings"
-                  >
-                    <span>Calculate Your Exact Savings</span>
-                    <ArrowRight className="w-3 h-3 sm:w-5 sm:h-5 flex-shrink-0" />
-                  </Button>
+                <div className="text-right">
+                  <div className="text-xs text-amber-400">Annual Savings</div>
+                  <div className="text-2xl font-bold text-green-400">$6,240</div>
                 </div>
               </CardContent>
             </Card>
+
+            <div className="text-center">
+              <Button 
+                onClick={() => setShowDemoForm(true)}
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-sm px-6 py-3"
+                data-testid="button-calculate-savings"
+              >
+                Calculate Your Exact Savings <ArrowRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features - Collapsible */}
-      <section className="py-6 sm:py-8 bg-card/30 backdrop-blur-sm border-y border-border/30">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-1">End-to-End Staffing Lifecycle</h2>
-            <p className="text-muted-foreground text-xs sm:text-sm">Click to explore features. Complete control from recruitment through payroll.</p>
+      {/* Features - Collapsible compact */}
+      <section className="py-3 sm:py-6 bg-card/30 backdrop-blur-sm border-y border-border/30">
+        <div className="max-w-6xl mx-auto px-2 sm:px-6">
+          <div className="mb-2 sm:mb-4 text-center sm:text-left">
+            <h2 className="text-xs sm:text-xl font-bold">Full Staffing Lifecycle</h2>
           </div>
-
           <Accordion 
             items={[
-              {
-                title: "Recruit & Source",
-                icon: "👥",
-                description: "Multi-channel job posting, ATS, resume parsing, background checks, I-9 verification, reference checks, credential validation."
-              },
-              {
-                title: "Match & Place",
-                icon: "🎯",
-                description: "Smart candidate matching, client interviews, offer negotiation, assignment tracking, fast fulfillment in minutes not hours."
-              },
-              {
-                title: "Time & Payroll",
-                icon: "💰",
-                description: "Mobile timesheets, client approval workflows, payroll processing, tax withholding, W-2s, direct deposit, ORBIT Pay Card, and compliance reporting."
-              },
-              {
-                title: "Billing & Revenue",
-                icon: "📊",
-                description: "Automatic invoice generation, bill rate management, AR tracking, payment collections, P&L dashboards, margin analysis."
-              },
-              {
-                title: "Compliance & Risk",
-                icon: "🛡️",
-                description: "I-9 management, E-Verify, background screening, prevailing wage, workers' comp, tax filings (941, W-2), OSHA safety."
-              },
-              {
-                title: "Full Automation",
-                icon: "⚡",
-                description: "Zero manual entry. Rules-based workflows. Audit-ready. Everything logged. Multi-state tax handling. Real-time notifications."
-              }
+              { title: "Recruit", icon: "👥", description: "Job posting, ATS, background checks, I-9." },
+              { title: "Match", icon: "🎯", description: "Smart matching, interviews, assignments." },
+              { title: "Payroll", icon: "💰", description: "Timesheets, payroll, W-2s, Pay Card." },
+              { title: "Billing", icon: "📊", description: "Invoicing, AR, P&L dashboards." },
+              { title: "Compliance", icon: "🛡️", description: "I-9, E-Verify, workers' comp." },
+              { title: "Automation", icon: "⚡", description: "Zero entry, real-time sync." }
             ]}
           />
         </div>
@@ -1089,7 +813,7 @@ export default function Landing() {
               <p>© 2025 ORBIT Staffing. All rights reserved.</p>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="https://darkwavestudios.net" target="_blank" className="text-primary hover:text-primary/80 transition-colors font-bold">
+              <Link href="https://darkwavestudios.io" target="_blank" className="text-primary hover:text-primary/80 transition-colors font-bold">
                 DarkWave Studios →
               </Link>
               <Link href="/developer" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">

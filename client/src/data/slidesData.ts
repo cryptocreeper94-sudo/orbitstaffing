@@ -620,11 +620,11 @@ export const slidesData: Slide[] = [
       headline: 'Get in Touch',
       description: 'Ready to learn more? Our team is here to help.',
       bullets: [
-        'Sales: sales@darkwavestudios.com',
-        'Support: support@darkwavestudios.com',
+        'Sales: sales@darkwavestudios.io',
+        'Support: support@darkwavestudios.io',
         'Phone: 1-800-LOT-OPSPRO',
-        'Website: www.darkwavestudios.com',
-        'Demo: Schedule at darkwavestudios.com/demo'
+        'Website: www.darkwavestudios.io',
+        'Demo: Schedule at darkwavestudios.io/demo'
       ]
     }
   },

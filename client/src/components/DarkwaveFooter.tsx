@@ -32,14 +32,14 @@ export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot O
           <div className="flex flex-col items-center md:items-end">
             <h4 className="text-sm font-semibold text-cyan-300 mb-3">Quick Links</h4>
             <div className="space-y-1 text-xs text-slate-400">
-              <a href="https://darkwavestudios.net" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition">
-                DarkWave Studios →
+              <a href="https://darkwavestudios.io" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition block">
+                DarkWave Studios
               </a>
-              <a href="/products" className="hover:text-cyan-400 transition">
-                All Products →
+              <a href="/products" className="hover:text-cyan-400 transition block">
+                All Products
               </a>
-              <a href="/developer" className="hover:text-cyan-400 transition">
-                Developer Access →
+              <a href="/developer" className="hover:text-cyan-400 transition block">
+                Developer Access
               </a>
             </div>
           </div>
