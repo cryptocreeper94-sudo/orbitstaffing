@@ -56,16 +56,19 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ## Last Session Summary (December 3, 2025)
 
-### Current Version: v2.5.2 (Published)
+### Current Version: v2.5.3 (Publishing)
 
 ### What Was Accomplished
-1. **Desktop Layout Fix** - All multi-card sections now use `sm:grid` pattern to fill full width with zero white space on desktop
-2. **Pricing Card Alignment** - Buttons now align horizontally using flexbox with `h-full` cards and `flex-1` features
-3. **Orby Hallmark Redesign** - Mascot now presents the certificate in a side-by-side layout instead of covering it
-4. **Custom Orby Mascot** - Generated new mascot image with correct arm positioning (left up, right down) and transparent background using rembg
-5. **Slower Animations** - All bounce animations slowed to 6s for smoother, more elegant floating effect (hallmark Orby, AI chat Orby, weather button)
-6. **Weather Button Enhancement** - Temperature now displays integrated into the weather emoji button with localStorage persistence
-7. **Visual Alignment** - Weather button and Orby AI chat now sit on the same baseline (bottom-left and bottom-right)
+1. **Sid Partner Login Fixed** - SecureSandbox now calls correct endpoint (/api/auth/verify-admin-pin)
+2. **Sid Welcome Modal** - Time-based greeting, full system walkthrough, GetOrby.io mention, only shows on first login
+3. **Sandbox Access System** - Sid has full sandbox access (can interact with everything, nothing saves to production) - NOT read-only
+4. **Naming Update** - Changed from "Sidonie" to "Sid" throughout the system
+5. **Access Structure Clarified** - Only 2 users: Jason (dev, 0424) and Sid (partner, 4444) - admin roles for salespeople later
+
+### User Access Structure
+- **Jason (0424):** Developer, full access to everything
+- **Sid (4444):** Partner, full sandbox access (can interact, nothing saves to production)
+- **Future:** Admin roles will be created for salespeople
 
 ### Design Patterns Established
 - **Responsive sections:** `flex flex-row flex-nowrap ... sm:grid sm:grid-cols-N sm:overflow-visible`
@@ -74,11 +77,9 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 - **Float animations:** 6s duration for smooth, elegant movement
 
 ### Key Files Modified
-- `client/src/pages/Landing.tsx` - Desktop grid layouts
-- `client/src/components/FloatingWeatherButton.tsx` - Temperature display, positioning
-- `client/src/components/OrbitChatAssistant.tsx` - Animation timing, positioning
-- `client/src/components/OrbyHallmark.tsx` - Side-by-side layout redesign
-- `client/src/components/DarkwaveFooter.tsx` - Version stamp
+- `client/src/pages/SecureSandbox.tsx` - Fixed login endpoint, Sid user data, welcome modal
+- `server/routes.ts` - Updated Sid's role to partner with sandboxMode flag
+- `client/src/components/DarkwaveFooter.tsx` - Version stamp v2.5.3
 - `client/src/components/FeatureInventory.tsx` - Publish log entry
 
 ### Protocol Reminder

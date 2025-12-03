@@ -181,6 +181,7 @@ const PUBLISH_LOG = [
   { version: "2.5.0", date: "2025-12-01", time: "18:00 CST", notes: "Premium UI/UX maxed out, animations system" },
   { version: "2.5.1", date: "2025-12-03", time: "08:00 CST", notes: "Mobile carousel polish, emergency runbook access, link fixes" },
   { version: "2.5.2", date: "2025-12-03", time: "14:55 CST", notes: "Desktop full-width grids, Orby hallmark redesign, slower animations, weather temp display" },
+  { version: "2.5.3", date: "2025-12-03", time: "13:10 CST", notes: "Sid partner login with welcome modal, sandbox access system, GetOrby.io mention" },
 ];
 
 function FeatureInventory() {
@@ -341,7 +342,7 @@ function FeatureInventory() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div className="text-slate-400 text-[10px] sm:text-xs">
-          Powered by ORBIT v2.5.0
+          Powered by ORBIT v2.5.3
         </div>
         <Button 
           variant="outline" 
