@@ -2,10 +2,10 @@
  * Secure Sandbox - Multi-PIN Access System
  * 
  * PIN STRUCTURE (Only 2 users):
- * - 4444 = Sid (partner, full read-only preview access)
+ * - 4444 = Sid (partner, full sandbox access - can interact with everything, nothing saves to production)
  * - 0424 = Jason (developer, full access)
  * 
- * Access: Owner, Admin, Employee sandboxes for preview
+ * Access: Owner, Admin, Employee sandboxes for testing
  * Only accessible via /sandbox-secure (not publicly visible)
  */
 import React, { useState, useEffect } from 'react';
