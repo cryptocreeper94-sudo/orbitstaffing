@@ -678,30 +678,103 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Product Showcase - ORBIT Only */}
+      {/* Product Showcase - Dual Platform */}
       <section className="py-4 sm:py-8 border-t border-border/50 bg-slate-900/30">
         <div className="max-w-6xl mx-auto px-2 sm:px-6">
           <div className="mb-3 sm:mb-6 text-center">
-            <h2 className="text-sm sm:text-3xl font-bold font-heading mb-1">Product Showcase</h2>
-            <p className="text-muted-foreground text-[9px] sm:text-sm">Click to explore ORBIT Staffing OS features.</p>
+            <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/40 text-[9px] sm:text-sm mb-2">
+              <Zap className="w-2 h-2 sm:w-3 sm:h-3 mr-1" /> DarkWave Studios Ecosystem
+            </Badge>
+            <h2 className="text-sm sm:text-3xl font-bold font-heading mb-1">Dual Platform System</h2>
+            <p className="text-muted-foreground text-[9px] sm:text-sm">Two powerful platforms that work together seamlessly.</p>
           </div>
 
-          {/* ORBIT Staffing OS Showcase Only */}
-          <div className="space-y-4">
-            <Button 
-              onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
-              className="w-full h-10 sm:h-12 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-700 hover:to-violet-600 text-white font-semibold text-xs sm:text-lg"
-              data-testid="button-show-orbit-slideshow"
+          {/* Dual Platform Cards - Horizontal on mobile */}
+          <div className="relative mb-4">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
             >
-              {showOrbitSlideshow ? '▼ Hide' : '▶ View'} ORBIT Staffing OS Walkthrough
-            </Button>
-            {showOrbitSlideshow && (
+              {/* ORBIT Staffing OS */}
+              <div style={{ flex: '0 0 260px', minWidth: '260px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border-violet-500/50 hover:border-violet-400/80 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">
+                  <CardContent className="p-3 sm:p-6">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                      <div className="text-2xl sm:text-4xl">🪐</div>
+                      <div>
+                        <h3 className="text-sm sm:text-xl font-bold text-violet-200">ORBIT Staffing OS</h3>
+                        <p className="text-[8px] sm:text-xs text-violet-400">Full-Cycle Workforce Management</p>
+                      </div>
+                    </div>
+                    <ul className="space-y-1 mb-3 sm:mb-4 text-[8px] sm:text-xs text-slate-300">
+                      <li>✓ Recruit → Match → Payroll</li>
+                      <li>✓ Time & Attendance</li>
+                      <li>✓ Compliance & I-9</li>
+                      <li>✓ Invoicing & Billing</li>
+                    </ul>
+                    <Button 
+                      onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
+                      className="w-full h-8 sm:h-10 bg-violet-600 hover:bg-violet-700 text-white text-[10px] sm:text-sm"
+                      data-testid="button-show-orbit-slideshow"
+                    >
+                      {showOrbitSlideshow ? '▼ Hide' : '▶ View'} Walkthrough
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Orby Command Center */}
+              <div style={{ flex: '0 0 260px', minWidth: '260px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <Card className="h-full bg-gradient-to-br from-cyan-900/40 to-blue-900/30 border-cyan-500/50 hover:border-cyan-400/80 transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+                  <CardContent className="p-3 sm:p-6">
+                    <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                      <div className="text-2xl sm:text-4xl">🎯</div>
+                      <div>
+                        <h3 className="text-sm sm:text-xl font-bold text-cyan-200">Orby Command Center</h3>
+                        <p className="text-[8px] sm:text-xs text-cyan-400">Real-Time Venue Operations</p>
+                      </div>
+                    </div>
+                    <ul className="space-y-1 mb-3 sm:mb-4 text-[8px] sm:text-xs text-slate-300">
+                      <li>✓ Emergency Command</li>
+                      <li>✓ Inventory Tracking + AI Scanner</li>
+                      <li>✓ Team Communications</li>
+                      <li>✓ Compliance Monitoring</li>
+                    </ul>
+                    <a 
+                      href="https://getorby.io" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-full h-8 sm:h-10 bg-cyan-600 hover:bg-cyan-700 text-white text-[10px] sm:text-sm rounded-md flex items-center justify-center font-medium"
+                      data-testid="link-orby-command"
+                    >
+                      Visit getorby.io →
+                    </a>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+            {/* Scroll indicator - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-slate-900/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
+          </div>
+
+          {/* ORBIT Slideshow (expandable) */}
+          {showOrbitSlideshow && (
+            <div className="mt-4">
               <HomeSlideshow 
                 slides={orbitSlides as any} 
                 title="ORBIT Slides"
                 product="ORBIT Staffing OS"
               />
-            )}
+            </div>
+          )}
+
+          {/* Integration Note */}
+          <div className="text-center mt-4 sm:mt-6 p-3 rounded-lg bg-gradient-to-r from-violet-500/10 via-cyan-500/10 to-violet-500/10 border border-cyan-500/20">
+            <p className="text-[9px] sm:text-sm text-slate-300">
+              <span className="text-cyan-400 font-semibold">Seamless Integration:</span> Workers from ORBIT sync directly with Orby venue operations. One ecosystem, complete control.
+            </p>
           </div>
         </div>
       </section>
