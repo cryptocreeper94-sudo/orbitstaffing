@@ -179,6 +179,7 @@ const PUBLISH_LOG = [
   { version: "2.3.0", date: "2025-11-28", time: "11:00 CST", notes: "ORBIT Pay Card waitlist, Orby AI assistant" },
   { version: "2.4.0", date: "2025-11-30", time: "13:00 CST", notes: "Sandbox mode, hallmark system" },
   { version: "2.5.0", date: "2025-12-01", time: "18:00 CST", notes: "Premium UI/UX maxed out, animations system" },
+  { version: "2.5.1", date: "2025-12-03", time: "08:00 CST", notes: "Mobile carousel polish, emergency runbook access, link fixes" },
 ];
 
 function FeatureInventory() {

@@ -2428,6 +2428,16 @@ export default function DeveloperPanel() {
               <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Report Bug</span>
             </button>
 
+            {/* Emergency Runbook Button - Quick Access to Contingency Plans */}
+            <button
+              onClick={() => navigateTo('/admin?tab=contingency')}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-red-900/50 to-slate-800 border border-red-600/50 hover:border-red-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-emergency-runbook"
+            >
+              <Scale className="w-5 h-5 md:w-6 md:h-6 text-red-400 group-hover:text-red-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Emergency</span>
+            </button>
+
             {/* Talent Exchange Button */}
             <button
               onClick={() => navigateTo('/talent-exchange')}
