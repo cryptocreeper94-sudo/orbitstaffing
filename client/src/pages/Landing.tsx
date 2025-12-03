@@ -202,38 +202,38 @@ export default function Landing() {
             <h2 className="text-xs sm:text-xl font-bold text-cyan-300">Try Sandbox</h2>
           </div>
           <div className="relative">
-            <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }} className="scrollbar-hide snap-x snap-mandatory">
-              <Link href="/equipment-tracking" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">📦</div>
-                <div className="font-semibold text-white text-[9px]">Gear</div>
+            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
+              <Link href="/equipment-tracking" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">📦</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">Gear</div>
               </Link>
-              <Link href="/gps-clock-in" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">📍</div>
-                <div className="font-semibold text-white text-[9px]">GPS</div>
+              <Link href="/gps-clock-in" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">📍</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">GPS</div>
               </Link>
-              <Link href="/payroll-processing" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">💰</div>
-                <div className="font-semibold text-white text-[9px]">Pay</div>
+              <Link href="/payroll-processing" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">💰</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">Pay</div>
               </Link>
-              <Link href="/worker-availability" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">📅</div>
-                <div className="font-semibold text-white text-[9px]">Sched</div>
+              <Link href="/worker-availability" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">📅</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">Sched</div>
               </Link>
-              <Link href="/admin/compliance" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">✅</div>
-                <div className="font-semibold text-white text-[9px]">Comply</div>
+              <Link href="/admin/compliance" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">✅</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">Comply</div>
               </Link>
-              <Link href="/admin/payroll-dashboard" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">🧾</div>
-                <div className="font-semibold text-white text-[9px]">Invoice</div>
+              <Link href="/admin/payroll-dashboard" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">🧾</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">Invoice</div>
               </Link>
-              <Link href="/crm" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">📇</div>
-                <div className="font-semibold text-white text-[9px]">CRM</div>
+              <Link href="/crm" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">📇</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">CRM</div>
               </Link>
-              <Link href="/features" style={{ flex: '0 0 70px', minWidth: '70px' }} className="snap-start p-2 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl mb-0.5">📊</div>
-                <div className="font-semibold text-white text-[9px]">More</div>
+              <Link href="/features" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
+                <div className="text-xl sm:text-2xl mb-0.5">📊</div>
+                <div className="font-semibold text-white text-[9px] sm:text-xs">More</div>
               </Link>
             </div>
             {/* Scroll indicator arrow - mobile only */}
@@ -341,12 +341,9 @@ export default function Landing() {
           </div>
 
           <div className="relative">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
-            >
+            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
               {/* Business Owner Login */}
-              <Link href="/admin" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+              <Link href="/admin" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-violet-400/50 hover:border-violet-300/80 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 transition-all cursor-pointer shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
                   <CardContent className="p-2 sm:p-4 text-center">
                     <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
@@ -359,7 +356,7 @@ export default function Landing() {
               </Link>
 
               {/* Customer/Client Login */}
-              <Link href="/worker" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+              <Link href="/worker" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-blue-500/50 hover:border-blue-400/80 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
                   <CardContent className="p-2 sm:p-4 text-center">
                     <div className="text-xl sm:text-3xl mb-0.5">👥</div>
@@ -372,7 +369,7 @@ export default function Landing() {
               </Link>
 
               {/* Employee Self-Service */}
-              <Link href="/employee-hub" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+              <Link href="/employee-hub" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-emerald-500/50 hover:border-emerald-400/80 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
                   <CardContent className="p-2 sm:p-4 text-center">
                     <div className="text-xl sm:text-3xl mb-0.5">📋</div>
@@ -385,7 +382,7 @@ export default function Landing() {
               </Link>
 
               {/* Admin Access */}
-              <Link href="/developer" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+              <Link href="/developer" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-cyan-500/50 hover:border-cyan-400/80 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
                   <CardContent className="p-2 sm:p-4 text-center">
                     <div className="text-xl sm:text-3xl mb-0.5">⚙️</div>
@@ -440,11 +437,8 @@ export default function Landing() {
 
           {/* Benefit Cards - Horizontal Carousel on mobile */}
           <div className="relative mb-4 sm:mb-8">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
-            >
-              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
+              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="⚡"
                   title="Automate"
@@ -452,7 +446,7 @@ export default function Landing() {
                   onClick={() => setSelectedBenefit("automate")}
                 />
               </div>
-              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="👥"
                   title="Retain"
@@ -460,7 +454,7 @@ export default function Landing() {
                   onClick={() => setSelectedBenefit("workers")}
                 />
               </div>
-              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="💰"
                   title="Save"
@@ -468,7 +462,7 @@ export default function Landing() {
                   onClick={() => setSelectedBenefit("money")}
                 />
               </div>
-              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="📈"
                   title="Scale"
@@ -645,12 +639,9 @@ export default function Landing() {
             <h2 className="text-xs sm:text-xl font-bold">Full Staffing Lifecycle</h2>
           </div>
           
-          {/* Horizontal Carousel on all screens */}
+          {/* Horizontal Carousel on mobile, full-width grid on desktop */}
           <div className="relative">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="sm:gap-4 sm:pr-0 snap-x snap-mandatory scrollbar-hide"
-            >
+            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-6 sm:gap-3 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
               {[
                 { title: "Recruit", icon: "👥", description: "Job posting, ATS, background checks, I-9." },
                 { title: "Match", icon: "🎯", description: "Smart matching, interviews, assignments." },
@@ -659,7 +650,7 @@ export default function Landing() {
                 { title: "Comply", icon: "🛡️", description: "I-9, E-Verify, workers' comp." },
                 { title: "Auto", icon: "⚡", description: "Zero entry, real-time sync." }
               ].map((item, idx) => (
-                <div key={idx} style={{ flex: '0 0 120px', minWidth: '120px' }} className="sm:flex-1 sm:min-w-[140px] snap-start">
+                <div key={idx} className="flex-shrink-0 w-[120px] sm:w-auto snap-start">
                   <Card className="h-full bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/50 transition-all">
                     <CardContent className="p-2 sm:p-4 text-center">
                       <div className="text-2xl sm:text-3xl mb-1">{item.icon}</div>
@@ -689,14 +680,11 @@ export default function Landing() {
             <p className="text-muted-foreground text-[9px] sm:text-sm">Two powerful platforms that work together seamlessly.</p>
           </div>
 
-          {/* Dual Platform Cards - Horizontal on mobile */}
+          {/* Dual Platform Cards - Horizontal on mobile, full-width on desktop */}
           <div className="relative mb-4">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
-            >
+            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
               {/* ORBIT Staffing OS */}
-              <div style={{ flex: '0 0 260px', minWidth: '260px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+              <div className="flex-shrink-0 w-[260px] sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border-violet-500/50 hover:border-violet-400/80 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">
                   <CardContent className="p-3 sm:p-6 flex flex-col h-full">
                     <div className="flex items-center gap-2 mb-2 sm:mb-3">
@@ -724,7 +712,7 @@ export default function Landing() {
               </div>
 
               {/* Orby Command Center */}
-              <div style={{ flex: '0 0 260px', minWidth: '260px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+              <div className="flex-shrink-0 w-[260px] sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-cyan-900/40 to-blue-900/30 border-cyan-500/50 hover:border-cyan-400/80 transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]">
                   <CardContent className="p-3 sm:p-6 flex flex-col h-full">
                     <div className="flex items-center gap-2 mb-2 sm:mb-3">
@@ -787,11 +775,8 @@ export default function Landing() {
 
           {/* Mobile: Horizontal Carousel */}
           <div className="relative sm:hidden">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="snap-x snap-mandatory scrollbar-hide"
-            >
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-10 scrollbar-hide snap-x snap-mandatory">
+              <div className="flex-shrink-0 w-[200px] snap-start">
                 <PricingCard 
                   tier="Starter"
                   price="$39"
@@ -808,7 +793,7 @@ export default function Landing() {
                   cta="Get Started Free"
                 />
               </div>
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+              <div className="flex-shrink-0 w-[200px] snap-start">
                 <PricingCard 
                   tier="Growth"
                   price="$99"
@@ -827,7 +812,7 @@ export default function Landing() {
                   featured
                 />
               </div>
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+              <div className="flex-shrink-0 w-[200px] snap-start">
                 <PricingCard 
                   tier="Professional"
                   price="$249"
@@ -845,7 +830,7 @@ export default function Landing() {
                   cta="Schedule Demo"
                 />
               </div>
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+              <div className="flex-shrink-0 w-[200px] snap-start">
                 <PricingCard 
                   tier="Enterprise"
                   price="Custom"
@@ -946,13 +931,10 @@ export default function Landing() {
             </Link>
           </div>
 
-          {/* Pricing Info - Horizontal Carousel on mobile */}
+          {/* Pricing Info - Horizontal Carousel on mobile, full-width grid on desktop */}
           <div className="relative mt-6 sm:mt-12">
-            <div 
-              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
-              className="sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
-            >
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
+              <div className="flex-shrink-0 w-[200px] sm:w-auto snap-start">
                 <Card className="h-full bg-card/50 border-border/50">
                   <CardContent className="p-3 sm:pt-6">
                     <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-3">💰 Fixed Monthly</h3>
@@ -963,7 +945,7 @@ export default function Landing() {
                   </CardContent>
                 </Card>
               </div>
-              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+              <div className="flex-shrink-0 w-[200px] sm:w-auto snap-start">
                 <Card className="h-full bg-card/50 border-border/50">
                   <CardContent className="p-3 sm:pt-6">
                     <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-3">📈 Revenue Share</h3>
