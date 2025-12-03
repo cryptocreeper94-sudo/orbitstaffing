@@ -162,28 +162,28 @@ export default function Landing() {
             <p className="text-[9px] sm:text-sm text-muted-foreground hidden sm:block">Two-way job marketplace</p>
           </div>
           {/* Mobile: Horizontal carousel | Desktop: 6-col grid */}
-          <div className="flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
-            <Link href="/jobs" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="link-job-board">
+          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            <Link href="/jobs" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-job-board">
               <div className="text-xl sm:text-3xl mb-0.5">💼</div>
               <div className="font-semibold text-white text-[9px] sm:text-sm">Jobs</div>
             </Link>
-            <Link href="/talent-pool" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="link-talent-pool">
+            <Link href="/talent-pool" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-talent-pool">
               <div className="text-xl sm:text-3xl mb-0.5">⭐</div>
               <div className="font-semibold text-white text-[9px] sm:text-sm">Talent</div>
             </Link>
-            <Link href="/employer/register" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="link-employer-register">
+            <Link href="/employer/register" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-employer-register">
               <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
               <div className="font-semibold text-white text-[9px] sm:text-sm">Post</div>
             </Link>
-            <Link href="/apply" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="link-apply">
+            <Link href="/apply" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-apply">
               <div className="text-xl sm:text-3xl mb-0.5">👷</div>
               <div className="font-semibold text-white text-[9px] sm:text-sm">Apply</div>
             </Link>
-            <Link href="/employee-hub" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]" data-testid="link-employee-hub">
+            <Link href="/employee-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-employee-hub">
               <div className="text-xl sm:text-3xl mb-0.5">🧑‍💼</div>
               <div className="font-semibold text-white text-[9px] sm:text-sm">Hub</div>
             </Link>
-            <Link href="/owner-hub" className="flex-shrink-0 w-[28%] sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]" data-testid="link-owner-hub">
+            <Link href="/owner-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-owner-hub">
               <div className="text-xl sm:text-3xl mb-0.5">👔</div>
               <div className="font-semibold text-white text-[9px] sm:text-sm">Owner</div>
             </Link>
@@ -237,9 +237,9 @@ export default function Landing() {
           </div>
           
           {/* Mobile: Horizontal carousel | Desktop: 3-col grid */}
-          <div className="flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
-            <Link href="/hallmark-seal" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-hallmarks">
+          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-3 gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            <Link href="/hallmark-seal" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-hallmarks">
                 <CardContent className="p-2 sm:p-4">
                   <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔐</div>
                   <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Hallmarks</h3>
@@ -248,8 +248,8 @@ export default function Landing() {
               </Card>
             </Link>
             
-            <Link href="/crm" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-crm">
+            <Link href="/crm" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crm">
                 <CardContent className="p-2 sm:p-4">
                   <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📇</div>
                   <h3 className="text-[9px] sm:text-sm font-bold text-green-200">CRM</h3>
@@ -258,8 +258,8 @@ export default function Landing() {
               </Card>
             </Link>
             
-            <Link href="/pay-card" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-pay-card">
+            <Link href="/pay-card" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-pay-card">
                 <CardContent className="p-2 sm:p-4">
                   <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">💳</div>
                   <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Pay Card</h3>
@@ -268,8 +268,8 @@ export default function Landing() {
               </Card>
             </Link>
             
-            <Link href="/marketing-hub" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-marketing">
+            <Link href="/marketing-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-marketing">
                 <CardContent className="p-2 sm:p-4">
                   <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📢</div>
                   <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Marketing</h3>
@@ -278,8 +278,8 @@ export default function Landing() {
               </Card>
             </Link>
             
-            <Link href="/talent-exchange" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-exchange">
+            <Link href="/talent-exchange" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-exchange">
                 <CardContent className="p-2 sm:p-4">
                   <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔄</div>
                   <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Exchange</h3>
@@ -288,8 +288,8 @@ export default function Landing() {
               </Card>
             </Link>
             
-            <Link href="/crypto-wallet" className="flex-shrink-0 w-[40%] sm:w-auto snap-start">
-              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:shadow-[0_0_20px_rgba(34,197,94,0.3)]" data-testid="card-crypto">
+            <Link href="/crypto-wallet" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
+              <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crypto">
                 <CardContent className="p-2 sm:p-4">
                   <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">⛓️</div>
                   <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Crypto</h3>
@@ -439,11 +439,11 @@ export default function Landing() {
           </div>
 
           {/* Stats - Compact horizontal scroll on mobile */}
-          <div className="flex sm:grid sm:grid-cols-4 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory">
-            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="35%" label="Savings" /></div>
-            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="2hrs" label="Onboard" /></div>
-            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="$0" label="Setup" /></div>
-            <div className="flex-shrink-0 w-[45%] sm:w-auto snap-start"><StatCard number="24/7" label="Support" /></div>
+          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-4 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+            <div className="flex-shrink-0 basis-[45%] min-w-[45%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start"><StatCard number="35%" label="Savings" /></div>
+            <div className="flex-shrink-0 basis-[45%] min-w-[45%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start"><StatCard number="2hrs" label="Onboard" /></div>
+            <div className="flex-shrink-0 basis-[45%] min-w-[45%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start"><StatCard number="$0" label="Setup" /></div>
+            <div className="flex-shrink-0 basis-[45%] min-w-[45%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start"><StatCard number="24/7" label="Support" /></div>
           </div>
         </div>
       </section>
@@ -456,7 +456,7 @@ export default function Landing() {
           </div>
 
           {/* Integration Logos - Horizontal scroll with sparkle */}
-          <div className="flex sm:grid sm:grid-cols-4 gap-1.5 sm:gap-3 mb-2 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
+          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-4 gap-1.5 sm:gap-3 mb-2 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
             <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
               <CardContent className="p-1.5 sm:p-3 text-center">
                 <div className="text-lg sm:text-2xl">📊</div>
