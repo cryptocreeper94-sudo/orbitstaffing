@@ -64,6 +64,7 @@ import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
+import { WeatherRadarModal } from "@/components/WeatherRadarModal";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
@@ -161,6 +162,8 @@ function Router() {
 }
 
 export default function App() {
+  const [isRadarOpen, setIsRadarOpen] = useState(false);
+  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -172,7 +175,8 @@ export default function App() {
               <div className="sandbox-banner-spacer" />
               <Router />
               <FloatingHomeButton />
-              <FloatingWeatherButton />
+              <FloatingWeatherButton onOpenRadar={() => setIsRadarOpen(true)} />
+              <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
               <OrbitChatAssistant />
               <Toaster />
             </TutorialProvider>

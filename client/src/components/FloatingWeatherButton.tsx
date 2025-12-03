@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, X, Thermometer, Droplets, Wind, RefreshCw } from "lucide-react";
+import { MapPin, X, Thermometer, Droplets, Wind, RefreshCw, Radar, Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -28,49 +28,67 @@ interface GeoLocation {
   country: string;
 }
 
-const WEATHER_ICONS: Record<string, string> = {
-  sunny: '/weather-icons/sunny.png',
-  'partly-cloudy': '/weather-icons/partly-cloudy.png',
-  cloudy: '/weather-icons/cloudy.png',
-  rainy: '/weather-icons/rainy.png',
-  thunderstorm: '/weather-icons/thunderstorm.png',
-  snowy: '/weather-icons/snowy.png',
-  foggy: '/weather-icons/foggy.png',
-  night: '/weather-icons/night.png',
+const WEATHER_EMOJIS: Record<string, string> = {
+  sunny: '☀️',
+  'partly-cloudy': '⛅',
+  cloudy: '☁️',
+  rainy: '🌧️',
+  thunderstorm: '⛈️',
+  snowy: '❄️',
+  foggy: '🌫️',
+  night: '🌙',
+  'night-cloudy': '🌥️',
+  windy: '💨',
+  tornado: '🌪️',
+  hot: '🔥',
+  cold: '🥶',
 };
 
-const WEATHER_GLOWS: Record<string, { color: string; shadow: string }> = {
+const WEATHER_GLOWS: Record<string, { color: string; shadow: string; bg: string }> = {
   sunny: { 
-    color: 'rgba(251, 191, 36, 0.6)', 
-    shadow: '0 0 30px rgba(251, 191, 36, 0.5), 0 0 60px rgba(251, 191, 36, 0.3)' 
+    color: 'rgba(251, 191, 36, 0.8)', 
+    shadow: '0 0 40px rgba(251, 191, 36, 0.6), 0 0 80px rgba(251, 191, 36, 0.3)',
+    bg: 'from-amber-500/20 to-orange-500/10'
   },
   'partly-cloudy': { 
-    color: 'rgba(251, 191, 36, 0.4)', 
-    shadow: '0 0 25px rgba(251, 191, 36, 0.4), 0 0 50px rgba(148, 163, 184, 0.3)' 
+    color: 'rgba(251, 191, 36, 0.5)', 
+    shadow: '0 0 30px rgba(251, 191, 36, 0.4), 0 0 60px rgba(148, 163, 184, 0.3)',
+    bg: 'from-amber-400/15 to-slate-400/10'
   },
   cloudy: { 
-    color: 'rgba(148, 163, 184, 0.5)', 
-    shadow: '0 0 25px rgba(148, 163, 184, 0.4), 0 0 50px rgba(100, 116, 139, 0.3)' 
+    color: 'rgba(148, 163, 184, 0.6)', 
+    shadow: '0 0 30px rgba(148, 163, 184, 0.5), 0 0 60px rgba(100, 116, 139, 0.3)',
+    bg: 'from-slate-400/20 to-slate-600/10'
   },
   rainy: { 
-    color: 'rgba(59, 130, 246, 0.5)', 
-    shadow: '0 0 25px rgba(59, 130, 246, 0.4), 0 0 50px rgba(37, 99, 235, 0.3)' 
+    color: 'rgba(59, 130, 246, 0.6)', 
+    shadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(37, 99, 235, 0.3)',
+    bg: 'from-blue-500/20 to-blue-700/10'
   },
   thunderstorm: { 
-    color: 'rgba(234, 179, 8, 0.6)', 
-    shadow: '0 0 30px rgba(234, 179, 8, 0.5), 0 0 60px rgba(139, 92, 246, 0.4)' 
+    color: 'rgba(234, 179, 8, 0.7)', 
+    shadow: '0 0 40px rgba(234, 179, 8, 0.6), 0 0 80px rgba(139, 92, 246, 0.4)',
+    bg: 'from-yellow-500/20 to-purple-600/15'
   },
   snowy: { 
-    color: 'rgba(226, 232, 240, 0.6)', 
-    shadow: '0 0 30px rgba(226, 232, 240, 0.5), 0 0 60px rgba(186, 230, 253, 0.4)' 
+    color: 'rgba(226, 232, 240, 0.7)', 
+    shadow: '0 0 35px rgba(226, 232, 240, 0.6), 0 0 70px rgba(186, 230, 253, 0.4)',
+    bg: 'from-slate-200/20 to-cyan-200/10'
   },
   foggy: { 
-    color: 'rgba(148, 163, 184, 0.4)', 
-    shadow: '0 0 25px rgba(148, 163, 184, 0.3), 0 0 50px rgba(100, 116, 139, 0.2)' 
+    color: 'rgba(148, 163, 184, 0.5)', 
+    shadow: '0 0 25px rgba(148, 163, 184, 0.4), 0 0 50px rgba(100, 116, 139, 0.2)',
+    bg: 'from-slate-400/15 to-slate-500/10'
   },
   night: { 
-    color: 'rgba(139, 92, 246, 0.5)', 
-    shadow: '0 0 30px rgba(139, 92, 246, 0.4), 0 0 60px rgba(99, 102, 241, 0.3)' 
+    color: 'rgba(139, 92, 246, 0.6)', 
+    shadow: '0 0 35px rgba(139, 92, 246, 0.5), 0 0 70px rgba(99, 102, 241, 0.3)',
+    bg: 'from-purple-500/20 to-indigo-600/15'
+  },
+  tornado: {
+    color: 'rgba(220, 38, 38, 0.7)',
+    shadow: '0 0 40px rgba(220, 38, 38, 0.6), 0 0 80px rgba(127, 29, 29, 0.4)',
+    bg: 'from-red-500/20 to-red-800/15'
   },
 };
 
@@ -83,10 +101,16 @@ const CONDITION_LABELS: Record<string, string> = {
   snowy: 'Snowy',
   foggy: 'Foggy',
   night: 'Clear Night',
+  'night-cloudy': 'Cloudy Night',
   clear: 'Clear',
+  tornado: 'Severe Weather',
 };
 
-export function FloatingWeatherButton() {
+interface FloatingWeatherButtonProps {
+  onOpenRadar?: () => void;
+}
+
+export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showZipInput, setShowZipInput] = useState(false);
   const [zipCode, setZipCode] = useState(() => {
@@ -100,7 +124,11 @@ export function FloatingWeatherButton() {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('orbit-weather-coords');
       if (saved) {
-        return JSON.parse(saved);
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return null;
+        }
       }
     }
     return null;
@@ -121,7 +149,7 @@ export function FloatingWeatherButton() {
       return response.json();
     },
     enabled: !!zipCode && zipCode.length === 5,
-    staleTime: 1000 * 60 * 60 * 24, // Cache for 24 hours
+    staleTime: 1000 * 60 * 60 * 24,
   });
 
   useEffect(() => {
@@ -142,8 +170,8 @@ export function FloatingWeatherButton() {
       return response.json();
     },
     enabled: !!coordinates,
-    staleTime: 1000 * 60 * 10, // 10 minute cache
-    refetchInterval: 1000 * 60 * 30, // Refresh every 30 minutes
+    staleTime: 1000 * 60 * 10,
+    refetchInterval: 1000 * 60 * 30,
   });
 
   const handleZipSubmit = (e: React.FormEvent) => {
@@ -152,6 +180,7 @@ export function FloatingWeatherButton() {
       setZipCode(tempZip);
       localStorage.setItem('orbit-weather-zip', tempZip);
       setShowZipInput(false);
+      setTempZip('');
     }
   };
 
@@ -162,24 +191,29 @@ export function FloatingWeatherButton() {
 
   const iconType = weatherData?.icon || 'sunny';
   const glow = WEATHER_GLOWS[iconType] || WEATHER_GLOWS.sunny;
+  const emoji = WEATHER_EMOJIS[iconType] || '☀️';
   const isLoading = geoLoading || weatherLoading;
 
   if (!zipCode) {
     return (
-      <div className="fixed bottom-3 left-4 z-[140]" data-testid="floating-weather-container">
+      <div className="fixed bottom-4 left-4 z-[140]" data-testid="floating-weather-container">
         <AnimatePresence>
           {showZipInput ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 10 }}
-              className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600/50 rounded-2xl p-4 shadow-xl w-64"
+              className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-lg border border-cyan-500/30 rounded-2xl p-4 shadow-2xl w-64"
+              style={{ boxShadow: '0 0 30px rgba(6, 182, 212, 0.2)' }}
             >
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-white">Set Location</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🌤️</span>
+                  <span className="text-sm font-medium text-white">Set Your Location</span>
+                </div>
                 <button 
                   onClick={() => setShowZipInput(false)}
-                  className="text-slate-400 hover:text-white"
+                  className="text-slate-400 hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -189,30 +223,42 @@ export function FloatingWeatherButton() {
                   value={tempZip}
                   onChange={(e) => setTempZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
                   placeholder="Enter ZIP code"
-                  className="bg-slate-700/50 border-slate-600 text-white"
+                  className="bg-slate-700/50 border-cyan-500/30 text-white text-center text-lg tracking-widest"
                   data-testid="input-weather-zip"
+                  autoFocus
                 />
                 <Button 
                   type="submit" 
-                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-600"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500"
                   disabled={tempZip.length !== 5}
                   data-testid="button-weather-submit"
                 >
                   <MapPin className="w-4 h-4 mr-2" />
-                  Set Location
+                  Get Weather
                 </Button>
               </form>
             </motion.div>
           ) : (
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowZipInput(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600/50 rounded-full text-slate-300 hover:text-white transition-colors shadow-lg"
+              className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 backdrop-blur-sm border border-cyan-500/40 shadow-lg flex items-center justify-center"
+              style={{ boxShadow: '0 0 25px rgba(6, 182, 212, 0.3)' }}
               data-testid="button-weather-setup"
             >
-              <MapPin className="w-4 h-4" />
-              <span className="text-sm">Add Weather</span>
+              <motion.span 
+                className="text-3xl"
+                animate={{ y: [0, -3, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                🌤️
+              </motion.span>
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-lg">
+                +
+              </span>
             </motion.button>
           )}
         </AnimatePresence>
@@ -221,94 +267,100 @@ export function FloatingWeatherButton() {
   }
 
   return (
-    <div className="fixed bottom-3 left-4 z-[140]" data-testid="floating-weather-container">
+    <div className="fixed bottom-4 left-4 z-[140]" data-testid="floating-weather-container">
       <AnimatePresence>
         {isExpanded && weatherData && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            className="absolute bottom-20 left-0 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600/50 rounded-2xl p-4 shadow-xl w-72"
-            style={{ boxShadow: glow.shadow }}
+            className="absolute bottom-16 left-0 bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-lg border border-cyan-500/30 rounded-xl p-3 shadow-2xl"
+            style={{ boxShadow: glow.shadow, width: 'calc(100vw - 32px)', maxWidth: '320px' }}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-cyan-400" />
-                  <span className="text-sm text-white font-medium truncate max-w-[180px]">{locationName}</span>
-                </div>
-                <p className="text-xs text-slate-400 mt-1">
-                  {CONDITION_LABELS[weatherData.condition] || weatherData.condition}
-                </p>
+            {/* Header Row - Location & Controls */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                <MapPin className="w-3 h-3 text-cyan-400 flex-shrink-0" />
+                <span className="text-xs text-white font-medium truncate">{locationName}</span>
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-1 flex-shrink-0">
                 <button 
                   onClick={handleRefresh}
-                  className="text-slate-400 hover:text-cyan-400 transition-colors p-1"
+                  className="text-slate-400 hover:text-cyan-400 transition-colors p-0.5"
                   data-testid="button-weather-refresh"
                 >
-                  <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                 </button>
                 <button 
                   onClick={() => setIsExpanded(false)}
-                  className="text-slate-400 hover:text-white p-1"
+                  className="text-slate-400 hover:text-white p-0.5"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <motion.img
-                  src={WEATHER_ICONS[iconType]}
-                  alt={weatherData.condition}
-                  className="w-20 h-20 object-contain"
-                  animate={{ 
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  style={{ filter: `drop-shadow(${glow.shadow})` }}
-                />
+            {/* Main Weather Row - Icon, Temp, Stats all horizontal */}
+            <div className="flex items-center gap-3">
+              {/* Weather Icon */}
+              <motion.span 
+                className="text-4xl flex-shrink-0"
+                animate={{ y: [0, -3, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                style={{ filter: `drop-shadow(${glow.shadow})` }}
+              >
+                {emoji}
+              </motion.span>
+              
+              {/* Temperature */}
+              <div className="flex-shrink-0">
+                <div className="text-3xl font-bold text-white leading-none">{weatherData.temperature}°</div>
+                <div className="text-[10px] text-slate-400">{CONDITION_LABELS[weatherData.condition] || weatherData.condition}</div>
               </div>
-              <div className="flex-1">
-                <div className="text-4xl font-bold text-white">
-                  {weatherData.temperature}°
+              
+              {/* Stats Row - Compact horizontal */}
+              <div className="flex-1 grid grid-cols-3 gap-1 text-center border-l border-slate-700/50 pl-3">
+                <div>
+                  <Droplets className="w-3.5 h-3.5 text-blue-400 mx-auto" />
+                  <div className="text-xs text-white font-medium">{weatherData.humidity}%</div>
                 </div>
-                <p className="text-sm text-slate-400">
-                  Feels like {weatherData.feelsLike}°
-                </p>
+                <div>
+                  <Wind className="w-3.5 h-3.5 text-cyan-400 mx-auto" />
+                  <div className="text-xs text-white font-medium">{weatherData.windSpeed}</div>
+                </div>
+                <div>
+                  <Thermometer className="w-3.5 h-3.5 text-orange-400 mx-auto" />
+                  <div className="text-xs text-white font-medium">{weatherData.feelsLike}°</div>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-slate-700/50">
-              <div className="flex flex-col items-center gap-1">
-                <Droplets className="w-4 h-4 text-blue-400" />
-                <span className="text-xs text-slate-400">Humidity</span>
-                <span className="text-sm text-white font-medium">{weatherData.humidity}%</span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <Wind className="w-4 h-4 text-cyan-400" />
-                <span className="text-xs text-slate-400">Wind</span>
-                <span className="text-sm text-white font-medium">{weatherData.windSpeed} mph</span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <Thermometer className="w-4 h-4 text-orange-400" />
-                <span className="text-xs text-slate-400">Feels</span>
-                <span className="text-sm text-white font-medium">{weatherData.feelsLike}°</span>
-              </div>
+            {/* Action Row - Radar & Change Location */}
+            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-700/30">
+              <Button
+                onClick={() => {
+                  setIsExpanded(false);
+                  onOpenRadar?.();
+                }}
+                size="sm"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white h-8 text-xs"
+                data-testid="button-view-radar"
+              >
+                <Radar className="w-3.5 h-3.5 mr-1.5" />
+                Radar Map
+              </Button>
+              
+              <button
+                onClick={() => {
+                  setShowZipInput(true);
+                  setIsExpanded(false);
+                }}
+                className="text-[10px] text-slate-500 hover:text-cyan-400 transition-colors px-2"
+                data-testid="button-change-location"
+              >
+                Change
+              </button>
             </div>
-
-            <button
-              onClick={() => {
-                setShowZipInput(true);
-                setIsExpanded(false);
-              }}
-              className="mt-3 text-xs text-slate-500 hover:text-cyan-400 transition-colors w-full text-center"
-              data-testid="button-change-location"
-            >
-              Change location
-            </button>
           </motion.div>
         )}
 
@@ -317,7 +369,7 @@ export function FloatingWeatherButton() {
             initial={{ opacity: 0, scale: 0.9, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 10 }}
-            className="absolute bottom-20 left-0 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600/50 rounded-2xl p-4 shadow-xl w-64"
+            className="absolute bottom-20 left-0 bg-gradient-to-br from-slate-800/95 to-slate-900/95 backdrop-blur-lg border border-cyan-500/30 rounded-2xl p-4 shadow-2xl w-64"
           >
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-white">Change Location</span>
@@ -333,8 +385,9 @@ export function FloatingWeatherButton() {
                 value={tempZip}
                 onChange={(e) => setTempZip(e.target.value.replace(/\D/g, '').slice(0, 5))}
                 placeholder="Enter ZIP code"
-                className="bg-slate-700/50 border-slate-600 text-white"
+                className="bg-slate-700/50 border-cyan-500/30 text-white text-center text-lg tracking-widest"
                 data-testid="input-weather-zip-change"
+                autoFocus
               />
               <Button 
                 type="submit" 
@@ -351,53 +404,63 @@ export function FloatingWeatherButton() {
       </AnimatePresence>
 
       <motion.button
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => {
           if (!showZipInput) {
             setIsExpanded(!isExpanded);
           }
         }}
-        className="relative flex items-center gap-2.5 px-3 py-2 bg-gradient-to-br from-slate-700/90 to-slate-800/90 backdrop-blur-sm border border-slate-600/50 rounded-full shadow-lg transition-all"
+        className={`relative rounded-2xl backdrop-blur-sm border shadow-2xl transition-all overflow-hidden ${
+          weatherData 
+            ? `bg-gradient-to-br ${glow.bg} border-white/20` 
+            : 'bg-gradient-to-br from-slate-700/90 to-slate-800/90 border-slate-600/50'
+        }`}
         style={{ 
-          boxShadow: weatherData ? glow.shadow : undefined,
+          boxShadow: weatherData ? glow.shadow : '0 0 20px rgba(0,0,0,0.3)',
         }}
         data-testid="button-weather-toggle"
       >
         {weatherData ? (
-          <>
-            <motion.div
-              className="relative w-10 h-10"
+          <div className="flex items-center gap-1 px-2 py-1.5">
+            <motion.span
+              className="text-4xl leading-none"
               animate={{ 
-                y: [0, -2, 0],
+                y: [0, -4, 0],
+                rotate: iconType === 'sunny' ? [0, 5, 0] : 0,
               }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{ 
+                filter: `drop-shadow(0 0 12px ${glow.color})`,
+                textShadow: glow.shadow
+              }}
             >
-              <img
-                src={WEATHER_ICONS[iconType]}
-                alt={weatherData.condition}
-                className="w-full h-full object-contain"
-                style={{ filter: `drop-shadow(0 0 8px ${glow.color})` }}
-              />
-            </motion.div>
-            <div className="flex flex-col items-start pr-1">
-              <span className="text-lg font-bold text-white leading-tight">
+              {emoji}
+            </motion.span>
+            <div className="flex flex-col items-start pl-0.5 pr-1">
+              <span className="text-xl font-bold text-white leading-none" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                 {weatherData.temperature}°
               </span>
-              <span className="text-[10px] text-slate-400 leading-tight">
+              <span className="text-[9px] text-white/70 leading-tight mt-0.5 truncate max-w-[60px]">
                 {locationName.split(',')[0]}
               </span>
             </div>
-          </>
+          </div>
         ) : isLoading ? (
-          <div className="flex items-center gap-2 py-1 px-2">
-            <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin" />
-            <span className="text-sm text-slate-300">Loading...</span>
+          <div className="flex items-center gap-2 px-3 py-2">
+            <motion.span
+              className="text-2xl"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            >
+              🌀
+            </motion.span>
+            <span className="text-xs text-slate-300">Loading...</span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 py-1 px-2">
-            <MapPin className="w-5 h-5 text-cyan-400" />
-            <span className="text-sm text-slate-300">Weather</span>
+          <div className="flex items-center gap-2 px-3 py-2">
+            <Cloud className="w-5 h-5 text-cyan-400" />
+            <span className="text-xs text-slate-300">Weather</span>
           </div>
         )}
       </motion.button>
