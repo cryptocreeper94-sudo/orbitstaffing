@@ -145,51 +145,53 @@ export function OrbyHallmark({
       `}</style>
 
       <div 
-        className={`${config.container} relative inline-flex flex-col items-center justify-center cursor-pointer group ${className}`}
+        className={`${config.container} relative inline-flex flex-col items-center justify-end cursor-pointer group ${className}`}
         onClick={() => showExpand && setShowModal(true)}
         data-testid="orby-hallmark"
         title={showExpand ? "Click to view full hallmark" : undefined}
       >
         <TwinklingStars count={config.stars} />
         
-        <div className="relative" style={{ animation: 'float 4s ease-in-out infinite' }}>
+        {/* Orby positioned at top, holding the certificate */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10" style={{ animation: 'float 4s ease-in-out infinite' }}>
           <img 
             src="/mascot/clean/orbit_mascot_pointing_helpful_transparent_clean.png" 
             alt="Orby" 
             className={`${config.orby} object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300`}
           />
+        </div>
+        
+        {/* Certificate positioned below Orby, as if being held/presented */}
+        <div 
+          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform`}
+          style={{ animation: 'certGlow 3s ease-in-out infinite' }}
+        >
+          <div className={`${config.powered} text-cyan-400 font-bold tracking-wider mb-0.5`}>
+            ORBIT
+          </div>
           
-          <div 
-            className={`absolute -bottom-2 -right-2 ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center`}
-            style={{ animation: 'certGlow 3s ease-in-out infinite' }}
-          >
-            <div className={`${config.powered} text-cyan-400 font-bold tracking-wider mb-0.5`}>
-              ORBIT
-            </div>
-            
-            <div className="bg-white rounded p-0.5 mb-1">
-              <QRCodeSVG
-                id={qrId}
-                value={fullVerificationUrl}
-                size={config.qr}
-                level="H"
-                includeMargin={false}
-              />
-            </div>
-            
-            <div className={`${config.serial} font-mono font-bold text-amber-300 tracking-tight`}>
-              #{serialNumber}
-            </div>
-            
-            <div 
-              className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border border-white"
-              style={{ boxShadow: '0 0 8px rgba(34, 197, 94, 0.6)' }}
+          <div className="bg-white rounded p-0.5 mb-1">
+            <QRCodeSVG
+              id={qrId}
+              value={fullVerificationUrl}
+              size={config.qr}
+              level="H"
+              includeMargin={false}
             />
           </div>
+          
+          <div className={`${config.serial} font-mono font-bold text-amber-300 tracking-tight`}>
+            #{serialNumber}
+          </div>
+          
+          <div 
+            className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border border-white"
+            style={{ boxShadow: '0 0 8px rgba(34, 197, 94, 0.6)' }}
+          />
         </div>
         
         {showExpand && (
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="text-[8px] text-cyan-300 whitespace-nowrap">Click to expand</span>
           </div>
         )}
@@ -223,41 +225,43 @@ export function OrbyHallmark({
               </h3>
             </div>
 
-            <div className="flex justify-center mb-6 relative z-10">
-              <div className="relative" style={{ animation: 'float 4s ease-in-out infinite' }}>
+            <div className="flex flex-col items-center mb-6 relative z-10">
+              {/* Orby floating above, holding the certificate */}
+              <div style={{ animation: 'float 4s ease-in-out infinite' }}>
                 <img 
                   src="/mascot/clean/orbit_mascot_pointing_helpful_transparent_clean.png" 
                   alt="Orby presenting hallmark" 
-                  className="w-40 h-40 object-contain drop-shadow-[0_0_30px_rgba(6,182,212,0.6)]"
+                  className="w-32 h-32 object-contain drop-shadow-[0_0_30px_rgba(6,182,212,0.6)]"
                 />
+              </div>
+              
+              {/* Certificate below Orby, as if being presented */}
+              <div 
+                className="w-44 h-52 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-xl border-2 border-amber-400 p-3 flex flex-col items-center justify-center -mt-4 relative"
+                style={{ animation: 'certGlow 3s ease-in-out infinite' }}
+              >
+                <div className="text-[10px] text-cyan-400 font-bold tracking-wider mb-2 uppercase">
+                  Powered by ORBIT
+                </div>
+                
+                <div className="bg-white rounded-lg p-2 mb-2 shadow-lg">
+                  <QRCodeSVG
+                    value={fullVerificationUrl}
+                    size={100}
+                    level="H"
+                    includeMargin={false}
+                  />
+                </div>
+                
+                <div className="text-base font-mono font-bold text-amber-300 tracking-wide">
+                  #{serialNumber}
+                </div>
                 
                 <div 
-                  className="absolute -bottom-4 -right-6 w-36 h-44 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 rounded-xl border-3 border-amber-400 p-3 flex flex-col items-center justify-center"
-                  style={{ animation: 'certGlow 3s ease-in-out infinite' }}
+                  className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white flex items-center justify-center"
+                  style={{ boxShadow: '0 0 12px rgba(34, 197, 94, 0.8)' }}
                 >
-                  <div className="text-[10px] text-cyan-400 font-bold tracking-wider mb-2 uppercase">
-                    Powered by ORBIT
-                  </div>
-                  
-                  <div className="bg-white rounded-lg p-2 mb-2 shadow-lg">
-                    <QRCodeSVG
-                      value={fullVerificationUrl}
-                      size={100}
-                      level="H"
-                      includeMargin={false}
-                    />
-                  </div>
-                  
-                  <div className="text-base font-mono font-bold text-amber-300 tracking-wide">
-                    #{serialNumber}
-                  </div>
-                  
-                  <div 
-                    className="absolute -top-2 -right-2 w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-2 border-white flex items-center justify-center"
-                    style={{ boxShadow: '0 0 12px rgba(34, 197, 94, 0.8)' }}
-                  >
-                    <span className="text-[8px] text-white font-bold">✓</span>
-                  </div>
+                  <span className="text-[8px] text-white font-bold">✓</span>
                 </div>
               </div>
             </div>
