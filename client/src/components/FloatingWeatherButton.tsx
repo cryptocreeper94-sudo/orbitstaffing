@@ -447,29 +447,28 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
         data-testid="button-weather-toggle"
       >
         {weatherData ? (
-          <div className="relative">
-            <motion.span
+          <motion.div 
+            className="relative"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <span
               className="text-5xl leading-none block"
-              animate={{ 
-                y: [0, -4, 0],
-                rotate: iconType === 'sunny' ? [0, 3, 0] : 0,
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               style={{ 
                 filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
               }}
             >
               {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
-            </motion.span>
+            </span>
             <span 
-              className="absolute bottom-0 right-0 text-[11px] font-bold text-white leading-none"
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-sm font-black text-white leading-none"
               style={{ 
-                textShadow: '0 0 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.9)'
+                textShadow: '0 0 6px rgba(0,0,0,1), 0 0 10px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,1), -1px -1px 0 rgba(0,0,0,1), 1px -1px 0 rgba(0,0,0,1), -1px 1px 0 rgba(0,0,0,1), 1px 1px 0 rgba(0,0,0,1)'
               }}
             >
               {weatherData.temperature}°
             </span>
-          </div>
+          </motion.div>
         ) : isLoading ? (
           <motion.span
             className="text-4xl block"
