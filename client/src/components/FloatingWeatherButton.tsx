@@ -279,8 +279,8 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             >
               <motion.span 
                 className="text-5xl block"
-                animate={{ y: [0, -3, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 style={{ filter: 'drop-shadow(0 0 12px rgba(6,182,212,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
               >
                 🌤️
@@ -451,10 +451,10 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             <motion.span
               className="text-5xl leading-none block"
               animate={{ 
-                y: [0, -3, 0],
-                rotate: iconType === 'sunny' ? [0, 5, 0] : 0,
+                y: [0, -4, 0],
+                rotate: iconType === 'sunny' ? [0, 3, 0] : 0,
               }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               style={{ 
                 filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
               }}
@@ -462,8 +462,10 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
               {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
             </motion.span>
             <span 
-              className="absolute -bottom-1 -right-1 text-sm font-bold text-white px-1 rounded bg-black/40 backdrop-blur-sm leading-none"
-              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}
+              className="absolute bottom-0 right-0 text-[11px] font-bold text-white leading-none"
+              style={{ 
+                textShadow: '0 0 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.9)'
+              }}
             >
               {weatherData.temperature}°
             </span>
@@ -472,18 +474,20 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
           <motion.span
             className="text-4xl block"
             animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.5))' }}
           >
             🌀
           </motion.span>
         ) : (
-          <span 
+          <motion.span 
             className="text-4xl block"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
             style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.4))' }}
           >
             🌤️
-          </span>
+          </motion.span>
         )}
       </motion.button>
     </div>
