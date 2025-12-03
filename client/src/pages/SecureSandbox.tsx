@@ -1,12 +1,11 @@
 /**
  * Secure Sandbox - Multi-PIN Access System
  * 
- * PIN STRUCTURE:
- * - 4444 = Sidonie (read-only access to all views)
- * - 0424 = Dev PIN (full access - Jason uses this)
- * - Jason bypasses login → direct to /developer-panel
+ * PIN STRUCTURE (Only 2 users):
+ * - 4444 = Sid (partner, full read-only preview access)
+ * - 0424 = Jason (developer, full access)
  * 
- * Access: Owner, Admin, Employee sandboxes
+ * Access: Owner, Admin, Employee sandboxes for preview
  * Only accessible via /sandbox-secure (not publicly visible)
  */
 import React, { useState, useEffect } from 'react';
@@ -21,21 +20,28 @@ import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
 import { AlertCircle } from 'lucide-react';
 
-function SidonieWelcomeModal({ onClose }: { onClose: () => void }) {
+function SidWelcomeModal({ onClose }: { onClose: () => void }) {
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/20">
-        <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/20">
+        <div className="p-6 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-purple-900/30 to-cyan-900/30">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-              <Star className="w-6 h-6 text-white" />
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+              <Star className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Welcome, Sidonie!</h2>
-              <p className="text-cyan-400 text-sm">ORBIT Staffing OS • v2.5.2</p>
+              <h2 className="text-2xl font-bold text-white">{getGreeting()}, Sid!</h2>
+              <p className="text-cyan-400 text-sm">ORBIT Staffing OS • v2.5.2 • Full Preview Access</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white transition">
+          <button onClick={onClose} className="text-gray-400 hover:text-white transition p-2 hover:bg-slate-700 rounded-lg">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -45,10 +51,10 @@ function SidonieWelcomeModal({ onClose }: { onClose: () => void }) {
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-purple-300">Your Access Level</h3>
+                <h3 className="font-semibold text-purple-300">Your Access Level: Full Sandbox Access</h3>
                 <p className="text-gray-400 text-sm mt-1">
-                  You have <span className="text-purple-300 font-medium">full read-only preview access</span> to the entire platform. 
-                  You can explore all features, dashboards, and views without making any changes.
+                  You have <span className="text-purple-300 font-medium">complete access to play in the sandbox</span> - click everything, fill out forms, test all features! 
+                  Nothing saves to the live system yet, and you can't edit the actual site code. Perfect for exploring and giving feedback!
                 </p>
               </div>
             </div>
@@ -57,57 +63,91 @@ function SidonieWelcomeModal({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <Rocket className="w-5 h-5 text-cyan-400" />
-              What ORBIT Does
+              What ORBIT Staffing OS Does
             </h3>
-            <div className="grid gap-2 text-sm">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300"><strong className="text-white">Staffing Automation</strong> - End-to-end temp worker management from recruitment to payroll</span>
+            <div className="grid gap-3 text-sm">
+              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/50">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Complete Staffing Automation</span>
+                    <p className="text-gray-400 text-xs mt-1">End-to-end temp worker management - from the moment someone applies to when they get paid. Handles recruitment, onboarding, scheduling, timekeeping, payroll, and invoicing all in one system.</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300"><strong className="text-white">Talent Exchange</strong> - Two-way marketplace connecting workers and employers</span>
+              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/50">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Talent Exchange Marketplace</span>
+                    <p className="text-gray-400 text-xs mt-1">Two-way job marketplace where workers find jobs AND employers find workers. AI-powered matching, skill verification, and instant hiring capabilities.</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300"><strong className="text-white">White-Label Franchise</strong> - Ready for licensing to staffing agencies worldwide</span>
+              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/50">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">White-Label Franchise System</span>
+                    <p className="text-gray-400 text-xs mt-1">Complete franchise-ready platform that staffing agencies can license and brand as their own. Includes custom branding, separate databases, and full operational independence.</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300"><strong className="text-white">ORBIT Pay Card</strong> - Branded debit cards for instant worker payments</span>
+              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/50">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">ORBIT Pay Card</span>
+                    <p className="text-gray-400 text-xs mt-1">Branded Visa debit cards for workers to receive instant pay. No bank account needed, access to 55k+ free ATMs, mobile wallet integration. Huge competitive advantage since many temp workers are unbanked.</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
-                <span className="text-gray-300"><strong className="text-white">Compliance & Payroll</strong> - Multi-state tax handling, garnishments, I-9 tracking</span>
+              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/50">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Compliance & Payroll Engine</span>
+                    <p className="text-gray-400 text-xs mt-1">Multi-state tax calculations, wage garnishments, child support deductions, I-9 verification, background checks, drug testing integration, and complete audit trails for legal protection.</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-slate-800/40 rounded-lg p-3 border border-slate-700/50">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">HubSpot-Competitive CRM</span>
+                    <p className="text-gray-400 text-xs mt-1">Full customer relationship management built specifically for staffing. Track leads, manage client relationships, automate follow-ups, and close franchise deals.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div>
+          <div className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 rounded-lg p-4 border border-cyan-500/30">
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-amber-400" />
-              Latest Updates (v2.5.2)
+              <Globe className="w-5 h-5 text-cyan-400" />
+              NEW: GetOrby.io - Orby Commander
             </h3>
-            <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                <span className="text-gray-300">Desktop layouts now fill full width with zero white space</span>
+            <p className="text-gray-300 text-sm mb-3">
+              We've added a new companion site at <span className="text-cyan-400 font-medium">GetOrby.io</span> - the Orby Commander! 
+              This is a centralized command center that connects all DarkWave Studios products together.
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="bg-slate-800/50 rounded p-2">
+                <span className="text-cyan-300">• Unified Dashboard</span>
+                <p className="text-gray-500">Access all ORBIT products from one place</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                <span className="text-gray-300">Orby mascot redesigned with side-by-side certificate presentation</span>
+              <div className="bg-slate-800/50 rounded p-2">
+                <span className="text-cyan-300">• Orby AI Assistant</span>
+                <p className="text-gray-500">Our mascot as your personal guide</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                <span className="text-gray-300">Smoother animations across all floating elements</span>
+              <div className="bg-slate-800/50 rounded p-2">
+                <span className="text-cyan-300">• Cross-Platform Sync</span>
+                <p className="text-gray-500">Data flows between all connected apps</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                <span className="text-gray-300">Weather button now shows real-time temperature</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-cyan-400">•</span>
-                <span className="text-gray-300">Mobile-first horizontal scroll carousels for all sections</span>
+              <div className="bg-slate-800/50 rounded p-2">
+                <span className="text-cyan-300">• Command Center</span>
+                <p className="text-gray-500">Manage everything from one interface</p>
               </div>
             </div>
           </div>
@@ -115,24 +155,65 @@ function SidonieWelcomeModal({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <Shield className="w-5 h-5 text-green-400" />
-              What You Can Explore
+              What You Can Explore Today
             </h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-cyan-500/50 transition">
                 <span className="text-cyan-300 font-medium">Admin Dashboard</span>
-                <p className="text-gray-500 text-xs mt-1">Full system overview, analytics, user management</p>
+                <p className="text-gray-500 text-xs mt-1">Full system overview, real-time analytics, user management, and operational controls</p>
               </div>
-              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-purple-500/50 transition">
                 <span className="text-purple-300 font-medium">Owner Portal</span>
-                <p className="text-gray-500 text-xs mt-1">Company management, billing, worker assignments</p>
+                <p className="text-gray-500 text-xs mt-1">Company management, billing dashboard, worker assignments, job postings</p>
               </div>
-              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-green-500/50 transition">
                 <span className="text-green-300 font-medium">Employee App</span>
-                <p className="text-gray-500 text-xs mt-1">Worker experience, timesheets, availability</p>
+                <p className="text-gray-500 text-xs mt-1">Mobile worker experience, timesheets, availability calendar, pay stubs</p>
               </div>
-              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700">
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-amber-500/50 transition">
                 <span className="text-amber-300 font-medium">Talent Exchange</span>
-                <p className="text-gray-500 text-xs mt-1">Job marketplace, candidate matching</p>
+                <p className="text-gray-500 text-xs mt-1">Job marketplace, candidate profiles, AI matching, instant applications</p>
+              </div>
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-pink-500/50 transition">
+                <span className="text-pink-300 font-medium">CRM System</span>
+                <p className="text-gray-500 text-xs mt-1">Lead tracking, client management, sales pipeline, franchise deals</p>
+              </div>
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-blue-500/50 transition">
+                <span className="text-blue-300 font-medium">Marketing Hub</span>
+                <p className="text-gray-500 text-xs mt-1">Campaigns, affiliate program, MLM tracking, promotional tools</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-amber-400" />
+              Latest Updates (v2.5.2 - Today)
+            </h3>
+            <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">Desktop layouts now fill full width with zero white space</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">Orby mascot redesigned - now presents certificates side-by-side</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">Smoother, more elegant floating animations (6s duration)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">Weather button shows real-time temperature</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">Mobile-first horizontal scroll carousels everywhere</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">✓</span>
+                <span className="text-gray-300">Your PIN (4444) login fixed and working!</span>
               </div>
             </div>
           </div>
@@ -141,11 +222,14 @@ function SidonieWelcomeModal({ onClose }: { onClose: () => void }) {
         <div className="p-6 border-t border-slate-700 bg-slate-800/30">
           <Button
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-bold py-3"
+            className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-bold py-3 text-lg"
           >
-            <Sparkles className="w-4 h-4 mr-2" />
-            Start Exploring
+            <Sparkles className="w-5 h-5 mr-2" />
+            Let's Explore ORBIT!
           </Button>
+          <p className="text-center text-gray-500 text-xs mt-3">
+            Full sandbox access - play with everything! Nothing saves to production.
+          </p>
         </div>
       </div>
     </div>
@@ -182,23 +266,23 @@ export default function SecureSandbox() {
     },
     onSuccess: (data, sandboxRole) => {
       const user = {
-        id: 'sidonie',
-        firstName: 'Sidonie',
+        id: 'sid',
+        firstName: 'Sid',
         role: data.role || sandboxRole,
-        isReadOnly: true,
-        name: data.name || 'Sidonie',
+        sandboxMode: true,
+        name: data.name || 'Sid',
       };
       setCurrentUser(user);
       setIsAuthenticated(true);
       localStorage.setItem('currentUser', JSON.stringify(user));
       localStorage.setItem('userRole', sandboxRole);
-      localStorage.setItem('isReadOnly', 'true');
+      localStorage.setItem('sandboxMode', 'true');
       localStorage.setItem('sandboxSecure', 'true');
       
-      const hasSeenWelcome = localStorage.getItem('sidonie_welcome_seen');
+      const hasSeenWelcome = localStorage.getItem('sid_welcome_seen');
       if (!hasSeenWelcome) {
         setShowWelcomeModal(true);
-        localStorage.setItem('sidonie_welcome_seen', 'true');
+        localStorage.setItem('sid_welcome_seen', 'true');
       }
     },
     onError: (err: Error) => {
@@ -220,7 +304,7 @@ export default function SecureSandbox() {
     setError('');
     localStorage.removeItem('currentUser');
     localStorage.removeItem('userRole');
-    localStorage.removeItem('isReadOnly');
+    localStorage.removeItem('sandboxMode');
     localStorage.removeItem('sandboxSecure');
   };
 
@@ -305,7 +389,7 @@ export default function SecureSandbox() {
   if (isAuthenticated && currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
-        {showWelcomeModal && <SidonieWelcomeModal onClose={() => setShowWelcomeModal(false)} />}
+        {showWelcomeModal && <SidWelcomeModal onClose={() => setShowWelcomeModal(false)} />}
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-start mb-8">
             <div>

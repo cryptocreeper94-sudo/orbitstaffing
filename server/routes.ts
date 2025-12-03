@@ -550,9 +550,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       
-      // Check for Master Admin PIN (4444 or ADMIN_PIN env variable)
-      const masterPin = process.env.ADMIN_PIN || '4444';
-      if (pin === masterPin) {
+      // Check for Sid's PIN (4444) - Partner with full sandbox access
+      if (pin === '4444') {
         // Regenerate session to prevent session fixation
         req.session.regenerate(async (err) => {
           if (err) {
@@ -560,23 +559,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(500).json({ error: "Session error" });
           }
           
-          // Set session for master admin
+          // Set session for Sid - full sandbox access (can interact, nothing saves to production)
           req.session.adminAuthenticated = true;
-          req.session.adminName = 'Sidonie';
-          req.session.adminRole = 'master';
+          req.session.adminName = 'Sid';
+          req.session.adminRole = 'partner';
           
-          // Log successful master admin login
+          // Log successful Sid login
           await db.insert(adminLoginLogs).values({
-            adminName: 'Sidonie',
-            adminRole: 'master_admin',
+            adminName: 'Sid',
+            adminRole: 'partner',
             loginTime: new Date(),
             ipAddress: ipAddress as string,
             userAgent: userAgent || 'Unknown',
           });
           
-          console.log(`[Master Admin Login] ✅ Sidonie logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          console.log(`[Sid Login] ✅ Sid logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
           
-          return res.json({ verified: true, role: 'master_admin', name: 'Sidonie' });
+          return res.json({ verified: true, role: 'partner', name: 'Sid', sandboxMode: true });
         });
         return;
       }
