@@ -66,7 +66,7 @@ export function useWebSocket(
         reconnectTimeoutRef.current = window.setTimeout(() => {
           console.log("Attempting to reconnect...");
           connect();
-        }, 3000) as unknown as ReturnType<typeof setTimeout>;
+        }, 3000);
       };
 
       wsRef.current = ws;

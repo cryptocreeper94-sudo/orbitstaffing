@@ -105,7 +105,7 @@ export default function UniversalEmployeeRegistry({
   const [expandedNote, setExpandedNote] = useState(selectedEmployee?.notes || '');
   const [isSavingNote, setIsSavingNote] = useState(false);
 
-  const allSkills = [...new Set(employees.flatMap(e => e.skillSet))];
+  const allSkills = Array.from(new Set(employees.flatMap(e => e.skillSet)));
 
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -221,7 +221,7 @@ export default function UniversalEmployeeRegistry({
                 {/* QR Code Section - Bottom Left */}
                 <div className="absolute bottom-2 left-2 flex flex-col items-center gap-0.5 p-1 rounded bg-black/50 border border-yellow-400">
                   <div className="p-0.5 bg-white rounded-sm">
-                    <QRCode value={`VCARD:${selectedEmployee.name}`} size={32} level="H" margin={0} />
+                    <QRCode value={`VCARD:${selectedEmployee.name}`} size={32} level="H" />
                   </div>
                   <span className="text-[6px] font-mono font-bold text-yellow-400">
                     {selectedEmployee.employeeNumber}
@@ -478,7 +478,7 @@ export default function UniversalEmployeeRegistry({
                 {/* QR Code Section - Bottom Left */}
                 <div className="absolute bottom-1.5 left-1.5 flex flex-col items-center gap-0.5 p-1 rounded bg-black/50 border border-yellow-400">
                   <div className="p-0.5 bg-white rounded-sm">
-                    <QRCode value={vCardData} size={24} level="H" margin={0} />
+                    <QRCode value={vCardData} size={24} level="H" />
                   </div>
                   <span className="text-[5px] font-mono font-bold text-yellow-400 text-center">
                     {upcCode.slice(0, 6)}

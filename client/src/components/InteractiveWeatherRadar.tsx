@@ -411,7 +411,7 @@ export default function InteractiveWeatherRadar({
                 data-testid="input-weather-zip"
               />
               <button
-                onClick={searchByZip}
+                onClick={() => searchByZip()}
                 disabled={loading}
                 className="px-2 sm:px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 rounded text-white text-xs sm:text-sm transition-colors disabled:opacity-50"
                 data-testid="button-weather-search"

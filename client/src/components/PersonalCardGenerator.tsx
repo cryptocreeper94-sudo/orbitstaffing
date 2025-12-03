@@ -379,7 +379,7 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
           {/* QR Code Section (Bottom Left - Hallmark) */}
           <div className="absolute bottom-2 left-2 flex flex-col items-center gap-0.5 p-1.5 rounded bg-black/40 border-2" style={{ borderColor: cardData.stampColor }}>
             <div className="p-0.5 bg-white rounded-sm">
-              <QRCode value={vCardData} size={36} level="H" margin={1} />
+              <QRCode value={vCardData} size={36} level="H" />
             </div>
             <span className="text-[5px] font-mono font-bold" style={{ color: cardData.stampColor }}>
               {cardData.upcCode || 'UPC'}
