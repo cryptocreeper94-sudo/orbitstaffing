@@ -333,65 +333,74 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ACCESS BOXES - Compact 2x2 on mobile with sparkle */}
+      {/* ACCESS BOXES - Horizontal Carousel on mobile */}
       <section className="bg-gradient-to-b from-background to-slate-900/30 py-3 sm:py-8">
         <div className="max-w-7xl mx-auto px-2 sm:px-6">
           <div className="text-center mb-2 sm:mb-6">
             <h2 className="text-sm sm:text-2xl font-bold text-white">Get Started</h2>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-4">
-            {/* Business Owner Login */}
-            <Link href="/admin" className="group">
-              <Card className="h-full border border-violet-400/50 hover:border-violet-300/80 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 transition-all cursor-pointer shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
-                <CardContent className="p-2 sm:p-4 text-center">
-                  <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
-                  <h3 className="text-[10px] sm:text-sm font-bold text-violet-300">Owner</h3>
-                  <Button className="w-full mt-1.5 bg-violet-500/80 hover:bg-violet-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-owner-access">
-                    Login
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
+          <div className="relative">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
+            >
+              {/* Business Owner Login */}
+              <Link href="/admin" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+                <Card className="h-full border border-violet-400/50 hover:border-violet-300/80 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 transition-all cursor-pointer shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                  <CardContent className="p-2 sm:p-4 text-center">
+                    <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
+                    <h3 className="text-[10px] sm:text-sm font-bold text-violet-300">Owner</h3>
+                    <Button className="w-full mt-1.5 bg-violet-500/80 hover:bg-violet-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-owner-access">
+                      Login
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
 
-            {/* Customer/Client Login */}
-            <Link href="/worker" className="group">
-              <Card className="h-full border border-blue-500/50 hover:border-blue-400/80 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                <CardContent className="p-2 sm:p-4 text-center">
-                  <div className="text-xl sm:text-3xl mb-0.5">👥</div>
-                  <h3 className="text-[10px] sm:text-sm font-bold text-blue-300">Client</h3>
-                  <Button className="w-full mt-1.5 bg-blue-500/80 hover:bg-blue-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-customer-access">
-                    Login
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
+              {/* Customer/Client Login */}
+              <Link href="/worker" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+                <Card className="h-full border border-blue-500/50 hover:border-blue-400/80 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                  <CardContent className="p-2 sm:p-4 text-center">
+                    <div className="text-xl sm:text-3xl mb-0.5">👥</div>
+                    <h3 className="text-[10px] sm:text-sm font-bold text-blue-300">Client</h3>
+                    <Button className="w-full mt-1.5 bg-blue-500/80 hover:bg-blue-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-customer-access">
+                      Login
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
 
-            {/* Employee Self-Service */}
-            <Link href="/employee-hub" className="group">
-              <Card className="h-full border border-emerald-500/50 hover:border-emerald-400/80 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
-                <CardContent className="p-2 sm:p-4 text-center">
-                  <div className="text-xl sm:text-3xl mb-0.5">📋</div>
-                  <h3 className="text-[10px] sm:text-sm font-bold text-emerald-300">Employee</h3>
-                  <Button className="w-full mt-1.5 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-employee-access">
-                    Hub
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
+              {/* Employee Self-Service */}
+              <Link href="/employee-hub" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+                <Card className="h-full border border-emerald-500/50 hover:border-emerald-400/80 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
+                  <CardContent className="p-2 sm:p-4 text-center">
+                    <div className="text-xl sm:text-3xl mb-0.5">📋</div>
+                    <h3 className="text-[10px] sm:text-sm font-bold text-emerald-300">Employee</h3>
+                    <Button className="w-full mt-1.5 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-employee-access">
+                      Hub
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
 
-            {/* Admin Access */}
-            <Link href="/developer" className="group">
-              <Card className="h-full border border-cyan-500/50 hover:border-cyan-400/80 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                <CardContent className="p-2 sm:p-4 text-center">
-                  <div className="text-xl sm:text-3xl mb-0.5">⚙️</div>
-                  <h3 className="text-[10px] sm:text-sm font-bold text-cyan-300">Admin</h3>
-                  <Button className="w-full mt-1.5 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-admin-access">
-                    Panel
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
+              {/* Admin Access */}
+              <Link href="/developer" style={{ flex: '0 0 140px', minWidth: '140px' }} className="sm:flex-auto sm:min-w-0 snap-start group">
+                <Card className="h-full border border-cyan-500/50 hover:border-cyan-400/80 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                  <CardContent className="p-2 sm:p-4 text-center">
+                    <div className="text-xl sm:text-3xl mb-0.5">⚙️</div>
+                    <h3 className="text-[10px] sm:text-sm font-bold text-cyan-300">Admin</h3>
+                    <Button className="w-full mt-1.5 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-admin-access">
+                      Panel
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
+            {/* Scroll indicator - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-slate-900 via-slate-900/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
           </div>
         </div>
       </section>
@@ -429,32 +438,49 @@ export default function Landing() {
             </Link>
           </div>
 
-          {/* Benefit Cards - 2 cols on mobile */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-8">
-            <BenefitCard 
-              icon="⚡"
-              title="Automate"
-              brief="Zero entry"
-              onClick={() => setSelectedBenefit("automate")}
-            />
-            <BenefitCard 
-              icon="👥"
-              title="Retain"
-              brief="3x longer"
-              onClick={() => setSelectedBenefit("workers")}
-            />
-            <BenefitCard 
-              icon="💰"
-              title="Save"
-              brief="35% off"
-              onClick={() => setSelectedBenefit("money")}
-            />
-            <BenefitCard 
-              icon="📈"
-              title="Scale"
-              brief="10x capacity"
-              onClick={() => setSelectedBenefit("scale")}
-            />
+          {/* Benefit Cards - Horizontal Carousel on mobile */}
+          <div className="relative mb-4 sm:mb-8">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
+            >
+              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <BenefitCard 
+                  icon="⚡"
+                  title="Automate"
+                  brief="Zero entry"
+                  onClick={() => setSelectedBenefit("automate")}
+                />
+              </div>
+              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <BenefitCard 
+                  icon="👥"
+                  title="Retain"
+                  brief="3x longer"
+                  onClick={() => setSelectedBenefit("workers")}
+                />
+              </div>
+              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <BenefitCard 
+                  icon="💰"
+                  title="Save"
+                  brief="35% off"
+                  onClick={() => setSelectedBenefit("money")}
+                />
+              </div>
+              <div style={{ flex: '0 0 130px', minWidth: '130px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <BenefitCard 
+                  icon="📈"
+                  title="Scale"
+                  brief="10x capacity"
+                  onClick={() => setSelectedBenefit("scale")}
+                />
+              </div>
+            </div>
+            {/* Scroll indicator - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-background via-background/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
           </div>
 
           {/* Stats - Compact horizontal scroll on mobile */}
@@ -612,68 +638,99 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Features - Collapsible compact */}
+      {/* Features - Horizontal Carousel on all screens */}
       <section className="py-3 sm:py-6 bg-card/30 backdrop-blur-sm border-y border-border/30">
         <div className="max-w-6xl mx-auto px-2 sm:px-6">
           <div className="mb-2 sm:mb-4 text-center sm:text-left">
             <h2 className="text-xs sm:text-xl font-bold">Full Staffing Lifecycle</h2>
           </div>
-          <Accordion 
-            items={[
-              { title: "Recruit", icon: "👥", description: "Job posting, ATS, background checks, I-9." },
-              { title: "Match", icon: "🎯", description: "Smart matching, interviews, assignments." },
-              { title: "Payroll", icon: "💰", description: "Timesheets, payroll, W-2s, Pay Card." },
-              { title: "Billing", icon: "📊", description: "Invoicing, AR, P&L dashboards." },
-              { title: "Compliance", icon: "🛡️", description: "I-9, E-Verify, workers' comp." },
-              { title: "Automation", icon: "⚡", description: "Zero entry, real-time sync." }
-            ]}
-          />
+          
+          {/* Horizontal Carousel on all screens */}
+          <div className="relative">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '8px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="sm:gap-4 sm:pr-0 snap-x snap-mandatory scrollbar-hide"
+            >
+              {[
+                { title: "Recruit", icon: "👥", description: "Job posting, ATS, background checks, I-9." },
+                { title: "Match", icon: "🎯", description: "Smart matching, interviews, assignments." },
+                { title: "Payroll", icon: "💰", description: "Timesheets, payroll, W-2s, Pay Card." },
+                { title: "Billing", icon: "📊", description: "Invoicing, AR, P&L dashboards." },
+                { title: "Comply", icon: "🛡️", description: "I-9, E-Verify, workers' comp." },
+                { title: "Auto", icon: "⚡", description: "Zero entry, real-time sync." }
+              ].map((item, idx) => (
+                <div key={idx} style={{ flex: '0 0 120px', minWidth: '120px' }} className="sm:flex-1 sm:min-w-[140px] snap-start">
+                  <Card className="h-full bg-slate-900/50 border-cyan-500/30 hover:border-cyan-400/50 transition-all">
+                    <CardContent className="p-2 sm:p-4 text-center">
+                      <div className="text-2xl sm:text-3xl mb-1">{item.icon}</div>
+                      <h3 className="text-[10px] sm:text-sm font-bold text-white mb-0.5">{item.title}</h3>
+                      <p className="text-[8px] sm:text-xs text-slate-400 line-clamp-2">{item.description}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+            {/* Scroll indicator - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-card/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Product Showcases */}
-      <section className="py-6 sm:py-8 border-t border-border/50 bg-slate-900/30">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-1">Product Showcases</h2>
-            <p className="text-muted-foreground text-xs sm:text-sm">Click to explore detailed feature walkthroughs.</p>
+      <section className="py-4 sm:py-8 border-t border-border/50 bg-slate-900/30">
+        <div className="max-w-6xl mx-auto px-2 sm:px-6">
+          <div className="mb-3 sm:mb-6 text-center sm:text-left">
+            <h2 className="text-sm sm:text-3xl font-bold font-heading mb-1">Product Showcases</h2>
+            <p className="text-muted-foreground text-[9px] sm:text-sm">Click to explore detailed feature walkthroughs.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Lot Ops Pro Showcase */}
-            <div className="space-y-4">
-              <Button 
-                onClick={() => setShowLotOpsSlideshow(!showLotOpsSlideshow)}
-                className="w-full h-12 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold text-lg"
-                data-testid="button-show-lot-ops-slideshow"
-              >
-                {showLotOpsSlideshow ? '▼ Hide' : '▶ View'} Lot Ops Pro Showcase
-              </Button>
-              {showLotOpsSlideshow && (
-                <HomeSlideshow 
-                  slides={slidesData as any} 
-                  title="Lot Ops Pro Slides"
-                  product="Lot Ops Pro"
-                />
-              )}
-            </div>
+          {/* Mobile: Horizontal scroll | Desktop: Grid */}
+          <div className="relative">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide mb-4 sm:mb-8"
+            >
+              {/* Lot Ops Pro Showcase */}
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start space-y-2">
+                <Button 
+                  onClick={() => setShowLotOpsSlideshow(!showLotOpsSlideshow)}
+                  className="w-full h-10 sm:h-12 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-700 hover:to-cyan-600 text-white font-semibold text-xs sm:text-lg"
+                  data-testid="button-show-lot-ops-slideshow"
+                >
+                  {showLotOpsSlideshow ? '▼' : '▶'} Lot Ops Pro
+                </Button>
+                {showLotOpsSlideshow && (
+                  <HomeSlideshow 
+                    slides={slidesData as any} 
+                    title="Lot Ops Pro Slides"
+                    product="Lot Ops Pro"
+                  />
+                )}
+              </div>
 
-            {/* ORBIT Staffing OS Showcase */}
-            <div className="space-y-4">
-              <Button 
-                onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
-                className="w-full h-12 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-700 hover:to-violet-600 text-white font-semibold text-lg"
-                data-testid="button-show-orbit-slideshow"
-              >
-                {showOrbitSlideshow ? '▼ Hide' : '▶ View'} ORBIT Staffing OS Showcase
-              </Button>
-              {showOrbitSlideshow && (
-                <HomeSlideshow 
-                  slides={orbitSlides as any} 
-                  title="ORBIT Slides"
-                  product="ORBIT Staffing OS"
-                />
-              )}
+              {/* ORBIT Staffing OS Showcase */}
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start space-y-2">
+                <Button 
+                  onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
+                  className="w-full h-10 sm:h-12 bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-700 hover:to-violet-600 text-white font-semibold text-xs sm:text-lg"
+                  data-testid="button-show-orbit-slideshow"
+                >
+                  {showOrbitSlideshow ? '▼' : '▶'} ORBIT OS
+                </Button>
+                {showOrbitSlideshow && (
+                  <HomeSlideshow 
+                    slides={orbitSlides as any} 
+                    title="ORBIT Slides"
+                    product="ORBIT Staffing OS"
+                  />
+                )}
+              </div>
+            </div>
+            {/* Scroll indicator - mobile only */}
+            <div className="absolute right-0 top-0 h-12 w-10 bg-gradient-to-l from-slate-900/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
             </div>
           </div>
         </div>
@@ -681,13 +738,99 @@ export default function Landing() {
 
       {/* Pricing */}
       <section className="py-6 sm:py-8">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-1">Flexible Pricing</h2>
-            <p className="text-muted-foreground text-xs sm:text-sm">Pay only for what you use. Monthly, revenue-share, or white-label options.</p>
+        <div className="max-w-6xl mx-auto px-2 sm:px-6">
+          <div className="mb-3 sm:mb-6 text-center sm:text-left">
+            <h2 className="text-sm sm:text-3xl font-bold font-heading mb-1">Flexible Pricing</h2>
+            <p className="text-muted-foreground text-[9px] sm:text-sm">Pay only for what you use. Monthly, revenue-share, or white-label options.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Mobile: Horizontal Carousel */}
+          <div className="relative sm:hidden">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="snap-x snap-mandatory scrollbar-hide"
+            >
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+                <PricingCard 
+                  tier="Starter"
+                  price="$39"
+                  period="/month"
+                  desc="68% less than Indeed"
+                  workers="1-10 workers"
+                  features={[
+                    "Job posting & matching",
+                    "GPS time tracking",
+                    "Basic payroll export",
+                    "Employee Hub access",
+                    "Email support"
+                  ]}
+                  cta="Get Started Free"
+                />
+              </div>
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+                <PricingCard 
+                  tier="Growth"
+                  price="$99"
+                  period="/month"
+                  desc="67% less than ZipRecruiter"
+                  workers="10-50 workers"
+                  features={[
+                    "Everything in Starter",
+                    "Owner Hub access",
+                    "Full payroll automation",
+                    "ORBIT Pay Card access",
+                    "Unlimited clients",
+                    "Priority support"
+                  ]}
+                  cta="Start Free Trial"
+                  featured
+                />
+              </div>
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+                <PricingCard 
+                  tier="Professional"
+                  price="$249"
+                  period="/month"
+                  desc="60% less than Bullhorn"
+                  workers="50-200 workers"
+                  features={[
+                    "Everything in Growth",
+                    "Multi-location",
+                    "Instant Pay via Pay Card",
+                    "Advanced analytics",
+                    "Full API access",
+                    "Dedicated support"
+                  ]}
+                  cta="Schedule Demo"
+                />
+              </div>
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="snap-start">
+                <PricingCard 
+                  tier="Enterprise"
+                  price="Custom"
+                  period="pricing"
+                  desc="White-label & franchises"
+                  workers="200+ workers"
+                  features={[
+                    "Everything in Pro",
+                    "White-label platform",
+                    "Custom branding",
+                    "Multi-tenant support",
+                    "Account manager",
+                    "24/7 phone support"
+                  ]}
+                  cta="Contact Sales"
+                />
+              </div>
+            </div>
+            {/* Scroll indicator */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
+          </div>
+          
+          {/* Desktop: Grid */}
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <PricingCard 
               tier="Starter"
               price="$39"
@@ -762,26 +905,39 @@ export default function Landing() {
             </Link>
           </div>
 
-          {/* Pricing Info */}
-          <div className="grid md:grid-cols-2 gap-6 mt-12">
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="pt-6">
-                <h3 className="font-bold text-lg mb-3">💰 Fixed Monthly</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Predictable monthly fee based on worker volume. Best for established agencies with stable staffing.
-                </p>
-                <p className="text-xs text-primary font-medium">No per-placement fees. No variable costs.</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="pt-6">
-                <h3 className="font-bold text-lg mb-3">📈 Revenue Share</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Pay 3-6% of total placements. Perfect for franchises and scaling. You only pay when you earn.
-                </p>
-                <p className="text-xs text-primary font-medium">Scale without upfront costs. Aligned incentives.</p>
-              </CardContent>
-            </Card>
+          {/* Pricing Info - Horizontal Carousel on mobile */}
+          <div className="relative mt-6 sm:mt-12">
+            <div 
+              style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '12px', overflowX: 'auto', paddingBottom: '8px', paddingRight: '40px' }}
+              className="sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pr-0 snap-x snap-mandatory scrollbar-hide"
+            >
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <Card className="h-full bg-card/50 border-border/50">
+                  <CardContent className="p-3 sm:pt-6">
+                    <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-3">💰 Fixed Monthly</h3>
+                    <p className="text-[9px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Predictable monthly fee based on worker volume. Best for established agencies.
+                    </p>
+                    <p className="text-[8px] sm:text-xs text-primary font-medium">No per-placement fees.</p>
+                  </CardContent>
+                </Card>
+              </div>
+              <div style={{ flex: '0 0 200px', minWidth: '200px' }} className="sm:flex-auto sm:min-w-0 snap-start">
+                <Card className="h-full bg-card/50 border-border/50">
+                  <CardContent className="p-3 sm:pt-6">
+                    <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-3">📈 Revenue Share</h3>
+                    <p className="text-[9px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
+                      Pay 3-6% of placements. Perfect for franchises. Pay only when you earn.
+                    </p>
+                    <p className="text-[8px] sm:text-xs text-primary font-medium">Scale without upfront costs.</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+            {/* Scroll indicator - mobile only */}
+            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
           </div>
         </div>
       </section>
