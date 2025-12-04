@@ -51,6 +51,9 @@ const ANCHORABLE_TYPES = [
   'certification', // Worker certifications
   'background_check',
   'i9_verification',
+  'release',       // Software version releases
+  'franchise',     // Franchise agreements
+  'audit',         // Audit logs & compliance records
 ];
 
 export class SolanaService {
