@@ -2775,6 +2775,194 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // MODULAR PRICING ROUTES (Database-backed)
+  // ========================
+  
+  // Get all platform modules (public - for pricing page)
+  app.get("/api/modules", async (req: Request, res: Response) => {
+    try {
+      const modules = await storage.getAllModules();
+      res.json(modules);
+    } catch (error) {
+      console.error("Get modules error:", error);
+      res.status(500).json({ error: "Failed to fetch modules" });
+    }
+  });
+
+  // Get single module by ID
+  app.get("/api/modules/:id", async (req: Request, res: Response) => {
+    try {
+      const module = await storage.getModuleById(req.params.id);
+      if (!module) {
+        return res.status(404).json({ error: "Module not found" });
+      }
+      res.json(module);
+    } catch (error) {
+      console.error("Get module error:", error);
+      res.status(500).json({ error: "Failed to fetch module" });
+    }
+  });
+
+  // Get all subscription plans (public - for pricing page)
+  app.get("/api/subscription-plans", async (req: Request, res: Response) => {
+    try {
+      const plans = await storage.getAllPlans();
+      res.json(plans);
+    } catch (error) {
+      console.error("Get plans error:", error);
+      res.status(500).json({ error: "Failed to fetch subscription plans" });
+    }
+  });
+
+  // Get single plan by ID
+  app.get("/api/subscription-plans/:id", async (req: Request, res: Response) => {
+    try {
+      const plan = await storage.getPlanById(req.params.id);
+      if (!plan) {
+        return res.status(404).json({ error: "Plan not found" });
+      }
+      res.json(plan);
+    } catch (error) {
+      console.error("Get plan error:", error);
+      res.status(500).json({ error: "Failed to fetch plan" });
+    }
+  });
+
+  // Get tenant's active modules
+  app.get("/api/tenant/modules", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const tenantModules = await storage.getTenantActiveModules(tenantId);
+      const allModules = await storage.getAllModules();
+      
+      // Combine to show which modules tenant has access to
+      const modulesWithAccess = allModules.map((module: any) => ({
+        ...module,
+        hasAccess: tenantModules.some((tm: any) => tm.moduleId === module.id),
+        accessInfo: tenantModules.find((tm: any) => tm.moduleId === module.id) || null
+      }));
+
+      res.json(modulesWithAccess);
+    } catch (error) {
+      console.error("Get tenant modules error:", error);
+      res.status(500).json({ error: "Failed to fetch tenant modules" });
+    }
+  });
+
+  // Check if tenant has access to a specific module
+  app.get("/api/tenant/modules/:moduleId/access", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const hasAccess = await storage.hasTenantModule(tenantId, req.params.moduleId);
+      res.json({ hasAccess, moduleId: req.params.moduleId });
+    } catch (error) {
+      console.error("Check module access error:", error);
+      res.status(500).json({ error: "Failed to check module access" });
+    }
+  });
+
+  // Create checkout for addon module (authenticated)
+  app.post("/api/modules/:moduleId/checkout", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+
+      const module = await storage.getModuleById(req.params.moduleId);
+      if (!module) {
+        return res.status(404).json({ error: "Module not found" });
+      }
+
+      if (module.isRequired) {
+        return res.status(400).json({ error: "Core module is included in all plans" });
+      }
+
+      // Check if already has access
+      const hasAccess = await storage.hasTenantModule(tenantId, module.id);
+      if (hasAccess) {
+        return res.status(400).json({ error: "You already have access to this module" });
+      }
+
+      const { billingCycle = 'monthly' } = req.body;
+      const priceId = billingCycle === 'annual' ? module.stripePriceIdAnnual : module.stripePriceIdMonthly;
+
+      if (!priceId) {
+        // If no Stripe price, grant access directly (for demo/dev)
+        await storage.grantModuleAccess({
+          tenantId,
+          moduleId: module.id,
+          source: 'addon',
+          isEnabled: true
+        });
+        return res.json({ success: true, message: "Module access granted" });
+      }
+
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const session = await stripeService.createCheckoutSession(
+        null,
+        priceId,
+        `${baseUrl}/dashboard?module_added=${module.id}`,
+        `${baseUrl}/pricing?canceled=true`
+      );
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("Module checkout error:", error);
+      res.status(500).json({ error: "Failed to create module checkout" });
+    }
+  });
+
+  // Admin: Grant module access (admin only)
+  app.post("/api/admin/tenant/:tenantId/modules/:moduleId", async (req: Request, res: Response) => {
+    try {
+      const { source = 'manual', expiresAt, trialEndsAt } = req.body;
+      
+      const access = await storage.grantModuleAccess({
+        tenantId: req.params.tenantId,
+        moduleId: req.params.moduleId,
+        source,
+        isEnabled: true,
+        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+        trialEndsAt: trialEndsAt ? new Date(trialEndsAt) : undefined
+      });
+
+      res.json(access);
+    } catch (error) {
+      console.error("Grant module access error:", error);
+      res.status(500).json({ error: "Failed to grant module access" });
+    }
+  });
+
+  // Admin: Revoke module access
+  app.delete("/api/admin/tenant/:tenantId/modules/:moduleId", async (req: Request, res: Response) => {
+    try {
+      await storage.revokeModuleAccess(req.params.tenantId, req.params.moduleId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Revoke module access error:", error);
+      res.status(500).json({ error: "Failed to revoke module access" });
+    }
+  });
+
+  // Admin: Grant all plan modules to tenant
+  app.post("/api/admin/tenant/:tenantId/apply-plan/:planId", async (req: Request, res: Response) => {
+    try {
+      const grantedModules = await storage.grantPlanModules(req.params.tenantId, req.params.planId);
+      res.json({ 
+        success: true, 
+        modulesGranted: grantedModules.length,
+        modules: grantedModules 
+      });
+    } catch (error) {
+      console.error("Apply plan error:", error);
+      res.status(500).json({ error: "Failed to apply plan modules" });
+    }
+  });
+
+  // ========================
   // PAYMENT/STRIPE ROUTES
   // ========================
   app.post("/api/payments/stripe/create", async (req: Request, res: Response) => {
