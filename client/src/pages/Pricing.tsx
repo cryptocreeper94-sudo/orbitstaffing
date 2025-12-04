@@ -411,9 +411,9 @@ export default function Pricing() {
             </div>
 
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 pr-10 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pr-0">
                 {[1, 2, 3, 4].map(i => (
-                  <Card key={i} className="bg-slate-800/50 border-slate-700/50 animate-pulse">
+                  <Card key={i} className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 animate-pulse">
                     <CardHeader><div className="h-8 bg-slate-700 rounded w-3/4" /></CardHeader>
                     <CardContent><div className="space-y-3"><div className="h-10 bg-slate-700 rounded w-1/2" /><div className="h-4 bg-slate-700 rounded" /><div className="h-4 bg-slate-700 rounded w-5/6" /></div></CardContent>
                   </Card>
@@ -425,7 +425,8 @@ export default function Pricing() {
                 <p>No subscription plans available. Check back soon!</p>
               </div>
             ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="relative">
+            <div className="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 pr-10 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-6 sm:overflow-visible sm:pr-0">
               {dbPlans.map((plan) => {
                 const planModules = getModulesForPlan(plan);
                 const priceId = plan.stripePriceIdMonthly || PLATFORM_BUNDLES.find(b => b.id === plan.id)?.priceId;
@@ -433,7 +434,7 @@ export default function Pricing() {
                 return (
                   <Card
                     key={plan.id}
-                    className={`relative flex flex-col bg-slate-800/50 border-slate-700/50 transition-all hover:border-cyan-500/30 ${
+                    className={`flex-shrink-0 w-[280px] sm:w-auto snap-start relative flex flex-col bg-slate-800/50 border-slate-700/50 transition-all hover:border-cyan-500/30 ${
                       plan.isPopular ? 'ring-2 ring-cyan-500/50 border-cyan-500/50' : ''
                     }`}
                     data-testid={`bundle-card-${plan.id}`}
@@ -519,6 +520,10 @@ export default function Pricing() {
                 );
               })}
             </div>
+            <div className="absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
+            </div>
             )}
           </TabsContent>
 
@@ -529,9 +534,9 @@ export default function Pricing() {
             </div>
 
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 pr-10 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:overflow-visible sm:pr-0">
                 {[1, 2, 3].map(i => (
-                  <Card key={i} className="bg-slate-800/50 border-slate-700/50 animate-pulse">
+                  <Card key={i} className="flex-shrink-0 w-[260px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 animate-pulse">
                     <CardHeader><div className="h-12 w-12 bg-slate-700 rounded-xl mb-3" /><div className="h-6 bg-slate-700 rounded w-3/4" /></CardHeader>
                     <CardContent><div className="space-y-3"><div className="h-8 bg-slate-700 rounded w-1/3" /><div className="h-4 bg-slate-700 rounded" /><div className="h-4 bg-slate-700 rounded w-5/6" /></div></CardContent>
                   </Card>
@@ -543,7 +548,8 @@ export default function Pricing() {
                 <p>No standalone tools available. Check back soon!</p>
               </div>
             ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="relative">
+            <div className="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 pr-10 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:overflow-visible sm:pr-0">
               {dbModules.filter(m => m.isAddon && !m.isRequired).map((module) => {
                 const gradientColors: Record<string, string> = {
                   payroll: 'from-green-500 to-emerald-600',
@@ -560,7 +566,7 @@ export default function Pricing() {
                 return (
                   <Card
                     key={module.id}
-                    className="relative flex flex-col bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/30 transition-all overflow-hidden"
+                    className="flex-shrink-0 w-[260px] sm:w-auto snap-start relative flex flex-col bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/30 transition-all overflow-hidden"
                     data-testid={`tool-card-${module.id}`}
                   >
                     <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${color}`} />
@@ -632,6 +638,10 @@ export default function Pricing() {
                   </Card>
                 );
               })}
+            </div>
+            <div className="absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
             </div>
             )}
 
@@ -825,8 +835,9 @@ export default function Pricing() {
               <p className="text-slate-400">Join our affiliate program and earn recurring commissions for every referral.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700/50 text-center p-6">
+            <div className="relative">
+            <div className="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 pr-10 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:pr-0">
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 text-center p-6">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center mx-auto mb-4">
                   <Share2 className="w-8 h-8 text-white" />
                 </div>
@@ -845,7 +856,7 @@ export default function Pricing() {
                 </Link>
               </Card>
 
-              <Card className="bg-slate-800/50 border-cyan-500/50 ring-2 ring-cyan-500/20 text-center p-6 relative">
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-slate-800/50 border-cyan-500/50 ring-2 ring-cyan-500/20 text-center p-6 relative">
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-500">
                   Best Value
                 </Badge>
@@ -868,7 +879,7 @@ export default function Pricing() {
                 </Link>
               </Card>
 
-              <Card className="bg-slate-800/50 border-slate-700/50 text-center p-6">
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 text-center p-6">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
                   <Crown className="w-8 h-8 text-white" />
                 </div>
@@ -888,6 +899,10 @@ export default function Pricing() {
                 </a>
               </Card>
             </div>
+            <div className="absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+            </div>
+            </div>
 
             <Card className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border-amber-500/30 p-6">
               <div className="flex items-start gap-4">
@@ -906,22 +921,27 @@ export default function Pricing() {
           </TabsContent>
         </Tabs>
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-slate-800/50 border-slate-700/50 p-6 text-center">
-            <CreditCard className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-            <h3 className="font-bold text-white mb-2">Secure Payments</h3>
-            <p className="text-sm text-slate-400">Credit card, ACH, and crypto accepted. PCI-DSS compliant.</p>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700/50 p-6 text-center">
-            <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
-            <h3 className="font-bold text-white mb-2">14-Day Free Trial</h3>
-            <p className="text-sm text-slate-400">Try any plan free. No credit card required to start.</p>
-          </Card>
-          <Card className="bg-slate-800/50 border-slate-700/50 p-6 text-center">
-            <HelpCircle className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-            <h3 className="font-bold text-white mb-2">Cancel Anytime</h3>
-            <p className="text-sm text-slate-400">No contracts, no penalties. Downgrade or cancel freely.</p>
-          </Card>
+        <div className="mt-16 relative">
+          <div className="flex flex-row flex-nowrap gap-4 overflow-x-auto pb-4 pr-10 snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:pr-0">
+            <Card className="flex-shrink-0 w-[220px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 p-6 text-center">
+              <CreditCard className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+              <h3 className="font-bold text-white mb-2">Secure Payments</h3>
+              <p className="text-sm text-slate-400">Credit card, ACH, and crypto accepted. PCI-DSS compliant.</p>
+            </Card>
+            <Card className="flex-shrink-0 w-[220px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 p-6 text-center">
+              <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
+              <h3 className="font-bold text-white mb-2">14-Day Free Trial</h3>
+              <p className="text-sm text-slate-400">Try any plan free. No credit card required to start.</p>
+            </Card>
+            <Card className="flex-shrink-0 w-[220px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 p-6 text-center">
+              <HelpCircle className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+              <h3 className="font-bold text-white mb-2">Cancel Anytime</h3>
+              <p className="text-sm text-slate-400">No contracts, no penalties. Downgrade or cancel freely.</p>
+            </Card>
+          </div>
+          <div className="absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none sm:hidden">
+            <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
+          </div>
         </div>
 
         <div className="mt-16 text-center">
