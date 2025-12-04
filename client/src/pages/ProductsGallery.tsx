@@ -98,33 +98,33 @@ export default function ProductsGallery() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 pt-12 pb-8 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-4">
+      <div className="relative z-10 pt-6 sm:pt-12 pb-4 sm:pb-8 text-center px-4">
+        <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-2 sm:mb-4">
           <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             Darkwave Studios
           </span>
         </h1>
-        <p className="text-xl text-gray-300 mb-2">
-          Complete Enterprise Solutions Ecosystem
+        <p className="text-sm sm:text-xl text-gray-300 mb-1 sm:mb-2">
+          Enterprise Solutions Ecosystem
         </p>
-        <p className="text-gray-500 text-sm">
-          {currentIndex + 1} of {products.length} Products
+        <p className="text-gray-500 text-xs sm:text-sm">
+          {currentIndex + 1} of {products.length}
         </p>
       </div>
 
       {/* Carousel Container */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 min-h-[60vh]">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-2 sm:px-4 py-4 sm:py-8">
         {/* Left Arrow */}
         <button
           onClick={prevProduct}
-          className="absolute left-4 md:left-8 z-20 p-3 md:p-4 bg-slate-800/80 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group"
+          className="absolute left-1 sm:left-4 md:left-8 z-20 p-2 sm:p-3 md:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group"
           data-testid="button-prev-product"
         >
-          <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
         </button>
 
         {/* Product Card */}
-        <div className="w-full max-w-2xl mx-auto px-12 md:px-20">
+        <div className="w-full max-w-2xl mx-auto px-10 sm:px-16 md:px-20">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
@@ -135,58 +135,63 @@ export default function ProductsGallery() {
               className="relative"
             >
               <div
-                className={`relative overflow-hidden rounded-2xl bg-slate-800/70 backdrop-blur-sm border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer`}
+                className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-slate-800/70 backdrop-blur-sm border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer`}
                 onClick={() => setSelectedProduct(currentProduct.id)}
                 data-testid={`card-product-${currentProduct.id}`}
               >
                 {/* Gradient background */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-10`} />
 
-                <div className="relative p-8 md:p-12">
+                <div className="relative p-4 sm:p-6 md:p-12">
                   {/* Header */}
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">{currentProduct.name}</h2>
-                    <p className={`text-lg md:text-xl font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
+                  <div className="text-center mb-3 sm:mb-6 md:mb-8">
+                    <h2 className="text-xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4">{currentProduct.name}</h2>
+                    <p className={`text-sm sm:text-lg md:text-xl font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                       {currentProduct.tagline}
                     </p>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-gray-300 text-center text-lg mb-8 max-w-xl mx-auto">
+                  {/* Description - hidden on mobile, shown on larger screens */}
+                  <p className="hidden sm:block text-gray-300 text-center text-base md:text-lg mb-6 md:mb-8 max-w-xl mx-auto">
+                    {currentProduct.description}
+                  </p>
+
+                  {/* Mobile-only short description */}
+                  <p className="sm:hidden text-gray-400 text-center text-xs mb-4 line-clamp-2">
                     {currentProduct.description}
                   </p>
 
                   {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <div className="flex flex-row gap-2 sm:gap-4 justify-center items-center">
                     <button
-                      className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${currentProduct.color} rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition transform hover:scale-105`}
+                      className={`inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r ${currentProduct.color} rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition transform hover:scale-105`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedProduct(currentProduct.id);
                       }}
                       data-testid={`button-view-presentation-${currentProduct.id}`}
                     >
-                      View Presentation
-                      <ChevronRight className="w-4 h-4" />
+                      Presentation
+                      <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                     
                     {currentProduct.slideshowData && (
                       <button
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-700/80 hover:bg-slate-600 border border-slate-600 rounded-xl font-semibold text-sm transition transform hover:scale-105"
+                        className="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-slate-700/80 hover:bg-slate-600 border border-slate-600 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm transition transform hover:scale-105"
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowSlideshow(currentProduct.id);
                         }}
                         data-testid={`button-view-slideshow-${currentProduct.id}`}
                       >
-                        Full Slideshow
-                        <ChevronRight className="w-4 h-4" />
+                        Slideshow
+                        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                       </button>
                     )}
                   </div>
 
-                  {/* Slide count */}
-                  <p className="text-center text-gray-500 text-sm mt-6">
+                  {/* Slide count - hidden on mobile */}
+                  <p className="hidden sm:block text-center text-gray-500 text-sm mt-6">
                     {currentProduct.slides.length} slides available
                   </p>
                 </div>
@@ -198,10 +203,10 @@ export default function ProductsGallery() {
         {/* Right Arrow */}
         <button
           onClick={nextProduct}
-          className="absolute right-4 md:right-8 z-20 p-3 md:p-4 bg-slate-800/80 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group"
+          className="absolute right-1 sm:right-4 md:right-8 z-20 p-2 sm:p-3 md:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group"
           data-testid="button-next-product"
         >
-          <ChevronRight className="w-6 h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
         </button>
       </div>
 
