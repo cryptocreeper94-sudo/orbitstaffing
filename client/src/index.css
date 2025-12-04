@@ -557,16 +557,8 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
       max-width: calc(100vw - 2rem) !important;
     }
     
-    /* Flex containers should wrap on mobile - EXCEPT carousels */
-    .flex:not(.carousel-flex) {
-      flex-wrap: wrap;
-    }
-    
-    /* Horizontal carousel for mobile - keeps items in a row */
-    .carousel-flex {
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-    }
+    /* NOTE: Removed flex-wrap: wrap rule that was breaking carousels */
+    /* Carousels now handled by inline Tailwind classes */
     
     /* Badge improvements on mobile */
     .badge, [class*="Badge"] {
@@ -581,14 +573,8 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
       text-overflow: ellipsis;
     }
     
-    /* Grid improvements for mobile */
-    .grid {
-      grid-template-columns: 1fr !important;
-    }
-    
-    .grid-cols-2 {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
+    /* NOTE: Removed grid override that was breaking carousel grids */
+    /* Grids now handled by inline Tailwind responsive classes */
   }
   
   /* Small phones need extra care */
@@ -606,11 +592,7 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
       padding-right: 0.5rem !important;
     }
     
-    /* Stack all flex layouts - EXCEPT carousels */
-    .flex:not(.flex-col):not(.carousel-flex) {
-      flex-direction: column !important;
-      align-items: stretch !important;
-    }
+    /* NOTE: Removed flex-direction: column rule that was breaking carousels */
   }
   
   /* Tablet optimizations */
