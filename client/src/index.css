@@ -468,16 +468,8 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
      MOBILE OPTIMIZATION
      ======================== */
   
-  /* CRITICAL: Prevent horizontal overflow on mobile */
-  html, body {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
-  
-  /* Ensure all content respects viewport width */
-  *, *::before, *::after {
-    max-width: 100%;
-  }
+  /* NOTE: Removed overflow-x: hidden from html/body to allow carousel scrolling */
+  /* Carousels use overflow-x-auto and need horizontal scroll to work */
   
   /* Force text to wrap properly */
   p, span, div, h1, h2, h3, h4, h5, h6, li, td, th, label {
@@ -509,11 +501,11 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
       min-height: 44px;
     }
     
-    /* Container must respect viewport */
-    .container, [class*="container"], main, section {
+    /* Container respects viewport but allows carousel scroll */
+    .container, [class*="container"], main {
       max-width: 100vw !important;
-      overflow-x: hidden;
     }
+    /* NOTE: Removed overflow-x: hidden from section to allow carousels */
     
     /* Larger touch areas for interactive elements */
     .touch-target {

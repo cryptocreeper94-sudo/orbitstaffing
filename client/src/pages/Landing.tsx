@@ -73,7 +73,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground relative overflow-y-hidden">
       {/* Welcome Slideshow (Primary for new visitors) */}
       <WelcomeSlideshow
         isOpen={showWelcomeSlideshow}
