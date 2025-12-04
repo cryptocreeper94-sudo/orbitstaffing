@@ -7,11 +7,47 @@ import {
   Check, CreditCard, Bitcoin, ArrowLeft, TrendingDown, Star,
   Users, Calendar, DollarSign, MapPin, Shield, BarChart3,
   Briefcase, Clock, FileCheck, Zap, Building2, Rocket,
-  Gift, Share2, Crown, HelpCircle, ChevronRight, Package
+  Gift, Share2, Crown, HelpCircle, ChevronRight, Package,
+  Plus, Minus, Layers
 } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Switch } from '@/components/ui/switch';
+
+interface PlatformModule {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  monthlyPrice: string;
+  annualPrice: string;
+  stripePriceIdMonthly: string | null;
+  stripePriceIdAnnual: string | null;
+  isRequired: boolean;
+  isAddon: boolean;
+  sortOrder: number;
+  iconEmoji: string;
+  features: string[];
+}
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  tagline: string;
+  monthlyPrice: string;
+  annualPrice: string;
+  stripePriceIdMonthly: string | null;
+  stripePriceIdAnnual: string | null;
+  includedModules: string[];
+  maxWorkers: number;
+  maxAdmins: number;
+  storageGb: number;
+  isPopular: boolean;
+  isFeatured: boolean;
+  badgeText: string | null;
+}
 
 interface StandaloneTool {
   id: string;
@@ -216,11 +252,64 @@ export default function Pricing() {
   const [activeTab, setActiveTab] = useState('bundles');
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'coinbase' | null>(null);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set(['core']));
+
+  const { data: dbModules = [], isLoading: isLoadingModules } = useQuery<PlatformModule[]>({
+    queryKey: ['/api/modules'],
+    queryFn: async () => {
+      const res = await fetch('/api/modules');
+      if (!res.ok) throw new Error('Failed to fetch modules');
+      return res.json();
+    }
+  });
+
+  const { data: dbPlans = [], isLoading: isLoadingPlans } = useQuery<SubscriptionPlan[]>({
+    queryKey: ['/api/subscription-plans'],
+    queryFn: async () => {
+      const res = await fetch('/api/subscription-plans');
+      if (!res.ok) throw new Error('Failed to fetch plans');
+      return res.json();
+    }
+  });
+
+  const isLoading = isLoadingModules || isLoadingPlans;
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     setSelectedPlan(null);
     setPaymentMethod(null);
+  };
+
+  const toggleModule = (moduleId: string) => {
+    const module = dbModules.find(m => m.id === moduleId);
+    if (module?.isRequired) return;
+    
+    const newSelected = new Set(selectedModules);
+    if (newSelected.has(moduleId)) {
+      newSelected.delete(moduleId);
+    } else {
+      newSelected.add(moduleId);
+    }
+    setSelectedModules(newSelected);
+  };
+
+  const calculateTotal = () => {
+    let total = 0;
+    selectedModules.forEach(id => {
+      const module = dbModules.find(m => m.id === id);
+      if (module) {
+        const price = billingCycle === 'annual' 
+          ? parseFloat(module.annualPrice) / 12 
+          : parseFloat(module.monthlyPrice);
+        total += price;
+      }
+    });
+    return total;
+  };
+
+  const getModulesForPlan = (plan: SubscriptionPlan) => {
+    return dbModules.filter(m => plan.includedModules.includes(m.id));
   };
 
   const checkoutMutation = useMutation({
@@ -289,6 +378,14 @@ export default function Pricing() {
                 <span className="hidden sm:inline">Platform </span>Bundles
               </TabsTrigger>
               <TabsTrigger 
+                value="modular" 
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
+                data-testid="tab-modular"
+              >
+                <Layers className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Build Your </span>Own
+              </TabsTrigger>
+              <TabsTrigger 
                 value="tools" 
                 className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-tools"
@@ -313,89 +410,116 @@ export default function Pricing() {
               <p className="text-slate-400">Get everything you need at one low price. Best value for most businesses.</p>
             </div>
 
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4].map(i => (
+                  <Card key={i} className="bg-slate-800/50 border-slate-700/50 animate-pulse">
+                    <CardHeader><div className="h-8 bg-slate-700 rounded w-3/4" /></CardHeader>
+                    <CardContent><div className="space-y-3"><div className="h-10 bg-slate-700 rounded w-1/2" /><div className="h-4 bg-slate-700 rounded" /><div className="h-4 bg-slate-700 rounded w-5/6" /></div></CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : dbPlans.length === 0 ? (
+              <div className="text-center py-12 text-slate-400">
+                <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No subscription plans available. Check back soon!</p>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {PLATFORM_BUNDLES.map((bundle) => (
-                <Card
-                  key={bundle.id}
-                  className={`relative flex flex-col bg-slate-800/50 border-slate-700/50 transition-all hover:border-cyan-500/30 ${
-                    bundle.featured ? 'ring-2 ring-cyan-500/50 border-cyan-500/50' : ''
-                  }`}
-                  data-testid={`bundle-card-${bundle.id}`}
-                >
-                  {bundle.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4">
-                        <Star className="w-3 h-3 mr-1" />
-                        Most Popular
-                      </Badge>
-                    </div>
-                  )}
-
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <CardTitle className="text-xl">{bundle.name}</CardTitle>
-                      {bundle.savings && (
-                        <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">
-                          {bundle.savings}
+              {dbPlans.map((plan) => {
+                const planModules = getModulesForPlan(plan);
+                const priceId = plan.stripePriceIdMonthly || PLATFORM_BUNDLES.find(b => b.id === plan.id)?.priceId;
+                
+                return (
+                  <Card
+                    key={plan.id}
+                    className={`relative flex flex-col bg-slate-800/50 border-slate-700/50 transition-all hover:border-cyan-500/30 ${
+                      plan.isPopular ? 'ring-2 ring-cyan-500/50 border-cyan-500/50' : ''
+                    }`}
+                    data-testid={`bundle-card-${plan.id}`}
+                  >
+                    {plan.badgeText && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4">
+                          <Star className="w-3 h-3 mr-1" />
+                          {plan.badgeText}
                         </Badge>
-                      )}
-                    </div>
-                    <CardDescription className="text-slate-400">{bundle.description}</CardDescription>
-                  </CardHeader>
+                      </div>
+                    )}
 
-                  <CardContent className="flex-1 flex flex-col">
-                    <div className="mb-6">
-                      {bundle.price !== null ? (
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <CardTitle className="text-xl">{plan.name}</CardTitle>
+                        {plan.isFeatured && (
+                          <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">
+                            Best Value
+                          </Badge>
+                        )}
+                      </div>
+                      <CardDescription className="text-slate-400">{plan.description}</CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="flex-1 flex flex-col">
+                      <div className="mb-6">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-4xl font-bold text-white">${bundle.price}</span>
+                          <span className="text-4xl font-bold text-white">${parseFloat(plan.monthlyPrice).toFixed(0)}</span>
                           <span className="text-slate-400">/month</span>
                         </div>
-                      ) : (
-                        <span className="text-2xl font-bold text-cyan-400">Custom Pricing</span>
-                      )}
-                      <p className="text-sm text-slate-500 mt-1">{bundle.workers}</p>
-                    </div>
-
-                    <ul className="space-y-3 mb-6 flex-1">
-                      {bundle.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
-                          <span className="text-sm text-slate-300">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {bundle.priceId ? (
-                      <div className="space-y-2">
-                        <Button
-                          onClick={() => handleCheckout(bundle.priceId!, 'bundle', 'stripe')}
-                          className={`w-full ${bundle.featured ? 'bg-gradient-to-r from-cyan-500 to-blue-600' : 'bg-slate-700 hover:bg-slate-600'}`}
-                          disabled={checkoutMutation.isPending}
-                          data-testid={`button-checkout-${bundle.id}`}
-                        >
-                          <CreditCard className="w-4 h-4 mr-2" />
-                          {checkoutMutation.isPending && selectedPlan === bundle.priceId ? 'Processing...' : 'Subscribe with Card'}
-                        </Button>
-                        <Button
-                          onClick={() => handleCheckout(bundle.priceId!, 'bundle', 'coinbase')}
-                          variant="outline"
-                          className="w-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                          disabled={checkoutMutation.isPending}
-                          data-testid={`button-crypto-${bundle.id}`}
-                        >
-                          <Bitcoin className="w-4 h-4 mr-2" />
-                          Pay with Crypto
-                        </Button>
+                        <p className="text-sm text-slate-500 mt-1">{plan.tagline}</p>
                       </div>
-                    ) : (
-                      <Button className="w-full bg-slate-700 hover:bg-slate-600" data-testid="button-contact-sales">
-                        Contact Sales
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
+
+                      <ul className="space-y-3 mb-6 flex-1">
+                        {planModules.map((module) => (
+                          <li key={module.id} className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                            <span className="text-sm text-slate-300">
+                              {module.iconEmoji} {module.name}
+                            </span>
+                          </li>
+                        ))}
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                          <span className="text-sm text-slate-300">Up to {plan.maxWorkers.toLocaleString()} workers</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                          <span className="text-sm text-slate-300">{plan.storageGb}GB storage</span>
+                        </li>
+                      </ul>
+
+                      {priceId ? (
+                        <div className="space-y-2">
+                          <Button
+                            onClick={() => handleCheckout(priceId, 'bundle', 'stripe')}
+                            className={`w-full ${plan.isPopular ? 'bg-gradient-to-r from-cyan-500 to-blue-600' : 'bg-slate-700 hover:bg-slate-600'}`}
+                            disabled={checkoutMutation.isPending}
+                            data-testid={`button-checkout-${plan.id}`}
+                          >
+                            <CreditCard className="w-4 h-4 mr-2" />
+                            {checkoutMutation.isPending && selectedPlan === priceId ? 'Processing...' : 'Subscribe with Card'}
+                          </Button>
+                          <Button
+                            onClick={() => handleCheckout(priceId, 'bundle', 'coinbase')}
+                            variant="outline"
+                            className="w-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                            disabled={checkoutMutation.isPending}
+                            data-testid={`button-crypto-${plan.id}`}
+                          >
+                            <Bitcoin className="w-4 h-4 mr-2" />
+                            Pay with Crypto
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button className="w-full bg-slate-700 hover:bg-slate-600" data-testid="button-contact-sales">
+                          Contact Sales
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
+            )}
           </TabsContent>
 
           <TabsContent value="tools" className="space-y-8">
@@ -404,44 +528,69 @@ export default function Pricing() {
               <p className="text-slate-400">Each tool works standalone. Mix and match as your business grows.</p>
             </div>
 
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map(i => (
+                  <Card key={i} className="bg-slate-800/50 border-slate-700/50 animate-pulse">
+                    <CardHeader><div className="h-12 w-12 bg-slate-700 rounded-xl mb-3" /><div className="h-6 bg-slate-700 rounded w-3/4" /></CardHeader>
+                    <CardContent><div className="space-y-3"><div className="h-8 bg-slate-700 rounded w-1/3" /><div className="h-4 bg-slate-700 rounded" /><div className="h-4 bg-slate-700 rounded w-5/6" /></div></CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : dbModules.filter(m => m.isAddon && !m.isRequired).length === 0 ? (
+              <div className="text-center py-12 text-slate-400">
+                <Zap className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No standalone tools available. Check back soon!</p>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {STANDALONE_TOOLS.map((tool) => {
-                const IconComponent = tool.icon;
+              {dbModules.filter(m => m.isAddon && !m.isRequired).map((module) => {
+                const gradientColors: Record<string, string> = {
+                  payroll: 'from-green-500 to-emerald-600',
+                  compliance: 'from-red-500 to-rose-600',
+                  pay_card: 'from-amber-500 to-orange-600',
+                  talent_exchange: 'from-purple-500 to-pink-600',
+                  crm: 'from-cyan-500 to-blue-600',
+                  blockchain: 'from-violet-500 to-purple-600',
+                  ai_assistant: 'from-pink-500 to-rose-600',
+                };
+                const color = gradientColors[module.id] || 'from-cyan-500 to-blue-600';
+                const priceId = module.stripePriceIdMonthly || STANDALONE_TOOLS.find(t => t.id === module.id)?.priceId;
+                
                 return (
                   <Card
-                    key={tool.id}
+                    key={module.id}
                     className="relative flex flex-col bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/30 transition-all overflow-hidden"
-                    data-testid={`tool-card-${tool.id}`}
+                    data-testid={`tool-card-${module.id}`}
                   >
-                    <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${tool.color}`} />
+                    <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${color}`} />
                     
                     <CardHeader className="pb-4">
                       <div className="flex items-start justify-between">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${tool.color} flex items-center justify-center mb-3`}>
-                          <IconComponent className="w-6 h-6 text-white" />
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${color} flex items-center justify-center mb-3`}>
+                          <span className="text-2xl">{module.iconEmoji}</span>
                         </div>
                         <Badge variant="outline" className="text-green-400 border-green-500/30 text-xs">
-                          {tool.savings}
+                          Addon
                         </Badge>
                       </div>
-                      <CardTitle className="text-xl">{tool.name}</CardTitle>
-                      <CardDescription className="text-slate-400">{tool.description}</CardDescription>
+                      <CardTitle className="text-xl">{module.name}</CardTitle>
+                      <CardDescription className="text-slate-400">{module.description}</CardDescription>
                     </CardHeader>
 
                     <CardContent className="flex-1 flex flex-col">
                       <div className="mb-4">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-3xl font-bold text-white">${tool.price}</span>
+                          <span className="text-3xl font-bold text-white">${parseFloat(module.monthlyPrice).toFixed(0)}</span>
                           <span className="text-slate-400">/month</span>
                         </div>
-                        <div className="flex items-center gap-2 mt-2 text-xs">
-                          <span className="text-slate-500">vs {tool.competitor}:</span>
-                          <span className="text-slate-400 line-through">{tool.competitorPrice}</span>
+                        <div className="text-xs text-slate-500 mt-1">
+                          or ${parseFloat(module.annualPrice).toFixed(0)}/year (save 17%)
                         </div>
                       </div>
 
                       <ul className="space-y-2 mb-6 flex-1">
-                        {tool.features.map((feature, idx) => (
+                        {module.features && (module.features as string[]).map((feature, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
                             <span className="text-sm text-slate-300">{feature}</span>
@@ -450,48 +599,48 @@ export default function Pricing() {
                       </ul>
 
                       <div className="space-y-2">
-                        {tool.priceId ? (
+                        {priceId ? (
                           <Button
-                            onClick={() => handleCheckout(tool.priceId!, 'tool', 'stripe')}
-                            className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90`}
+                            onClick={() => handleCheckout(priceId, 'module', 'stripe')}
+                            className={`w-full bg-gradient-to-r ${color} hover:opacity-90`}
                             disabled={checkoutMutation.isPending}
-                            data-testid={`button-subscribe-${tool.id}`}
+                            data-testid={`button-subscribe-${module.id}`}
                           >
                             <CreditCard className="w-4 h-4 mr-2" />
-                            {checkoutMutation.isPending && selectedPlan === tool.priceId ? 'Processing...' : 'Subscribe Now'}
+                            {checkoutMutation.isPending && selectedPlan === priceId ? 'Processing...' : 'Add Module'}
                           </Button>
                         ) : (
                           <Button
-                            className={`w-full bg-gradient-to-r ${tool.color} hover:opacity-90`}
-                            onClick={() => handleTabChange('bundles')}
-                            data-testid={`button-subscribe-${tool.id}`}
+                            className={`w-full bg-gradient-to-r ${color} hover:opacity-90`}
+                            onClick={() => handleTabChange('modular')}
+                            data-testid={`button-subscribe-${module.id}`}
                           >
                             <Package className="w-4 h-4 mr-2" />
-                            Get in Bundle
+                            Build Custom Package
                           </Button>
                         )}
-                        <Link href="/jobs">
-                          <Button
-                            variant="outline"
-                            className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
-                            data-testid={`button-demo-${tool.id}`}
-                          >
-                            Try Free Demo
-                          </Button>
-                        </Link>
+                        <Button
+                          variant="outline"
+                          className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+                          onClick={() => handleTabChange('bundles')}
+                          data-testid={`button-bundle-${module.id}`}
+                        >
+                          Get in Bundle
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
+            )}
 
             <Card className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30 p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">Need Everything?</h3>
                   <p className="text-slate-400">
-                    All 5 tools purchased separately = $127/mo. Get them all in a bundle for just $99-249/mo!
+                    All modules purchased separately = ${dbModules.reduce((sum, m) => sum + parseFloat(m.monthlyPrice || '0'), 0)}/mo. Get them in an Enterprise bundle!
                   </p>
                 </div>
                 <Button 
@@ -504,6 +653,170 @@ export default function Pricing() {
                 </Button>
               </div>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="modular" className="space-y-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold mb-2">Build Your Perfect Package</h2>
+              <p className="text-slate-400">Select only the modules you need. Mix and match to create your ideal solution.</p>
+            </div>
+
+            <div className="flex justify-center mb-6">
+              <div className="bg-slate-800 rounded-full p-1 flex items-center gap-2">
+                <button
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    billingCycle === 'monthly' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
+                  }`}
+                  data-testid="button-monthly"
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setBillingCycle('annual')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+                    billingCycle === 'annual' ? 'bg-cyan-500 text-white' : 'text-slate-400 hover:text-white'
+                  }`}
+                  data-testid="button-annual"
+                >
+                  Annual
+                  <Badge className="bg-green-500/20 text-green-400 text-xs">Save 17%</Badge>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-4">
+                <h3 className="text-lg font-semibold text-slate-300 mb-4">Available Modules</h3>
+                
+                {dbModules.map((module) => (
+                  <Card 
+                    key={module.id}
+                    className={`bg-slate-800/50 border-slate-700/50 cursor-pointer transition-all ${
+                      selectedModules.has(module.id) ? 'ring-2 ring-cyan-500/50 border-cyan-500/50' : 'hover:border-slate-600'
+                    } ${module.isRequired ? 'opacity-75' : ''}`}
+                    onClick={() => toggleModule(module.id)}
+                    data-testid={`module-card-${module.id}`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="text-2xl">{module.iconEmoji}</div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-white">{module.name}</h4>
+                              {module.isRequired && (
+                                <Badge variant="outline" className="text-xs text-cyan-400 border-cyan-500/30">Required</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-slate-400">{module.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <div className="font-bold text-white">
+                              ${billingCycle === 'annual' 
+                                ? (parseFloat(module.annualPrice) / 12).toFixed(0) 
+                                : parseFloat(module.monthlyPrice).toFixed(0)}
+                            </div>
+                            <div className="text-xs text-slate-500">/month</div>
+                          </div>
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                            selectedModules.has(module.id) 
+                              ? 'bg-cyan-500 border-cyan-500' 
+                              : 'border-slate-600'
+                          }`}>
+                            {selectedModules.has(module.id) && <Check className="w-4 h-4 text-white" />}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {selectedModules.has(module.id) && module.features && (
+                        <div className="mt-4 pt-4 border-t border-slate-700">
+                          <div className="grid grid-cols-2 gap-2">
+                            {(module.features as string[]).map((feature, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-sm text-slate-400">
+                                <Check className="w-3 h-3 text-green-400 flex-shrink-0" />
+                                {feature}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="lg:col-span-1">
+                <Card className="bg-slate-800/50 border-slate-700/50 sticky top-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Your Package</CardTitle>
+                    <CardDescription>Selected modules and pricing</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      {dbModules
+                        .filter(m => selectedModules.has(m.id))
+                        .map(module => (
+                          <div key={module.id} className="flex justify-between items-center text-sm">
+                            <span className="flex items-center gap-2">
+                              <span>{module.iconEmoji}</span>
+                              <span className="text-slate-300">{module.name}</span>
+                            </span>
+                            <span className="text-slate-400">
+                              ${billingCycle === 'annual' 
+                                ? (parseFloat(module.annualPrice) / 12).toFixed(0) 
+                                : parseFloat(module.monthlyPrice).toFixed(0)}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+
+                    <div className="border-t border-slate-700 pt-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-slate-400">Monthly Total</span>
+                        <span className="text-2xl font-bold text-white">${calculateTotal().toFixed(0)}</span>
+                      </div>
+                      {billingCycle === 'annual' && (
+                        <div className="text-sm text-green-400 text-right">
+                          Save ${((calculateTotal() * 12) - (calculateTotal() * 12 * 0.83)).toFixed(0)}/year
+                        </div>
+                      )}
+                    </div>
+
+                    <Button 
+                      className="w-full bg-gradient-to-r from-cyan-500 to-blue-600"
+                      disabled={selectedModules.size === 0}
+                      data-testid="button-checkout-custom"
+                    >
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Start Subscription
+                    </Button>
+
+                    <p className="text-xs text-slate-500 text-center">
+                      Cancel anytime. No long-term contracts.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30 mt-6 p-4">
+                  <h4 className="font-semibold text-white mb-2">Compare to Pre-built Plans</h4>
+                  <p className="text-sm text-slate-400 mb-3">
+                    Pre-built bundles may save you money if you need multiple modules.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleTabChange('bundles')}
+                    className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                    data-testid="button-compare-plans"
+                  >
+                    View Pre-built Plans
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="affiliate" className="space-y-8">
