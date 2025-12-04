@@ -340,6 +340,11 @@ export const workers = pgTable(
     assignmentOnboardingDeadline: timestamp("assignment_onboarding_deadline"), // 1 business day after assignment
     onboardingTimedOut: boolean("onboarding_timed_out").default(false),
 
+    // Facial Recognition - Profile Photo (reference for clock-in verification)
+    profilePhotoUrl: varchar("profile_photo_url", { length: 500 }),
+    profilePhotoUploadedAt: timestamp("profile_photo_uploaded_at"),
+    profilePhotoVerified: boolean("profile_photo_verified").default(false), // Admin verified this is the actual worker
+
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
@@ -559,10 +564,22 @@ export const timesheets = pgTable(
     clockInLongitude: decimal("clock_in_longitude", { precision: 9, scale: 6 }),
     clockInVerified: boolean("clock_in_verified"),
 
+    // Facial Recognition - Clock In
+    clockInPhotoUrl: varchar("clock_in_photo_url", { length: 500 }),
+    clockInFaceMatchScore: decimal("clock_in_face_match_score", { precision: 5, scale: 2 }), // 0-100 confidence
+    clockInFaceVerified: boolean("clock_in_face_verified"), // true if score >= 90%
+    clockInFaceStatus: varchar("clock_in_face_status", { length: 20 }), // 'verified', 'flagged', 'rejected', 'pending_review'
+
     clockOutTime: timestamp("clock_out_time"),
     clockOutLatitude: decimal("clock_out_latitude", { precision: 9, scale: 6 }),
     clockOutLongitude: decimal("clock_out_longitude", { precision: 9, scale: 6 }),
     clockOutVerified: boolean("clock_out_verified"),
+
+    // Facial Recognition - Clock Out (optional)
+    clockOutPhotoUrl: varchar("clock_out_photo_url", { length: 500 }),
+    clockOutFaceMatchScore: decimal("clock_out_face_match_score", { precision: 5, scale: 2 }),
+    clockOutFaceVerified: boolean("clock_out_face_verified"),
+    clockOutFaceStatus: varchar("clock_out_face_status", { length: 20 }),
 
     // Weather conditions at clock-in/out for job site reporting
     clockInWeather: jsonb("clock_in_weather"), // {temp, feelsLike, condition, humidity, windSpeed, windDirection, precipitation, visibility, uvIndex, pressure, alerts[]}

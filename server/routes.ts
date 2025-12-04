@@ -20,6 +20,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import express from "express";
+import { azureFaceService } from "./azureFaceService";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -1626,6 +1627,397 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Get active clock-in error:', error);
       res.status(500).json({ error: 'Failed to get active clock-in' });
+    }
+  });
+  
+  // ========================
+  // FACIAL RECOGNITION ROUTES (Anti-Fraud Clock-in Verification)
+  // ========================
+  
+  /**
+   * Check if facial recognition is available
+   */
+  app.get('/api/face-recognition/status', async (_req: Request, res: Response) => {
+    res.json({
+      available: azureFaceService.isAvailable(),
+      message: azureFaceService.isAvailable()
+        ? 'Facial recognition is configured and ready'
+        : 'Facial recognition is not configured - add AZURE_FACE_API_KEY and AZURE_FACE_API_ENDPOINT to enable',
+    });
+  });
+  
+  /**
+   * Upload/update worker profile photo for face verification
+   * This photo will be used as the reference for all future clock-in verifications
+   */
+  app.post('/api/workers/:workerId/profile-photo', async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const { photoBase64 } = req.body;
+      const tenantId = getTenantIdFromRequest(req);
+      
+      if (!tenantId) {
+        return res.status(401).json({ error: 'Tenant ID required' });
+      }
+      
+      if (!photoBase64) {
+        return res.status(400).json({ error: 'Photo data required (base64 encoded)' });
+      }
+      
+      // Get the worker
+      const worker = await storage.getWorker(workerId);
+      if (!worker) {
+        return res.status(404).json({ error: 'Worker not found' });
+      }
+      
+      // Verify tenant access
+      if (worker.tenantId !== tenantId) {
+        return res.status(403).json({ error: 'Access denied - worker belongs to different tenant' });
+      }
+      
+      // Validate photo has exactly one face if Azure is configured
+      const validation = await azureFaceService.validateProfilePhoto(photoBase64);
+      if (!validation.valid) {
+        return res.status(400).json({
+          error: validation.message,
+          faceCount: validation.faceCount,
+        });
+      }
+      
+      // Store photo as base64 data URL (in production, you'd upload to cloud storage)
+      const photoUrl = `data:image/jpeg;base64,${photoBase64.replace(/^data:image\/\w+;base64,/, '')}`;
+      
+      // Update worker profile photo
+      await storage.updateWorker(workerId, {
+        profilePhotoUrl: photoUrl,
+        profilePhotoUploadedAt: new Date(),
+        profilePhotoVerified: false, // Admin needs to verify this is the actual worker
+      });
+      
+      console.log(`[Facial Recognition] 📸 Profile photo uploaded for worker ${workerId}`);
+      
+      res.json({
+        success: true,
+        message: 'Profile photo uploaded successfully. Admin verification pending.',
+        validation: validation,
+      });
+    } catch (error) {
+      console.error('Profile photo upload error:', error);
+      res.status(500).json({ error: 'Failed to upload profile photo' });
+    }
+  });
+  
+  /**
+   * Admin: Verify a worker's profile photo (confirm it's actually them)
+   */
+  app.post('/api/workers/:workerId/verify-photo', requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const { verified, reason } = req.body;
+      
+      const worker = await storage.getWorker(workerId);
+      if (!worker) {
+        return res.status(404).json({ error: 'Worker not found' });
+      }
+      
+      if (!worker.profilePhotoUrl) {
+        return res.status(400).json({ error: 'Worker has no profile photo to verify' });
+      }
+      
+      await storage.updateWorker(workerId, {
+        profilePhotoVerified: verified === true,
+      });
+      
+      console.log(`[Facial Recognition] ${verified ? '✅' : '❌'} Admin ${verified ? 'verified' : 'rejected'} profile photo for worker ${workerId}${reason ? ` - Reason: ${reason}` : ''}`);
+      
+      res.json({
+        success: true,
+        verified: verified === true,
+        message: verified ? 'Profile photo verified by admin' : 'Profile photo rejected by admin',
+      });
+    } catch (error) {
+      console.error('Photo verification error:', error);
+      res.status(500).json({ error: 'Failed to verify photo' });
+    }
+  });
+  
+  /**
+   * Get worker's profile photo info
+   */
+  app.get('/api/workers/:workerId/profile-photo', async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const tenantId = getTenantIdFromRequest(req);
+      
+      if (!tenantId) {
+        return res.status(401).json({ error: 'Tenant ID required' });
+      }
+      
+      const worker = await storage.getWorker(workerId);
+      if (!worker) {
+        return res.status(404).json({ error: 'Worker not found' });
+      }
+      
+      if (worker.tenantId !== tenantId) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+      
+      res.json({
+        hasPhoto: !!worker.profilePhotoUrl,
+        photoUrl: worker.profilePhotoUrl,
+        uploadedAt: worker.profilePhotoUploadedAt,
+        verified: worker.profilePhotoVerified,
+      });
+    } catch (error) {
+      console.error('Get profile photo error:', error);
+      res.status(500).json({ error: 'Failed to get profile photo' });
+    }
+  });
+  
+  /**
+   * Enhanced GPS Clock-In with Facial Recognition
+   * Verifies both GPS location AND face match against profile photo
+   */
+  app.post('/api/gps/clock-in-verified', async (req: Request, res: Response) => {
+    try {
+      const { workerId, assignmentId, latitude, longitude, accuracy, selfieBase64 } = req.body;
+      const tenantId = getTenantIdFromRequest(req);
+      
+      if (!tenantId) {
+        return res.status(401).json({ error: 'Tenant ID required' });
+      }
+      
+      if (!workerId || !assignmentId || latitude === undefined || longitude === undefined) {
+        return res.status(400).json({ error: 'Missing required fields: workerId, assignmentId, latitude, longitude' });
+      }
+      
+      // Get worker to check profile photo
+      const worker = await storage.getWorker(workerId);
+      if (!worker) {
+        return res.status(404).json({ error: 'Worker not found' });
+      }
+      
+      // Get assignment to verify geofence
+      const assignment = await storage.getAssignment(assignmentId);
+      if (!assignment) {
+        return res.status(404).json({ error: 'Assignment not found' });
+      }
+      
+      // Verify GPS is within geofence (300 feet / ~90 meters)
+      const geofenceRadiusFeet = 300;
+      const assignmentLat = parseFloat(assignment.latitude || '0');
+      const assignmentLon = parseFloat(assignment.longitude || '0');
+      
+      const isWithinGeofence = verifyGeofence(
+        latitude,
+        longitude,
+        assignmentLat,
+        assignmentLon,
+        geofenceRadiusFeet
+      );
+      
+      if (!isWithinGeofence) {
+        return res.status(400).json({
+          error: 'You are not at the work location. Please move closer to clock in.',
+          distanceCheck: 'failed',
+        });
+      }
+      
+      // Perform face verification if selfie provided
+      let faceResult = null;
+      let faceVerified = null;
+      let faceStatus: string | null = null;
+      let faceScore: string | null = null;
+      let clockInPhotoUrl: string | null = null;
+      
+      if (selfieBase64) {
+        // Store the selfie
+        clockInPhotoUrl = `data:image/jpeg;base64,${selfieBase64.replace(/^data:image\/\w+;base64,/, '')}`;
+        
+        if (azureFaceService.isAvailable() && worker.profilePhotoUrl) {
+          faceResult = await azureFaceService.compareFaces(worker.profilePhotoUrl, selfieBase64);
+          faceVerified = faceResult.status === 'verified';
+          faceStatus = faceResult.status;
+          faceScore = faceResult.confidence.toString();
+          
+          console.log(`[Facial Recognition] Face match for worker ${workerId}: ${faceResult.status} (${faceResult.confidence}%)`);
+          
+          // If face is rejected, don't allow clock-in
+          if (faceResult.status === 'rejected') {
+            return res.status(400).json({
+              error: faceResult.message,
+              faceVerification: {
+                status: faceResult.status,
+                confidence: faceResult.confidence,
+              },
+            });
+          }
+        } else if (!worker.profilePhotoUrl) {
+          faceStatus = 'no_reference_photo';
+          console.log(`[Facial Recognition] No profile photo for worker ${workerId} - verification skipped`);
+        } else {
+          faceStatus = 'service_unavailable';
+          console.log(`[Facial Recognition] Service not configured - verification skipped`);
+        }
+      }
+      
+      // Fetch current weather conditions for job site reporting
+      const weatherData = await fetchWeatherData(latitude, longitude);
+      
+      // Determine overall status based on face verification
+      let timesheetStatus = 'draft';
+      if (faceStatus === 'flagged') {
+        timesheetStatus = 'requires_review'; // Admin needs to review
+      }
+      
+      // Create timesheet entry with face verification data
+      const timesheet = await storage.createTimesheet({
+        workerId,
+        tenantId,
+        assignmentId,
+        clockInTime: new Date(),
+        clockInLatitude: latitude.toString(),
+        clockInLongitude: longitude.toString(),
+        clockInVerified: true,
+        clockInPhotoUrl,
+        clockInFaceMatchScore: faceScore,
+        clockInFaceVerified: faceVerified,
+        clockInFaceStatus: faceStatus,
+        clockInWeather: weatherData,
+        status: timesheetStatus,
+      });
+      
+      console.log(`[GPS Clock-In Verified] ✅ Worker ${workerId} clocked in at assignment ${assignmentId}${faceStatus ? ` (Face: ${faceStatus})` : ''}`);
+      if (weatherData) {
+        console.log(`[GPS Clock-In Verified] 🌤️ Weather captured: ${weatherData.temp}°F, ${weatherData.condition}`);
+      }
+      
+      res.json({
+        success: true,
+        timesheetId: timesheet.id,
+        clockInTime: timesheet.clockInTime,
+        gpsVerified: true,
+        faceVerification: faceResult ? {
+          status: faceResult.status,
+          confidence: faceResult.confidence,
+          message: faceResult.message,
+          verified: faceResult.status === 'verified',
+        } : null,
+        weather: weatherData,
+        requiresReview: faceStatus === 'flagged',
+      });
+    } catch (error) {
+      console.error('GPS clock-in with face verification error:', error);
+      res.status(500).json({ error: 'Failed to clock in' });
+    }
+  });
+  
+  /**
+   * Get timesheets with flagged face verification for admin review
+   */
+  app.get('/api/timesheets/face-flagged', async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const timesheets = await storage.listTimesheets(tenantId);
+      
+      // Filter for timesheets with flagged face status
+      const flaggedTimesheets = timesheets.filter(
+        (ts: Timesheet) => ts.clockInFaceStatus === 'flagged' || ts.clockOutFaceStatus === 'flagged'
+      );
+      
+      // Enrich with worker details
+      const enrichedTimesheets = await Promise.all(
+        flaggedTimesheets.map(async (timesheet: Timesheet) => {
+          const worker = await storage.getWorker(timesheet.workerId || '');
+          return {
+            ...timesheet,
+            workerName: worker?.fullName || 'Unknown',
+            workerPhone: worker?.phone || 'Unknown',
+            workerProfilePhoto: worker?.profilePhotoUrl,
+          };
+        })
+      );
+      
+      res.json(enrichedTimesheets);
+    } catch (error) {
+      console.error('Get flagged timesheets error:', error);
+      res.status(500).json({ error: 'Failed to fetch flagged timesheets' });
+    }
+  });
+  
+  /**
+   * Admin: Manually approve/reject a flagged face verification
+   */
+  app.post('/api/timesheets/:id/face-review', requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { approved, reason, reviewedBy } = req.body;
+      
+      const timesheet = await storage.getTimesheet(id);
+      if (!timesheet) {
+        return res.status(404).json({ error: 'Timesheet not found' });
+      }
+      
+      // Update face status based on admin decision
+      const newFaceStatus = approved ? 'verified' : 'rejected';
+      const updates: any = {
+        clockInFaceStatus: newFaceStatus,
+        clockInFaceVerified: approved,
+      };
+      
+      // If approved, allow the timesheet to proceed normally
+      if (approved) {
+        updates.status = 'draft'; // Return to normal flow
+      } else {
+        updates.status = 'rejected'; // Reject the entire timesheet
+        updates.notes = `Face verification rejected by admin: ${reason || 'No reason provided'}`;
+      }
+      
+      await storage.updateTimesheet(id, updates);
+      
+      console.log(`[Facial Recognition] Admin ${approved ? 'approved' : 'rejected'} face verification for timesheet ${id}${reason ? ` - Reason: ${reason}` : ''}`);
+      
+      res.json({
+        success: true,
+        approved,
+        message: approved 
+          ? 'Face verification approved by admin - timesheet can proceed'
+          : 'Face verification rejected by admin - timesheet marked as rejected',
+      });
+    } catch (error) {
+      console.error('Face review error:', error);
+      res.status(500).json({ error: 'Failed to review face verification' });
+    }
+  });
+  
+  /**
+   * Get workers without profile photos (for admin to follow up)
+   */
+  app.get('/api/workers/missing-photos', async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const workers = await storage.listWorkers(tenantId);
+      const workersWithoutPhotos = workers.filter(
+        (w: any) => !w.profilePhotoUrl && w.status === 'approved'
+      );
+      
+      res.json({
+        count: workersWithoutPhotos.length,
+        workers: workersWithoutPhotos.map((w: any) => ({
+          id: w.id,
+          fullName: w.fullName,
+          phone: w.phone,
+          email: w.email,
+          status: w.status,
+        })),
+      });
+    } catch (error) {
+      console.error('Get workers missing photos error:', error);
+      res.status(500).json({ error: 'Failed to fetch workers' });
     }
   });
   
