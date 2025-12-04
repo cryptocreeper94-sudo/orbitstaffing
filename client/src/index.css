@@ -133,6 +133,30 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
   display: none;
 }
 
+/* MOBILE CAROUSEL FIX - Enable touch scrolling */
+@media (max-width: 640px) {
+  .overflow-x-auto {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  
+  /* Ensure flex items don't shrink below their min-width */
+  .flex-shrink-0 {
+    flex-shrink: 0 !important;
+  }
+  
+  /* Ensure proper sizing for carousel cards */
+  .basis-\[48\%\] {
+    flex-basis: 48% !important;
+    min-width: 48% !important;
+  }
+  
+  .min-w-\[48\%\] {
+    min-width: 48% !important;
+  }
+}
+
 /* Gradient text effect */
 .gradient-text {
   background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #06b6d4 100%);

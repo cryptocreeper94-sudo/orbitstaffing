@@ -494,29 +494,29 @@ export default function Landing() {
           </div>
 
           {/* Integration Logos - Horizontal scroll with sparkle */}
-          <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-4 gap-1.5 sm:gap-3 mb-2 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide">
-            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-1.5 sm:p-3 text-center">
-                <div className="text-lg sm:text-2xl">📊</div>
-                <div className="text-[7px] sm:text-xs font-bold text-white">QB</div>
+          <div className="flex flex-row flex-nowrap gap-2 sm:gap-3 mb-2 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide pr-8 sm:pr-0 sm:grid sm:grid-cols-4">
+            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl">📊</div>
+                <div className="text-[9px] sm:text-xs font-bold text-white">QB</div>
               </CardContent>
             </Card>
-            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-1.5 sm:p-3 text-center">
-                <div className="text-lg sm:text-2xl">👥</div>
-                <div className="text-[7px] sm:text-xs font-bold text-white">ADP</div>
+            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl">👥</div>
+                <div className="text-[9px] sm:text-xs font-bold text-white">ADP</div>
               </CardContent>
             </Card>
-            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-1.5 sm:p-3 text-center">
-                <div className="text-lg sm:text-2xl">📅</div>
-                <div className="text-[7px] sm:text-xs font-bold text-white">UKG</div>
+            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl">📅</div>
+                <div className="text-[9px] sm:text-xs font-bold text-white">UKG</div>
               </CardContent>
             </Card>
-            <Card className="flex-shrink-0 w-[22%] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-1.5 sm:p-3 text-center">
-                <div className="text-lg sm:text-2xl">💼</div>
-                <div className="text-[7px] sm:text-xs font-bold text-white">Paychex</div>
+            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <CardContent className="p-2 sm:p-3 text-center">
+                <div className="text-xl sm:text-2xl">💼</div>
+                <div className="text-[9px] sm:text-xs font-bold text-white">Paychex</div>
               </CardContent>
             </Card>
           </div>
