@@ -17,7 +17,6 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { HallmarkPageWatermark } from "@/components/HallmarkWatermark";
 import { ContactForm } from "@/components/ContactForm";
 import { OCRScannerModal } from "@/components/layout/OCRScannerModal";
 import { CameraModal } from "@/components/layout/CameraModal";
@@ -144,8 +143,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        {/* Saturn Watermark Background */}
-        <HallmarkPageWatermark />
         
         {/* Noise overlay */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay"></div>
