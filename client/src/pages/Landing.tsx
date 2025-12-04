@@ -486,46 +486,77 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CONNECT YOUR EXISTING SYSTEMS - Compact with sparkle */}
+      {/* CONNECT YOUR EXISTING SYSTEMS - Carousel mobile, Accordion desktop */}
       <section className="py-3 sm:py-8 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
         <div className="max-w-6xl mx-auto px-2 sm:px-6">
-          <div className="text-center mb-2 sm:mb-6">
+          <div className="text-center mb-3 sm:mb-6">
             <h2 className="text-sm sm:text-2xl font-bold text-white">Connect Your Systems</h2>
+            <p className="text-[9px] sm:text-sm text-slate-400 mt-1">16+ integrations to streamline your workflow</p>
           </div>
 
-          {/* Integration Logos - Horizontal scroll with sparkle */}
-          <div className="flex flex-row flex-nowrap gap-2 sm:gap-3 mb-2 sm:mb-6 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide pr-8 sm:pr-0 sm:grid sm:grid-cols-4">
-            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-2 sm:p-3 text-center">
-                <div className="text-xl sm:text-2xl">📊</div>
-                <div className="text-[9px] sm:text-xs font-bold text-white">QB</div>
-              </CardContent>
-            </Card>
-            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-2 sm:p-3 text-center">
-                <div className="text-xl sm:text-2xl">👥</div>
-                <div className="text-[9px] sm:text-xs font-bold text-white">ADP</div>
-              </CardContent>
-            </Card>
-            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-2 sm:p-3 text-center">
-                <div className="text-xl sm:text-2xl">📅</div>
-                <div className="text-[9px] sm:text-xs font-bold text-white">UKG</div>
-              </CardContent>
-            </Card>
-            <Card className="flex-shrink-0 w-[70px] sm:w-auto snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)] hover:shadow-[0_0_15px_rgba(6,182,212,0.25)]">
-              <CardContent className="p-2 sm:p-3 text-center">
-                <div className="text-xl sm:text-2xl">💼</div>
-                <div className="text-[9px] sm:text-xs font-bold text-white">Paychex</div>
-              </CardContent>
-            </Card>
+          {/* Mobile: Horizontal scroll carousel */}
+          <div className="sm:hidden relative mb-3">
+            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 snap-x snap-mandatory scrollbar-hide -mx-2 px-2">
+              {[
+                { icon: "📊", name: "QuickBooks", cat: "Accounting" },
+                { icon: "👥", name: "ADP", cat: "Payroll" },
+                { icon: "📅", name: "UKG", cat: "HR" },
+                { icon: "💼", name: "Paychex", cat: "Payroll" },
+                { icon: "📈", name: "Xero", cat: "Accounting" },
+                { icon: "🔗", name: "Indeed", cat: "Job Board" },
+                { icon: "💬", name: "LinkedIn", cat: "Job Board" },
+                { icon: "📋", name: "ZipRecruiter", cat: "Job Board" },
+                { icon: "⚡", name: "Gusto", cat: "Payroll" },
+                { icon: "🏢", name: "Workday", cat: "HR" },
+                { icon: "📱", name: "Slack", cat: "Comms" },
+                { icon: "📧", name: "Gmail", cat: "Comms" },
+              ].map((item, idx) => (
+                <Card key={idx} className="flex-shrink-0 w-[75px] snap-start bg-slate-900/50 border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
+                  <CardContent className="p-2 text-center">
+                    <div className="text-lg">{item.icon}</div>
+                    <div className="text-[8px] font-bold text-white truncate">{item.name}</div>
+                    <div className="text-[7px] text-cyan-400">{item.cat}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <div className="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none">
+              <ChevronRight className="w-4 h-4 text-cyan-400 animate-pulse" />
+            </div>
+          </div>
+
+          {/* Desktop: Category Grid with full width */}
+          <div className="hidden sm:grid sm:grid-cols-4 gap-4">
+            {[
+              { icon: "💰", title: "Payroll", items: ["ADP", "Paychex", "Gusto", "OnPay"] },
+              { icon: "📊", title: "Accounting", items: ["QuickBooks", "Xero", "FreshBooks", "Wave"] },
+              { icon: "👥", title: "HR Systems", items: ["UKG", "Workday", "BambooHR", "Rippling"] },
+              { icon: "🔗", title: "Job Boards", items: ["Indeed", "LinkedIn", "ZipRecruiter", "Glassdoor"] },
+            ].map((category, idx) => (
+              <Card key={idx} className="bg-slate-900/30 border-cyan-500/30">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">{category.icon}</span>
+                    <h3 className="font-semibold text-cyan-400 text-sm">{category.title}</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {category.items.map(name => (
+                      <div key={name} className="flex items-center gap-2 text-xs text-slate-300 hover:text-white cursor-pointer transition-colors">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                        {name}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           {/* Call to Action */}
-          <div className="text-center">
+          <div className="text-center mt-3 sm:mt-6">
             <Link href="/integrations">
               <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] text-[9px] sm:text-sm h-7 sm:h-9 px-3">
-                16+ Integrations <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
+                View All Integrations <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
               </Button>
             </Link>
           </div>
