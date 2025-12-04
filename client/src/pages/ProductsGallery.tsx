@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { ChevronRight, X, Shield, Zap, Truck } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
 import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides } from '@/data/slidesData';
-import { QRCodeSVG } from 'qrcode.react';
 
 export default function ProductsGallery() {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [showSlideshow, setShowSlideshow] = useState<string | null>(null);
 
@@ -51,130 +51,175 @@ export default function ProductsGallery() {
     },
   ];
 
+  const nextProduct = () => {
+    setCurrentIndex((prev) => (prev + 1) % products.length);
+  };
+
+  const prevProduct = () => {
+    setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
+  };
+
+  const currentProduct = products[currentIndex];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden py-20 px-4">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl" />
-        </div>
-
-        <div className="relative max-w-6xl mx-auto text-center mb-20">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Darkwave Studios
-            </span>
-          </h1>
-          <p className="text-2xl text-gray-300 mb-4">
-            Complete Enterprise Solutions Ecosystem
-          </p>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Four powerful platforms for staffing, safety, operations, and B2B services. Built for scale, designed for excellence.
-          </p>
-        </div>
-
-        {/* Product Cards */}
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="group relative overflow-hidden rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-300 transform hover:scale-105 cursor-pointer"
-              onClick={() => setSelectedProduct(product.id)}
-              data-testid={`card-product-${product.id}`}
-            >
-              {/* Gradient background */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${product.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-
-              <div className="relative p-6 h-full flex flex-col">
-                {/* Header */}
-                <div className="mb-4">
-                  <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
-                  <p className={`text-sm font-semibold bg-gradient-to-r ${product.color} bg-clip-text text-transparent`}>
-                    {product.tagline}
-                  </p>
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-300 text-sm mb-6 flex-grow">
-                  {product.description}
-                </p>
-
-                {/* Slide count and CTA */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {product.slides.length} slides
-                    </span>
-                    <button
-                      className={`inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r ${product.color} rounded-lg font-semibold text-xs hover:shadow-lg hover:shadow-cyan-500/50 transition transform hover:translate-x-1`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProduct(product.id);
-                      }}
-                      data-testid={`button-view-presentation-${product.id}`}
-                    >
-                      Presentation
-                      <ChevronRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                  
-                  {product.slideshowData && (
-                    <button
-                      className={`w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 bg-gradient-to-r ${product.color} rounded-lg font-semibold text-xs hover:shadow-lg hover:shadow-cyan-500/50 transition transform hover:scale-105`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSlideshow(product.id);
-                      }}
-                      data-testid={`button-view-slideshow-${product.id}`}
-                    >
-                      View Slideshow
-                      <ChevronRight className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden">
+      {/* Twinkling Stars Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(50)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full animate-twinkle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={`big-${i}`}
+            className="absolute w-1.5 h-1.5 bg-cyan-400 rounded-full animate-twinkle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 4}s`,
+              animationDuration: `${3 + Math.random() * 2}s`,
+            }}
+          />
+        ))}
       </div>
 
-      {/* Features Section */}
-      <div className="py-20 px-4 bg-slate-900/50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">
-            <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              Ecosystem Benefits
-            </span>
-          </h2>
+      {/* Gradient Orbs */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl" />
+      </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Enterprise Grade',
-                description: 'Production-ready with 100+ API endpoints, multi-tenant architecture, and enterprise security.',
-              },
-              {
-                title: 'Fully Automated',
-                description: 'Zero manual intervention. Background jobs, automated workflows, and intelligent routing.',
-              },
-              {
-                title: 'Completely Customizable',
-                description: 'White-label branding, custom workflows, configurable integrations, and scalable licensing.',
-              },
-            ].map((feature, i) => (
+      {/* Header */}
+      <div className="relative z-10 pt-12 pb-8 text-center">
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">
+          <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            Darkwave Studios
+          </span>
+        </h1>
+        <p className="text-xl text-gray-300 mb-2">
+          Complete Enterprise Solutions Ecosystem
+        </p>
+        <p className="text-gray-500 text-sm">
+          {currentIndex + 1} of {products.length} Products
+        </p>
+      </div>
+
+      {/* Carousel Container */}
+      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 min-h-[60vh]">
+        {/* Left Arrow */}
+        <button
+          onClick={prevProduct}
+          className="absolute left-4 md:left-8 z-20 p-3 md:p-4 bg-slate-800/80 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group"
+          data-testid="button-prev-product"
+        >
+          <ChevronLeft className="w-6 h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
+        </button>
+
+        {/* Product Card */}
+        <div className="w-full max-w-2xl mx-auto px-12 md:px-20">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentProduct.id}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.3 }}
+              className="relative"
+            >
               <div
-                key={i}
-                className="p-6 rounded-lg bg-slate-800/30 border border-slate-700/50 hover:border-cyan-500/50 transition"
+                className={`relative overflow-hidden rounded-2xl bg-slate-800/70 backdrop-blur-sm border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer`}
+                onClick={() => setSelectedProduct(currentProduct.id)}
+                data-testid={`card-product-${currentProduct.id}`}
               >
-                <h4 className="text-lg font-semibold mb-2 text-cyan-300">
-                  {feature.title}
-                </h4>
-                <p className="text-gray-400">{feature.description}</p>
+                {/* Gradient background */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-10`} />
+
+                <div className="relative p-8 md:p-12">
+                  {/* Header */}
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4">{currentProduct.name}</h2>
+                    <p className={`text-lg md:text-xl font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
+                      {currentProduct.tagline}
+                    </p>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-300 text-center text-lg mb-8 max-w-xl mx-auto">
+                    {currentProduct.description}
+                  </p>
+
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button
+                      className={`inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r ${currentProduct.color} rounded-xl font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/30 transition transform hover:scale-105`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedProduct(currentProduct.id);
+                      }}
+                      data-testid={`button-view-presentation-${currentProduct.id}`}
+                    >
+                      View Presentation
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    
+                    {currentProduct.slideshowData && (
+                      <button
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-slate-700/80 hover:bg-slate-600 border border-slate-600 rounded-xl font-semibold text-sm transition transform hover:scale-105"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSlideshow(currentProduct.id);
+                        }}
+                        data-testid={`button-view-slideshow-${currentProduct.id}`}
+                      >
+                        Full Slideshow
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Slide count */}
+                  <p className="text-center text-gray-500 text-sm mt-6">
+                    {currentProduct.slides.length} slides available
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={nextProduct}
+          className="absolute right-4 md:right-8 z-20 p-3 md:p-4 bg-slate-800/80 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group"
+          data-testid="button-next-product"
+        >
+          <ChevronRight className="w-6 h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
+        </button>
+      </div>
+
+      {/* Dot Navigation */}
+      <div className="relative z-10 flex justify-center gap-3 pb-8">
+        {products.map((product, index) => (
+          <button
+            key={product.id}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === currentIndex
+                ? 'bg-cyan-400 w-8'
+                : 'bg-slate-600 hover:bg-slate-500'
+            }`}
+            data-testid={`dot-${product.id}`}
+            aria-label={`Go to ${product.name}`}
+          />
+        ))}
       </div>
 
       {/* Product Presentation Modal */}
