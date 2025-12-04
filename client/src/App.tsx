@@ -135,6 +135,7 @@ function Router() {
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />
       <Route path="/oauth/settings" component={OAuthSettings} />
       <Route path="/products" component={ProductsGallery} />
+      <Route path="/studio" component={ProductsGallery} />
       <Route path="/slideshow" component={Slideshow} />
       <Route path="/jobs" component={JobBoard} />
       <Route path="/jobs/:jobId" component={JobDetails} />
