@@ -5,7 +5,7 @@ import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
 import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
-import { slidesData, orbitSlides } from '@/data/slidesData';
+import { slidesData, orbitSlides, brewAndBoardSlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
 
 export default function ProductsGallery() {
@@ -40,6 +40,15 @@ export default function ProductsGallery() {
       slides: slideContent['Lot Ops Pro'],
       slideshowData: slidesData,
     },
+    {
+      id: 'BrewAndBoard',
+      name: 'Brew & Board Coffee',
+      tagline: 'B2B Coffee Delivery for Nashville Businesses',
+      description: 'Connect businesses with Nashville coffee shops for pre-meeting deliveries. Features 20+ vendors, calendar scheduling, distance-based pricing, and blockchain-verified receipts.',
+      color: 'from-stone-800 to-amber-950',
+      slides: slideContent['BREW_AND_BOARD'],
+      slideshowData: brewAndBoardSlides,
+    },
   ];
 
   return (
@@ -61,12 +70,12 @@ export default function ProductsGallery() {
             Complete Enterprise Solutions Ecosystem
           </p>
           <p className="text-gray-400 max-w-2xl mx-auto">
-            Three powerful platforms for staffing, safety, and operations. Built for scale, designed for excellence.
+            Four powerful platforms for staffing, safety, operations, and B2B services. Built for scale, designed for excellence.
           </p>
         </div>
 
         {/* Product Cards */}
-        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <div
               key={product.id}
@@ -202,6 +211,13 @@ export default function ProductsGallery() {
                   slides={slidesData as any} 
                   product="Lot Ops Pro"
                   title="Lot Ops Pro Slideshow"
+                />
+              )}
+              {showSlideshow === 'BrewAndBoard' && (
+                <HomeSlideshow 
+                  slides={brewAndBoardSlides as any} 
+                  product="Brew & Board Coffee"
+                  title="Brew & Board Coffee Slideshow"
                 />
               )}
             </div>

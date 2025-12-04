@@ -843,3 +843,147 @@ export const orbitSlides: Slide[] = [
     }
   }
 ];
+
+export const brewAndBoardSlides: Slide[] = [
+  {
+    id: 1,
+    title: "Brew & Board Coffee",
+    section: "Opening & Hook",
+    duration: 8,
+    content: {
+      type: 'hero',
+      headline: 'Brew & Board Coffee',
+      subheadline: 'B2B Coffee Delivery for Nashville Businesses'
+    }
+  },
+  {
+    id: 2,
+    title: "The Challenge",
+    section: "Problem Statement",
+    duration: 8,
+    content: {
+      type: 'problem',
+      headline: 'Meeting Coffee is a Headache',
+      bullets: [
+        'Coordinating with multiple coffee vendors wastes time',
+        'No easy way to schedule deliveries in advance',
+        'Hidden fees and unreliable delivery times',
+        'Tracking orders across different platforms is chaotic'
+      ]
+    }
+  },
+  {
+    id: 3,
+    title: "The Solution",
+    section: "Solution Overview",
+    duration: 8,
+    content: {
+      type: 'solution',
+      headline: 'Brew & Board - Coffee Concierge',
+      bullets: [
+        'One platform for 20+ Nashville coffee vendors',
+        'Schedule deliveries days or weeks in advance',
+        'Transparent pricing with distance-based fees',
+        'Real-time order tracking and status updates'
+      ]
+    }
+  },
+  {
+    id: 4,
+    title: "Nashville Vendors",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Local Favorites & National Chains',
+      subheadline: 'The best of Nashville coffee in one place',
+      description: 'Access Crema, Barista Parlor, Frothy Monkey, plus Starbucks, Dunkin, and specialty bakeries.',
+      bullets: [
+        'Artisan local roasters',
+        'National chains with multiple locations',
+        'Specialty bakeries like Crumbl and Five Daughters',
+        'Smoothie shops for health-conscious teams'
+      ]
+    }
+  },
+  {
+    id: 5,
+    title: "Smart Pricing",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Distance-Based Delivery',
+      subheadline: 'Fair and transparent pricing',
+      description: 'Pay based on actual distance, not flat rates that overcharge nearby orders.',
+      bullets: [
+        '$5 base delivery for vendors within 10 miles',
+        '+$7.50 premium for extended delivery areas',
+        '15% service fee on one-time orders',
+        'Subscription discounts up to 100% on fees'
+      ]
+    }
+  },
+  {
+    id: 6,
+    title: "Easy Scheduling",
+    section: "Core Features",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Calendar-Based Ordering',
+      subheadline: 'Plan ahead with confidence',
+      description: 'Visual calendar interface makes scheduling multiple deliveries simple.',
+      bullets: [
+        'Schedule orders days or weeks ahead',
+        '2-hour minimum lead time guarantee',
+        'Recurring order support for regular meetings',
+        'Special instructions for each delivery'
+      ]
+    }
+  },
+  {
+    id: 7,
+    title: "Blockchain Hallmarks",
+    section: "Security",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Verified with Blockchain',
+      subheadline: 'Tamper-proof document verification',
+      description: 'Every receipt and invoice can be permanently verified on Solana blockchain.',
+      bullets: [
+        'Unique hallmark codes for each document',
+        'QR code verification for instant validation',
+        'Permanent record that cannot be altered',
+        'Professional credibility for your business'
+      ]
+    }
+  },
+  {
+    id: 8,
+    title: "Subscription Plans",
+    section: "Pricing",
+    duration: 8,
+    content: {
+      type: 'comparison',
+      headline: 'Plans for Every Business Size',
+      bullets: [
+        'Starter $29/mo - 10 orders, 10% fee discount',
+        'Professional $79/mo - 50 orders, 50% discount, free delivery',
+        'Enterprise $199/mo - Unlimited orders, no fees, priority service'
+      ]
+    }
+  },
+  {
+    id: 9,
+    title: "Get Started",
+    section: "Call to Action",
+    duration: 8,
+    content: {
+      type: 'cta',
+      headline: 'Fuel Your Next Meeting',
+      subheadline: 'Sign up at brewandboard.coffee'
+    }
+  }
+];

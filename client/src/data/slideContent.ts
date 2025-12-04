@@ -391,5 +391,48 @@ export const slideContent: ProductSlides = {
       content: "Lot Ops Pro streamlines inventory and fleet operations. Increase utilization, reduce costs, improve compliance. Operational intelligence at your fingertips.",
       category: "CALL TO ACTION"
     }
+  ],
+  "BREW_AND_BOARD": [
+    {
+      title: "Brew & Board Coffee",
+      subtitle: "B2B Coffee Delivery for Nashville Businesses",
+      content: "Connect your business with Nashville's finest coffee shops. Schedule pre-meeting coffee deliveries with just a few taps - from local artisan roasters to national chains.",
+      category: "INTRODUCTION"
+    },
+    {
+      title: "The Problem We Solve",
+      content: "Planning coffee for meetings is tedious. Coordinating with vendors, managing orders, and tracking deliveries wastes valuable time. Brew & Board automates the entire process so you can focus on your business.",
+      category: "VISION"
+    },
+    {
+      title: "20+ Nashville Vendors",
+      content: "Access local favorites like Crema, Barista Parlor, and Frothy Monkey, plus national chains like Starbucks, Dunkin', and specialty bakeries including Crumbl Cookie and Five Daughters Bakery.",
+      category: "FEATURE"
+    },
+    {
+      title: "Smart Distance Pricing",
+      content: "Transparent pricing with $5 base delivery for nearby vendors. Extended delivery over 10 miles adds just $7.50 - no hidden fees, no surprises.",
+      category: "FEATURE"
+    },
+    {
+      title: "Calendar Scheduling",
+      content: "Schedule orders up to weeks in advance with our intuitive calendar. Set delivery time, location, and special instructions. Minimum 2-hour lead time ensures fresh delivery.",
+      category: "AUTOMATION"
+    },
+    {
+      title: "Blockchain Verification",
+      content: "Every order and document can be verified with our Solana-based hallmark system. Tamper-proof receipts and invoices for your business records.",
+      category: "SECURITY"
+    },
+    {
+      title: "Flexible Subscriptions",
+      content: "Starter at $29/month for small teams, Professional at $79/month with 50% fee discounts, Enterprise at $199/month for unlimited orders with no service fees.",
+      category: "FEATURE"
+    },
+    {
+      title: "Start Ordering Today",
+      content: "Join Nashville businesses already using Brew & Board to impress clients and fuel productive meetings. Sign up with just a 4-digit PIN.",
+      category: "CALL TO ACTION"
+    }
   ]
 };
