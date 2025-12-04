@@ -31,6 +31,9 @@ import {
   workerReferralBonuses,
   rateConfirmations,
   billingConfirmations,
+  platformModules,
+  subscriptionPlans,
+  tenantModules,
   type User,
   type InsertUser,
   type Company,
@@ -91,6 +94,12 @@ import {
   type InsertRateConfirmation,
   type BillingConfirmation,
   type InsertBillingConfirmation,
+  type PlatformModule,
+  type InsertPlatformModule,
+  type SubscriptionPlan,
+  type InsertSubscriptionPlan,
+  type TenantModule,
+  type InsertTenantModule,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -2488,6 +2497,173 @@ export const storage: IStorage = {
 
   async getPaystubByPayrollId(payrollId: string): Promise<PayrollRecord | null> {
     return this.getPayrollRecord(payrollId);
+  },
+
+  // ========================
+  // PLATFORM MODULES (À La Carte)
+  // ========================
+  async getAllModules(): Promise<PlatformModule[]> {
+    return await db
+      .select()
+      .from(platformModules)
+      .orderBy(platformModules.sortOrder);
+  },
+
+  async getModuleById(id: string): Promise<PlatformModule | null> {
+    const result = await db
+      .select()
+      .from(platformModules)
+      .where(eq(platformModules.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getModulesByCategory(category: string): Promise<PlatformModule[]> {
+    return await db
+      .select()
+      .from(platformModules)
+      .where(eq(platformModules.category, category))
+      .orderBy(platformModules.sortOrder);
+  },
+
+  async createModule(data: InsertPlatformModule): Promise<PlatformModule> {
+    const result = await db.insert(platformModules).values(data).returning();
+    return result[0];
+  },
+
+  async updateModule(id: string, data: Partial<InsertPlatformModule>): Promise<PlatformModule> {
+    const result = await db
+      .update(platformModules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(platformModules.id, id))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // SUBSCRIPTION PLANS
+  // ========================
+  async getAllPlans(): Promise<SubscriptionPlan[]> {
+    return await db
+      .select()
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.isActive, true))
+      .orderBy(subscriptionPlans.sortOrder);
+  },
+
+  async getPlanById(id: string): Promise<SubscriptionPlan | null> {
+    const result = await db
+      .select()
+      .from(subscriptionPlans)
+      .where(eq(subscriptionPlans.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async createPlan(data: InsertSubscriptionPlan): Promise<SubscriptionPlan> {
+    const result = await db.insert(subscriptionPlans).values(data).returning();
+    return result[0];
+  },
+
+  async updatePlan(id: string, data: Partial<InsertSubscriptionPlan>): Promise<SubscriptionPlan> {
+    const result = await db
+      .update(subscriptionPlans)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(subscriptionPlans.id, id))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // TENANT MODULES (Per-Tenant Feature Access)
+  // ========================
+  async getTenantModules(tenantId: string): Promise<TenantModule[]> {
+    return await db
+      .select()
+      .from(tenantModules)
+      .where(eq(tenantModules.tenantId, tenantId));
+  },
+
+  async getTenantActiveModules(tenantId: string): Promise<TenantModule[]> {
+    return await db
+      .select()
+      .from(tenantModules)
+      .where(
+        and(
+          eq(tenantModules.tenantId, tenantId),
+          eq(tenantModules.isEnabled, true)
+        )
+      );
+  },
+
+  async getTenantModuleAccess(tenantId: string, moduleId: string): Promise<TenantModule | null> {
+    const result = await db
+      .select()
+      .from(tenantModules)
+      .where(
+        and(
+          eq(tenantModules.tenantId, tenantId),
+          eq(tenantModules.moduleId, moduleId)
+        )
+      )
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async grantModuleAccess(data: InsertTenantModule): Promise<TenantModule> {
+    const result = await db.insert(tenantModules).values(data).returning();
+    return result[0];
+  },
+
+  async updateTenantModule(id: string, data: Partial<InsertTenantModule>): Promise<TenantModule> {
+    const result = await db
+      .update(tenantModules)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(tenantModules.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async revokeModuleAccess(tenantId: string, moduleId: string): Promise<void> {
+    await db
+      .delete(tenantModules)
+      .where(
+        and(
+          eq(tenantModules.tenantId, tenantId),
+          eq(tenantModules.moduleId, moduleId)
+        )
+      );
+  },
+
+  async grantPlanModules(tenantId: string, planId: string): Promise<TenantModule[]> {
+    const plan = await this.getPlanById(planId);
+    if (!plan) throw new Error('Plan not found');
+
+    const moduleIds = plan.includedModules as string[];
+    const results: TenantModule[] = [];
+
+    for (const moduleId of moduleIds) {
+      const existing = await this.getTenantModuleAccess(tenantId, moduleId);
+      if (!existing) {
+        const granted = await this.grantModuleAccess({
+          tenantId,
+          moduleId,
+          source: 'plan',
+          isEnabled: true,
+        });
+        results.push(granted);
+      }
+    }
+
+    return results;
+  },
+
+  async hasTenantModule(tenantId: string, moduleId: string): Promise<boolean> {
+    const access = await this.getTenantModuleAccess(tenantId, moduleId);
+    if (!access) return false;
+    if (!access.isEnabled) return false;
+    if (access.expiresAt && new Date(access.expiresAt) < new Date()) return false;
+    return true;
   },
 
 };
