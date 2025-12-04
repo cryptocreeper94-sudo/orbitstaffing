@@ -34,15 +34,26 @@ const navItems = [
   { icon: Megaphone, label: "Recruiting", href: "/marketing" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ mobileOpen, onMobileClose }: { mobileOpen?: boolean; onMobileClose?: () => void }) {
   const [location] = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <aside className={cn(
-      "h-screen bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300",
-      collapsed ? "w-16" : "w-64"
-    )}>
+    <>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+          onClick={onMobileClose}
+        />
+      )}
+      <aside className={cn(
+        "h-screen bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300",
+        "fixed md:relative z-50",
+        "transform md:transform-none",
+        mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        collapsed ? "w-16" : "w-64"
+      )}>
       <div className="p-4 flex items-center justify-between border-b border-sidebar-border/50">
         {!collapsed && (
           <div className="flex flex-col">
@@ -97,6 +108,7 @@ export function Sidebar() {
         )}
       </div>
     </aside>
+    </>
   );
 }
 
@@ -104,11 +116,27 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [contactOpen, setContactOpen] = useState(false);
   const [ocrScannerOpen, setOcrScannerOpen] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
-      <Sidebar />
+      <Sidebar mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
       <main className="flex-1 overflow-y-auto relative">
+        {/* Mobile header with hamburger menu */}
+        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-sidebar-border/50 p-3 flex items-center gap-3 md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMobileMenuOpen(true)}
+            className="text-sidebar-foreground"
+            data-testid="button-mobile-menu"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+          <div className="font-heading font-bold text-lg text-sidebar-primary tracking-wider">
+            ORBIT
+          </div>
+        </div>
         {/* App Store Coming Soon Banner + OCR Scanner Button - Hidden on mobile */}
         <div className="sticky top-0 z-50 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b-2 border-cyan-500/50 backdrop-blur-sm hidden md:block">
           <div className="px-8 py-3 flex items-center justify-between">
