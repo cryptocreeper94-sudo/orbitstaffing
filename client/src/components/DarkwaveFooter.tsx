@@ -59,7 +59,7 @@ export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot O
           <div className="flex flex-col items-center md:items-end">
             <div className="text-[10px] text-slate-400 uppercase tracking-widest">Powered By</div>
             <div className="text-xs font-bold text-slate-300">DARKWAVE STUDIOS</div>
-            <div className="text-[9px] text-slate-600 mt-1">v2.5.3 • Enterprise Edition</div>
+            <div className="text-[9px] text-slate-600 mt-1">v2.5.4 • Enterprise Edition</div>
           </div>
         </div>
       </div>

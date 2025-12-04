@@ -54,16 +54,29 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ---
 
-## Last Session Summary (December 3, 2025)
+## Last Session Summary (December 4, 2025)
 
-### Current Version: v2.5.3 (Publishing)
+### Current Version: v2.5.4 (Publishing)
 
 ### What Was Accomplished
-1. **Sid Partner Login Fixed** - SecureSandbox now calls correct endpoint (/api/auth/verify-admin-pin)
-2. **Sid Welcome Modal** - Time-based greeting, full system walkthrough, GetOrby.io mention, only shows on first login
-3. **Sandbox Access System** - Sid has full sandbox access (can interact with everything, nothing saves to production) - NOT read-only
-4. **Naming Update** - Changed from "Sidonie" to "Sid" throughout the system
-5. **Access Structure Clarified** - Only 2 users: Jason (dev, 0424) and Sid (partner, 4444) - admin roles for salespeople later
+1. **Database-Backed Modular Pricing** - Pricing page now fetches bundles from `/api/subscription-plans` and modules from `/api/modules` database
+2. **Loading/Empty States** - Added skeleton loading states and empty state handling for Pricing page tabs
+3. **Landing Page - Connect Your Systems** - Redesigned with horizontal scroll carousel (12 integrations) on mobile, 4-column category grid on desktop
+4. **Landing Page - Benefit Cards Fix** - Changed parent section from `overflow-hidden` to `sm:overflow-hidden` to enable mobile scrolling
+5. **Pricing Page - Full Carousel Conversion** - Bundles, Tools, Affiliate, and Trust Badges all now use horizontal scroll on mobile
+6. **Scroll Indicators** - Added pulsing ChevronRight arrows to indicate scrollable content on mobile
+
+### Technical Details
+- Pricing interfaces updated with `stripePriceIdMonthly` and `stripePriceIdAnnual` fields
+- All carousel patterns: `flex flex-row flex-nowrap gap-X overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-X sm:overflow-visible`
+- Card patterns: `flex-shrink-0 w-[Xpx] sm:w-auto snap-start`
+- Scroll indicator: `absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent`
+
+### Key Files Modified
+- `client/src/pages/Pricing.tsx` - Database integration, carousel conversion for all tabs
+- `client/src/pages/Landing.tsx` - Connect Your Systems redesign, benefit cards fix
+- `client/src/components/DarkwaveFooter.tsx` - Version stamp v2.5.4
+- `client/src/components/FeatureInventory.tsx` - Publish log entry
 
 ### User Access Structure
 - **Jason (0424):** Developer, full access to everything
@@ -75,12 +88,7 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 - **Card pattern:** `flex-shrink-0 w-[XXpx] sm:w-auto snap-start` for grid expansion on desktop
 - **Pricing cards:** `h-full flex flex-col` with `flex-1` on features to align buttons
 - **Float animations:** 6s duration for smooth, elegant movement
-
-### Key Files Modified
-- `client/src/pages/SecureSandbox.tsx` - Fixed login endpoint, Sid user data, welcome modal
-- `server/routes.ts` - Updated Sid's role to partner with sandboxMode flag
-- `client/src/components/DarkwaveFooter.tsx` - Version stamp v2.5.3
-- `client/src/components/FeatureInventory.tsx` - Publish log entry
+- **Scroll indicators:** Absolute positioned with gradient fade and pulsing arrow
 
 ### Protocol Reminder
 - Always confirm before starting implementation - user must approve with "go"
