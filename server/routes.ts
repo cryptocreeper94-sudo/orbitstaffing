@@ -6737,6 +6737,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to send campaign" });
     }
   });
+
+  // ========================
+  // RESEND TRANSACTIONAL EMAILS
+  // ========================
+  
+  // Helper: Check if user is admin authenticated
+  const requireAdminAuth = (req: Request, res: Response, next: () => void) => {
+    if (!req.session?.adminAuthenticated) {
+      return res.status(401).json({ error: "Admin authentication required" });
+    }
+    next();
+  };
+  
+  // POST /api/resend/test - Send a test email (admin only)
+  app.post("/api/resend/test", requireAdminAuth, async (req: Request, res: Response) => {
+    try {
+      const { to, subject, message } = req.body;
+      
+      if (!to || !subject) {
+        return res.status(400).json({ error: "to and subject are required" });
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emails = Array.isArray(to) ? to : [to];
+      if (!emails.every((e: string) => emailRegex.test(e))) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+      
+      const { sendEmail } = await import('./services/resend');
+      
+      const result = await sendEmail({
+        to,
+        subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 12px;">
+              <h1 style="color: #22d3ee; margin: 0;">ORBIT Test Email</h1>
+            </div>
+            <div style="padding: 20px;">
+              <p style="color: #334155;">${message || 'This is a test email from ORBIT Staffing OS.'}</p>
+            </div>
+            <div style="text-align: center; padding: 20px; border-top: 1px solid #e2e8f0;">
+              <p style="color: #64748b; font-size: 12px;">Powered by ORBIT Staffing OS</p>
+            </div>
+          </div>
+        `
+      });
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Resend] Test email error:", error);
+      res.status(500).json({ error: error.message || "Failed to send test email" });
+    }
+  });
+  
+  // POST /api/resend/welcome - Send welcome email to a worker (admin only)
+  app.post("/api/resend/welcome", requireAdminAuth, async (req: Request, res: Response) => {
+    try {
+      const { workerName, workerEmail } = req.body;
+      
+      if (!workerName || !workerEmail) {
+        return res.status(400).json({ error: "workerName and workerEmail are required" });
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(workerEmail)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+      
+      const { sendWelcomeEmail } = await import('./services/resend');
+      const result = await sendWelcomeEmail(workerName, workerEmail);
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Resend] Welcome email error:", error);
+      res.status(500).json({ error: error.message || "Failed to send welcome email" });
+    }
+  });
+  
+  // POST /api/resend/assignment - Send assignment notification (admin only)
+  app.post("/api/resend/assignment", requireAdminAuth, async (req: Request, res: Response) => {
+    try {
+      const { workerName, workerEmail, jobTitle, clientName, startDate, location } = req.body;
+      
+      if (!workerName || !workerEmail || !jobTitle || !clientName || !startDate || !location) {
+        return res.status(400).json({ error: "All fields are required: workerName, workerEmail, jobTitle, clientName, startDate, location" });
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(workerEmail)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+      
+      const { sendAssignmentNotification } = await import('./services/resend');
+      const result = await sendAssignmentNotification(workerName, workerEmail, jobTitle, clientName, startDate, location);
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Resend] Assignment email error:", error);
+      res.status(500).json({ error: error.message || "Failed to send assignment notification" });
+    }
+  });
+  
+  // POST /api/resend/payroll - Send payroll confirmation (admin only)
+  app.post("/api/resend/payroll", requireAdminAuth, async (req: Request, res: Response) => {
+    try {
+      const { workerName, workerEmail, payPeriod, grossPay, netPay, payDate } = req.body;
+      
+      if (!workerName || !workerEmail || !payPeriod || !grossPay || !netPay || !payDate) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(workerEmail)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+      
+      const { sendPayrollConfirmation } = await import('./services/resend');
+      const result = await sendPayrollConfirmation(workerName, workerEmail, payPeriod, grossPay, netPay, payDate);
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Resend] Payroll email error:", error);
+      res.status(500).json({ error: error.message || "Failed to send payroll confirmation" });
+    }
+  });
+  
+  // POST /api/resend/compliance - Send compliance reminder (admin only)
+  app.post("/api/resend/compliance", requireAdminAuth, async (req: Request, res: Response) => {
+    try {
+      const { workerName, workerEmail, documentType, expirationDate, daysRemaining } = req.body;
+      
+      if (!workerName || !workerEmail || !documentType || !expirationDate || daysRemaining === undefined) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(workerEmail)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
+      
+      const { sendComplianceReminder } = await import('./services/resend');
+      const result = await sendComplianceReminder(workerName, workerEmail, documentType, expirationDate, daysRemaining);
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Resend] Compliance email error:", error);
+      res.status(500).json({ error: error.message || "Failed to send compliance reminder" });
+    }
+  });
   
   // ========================
   // COMPETITIVE FEATURE STATUS
