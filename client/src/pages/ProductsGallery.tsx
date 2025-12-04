@@ -276,7 +276,7 @@ export default function ProductsGallery() {
       )}
 
       {/* Footer */}
-      <DarkwaveFooter product="Darkwave Studios Ecosystem" />
+      <DarkwaveFooter product="Darkwave Studios Ecosystem" hidePoweredBy={true} />
     </div>
   );
 }

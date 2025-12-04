@@ -1,8 +1,9 @@
 interface DarkwaveFooterProps {
   product?: string;
+  hidePoweredBy?: boolean;
 }
 
-export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot Ops Pro" }) => {
+export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot Ops Pro", hidePoweredBy = false }) => {
   return (
     <footer className="w-full bg-gradient-to-b from-slate-900 to-slate-950 border-t border-slate-800 py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -56,11 +57,13 @@ export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot O
           </div>
 
           {/* Powered By Attribution */}
-          <div className="flex flex-col items-center md:items-end">
-            <div className="text-[10px] text-slate-400 uppercase tracking-widest">Powered By</div>
-            <div className="text-xs font-bold text-slate-300">DARKWAVE STUDIOS</div>
-            <div className="text-[9px] text-slate-600 mt-1">v2.5.4 • Enterprise Edition</div>
-          </div>
+          {!hidePoweredBy && (
+            <div className="flex flex-col items-center md:items-end">
+              <div className="text-[10px] text-slate-400 uppercase tracking-widest">Powered By</div>
+              <div className="text-xs font-bold text-slate-300">DARKWAVE STUDIOS</div>
+              <div className="text-[9px] text-slate-600 mt-1">v2.5.4 • Enterprise Edition</div>
+            </div>
+          )}
         </div>
       </div>
     </footer>
