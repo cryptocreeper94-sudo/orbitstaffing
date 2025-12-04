@@ -4952,3 +4952,142 @@ export const insertBlockchainAnchorBatchSchema = createInsertSchema(blockchainAn
 
 export type InsertBlockchainAnchorBatch = z.infer<typeof insertBlockchainAnchorBatchSchema>;
 export type BlockchainAnchorBatch = typeof blockchainAnchorBatches.$inferSelect;
+
+// ========================
+// Platform Modules (À La Carte Features)
+// ========================
+export const platformModules = pgTable(
+  "platform_modules",
+  {
+    id: varchar("id").primaryKey(), // e.g., "core", "payroll", "compliance", "pay_card", "talent_exchange", "crm", "blockchain", "ai_assistant"
+    name: varchar("name", { length: 100 }).notNull(),
+    description: text("description"),
+    category: varchar("category", { length: 50 }).notNull(), // "core", "operations", "finance", "marketing", "advanced"
+    
+    // Pricing
+    monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }).default("0"),
+    annualPrice: decimal("annual_price", { precision: 10, scale: 2 }).default("0"),
+    
+    // Stripe Price IDs
+    stripePriceIdMonthly: varchar("stripe_price_id_monthly", { length: 255 }),
+    stripePriceIdAnnual: varchar("stripe_price_id_annual", { length: 255 }),
+    
+    // Module Settings
+    isRequired: boolean("is_required").default(false), // Core is always required
+    isAddon: boolean("is_addon").default(true), // Can be added to any plan
+    sortOrder: integer("sort_order").default(0),
+    iconEmoji: varchar("icon_emoji", { length: 10 }),
+    
+    // Feature List (for display)
+    features: jsonb("features"), // ["Feature 1", "Feature 2", ...]
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    categoryIdx: index("idx_platform_modules_category").on(table.category),
+    sortIdx: index("idx_platform_modules_sort").on(table.sortOrder),
+  })
+);
+
+export const insertPlatformModuleSchema = createInsertSchema(platformModules).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPlatformModule = z.infer<typeof insertPlatformModuleSchema>;
+export type PlatformModule = typeof platformModules.$inferSelect;
+
+// ========================
+// Subscription Plans (Bundled Packages)
+// ========================
+export const subscriptionPlans = pgTable(
+  "subscription_plans",
+  {
+    id: varchar("id").primaryKey(), // e.g., "starter", "growth", "professional", "enterprise"
+    name: varchar("name", { length: 100 }).notNull(),
+    description: text("description"),
+    tagline: varchar("tagline", { length: 255 }), // "Perfect for small teams"
+    
+    // Pricing
+    monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }).notNull(),
+    annualPrice: decimal("annual_price", { precision: 10, scale: 2 }).notNull(),
+    
+    // Stripe Price IDs
+    stripePriceIdMonthly: varchar("stripe_price_id_monthly", { length: 255 }),
+    stripePriceIdAnnual: varchar("stripe_price_id_annual", { length: 255 }),
+    
+    // Included Modules (array of module IDs)
+    includedModules: jsonb("included_modules").notNull(), // ["core", "payroll", "compliance"]
+    
+    // Limits
+    maxWorkers: integer("max_workers").default(100),
+    maxAdmins: integer("max_admins").default(5),
+    storageGb: integer("storage_gb").default(10),
+    
+    // Display
+    isPopular: boolean("is_popular").default(false),
+    isFeatured: boolean("is_featured").default(false),
+    sortOrder: integer("sort_order").default(0),
+    badgeText: varchar("badge_text", { length: 50 }), // "Most Popular", "Best Value"
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    activeIdx: index("idx_subscription_plans_active").on(table.isActive),
+    sortIdx: index("idx_subscription_plans_sort").on(table.sortOrder),
+  })
+);
+
+export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSubscriptionPlan = z.infer<typeof insertSubscriptionPlanSchema>;
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+
+// ========================
+// Tenant Modules (Per-Tenant Feature Access)
+// ========================
+export const tenantModules = pgTable(
+  "tenant_modules",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    moduleId: varchar("module_id").notNull().references(() => platformModules.id),
+    
+    // Access Control
+    isEnabled: boolean("is_enabled").default(true),
+    source: varchar("source", { length: 50 }).default("plan"), // "plan" (from subscription), "addon" (purchased separately), "trial", "manual"
+    
+    // If purchased as addon
+    stripePriceId: varchar("stripe_price_id", { length: 255 }),
+    stripeSubscriptionItemId: varchar("stripe_subscription_item_id", { length: 255 }),
+    
+    // Trial/Expiration
+    expiresAt: timestamp("expires_at"),
+    trialEndsAt: timestamp("trial_ends_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_tenant_modules_tenant").on(table.tenantId),
+    moduleIdx: index("idx_tenant_modules_module").on(table.moduleId),
+    tenantModuleIdx: index("idx_tenant_modules_unique").on(table.tenantId, table.moduleId),
+  })
+);
+
+export const insertTenantModuleSchema = createInsertSchema(tenantModules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTenantModule = z.infer<typeof insertTenantModuleSchema>;
+export type TenantModule = typeof tenantModules.$inferSelect;
