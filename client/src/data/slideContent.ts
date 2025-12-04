@@ -392,6 +392,19 @@ export const slideContent: ProductSlides = {
       category: "CALL TO ACTION"
     }
   ],
+  "ORBY": [
+    {
+      title: "Orby",
+      subtitle: "Operations Command Software",
+      content: "Complete command and control platform with full communication suite, emergency management, and advanced geofencing capabilities.",
+      category: "INTRODUCTION"
+    },
+    {
+      title: "Coming Soon",
+      content: "Full slideshow content coming soon. Orby is a comprehensive operations command software available at getorby.io.",
+      category: "PREVIEW"
+    }
+  ],
   "BREW_AND_BOARD": [
     {
       title: "Brew & Board Coffee",

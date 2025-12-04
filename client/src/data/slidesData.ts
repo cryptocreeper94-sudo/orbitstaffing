@@ -844,6 +844,38 @@ export const orbitSlides: Slide[] = [
   }
 ];
 
+export const orbySlides: Slide[] = [
+  {
+    id: 1,
+    title: "Orby",
+    section: "Opening & Hook",
+    duration: 8,
+    content: {
+      type: 'hero',
+      headline: 'Orby',
+      subheadline: 'Operations Command Software'
+    }
+  },
+  {
+    id: 2,
+    title: "Coming Soon",
+    section: "Preview",
+    duration: 8,
+    content: {
+      type: 'feature',
+      headline: 'Full Presentation Coming Soon',
+      subheadline: 'getorby.io',
+      description: 'Complete command and control platform with communication suite, emergency management, and geofencing.',
+      bullets: [
+        'Full Communication Suite',
+        'Emergency Management System',
+        'Advanced Geofencing',
+        'Real-time Operations Command'
+      ]
+    }
+  }
+];
+
 export const brewAndBoardSlides: Slide[] = [
   {
     id: 1,

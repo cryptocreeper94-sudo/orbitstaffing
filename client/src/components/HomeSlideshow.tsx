@@ -15,7 +15,7 @@ export interface HomeSlide {
 interface HomeSlideshowProps {
   slides: HomeSlide[];
   title: string;
-  product: "Lot Ops Pro" | "ORBIT Staffing OS" | "DarkWave Pulse" | "Brew & Board Coffee";
+  product: "Lot Ops Pro" | "ORBIT Staffing OS" | "DarkWave Pulse" | "Brew & Board Coffee" | "Orby";
 }
 
 export function HomeSlideshow({ slides, title, product }: HomeSlideshowProps) {
