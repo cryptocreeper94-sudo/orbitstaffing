@@ -402,7 +402,7 @@ export default function Landing() {
       </section>
 
       {/* Hero - Compact Mobile */}
-      <section className="relative py-4 sm:py-12 md:py-20 overflow-hidden">
+      <section className="relative py-4 sm:py-12 md:py-20 sm:overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background"></div>
         <div className="absolute top-10 right-10 w-60 h-60 bg-primary/10 rounded-full blur-3xl hidden sm:block"></div>
         
@@ -436,8 +436,8 @@ export default function Landing() {
 
           {/* Benefit Cards - Horizontal Carousel on mobile */}
           <div className="relative mb-4 sm:mb-8">
-            <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
-              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
+            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-12 sm:pr-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible scrollbar-hide snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0">
+              <div className="flex-shrink-0 w-[140px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="⚡"
                   title="Automate"
@@ -445,7 +445,7 @@ export default function Landing() {
                   onClick={() => setSelectedBenefit("automate")}
                 />
               </div>
-              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
+              <div className="flex-shrink-0 w-[140px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="👥"
                   title="Retain"
@@ -453,7 +453,7 @@ export default function Landing() {
                   onClick={() => setSelectedBenefit("workers")}
                 />
               </div>
-              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
+              <div className="flex-shrink-0 w-[140px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="💰"
                   title="Save"
@@ -461,7 +461,7 @@ export default function Landing() {
                   onClick={() => setSelectedBenefit("money")}
                 />
               </div>
-              <div className="flex-shrink-0 w-[130px] sm:w-auto snap-start">
+              <div className="flex-shrink-0 w-[140px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="📈"
                   title="Scale"
