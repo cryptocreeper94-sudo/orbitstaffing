@@ -127,27 +127,26 @@ export default function Landing() {
             </div>
           </div>
           
-          <nav className="flex items-center gap-1 bg-slate-800/50 backdrop-blur-sm px-1.5 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-slate-700/50 flex-shrink-0">
+          <nav className="hidden sm:flex items-center gap-1 bg-slate-800/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-700/50 flex-shrink-0">
             <Link href="/hallmark-seal" className="px-2 py-1 text-xs font-medium text-amber-300 hover:bg-amber-900/30 rounded transition-all flex items-center" data-testid="link-hallmark-seal">
-              <span className="hidden sm:inline">✓ Hallmark</span>
-              <span className="sm:hidden">✓</span>
+              ✓ Hallmark
             </Link>
             <div className="h-4 w-px bg-slate-600/50" />
             <Link href="/why-orbit" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-why-orbit">
-              <span className="hidden sm:inline">Why ORBIT</span>
-              <span className="sm:hidden">Why</span>
+              Why ORBIT
             </Link>
             <div className="h-4 w-px bg-slate-600/50" />
             <Link href="/professional-staffing" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-professional">
-              <span className="hidden sm:inline">Professional</span>
-              <span className="sm:hidden">Pro</span>
+              Professional
             </Link>
           </nav>
         </div>
       </header>
 
-      {/* ISO 20022 BANKING ROADMAP BANNER */}
-      <ISO20022Banner />
+      {/* ISO 20022 BANKING ROADMAP BANNER - Hidden on mobile */}
+      <div className="hidden sm:block">
+        <ISO20022Banner />
+      </div>
 
       {/* TALENT EXCHANGE SECTION - Carousel on mobile, grid on desktop */}
       <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-3 sm:py-6">
