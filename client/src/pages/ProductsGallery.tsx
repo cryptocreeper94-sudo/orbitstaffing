@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
 import { DarkwaveFooter } from '@/components/DarkwaveFooter';
+import { DarkWaveAssistant } from '@/components/DarkWaveAssistant';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides } from '@/data/slidesData';
 
@@ -277,6 +278,9 @@ export default function ProductsGallery() {
 
       {/* Footer */}
       <DarkwaveFooter product="Darkwave Studios Ecosystem" hidePoweredBy={true} />
+
+      {/* DarkWave AI Assistant */}
+      <DarkWaveAssistant />
     </div>
   );
 }

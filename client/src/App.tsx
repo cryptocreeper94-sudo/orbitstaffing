@@ -162,6 +162,17 @@ function Router() {
   );
 }
 
+function ConditionalOrbitAssistant() {
+  const [location] = useLocation();
+  const darkwavePages = ['/products', '/studio'];
+  
+  if (darkwavePages.some(page => location.startsWith(page))) {
+    return null;
+  }
+  
+  return <OrbitChatAssistant />;
+}
+
 export default function App() {
   const [isRadarOpen, setIsRadarOpen] = useState(false);
   
@@ -178,7 +189,7 @@ export default function App() {
               <FloatingHomeButton />
               <FloatingWeatherButton onOpenRadar={() => setIsRadarOpen(true)} />
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
-              <OrbitChatAssistant />
+              <ConditionalOrbitAssistant />
               <Toaster />
             </TutorialProvider>
           </OrbitExperienceProvider>
