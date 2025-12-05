@@ -1,7 +1,10 @@
 /**
  * Email service for notifications
- * Production-ready with fallback for local development
+ * Uses Resend integration for production emails
+ * Reference: Resend integration (connection:conn_resend_01KBN5WXQGKKT4A37DWV724H4G)
  */
+
+import { Resend } from 'resend';
 
 interface EmailOptions {
   to: string;
@@ -10,44 +13,76 @@ interface EmailOptions {
   from?: string;
 }
 
+// Resend integration credentials cache
+let connectionSettings: any;
+
+async function getResendCredentials() {
+  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
+  const xReplitToken = process.env.REPL_IDENTITY 
+    ? 'repl ' + process.env.REPL_IDENTITY 
+    : process.env.WEB_REPL_RENEWAL 
+    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+    : null;
+
+  if (!hostname || !xReplitToken) {
+    return null;
+  }
+
+  try {
+    connectionSettings = await fetch(
+      'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=resend',
+      {
+        headers: {
+          'Accept': 'application/json',
+          'X_REPLIT_TOKEN': xReplitToken
+        }
+      }
+    ).then(res => res.json()).then(data => data.items?.[0]);
+
+    if (!connectionSettings || !connectionSettings.settings?.api_key) {
+      return null;
+    }
+    return {
+      apiKey: connectionSettings.settings.api_key,
+      fromEmail: connectionSettings.settings.from_email
+    };
+  } catch (error) {
+    console.error('[Email] Failed to get Resend credentials:', error);
+    return null;
+  }
+}
+
 class EmailService {
-  private from = process.env.EMAIL_FROM || "Orby from ORBIT <orby@orbitstaffing.io>";
-  private smtpHost = process.env.SMTP_HOST;
-  private smtpPort = process.env.SMTP_PORT;
-  private smtpUser = process.env.SMTP_USER;
-  private smtpPass = process.env.SMTP_PASS;
+  private defaultFrom = "Orby from ORBIT <orby@orbitstaffing.io>";
 
   /**
-   * Send email (production or mock)
+   * Send email via Resend or fallback to console
    */
   async send(options: EmailOptions): Promise<{ success: boolean; messageId?: string }> {
-    // In production with SMTP credentials, use nodemailer
-    if (this.smtpHost && this.smtpUser && this.smtpPass) {
+    // Try Resend integration first
+    const credentials = await getResendCredentials();
+    
+    if (credentials) {
       try {
-        // Dynamic import to avoid requiring nodemailer if not configured
-        const nodemailer = await import("nodemailer");
-        const transporter = nodemailer.default.createTransport({
-          host: this.smtpHost,
-          port: parseInt(this.smtpPort || "587"),
-          secure: this.smtpPort === "465",
-          auth: {
-            user: this.smtpUser,
-            pass: this.smtpPass,
-          },
-        });
-
-        const result = await transporter.sendMail({
-          from: options.from || this.from,
+        const resend = new Resend(credentials.apiKey);
+        const fromEmail = options.from || credentials.fromEmail || this.defaultFrom;
+        
+        const result = await resend.emails.send({
+          from: fromEmail,
           to: options.to,
           subject: options.subject,
           html: options.html,
         });
 
-        console.log(`✓ Email sent to ${options.to} (${result.messageId})`);
-        return { success: true, messageId: result.messageId };
+        if (result.error) {
+          console.error('[Email] Resend error:', result.error);
+          return this.logEmail(options);
+        }
+
+        console.log(`✓ Email sent via Resend to ${options.to} (${result.data?.id})`);
+        return { success: true, messageId: result.data?.id };
       } catch (error) {
-        console.error("Email send error:", error);
-        // Fallback to console logging
+        console.error('[Email] Resend send error:', error);
         return this.logEmail(options);
       }
     }
