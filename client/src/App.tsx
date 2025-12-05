@@ -61,6 +61,7 @@ import OrbitPayCard from "@/pages/OrbitPayCard";
 import MarketingHub from "@/pages/MarketingHub";
 import CryptoWallet from "@/pages/CryptoWallet";
 import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
+import FranchiseOffer from "@/pages/FranchiseOffer";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -157,6 +158,8 @@ function Router() {
       <Route path="/crypto" component={CryptoWallet} />
       <Route path="/feature-inventory" component={FeatureInventoryPage} />
       <Route path="/features" component={FeatureInventoryPage} />
+      <Route path="/franchise" component={FranchiseOffer} />
+      <Route path="/franchise-offer" component={FranchiseOffer} />
       <Route component={NotFound} />
     </Switch>
   );
