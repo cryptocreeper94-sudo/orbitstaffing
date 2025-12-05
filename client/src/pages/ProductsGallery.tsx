@@ -169,9 +169,33 @@ export default function ProductsGallery() {
           <span className="text-xs sm:text-sm text-cyan-300 uppercase tracking-widest font-semibold">Enterprise Solutions</span>
           <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
         </motion.div>
-        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-2 sm:mb-3">
-          <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
-            DarkWave Studios
+        <h1 className="text-3xl sm:text-5xl md:text-7xl mb-2 sm:mb-3 relative">
+          <span 
+            className="font-extralight tracking-[0.2em] sm:tracking-[0.3em] uppercase"
+            style={{
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)',
+              backgroundSize: '200% 200%',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+              textShadow: '0 0 80px rgba(6, 182, 212, 0.5), 0 0 120px rgba(139, 92, 246, 0.3)',
+              animation: 'holographic 4s ease-in-out infinite',
+            }}
+          >
+            DarkWave
+          </span>
+          <span 
+            className="font-thin tracking-[0.15em] sm:tracking-[0.2em] uppercase ml-2 sm:ml-4"
+            style={{
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(6,182,212,0.8) 50%, rgba(255,255,255,0.9) 100%)',
+              backgroundSize: '200% 100%',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+              animation: 'shimmer 3s linear infinite',
+            }}
+          >
+            Studios
           </span>
         </h1>
         <p className="text-gray-400 text-xs sm:text-sm">
