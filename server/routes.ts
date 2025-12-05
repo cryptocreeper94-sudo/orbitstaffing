@@ -30,6 +30,8 @@ declare module 'express-session' {
     adminRole?: string;
     pinChanged?: boolean;
     pinChangedAt?: string;
+    stripeCustomerId?: string;
+    hallmarkId?: number;
   }
 }
 import {
@@ -8300,6 +8302,90 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Update franchise tier error:", error);
       res.status(500).json({ error: "Failed to update tier" });
+    }
+  });
+
+  // ========================
+  // CUSTOMER HALLMARK ENDPOINTS (SESSION-BASED)
+  // ========================
+  app.get("/api/my-hallmark", async (req: Request, res: Response) => {
+    try {
+      const stripeCustomerId = req.session?.stripeCustomerId;
+      
+      if (!stripeCustomerId) {
+        return res.status(404).json({ error: "No hallmark found" });
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM customer_hallmarks 
+        WHERE stripe_customer_id = ${stripeCustomerId}
+        LIMIT 1
+      `);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "No hallmark found" });
+      }
+      
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error("Get my hallmark error:", error);
+      res.status(500).json({ error: "Failed to get hallmark" });
+    }
+  });
+
+  app.get("/api/my-hallmark/payments", async (req: Request, res: Response) => {
+    try {
+      const stripeCustomerId = req.session?.stripeCustomerId;
+      
+      if (!stripeCustomerId) {
+        return res.json([]);
+      }
+      
+      const hallmarkResult = await db.execute(sql`
+        SELECT id FROM customer_hallmarks 
+        WHERE stripe_customer_id = ${stripeCustomerId}
+        LIMIT 1
+      `);
+      
+      if (hallmarkResult.rows.length === 0) {
+        return res.json([]);
+      }
+      
+      const hallmarkId = (hallmarkResult.rows[0] as any).id;
+      const payments = await storage.getFranchisePayments(hallmarkId);
+      
+      res.json(payments);
+    } catch (error) {
+      console.error("Get my hallmark payments error:", error);
+      res.status(500).json({ error: "Failed to get payments" });
+    }
+  });
+
+  app.get("/api/my-hallmark/territories", async (req: Request, res: Response) => {
+    try {
+      const stripeCustomerId = req.session?.stripeCustomerId;
+      
+      if (!stripeCustomerId) {
+        return res.json([]);
+      }
+      
+      const hallmarkResult = await db.execute(sql`
+        SELECT id FROM customer_hallmarks 
+        WHERE stripe_customer_id = ${stripeCustomerId}
+        LIMIT 1
+      `);
+      
+      if (hallmarkResult.rows.length === 0) {
+        return res.json([]);
+      }
+      
+      const hallmarkId = (hallmarkResult.rows[0] as any).id;
+      const territories = await storage.getFranchiseTerritories(hallmarkId);
+      
+      res.json(territories);
+    } catch (error) {
+      console.error("Get my hallmark territories error:", error);
+      res.status(500).json({ error: "Failed to get territories" });
     }
   });
 
