@@ -1,0 +1,206 @@
+// ============================================
+// TWO-TIER HALLMARK FRANCHISE SYSTEM
+// Lot Ops Pro v2.1.2 - December 5, 2025
+// ============================================
+
+// OWNERSHIP MODES:
+// 1. "subscriber_managed" - Lot Ops Pro controls hallmark, serials, data (monthly SaaS $15-25/driver)
+// 2. "franchise_owned" - Customer owns hallmark fully, can customize everything (one-time $5K-25K + royalty)
+
+// ============================================
+// CUSTOMER HALLMARKS TABLE (extended)
+// ============================================
+export const customerHallmarks = pgTable("customer_hallmarks", {
+  id: serial("id").primaryKey(),
+  stripeCustomerId: text("stripe_customer_id").notNull().unique(),
+  hallmarkName: text("hallmark_name").notNull(),
+  hallmarkDescription: text("hallmark_description"),
+  primaryColor: text("primary_color").notNull(),
+  secondaryColor: text("secondary_color").notNull(),
+  accentColor: text("accent_color"),
+  logoUrl: text("logo_url"),
+  favicon: text("favicon"),
+  companyWebsite: text("company_website"),
+  supportEmail: text("support_email"),
+  supportPhone: text("support_phone"),
+  socialMedia: text("social_media"), // JSON: {linkedin, twitter, instagram, facebook}
+  isDefault: boolean("is_default").default(false),
+  isActive: boolean("is_active").default(true),
+  
+  // OWNERSHIP & FRANCHISE FIELDS
+  ownershipMode: text("ownership_mode").default("subscriber_managed"), // "subscriber_managed" or "franchise_owned"
+  franchiseId: text("franchise_id"), // Unique franchise identifier (e.g., "LOT-NASH-001")
+  franchiseTier: text("franchise_tier"), // "standard", "premium", "enterprise"
+  territoryExclusive: boolean("territory_exclusive").default(false),
+  territoryRegion: text("territory_region"), // "Nashville, TN", "Southeast US", etc.
+  franchiseFee: text("franchise_fee"), // One-time fee paid: "$10,000"
+  royaltyPercent: text("royalty_percent"), // Ongoing royalty: "5%"
+  royaltyType: text("royalty_type"), // "percentage", "per_vehicle", "per_move", "flat_monthly"
+  royaltyAmount: text("royalty_amount"), // For per-unit: "$0.50", for flat: "$500"
+  supportTier: text("support_tier"), // "basic", "priority", "enterprise"
+  supportMonthlyFee: text("support_monthly_fee"), // "$500", "$1000", etc.
+  nftRevenueSharePercent: integer("nft_revenue_share_percent").default(0), // Franchisee NFT share
+  franchiseAgreementUrl: text("franchise_agreement_url"), // Signed legal agreement
+  franchiseStartDate: timestamp("franchise_start_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ============================================
+// FRANCHISE TIERS - Configurable pricing/features
+// ============================================
+export const franchiseTiers = pgTable("franchise_tiers", {
+  id: serial("id").primaryKey(),
+  tierCode: text("tier_code").notNull().unique(), // "standard", "premium", "enterprise"
+  tierName: text("tier_name").notNull(),
+  description: text("description"),
+  
+  // Pricing (amounts in cents)
+  franchiseFee: integer("franchise_fee").notNull(), // 500000 = $5,000
+  royaltyPercent: text("royalty_percent").notNull(), // "5%", "4%", "3%"
+  royaltyType: text("royalty_type").default("percentage"),
+  royaltyPerUnit: integer("royalty_per_unit"), // For per-unit pricing
+  supportMonthlyFee: integer("support_monthly_fee").notNull(), // 50000 = $500
+  transferFee: integer("transfer_fee").notNull(), // 250000 = $2,500
+  
+  // Features
+  maxLocations: integer("max_locations").default(1), // 1, 5, -1 (unlimited)
+  territoryExclusive: boolean("territory_exclusive").default(false),
+  territoryLevel: text("territory_level"), // "city", "regional", "state", "multi_state"
+  supportResponseHours: integer("support_response_hours").default(48),
+  nftRevenueSharePercent: integer("nft_revenue_share_percent").default(70), // Franchisee keeps 70-90%
+  whitelabelApp: boolean("whitelabel_app").default(false),
+  dedicatedAccountManager: boolean("dedicated_account_manager").default(false),
+  subFranchiseRights: boolean("sub_franchise_rights").default(false),
+  customApiAccess: boolean("custom_api_access").default(false),
+  priorityFeatureRequests: boolean("priority_feature_requests").default(false),
+  brandingControl: text("branding_control").default("basic"), // "basic", "full", "complete"
+  dataOwnership: text("data_ownership").default("shared"), // "shared", "full", "exclusive"
+  
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ============================================
+// FRANCHISE APPLICATIONS
+// ============================================
+export const franchiseApplications = pgTable("franchise_applications", {
+  id: serial("id").primaryKey(),
+  companyName: text("company_name").notNull(),
+  contactName: text("contact_name").notNull(),
+  contactEmail: text("contact_email").notNull(),
+  contactPhone: text("contact_phone"),
+  website: text("website"),
+  businessType: text("business_type"), // "auto_auction", "dealership", "fleet_management"
+  currentLocations: integer("current_locations").default(1),
+  estimatedVehiclesPerMonth: integer("estimated_vehicles_per_month"),
+  currentSoftware: text("current_software"),
+  requestedTierId: integer("requested_tier_id"),
+  requestedTerritoryRegion: text("requested_territory_region"),
+  requestedTerritoryState: text("requested_territory_state"),
+  existingStripeCustomerId: text("existing_stripe_customer_id"),
+  existingHallmarkId: integer("existing_hallmark_id"),
+  isUpgrade: boolean("is_upgrade").default(false), // Subscriber → Franchise upgrade
+  status: text("status").default("pending"), // "pending", "reviewing", "approved", "rejected", "converted"
+  reviewNotes: text("review_notes"),
+  reviewedBy: text("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
+  convertedToHallmarkId: integer("converted_to_hallmark_id"),
+  convertedAt: timestamp("converted_at"),
+  source: text("source"), // "website", "referral", "sales_call"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ============================================
+// CUSTODY TRANSFER LOG - Subscriber → Franchise
+// ============================================
+export const hallmarkCustodyTransfers = pgTable("hallmark_custody_transfers", {
+  id: serial("id").primaryKey(),
+  hallmarkId: integer("hallmark_id").notNull(),
+  stripeCustomerId: text("stripe_customer_id").notNull(),
+  transferType: text("transfer_type").notNull(), // "subscriber_to_franchise", "franchise_upgrade", "territory_expansion"
+  fromMode: text("from_mode").notNull(), // "subscriber_managed"
+  toMode: text("to_mode").notNull(), // "franchise_owned"
+  fromOwner: text("from_owner").notNull(), // "lotops" or previous owner
+  toOwner: text("to_owner").notNull(),
+  transferFee: text("transfer_fee"),
+  franchiseFeeAgreed: text("franchise_fee_agreed"),
+  royaltyTerms: text("royalty_terms"), // JSON: {type, percent, amount}
+  serialSystemsTransferred: integer("serial_systems_transferred"),
+  assetsTransferred: integer("assets_transferred"),
+  auditHistoryIncluded: boolean("audit_history_included").default(true),
+  approvedBy: text("approved_by"),
+  customerAccepted: boolean("customer_accepted").default(false),
+  customerAcceptedAt: timestamp("customer_accepted_at"),
+  legalAgreementSigned: boolean("legal_agreement_signed").default(false),
+  legalAgreementUrl: text("legal_agreement_url"),
+  status: text("status").default("pending"), // "pending", "approved", "completed", "cancelled"
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ============================================
+// FRANCHISE PAYMENTS - Royalties & Fees
+// ============================================
+export const franchisePayments = pgTable("franchise_payments", {
+  id: serial("id").primaryKey(),
+  hallmarkId: integer("hallmark_id").notNull(),
+  stripeCustomerId: text("stripe_customer_id"),
+  paymentType: text("payment_type").notNull(), // "franchise_fee", "royalty", "support", "transfer_fee", "nft_share"
+  amount: integer("amount").notNull(), // Amount in cents
+  currency: text("currency").default("usd"),
+  periodStart: timestamp("period_start"),
+  periodEnd: timestamp("period_end"),
+  vehicleCount: integer("vehicle_count"), // For per-vehicle royalties
+  moveCount: integer("move_count"), // For per-move royalties
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  stripeInvoiceId: text("stripe_invoice_id"),
+  status: text("status").default("pending"), // "pending", "paid", "failed", "refunded"
+  paidAt: timestamp("paid_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// ============================================
+// FRANCHISE TERRITORIES
+// ============================================
+export const franchiseTerritories = pgTable("franchise_territories", {
+  id: serial("id").primaryKey(),
+  hallmarkId: integer("hallmark_id").notNull(),
+  territoryName: text("territory_name").notNull(),
+  territoryType: text("territory_type").notNull(), // "city", "county", "state", "region", "custom"
+  state: text("state"),
+  city: text("city"),
+  county: text("county"),
+  zipCodes: text("zip_codes"), // JSON array of zip codes
+  geoJsonBoundary: text("geo_json_boundary"), // Custom boundary polygon
+  isExclusive: boolean("is_exclusive").default(true),
+  validFrom: timestamp("valid_from").defaultNow(),
+  validUntil: timestamp("valid_until"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ============================================
+// REVENUE STREAMS SUMMARY
+// ============================================
+/*
+| Revenue Stream       | Subscriber Mode    | Franchise Mode      |
+|---------------------|-------------------|---------------------|
+| Monthly Fee         | $15-25/driver     | $0                  |
+| Royalty             | $0                | 3-5% per vehicle    |
+| Support Fee         | Included          | $500-1,500/month    |
+| NFT Badge Share     | 100% to Lot Ops   | 10-30% to Lot Ops   |
+| Serial Issuance     | Included          | $0.01-0.05/serial   |
+| Transfer Fee        | N/A               | $2,500-5,000        |
+| Franchise Fee       | N/A               | $5,000-25,000       |
+
+TIER PRICING:
+- Standard ($5K): 5% royalty, $500/mo support, 1 location, city territory
+- Premium ($10K): 4% royalty, $1K/mo support, 5 locations, regional territory, white-label
+- Enterprise ($25K): 3% royalty, $1.5K/mo support, unlimited, state territory, sub-franchise rights
+*/
