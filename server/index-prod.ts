@@ -20,6 +20,10 @@ export async function serveStatic(app: Express, server: Server) {
 
   app.use(express.static(distPath));
 
+  // Serve attached_assets folder for images, emblems, hallmarks
+  const attachedAssetsPath = path.resolve(import.meta.dirname, "..", "attached_assets");
+  app.use('/attached_assets', express.static(attachedAssetsPath));
+
   // Serve DarkWave Studios landing page at /studio path
   app.get('/studio', (_req, res) => {
     res.sendFile(path.resolve(distPath, "studio-landing.html"));
