@@ -74,6 +74,8 @@ import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
 import { SandboxBanner } from "@/components/SandboxBanner";
 import { SandboxWelcome } from "@/components/SandboxWelcome";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import { PWASplashScreen } from "@/components/PWASplashScreen";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -203,6 +205,8 @@ export default function App() {
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
               <ConditionalOrbitAssistant />
               <Toaster />
+              <PWAInstallPrompt />
+              <PWASplashScreen />
             </TutorialProvider>
           </OrbitExperienceProvider>
         </ModeProvider>
