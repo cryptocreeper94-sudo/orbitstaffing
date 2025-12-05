@@ -80,6 +80,19 @@ export default function ProductsGallery() {
       emblem: null,
       hallmark: null,
     },
+    {
+      id: 'GarageBot',
+      name: 'GarageBot',
+      tagline: 'Smart Garage & Workshop Management',
+      description: 'Intelligent automation for garage and workshop operations with IoT integration and smart scheduling.',
+      color: 'from-sky-500 to-blue-700',
+      glowColor: 'sky',
+      slides: slideContent['ORBIT'] || [],
+      slideshowData: null,
+      url: 'https://garagebot.io',
+      emblem: '/attached_assets/garagebot_emblem.png',
+      hallmark: null,
+    },
   ];
 
   const nextProduct = () => {
