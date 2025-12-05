@@ -54,44 +54,51 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ---
 
-## Last Session Summary (December 4, 2025)
+## Last Session Summary (December 5, 2025)
 
-### Current Version: v2.5.4 (Publishing)
+### Current Version: v2.5.5 (Publishing)
 
 ### What Was Accomplished
-1. **Database-Backed Modular Pricing** - Pricing page now fetches bundles from `/api/subscription-plans` and modules from `/api/modules` database
-2. **Loading/Empty States** - Added skeleton loading states and empty state handling for Pricing page tabs
-3. **Landing Page - Connect Your Systems** - Redesigned with horizontal scroll carousel (12 integrations) on mobile, 4-column category grid on desktop
-4. **Landing Page - Benefit Cards Fix** - Changed parent section from `overflow-hidden` to `sm:overflow-hidden` to enable mobile scrolling
-5. **Pricing Page - Full Carousel Conversion** - Bundles, Tools, Affiliate, and Trust Badges all now use horizontal scroll on mobile
-6. **Scroll Indicators** - Added pulsing ChevronRight arrows to indicate scrollable content on mobile
+1. **Franchise System Carousel UI** - Applied unified mobile-first carousel pattern with left/right arrow navigation to FranchiseOffer and FranchiseSuccess pages
+2. **FranchiseOffer Tier Cards** - Tier selection cards now use horizontal scroll carousel on mobile with arrow buttons
+3. **FranchiseOffer Benefits Section** - "Why Choose ORBIT Franchise?" section converted to carousel with arrow navigation
+4. **FranchiseSuccess Next-Steps Cards** - Post-checkout confirmation cards now use carousel pattern with arrows
+5. **Consistent Arrow Navigation** - All franchise pages now have consistent rounded button arrows (left/right) for mobile carousel navigation
 
 ### Technical Details
-- Pricing interfaces updated with `stripePriceIdMonthly` and `stripePriceIdAnnual` fields
-- All carousel patterns: `flex flex-row flex-nowrap gap-X overflow-x-auto snap-x snap-mandatory scrollbar-hide sm:grid sm:grid-cols-X sm:overflow-visible`
-- Card patterns: `flex-shrink-0 w-[Xpx] sm:w-auto snap-start`
-- Scroll indicator: `absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent`
+- Arrow button pattern: `absolute left-0/right-0 top-1/2 -translate-y-1/2 z-10 sm:hidden/md:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600`
+- Carousel container: Wrapped with `relative` div to position arrows absolutely
+- Added `useRef` for carousel refs and `scrollCarousel` function with smooth scrolling
+- Carousel items: `flex-shrink-0 w-[280px] md:w-auto snap-start` pattern
 
 ### Key Files Modified
-- `client/src/pages/Pricing.tsx` - Database integration, carousel conversion for all tabs
-- `client/src/pages/Landing.tsx` - Connect Your Systems redesign, benefit cards fix
-- `client/src/components/DarkwaveFooter.tsx` - Version stamp v2.5.4
-- `client/src/components/FeatureInventory.tsx` - Publish log entry
+- `client/src/pages/FranchiseOffer.tsx` - Arrow navigation for tier cards and benefits carousel
+- `client/src/pages/FranchiseSuccess.tsx` - Arrow navigation for next-steps cards carousel
+
+### Franchise System Architecture
+- **Two-tier ownership model:**
+  - `subscriber_managed` - ORBIT controls hallmark, customer pays monthly SaaS
+  - `franchise_owned` - Customer owns hallmark, pays one-time franchise fee + monthly royalties
+- **Franchise tiers:** Standard (city), Premium (regional), Enterprise (state-level with sub-franchise rights)
+- **Territory checking:** `/api/franchise-territory-availability` validates exclusive territory before application
+- **Email notifications:** Application received, approved (with Stripe checkout link), rejected (with reason)
+- **Payment flow:** Stripe checkout for franchise fee + recurring monthly support subscription
+
+### Design Patterns Established
+- **Arrow button navigation:** Rounded circular buttons (w-10 h-10) positioned absolutely on carousel sides
+- **Mobile carousel wrapper:** `relative` div containing absolute-positioned arrow buttons
+- **Scroll function:** `scrollCarousel(ref, 'left'|'right')` with 300-340px scroll amount and smooth behavior
+- **Responsive sections:** `flex flex-row flex-nowrap ... sm:grid sm:grid-cols-N sm:overflow-visible`
+- **Card pattern:** `flex-shrink-0 w-[XXpx] sm:w-auto snap-start` for grid expansion on desktop
 
 ### User Access Structure
 - **Jason (0424):** Developer, full access to everything
 - **Sid (4444):** Partner, full sandbox access (can interact, nothing saves to production)
 - **Future:** Admin roles will be created for salespeople
 
-### Design Patterns Established
-- **Responsive sections:** `flex flex-row flex-nowrap ... sm:grid sm:grid-cols-N sm:overflow-visible`
-- **Card pattern:** `flex-shrink-0 w-[XXpx] sm:w-auto snap-start` for grid expansion on desktop
-- **Pricing cards:** `h-full flex flex-col` with `flex-1` on features to align buttons
-- **Float animations:** 6s duration for smooth, elegant movement
-- **Scroll indicators:** Absolute positioned with gradient fade and pulsing arrow
-
 ### Protocol Reminder
 - Always confirm before starting implementation - user must approve with "go"
 - EVERY multi-card section must be horizontal scroll carousel on mobile
 - Desktop layouts must fill full width with zero white space
 - Keep text-heavy accordions/dropdowns as-is - only convert multi-card sections
+- Arrow navigation buttons must be hidden on desktop breakpoints (sm:hidden or md:hidden)
