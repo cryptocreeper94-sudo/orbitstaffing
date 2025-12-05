@@ -91,7 +91,7 @@ export default function ProductsGallery() {
       slideshowData: null,
       url: 'https://garagebot.io',
       emblem: '/attached_assets/garagebot_emblem.png',
-      hallmark: null,
+      hallmark: '/attached_assets/Screenshot_20251205_150630_Chrome_1764968855422.jpg',
     },
   ];
 
