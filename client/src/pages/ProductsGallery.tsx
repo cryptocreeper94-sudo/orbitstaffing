@@ -77,7 +77,7 @@ export default function ProductsGallery() {
       slides: slideContent['BREW_AND_BOARD'],
       slideshowData: brewAndBoardSlides,
       url: 'https://brewandboard.coffee',
-      emblem: null,
+      emblem: '/attached_assets/brew_board_emblem.png',
       hallmark: '/attached_assets/Screenshot_20251205_135345_Replit_1764964534831.jpg',
     },
     {
