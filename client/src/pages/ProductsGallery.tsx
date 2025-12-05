@@ -78,7 +78,7 @@ export default function ProductsGallery() {
       slideshowData: brewAndBoardSlides,
       url: 'https://brewandboard.coffee',
       emblem: null,
-      hallmark: null,
+      hallmark: '/attached_assets/Screenshot_20251205_135345_Replit_1764964534831.jpg',
     },
     {
       id: 'GarageBot',
