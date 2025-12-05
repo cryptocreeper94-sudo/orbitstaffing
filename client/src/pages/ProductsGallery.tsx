@@ -26,6 +26,7 @@ export default function ProductsGallery() {
       slideshowData: orbitSlides,
       url: 'https://orbitstaffing.io',
       emblem: null,
+      hallmark: null,
     },
     {
       id: 'Orby',
@@ -38,6 +39,7 @@ export default function ProductsGallery() {
       slideshowData: orbySlides,
       url: 'https://getorby.io',
       emblem: null,
+      hallmark: null,
     },
     {
       id: 'DarkWave Pulse',
@@ -50,6 +52,7 @@ export default function ProductsGallery() {
       slideshowData: null,
       url: null,
       emblem: null,
+      hallmark: null,
     },
     {
       id: 'Lot Ops Pro',
@@ -61,7 +64,8 @@ export default function ProductsGallery() {
       slides: slideContent['Lot Ops Pro'],
       slideshowData: slidesData,
       url: null,
-      emblem: null,
+      emblem: '/attached_assets/Screenshot_20251205_080335_Replit_1764943504222.jpg',
+      hallmark: '/attached_assets/Screenshot_20251205_092457_Replit_1764949322382.jpg',
     },
     {
       id: 'BrewAndBoard',
@@ -74,6 +78,7 @@ export default function ProductsGallery() {
       slideshowData: brewAndBoardSlides,
       url: 'https://brewandboard.coffee',
       emblem: null,
+      hallmark: null,
     },
   ];
 
@@ -242,16 +247,26 @@ export default function ProductsGallery() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" />
 
                 <div className="relative p-5 sm:p-8 md:p-10">
-                  {/* Top Row: Emblem placeholder + Name + QR placeholder */}
+                  {/* Top Row: Emblem + Name + Hallmark/QR */}
                   <div className="flex items-start justify-between gap-4 mb-4 sm:mb-6">
-                    {/* Emblem Placeholder */}
-                    <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
-                      <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                        <span className="text-lg sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                          {currentProduct.name.charAt(0)}
-                        </span>
+                    {/* Emblem - Show image if available, otherwise placeholder */}
+                    {currentProduct.emblem ? (
+                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg overflow-hidden`}>
+                        <img 
+                          src={currentProduct.emblem} 
+                          alt={`${currentProduct.name} emblem`}
+                          className="w-full h-full rounded-xl object-cover"
+                        />
                       </div>
-                    </div>
+                    ) : (
+                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
+                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                          <span className="text-lg sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            {currentProduct.name.charAt(0)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Center: Name & Tagline */}
                     <div className="flex-1 text-center">
@@ -263,8 +278,16 @@ export default function ProductsGallery() {
                       </p>
                     </div>
 
-                    {/* QR Code */}
-                    {currentProduct.url && (
+                    {/* Hallmark/QR Code - Show hallmark image if available, otherwise QR or placeholder */}
+                    {currentProduct.hallmark ? (
+                      <div className="w-20 h-14 sm:w-28 sm:h-20 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 flex-shrink-0 shadow-lg overflow-hidden">
+                        <img 
+                          src={currentProduct.hallmark} 
+                          alt={`${currentProduct.name} hallmark`}
+                          className="w-full h-full rounded-xl object-cover"
+                        />
+                      </div>
+                    ) : currentProduct.url ? (
                       <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-white p-1 sm:p-1.5 flex-shrink-0 shadow-lg">
                         <QRCodeSVG 
                           value={currentProduct.url} 
@@ -274,8 +297,7 @@ export default function ProductsGallery() {
                           fgColor="#0f172a"
                         />
                       </div>
-                    )}
-                    {!currentProduct.url && (
+                    ) : (
                       <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 opacity-30`}>
                         <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
                           <span className="text-[8px] sm:text-xs text-gray-500">Soon</span>
