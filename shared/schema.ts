@@ -5091,3 +5091,326 @@ export const insertTenantModuleSchema = createInsertSchema(tenantModules).omit({
 
 export type InsertTenantModule = z.infer<typeof insertTenantModuleSchema>;
 export type TenantModule = typeof tenantModules.$inferSelect;
+
+// ============================================
+// TWO-TIER HALLMARK FRANCHISE SYSTEM
+// ============================================
+
+// ========================
+// Customer Hallmarks (White-label Branding)
+// ========================
+export const customerHallmarks = pgTable(
+  "customer_hallmarks",
+  {
+    id: serial("id").primaryKey(),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }).notNull().unique(),
+    hallmarkName: varchar("hallmark_name", { length: 255 }).notNull(),
+    hallmarkDescription: text("hallmark_description"),
+    primaryColor: varchar("primary_color", { length: 7 }).notNull().default("#06B6D4"),
+    secondaryColor: varchar("secondary_color", { length: 7 }).notNull().default("#8B5CF6"),
+    accentColor: varchar("accent_color", { length: 7 }),
+    logoUrl: text("logo_url"),
+    favicon: text("favicon"),
+    companyWebsite: varchar("company_website", { length: 255 }),
+    supportEmail: varchar("support_email", { length: 255 }),
+    supportPhone: varchar("support_phone", { length: 20 }),
+    socialMedia: text("social_media"),
+    isDefault: boolean("is_default").default(false),
+    isActive: boolean("is_active").default(true),
+    
+    // OWNERSHIP MODE - Key field for two-tier system
+    ownershipMode: varchar("ownership_mode", { length: 50 }).default("subscriber_managed"),
+    
+    // Franchise Fields
+    franchiseId: varchar("franchise_id", { length: 100 }),
+    franchiseTierId: integer("franchise_tier_id"),
+    territoryExclusive: boolean("territory_exclusive").default(false),
+    territoryRegion: varchar("territory_region", { length: 255 }),
+    franchiseFee: varchar("franchise_fee", { length: 50 }),
+    royaltyPercent: varchar("royalty_percent", { length: 10 }),
+    royaltyType: varchar("royalty_type", { length: 50 }),
+    royaltyAmount: varchar("royalty_amount", { length: 50 }),
+    supportTier: varchar("support_tier", { length: 50 }),
+    supportMonthlyFee: varchar("support_monthly_fee", { length: 50 }),
+    nftRevenueSharePercent: integer("nft_revenue_share_percent").default(0),
+    franchiseAgreementUrl: text("franchise_agreement_url"),
+    franchiseStartDate: timestamp("franchise_start_date"),
+    
+    // Custody Fields
+    custodyOwner: varchar("custody_owner", { length: 255 }).default("orbit"),
+    custodyTransferDate: timestamp("custody_transfer_date"),
+    previousOwner: varchar("previous_owner", { length: 255 }),
+    
+    // Serial System
+    serialPrefix: varchar("serial_prefix", { length: 20 }),
+    nextSerialNumber: integer("next_serial_number").default(1),
+    totalSerialsIssued: integer("total_serials_issued").default(0),
+    
+    // Blockchain
+    solanaWalletAddress: varchar("solana_wallet_address", { length: 255 }),
+    nftCollectionAddress: varchar("nft_collection_address", { length: 255 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_customer_hallmarks_tenant").on(table.tenantId),
+    stripeIdx: index("idx_customer_hallmarks_stripe").on(table.stripeCustomerId),
+    franchiseIdx: index("idx_customer_hallmarks_franchise").on(table.franchiseId),
+    ownershipIdx: index("idx_customer_hallmarks_ownership").on(table.ownershipMode),
+  })
+);
+
+export const insertCustomerHallmarkSchema = createInsertSchema(customerHallmarks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertCustomerHallmark = z.infer<typeof insertCustomerHallmarkSchema>;
+export type CustomerHallmark = typeof customerHallmarks.$inferSelect;
+
+// ========================
+// Franchise Tiers (Configurable Pricing)
+// ========================
+export const franchiseTiers = pgTable(
+  "franchise_tiers",
+  {
+    id: serial("id").primaryKey(),
+    tierCode: varchar("tier_code", { length: 50 }).notNull().unique(),
+    tierName: varchar("tier_name", { length: 100 }).notNull(),
+    description: text("description"),
+    
+    // Pricing (amounts in cents)
+    franchiseFee: integer("franchise_fee").notNull(),
+    royaltyPercent: varchar("royalty_percent", { length: 10 }).notNull(),
+    royaltyType: varchar("royalty_type", { length: 50 }).default("percentage"),
+    royaltyPerUnit: integer("royalty_per_unit"),
+    supportMonthlyFee: integer("support_monthly_fee").notNull(),
+    transferFee: integer("transfer_fee").notNull(),
+    
+    // Stripe Price IDs for recurring support fees
+    stripeSupportPriceIdMonthly: varchar("stripe_support_price_id_monthly", { length: 255 }),
+    stripeFranchiseFeeProductId: varchar("stripe_franchise_fee_product_id", { length: 255 }),
+    
+    // Features
+    maxLocations: integer("max_locations").default(1),
+    territoryExclusive: boolean("territory_exclusive").default(false),
+    territoryLevel: varchar("territory_level", { length: 50 }),
+    supportResponseHours: integer("support_response_hours").default(48),
+    nftRevenueSharePercent: integer("nft_revenue_share_percent").default(70),
+    whitelabelApp: boolean("whitelabel_app").default(false),
+    dedicatedAccountManager: boolean("dedicated_account_manager").default(false),
+    subFranchiseRights: boolean("sub_franchise_rights").default(false),
+    customApiAccess: boolean("custom_api_access").default(false),
+    priorityFeatureRequests: boolean("priority_feature_requests").default(false),
+    brandingControl: varchar("branding_control", { length: 50 }).default("basic"),
+    dataOwnership: varchar("data_ownership", { length: 50 }).default("shared"),
+    
+    // All modules included for franchise owners
+    allModulesIncluded: boolean("all_modules_included").default(true),
+    
+    isActive: boolean("is_active").default(true),
+    sortOrder: integer("sort_order").default(0),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    codeIdx: index("idx_franchise_tiers_code").on(table.tierCode),
+    activeIdx: index("idx_franchise_tiers_active").on(table.isActive),
+    sortIdx: index("idx_franchise_tiers_sort").on(table.sortOrder),
+  })
+);
+
+export const insertFranchiseTierSchema = createInsertSchema(franchiseTiers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFranchiseTier = z.infer<typeof insertFranchiseTierSchema>;
+export type FranchiseTier = typeof franchiseTiers.$inferSelect;
+
+// ========================
+// Franchise Applications
+// ========================
+export const franchiseApplications = pgTable(
+  "franchise_applications",
+  {
+    id: serial("id").primaryKey(),
+    companyName: varchar("company_name", { length: 255 }).notNull(),
+    contactName: varchar("contact_name", { length: 255 }).notNull(),
+    contactEmail: varchar("contact_email", { length: 255 }).notNull(),
+    contactPhone: varchar("contact_phone", { length: 20 }),
+    website: varchar("website", { length: 255 }),
+    businessType: varchar("business_type", { length: 100 }),
+    currentLocations: integer("current_locations").default(1),
+    estimatedWorkersPerMonth: integer("estimated_workers_per_month"),
+    currentSoftware: varchar("current_software", { length: 255 }),
+    requestedTierId: integer("requested_tier_id").references(() => franchiseTiers.id),
+    requestedTerritoryRegion: varchar("requested_territory_region", { length: 255 }),
+    requestedTerritoryState: varchar("requested_territory_state", { length: 2 }),
+    existingStripeCustomerId: varchar("existing_stripe_customer_id", { length: 255 }),
+    existingHallmarkId: integer("existing_hallmark_id"),
+    isUpgrade: boolean("is_upgrade").default(false),
+    status: varchar("status", { length: 50 }).default("pending"),
+    reviewNotes: text("review_notes"),
+    reviewedBy: varchar("reviewed_by", { length: 255 }),
+    reviewedAt: timestamp("reviewed_at"),
+    convertedToHallmarkId: integer("converted_to_hallmark_id"),
+    convertedAt: timestamp("converted_at"),
+    source: varchar("source", { length: 100 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    statusIdx: index("idx_franchise_applications_status").on(table.status),
+    emailIdx: index("idx_franchise_applications_email").on(table.contactEmail),
+    tierIdx: index("idx_franchise_applications_tier").on(table.requestedTierId),
+  })
+);
+
+export const insertFranchiseApplicationSchema = createInsertSchema(franchiseApplications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFranchiseApplication = z.infer<typeof insertFranchiseApplicationSchema>;
+export type FranchiseApplication = typeof franchiseApplications.$inferSelect;
+
+// ========================
+// Hallmark Custody Transfers
+// ========================
+export const hallmarkCustodyTransfers = pgTable(
+  "hallmark_custody_transfers",
+  {
+    id: serial("id").primaryKey(),
+    hallmarkId: integer("hallmark_id").notNull().references(() => customerHallmarks.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }).notNull(),
+    transferType: varchar("transfer_type", { length: 100 }).notNull(),
+    fromMode: varchar("from_mode", { length: 50 }).notNull(),
+    toMode: varchar("to_mode", { length: 50 }).notNull(),
+    fromOwner: varchar("from_owner", { length: 255 }).notNull(),
+    toOwner: varchar("to_owner", { length: 255 }).notNull(),
+    transferFee: varchar("transfer_fee", { length: 50 }),
+    franchiseFeeAgreed: varchar("franchise_fee_agreed", { length: 50 }),
+    royaltyTerms: text("royalty_terms"),
+    workersTransferred: integer("workers_transferred"),
+    jobsTransferred: integer("jobs_transferred"),
+    serialSystemsTransferred: integer("serial_systems_transferred"),
+    auditHistoryIncluded: boolean("audit_history_included").default(true),
+    requestedAt: timestamp("requested_at").default(sql`NOW()`),
+    requestedBy: varchar("requested_by", { length: 255 }),
+    approvedBy: varchar("approved_by", { length: 255 }),
+    approvedAt: timestamp("approved_at"),
+    customerAccepted: boolean("customer_accepted").default(false),
+    customerAcceptedAt: timestamp("customer_accepted_at"),
+    legalAgreementSigned: boolean("legal_agreement_signed").default(false),
+    legalAgreementUrl: text("legal_agreement_url"),
+    status: varchar("status", { length: 50 }).default("pending"),
+    completedAt: timestamp("completed_at"),
+    
+    // Stripe Payment for Transfer
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    hallmarkIdx: index("idx_custody_transfers_hallmark").on(table.hallmarkId),
+    statusIdx: index("idx_custody_transfers_status").on(table.status),
+    stripeIdx: index("idx_custody_transfers_stripe").on(table.stripeCustomerId),
+  })
+);
+
+export const insertHallmarkCustodyTransferSchema = createInsertSchema(hallmarkCustodyTransfers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertHallmarkCustodyTransfer = z.infer<typeof insertHallmarkCustodyTransferSchema>;
+export type HallmarkCustodyTransfer = typeof hallmarkCustodyTransfers.$inferSelect;
+
+// ========================
+// Franchise Payments (Royalties & Fees)
+// ========================
+export const franchisePayments = pgTable(
+  "franchise_payments",
+  {
+    id: serial("id").primaryKey(),
+    hallmarkId: integer("hallmark_id").notNull().references(() => customerHallmarks.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+    paymentType: varchar("payment_type", { length: 100 }).notNull(),
+    amount: integer("amount").notNull(),
+    currency: varchar("currency", { length: 3 }).default("usd"),
+    periodStart: timestamp("period_start"),
+    periodEnd: timestamp("period_end"),
+    workerCount: integer("worker_count"),
+    placementCount: integer("placement_count"),
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 255 }),
+    stripeInvoiceId: varchar("stripe_invoice_id", { length: 255 }),
+    status: varchar("status", { length: 50 }).default("pending"),
+    paidAt: timestamp("paid_at"),
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    hallmarkIdx: index("idx_franchise_payments_hallmark").on(table.hallmarkId),
+    statusIdx: index("idx_franchise_payments_status").on(table.status),
+    typeIdx: index("idx_franchise_payments_type").on(table.paymentType),
+  })
+);
+
+export const insertFranchisePaymentSchema = createInsertSchema(franchisePayments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertFranchisePayment = z.infer<typeof insertFranchisePaymentSchema>;
+export type FranchisePayment = typeof franchisePayments.$inferSelect;
+
+// ========================
+// Franchise Territories
+// ========================
+export const franchiseTerritories = pgTable(
+  "franchise_territories",
+  {
+    id: serial("id").primaryKey(),
+    hallmarkId: integer("hallmark_id").notNull().references(() => customerHallmarks.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    territoryName: varchar("territory_name", { length: 255 }).notNull(),
+    territoryType: varchar("territory_type", { length: 50 }).notNull(),
+    state: varchar("state", { length: 2 }),
+    city: varchar("city", { length: 255 }),
+    county: varchar("county", { length: 255 }),
+    zipCodes: text("zip_codes"),
+    geoJsonBoundary: text("geo_json_boundary"),
+    isExclusive: boolean("is_exclusive").default(true),
+    validFrom: timestamp("valid_from").default(sql`NOW()`),
+    validUntil: timestamp("valid_until"),
+    isActive: boolean("is_active").default(true),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    hallmarkIdx: index("idx_franchise_territories_hallmark").on(table.hallmarkId),
+    stateIdx: index("idx_franchise_territories_state").on(table.state),
+    activeIdx: index("idx_franchise_territories_active").on(table.isActive),
+  })
+);
+
+export const insertFranchiseTerritorySchema = createInsertSchema(franchiseTerritories).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFranchiseTerritory = z.infer<typeof insertFranchiseTerritorySchema>;
+export type FranchiseTerritory = typeof franchiseTerritories.$inferSelect;
