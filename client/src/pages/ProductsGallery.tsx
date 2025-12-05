@@ -164,19 +164,19 @@ export default function ProductsGallery() {
       </div>
 
       {/* Header */}
-      <div className="relative z-10 pt-6 sm:pt-10 pb-2 sm:pb-4 text-center px-4">
+      <div className="relative z-10 pt-8 sm:pt-10 pb-2 sm:pb-4 text-center px-6 sm:px-8 overflow-visible">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-center gap-2 mb-2"
         >
-          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
-          <span className="text-xs sm:text-sm text-cyan-300 uppercase tracking-widest font-semibold">Enterprise Solutions</span>
-          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
+          <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-cyan-400" />
+          <span className="text-[10px] sm:text-sm text-cyan-300 uppercase tracking-wider sm:tracking-widest font-semibold">Enterprise Solutions</span>
+          <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-cyan-400" />
         </motion.div>
-        <h1 className="text-3xl sm:text-5xl md:text-7xl mb-2 sm:mb-3 relative">
+        <h1 className="text-2xl sm:text-5xl md:text-7xl mb-2 sm:mb-3 relative overflow-visible">
           <span 
-            className="font-extralight tracking-[0.2em] sm:tracking-[0.3em] uppercase"
+            className="font-extralight tracking-[0.08em] sm:tracking-[0.3em] uppercase"
             style={{
               background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)',
               backgroundSize: '200% 200%',
@@ -190,7 +190,7 @@ export default function ProductsGallery() {
             DarkWave
           </span>
           <span 
-            className="font-thin tracking-[0.15em] sm:tracking-[0.2em] uppercase ml-2 sm:ml-4"
+            className="font-thin tracking-[0.05em] sm:tracking-[0.2em] uppercase ml-1 sm:ml-4"
             style={{
               background: 'linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(6,182,212,0.8) 50%, rgba(255,255,255,0.9) 100%)',
               backgroundSize: '200% 100%',
@@ -247,13 +247,13 @@ export default function ProductsGallery() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" />
 
                 <div className="relative p-4 sm:p-8 md:p-10">
-                  {/* Mobile: Stack layout, Desktop: Row layout */}
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-                    {/* Top row on mobile: Emblem + Hallmark/QR side by side */}
-                    <div className="flex sm:hidden items-center justify-center gap-4 w-full">
-                      {/* Emblem - Show image if available, otherwise placeholder */}
+                  {/* Card Header: Emblem + Name/Tagline + Hallmark */}
+                  <div className="flex flex-col items-center gap-3 mb-4 sm:mb-6">
+                    {/* Top row: Emblem + Hallmark/QR side by side */}
+                    <div className="flex items-center justify-center gap-3 sm:gap-4">
+                      {/* Emblem - Square */}
                       {currentProduct.emblem ? (
-                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg overflow-hidden`}>
+                        <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg overflow-hidden`}>
                           <img 
                             src={currentProduct.emblem} 
                             alt={`${currentProduct.name} emblem`}
@@ -261,18 +261,18 @@ export default function ProductsGallery() {
                           />
                         </div>
                       ) : (
-                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
+                        <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg`}>
                           <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            <span className="text-xl sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                               {currentProduct.name.charAt(0)}
                             </span>
                           </div>
                         </div>
                       )}
 
-                      {/* Hallmark/QR Code on mobile */}
+                      {/* Hallmark/QR Code - Horizontal rectangle */}
                       {currentProduct.hallmark ? (
-                        <div className="w-24 h-16 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 flex-shrink-0 shadow-lg overflow-hidden">
+                        <div className="w-24 h-14 sm:w-32 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
                           <img 
                             src={currentProduct.hallmark} 
                             alt={`${currentProduct.name} hallmark`}
@@ -280,7 +280,7 @@ export default function ProductsGallery() {
                           />
                         </div>
                       ) : currentProduct.url ? (
-                        <div className="w-16 h-16 rounded-xl bg-white p-1.5 flex-shrink-0 shadow-lg">
+                        <div className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-white p-1.5 shadow-lg">
                           <QRCodeSVG 
                             value={currentProduct.url} 
                             size={100}
@@ -290,7 +290,7 @@ export default function ProductsGallery() {
                           />
                         </div>
                       ) : (
-                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 opacity-30`}>
+                        <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
                           <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
                             <span className="text-xs text-gray-500">Soon</span>
                           </div>
@@ -298,64 +298,14 @@ export default function ProductsGallery() {
                       )}
                     </div>
 
-                    {/* Desktop layout: Emblem on left */}
-                    <div className="hidden sm:block">
-                      {currentProduct.emblem ? (
-                        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg overflow-hidden`}>
-                          <img 
-                            src={currentProduct.emblem} 
-                            alt={`${currentProduct.name} emblem`}
-                            className="w-full h-full rounded-xl object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
-                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                              {currentProduct.name.charAt(0)}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Center: Name & Tagline */}
-                    <div className="flex-1 text-center">
-                      <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2 text-white whitespace-nowrap">
+                    {/* Name & Tagline - Below the images */}
+                    <div className="text-center">
+                      <h2 className="text-xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2 text-white">
                         {currentProduct.name}
                       </h2>
-                      <p className={`text-sm sm:text-base font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
+                      <p className={`text-xs sm:text-base font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                         {currentProduct.tagline}
                       </p>
-                    </div>
-
-                    {/* Desktop layout: Hallmark/QR Code on right */}
-                    <div className="hidden sm:block">
-                      {currentProduct.hallmark ? (
-                        <div className="w-28 h-20 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 flex-shrink-0 shadow-lg overflow-hidden">
-                          <img 
-                            src={currentProduct.hallmark} 
-                            alt={`${currentProduct.name} hallmark`}
-                            className="w-full h-full rounded-xl object-cover"
-                          />
-                        </div>
-                      ) : currentProduct.url ? (
-                        <div className="w-20 h-20 rounded-xl bg-white p-1.5 flex-shrink-0 shadow-lg">
-                          <QRCodeSVG 
-                            value={currentProduct.url} 
-                            size={100}
-                            className="w-full h-full"
-                            bgColor="#ffffff"
-                            fgColor="#0f172a"
-                          />
-                        </div>
-                      ) : (
-                        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 opacity-30`}>
-                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-xs text-gray-500">Soon</span>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
 
