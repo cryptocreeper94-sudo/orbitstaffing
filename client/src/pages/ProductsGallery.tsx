@@ -234,8 +234,8 @@ export default function ProductsGallery() {
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
 
-        {/* Compact Product Card */}
-        <div className="w-full max-w-lg mx-auto">
+        {/* Full Width Product Card */}
+        <div className="w-full max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
@@ -255,22 +255,22 @@ export default function ProductsGallery() {
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-5`} />
                 
-                <div className="relative p-4 sm:p-5">
+                <div className="relative p-5 sm:p-6">
                   {/* Row 1: Emblem + Name/Tagline + Hallmark/QR */}
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-4 mb-4">
                     {/* Emblem - Square */}
                     {currentProduct.emblem ? (
-                      <div className={`w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg overflow-hidden`}>
+                      <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg overflow-hidden`}>
                         <img 
                           src={currentProduct.emblem} 
                           alt={`${currentProduct.name} emblem`}
-                          className="w-full h-full rounded-lg object-cover"
+                          className="w-full h-full rounded-xl object-cover"
                         />
                       </div>
                     ) : (
-                      <div className={`w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg`}>
-                        <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
-                          <span className="text-lg sm:text-xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                      <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg`}>
+                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                          <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                             {currentProduct.name.charAt(0)}
                           </span>
                         </div>
@@ -279,56 +279,56 @@ export default function ProductsGallery() {
 
                     {/* Name & Tagline - Center */}
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-base sm:text-lg font-bold text-white truncate">
+                      <h2 className="text-lg sm:text-2xl font-bold text-white truncate">
                         {currentProduct.name}
                       </h2>
-                      <p className={`text-[10px] sm:text-xs font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent truncate`}>
+                      <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent truncate`}>
                         {currentProduct.tagline}
                       </p>
                     </div>
 
                     {/* Hallmark/QR - Right (same size as emblem) */}
                     {currentProduct.hallmark ? (
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
                         <img 
                           src={currentProduct.hallmark} 
                           alt={`${currentProduct.name} hallmark`}
-                          className="w-full h-full rounded-lg object-cover"
+                          className="w-full h-full rounded-xl object-cover"
                         />
                       </div>
                     ) : currentProduct.url ? (
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-white p-1 shadow-lg">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-white p-1.5 shadow-lg">
                         <QRCodeSVG 
                           value={currentProduct.url} 
-                          size={48}
+                          size={72}
                           className="w-full h-full"
                           bgColor="#ffffff"
                           fgColor="#0f172a"
                         />
                       </div>
                     ) : (
-                      <div className={`w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
-                        <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
-                          <span className="text-[8px] text-gray-500">Soon</span>
+                      <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
+                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                          <span className="text-xs text-gray-500">Soon</span>
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Row 2: Description (2 lines max) */}
-                  <p className="text-gray-300 text-xs sm:text-sm mb-3 line-clamp-2 leading-snug">
+                  {/* Row 2: Description */}
+                  <p className="text-gray-300 text-sm sm:text-base mb-4 line-clamp-2 leading-relaxed">
                     {currentProduct.description}
                   </p>
 
-                  {/* Row 3: Compact Action Buttons */}
-                  <div className="flex gap-2 justify-center">
+                  {/* Row 3: Action Buttons */}
+                  <div className="flex gap-3 justify-center">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      className={`flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r ${currentProduct.color} rounded-lg font-bold text-[10px] sm:text-xs shadow-lg`}
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${currentProduct.color} rounded-lg font-bold text-xs sm:text-sm shadow-lg`}
                       onClick={() => setSelectedProduct(currentProduct.id)}
                       data-testid={`button-view-presentation-${currentProduct.id}`}
                     >
-                      <Sparkles className="w-3 h-3" />
+                      <Sparkles className="w-4 h-4" />
                       Details
                     </motion.button>
                     
@@ -338,11 +338,11 @@ export default function ProductsGallery() {
                         target="_blank"
                         rel="noopener noreferrer"
                         whileTap={{ scale: 0.95 }}
-                        className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg font-bold text-[10px] sm:text-xs"
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg font-bold text-xs sm:text-sm"
                         data-testid={`button-visit-${currentProduct.id}`}
                       >
                         Visit
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink className="w-4 h-4" />
                       </motion.a>
                     )}
                   </div>
