@@ -7774,4 +7774,532 @@ export function registerPayCardRoutes(app: Express) {
       res.status(500).json({ error: "Failed to get application" });
     }
   });
+
+  // ============================================
+  // TWO-TIER HALLMARK FRANCHISE SYSTEM API
+  // ============================================
+
+  // ========================
+  // PUBLIC: FRANCHISE TIERS
+  // ========================
+  app.get("/api/franchise-tiers", async (req: Request, res: Response) => {
+    try {
+      const tiers = await storage.getAllFranchiseTiers();
+      res.json(tiers);
+    } catch (error) {
+      console.error("Get franchise tiers error:", error);
+      res.status(500).json({ error: "Failed to get franchise tiers" });
+    }
+  });
+
+  app.get("/api/franchise-tiers/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const tier = await storage.getFranchiseTierById(id);
+      if (!tier) {
+        return res.status(404).json({ error: "Franchise tier not found" });
+      }
+      res.json(tier);
+    } catch (error) {
+      console.error("Get franchise tier error:", error);
+      res.status(500).json({ error: "Failed to get franchise tier" });
+    }
+  });
+
+  // ========================
+  // PUBLIC: FRANCHISE APPLICATION
+  // ========================
+  app.post("/api/franchise-applications", async (req: Request, res: Response) => {
+    try {
+      const applicationData = req.body;
+      
+      if (!applicationData.companyName || !applicationData.contactName || !applicationData.contactEmail) {
+        return res.status(400).json({ error: "Company name, contact name, and email are required" });
+      }
+      
+      const application = await storage.createFranchiseApplication({
+        companyName: applicationData.companyName,
+        contactName: applicationData.contactName,
+        contactEmail: applicationData.contactEmail,
+        contactPhone: applicationData.contactPhone,
+        website: applicationData.website,
+        businessType: applicationData.businessType,
+        currentLocations: applicationData.currentLocations || 1,
+        estimatedWorkersPerMonth: applicationData.estimatedWorkersPerMonth,
+        currentSoftware: applicationData.currentSoftware,
+        requestedTierId: applicationData.requestedTierId,
+        requestedTerritoryRegion: applicationData.requestedTerritoryRegion,
+        requestedTerritoryState: applicationData.requestedTerritoryState,
+        existingStripeCustomerId: applicationData.existingStripeCustomerId,
+        source: applicationData.source || 'website',
+      });
+      
+      console.log(`[Franchise] New application submitted: ${application.companyName} (${application.contactEmail})`);
+      
+      res.status(201).json({ 
+        success: true, 
+        message: "Application submitted successfully. Our team will review and contact you within 24-48 hours.",
+        applicationId: application.id 
+      });
+    } catch (error) {
+      console.error("Create franchise application error:", error);
+      res.status(500).json({ error: "Failed to submit application" });
+    }
+  });
+
+  // ========================
+  // ADMIN: FRANCHISE MANAGEMENT
+  // ========================
+  app.get("/api/admin/franchise-applications", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string;
+      const applications = status 
+        ? await storage.getFranchiseApplicationsByStatus(status)
+        : await storage.getAllFranchiseApplications();
+      res.json(applications);
+    } catch (error) {
+      console.error("Get franchise applications error:", error);
+      res.status(500).json({ error: "Failed to get applications" });
+    }
+  });
+
+  app.get("/api/admin/franchise-applications/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const application = await storage.getFranchiseApplicationById(id);
+      if (!application) {
+        return res.status(404).json({ error: "Application not found" });
+      }
+      res.json(application);
+    } catch (error) {
+      console.error("Get franchise application error:", error);
+      res.status(500).json({ error: "Failed to get application" });
+    }
+  });
+
+  app.post("/api/admin/franchise-applications/:id/approve", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { notes } = req.body;
+      const reviewedBy = req.session?.adminName || 'Admin';
+      
+      const application = await storage.approveFranchiseApplication(id, reviewedBy, notes);
+      
+      console.log(`[Franchise] Application ${id} approved by ${reviewedBy}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Application approved",
+        application 
+      });
+    } catch (error) {
+      console.error("Approve franchise application error:", error);
+      res.status(500).json({ error: "Failed to approve application" });
+    }
+  });
+
+  app.post("/api/admin/franchise-applications/:id/reject", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { reason } = req.body;
+      
+      if (!reason) {
+        return res.status(400).json({ error: "Rejection reason is required" });
+      }
+      
+      const reviewedBy = req.session?.adminName || 'Admin';
+      const application = await storage.rejectFranchiseApplication(id, reviewedBy, reason);
+      
+      console.log(`[Franchise] Application ${id} rejected by ${reviewedBy}: ${reason}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Application rejected",
+        application 
+      });
+    } catch (error) {
+      console.error("Reject franchise application error:", error);
+      res.status(500).json({ error: "Failed to reject application" });
+    }
+  });
+
+  // ========================
+  // ADMIN: CUSTOMER HALLMARKS
+  // ========================
+  app.get("/api/admin/customer-hallmarks", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const mode = req.query.mode as string;
+      if (mode === 'franchise') {
+        const hallmarks = await storage.getAllFranchiseHallmarks();
+        return res.json(hallmarks);
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM customer_hallmarks ORDER BY created_at DESC
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get customer hallmarks error:", error);
+      res.status(500).json({ error: "Failed to get hallmarks" });
+    }
+  });
+
+  app.get("/api/admin/customer-hallmarks/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const hallmark = await storage.getCustomerHallmarkById(id);
+      if (!hallmark) {
+        return res.status(404).json({ error: "Hallmark not found" });
+      }
+      res.json(hallmark);
+    } catch (error) {
+      console.error("Get customer hallmark error:", error);
+      res.status(500).json({ error: "Failed to get hallmark" });
+    }
+  });
+
+  app.post("/api/admin/customer-hallmarks", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      if (!data.stripeCustomerId || !data.hallmarkName) {
+        return res.status(400).json({ error: "Stripe customer ID and hallmark name are required" });
+      }
+      
+      const hallmark = await storage.createCustomerHallmark(data);
+      
+      console.log(`[Franchise] Created hallmark: ${hallmark.hallmarkName} (${hallmark.id})`);
+      
+      res.status(201).json(hallmark);
+    } catch (error: any) {
+      if (error.code === '23505') {
+        return res.status(409).json({ error: "A hallmark already exists for this Stripe customer" });
+      }
+      console.error("Create customer hallmark error:", error);
+      res.status(500).json({ error: "Failed to create hallmark" });
+    }
+  });
+
+  app.patch("/api/admin/customer-hallmarks/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = req.body;
+      
+      const hallmark = await storage.updateCustomerHallmark(id, data);
+      
+      console.log(`[Franchise] Updated hallmark: ${hallmark.hallmarkName} (${hallmark.id})`);
+      
+      res.json(hallmark);
+    } catch (error) {
+      console.error("Update customer hallmark error:", error);
+      res.status(500).json({ error: "Failed to update hallmark" });
+    }
+  });
+
+  app.post("/api/admin/customer-hallmarks/:id/convert-to-franchise", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { franchiseTierId, territoryRegion, territoryState, franchiseAgreementUrl } = req.body;
+      
+      if (!franchiseTierId) {
+        return res.status(400).json({ error: "Franchise tier is required" });
+      }
+      
+      const hallmark = await storage.convertHallmarkToFranchise(id, franchiseTierId, {
+        territoryRegion,
+        franchiseAgreementUrl,
+      });
+      
+      console.log(`[Franchise] Converted hallmark ${id} to franchise tier ${franchiseTierId}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Hallmark converted to franchise ownership",
+        hallmark 
+      });
+    } catch (error) {
+      console.error("Convert hallmark to franchise error:", error);
+      res.status(500).json({ error: "Failed to convert hallmark" });
+    }
+  });
+
+  // ========================
+  // ADMIN: CUSTODY TRANSFERS
+  // ========================
+  app.get("/api/admin/custody-transfers", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string;
+      if (status === 'pending') {
+        const transfers = await storage.getPendingCustodyTransfers();
+        return res.json(transfers);
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM hallmark_custody_transfers ORDER BY created_at DESC
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get custody transfers error:", error);
+      res.status(500).json({ error: "Failed to get transfers" });
+    }
+  });
+
+  app.post("/api/admin/custody-transfers", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      if (!data.hallmarkId || !data.stripeCustomerId || !data.transferType) {
+        return res.status(400).json({ error: "Hallmark ID, Stripe customer ID, and transfer type are required" });
+      }
+      
+      const transfer = await storage.createCustodyTransfer({
+        ...data,
+        requestedBy: req.session?.adminName || 'Admin',
+      });
+      
+      console.log(`[Franchise] Created custody transfer ${transfer.id} for hallmark ${data.hallmarkId}`);
+      
+      res.status(201).json(transfer);
+    } catch (error) {
+      console.error("Create custody transfer error:", error);
+      res.status(500).json({ error: "Failed to create transfer" });
+    }
+  });
+
+  app.post("/api/admin/custody-transfers/:id/complete", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const approvedBy = req.session?.adminName || 'Admin';
+      
+      const transfer = await storage.completeCustodyTransfer(id, approvedBy);
+      
+      console.log(`[Franchise] Completed custody transfer ${id}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Custody transfer completed",
+        transfer 
+      });
+    } catch (error) {
+      console.error("Complete custody transfer error:", error);
+      res.status(500).json({ error: "Failed to complete transfer" });
+    }
+  });
+
+  // ========================
+  // ADMIN: FRANCHISE PAYMENTS
+  // ========================
+  app.get("/api/admin/franchise-payments", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const status = req.query.status as string;
+      if (status === 'pending') {
+        const payments = await storage.getPendingFranchisePayments();
+        return res.json(payments);
+      }
+      
+      const hallmarkId = req.query.hallmarkId ? parseInt(req.query.hallmarkId as string) : null;
+      if (hallmarkId) {
+        const payments = await storage.getFranchisePayments(hallmarkId);
+        return res.json(payments);
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM franchise_payments ORDER BY created_at DESC LIMIT 100
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get franchise payments error:", error);
+      res.status(500).json({ error: "Failed to get payments" });
+    }
+  });
+
+  app.post("/api/admin/franchise-payments", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      if (!data.hallmarkId || !data.paymentType || !data.amount) {
+        return res.status(400).json({ error: "Hallmark ID, payment type, and amount are required" });
+      }
+      
+      const payment = await storage.createFranchisePayment(data);
+      
+      console.log(`[Franchise] Created payment ${payment.id}: ${data.paymentType} for $${(data.amount / 100).toFixed(2)}`);
+      
+      res.status(201).json(payment);
+    } catch (error) {
+      console.error("Create franchise payment error:", error);
+      res.status(500).json({ error: "Failed to create payment" });
+    }
+  });
+
+  app.post("/api/admin/franchise-payments/:id/mark-paid", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { stripePaymentIntentId } = req.body;
+      
+      if (!stripePaymentIntentId) {
+        return res.status(400).json({ error: "Stripe payment intent ID is required" });
+      }
+      
+      const payment = await storage.markFranchisePaymentPaid(id, stripePaymentIntentId);
+      
+      console.log(`[Franchise] Marked payment ${id} as paid`);
+      
+      res.json({ 
+        success: true, 
+        message: "Payment marked as paid",
+        payment 
+      });
+    } catch (error) {
+      console.error("Mark franchise payment paid error:", error);
+      res.status(500).json({ error: "Failed to mark payment as paid" });
+    }
+  });
+
+  // ========================
+  // ADMIN: FRANCHISE TERRITORIES
+  // ========================
+  app.get("/api/admin/franchise-territories", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const state = req.query.state as string;
+      if (state) {
+        const territories = await storage.getTerritoriesByState(state);
+        return res.json(territories);
+      }
+      
+      const hallmarkId = req.query.hallmarkId ? parseInt(req.query.hallmarkId as string) : null;
+      if (hallmarkId) {
+        const territories = await storage.getFranchiseTerritories(hallmarkId);
+        return res.json(territories);
+      }
+      
+      const result = await db.execute(sql`
+        SELECT * FROM franchise_territories WHERE is_active = true ORDER BY state, territory_name
+      `);
+      res.json(result.rows);
+    } catch (error) {
+      console.error("Get franchise territories error:", error);
+      res.status(500).json({ error: "Failed to get territories" });
+    }
+  });
+
+  app.get("/api/franchise-territories/check-availability", async (req: Request, res: Response) => {
+    try {
+      const state = req.query.state as string;
+      const city = req.query.city as string;
+      
+      if (!state) {
+        return res.status(400).json({ error: "State is required" });
+      }
+      
+      const available = await storage.checkTerritoryAvailability(state, city);
+      
+      res.json({ 
+        available,
+        state,
+        city: city || null,
+        message: available 
+          ? "This territory is available for franchise" 
+          : "This territory is already claimed by an existing franchise"
+      });
+    } catch (error) {
+      console.error("Check territory availability error:", error);
+      res.status(500).json({ error: "Failed to check availability" });
+    }
+  });
+
+  app.post("/api/admin/franchise-territories", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      if (!data.hallmarkId || !data.territoryName || !data.territoryType) {
+        return res.status(400).json({ error: "Hallmark ID, territory name, and type are required" });
+      }
+      
+      const territory = await storage.createFranchiseTerritory(data);
+      
+      console.log(`[Franchise] Created territory: ${territory.territoryName} (${territory.id})`);
+      
+      res.status(201).json(territory);
+    } catch (error) {
+      console.error("Create franchise territory error:", error);
+      res.status(500).json({ error: "Failed to create territory" });
+    }
+  });
+
+  app.patch("/api/admin/franchise-territories/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = req.body;
+      
+      const territory = await storage.updateFranchiseTerritory(id, data);
+      
+      console.log(`[Franchise] Updated territory: ${territory.territoryName} (${territory.id})`);
+      
+      res.json(territory);
+    } catch (error) {
+      console.error("Update franchise territory error:", error);
+      res.status(500).json({ error: "Failed to update territory" });
+    }
+  });
+
+  app.delete("/api/admin/franchise-territories/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      
+      const territory = await storage.deactivateFranchiseTerritory(id);
+      
+      console.log(`[Franchise] Deactivated territory ${id}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Territory deactivated",
+        territory 
+      });
+    } catch (error) {
+      console.error("Deactivate franchise territory error:", error);
+      res.status(500).json({ error: "Failed to deactivate territory" });
+    }
+  });
+
+  // ========================
+  // ADMIN: FRANCHISE TIER MANAGEMENT
+  // ========================
+  app.post("/api/admin/franchise-tiers", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      if (!data.tierCode || !data.tierName || !data.franchiseFee || !data.royaltyPercent || !data.supportMonthlyFee || !data.transferFee) {
+        return res.status(400).json({ error: "Tier code, name, franchise fee, royalty percent, support fee, and transfer fee are required" });
+      }
+      
+      const tier = await storage.createFranchiseTier(data);
+      
+      console.log(`[Franchise] Created tier: ${tier.tierName} (${tier.tierCode})`);
+      
+      res.status(201).json(tier);
+    } catch (error: any) {
+      if (error.code === '23505') {
+        return res.status(409).json({ error: "A tier with this code already exists" });
+      }
+      console.error("Create franchise tier error:", error);
+      res.status(500).json({ error: "Failed to create tier" });
+    }
+  });
+
+  app.patch("/api/admin/franchise-tiers/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const data = req.body;
+      
+      const tier = await storage.updateFranchiseTier(id, data);
+      
+      console.log(`[Franchise] Updated tier: ${tier.tierName} (${tier.id})`);
+      
+      res.json(tier);
+    } catch (error) {
+      console.error("Update franchise tier error:", error);
+      res.status(500).json({ error: "Failed to update tier" });
+    }
+  });
 }
