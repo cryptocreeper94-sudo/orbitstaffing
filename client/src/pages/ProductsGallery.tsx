@@ -246,64 +246,117 @@ export default function ProductsGallery() {
                 {/* Shimmer Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" />
 
-                <div className="relative p-5 sm:p-8 md:p-10">
-                  {/* Top Row: Emblem + Name + Hallmark/QR */}
-                  <div className="flex items-start justify-between gap-4 mb-4 sm:mb-6">
-                    {/* Emblem - Show image if available, otherwise placeholder */}
-                    {currentProduct.emblem ? (
-                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg overflow-hidden`}>
-                        <img 
-                          src={currentProduct.emblem} 
-                          alt={`${currentProduct.name} emblem`}
-                          className="w-full h-full rounded-xl object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
-                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                          <span className="text-lg sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                            {currentProduct.name.charAt(0)}
-                          </span>
+                <div className="relative p-4 sm:p-8 md:p-10">
+                  {/* Mobile: Stack layout, Desktop: Row layout */}
+                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    {/* Top row on mobile: Emblem + Hallmark/QR side by side */}
+                    <div className="flex sm:hidden items-center justify-center gap-4 w-full">
+                      {/* Emblem - Show image if available, otherwise placeholder */}
+                      {currentProduct.emblem ? (
+                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg overflow-hidden`}>
+                          <img 
+                            src={currentProduct.emblem} 
+                            alt={`${currentProduct.name} emblem`}
+                            className="w-full h-full rounded-xl object-cover"
+                          />
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
+                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                              {currentProduct.name.charAt(0)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Hallmark/QR Code on mobile */}
+                      {currentProduct.hallmark ? (
+                        <div className="w-24 h-16 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 flex-shrink-0 shadow-lg overflow-hidden">
+                          <img 
+                            src={currentProduct.hallmark} 
+                            alt={`${currentProduct.name} hallmark`}
+                            className="w-full h-full rounded-xl object-cover"
+                          />
+                        </div>
+                      ) : currentProduct.url ? (
+                        <div className="w-16 h-16 rounded-xl bg-white p-1.5 flex-shrink-0 shadow-lg">
+                          <QRCodeSVG 
+                            value={currentProduct.url} 
+                            size={100}
+                            className="w-full h-full"
+                            bgColor="#ffffff"
+                            fgColor="#0f172a"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 opacity-30`}>
+                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-xs text-gray-500">Soon</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Desktop layout: Emblem on left */}
+                    <div className="hidden sm:block">
+                      {currentProduct.emblem ? (
+                        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg overflow-hidden`}>
+                          <img 
+                            src={currentProduct.emblem} 
+                            alt={`${currentProduct.name} emblem`}
+                            className="w-full h-full rounded-xl object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 shadow-lg`}>
+                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                              {currentProduct.name.charAt(0)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Center: Name & Tagline */}
                     <div className="flex-1 text-center">
-                      <h2 className="text-xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2 text-white">
+                      <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2 text-white whitespace-nowrap">
                         {currentProduct.name}
                       </h2>
-                      <p className={`text-xs sm:text-base font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
+                      <p className={`text-sm sm:text-base font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                         {currentProduct.tagline}
                       </p>
                     </div>
 
-                    {/* Hallmark/QR Code - Show hallmark image if available, otherwise QR or placeholder */}
-                    {currentProduct.hallmark ? (
-                      <div className="w-20 h-14 sm:w-28 sm:h-20 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 flex-shrink-0 shadow-lg overflow-hidden">
-                        <img 
-                          src={currentProduct.hallmark} 
-                          alt={`${currentProduct.name} hallmark`}
-                          className="w-full h-full rounded-xl object-cover"
-                        />
-                      </div>
-                    ) : currentProduct.url ? (
-                      <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-white p-1 sm:p-1.5 flex-shrink-0 shadow-lg">
-                        <QRCodeSVG 
-                          value={currentProduct.url} 
-                          size={100}
-                          className="w-full h-full"
-                          bgColor="#ffffff"
-                          fgColor="#0f172a"
-                        />
-                      </div>
-                    ) : (
-                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 opacity-30`}>
-                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                          <span className="text-[8px] sm:text-xs text-gray-500">Soon</span>
+                    {/* Desktop layout: Hallmark/QR Code on right */}
+                    <div className="hidden sm:block">
+                      {currentProduct.hallmark ? (
+                        <div className="w-28 h-20 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 flex-shrink-0 shadow-lg overflow-hidden">
+                          <img 
+                            src={currentProduct.hallmark} 
+                            alt={`${currentProduct.name} hallmark`}
+                            className="w-full h-full rounded-xl object-cover"
+                          />
                         </div>
-                      </div>
-                    )}
+                      ) : currentProduct.url ? (
+                        <div className="w-20 h-20 rounded-xl bg-white p-1.5 flex-shrink-0 shadow-lg">
+                          <QRCodeSVG 
+                            value={currentProduct.url} 
+                            size={100}
+                            className="w-full h-full"
+                            bgColor="#ffffff"
+                            fgColor="#0f172a"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`w-20 h-20 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 flex-shrink-0 opacity-30`}>
+                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-xs text-gray-500">Soon</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Description */}
