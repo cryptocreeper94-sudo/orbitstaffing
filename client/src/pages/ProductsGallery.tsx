@@ -25,8 +25,8 @@ export default function ProductsGallery() {
       slides: slideContent.ORBIT,
       slideshowData: orbitSlides,
       url: 'https://orbitstaffing.io',
-      emblem: null,
-      hallmark: null,
+      emblem: '/attached_assets/generated_images/orbit_staffing_emblem_on_black.png',
+      hallmark: '/attached_assets/generated_images/orbit_hallmark_emblem_seal.png',
     },
     {
       id: 'Orby',
