@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, X, ExternalLink, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ExternalLink, Sparkles, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
@@ -19,7 +19,7 @@ export default function ProductsGallery() {
       id: 'ORBIT',
       name: 'ORBIT Staffing OS',
       tagline: '100% Automated Flexible Labor Marketplace',
-      description: 'Zero manual intervention staffing platform with GPS-verified check-ins, automated matching, and comprehensive payroll.',
+      description: 'Zero manual intervention staffing platform with GPS-verified check-ins, automated matching, and comprehensive payroll. Complete workforce management from recruitment to payment with blockchain-verified credentials and real-time compliance tracking.',
       color: 'from-cyan-500 to-blue-600',
       glowColor: 'cyan',
       slides: slideContent.ORBIT,
@@ -32,7 +32,7 @@ export default function ProductsGallery() {
       id: 'Orby',
       name: 'Orby',
       tagline: 'Operations Command Software',
-      description: 'Complete command and control platform with full communication suite, emergency management, and advanced geofencing.',
+      description: 'Complete command and control platform with full communication suite, emergency management, and advanced geofencing. Real-time location tracking, automated dispatch, and comprehensive incident response for enterprise operations.',
       color: 'from-emerald-500 to-teal-600',
       glowColor: 'emerald',
       slides: slideContent['ORBY'],
@@ -45,7 +45,7 @@ export default function ProductsGallery() {
       id: 'DarkWave Pulse',
       name: 'DarkWave Pulse',
       tagline: 'Lightning-Fast Compliance & Safety Platform',
-      description: 'Enterprise-grade safety management with real-time incident detection and OSHA compliance automation.',
+      description: 'Enterprise-grade safety management with real-time incident detection and OSHA compliance automation. Automated safety audits, incident tracking, and regulatory reporting with predictive analytics for workplace safety.',
       color: 'from-purple-500 to-pink-600',
       glowColor: 'purple',
       slides: slideContent['DarkWave Pulse'],
@@ -58,7 +58,7 @@ export default function ProductsGallery() {
       id: 'Lot Ops Pro',
       name: 'Lot Ops Pro',
       tagline: 'Smart Inventory & Fleet Operations',
-      description: 'Complete inventory and fleet operations with real-time tracking and maintenance scheduling.',
+      description: 'Complete inventory and fleet operations with real-time tracking and maintenance scheduling. Automated lot management, vehicle tracking, condition reporting, and predictive maintenance for automotive dealerships.',
       color: 'from-amber-500 to-orange-600',
       glowColor: 'amber',
       slides: slideContent['Lot Ops Pro'],
@@ -71,7 +71,7 @@ export default function ProductsGallery() {
       id: 'BrewAndBoard',
       name: 'Brew & Board Coffee',
       tagline: 'B2B Coffee Delivery for Nashville',
-      description: 'Connect businesses with Nashville coffee shops. 20+ vendors, calendar scheduling, blockchain-verified receipts.',
+      description: 'Connect businesses with Nashville coffee shops. 20+ vendors, calendar scheduling, blockchain-verified receipts. Streamline your office coffee program with automated ordering and delivery coordination.',
       color: 'from-stone-700 to-amber-900',
       glowColor: 'amber',
       slides: slideContent['BREW_AND_BOARD'],
@@ -84,7 +84,7 @@ export default function ProductsGallery() {
       id: 'GarageBot',
       name: 'GarageBot',
       tagline: 'Smart Garage & Workshop Management',
-      description: 'Intelligent automation for garage and workshop operations with IoT integration and smart scheduling.',
+      description: 'Intelligent automation for garage and workshop operations with IoT integration and smart scheduling. Tool inventory, work order management, and automated maintenance tracking for professional workshops.',
       color: 'from-sky-500 to-blue-700',
       glowColor: 'sky',
       slides: slideContent['ORBIT'] || [],
@@ -106,9 +106,9 @@ export default function ProductsGallery() {
   const currentProduct = products[currentIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      {/* Animated Background - Fixed behind everything */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Twinkling Stars */}
         {[...Array(60)].map((_, i) => (
           <div
@@ -147,49 +147,36 @@ export default function ProductsGallery() {
             }}
           />
         ))}
+        
+        {/* Gradient Orbs */}
+        <div className="absolute inset-0 opacity-40">
+          <motion.div 
+            className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/30 rounded-full blur-3xl"
+            animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/30 rounded-full blur-3xl"
+            animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </div>
       </div>
 
-      {/* Gradient Orbs */}
-      <div className="absolute inset-0 opacity-40 pointer-events-none">
-        <motion.div 
-          className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/30 rounded-full blur-3xl"
-          animate={{ 
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/30 rounded-full blur-3xl"
-          animate={{ 
-            x: [0, -50, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-pink-500/20 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
-
-      {/* Header */}
-      <div className="relative z-10 pt-8 sm:pt-10 pb-2 sm:pb-4 text-center px-6 sm:px-8 overflow-visible">
+      {/* ===== SECTION 1: HEADER (Fixed height) ===== */}
+      <header className="relative z-10 pt-6 pb-4 text-center px-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-center gap-2 mb-2"
         >
-          <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-cyan-400" />
-          <span className="text-[10px] sm:text-sm text-cyan-300 uppercase tracking-wider sm:tracking-widest font-semibold">Enterprise Solutions</span>
-          <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-cyan-400" />
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span className="text-xs text-cyan-300 uppercase tracking-widest font-semibold">Enterprise Solutions</span>
+          <Sparkles className="w-4 h-4 text-cyan-400" />
         </motion.div>
-        <h1 className="text-2xl sm:text-5xl md:text-7xl mb-2 sm:mb-3 relative overflow-visible">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl mb-1">
           <span 
-            className="font-extralight tracking-[0.08em] sm:tracking-[0.3em] uppercase"
+            className="font-extralight tracking-[0.1em] sm:tracking-[0.3em] uppercase"
             style={{
               background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)',
               backgroundSize: '200% 200%',
@@ -203,7 +190,7 @@ export default function ProductsGallery() {
             DarkWave
           </span>
           <span 
-            className="font-thin tracking-[0.05em] sm:tracking-[0.2em] uppercase ml-1 sm:ml-4"
+            className="font-thin tracking-[0.05em] sm:tracking-[0.2em] uppercase ml-2 sm:ml-4"
             style={{
               background: 'linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(6,182,212,0.8) 50%, rgba(255,255,255,0.9) 100%)',
               backgroundSize: '200% 100%',
@@ -216,139 +203,156 @@ export default function ProductsGallery() {
             Studios
           </span>
         </h1>
-        <p className="text-gray-400 text-xs sm:text-sm">
-          {currentIndex + 1} / {products.length} Products
-        </p>
-      </div>
+      </header>
 
-      {/* Compact Carousel - Horizontal Cards */}
-      <div className="relative z-10 flex items-center justify-center px-12 sm:px-16 py-4">
+      {/* ===== SECTION 2: FULL-SCREEN PRODUCT CARD ===== */}
+      <section className="relative z-10 h-[calc(100vh-120px)] flex items-center justify-center px-4">
         {/* Left Arrow */}
         <motion.button
           onClick={prevProduct}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute left-2 sm:left-4 z-20 p-2 sm:p-3 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-lg"
+          className="absolute left-2 sm:left-6 z-20 p-3 sm:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-xl"
           data-testid="button-prev-product"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 group-hover:text-white transition" />
+          <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
 
-        {/* Full Width Product Card */}
-        <div className="w-full max-w-2xl mx-auto">
+        {/* Product Card - Full Screen */}
+        <div className="w-full max-w-4xl h-full flex items-center justify-center py-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-              className="relative"
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="w-full h-full max-h-[600px] sm:max-h-[700px] relative"
             >
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${currentProduct.color} rounded-xl blur-lg opacity-40`} />
+              <div className={`absolute -inset-2 bg-gradient-to-r ${currentProduct.color} rounded-3xl blur-xl opacity-30`} />
               
-              {/* Compact Horizontal Card */}
+              {/* Card Container */}
               <div
-                className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl"
+                className="relative h-full overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900/98 via-slate-800/98 to-slate-900/98 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col"
                 data-testid={`card-product-${currentProduct.id}`}
               >
+                {/* Background Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-5`} />
                 
-                <div className="relative p-5 sm:p-6">
-                  {/* Row 1: Emblem + Name/Tagline + Hallmark/QR */}
-                  <div className="flex items-center gap-4 mb-4">
-                    {/* Emblem - Square */}
-                    {currentProduct.emblem ? (
-                      <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg overflow-hidden`}>
-                        <img 
-                          src={currentProduct.emblem} 
-                          alt={`${currentProduct.name} emblem`}
-                          className="w-full h-full rounded-xl object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg`}>
-                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                          <span className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                            {currentProduct.name.charAt(0)}
-                          </span>
+                {/* Card Content */}
+                <div className="relative flex-1 flex flex-col p-6 sm:p-10">
+                  
+                  {/* Top Section: Emblem + Product Info */}
+                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mb-6">
+                    {/* Emblem */}
+                    <div className="shrink-0">
+                      {currentProduct.emblem ? (
+                        <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl overflow-hidden`}>
+                          <img 
+                            src={currentProduct.emblem} 
+                            alt={`${currentProduct.name} emblem`}
+                            className="w-full h-full rounded-xl object-cover"
+                          />
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl`}>
+                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                              {currentProduct.name.charAt(0)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
-                    {/* Name & Tagline - Center */}
-                    <div className="flex-1 min-w-0">
-                      <h2 className="text-lg sm:text-2xl font-bold text-white truncate">
+                    {/* Product Name & Tagline */}
+                    <div className="text-center sm:text-left flex-1">
+                      <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2">
                         {currentProduct.name}
                       </h2>
-                      <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent truncate`}>
+                      <p className={`text-base sm:text-xl font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                         {currentProduct.tagline}
                       </p>
                     </div>
-
-                    {/* Hallmark/QR - Right (same size as emblem) */}
-                    {currentProduct.hallmark ? (
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
-                        <img 
-                          src={currentProduct.hallmark} 
-                          alt={`${currentProduct.name} hallmark`}
-                          className="w-full h-full rounded-xl object-cover"
-                        />
-                      </div>
-                    ) : currentProduct.url ? (
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-white p-1.5 shadow-lg">
-                        <QRCodeSVG 
-                          value={currentProduct.url} 
-                          size={72}
-                          className="w-full h-full"
-                          bgColor="#ffffff"
-                          fgColor="#0f172a"
-                        />
-                      </div>
-                    ) : (
-                      <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
-                        <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                          <span className="text-xs text-gray-500">Soon</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Row 2: Description */}
-                  <p className="text-gray-300 text-sm sm:text-base mb-4 line-clamp-2 leading-relaxed">
-                    {currentProduct.description}
-                  </p>
+                  {/* Middle Section: Description */}
+                  <div className="flex-1 flex items-center justify-center mb-6">
+                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed text-center max-w-2xl">
+                      {currentProduct.description}
+                    </p>
+                  </div>
 
-                  {/* Row 3: Action Buttons - Fixed width, same baseline */}
-                  <div className="flex gap-3 justify-center">
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      className={`w-32 sm:w-36 h-10 inline-flex items-center justify-center gap-2 bg-gradient-to-r ${currentProduct.color} rounded-lg font-bold text-xs sm:text-sm shadow-lg`}
-                      onClick={() => setSelectedProduct(currentProduct.id)}
-                      data-testid={`button-view-presentation-${currentProduct.id}`}
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Details
-                    </motion.button>
-                    
-                    {currentProduct.url ? (
-                      <motion.a
-                        href={currentProduct.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                  {/* Bottom Section: Hallmark QR + Buttons */}
+                  <div className="flex flex-col items-center gap-6">
+                    {/* Hallmark QR Code */}
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-xs text-gray-500 uppercase tracking-wider">Blockchain Verified</span>
+                      {currentProduct.hallmark ? (
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-1 shadow-lg overflow-hidden border border-cyan-500/20">
+                          <img 
+                            src={currentProduct.hallmark} 
+                            alt={`${currentProduct.name} hallmark`}
+                            className="w-full h-full rounded-lg object-cover"
+                          />
+                        </div>
+                      ) : currentProduct.url ? (
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white p-2 shadow-lg">
+                          <QRCodeSVG 
+                            value={currentProduct.url} 
+                            size={80}
+                            className="w-full h-full"
+                            bgColor="#ffffff"
+                            fgColor="#0f172a"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br ${currentProduct.color} p-1 opacity-30`}>
+                          <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-xs text-gray-500">Pending</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-32 sm:w-36 h-10 inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 rounded-lg font-bold text-xs sm:text-sm"
-                        data-testid={`button-visit-${currentProduct.id}`}
+                        className={`px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 bg-gradient-to-r ${currentProduct.color} rounded-xl font-bold text-sm sm:text-base shadow-lg`}
+                        onClick={() => setSelectedProduct(currentProduct.id)}
+                        data-testid={`button-slideshow-${currentProduct.id}`}
                       >
-                        Visit
-                        <ExternalLink className="w-4 h-4" />
-                      </motion.a>
-                    ) : (
-                      <div className="w-32 sm:w-36 h-10 inline-flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-lg font-bold text-xs sm:text-sm text-gray-500">
-                        Coming Soon
-                      </div>
-                    )}
+                        <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                        Slideshow
+                      </motion.button>
+                      
+                      {currentProduct.url ? (
+                        <motion.a
+                          href={currentProduct.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-sm sm:text-base transition-colors"
+                          data-testid={`button-visit-${currentProduct.id}`}
+                        >
+                          Visit Website
+                          <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </motion.a>
+                      ) : (
+                        <div className="px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-xl font-bold text-sm sm:text-base text-gray-500">
+                          Coming Soon
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Product Counter */}
+                    <p className="text-gray-500 text-sm">
+                      {currentIndex + 1} of {products.length}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -361,24 +365,24 @@ export default function ProductsGallery() {
           onClick={nextProduct}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute right-2 sm:right-4 z-20 p-2 sm:p-3 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-lg"
+          className="absolute right-2 sm:right-6 z-20 p-3 sm:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-xl"
           data-testid="button-next-product"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 group-hover:text-white transition" />
+          <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
-      </div>
+      </section>
 
-      {/* Dot Navigation */}
-      <div className="relative z-10 flex justify-center gap-2 pb-4">
+      {/* Dot Navigation - Between cards and footer */}
+      <div className="relative z-10 flex justify-center gap-2 py-6">
         {products.map((product, index) => (
           <motion.button
             key={product.id}
             onClick={() => setCurrentIndex(index)}
             whileTap={{ scale: 0.9 }}
-            className={`h-2 rounded-full transition-all duration-300 ${
+            className={`h-2.5 rounded-full transition-all duration-300 ${
               index === currentIndex
-                ? `bg-gradient-to-r ${product.color} w-6`
-                : 'bg-slate-600 hover:bg-slate-500 w-2'
+                ? `bg-gradient-to-r ${product.color} w-8`
+                : 'bg-slate-600 hover:bg-slate-500 w-2.5'
             }`}
             data-testid={`dot-${product.id}`}
             aria-label={`Go to ${product.name}`}
@@ -386,6 +390,11 @@ export default function ProductsGallery() {
         ))}
       </div>
 
+      {/* ===== SECTION 3: FOOTER (Scroll down to see) ===== */}
+      <DarkwaveFooter product="Darkwave Studios Ecosystem" hidePoweredBy={true} />
+
+      {/* ===== MODALS ===== */}
+      
       {/* Product Presentation Modal */}
       {selectedProduct && (
         <ProductSlideshow
@@ -440,9 +449,6 @@ export default function ProductsGallery() {
           </div>
         </div>
       )}
-
-      {/* Footer */}
-      <DarkwaveFooter product="Darkwave Studios Ecosystem" hidePoweredBy={true} />
 
       {/* DarkWave AI Assistant */}
       <DarkWaveAssistant />
