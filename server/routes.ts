@@ -754,6 +754,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // BUSINESS STATS (for BI Dashboard)
+  // ========================
+  
+  app.get("/api/admin/business-stats", async (req: Request, res: Response) => {
+    try {
+      // Get worker count
+      const workersResult = await db.execute(sql`SELECT COUNT(*) as count FROM workers`);
+      const workers = parseInt((workersResult.rows[0] as any)?.count || '0');
+      
+      // Get client/company count
+      const clientsResult = await db.execute(sql`SELECT COUNT(*) as count FROM companies`);
+      const clients = parseInt((clientsResult.rows[0] as any)?.count || '0');
+      
+      // Get active jobs count
+      const jobsResult = await db.execute(sql`SELECT COUNT(*) as count FROM jobs WHERE status = 'open'`);
+      const activeJobs = parseInt((jobsResult.rows[0] as any)?.count || '0');
+      
+      // Get tenant count
+      const tenantsResult = await db.execute(sql`SELECT COUNT(*) as count FROM tenants WHERE status = 'active'`);
+      const tenants = parseInt((tenantsResult.rows[0] as any)?.count || '0');
+      
+      // Get franchise application counts
+      let franchisesApproved = 0;
+      let franchisesPending = 0;
+      try {
+        const approvedResult = await db.execute(sql`SELECT COUNT(*) as count FROM franchise_applications WHERE status = 'approved'`);
+        franchisesApproved = parseInt((approvedResult.rows[0] as any)?.count || '0');
+        
+        const pendingResult = await db.execute(sql`SELECT COUNT(*) as count FROM franchise_applications WHERE status = 'pending'`);
+        franchisesPending = parseInt((pendingResult.rows[0] as any)?.count || '0');
+      } catch (e) {
+        // Table may not exist yet
+      }
+      
+      res.json({
+        workers,
+        clients,
+        activeJobs,
+        tenants,
+        franchisesApproved,
+        franchisesPending,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('[Business Stats] Error:', error);
+      res.json({ workers: 0, clients: 0, activeJobs: 0, tenants: 0, franchisesApproved: 0, franchisesPending: 0 });
+    }
+  });
+
+  // ========================
   // BETA TESTER ROUTES
   // ========================
   

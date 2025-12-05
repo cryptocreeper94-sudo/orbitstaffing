@@ -14,7 +14,8 @@ import { Code, Shield, Users, LogOut, Lock, Briefcase, ChevronLeft,
   Globe, Wallet, CreditCard, MapPin, Bell, FileText, Bot, 
   Target, Megaphone, Building2, UserCircle, Map, Award, Stamp,
   Users2, TrendingUp, Gift, Calendar, ClipboardList, X, CheckCircle2,
-  Rocket, Star, BookOpen, Info } from 'lucide-react';
+  Rocket, Star, BookOpen, Info, BarChart3 } from 'lucide-react';
+import { BusinessValuationDashboard } from '@/components/BusinessValuationDashboard';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
@@ -496,6 +497,20 @@ export default function SecureSandbox() {
                 </Button>
               </div>
             )}
+          </div>
+
+          {/* Business Intelligence & Valuation Dashboard for Partners */}
+          <div className="mt-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Partner View: Business Intelligence</h2>
+                <p className="text-sm text-gray-400">Full transparency on company growth and valuation potential</p>
+              </div>
+            </div>
+            <BusinessValuationDashboard isPartnerView={true} />
           </div>
 
           <div className="mt-8 bg-slate-800/30 border border-slate-700 rounded-lg p-6">
