@@ -24,24 +24,15 @@ export async function serveStatic(app: Express, server: Server) {
   const attachedAssetsPath = path.resolve(import.meta.dirname, "..", "attached_assets");
   app.use('/attached_assets', express.static(attachedAssetsPath));
 
-  // Serve DarkWave Studios landing page at /studio path
+  // Serve React app for /studio path - ProductsGallery component handles the UI
   app.get('/studio', (_req, res) => {
-    res.sendFile(path.resolve(distPath, "studio-landing.html"));
+    res.sendFile(path.resolve(distPath, "index.html"));
   });
 
   // fall through to index.html if the file doesn't exist
   app.use("*", (req, res) => {
-    // Check if request is for darkwavestudios.io domain
-    const hostHeader = req.headers.host || req.headers['x-forwarded-host'] || req.hostname || '';
-    const host = Array.isArray(hostHeader) ? hostHeader[0] : hostHeader;
-    const isStudioDomain = host.toLowerCase().includes('darkwavestudios.io');
-    
-    // Serve Dark Wave Studios landing page for darkwavestudios.io
-    if (isStudioDomain) {
-      return res.sendFile(path.resolve(distPath, "studio-landing.html"));
-    }
-    
-    // Serve ORBIT app for all other domains (replit.app, orbitstaffing.io, etc)
+    // All domains now use the React app (index.html)
+    // The React Router handles /studio path to show ProductsGallery component
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
