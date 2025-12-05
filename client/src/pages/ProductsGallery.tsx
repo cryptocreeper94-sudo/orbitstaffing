@@ -320,11 +320,11 @@ export default function ProductsGallery() {
                     {currentProduct.description}
                   </p>
 
-                  {/* Row 3: Action Buttons */}
+                  {/* Row 3: Action Buttons - Fixed width, same baseline */}
                   <div className="flex gap-3 justify-center">
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r ${currentProduct.color} rounded-lg font-bold text-xs sm:text-sm shadow-lg`}
+                      className={`w-32 sm:w-36 h-10 inline-flex items-center justify-center gap-2 bg-gradient-to-r ${currentProduct.color} rounded-lg font-bold text-xs sm:text-sm shadow-lg`}
                       onClick={() => setSelectedProduct(currentProduct.id)}
                       data-testid={`button-view-presentation-${currentProduct.id}`}
                     >
@@ -332,18 +332,22 @@ export default function ProductsGallery() {
                       Details
                     </motion.button>
                     
-                    {currentProduct.url && (
+                    {currentProduct.url ? (
                       <motion.a
                         href={currentProduct.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         whileTap={{ scale: 0.95 }}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg font-bold text-xs sm:text-sm"
+                        className="w-32 sm:w-36 h-10 inline-flex items-center justify-center gap-2 bg-white/10 border border-white/20 rounded-lg font-bold text-xs sm:text-sm"
                         data-testid={`button-visit-${currentProduct.id}`}
                       >
                         Visit
                         <ExternalLink className="w-4 h-4" />
                       </motion.a>
+                    ) : (
+                      <div className="w-32 sm:w-36 h-10 inline-flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-lg font-bold text-xs sm:text-sm text-gray-500">
+                        Coming Soon
+                      </div>
                     )}
                   </div>
                 </div>
