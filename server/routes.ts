@@ -8302,4 +8302,223 @@ export function registerPayCardRoutes(app: Express) {
       res.status(500).json({ error: "Failed to update tier" });
     }
   });
+
+  // ========================
+  // FRANCHISE CHECKOUT (STRIPE)
+  // ========================
+  app.post("/api/franchise/checkout", async (req: Request, res: Response) => {
+    try {
+      const { applicationId, tierId } = req.body;
+      
+      if (!applicationId || !tierId) {
+        return res.status(400).json({ error: "Application ID and tier ID are required" });
+      }
+      
+      const application = await storage.getFranchiseApplicationById(applicationId);
+      if (!application) {
+        return res.status(404).json({ error: "Application not found" });
+      }
+      
+      if (application.status !== 'approved') {
+        return res.status(400).json({ error: "Application must be approved before payment" });
+      }
+      
+      const tier = await storage.getFranchiseTierById(tierId);
+      if (!tier) {
+        return res.status(404).json({ error: "Franchise tier not found" });
+      }
+      
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : 'http://localhost:5000';
+      
+      const checkoutResult = await stripeService.createFranchiseCheckout({
+        franchiseFee: tier.franchiseFee,
+        supportMonthlyFee: tier.supportMonthlyFee,
+        tierCode: tier.tierCode,
+        tierName: tier.tierName,
+        customerEmail: application.contactEmail,
+        applicationId: application.id,
+        companyName: application.companyName,
+        successUrl: `${baseUrl}/franchise/success?session_id={CHECKOUT_SESSION_ID}&application_id=${applicationId}`,
+        cancelUrl: `${baseUrl}/franchise?cancelled=true`,
+      });
+      
+      await db.execute(sql`
+        UPDATE franchise_applications 
+        SET stripe_checkout_session_id = ${checkoutResult.sessionId},
+            stripe_customer_id = ${checkoutResult.customerId}
+        WHERE id = ${applicationId}
+      `);
+      
+      console.log(`[Franchise] Created checkout session for application ${applicationId}: ${checkoutResult.sessionId}`);
+      
+      res.json({
+        success: true,
+        sessionId: checkoutResult.sessionId,
+        sessionUrl: checkoutResult.sessionUrl,
+      });
+    } catch (error) {
+      console.error("Franchise checkout error:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  app.get("/api/franchise/checkout/success", async (req: Request, res: Response) => {
+    try {
+      const { session_id, application_id } = req.query;
+      
+      if (!session_id || !application_id) {
+        return res.status(400).json({ error: "Session ID and application ID are required" });
+      }
+      
+      const session = await stripeService.retrieveCheckoutSession(session_id as string);
+      
+      if (session.payment_status !== 'paid') {
+        return res.status(400).json({ error: "Payment not completed" });
+      }
+      
+      const applicationId = parseInt(application_id as string);
+      const application = await storage.getFranchiseApplicationById(applicationId);
+      
+      if (!application) {
+        return res.status(404).json({ error: "Application not found" });
+      }
+      
+      const tier = await storage.getFranchiseTierById(application.requestedTierId!);
+      
+      const hallmark = await storage.createCustomerHallmark({
+        stripeCustomerId: session.customer as string,
+        hallmarkName: application.companyName,
+        ownershipMode: 'franchise_owned',
+        franchiseTierId: application.requestedTierId,
+        territoryRegion: application.requestedTerritoryRegion,
+        isActive: true,
+      });
+      
+      await storage.createFranchisePayment({
+        hallmarkId: hallmark.id,
+        paymentType: 'franchise_fee',
+        amount: tier?.franchiseFee || 0,
+        stripePaymentIntentId: session.payment_intent as string,
+        status: 'paid',
+        paidAt: new Date(),
+      });
+      
+      await db.execute(sql`
+        UPDATE franchise_applications 
+        SET status = 'completed',
+            stripe_payment_intent_id = ${session.payment_intent as string}
+        WHERE id = ${applicationId}
+      `);
+      
+      console.log(`[Franchise] Payment completed for application ${applicationId}. Created hallmark ${hallmark.id}`);
+      
+      res.json({
+        success: true,
+        message: "Franchise purchase completed successfully",
+        hallmarkId: hallmark.id,
+        hallmarkName: hallmark.hallmarkName,
+      });
+    } catch (error) {
+      console.error("Franchise checkout success error:", error);
+      res.status(500).json({ error: "Failed to process successful payment" });
+    }
+  });
+
+  app.post("/api/franchise/support-subscription", async (req: Request, res: Response) => {
+    try {
+      const { hallmarkId } = req.body;
+      
+      if (!hallmarkId) {
+        return res.status(400).json({ error: "Hallmark ID is required" });
+      }
+      
+      const hallmark = await storage.getCustomerHallmarkById(hallmarkId);
+      if (!hallmark) {
+        return res.status(404).json({ error: "Hallmark not found" });
+      }
+      
+      if (!hallmark.franchiseTierId) {
+        return res.status(400).json({ error: "Hallmark is not a franchise" });
+      }
+      
+      const tier = await storage.getFranchiseTierById(hallmark.franchiseTierId);
+      if (!tier) {
+        return res.status(404).json({ error: "Franchise tier not found" });
+      }
+      
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : 'http://localhost:5000';
+      
+      const subscriptionResult = await stripeService.createFranchiseSupportSubscription({
+        supportMonthlyFee: tier.supportMonthlyFee,
+        tierCode: tier.tierCode,
+        tierName: tier.tierName,
+        customerId: hallmark.stripeCustomerId,
+        hallmarkId: hallmark.id,
+        successUrl: `${baseUrl}/franchise/subscription-success?hallmark_id=${hallmarkId}`,
+        cancelUrl: `${baseUrl}/owner-hub?cancelled=true`,
+      });
+      
+      console.log(`[Franchise] Created support subscription for hallmark ${hallmarkId}: ${subscriptionResult.sessionId}`);
+      
+      res.json({
+        success: true,
+        sessionId: subscriptionResult.sessionId,
+        sessionUrl: subscriptionResult.sessionUrl,
+      });
+    } catch (error) {
+      console.error("Franchise support subscription error:", error);
+      res.status(500).json({ error: "Failed to create support subscription" });
+    }
+  });
+
+  app.post("/api/admin/franchise/create-royalty-invoice", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hallmarkId, amount, periodStart, periodEnd, description } = req.body;
+      
+      if (!hallmarkId || !amount || !periodStart || !periodEnd) {
+        return res.status(400).json({ error: "Hallmark ID, amount, period start, and period end are required" });
+      }
+      
+      const hallmark = await storage.getCustomerHallmarkById(hallmarkId);
+      if (!hallmark) {
+        return res.status(404).json({ error: "Hallmark not found" });
+      }
+      
+      const invoiceResult = await stripeService.createRoyaltyPayment({
+        amount: Math.round(amount * 100),
+        hallmarkId,
+        periodStart: new Date(periodStart),
+        periodEnd: new Date(periodEnd),
+        customerId: hallmark.stripeCustomerId,
+        description: description || `ORBIT Franchise Royalty - ${new Date(periodStart).toLocaleDateString()} to ${new Date(periodEnd).toLocaleDateString()}`,
+      });
+      
+      await storage.createFranchisePayment({
+        hallmarkId,
+        paymentType: 'royalty',
+        amount: Math.round(amount * 100),
+        periodStart: new Date(periodStart),
+        periodEnd: new Date(periodEnd),
+        status: 'pending',
+        notes: `Invoice: ${invoiceResult.invoiceId}`,
+      });
+      
+      console.log(`[Franchise] Created royalty invoice for hallmark ${hallmarkId}: ${invoiceResult.invoiceId}`);
+      
+      res.json({
+        success: true,
+        invoiceId: invoiceResult.invoiceId,
+        invoiceUrl: invoiceResult.invoiceUrl,
+        invoicePdf: invoiceResult.invoicePdf,
+        amount: invoiceResult.amount,
+      });
+    } catch (error) {
+      console.error("Create royalty invoice error:", error);
+      res.status(500).json({ error: "Failed to create royalty invoice" });
+    }
+  });
 }

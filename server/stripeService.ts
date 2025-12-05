@@ -198,6 +198,263 @@ export class StripeService {
       reason: refund.reason,
     };
   }
+
+  /**
+   * Create or retrieve a Stripe Product for a franchise tier
+   */
+  async getOrCreateFranchiseProduct(tierCode: string, tierName: string) {
+    const stripe = await getUncachableStripeClient();
+    const productId = `franchise_${tierCode}`;
+    
+    try {
+      return await stripe.products.retrieve(productId);
+    } catch (e) {
+      return await stripe.products.create({
+        id: productId,
+        name: `ORBIT Franchise - ${tierName}`,
+        description: `ORBIT Staffing OS ${tierName} Franchise License`,
+        metadata: {
+          type: 'franchise',
+          tierCode,
+        },
+      });
+    }
+  }
+
+  /**
+   * Create a one-time payment checkout session for franchise fee
+   */
+  async createFranchiseFeeCheckout(input: {
+    franchiseFee: number;
+    tierCode: string;
+    tierName: string;
+    customerEmail: string;
+    applicationId: number;
+    successUrl: string;
+    cancelUrl: string;
+  }) {
+    const stripe = await getUncachableStripeClient();
+    
+    const product = await this.getOrCreateFranchiseProduct(input.tierCode, input.tierName);
+    
+    const price = await stripe.prices.create({
+      product: product.id,
+      unit_amount: input.franchiseFee,
+      currency: 'usd',
+      metadata: {
+        type: 'franchise_fee',
+        tierCode: input.tierCode,
+        applicationId: input.applicationId.toString(),
+      },
+    });
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{ price: price.id, quantity: 1 }],
+      mode: 'payment',
+      customer_email: input.customerEmail,
+      success_url: input.successUrl,
+      cancel_url: input.cancelUrl,
+      metadata: {
+        type: 'franchise_fee',
+        tierCode: input.tierCode,
+        applicationId: input.applicationId.toString(),
+      },
+    });
+    
+    return {
+      sessionId: session.id,
+      sessionUrl: session.url,
+      priceId: price.id,
+    };
+  }
+
+  /**
+   * Create a subscription checkout for monthly franchise support fee
+   */
+  async createFranchiseSupportSubscription(input: {
+    supportMonthlyFee: number;
+    tierCode: string;
+    tierName: string;
+    customerId: string;
+    hallmarkId: number;
+    successUrl: string;
+    cancelUrl: string;
+  }) {
+    const stripe = await getUncachableStripeClient();
+    
+    const productId = `franchise_support_${input.tierCode}`;
+    
+    let product;
+    try {
+      product = await stripe.products.retrieve(productId);
+    } catch (e) {
+      product = await stripe.products.create({
+        id: productId,
+        name: `ORBIT Franchise Support - ${input.tierName}`,
+        description: `Monthly support and platform access for ${input.tierName} franchise`,
+        metadata: {
+          type: 'franchise_support',
+          tierCode: input.tierCode,
+        },
+      });
+    }
+    
+    const priceId = `franchise_support_${input.tierCode}_monthly`;
+    
+    let price;
+    try {
+      price = await stripe.prices.retrieve(priceId);
+    } catch (e) {
+      price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: input.supportMonthlyFee,
+        currency: 'usd',
+        recurring: { interval: 'month' },
+        metadata: {
+          type: 'franchise_support',
+          tierCode: input.tierCode,
+        },
+      });
+    }
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{ price: price.id, quantity: 1 }],
+      mode: 'subscription',
+      customer: input.customerId,
+      success_url: input.successUrl,
+      cancel_url: input.cancelUrl,
+      metadata: {
+        type: 'franchise_support',
+        tierCode: input.tierCode,
+        hallmarkId: input.hallmarkId.toString(),
+      },
+    });
+    
+    return {
+      sessionId: session.id,
+      sessionUrl: session.url,
+      subscriptionPriceId: price.id,
+    };
+  }
+
+  /**
+   * Create a combined franchise checkout (fee + first month support)
+   */
+  async createFranchiseCheckout(input: {
+    franchiseFee: number;
+    supportMonthlyFee: number;
+    tierCode: string;
+    tierName: string;
+    customerEmail: string;
+    applicationId: number;
+    companyName: string;
+    successUrl: string;
+    cancelUrl: string;
+  }) {
+    const stripe = await getUncachableStripeClient();
+    
+    const customer = await stripe.customers.create({
+      email: input.customerEmail,
+      name: input.companyName,
+      metadata: {
+        type: 'franchise_applicant',
+        applicationId: input.applicationId.toString(),
+        tierCode: input.tierCode,
+      },
+    });
+    
+    const feeProduct = await this.getOrCreateFranchiseProduct(input.tierCode, input.tierName);
+    
+    const feePrice = await stripe.prices.create({
+      product: feeProduct.id,
+      unit_amount: input.franchiseFee,
+      currency: 'usd',
+      metadata: {
+        type: 'franchise_fee',
+        tierCode: input.tierCode,
+        applicationId: input.applicationId.toString(),
+      },
+    });
+    
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      customer: customer.id,
+      line_items: [
+        { price: feePrice.id, quantity: 1 },
+      ],
+      mode: 'payment',
+      success_url: input.successUrl,
+      cancel_url: input.cancelUrl,
+      metadata: {
+        type: 'franchise_purchase',
+        tierCode: input.tierCode,
+        applicationId: input.applicationId.toString(),
+        customerId: customer.id,
+      },
+      payment_intent_data: {
+        metadata: {
+          type: 'franchise_fee',
+          tierCode: input.tierCode,
+          applicationId: input.applicationId.toString(),
+        },
+      },
+    });
+    
+    return {
+      sessionId: session.id,
+      sessionUrl: session.url,
+      customerId: customer.id,
+      franchiseFeePriceId: feePrice.id,
+    };
+  }
+
+  /**
+   * Record a royalty payment from a franchise
+   */
+  async createRoyaltyPayment(input: {
+    amount: number;
+    hallmarkId: number;
+    periodStart: Date;
+    periodEnd: Date;
+    customerId: string;
+    description: string;
+  }) {
+    const stripe = await getUncachableStripeClient();
+    
+    const invoice = await stripe.invoices.create({
+      customer: input.customerId,
+      auto_advance: true,
+      collection_method: 'send_invoice',
+      days_until_due: 14,
+      description: input.description,
+      metadata: {
+        type: 'franchise_royalty',
+        hallmarkId: input.hallmarkId.toString(),
+        periodStart: input.periodStart.toISOString(),
+        periodEnd: input.periodEnd.toISOString(),
+      },
+    });
+    
+    await stripe.invoiceItems.create({
+      customer: input.customerId,
+      invoice: invoice.id,
+      amount: input.amount,
+      currency: 'usd',
+      description: input.description,
+    });
+    
+    const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+    
+    return {
+      invoiceId: finalizedInvoice.id,
+      invoiceUrl: finalizedInvoice.hosted_invoice_url,
+      invoicePdf: finalizedInvoice.invoice_pdf,
+      amount: input.amount / 100,
+      status: finalizedInvoice.status,
+    };
+  }
 }
 
 export const stripeService = new StripeService();
