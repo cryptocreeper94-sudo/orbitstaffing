@@ -38,7 +38,7 @@ export default function ProductsGallery() {
       slides: slideContent['ORBY'],
       slideshowData: orbySlides,
       url: 'https://getorby.io',
-      emblem: null,
+      emblem: '/attached_assets/Screenshot_20251205_100035_Replit_1764952065470.jpg',
       hallmark: null,
     },
     {
