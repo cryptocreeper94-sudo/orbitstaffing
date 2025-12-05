@@ -208,158 +208,131 @@ export default function ProductsGallery() {
         </p>
       </div>
 
-      {/* Carousel Container */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-2 sm:px-4 py-2 sm:py-6">
+      {/* Compact Carousel - Horizontal Cards */}
+      <div className="relative z-10 flex items-center justify-center px-12 sm:px-16 py-4">
         {/* Left Arrow */}
         <motion.button
           onClick={prevProduct}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute left-1 sm:left-4 md:left-8 z-20 p-2 sm:p-3 md:p-4 bg-slate-800/90 hover:bg-gradient-to-r hover:from-cyan-500/30 hover:to-purple-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group shadow-lg shadow-black/50"
+          className="absolute left-2 sm:left-4 z-20 p-2 sm:p-3 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-lg"
           data-testid="button-prev-product"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
 
-        {/* Product Card */}
-        <div className="w-full max-w-3xl mx-auto px-10 sm:px-16 md:px-20">
+        {/* Compact Product Card */}
+        <div className="w-full max-w-lg mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
-              initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
-              animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-              exit={{ opacity: 0, scale: 0.9, rotateY: 10 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3 }}
               className="relative"
             >
               {/* Glow Effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${currentProduct.color} rounded-2xl sm:rounded-3xl blur-xl opacity-50 animate-pulse`} />
+              <div className={`absolute -inset-1 bg-gradient-to-r ${currentProduct.color} rounded-xl blur-lg opacity-40`} />
               
-              {/* Card */}
+              {/* Compact Horizontal Card */}
               <div
-                className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl"
+                className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl"
                 data-testid={`card-product-${currentProduct.id}`}
               >
-                {/* Inner Gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-5`} />
                 
-                {/* Shimmer Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-shimmer" />
+                <div className="relative p-4 sm:p-5">
+                  {/* Row 1: Emblem + Name/Tagline + Hallmark/QR */}
+                  <div className="flex items-center gap-3 mb-3">
+                    {/* Emblem - Square */}
+                    {currentProduct.emblem ? (
+                      <div className={`w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg overflow-hidden`}>
+                        <img 
+                          src={currentProduct.emblem} 
+                          alt={`${currentProduct.name} emblem`}
+                          className="w-full h-full rounded-lg object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg`}>
+                        <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
+                          <span className="text-lg sm:text-xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            {currentProduct.name.charAt(0)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
-                <div className="relative p-4 sm:p-8 md:p-10">
-                  {/* Card Header: Emblem + Name/Tagline + Hallmark */}
-                  <div className="flex flex-col items-center gap-3 mb-4 sm:mb-6">
-                    {/* Top row: Emblem + Hallmark/QR side by side */}
-                    <div className="flex items-center justify-center gap-3 sm:gap-4">
-                      {/* Emblem - Square */}
-                      {currentProduct.emblem ? (
-                        <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg overflow-hidden`}>
-                          <img 
-                            src={currentProduct.emblem} 
-                            alt={`${currentProduct.name} emblem`}
-                            className="w-full h-full rounded-xl object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 shadow-lg`}>
-                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-xl sm:text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                              {currentProduct.name.charAt(0)}
-                            </span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Hallmark/QR Code - Horizontal rectangle */}
-                      {currentProduct.hallmark ? (
-                        <div className="w-24 h-14 sm:w-32 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
-                          <img 
-                            src={currentProduct.hallmark} 
-                            alt={`${currentProduct.name} hallmark`}
-                            className="w-full h-full rounded-xl object-cover"
-                          />
-                        </div>
-                      ) : currentProduct.url ? (
-                        <div className="w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-white p-1.5 shadow-lg">
-                          <QRCodeSVG 
-                            value={currentProduct.url} 
-                            size={100}
-                            className="w-full h-full"
-                            bgColor="#ffffff"
-                            fgColor="#0f172a"
-                          />
-                        </div>
-                      ) : (
-                        <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
-                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-xs text-gray-500">Soon</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Name & Tagline - Below the images */}
-                    <div className="text-center">
-                      <h2 className="text-xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2 text-white">
+                    {/* Name & Tagline - Center */}
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-base sm:text-lg font-bold text-white truncate">
                         {currentProduct.name}
                       </h2>
-                      <p className={`text-xs sm:text-base font-semibold bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
+                      <p className={`text-[10px] sm:text-xs font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent truncate`}>
                         {currentProduct.tagline}
                       </p>
                     </div>
+
+                    {/* Hallmark/QR - Right */}
+                    {currentProduct.hallmark ? (
+                      <div className="w-16 h-12 sm:w-20 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
+                        <img 
+                          src={currentProduct.hallmark} 
+                          alt={`${currentProduct.name} hallmark`}
+                          className="w-full h-full rounded-lg object-cover"
+                        />
+                      </div>
+                    ) : currentProduct.url ? (
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-white p-1 shadow-lg">
+                        <QRCodeSVG 
+                          value={currentProduct.url} 
+                          size={48}
+                          className="w-full h-full"
+                          bgColor="#ffffff"
+                          fgColor="#0f172a"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
+                        <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
+                          <span className="text-[8px] text-gray-500">Soon</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Description */}
-                  <p className="text-gray-300 text-center text-sm sm:text-base md:text-lg mb-4 sm:mb-6 leading-relaxed">
+                  {/* Row 2: Description (2 lines max) */}
+                  <p className="text-gray-300 text-xs sm:text-sm mb-3 line-clamp-2 leading-snug">
                     {currentProduct.description}
                   </p>
 
-                  {/* Actions */}
-                  <div className="flex flex-wrap gap-2 sm:gap-3 justify-center items-center">
+                  {/* Row 3: Compact Action Buttons */}
+                  <div className="flex gap-2 justify-center">
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r ${currentProduct.color} rounded-xl font-bold text-xs sm:text-sm shadow-lg hover:shadow-xl transition-shadow`}
+                      className={`flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-gradient-to-r ${currentProduct.color} rounded-lg font-bold text-[10px] sm:text-xs shadow-lg`}
                       onClick={() => setSelectedProduct(currentProduct.id)}
                       data-testid={`button-view-presentation-${currentProduct.id}`}
                     >
-                      <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                      Presentation
+                      <Sparkles className="w-3 h-3" />
+                      Details
                     </motion.button>
                     
-                    {currentProduct.slideshowData && (
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-slate-700/80 hover:bg-slate-600 border border-white/10 rounded-xl font-bold text-xs sm:text-sm transition shadow-lg"
-                        onClick={() => setShowSlideshow(currentProduct.id)}
-                        data-testid={`button-view-slideshow-${currentProduct.id}`}
-                      >
-                        Full Slideshow
-                        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </motion.button>
-                    )}
-
                     {currentProduct.url && (
                       <motion.a
                         href={currentProduct.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs sm:text-sm transition shadow-lg"
+                        className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg font-bold text-[10px] sm:text-xs"
                         data-testid={`button-visit-${currentProduct.id}`}
                       >
-                        Visit Site
-                        <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                        Visit
+                        <ExternalLink className="w-3 h-3" />
                       </motion.a>
                     )}
                   </div>
-
-                  {/* Slide count */}
-                  <p className="text-center text-gray-500 text-xs mt-4">
-                    {currentProduct.slides.length} slides available
-                  </p>
                 </div>
               </div>
             </motion.div>
@@ -371,25 +344,24 @@ export default function ProductsGallery() {
           onClick={nextProduct}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute right-1 sm:right-4 md:right-8 z-20 p-2 sm:p-3 md:p-4 bg-slate-800/90 hover:bg-gradient-to-r hover:from-purple-500/30 hover:to-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all duration-300 group shadow-lg shadow-black/50"
+          className="absolute right-2 sm:right-4 z-20 p-2 sm:p-3 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-lg"
           data-testid="button-next-product"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-cyan-400 group-hover:text-white transition" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
       </div>
 
       {/* Dot Navigation */}
-      <div className="relative z-10 flex justify-center gap-2 sm:gap-3 pb-4 sm:pb-6">
+      <div className="relative z-10 flex justify-center gap-2 pb-4">
         {products.map((product, index) => (
           <motion.button
             key={product.id}
             onClick={() => setCurrentIndex(index)}
-            whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
-            className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${
+            className={`h-2 rounded-full transition-all duration-300 ${
               index === currentIndex
-                ? `bg-gradient-to-r ${product.color} w-6 sm:w-10`
-                : 'bg-slate-600 hover:bg-slate-500 w-2 sm:w-3'
+                ? `bg-gradient-to-r ${product.color} w-6`
+                : 'bg-slate-600 hover:bg-slate-500 w-2'
             }`}
             data-testid={`dot-${product.id}`}
             aria-label={`Go to ${product.name}`}
