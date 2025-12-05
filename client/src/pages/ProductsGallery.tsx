@@ -287,9 +287,9 @@ export default function ProductsGallery() {
                       </p>
                     </div>
 
-                    {/* Hallmark/QR - Right */}
+                    {/* Hallmark/QR - Right (same size as emblem) */}
                     {currentProduct.hallmark ? (
-                      <div className="w-16 h-12 sm:w-20 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-lg bg-gradient-to-br from-teal-900 to-slate-900 p-0.5 shadow-lg overflow-hidden">
                         <img 
                           src={currentProduct.hallmark} 
                           alt={`${currentProduct.name} hallmark`}
