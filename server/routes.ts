@@ -8306,6 +8306,105 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // ========================
+  // TERRITORY AVAILABILITY CHECKING
+  // ========================
+  app.get("/api/territory-availability", async (req: Request, res: Response) => {
+    try {
+      const { state, region, tierId } = req.query;
+      
+      if (!state || !tierId) {
+        return res.status(400).json({ error: "State and tier ID required" });
+      }
+      
+      const tierIdNum = parseInt(tierId as string, 10);
+      
+      const tier = await db.execute(sql`
+        SELECT territory_level, territory_exclusive FROM franchise_tiers WHERE id = ${tierIdNum}
+      `);
+      
+      if (tier.rows.length === 0) {
+        return res.status(404).json({ error: "Tier not found" });
+      }
+      
+      const tierData = tier.rows[0] as any;
+      
+      const existingTerritories = await db.execute(sql`
+        SELECT t.*, h.hallmark_name, ft.tier_name
+        FROM franchise_territories t
+        JOIN customer_hallmarks h ON t.hallmark_id = h.id
+        JOIN franchise_tiers ft ON t.franchise_tier_id = ft.id
+        WHERE t.state = ${state}
+        AND t.is_active = true
+        ${region ? sql`AND t.region = ${region}` : sql``}
+      `);
+      
+      let available = true;
+      let conflicts: any[] = [];
+      
+      for (const territory of existingTerritories.rows as any[]) {
+        if (territory.is_exclusive) {
+          if (tierData.territory_level === 'state' || territory.territory_level === 'state') {
+            available = false;
+            conflicts.push({
+              reason: 'State-level exclusive territory exists',
+              holder: territory.hallmark_name,
+              tier: territory.tier_name
+            });
+          }
+          
+          if (tierData.territory_level === 'regional' && territory.territory_level === 'regional' && region === territory.region) {
+            available = false;
+            conflicts.push({
+              reason: 'Regional exclusive territory exists',
+              holder: territory.hallmark_name,
+              tier: territory.tier_name
+            });
+          }
+        }
+        
+        if (tierData.territory_exclusive && territory.is_exclusive) {
+          available = false;
+          conflicts.push({
+            reason: 'Requested exclusive territory conflicts with existing territory',
+            holder: territory.hallmark_name,
+            tier: territory.tier_name
+          });
+        }
+      }
+      
+      if (tierData.territory_exclusive) {
+        const pendingApplications = await db.execute(sql`
+          SELECT company_name, status FROM franchise_applications
+          WHERE requested_territory_state = ${state}
+          AND status = 'approved'
+          ${region ? sql`AND requested_territory_region = ${region}` : sql``}
+        `);
+        
+        if (pendingApplications.rows.length > 0) {
+          available = false;
+          conflicts.push({
+            reason: 'Approved application pending for this territory',
+            holder: (pendingApplications.rows[0] as any).company_name,
+            tier: 'Pending'
+          });
+        }
+      }
+      
+      res.json({
+        available,
+        conflicts,
+        territoryLevel: tierData.territory_level,
+        isExclusive: tierData.territory_exclusive,
+        checkedState: state,
+        checkedRegion: region || null
+      });
+    } catch (error) {
+      console.error("Territory availability check error:", error);
+      res.status(500).json({ error: "Failed to check territory availability" });
+    }
+  });
+
+  // ========================
   // CUSTOMER HALLMARK ENDPOINTS (SESSION-BASED)
   // ========================
   app.get("/api/my-hallmark", async (req: Request, res: Response) => {

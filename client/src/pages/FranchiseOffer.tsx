@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Check, ArrowLeft, Star, Building2, MapPin, Crown, Shield,
   TrendingUp, Users, DollarSign, Rocket, Zap, Lock, Globe,
-  ChevronRight, Award, Briefcase, CheckCircle2, Phone, Mail
+  ChevronRight, Award, Briefcase, CheckCircle2, Phone, Mail,
+  AlertCircle, Loader2, CheckCircle
 } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -87,6 +88,37 @@ export default function FranchiseOffer() {
     currentSoftware: '',
     requestedTerritoryState: '',
     requestedTerritoryRegion: '',
+  });
+  const [territoryChecked, setTerritoryChecked] = useState(false);
+
+  interface TerritoryAvailability {
+    available: boolean;
+    conflicts: Array<{ reason: string; holder: string; tier: string }>;
+    territoryLevel: string;
+    isExclusive: boolean;
+    checkedState: string;
+    checkedRegion: string | null;
+  }
+
+  const { data: territoryAvailability, isLoading: checkingTerritory, refetch: checkTerritory } = useQuery<TerritoryAvailability>({
+    queryKey: ['territory-availability', formData.requestedTerritoryState, formData.requestedTerritoryRegion, selectedTier?.id],
+    queryFn: async () => {
+      if (!formData.requestedTerritoryState || !selectedTier?.id) {
+        throw new Error('State and tier required');
+      }
+      const params = new URLSearchParams({
+        state: formData.requestedTerritoryState,
+        tierId: selectedTier.id.toString()
+      });
+      if (formData.requestedTerritoryRegion) {
+        params.append('region', formData.requestedTerritoryRegion);
+      }
+      const response = await fetch(`/api/territory-availability?${params}`);
+      if (!response.ok) throw new Error('Failed to check territory');
+      setTerritoryChecked(true);
+      return response.json();
+    },
+    enabled: false
   });
 
   const { data: tiers, isLoading } = useQuery<FranchiseTier[]>({
@@ -457,7 +489,10 @@ export default function FranchiseOffer() {
                       <label className="block text-sm font-medium text-gray-300 mb-2">Requested Territory (State)</label>
                       <Select 
                         value={formData.requestedTerritoryState} 
-                        onValueChange={(v) => setFormData({...formData, requestedTerritoryState: v})}
+                        onValueChange={(v) => {
+                          setFormData({...formData, requestedTerritoryState: v});
+                          setTerritoryChecked(false);
+                        }}
                       >
                         <SelectTrigger className="bg-gray-700 border-gray-600 text-white" data-testid="select-territory-state">
                           <SelectValue placeholder="Select state" />
@@ -475,13 +510,85 @@ export default function FranchiseOffer() {
                       <label className="block text-sm font-medium text-gray-300 mb-2">Territory Region/City</label>
                       <Input 
                         value={formData.requestedTerritoryRegion}
-                        onChange={(e) => setFormData({...formData, requestedTerritoryRegion: e.target.value})}
+                        onChange={(e) => {
+                          setFormData({...formData, requestedTerritoryRegion: e.target.value});
+                          setTerritoryChecked(false);
+                        }}
                         className="bg-gray-700 border-gray-600 text-white"
                         placeholder="e.g., Nashville Metro"
                         data-testid="input-territory-region"
                       />
                     </div>
                   </div>
+
+                  {formData.requestedTerritoryState && selectedTier && (
+                    <div className="p-4 rounded-lg bg-gray-700/50 border border-gray-600">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-white flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-cyan-400" />
+                          Territory Availability Check
+                        </h4>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => checkTerritory()}
+                          disabled={checkingTerritory}
+                          className="bg-cyan-500 hover:bg-cyan-600 text-white"
+                          data-testid="button-check-territory"
+                        >
+                          {checkingTerritory ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                              Checking...
+                            </>
+                          ) : (
+                            <>Check Availability</>
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {territoryChecked && territoryAvailability && (
+                        <div className={`p-3 rounded-lg ${
+                          territoryAvailability.available 
+                            ? 'bg-green-500/10 border border-green-500/30' 
+                            : 'bg-red-500/10 border border-red-500/30'
+                        }`}>
+                          <div className="flex items-center gap-2">
+                            {territoryAvailability.available ? (
+                              <>
+                                <CheckCircle className="h-5 w-5 text-green-400" />
+                                <div>
+                                  <div className="font-medium text-green-400">Territory Available!</div>
+                                  <div className="text-sm text-gray-400">
+                                    {territoryAvailability.isExclusive ? 'Exclusive' : 'Standard'} {territoryAvailability.territoryLevel}-level territory in {US_STATES.find(s => s.code === formData.requestedTerritoryState)?.name}
+                                    {formData.requestedTerritoryRegion && ` (${formData.requestedTerritoryRegion})`}
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="h-5 w-5 text-red-400" />
+                                <div>
+                                  <div className="font-medium text-red-400">Territory Unavailable</div>
+                                  {territoryAvailability.conflicts.map((conflict, i) => (
+                                    <div key={i} className="text-sm text-gray-400">
+                                      {conflict.reason}
+                                    </div>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {!territoryChecked && (
+                        <div className="text-sm text-gray-400">
+                          Click "Check Availability" to verify your selected territory is open for franchise ownership.
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">Current Software</label>
