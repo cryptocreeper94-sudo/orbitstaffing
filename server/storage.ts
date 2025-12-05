@@ -34,6 +34,12 @@ import {
   platformModules,
   subscriptionPlans,
   tenantModules,
+  customerHallmarks,
+  franchiseTiers,
+  franchiseApplications,
+  hallmarkCustodyTransfers,
+  franchisePayments,
+  franchiseTerritories,
   type User,
   type InsertUser,
   type Company,
@@ -100,6 +106,18 @@ import {
   type InsertSubscriptionPlan,
   type TenantModule,
   type InsertTenantModule,
+  type CustomerHallmark,
+  type InsertCustomerHallmark,
+  type FranchiseTier,
+  type InsertFranchiseTier,
+  type FranchiseApplication,
+  type InsertFranchiseApplication,
+  type HallmarkCustodyTransfer,
+  type InsertHallmarkCustodyTransfer,
+  type FranchisePayment,
+  type InsertFranchisePayment,
+  type FranchiseTerritory,
+  type InsertFranchiseTerritory,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -2664,6 +2682,390 @@ export const storage: IStorage = {
     if (!access.isEnabled) return false;
     if (access.expiresAt && new Date(access.expiresAt) < new Date()) return false;
     return true;
+  },
+
+  // ============================================
+  // TWO-TIER HALLMARK FRANCHISE SYSTEM
+  // ============================================
+
+  // ========================
+  // FRANCHISE TIERS
+  // ========================
+  async getAllFranchiseTiers(): Promise<FranchiseTier[]> {
+    return await db
+      .select()
+      .from(franchiseTiers)
+      .where(eq(franchiseTiers.isActive, true))
+      .orderBy(franchiseTiers.sortOrder);
+  },
+
+  async getFranchiseTierById(id: number): Promise<FranchiseTier | null> {
+    const result = await db
+      .select()
+      .from(franchiseTiers)
+      .where(eq(franchiseTiers.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getFranchiseTierByCode(tierCode: string): Promise<FranchiseTier | null> {
+    const result = await db
+      .select()
+      .from(franchiseTiers)
+      .where(eq(franchiseTiers.tierCode, tierCode))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async createFranchiseTier(data: InsertFranchiseTier): Promise<FranchiseTier> {
+    const result = await db.insert(franchiseTiers).values(data).returning();
+    return result[0];
+  },
+
+  async updateFranchiseTier(id: number, data: Partial<InsertFranchiseTier>): Promise<FranchiseTier> {
+    const result = await db
+      .update(franchiseTiers)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(franchiseTiers.id, id))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // CUSTOMER HALLMARKS
+  // ========================
+  async getCustomerHallmarkByStripeId(stripeCustomerId: string): Promise<CustomerHallmark | null> {
+    const result = await db
+      .select()
+      .from(customerHallmarks)
+      .where(eq(customerHallmarks.stripeCustomerId, stripeCustomerId))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getCustomerHallmarkById(id: number): Promise<CustomerHallmark | null> {
+    const result = await db
+      .select()
+      .from(customerHallmarks)
+      .where(eq(customerHallmarks.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getCustomerHallmarksByTenant(tenantId: string): Promise<CustomerHallmark[]> {
+    return await db
+      .select()
+      .from(customerHallmarks)
+      .where(eq(customerHallmarks.tenantId, tenantId));
+  },
+
+  async getAllFranchiseHallmarks(): Promise<CustomerHallmark[]> {
+    return await db
+      .select()
+      .from(customerHallmarks)
+      .where(eq(customerHallmarks.ownershipMode, 'franchise_owned'));
+  },
+
+  async createCustomerHallmark(data: InsertCustomerHallmark): Promise<CustomerHallmark> {
+    const result = await db.insert(customerHallmarks).values(data).returning();
+    return result[0];
+  },
+
+  async updateCustomerHallmark(id: number, data: Partial<InsertCustomerHallmark>): Promise<CustomerHallmark> {
+    const result = await db
+      .update(customerHallmarks)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(customerHallmarks.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async convertHallmarkToFranchise(
+    hallmarkId: number, 
+    franchiseTierId: number,
+    franchiseData: Partial<InsertCustomerHallmark>
+  ): Promise<CustomerHallmark> {
+    const tier = await this.getFranchiseTierById(franchiseTierId);
+    if (!tier) throw new Error('Franchise tier not found');
+
+    const result = await db
+      .update(customerHallmarks)
+      .set({
+        ownershipMode: 'franchise_owned',
+        franchiseTierId,
+        custodyOwner: 'customer',
+        custodyTransferDate: new Date(),
+        franchiseFee: (tier.franchiseFee / 100).toFixed(2),
+        royaltyPercent: tier.royaltyPercent,
+        royaltyType: tier.royaltyType || 'percentage',
+        supportTier: tier.tierCode,
+        supportMonthlyFee: (tier.supportMonthlyFee / 100).toFixed(2),
+        nftRevenueSharePercent: tier.nftRevenueSharePercent,
+        territoryExclusive: tier.territoryExclusive,
+        franchiseStartDate: new Date(),
+        ...franchiseData,
+        updatedAt: new Date(),
+      })
+      .where(eq(customerHallmarks.id, hallmarkId))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // FRANCHISE APPLICATIONS
+  // ========================
+  async getAllFranchiseApplications(): Promise<FranchiseApplication[]> {
+    return await db
+      .select()
+      .from(franchiseApplications)
+      .orderBy(desc(franchiseApplications.createdAt));
+  },
+
+  async getFranchiseApplicationsByStatus(status: string): Promise<FranchiseApplication[]> {
+    return await db
+      .select()
+      .from(franchiseApplications)
+      .where(eq(franchiseApplications.status, status))
+      .orderBy(desc(franchiseApplications.createdAt));
+  },
+
+  async getFranchiseApplicationById(id: number): Promise<FranchiseApplication | null> {
+    const result = await db
+      .select()
+      .from(franchiseApplications)
+      .where(eq(franchiseApplications.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async createFranchiseApplication(data: InsertFranchiseApplication): Promise<FranchiseApplication> {
+    const result = await db.insert(franchiseApplications).values(data).returning();
+    return result[0];
+  },
+
+  async updateFranchiseApplication(id: number, data: Partial<InsertFranchiseApplication>): Promise<FranchiseApplication> {
+    const result = await db
+      .update(franchiseApplications)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(franchiseApplications.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async approveFranchiseApplication(id: number, reviewedBy: string, notes?: string): Promise<FranchiseApplication> {
+    const result = await db
+      .update(franchiseApplications)
+      .set({
+        status: 'approved',
+        reviewedBy,
+        reviewedAt: new Date(),
+        reviewNotes: notes,
+        updatedAt: new Date(),
+      })
+      .where(eq(franchiseApplications.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async rejectFranchiseApplication(id: number, reviewedBy: string, reason: string): Promise<FranchiseApplication> {
+    const result = await db
+      .update(franchiseApplications)
+      .set({
+        status: 'rejected',
+        reviewedBy,
+        reviewedAt: new Date(),
+        reviewNotes: reason,
+        updatedAt: new Date(),
+      })
+      .where(eq(franchiseApplications.id, id))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // HALLMARK CUSTODY TRANSFERS
+  // ========================
+  async getHallmarkCustodyTransfers(hallmarkId: number): Promise<HallmarkCustodyTransfer[]> {
+    return await db
+      .select()
+      .from(hallmarkCustodyTransfers)
+      .where(eq(hallmarkCustodyTransfers.hallmarkId, hallmarkId))
+      .orderBy(desc(hallmarkCustodyTransfers.createdAt));
+  },
+
+  async getCustodyTransferById(id: number): Promise<HallmarkCustodyTransfer | null> {
+    const result = await db
+      .select()
+      .from(hallmarkCustodyTransfers)
+      .where(eq(hallmarkCustodyTransfers.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getPendingCustodyTransfers(): Promise<HallmarkCustodyTransfer[]> {
+    return await db
+      .select()
+      .from(hallmarkCustodyTransfers)
+      .where(eq(hallmarkCustodyTransfers.status, 'pending'))
+      .orderBy(desc(hallmarkCustodyTransfers.createdAt));
+  },
+
+  async createCustodyTransfer(data: InsertHallmarkCustodyTransfer): Promise<HallmarkCustodyTransfer> {
+    const result = await db.insert(hallmarkCustodyTransfers).values(data).returning();
+    return result[0];
+  },
+
+  async updateCustodyTransfer(id: number, data: Partial<InsertHallmarkCustodyTransfer>): Promise<HallmarkCustodyTransfer> {
+    const result = await db
+      .update(hallmarkCustodyTransfers)
+      .set(data)
+      .where(eq(hallmarkCustodyTransfers.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async completeCustodyTransfer(id: number, approvedBy: string): Promise<HallmarkCustodyTransfer> {
+    const result = await db
+      .update(hallmarkCustodyTransfers)
+      .set({
+        status: 'completed',
+        approvedBy,
+        approvedAt: new Date(),
+        completedAt: new Date(),
+      })
+      .where(eq(hallmarkCustodyTransfers.id, id))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // FRANCHISE PAYMENTS
+  // ========================
+  async getFranchisePayments(hallmarkId: number): Promise<FranchisePayment[]> {
+    return await db
+      .select()
+      .from(franchisePayments)
+      .where(eq(franchisePayments.hallmarkId, hallmarkId))
+      .orderBy(desc(franchisePayments.createdAt));
+  },
+
+  async getFranchisePaymentById(id: number): Promise<FranchisePayment | null> {
+    const result = await db
+      .select()
+      .from(franchisePayments)
+      .where(eq(franchisePayments.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getPendingFranchisePayments(): Promise<FranchisePayment[]> {
+    return await db
+      .select()
+      .from(franchisePayments)
+      .where(eq(franchisePayments.status, 'pending'))
+      .orderBy(desc(franchisePayments.createdAt));
+  },
+
+  async createFranchisePayment(data: InsertFranchisePayment): Promise<FranchisePayment> {
+    const result = await db.insert(franchisePayments).values(data).returning();
+    return result[0];
+  },
+
+  async updateFranchisePayment(id: number, data: Partial<InsertFranchisePayment>): Promise<FranchisePayment> {
+    const result = await db
+      .update(franchisePayments)
+      .set(data)
+      .where(eq(franchisePayments.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async markFranchisePaymentPaid(id: number, stripePaymentIntentId: string): Promise<FranchisePayment> {
+    const result = await db
+      .update(franchisePayments)
+      .set({
+        status: 'paid',
+        stripePaymentIntentId,
+        paidAt: new Date(),
+      })
+      .where(eq(franchisePayments.id, id))
+      .returning();
+    return result[0];
+  },
+
+  // ========================
+  // FRANCHISE TERRITORIES
+  // ========================
+  async getFranchiseTerritories(hallmarkId: number): Promise<FranchiseTerritory[]> {
+    return await db
+      .select()
+      .from(franchiseTerritories)
+      .where(eq(franchiseTerritories.hallmarkId, hallmarkId));
+  },
+
+  async getFranchiseTerritoryById(id: number): Promise<FranchiseTerritory | null> {
+    const result = await db
+      .select()
+      .from(franchiseTerritories)
+      .where(eq(franchiseTerritories.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getTerritoriesByState(state: string): Promise<FranchiseTerritory[]> {
+    return await db
+      .select()
+      .from(franchiseTerritories)
+      .where(
+        and(
+          eq(franchiseTerritories.state, state),
+          eq(franchiseTerritories.isActive, true)
+        )
+      );
+  },
+
+  async checkTerritoryAvailability(state: string, city?: string): Promise<boolean> {
+    const existingTerritories = await db
+      .select()
+      .from(franchiseTerritories)
+      .where(
+        and(
+          eq(franchiseTerritories.state, state),
+          eq(franchiseTerritories.isExclusive, true),
+          eq(franchiseTerritories.isActive, true)
+        )
+      );
+
+    if (city) {
+      const cityTerritories = existingTerritories.filter(t => t.city === city);
+      return cityTerritories.length === 0;
+    }
+
+    const stateTerritories = existingTerritories.filter(t => t.territoryType === 'state');
+    return stateTerritories.length === 0;
+  },
+
+  async createFranchiseTerritory(data: InsertFranchiseTerritory): Promise<FranchiseTerritory> {
+    const result = await db.insert(franchiseTerritories).values(data).returning();
+    return result[0];
+  },
+
+  async updateFranchiseTerritory(id: number, data: Partial<InsertFranchiseTerritory>): Promise<FranchiseTerritory> {
+    const result = await db
+      .update(franchiseTerritories)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(franchiseTerritories.id, id))
+      .returning();
+    return result[0];
+  },
+
+  async deactivateFranchiseTerritory(id: number): Promise<FranchiseTerritory> {
+    const result = await db
+      .update(franchiseTerritories)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(franchiseTerritories.id, id))
+      .returning();
+    return result[0];
   },
 
 };
