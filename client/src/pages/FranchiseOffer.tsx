@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   Check, ArrowLeft, Star, Building2, MapPin, Crown, Shield,
   TrendingUp, Users, DollarSign, Rocket, Zap, Lock, Globe,
-  ChevronRight, Award, Briefcase, CheckCircle2, Phone, Mail,
+  ChevronRight, ChevronLeft, Award, Briefcase, CheckCircle2, Phone, Mail,
   AlertCircle, Loader2, CheckCircle
 } from 'lucide-react';
+import { useRef } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
@@ -76,6 +77,17 @@ export default function FranchiseOffer() {
   const { toast } = useToast();
   const [selectedTier, setSelectedTier] = useState<FranchiseTier | null>(null);
   const [showApplication, setShowApplication] = useState(false);
+  const tierCarouselRef = useRef<HTMLDivElement>(null);
+  const benefitsCarouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollCarousel = (ref: React.RefObject<HTMLDivElement | null>, direction: 'left' | 'right') => {
+    if (!ref.current) return;
+    const scrollAmount = 340;
+    ref.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  };
   const [formData, setFormData] = useState({
     companyName: '',
     contactName: '',
@@ -280,7 +292,24 @@ export default function FranchiseOffer() {
 
         <h2 className="text-2xl font-bold text-white text-center mb-8">Choose Your Franchise Tier</h2>
 
-        <div className="flex flex-row flex-nowrap gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 sm:grid sm:grid-cols-3 sm:overflow-visible">
+        <div className="relative">
+          <button
+            onClick={() => scrollCarousel(tierCarouselRef, 'left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 sm:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600 flex items-center justify-center text-white hover:bg-gray-700 transition-colors shadow-lg"
+            aria-label="Scroll left"
+            data-testid="button-tier-scroll-left"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={() => scrollCarousel(tierCarouselRef, 'right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 sm:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600 flex items-center justify-center text-white hover:bg-gray-700 transition-colors shadow-lg"
+            aria-label="Scroll right"
+            data-testid="button-tier-scroll-right"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        <div ref={tierCarouselRef} className="flex flex-row flex-nowrap gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-8 sm:px-0 sm:grid sm:grid-cols-3 sm:overflow-visible">
           {tiers?.map((tier) => {
             const Icon = getTierIcon(tier.tierCode);
             const isSelected = selectedTier?.id === tier.id;
@@ -365,6 +394,7 @@ export default function FranchiseOffer() {
               </Card>
             );
           })}
+        </div>
         </div>
 
         <div className="sm:hidden flex justify-center mt-2 mb-4">
@@ -635,40 +665,61 @@ export default function FranchiseOffer() {
           </div>
         )}
 
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="pt-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="h-6 w-6 text-green-400" />
-              </div>
-              <h3 className="font-semibold text-white mb-2">Perpetual Revenue</h3>
-              <p className="text-gray-400 text-sm">
-                Earn ongoing revenue from NFT worker certifications. Your franchise fee pays for itself.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="pt-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
-                <Globe className="h-6 w-6 text-purple-400" />
-              </div>
-              <h3 className="font-semibold text-white mb-2">Your Brand, Your Platform</h3>
-              <p className="text-gray-400 text-sm">
-                Complete white-label branding with your logo, colors, and domain. Clients see your brand.
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-800/50 border-gray-700">
-            <CardContent className="pt-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-6 w-6 text-cyan-400" />
-              </div>
-              <h3 className="font-semibold text-white mb-2">Protected Territory</h3>
-              <p className="text-gray-400 text-sm">
-                Exclusive territory rights ensure no competition from other ORBIT franchisees in your region.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="mt-16 max-w-5xl mx-auto">
+          <h3 className="text-xl font-bold text-white text-center mb-6">Why Choose ORBIT Franchise?</h3>
+          <div className="relative">
+            <button
+              onClick={() => scrollCarousel(benefitsCarouselRef, 'left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 sm:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600 flex items-center justify-center text-white hover:bg-gray-700 transition-colors shadow-lg"
+              aria-label="Scroll left"
+              data-testid="button-benefits-scroll-left"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => scrollCarousel(benefitsCarouselRef, 'right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 sm:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600 flex items-center justify-center text-white hover:bg-gray-700 transition-colors shadow-lg"
+              aria-label="Scroll right"
+              data-testid="button-benefits-scroll-right"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+            <div ref={benefitsCarouselRef} className="flex flex-row flex-nowrap gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-8 sm:px-0 sm:grid sm:grid-cols-3 sm:overflow-visible">
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-colors">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="h-6 w-6 text-green-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Perpetual Revenue</h3>
+                  <p className="text-gray-400 text-sm">
+                    Earn ongoing revenue from NFT worker certifications. Your franchise fee pays for itself.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-colors">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
+                    <Globe className="h-6 w-6 text-purple-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Your Brand, Your Platform</h3>
+                  <p className="text-gray-400 text-sm">
+                    Complete white-label branding with your logo, colors, and domain. Clients see your brand.
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-cyan-500/50 transition-colors">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4">
+                    <Shield className="h-6 w-6 text-cyan-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Protected Territory</h3>
+                  <p className="text-gray-400 text-sm">
+                    Exclusive territory rights ensure no competition from other ORBIT franchisees in your region.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
 
         <div className="mt-12 text-center">

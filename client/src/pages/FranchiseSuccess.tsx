@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
   CheckCircle2, Crown, Shield, ArrowRight, Download, Mail,
-  Building2, MapPin, Sparkles, Rocket, Calendar, ChevronRight
+  Building2, MapPin, Sparkles, Rocket, Calendar, ChevronRight, ChevronLeft
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -12,6 +12,16 @@ import confetti from 'canvas-confetti';
 
 export default function FranchiseSuccess() {
   const [hasAnimated, setHasAnimated] = useState(false);
+  const cardsCarouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollCarousel = (direction: 'left' | 'right') => {
+    if (!cardsCarouselRef.current) return;
+    const scrollAmount = 300;
+    cardsCarouselRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  };
 
   const { data: hallmark, isLoading } = useQuery({
     queryKey: ['my-hallmark'],
@@ -177,51 +187,69 @@ export default function FranchiseSuccess() {
             </CardContent>
           </Card>
 
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <Card className="bg-gray-800/50 border-gray-700 hover:border-cyan-500/50 transition-colors group">
-              <CardContent className="pt-6 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Rocket className="h-7 w-7 text-cyan-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Next Steps</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Our franchise team will contact you within 24 hours to complete onboarding.
-                </p>
-                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
-                  Onboarding Soon
-                </Badge>
-              </CardContent>
-            </Card>
+          <div className="relative mb-8">
+            <button
+              onClick={() => scrollCarousel('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 md:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600 flex items-center justify-center text-white hover:bg-gray-700 transition-colors shadow-lg"
+              aria-label="Scroll left"
+              data-testid="button-cards-scroll-left"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => scrollCarousel('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 md:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600 flex items-center justify-center text-white hover:bg-gray-700 transition-colors shadow-lg"
+              aria-label="Scroll right"
+              data-testid="button-cards-scroll-right"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+            <div ref={cardsCarouselRef} className="flex flex-row flex-nowrap gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-8 md:px-0 md:grid md:grid-cols-3 md:overflow-visible">
+              <Card className="flex-shrink-0 w-[280px] md:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-cyan-500/50 transition-colors group">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <Rocket className="h-7 w-7 text-cyan-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Next Steps</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Our franchise team will contact you within 24 hours to complete onboarding.
+                  </p>
+                  <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                    Onboarding Soon
+                  </Badge>
+                </CardContent>
+              </Card>
 
-            <Card className="bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-colors group">
-              <CardContent className="pt-6 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Mail className="h-7 w-7 text-purple-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Check Your Email</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  A confirmation email with your franchise agreement has been sent.
-                </p>
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                  Sent
-                </Badge>
-              </CardContent>
-            </Card>
+              <Card className="flex-shrink-0 w-[280px] md:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-colors group">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <Mail className="h-7 w-7 text-purple-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Check Your Email</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    A confirmation email with your franchise agreement has been sent.
+                  </p>
+                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                    Sent
+                  </Badge>
+                </CardContent>
+              </Card>
 
-            <Card className="bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-colors group">
-              <CardContent className="pt-6 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Download className="h-7 w-7 text-green-400" />
-                </div>
-                <h3 className="font-semibold text-white mb-2">Resources</h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Access training materials and franchise guidelines in your portal.
-                </p>
-                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                  Available
-                </Badge>
-              </CardContent>
-            </Card>
+              <Card className="flex-shrink-0 w-[280px] md:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-green-500/50 transition-colors group">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <Download className="h-7 w-7 text-green-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Resources</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Access training materials and franchise guidelines in your portal.
+                  </p>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    Available
+                  </Badge>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
           <div className="bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl p-8 border border-gray-700">
