@@ -39,7 +39,7 @@ export default function ProductsGallery() {
       slideshowData: orbySlides,
       url: 'https://getorby.io',
       emblem: '/attached_assets/Screenshot_20251205_100035_Replit_1764952065470.jpg',
-      hallmark: null,
+      hallmark: '/attached_assets/Screenshot_20251205_154312_Replit_1764971077009.jpg',
     },
     {
       id: 'DarkWave Pulse',
