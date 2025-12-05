@@ -64,6 +64,7 @@ import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
 import FranchiseOffer from "@/pages/FranchiseOffer";
 import CustomerHallmarkManager from "@/pages/CustomerHallmarkManager";
 import AdminFranchiseDashboard from "@/pages/AdminFranchiseDashboard";
+import FranchiseSuccess from "@/pages/FranchiseSuccess";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -166,6 +167,8 @@ function Router() {
       <Route path="/hallmark-manager" component={CustomerHallmarkManager} />
       <Route path="/admin/franchise" component={AdminFranchiseDashboard} />
       <Route path="/admin/franchise-dashboard" component={AdminFranchiseDashboard} />
+      <Route path="/franchise-success" component={FranchiseSuccess} />
+      <Route path="/franchise/success" component={FranchiseSuccess} />
       <Route component={NotFound} />
     </Switch>
   );
