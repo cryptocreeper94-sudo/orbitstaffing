@@ -7838,6 +7838,20 @@ export function registerPayCardRoutes(app: Express) {
       
       console.log(`[Franchise] New application submitted: ${application.companyName} (${application.contactEmail})`);
       
+      const tier = await storage.getFranchiseTierById(applicationData.requestedTierId);
+      const tierName = tier?.tierName || 'Franchise';
+      
+      try {
+        const emailOptions = emailService.getFranchiseApplicationReceivedEmail(
+          application.contactEmail,
+          application.companyName,
+          tierName
+        );
+        await emailService.send(emailOptions);
+      } catch (emailError) {
+        console.error("Failed to send application received email:", emailError);
+      }
+      
       res.status(201).json({ 
         success: true, 
         message: "Application submitted successfully. Our team will review and contact you within 24-48 hours.",
@@ -7889,6 +7903,22 @@ export function registerPayCardRoutes(app: Express) {
       
       console.log(`[Franchise] Application ${id} approved by ${reviewedBy}`);
       
+      const tier = application.requestedTierId 
+        ? await storage.getFranchiseTierById(application.requestedTierId)
+        : null;
+      const tierName = tier?.tierName || 'Franchise';
+      
+      try {
+        const emailOptions = emailService.getFranchiseApplicationApprovedEmail(
+          application.contactEmail,
+          application.companyName,
+          tierName
+        );
+        await emailService.send(emailOptions);
+      } catch (emailError) {
+        console.error("Failed to send approval email:", emailError);
+      }
+      
       res.json({ 
         success: true, 
         message: "Application approved",
@@ -7913,6 +7943,17 @@ export function registerPayCardRoutes(app: Express) {
       const application = await storage.rejectFranchiseApplication(id, reviewedBy, reason);
       
       console.log(`[Franchise] Application ${id} rejected by ${reviewedBy}: ${reason}`);
+      
+      try {
+        const emailOptions = emailService.getFranchiseApplicationRejectedEmail(
+          application.contactEmail,
+          application.companyName,
+          reason
+        );
+        await emailService.send(emailOptions);
+      } catch (emailError) {
+        console.error("Failed to send rejection email:", emailError);
+      }
       
       res.json({ 
         success: true, 

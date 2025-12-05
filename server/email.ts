@@ -151,6 +151,151 @@ class EmailService {
   /**
    * Email template: Support ticket confirmation (auto-response)
    */
+  getFranchiseApplicationReceivedEmail(email: string, companyName: string, tierName: string): EmailOptions {
+    return {
+      to: email,
+      subject: "ORBIT Franchise Application Received 🚀",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 32px;">🪐 ORBIT Franchise</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px;">Application Received</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #000; margin-top: 0;">Thank You, ${companyName}!</h2>
+            
+            <p style="color: #333; line-height: 1.6;">
+              We've received your franchise application for the <strong>${tierName}</strong> tier. Our franchise team is reviewing your submission.
+            </p>
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #7c3aed;">
+              <h3 style="color: #7c3aed; margin-top: 0;">What Happens Next?</h3>
+              <ul style="color: #333; line-height: 1.8;">
+                <li>Our franchise team reviews your application (24-48 hours)</li>
+                <li>We'll verify territory availability</li>
+                <li>A franchise specialist will contact you to discuss details</li>
+                <li>Upon approval, you'll receive payment instructions</li>
+              </ul>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">
+              Questions? Contact our franchise team at franchise@orbitstaffing.io
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              ORBIT Staffing Platform | Franchise Opportunities
+            </p>
+          </div>
+        </div>
+      `,
+    };
+  }
+
+  getFranchiseApplicationApprovedEmail(email: string, companyName: string, tierName: string, checkoutUrl?: string): EmailOptions {
+    return {
+      to: email,
+      subject: "Congratulations! Your ORBIT Franchise Application is Approved! 🎉",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 32px;">🪐 ORBIT Franchise</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px;">Application Approved!</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #000; margin-top: 0;">Welcome to the ORBIT Family, ${companyName}!</h2>
+            
+            <p style="color: #333; line-height: 1.6;">
+              Great news! Your franchise application for the <strong>${tierName}</strong> tier has been approved. You're one step away from owning your ORBIT franchise.
+            </p>
+            
+            <div style="background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981;">
+              <h3 style="color: #059669; margin-top: 0;">Next Steps:</h3>
+              <ul style="color: #333; line-height: 1.8;">
+                <li>Complete your franchise fee payment</li>
+                <li>Sign your franchise agreement</li>
+                <li>Receive your exclusive territory assignment</li>
+                <li>Get access to your franchise dashboard</li>
+              </ul>
+            </div>
+            
+            ${checkoutUrl ? `
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${checkoutUrl}" style="display: inline-block; background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                Complete Payment
+              </a>
+            </div>
+            ` : ''}
+            
+            <p style="color: #666; font-size: 14px;">
+              A franchise specialist will contact you within 24 hours to finalize details.
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              ORBIT Staffing Platform | Franchise Opportunities
+            </p>
+          </div>
+        </div>
+      `,
+    };
+  }
+
+  getFranchiseApplicationRejectedEmail(email: string, companyName: string, reason?: string): EmailOptions {
+    return {
+      to: email,
+      subject: "Update on Your ORBIT Franchise Application",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #1f2937 0%, #374151 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 32px;">🪐 ORBIT Franchise</h1>
+            <p style="margin: 10px 0 0 0; font-size: 18px;">Application Update</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #000; margin-top: 0;">Dear ${companyName},</h2>
+            
+            <p style="color: #333; line-height: 1.6;">
+              Thank you for your interest in the ORBIT Staffing franchise program. After careful review, we're unable to move forward with your application at this time.
+            </p>
+            
+            ${reason ? `
+            <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+              <p style="margin: 0; color: #7f1d1d;">
+                <strong>Reason:</strong> ${reason}
+              </p>
+            </div>
+            ` : ''}
+            
+            <p style="color: #333; line-height: 1.6;">
+              We encourage you to consider our standard subscription options, which offer the same powerful features without the franchise commitment. If circumstances change, you're welcome to reapply in the future.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="https://orbitstaffing.io/pricing" style="display: inline-block; background: #0ea5e9; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                View Subscription Plans
+              </a>
+            </div>
+            
+            <p style="color: #666; font-size: 14px;">
+              Questions? Contact our team at franchise@orbitstaffing.io
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              ORBIT Staffing Platform | Franchise Opportunities
+            </p>
+          </div>
+        </div>
+      `,
+    };
+  }
+
   getSupportTicketConfirmationEmail(email: string, ticketId: string, subject: string): EmailOptions {
     return {
       to: email,
