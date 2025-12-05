@@ -879,24 +879,26 @@ export default function Pricing() {
                 </Link>
               </Card>
 
-              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-slate-800/50 border-slate-700/50 text-center p-6">
+              <Card className="flex-shrink-0 w-[280px] sm:w-auto snap-start bg-gradient-to-br from-purple-900/50 to-pink-900/30 border-purple-500/30 text-center p-6 ring-2 ring-purple-500/20">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
                   <Crown className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">Franchise Partner</h3>
-                <div className="text-3xl font-bold text-purple-400 mb-2">40%+</div>
-                <p className="text-slate-400 text-sm mb-4">Territory exclusivity available</p>
+                <div className="text-3xl font-bold text-purple-400 mb-1">$7.5K-$35K</div>
+                <p className="text-xs text-slate-400 mb-2">One-time fee + royalties</p>
+                <p className="text-slate-400 text-sm mb-4">Own your territory forever</p>
                 <ul className="text-left text-sm text-slate-300 space-y-2 mb-6">
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Exclusive territory</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Exclusive territory rights</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Full white-label platform</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Training & certification</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Revenue share model</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> NFT revenue share (70-90%)</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> All modules included</li>
                 </ul>
-                <a href="mailto:partnerships@orbitstaffing.io?subject=Franchise%20Partner%20Inquiry">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-join-franchise">
-                    Contact Us
+                <Link href="/franchise">
+                  <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" data-testid="button-join-franchise">
+                    View Franchise Tiers
+                    <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
-                </a>
+                </Link>
               </Card>
             </div>
             <div className="absolute right-0 top-0 bottom-4 w-10 bg-gradient-to-l from-background to-transparent flex items-center justify-end pointer-events-none sm:hidden">
