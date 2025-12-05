@@ -1,0 +1,77 @@
+// ============================================
+// TWO-TIER HALLMARK SYSTEM
+// ============================================
+
+export const customerHallmarks = pgTable("customer_hallmarks", {
+  id: serial("id").primaryKey(),
+  tenantId: integer("tenant_id").references(() => companies.id),
+  stripeCustomerId: text("stripe_customer_id"),
+  hallmarkName: text("hallmark_name").notNull(),
+  hallmarkLogo: text("hallmark_logo"),
+  hallmarkColors: text("hallmark_colors"),
+  hallmarkSlogan: text("hallmark_slogan"),
+  ownershipMode: text("ownership_mode").default("subscriber_managed"),
+  franchiseId: text("franchise_id"),
+  franchiseTier: text("franchise_tier"),
+  territoryExclusive: boolean("territory_exclusive").default(false),
+  territoryRegion: text("territory_region"),
+  territoryState: text("territory_state"),
+  franchiseFee: text("franchise_fee"),
+  royaltyPercent: text("royalty_percent"),
+  royaltyType: text("royalty_type"),
+  royaltyAmount: text("royalty_amount"),
+  supportTier: text("support_tier"),
+  supportMonthlyFee: text("support_monthly_fee"),
+  franchiseStartDate: timestamp("franchise_start_date"),
+  franchiseRenewalDate: timestamp("franchise_renewal_date"),
+  custodyOwner: text("custody_owner").default("orbit"),
+  custodyTransferDate: timestamp("custody_transfer_date"),
+  previousOwner: text("previous_owner"),
+  serialPrefix: text("serial_prefix"),
+  nextSerialNumber: integer("next_serial_number").default(1),
+  totalSerialsIssued: integer("total_serials_issued").default(0),
+  solanaWalletAddress: text("solana_wallet_address"),
+  nftCollectionAddress: text("nft_collection_address"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const hallmarkCustodyTransfers = pgTable("hallmark_custody_transfers", {
+  id: serial("id").primaryKey(),
+  hallmarkId: integer("hallmark_id").references(() => customerHallmarks.id),
+  tenantId: integer("tenant_id").references(() => companies.id),
+  stripeCustomerId: text("stripe_customer_id"),
+  transferType: text("transfer_type").notNull(),
+  fromMode: text("from_mode"),
+  toMode: text("to_mode"),
+  fromOwner: text("from_owner"),
+  toOwner: text("to_owner"),
+  transferFee: text("transfer_fee"),
+  franchiseFeeAgreed: text("franchise_fee_agreed"),
+  royaltyTerms: text("royalty_terms"),
+  workersTransferred: integer("workers_transferred"),
+  jobsTransferred: integer("jobs_transferred"),
+  serialSystemsTransferred: integer("serial_systems_transferred"),
+  auditHistoryIncluded: boolean("audit_history_included").default(true),
+  requestedAt: timestamp("requested_at").defaultNow(),
+  requestedBy: text("requested_by"),
+  approvedBy: text("approved_by"),
+  approvedAt: timestamp("approved_at"),
+  customerAccepted: boolean("customer_accepted").default(false),
+  customerAcceptedAt: timestamp("customer_accepted_at"),
+  legalAgreementSigned: boolean("legal_agreement_signed").default(false),
+  legalAgreementUrl: text("legal_agreement_url"),
+  status: text("status").default("pending"),
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+});
+
+// Zod schemas
+export const insertCustomerHallmarkSchema = createInsertSchema(customerHallmarks).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertHallmarkCustodyTransferSchema = createInsertSchema(hallmarkCustodyTransfers).omit({ id: true, requestedAt: true });
+
+export type InsertCustomerHallmark = z.infer<typeof insertCustomerHallmarkSchema>;
+export type CustomerHallmark = typeof customerHallmarks.$inferSelect;
+export type InsertHallmarkCustodyTransfer = z.infer<typeof insertHallmarkCustodyTransferSchema>;
+export type HallmarkCustodyTransfer = typeof hallmarkCustodyTransfers.$inferSelect;
