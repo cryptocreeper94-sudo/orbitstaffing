@@ -56,24 +56,53 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ## Last Session Summary (December 5, 2025)
 
-### Current Version: v2.5.5 (Publishing)
+### Current Version: v2.5.6 (Publishing)
 
 ### What Was Accomplished
-1. **Franchise System Carousel UI** - Applied unified mobile-first carousel pattern with left/right arrow navigation to FranchiseOffer and FranchiseSuccess pages
-2. **FranchiseOffer Tier Cards** - Tier selection cards now use horizontal scroll carousel on mobile with arrow buttons
-3. **FranchiseOffer Benefits Section** - "Why Choose ORBIT Franchise?" section converted to carousel with arrow navigation
-4. **FranchiseSuccess Next-Steps Cards** - Post-checkout confirmation cards now use carousel pattern with arrows
-5. **Consistent Arrow Navigation** - All franchise pages now have consistent rounded button arrows (left/right) for mobile carousel navigation
+1. **PWA (Progressive Web App) Complete Setup**
+   - Full-color Orby mascot as home screen icon (waving pose on dark slate background)
+   - Splash screen with Orby (presenting pose) and "Welcome back! Let's get to work." message
+   - Automatic install prompt appears after 2 seconds on first visit
+   - iOS-specific instructions for manual Add to Home Screen
+   - Service worker for offline caching
+   - 7-day dismissal cooldown for install prompt
 
-### Technical Details
-- Arrow button pattern: `absolute left-0/right-0 top-1/2 -translate-y-1/2 z-10 sm:hidden/md:hidden w-10 h-10 rounded-full bg-gray-800/90 border border-gray-600`
-- Carousel container: Wrapped with `relative` div to position arrows absolutely
-- Added `useRef` for carousel refs and `scrollCarousel` function with smooth scrolling
-- Carousel items: `flex-shrink-0 w-[280px] md:w-auto snap-start` pattern
+2. **DarkWave Studios Product Gallery Updates**
+   - Added GarageBot product with background-removed emblem
+   - Products now include: ORBIT Staffing OS, Orby, DarkWave Pulse, Lot Ops Pro, Brew & Board Coffee, GarageBot
+
+3. **Business Intelligence Dashboard** - Completed with real-time valuation tracking ($2M-$8M pre-revenue range)
+
+### PWA Technical Implementation
+- **Manifest:** `client/public/manifest.json` - App metadata, icons (192px, 512px, maskable variants)
+- **Service Worker:** `client/public/sw.js` - Offline caching with network-first strategy
+- **Icons:** `client/public/pwa/` - Orby icons with solid dark slate background (no transparency)
+- **Install Prompt:** `client/src/components/PWAInstallPrompt.tsx` - Auto-shows on first visit
+- **Splash Screen:** `client/src/components/PWASplashScreen.tsx` - Shows in standalone mode
+- **Apple Touch Icons:** Added to `client/index.html` for iOS home screen
 
 ### Key Files Modified
-- `client/src/pages/FranchiseOffer.tsx` - Arrow navigation for tier cards and benefits carousel
-- `client/src/pages/FranchiseSuccess.tsx` - Arrow navigation for next-steps cards carousel
+- `client/index.html` - Manifest link, apple-touch-icons, service worker registration
+- `client/src/App.tsx` - Added PWAInstallPrompt and PWASplashScreen components
+- `client/src/pages/ProductsGallery.tsx` - Added GarageBot product
+
+### DarkWave Studios Products
+| Product | Emblem | Hallmark | URL |
+|---------|--------|----------|-----|
+| ORBIT Staffing OS | ✓ | ✓ | orbitstaffing.io |
+| Orby | ✓ | Pending | - |
+| DarkWave Pulse | ✗ | ✗ | - |
+| Lot Ops Pro | ✓ | ✓ | lotops.pro |
+| Brew & Board Coffee | ✗ | ✗ | brewandboard.coffee |
+| GarageBot | ✓ | Pending | garagebot.io |
+
+### Design Patterns Established
+- **Arrow button navigation:** Rounded circular buttons (w-10 h-10) positioned absolutely on carousel sides
+- **Mobile carousel wrapper:** `relative` div containing absolute-positioned arrow buttons
+- **Scroll function:** `scrollCarousel(ref, 'left'|'right')` with 300-340px scroll amount and smooth behavior
+- **Responsive sections:** `flex flex-row flex-nowrap ... sm:grid sm:grid-cols-N sm:overflow-visible`
+- **Card pattern:** `flex-shrink-0 w-[XXpx] sm:w-auto snap-start` for grid expansion on desktop
+- **PWA Install Prompt:** Bottom slide-in card with Orby icon, dismiss stores timestamp in localStorage
 
 ### Franchise System Architecture
 - **Two-tier ownership model:**
@@ -83,13 +112,6 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 - **Territory checking:** `/api/franchise-territory-availability` validates exclusive territory before application
 - **Email notifications:** Application received, approved (with Stripe checkout link), rejected (with reason)
 - **Payment flow:** Stripe checkout for franchise fee + recurring monthly support subscription
-
-### Design Patterns Established
-- **Arrow button navigation:** Rounded circular buttons (w-10 h-10) positioned absolutely on carousel sides
-- **Mobile carousel wrapper:** `relative` div containing absolute-positioned arrow buttons
-- **Scroll function:** `scrollCarousel(ref, 'left'|'right')` with 300-340px scroll amount and smooth behavior
-- **Responsive sections:** `flex flex-row flex-nowrap ... sm:grid sm:grid-cols-N sm:overflow-visible`
-- **Card pattern:** `flex-shrink-0 w-[XXpx] sm:w-auto snap-start` for grid expansion on desktop
 
 ### User Access Structure
 - **Jason (0424):** Developer, full access to everything
