@@ -11,7 +11,7 @@ interface EmailOptions {
 }
 
 class EmailService {
-  private from = process.env.EMAIL_FROM || "noreply@orbitstaffing.io";
+  private from = process.env.EMAIL_FROM || "Orby from ORBIT <orby@orbitstaffing.io>";
   private smtpHost = process.env.SMTP_HOST;
   private smtpPort = process.env.SMTP_PORT;
   private smtpUser = process.env.SMTP_USER;
