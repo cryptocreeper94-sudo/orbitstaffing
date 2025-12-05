@@ -1,0 +1,365 @@
+================================================================================
+ORBIT STAFFING OS - AGENT HANDOFF TEMPLATE
+Two-Tier Hallmark System Implementation Guide
+Version: 1.0.0 | Created: December 5, 2025
+================================================================================
+
+## SYSTEM OVERVIEW
+
+ORBIT Staffing OS needs a two-tier hallmark system similar to Lot Ops Pro.
+This enables staffing agencies to either subscribe monthly OR purchase a 
+franchise with full ownership rights.
+
+1. SUBSCRIBER MANAGED - Monthly SaaS (existing pricing model)
+   - ORBIT controls the hallmark, serials, data
+   - Customers get full usage but no ownership
+   - Current subscription plans apply
+
+2. FRANCHISE OWNED - One-time fee + royalties
+   - Customer owns their hallmark system completely
+   - Full data portability and customization rights
+   - White-label with their branding
+
+================================================================================
+## WHAT CURRENTLY EXISTS
+================================================================================
+
+ORBIT already has:
+- Subscription plans table (subscription_plans)
+- Modules table (modules)
+- White-label capability
+- Solana blockchain verification
+- NFT badge minting
+- Stripe integration
+- Multi-tenant structure with tenantId
+
+ORBIT is MISSING:
+- customerHallmarks table
+- hallmarkCustodyTransfers table
+- FranchiseOffer.tsx page
+- CustomerHallmarkManager.tsx page
+- Franchise tier pricing API
+- Custody transfer workflow
+- Ownership mode field (subscriber_managed vs franchise_owned)
+
+================================================================================
+## DATABASE SCHEMA TO ADD (shared/schema.ts)
+================================================================================
+
+### customerHallmarks Table
+
+export const customerHallmarks = pgTable("customer_hallmarks", {
+  id: serial("id").primaryKey(),
+  
+  // TENANT & CUSTOMER
+  tenantId: integer("tenant_id").references(() => companies.id),
+  stripeCustomerId: text("stripe_customer_id"),
+  customerId: text("customer_id"),
+  
+  // HALLMARK IDENTITY
+  hallmarkName: text("hallmark_name").notNull(),
+  hallmarkLogo: text("hallmark_logo"),
+  hallmarkColors: text("hallmark_colors"), // JSON: {primary, secondary, accent}
+  hallmarkSlogan: text("hallmark_slogan"),
+  
+  // OWNERSHIP MODE - KEY FIELD
+  ownershipMode: text("ownership_mode").default("subscriber_managed"),
+  // Values: "subscriber_managed" | "franchise_owned"
+  
+  // FRANCHISE FIELDS
+  franchiseId: text("franchise_id"),           // "ORBIT-NASH-001"
+  franchiseTier: text("franchise_tier"),       // "standard" | "premium" | "enterprise"
+  territoryExclusive: boolean("territory_exclusive").default(false),
+  territoryRegion: text("territory_region"),   // "Nashville, TN"
+  territoryState: text("territory_state"),     // "TN"
+  franchiseFee: text("franchise_fee"),         // "$10,000"
+  royaltyPercent: text("royalty_percent"),     // "5%"
+  royaltyType: text("royalty_type"),           // "percentage" | "per_worker" | "per_placement"
+  royaltyAmount: text("royalty_amount"),       // For per-unit: "$2.50"
+  supportTier: text("support_tier"),           // "basic" | "priority" | "enterprise"
+  supportMonthlyFee: text("support_monthly_fee"), // "$500"
+  franchiseStartDate: timestamp("franchise_start_date"),
+  franchiseRenewalDate: timestamp("franchise_renewal_date"),
+  
+  // CUSTODY FIELDS
+  custodyOwner: text("custody_owner").default("orbit"),
+  custodyTransferDate: timestamp("custody_transfer_date"),
+  previousOwner: text("previous_owner"),
+  
+  // SERIAL SYSTEM
+  serialPrefix: text("serial_prefix"),         // "NASH" for Nashville
+  nextSerialNumber: integer("next_serial_number").default(1),
+  totalSerialsIssued: integer("total_serials_issued").default(0),
+  
+  // BLOCKCHAIN
+  solanaWalletAddress: text("solana_wallet_address"),
+  nftCollectionAddress: text("nft_collection_address"),
+  
+  // STATUS
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+### hallmarkCustodyTransfers Table
+
+export const hallmarkCustodyTransfers = pgTable("hallmark_custody_transfers", {
+  id: serial("id").primaryKey(),
+  
+  // REFERENCES
+  hallmarkId: integer("hallmark_id").references(() => customerHallmarks.id),
+  tenantId: integer("tenant_id").references(() => companies.id),
+  stripeCustomerId: text("stripe_customer_id"),
+  
+  // TRANSFER TYPE
+  transferType: text("transfer_type").notNull(),
+  // "subscriber_to_franchise" | "franchise_upgrade" | "franchise_downgrade"
+  fromMode: text("from_mode"),
+  toMode: text("to_mode"),
+  fromOwner: text("from_owner"),
+  toOwner: text("to_owner"),
+  
+  // FINANCIAL TERMS
+  transferFee: text("transfer_fee"),
+  franchiseFeeAgreed: text("franchise_fee_agreed"),
+  royaltyTerms: text("royalty_terms"), // JSON: {type, percent, amount}
+  
+  // ASSETS TRANSFERRED
+  workersTransferred: integer("workers_transferred"),
+  jobsTransferred: integer("jobs_transferred"),
+  serialSystemsTransferred: integer("serial_systems_transferred"),
+  auditHistoryIncluded: boolean("audit_history_included").default(true),
+  
+  // APPROVAL CHAIN
+  requestedAt: timestamp("requested_at").defaultNow(),
+  requestedBy: text("requested_by"),
+  approvedBy: text("approved_by"),
+  approvedAt: timestamp("approved_at"),
+  customerAccepted: boolean("customer_accepted").default(false),
+  customerAcceptedAt: timestamp("customer_accepted_at"),
+  legalAgreementSigned: boolean("legal_agreement_signed").default(false),
+  legalAgreementUrl: text("legal_agreement_url"),
+  
+  // STATUS
+  status: text("status").default("pending"),
+  // "pending" | "approved" | "customer_accepted" | "completed" | "cancelled"
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+});
+
+================================================================================
+## FRANCHISE TIERS & PRICING (Adapted for Staffing)
+================================================================================
+
+### STANDARD FRANCHISE ($7,500)
+- Single market/city
+- 5% royalty per worker placement
+- $500/month support fee
+- City-level territory (non-exclusive)
+- 48hr support response
+- 70/30 NFT badge revenue share
+- Standard ORBIT branding
+
+### PREMIUM FRANCHISE ($15,000) ★ RECOMMENDED
+- Up to 3 markets/cities
+- 4% royalty per worker placement
+- $1,000/month support fee
+- Regional exclusive territory
+- 24hr support response
+- 80/20 NFT badge revenue share
+- Full white-label branding
+- Dedicated account manager
+- Custom mobile app theming
+
+### ENTERPRISE FRANCHISE ($35,000)
+- Unlimited markets
+- 3% royalty per worker placement
+- $2,500/month support fee
+- State/multi-state exclusive territory
+- 4hr support response (24/7)
+- 90/10 NFT badge revenue share
+- Full white-label everything
+- Sub-franchise rights
+- Executive quarterly reviews
+- Priority feature requests
+- Custom integrations
+
+================================================================================
+## API ENDPOINTS TO IMPLEMENT
+================================================================================
+
+// Hallmark Management
+POST   /api/hallmarks                          // Create hallmark for customer
+GET    /api/hallmarks/:id                      // Get hallmark details
+PATCH  /api/hallmarks/:id                      // Update hallmark
+GET    /api/hallmarks/by-tenant/:tenantId      // Get hallmark by tenant
+
+// Custody Transfers
+POST   /api/hallmark/custody-transfer          // Request transfer to franchise
+GET    /api/hallmark/custody-transfer/:id      // Get transfer status
+PATCH  /api/hallmark/custody-transfer/:id/approve   // Admin approve
+PATCH  /api/hallmark/custody-transfer/:id/accept    // Customer accept terms
+POST   /api/hallmark/custody-transfer/:id/execute   // Execute transfer
+
+// Franchise
+GET    /api/franchise/tiers                    // Get pricing tiers
+POST   /api/franchise/request                  // Public franchise request form
+GET    /api/franchise/requests                 // Admin: list all requests
+
+================================================================================
+## UI PAGES TO CREATE
+================================================================================
+
+### 1. FranchiseOffer.tsx (client/src/pages/)
+Public page showcasing franchise opportunity:
+- Hero section with value proposition
+- Three tier cards (Standard/Premium/Enterprise)
+- Comparison table
+- ROI calculator
+- Testimonials placeholder
+- Application form
+- FAQ section
+
+### 2. CustomerHallmarkManager.tsx (client/src/pages/)
+Customer dashboard for their hallmark:
+- Hallmark branding editor (logo, colors, slogan)
+- Serial number management
+- Ownership status display
+- Upgrade to franchise CTA (if subscriber)
+- Transfer history
+- NFT badge analytics
+
+### 3. Admin Franchise Dashboard (add to existing admin)
+- Pending franchise requests
+- Transfer approvals queue
+- Active franchises list
+- Royalty tracking
+- Support ticket priority queue
+
+================================================================================
+## CUSTODY TRANSFER WORKFLOW
+================================================================================
+
+1. CUSTOMER REQUESTS UPGRADE
+   - Submits form selecting tier
+   - System creates transfer record with status "pending"
+   - Admin notified
+
+2. ADMIN REVIEWS
+   - Checks customer history, payment status
+   - Sets approvedBy, approvedAt
+   - Status changes to "approved"
+
+3. CUSTOMER ACCEPTS
+   - Reviews terms, signs legal agreement
+   - Sets customerAccepted, customerAcceptedAt
+   - Uploads signed agreement
+   - Status changes to "customer_accepted"
+
+4. PAYMENT PROCESSING
+   - Stripe charges franchise fee
+   - Confirm payment success
+
+5. EXECUTE TRANSFER
+   - Update hallmark.ownershipMode to "franchise_owned"
+   - Set hallmark.custodyOwner to customer
+   - Set hallmark.franchiseTier, franchiseFee, royaltyPercent
+   - Set territory fields
+   - Record transfer completion
+   - Status changes to "completed"
+
+6. POST-TRANSFER
+   - Welcome email to new franchise owner
+   - Schedule onboarding call
+   - Grant additional permissions
+   - Begin royalty tracking
+
+================================================================================
+## INTEGRATION WITH EXISTING ORBIT FEATURES
+================================================================================
+
+### Subscription Plans
+- Subscribers use existing subscription_plans
+- Franchise owners bypass subscription (pay royalties instead)
+- Add field to subscription: `isActive: false` when franchise
+
+### Modules
+- Subscribers pay per module
+- Franchise owners get ALL modules included
+- Track module usage for royalty calculation if per-placement
+
+### Multi-Tenant
+- tenantId continues to work
+- Add franchiseId for franchise-specific queries
+- Franchise owners can have sub-tenants (Enterprise only)
+
+### Blockchain
+- Franchise owners can customize their NFT collection
+- Serial prefixes tied to territory
+- Revenue split based on franchiseTier
+
+================================================================================
+## REVENUE MODEL FOR ORBIT
+================================================================================
+
+### SUBSCRIBER REVENUE (Current)
+| Stream              | Amount              |
+|---------------------|---------------------|
+| Monthly subscription| $199-$999/month     |
+| Module add-ons      | $29-$149/module     |
+| NFT badge sales     | 100% retained       |
+
+### FRANCHISE REVENUE (New)
+| Stream              | Amount              |
+|---------------------|---------------------|
+| Franchise fee       | $7.5K-$35K          |
+| Transfer fee        | $2.5K-$5K           |
+| Royalty             | 3-5% per placement  |
+| Monthly support     | $500-$2.5K          |
+| NFT badge share     | 10-30%              |
+
+================================================================================
+## PRIORITY ORDER FOR IMPLEMENTATION
+================================================================================
+
+1. Add database tables (customerHallmarks, hallmarkCustodyTransfers)
+2. Run migration
+3. Add storage interface methods
+4. Create API routes
+5. Build FranchiseOffer.tsx page
+6. Build CustomerHallmarkManager.tsx page
+7. Add admin franchise management section
+8. Integrate with existing subscription/module system
+9. Test custody transfer flow end-to-end
+10. Add to pricing page as "Franchise" option
+
+================================================================================
+## ENVIRONMENT VARIABLES
+================================================================================
+
+Already configured:
+- DATABASE_URL - PostgreSQL (Neon)
+- STRIPE_SECRET_KEY - Payment processing
+- HELIUS_API_KEY - Solana RPC
+- SOLANA_WALLET_PRIVATE_KEY - NFT minting wallet
+
+No new secrets required.
+
+================================================================================
+## TESTING CHECKLIST
+================================================================================
+
+[ ] Create hallmark for subscriber
+[ ] View hallmark in CustomerHallmarkManager
+[ ] Request franchise upgrade
+[ ] Admin approve transfer
+[ ] Customer accept terms
+[ ] Execute transfer
+[ ] Verify ownershipMode changed
+[ ] Verify franchise fields populated
+[ ] Verify NFT revenue split calculation
+[ ] Verify royalty tracking
+
+================================================================================
+END OF HANDOFF TEMPLATE
+================================================================================
