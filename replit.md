@@ -56,7 +56,7 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ## Last Session Summary (December 5, 2025)
 
-### Current Version: v2.5.6 (Publishing)
+### Current Version: v2.5.7 (Publishing)
 
 ### What Was Accomplished
 1. **PWA (Progressive Web App) Complete Setup**
@@ -67,9 +67,13 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
    - Service worker for offline caching
    - 7-day dismissal cooldown for install prompt
 
-2. **DarkWave Studios Product Gallery Updates**
-   - Added GarageBot product with background-removed emblem
-   - Products now include: ORBIT Staffing OS, Orby, DarkWave Pulse, Lot Ops Pro, Brew & Board Coffee, GarageBot
+2. **DarkWave Studios Product Gallery - Complete with Emblems & Hallmarks**
+   - ORBIT Staffing OS: Emblem ✓ + Hallmark ✓
+   - Orby (getorby.io): Emblem ✓ + Hallmark ✓
+   - DarkWave Pulse: Pending (emblem + hallmark)
+   - Lot Ops Pro: Emblem ✓ + Hallmark ✓
+   - Brew & Board Coffee: Emblem ✓ (bg-removed, amber-tinted) + Hallmark ✓
+   - GarageBot: Emblem ✓ (bg-removed) + Hallmark ✓
 
 3. **Business Intelligence Dashboard** - Completed with real-time valuation tracking ($2M-$8M pre-revenue range)
 
