@@ -62,8 +62,8 @@ export function DarkWaveAssistant() {
         onClick={() => setIsOpen(true)}
         style={{
           position: 'fixed',
-          bottom: '42px',
-          right: '6px',
+          bottom: '36px',
+          right: '30px',
           left: 'auto',
           top: 'auto',
           zIndex: 140,
