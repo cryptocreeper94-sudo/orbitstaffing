@@ -805,8 +805,8 @@ export default function Landing() {
 
           {/* Mobile: Horizontal Carousel */}
           <div className="relative sm:hidden">
-            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-10 scrollbar-hide snap-x snap-mandatory">
-              <div className="flex-shrink-0 w-[200px] snap-start">
+            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-10 scrollbar-hide snap-x snap-mandatory items-stretch">
+              <div className="flex-shrink-0 w-[160px] h-[280px] snap-start">
                 <PricingCard 
                   tier="Starter"
                   price="$39"
@@ -823,7 +823,7 @@ export default function Landing() {
                   cta="Get Started Free"
                 />
               </div>
-              <div className="flex-shrink-0 w-[200px] snap-start">
+              <div className="flex-shrink-0 w-[160px] h-[280px] snap-start">
                 <PricingCard 
                   tier="Growth"
                   price="$99"
@@ -842,7 +842,7 @@ export default function Landing() {
                   featured
                 />
               </div>
-              <div className="flex-shrink-0 w-[200px] snap-start">
+              <div className="flex-shrink-0 w-[160px] h-[280px] snap-start">
                 <PricingCard 
                   tier="Professional"
                   price="$249"
@@ -860,7 +860,7 @@ export default function Landing() {
                   cta="Schedule Demo"
                 />
               </div>
-              <div className="flex-shrink-0 w-[200px] snap-start">
+              <div className="flex-shrink-0 w-[160px] h-[280px] snap-start">
                 <PricingCard 
                   tier="Enterprise"
                   price="Custom"
@@ -1096,33 +1096,33 @@ function BenefitCard({ icon, title, brief, onClick }: any) {
 
 function PricingCard({ tier, price, period, desc, workers, features, cta, featured }: any) {
   return (
-    <Card className={`h-full border transition-all ${featured ? "border-primary bg-card/50 scale-105" : "border-border/50"}`}>
-      <CardContent className="p-6 h-full flex flex-col">
+    <Card className={`h-full border transition-all ${featured ? "border-primary bg-card/50" : "border-border/50"}`}>
+      <CardContent className="p-3 sm:p-6 h-full flex flex-col">
         {featured && (
-          <Badge className="mb-3 bg-primary/20 text-primary border-primary/30 text-xs">Most Popular</Badge>
+          <Badge className="mb-2 sm:mb-3 bg-primary/20 text-primary border-primary/30 text-[10px] sm:text-xs">Most Popular</Badge>
         )}
-        <h3 className="text-xl font-bold font-heading mb-1">{tier}</h3>
-        <p className="text-xs text-muted-foreground mb-3">{desc}</p>
+        <h3 className="text-base sm:text-xl font-bold font-heading mb-1">{tier}</h3>
+        <p className="text-[10px] sm:text-xs text-muted-foreground mb-2 sm:mb-3">{desc}</p>
         
-        <div className="mb-4">
-          <span className="text-3xl font-bold">{price}</span>
-          <span className="text-muted-foreground text-xs">/{period}</span>
+        <div className="mb-2 sm:mb-4">
+          <span className="text-xl sm:text-3xl font-bold">{price}</span>
+          <span className="text-muted-foreground text-[10px] sm:text-xs">/{period}</span>
         </div>
 
-        <div className="mb-4 p-2 bg-background/50 rounded-lg border border-border/50">
-          <div className="text-xs text-muted-foreground">{workers}</div>
+        <div className="mb-2 sm:mb-4 p-1.5 sm:p-2 bg-background/50 rounded-lg border border-border/50">
+          <div className="text-[10px] sm:text-xs text-muted-foreground">{workers}</div>
         </div>
 
-        <ul className="space-y-2 flex-1">
-          {features.map((f: any, i: any) => (
-            <li key={i} className="flex items-start gap-2 text-xs">
-              <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
-              <span>{f}</span>
+        <ul className="space-y-1 sm:space-y-2 flex-1 overflow-hidden">
+          {features.slice(0, 4).map((f: any, i: any) => (
+            <li key={i} className="flex items-start gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+              <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary mt-0.5 flex-shrink-0" />
+              <span className="line-clamp-1">{f}</span>
             </li>
           ))}
         </ul>
 
-        <Button className={`w-full h-9 text-xs mt-6 ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border border-border/50 hover:bg-white/5"}`}>
+        <Button className={`w-full h-7 sm:h-9 text-[10px] sm:text-xs mt-3 sm:mt-6 ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border border-border/50 hover:bg-white/5"}`}>
           {cta}
         </Button>
       </CardContent>
