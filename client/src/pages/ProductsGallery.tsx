@@ -25,8 +25,8 @@ export default function ProductsGallery() {
       slides: slideContent.ORBIT,
       slideshowData: orbitSlides,
       url: 'https://orbitstaffing.io',
-      emblem: '/attached_assets/generated_images/orbit_staffing_emblem_on_black.png',
-      hallmark: '/attached_assets/generated_images/orbit_hallmark_emblem_seal.png',
+      emblem: '/attached_assets/generated_images/orby_mascot_presenting_pose.png',
+      hallmark: null,
     },
     {
       id: 'Orby',
@@ -218,8 +218,8 @@ export default function ProductsGallery() {
           <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
 
-        {/* Product Card - Full Screen */}
-        <div className="w-full max-w-4xl h-full flex items-center justify-center py-4">
+        {/* Product Card - Full Screen, Nearly Full Width */}
+        <div className="w-full max-w-6xl xl:max-w-7xl h-full flex items-center justify-center py-4 mx-8 sm:mx-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
@@ -286,29 +286,29 @@ export default function ProductsGallery() {
 
                   {/* Bottom Section: Hallmark QR + Buttons */}
                   <div className="flex flex-col items-center gap-6">
-                    {/* Hallmark QR Code */}
+                    {/* Hallmark QR Code - Full image, not cropped */}
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-xs text-gray-500 uppercase tracking-wider">Blockchain Verified</span>
                       {currentProduct.hallmark ? (
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-1 shadow-lg overflow-hidden border border-cyan-500/20">
+                        <div className="w-auto h-24 sm:h-32 max-w-[200px] rounded-xl bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-1.5 shadow-lg overflow-hidden border border-cyan-500/20">
                           <img 
                             src={currentProduct.hallmark} 
                             alt={`${currentProduct.name} hallmark`}
-                            className="w-full h-full rounded-lg object-cover"
+                            className="h-full w-auto rounded-lg object-contain"
                           />
                         </div>
                       ) : currentProduct.url ? (
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white p-2 shadow-lg">
+                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-white p-2 shadow-lg">
                           <QRCodeSVG 
                             value={currentProduct.url} 
-                            size={80}
+                            size={96}
                             className="w-full h-full"
                             bgColor="#ffffff"
                             fgColor="#0f172a"
                           />
                         </div>
                       ) : (
-                        <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br ${currentProduct.color} p-1 opacity-30`}>
+                        <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-gradient-to-br ${currentProduct.color} p-1 opacity-30`}>
                           <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
                             <span className="text-xs text-gray-500">Pending</span>
                           </div>
