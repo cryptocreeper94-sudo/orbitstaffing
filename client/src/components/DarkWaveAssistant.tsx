@@ -57,16 +57,16 @@ export function DarkWaveAssistant() {
 
   return (
     <>
-      {/* Floating Soundwave Button - No background, just the wave */}
+      {/* Floating Soundwave Button - No background, just the wave, matches weather button baseline */}
       <motion.button
         onClick={() => setIsOpen(true)}
         style={{
           position: 'fixed',
-          bottom: '24px',
+          bottom: '42px',
           right: '16px',
           left: 'auto',
           top: 'auto',
-          zIndex: 9999,
+          zIndex: 140,
         }}
         className="hover:scale-110 transition-transform"
         whileHover={{ scale: 1.1 }}
@@ -76,8 +76,8 @@ export function DarkWaveAssistant() {
         <img 
           src={darkwaveSoundwave} 
           alt="DarkWave Assistant" 
-          className="w-20 h-12 sm:w-28 sm:h-16 object-contain"
-          style={{ filter: 'drop-shadow(0 0 20px rgba(168, 85, 247, 0.8))' }}
+          className="w-36 h-20 sm:w-48 sm:h-28 object-contain"
+          style={{ filter: 'drop-shadow(0 0 25px rgba(168, 85, 247, 0.8))' }}
         />
       </motion.button>
 
