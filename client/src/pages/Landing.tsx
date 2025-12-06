@@ -768,7 +768,7 @@ export default function Landing() {
                   <img 
                     src="/mascot/clean/orbit_mascot_cyan_saturn_style_transparent_clean.png" 
                     alt="Orby Mascot" 
-                    className="w-20 h-20 sm:w-32 sm:h-32 object-contain mb-2 mt-4 sm:mt-4"
+                    className="w-20 h-20 sm:w-32 sm:h-32 object-contain mb-2 mt-5 sm:mt-5"
                   />
                   <h3 className="text-xs sm:text-xl font-bold text-violet-200 mt-4 sm:mt-4">ORBIT Staffing OS</h3>
                   <p className="text-[7px] sm:text-xs text-violet-400">Full-Cycle Workforce Management</p>
