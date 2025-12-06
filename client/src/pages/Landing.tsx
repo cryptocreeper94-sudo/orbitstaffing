@@ -435,8 +435,8 @@ export default function Landing() {
           </div>
 
           {/* Benefit Cards - Horizontal Carousel on mobile */}
-          <div className="relative mb-4 sm:mb-8">
-            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-12 sm:pr-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible scrollbar-hide snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0">
+          <div className="relative mb-6 sm:mb-8">
+            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-4 pr-16 sm:pr-0 sm:grid sm:grid-cols-4 sm:gap-4 sm:overflow-visible scrollbar-hide snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0">
               <div className="flex-shrink-0 w-[140px] sm:w-auto snap-start">
                 <BenefitCard 
                   icon="⚡"
