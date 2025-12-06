@@ -317,8 +317,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Override icon for nighttime if not a severe weather condition
-      if (!isDay && ['sunny', 'partly-cloudy'].includes(icon)) {
-        icon = 'night';
+      if (!isDay) {
+        if (['sunny', 'partly-cloudy'].includes(icon)) {
+          icon = 'night';
+        } else if (icon === 'cloudy') {
+          icon = 'night-cloudy';
+        }
       }
       
       res.json({
