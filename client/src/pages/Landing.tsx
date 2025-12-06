@@ -130,7 +130,7 @@ export default function Landing() {
           <div className="flex items-end gap-2 flex-shrink-0 pb-1">
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none sm:hidden">ORBIT</span>
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none hidden sm:inline">Why ORBIT Staffing OS</span>
-            <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors leading-none pb-[1px]" data-testid="link-version">
+            <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors leading-none self-end" data-testid="link-version">
               v2.6.4
             </Link>
           </div>
