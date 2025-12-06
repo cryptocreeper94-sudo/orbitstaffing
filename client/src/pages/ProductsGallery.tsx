@@ -54,8 +54,8 @@ export default function ProductsGallery() {
     {
       id: 'DarkWave Pulse',
       name: 'DarkWave Pulse',
-      tagline: 'Lightning-Fast Compliance & Safety Platform',
-      description: 'Enterprise-grade safety management with real-time incident detection and OSHA compliance automation. Automated safety audits, incident tracking, and regulatory reporting with predictive analytics for workplace safety.',
+      tagline: 'Predictive AI Market Intelligence',
+      description: 'AI-powered crypto market analysis using wave pattern recognition and predictive coding. Analyzes market trends to help traders understand what they\'re dealing with. Not financial advice - for informational purposes only.',
       color: 'from-purple-500 to-pink-600',
       glowColor: 'purple',
       slides: slideContent['DarkWave Pulse'],
