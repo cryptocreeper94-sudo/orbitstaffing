@@ -60,7 +60,8 @@ export function DarkWaveAssistant() {
       {/* Floating Soundwave Button */}
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 z-[9999] w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-900/90 to-slate-900/90 backdrop-blur-sm border-2 border-purple-500/70 shadow-lg shadow-purple-500/40 flex items-center justify-center overflow-hidden hover:scale-110 transition-transform"
+        className="fixed bottom-4 right-4 z-[9999] w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-900/95 to-slate-900/95 backdrop-blur-sm border-2 border-purple-500/80 shadow-xl shadow-purple-500/50 flex items-center justify-center overflow-hidden hover:scale-110 transition-transform"
+        style={{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         animate={{ 
@@ -85,7 +86,7 @@ export function DarkWaveAssistant() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-36 right-4 z-[9999] w-80 sm:w-96 max-h-[60vh] bg-gradient-to-br from-slate-900 via-purple-950/50 to-slate-900 rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden flex flex-col"
+            className="fixed bottom-20 right-4 z-[9999] w-80 sm:w-96 max-h-[60vh] bg-gradient-to-br from-slate-900 via-purple-950/50 to-slate-900 rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/30">

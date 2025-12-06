@@ -56,29 +56,30 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ## Last Session Summary (December 6, 2025)
 
-### Current Version: v2.6.0 (Publishing)
+### Current Version: v2.6.1 (Publishing)
 
 ### What Was Accomplished
 1. **DarkWave Studios Landing Page Complete**
-   - Header: darkwavestudios.io title + v2.6.0 version + Solana verification badge with QR code + hamburger menu
+   - Header: darkwavestudios.io title + v2.6.1 version + Solana verification badge with QR code + hamburger menu
    - Full viewport height product cards with left/right arrow navigation
    - Each card: emblem (top), name/tagline/description (center), hallmark QR (bottom), action buttons
-   - Wave AI assistant floating button (bottom right) - soundwave image
-   - Minimal footer: Developer link | © 2025 | v2.6.0 (horizontally aligned with items-baseline)
+   - Wave AI assistant floating button (bottom right) - fixed mobile visibility
+   - Minimal footer: Developer link | © 2025 | v2.6.1 (horizontally aligned)
    - Hamburger menu with links: ORBIT Home, Product Gallery, Developer Portal, Contact, About
 
-2. **Domain Redirect Configuration**
-   - darkwavestudios.io auto-redirects to /studio route
-   - All product cards accessible via horizontal navigation
+2. **v2.6.1 Mobile Fixes**
+   - Fixed Wave AI button visibility on mobile (was positioned outside viewport)
+   - Reduced button offset to bottom-4 with safe-area-inset support
+   - Improved card layout to prevent QR code cutoff
+   - Smaller elements on mobile for better fit
 
-3. **Version Updates to v2.6.0**
+3. **Version Updates to v2.6.1**
    - Updated all version references across codebase
-   - SecureSandbox.tsx, BusinessValuationDashboard.tsx, FeatureInventory.tsx, DarkwaveFooter.tsx
-   - Added v2.5.5 and v2.6.0 to publish log history
+   - SecureSandbox.tsx, BusinessValuationDashboard.tsx, FeatureInventory.tsx, DarkwaveFooter.tsx, ProductsGallery.tsx
 
 4. **Solana Blockchain Stamps (December 6, 2025)**
-   - ORBIT Staffing OS v2.6.0: Hash `43c8a083ca6e92ad2d6a9c5ba8b14821477b40a23113107aadabb2994651ce21`
-   - DarkWave Studios v2.6.0: Hash `126de1690f4e240bee2bd2b9018348fe0e0f0ef7002bb1e20268fce9662e4f61`
+   - ORBIT Staffing OS v2.6.1: Hash `ea7987aeae03ddd1d21c20e4931b7abbbf0ba1bc7b847f8494d0cd4a6c5a80dd`
+   - DarkWave Studios v2.6.1: Hash `68fc1b0a7f0e31e3404083a3cd90ea22a34df0478e94f12e5f7b21c5a3f53fba`
 
 5. **Previous Session (Dec 5) - PWA Complete**
    - Full-color Orby mascot as home screen icon
