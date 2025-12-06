@@ -56,7 +56,7 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ## Last Session Summary (December 5, 2025)
 
-### Current Version: v2.5.9 (Publishing)
+### Current Version: v2.6.0 (Publishing)
 
 ### What Was Accomplished
 1. **PWA (Progressive Web App) Complete Setup**
