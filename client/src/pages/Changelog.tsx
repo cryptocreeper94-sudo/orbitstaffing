@@ -6,6 +6,17 @@ import { ArrowLeft, Zap, Bug, Sparkles, Shield } from "lucide-react";
 
 const changelogEntries = [
   {
+    version: "v2.6.5",
+    date: "December 6, 2025",
+    type: "patch",
+    changes: [
+      { type: "fix", text: "Version number moved to footer with proper baseline alignment" },
+      { type: "fix", text: "Header cleaned up - just ORBIT title and hamburger menu" },
+      { type: "fix", text: "Footer simplified to minimal strip: DarkWave Studios, LLC | © 2025 | version" },
+      { type: "security", text: "New Solana blockchain stamp generated" },
+    ]
+  },
+  {
     version: "v2.6.4",
     date: "December 6, 2025",
     type: "patch",

@@ -97,7 +97,7 @@ export default function AboutUs() {
             DarkWave Studios, LLC &copy; 2025 | Nashville, TN
           </p>
           <p className="text-slate-600 text-xs">
-            Version 2.6.4 | Powered by ORBIT Technology
+            Version 2.6.5 | Powered by ORBIT Technology
           </p>
         </section>
       </main>
