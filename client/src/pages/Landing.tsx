@@ -126,12 +126,10 @@ export default function Landing() {
       
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-4 flex justify-between items-end gap-2 sm:gap-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-12 sm:h-14 flex justify-between items-end gap-2 sm:gap-8 pb-1.5">
           <div className="flex items-baseline gap-2 flex-shrink-0">
-            <div className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap">
-              <span className="block sm:hidden">ORBIT</span>
-              <span className="hidden sm:block">Why ORBIT Staffing OS</span>
-            </div>
+            <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap sm:hidden">ORBIT</span>
+            <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap hidden sm:inline">Why ORBIT Staffing OS</span>
             <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version">
               v2.6.4
             </Link>
