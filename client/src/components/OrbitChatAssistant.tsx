@@ -86,13 +86,12 @@ function getOrbitResponse(message: string): string {
 const DEFAULT_WELCOME: Message = {
   id: "welcome",
   role: "assistant",
-  content: "Hey! I'm Orby, your AI assistant! Ask me anything about the platform - payroll, workers, compliance, jobs, or pricing. I'm floating here to help! 🪐",
+  content: "Hi! I'm Orby, I'm here to help. Call me up anytime you need me! 🪐",
   timestamp: new Date().toISOString(),
 };
 
 export function OrbitChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [showGreetingBubble, setShowGreetingBubble] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -118,12 +117,12 @@ export function OrbitChatAssistant() {
     const greetingShown = sessionStorage.getItem(GREETING_SHOWN_KEY);
     if (!greetingShown) {
       const timer = setTimeout(() => {
-        setShowGreetingBubble(true);
+        setIsOpen(true);
         sessionStorage.setItem(GREETING_SHOWN_KEY, "true");
         setTimeout(() => {
-          setShowGreetingBubble(false);
+          setIsOpen(false);
         }, 4000);
-      }, 1500);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -315,24 +314,8 @@ export function OrbitChatAssistant() {
       </AnimatePresence>
 
       <div className="fixed bottom-6 right-4 z-[150]" data-testid="floating-orby-container">
-        <AnimatePresence>
-          {showGreetingBubble && !isOpen && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.8, x: 20 }}
-              className="absolute -top-16 right-0 bg-gradient-to-br from-cyan-600 to-blue-700 border border-cyan-400/50 rounded-2xl px-4 py-3 shadow-lg shadow-cyan-500/30 min-w-[160px]"
-              style={{ filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.4))' }}
-            >
-              <p className="text-sm text-white font-medium">Hi! I'm available 👋</p>
-              <p className="text-xs text-cyan-200 mt-1">Click me to chat!</p>
-              <div className="absolute -bottom-2 right-8 w-4 h-4 bg-blue-700 border-r border-b border-cyan-400/50 transform rotate-45" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {!isOpen && !showGreetingBubble && (
+          <AnimatePresence>
+          {!isOpen && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
