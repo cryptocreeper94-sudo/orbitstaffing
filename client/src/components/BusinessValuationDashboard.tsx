@@ -584,7 +584,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-purple-400" />
             <span className="text-gray-400">Version:</span>
-            <span className="text-white font-medium">v2.5.5</span>
+            <span className="text-white font-medium">v2.6.0</span>
           </div>
         </div>
       </div>

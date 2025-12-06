@@ -39,7 +39,7 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white">{getGreeting()}, Sid!</h2>
-              <p className="text-cyan-400 text-sm">ORBIT Staffing OS • v2.5.2 • Full Preview Access</p>
+              <p className="text-cyan-400 text-sm">ORBIT Staffing OS • v2.6.0 • Full Preview Access</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white transition p-2 hover:bg-slate-700 rounded-lg">
@@ -189,7 +189,7 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
           <div>
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-amber-400" />
-              Latest Updates (v2.5.2 - Today)
+              Latest Updates (v2.6.0 - Today)
             </h3>
             <div className="bg-slate-800/50 rounded-lg p-4 space-y-2 text-sm">
               <div className="flex items-center gap-2">

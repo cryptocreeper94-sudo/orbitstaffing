@@ -183,6 +183,8 @@ const PUBLISH_LOG = [
   { version: "2.5.2", date: "2025-12-03", time: "14:55 CST", notes: "Desktop full-width grids, Orby hallmark redesign, slower animations, weather temp display" },
   { version: "2.5.3", date: "2025-12-03", time: "13:10 CST", notes: "Sid partner login with welcome modal, sandbox access system, GetOrby.io mention" },
   { version: "2.5.4", date: "2025-12-04", time: "10:30 CST", notes: "Database-backed modular pricing, site-wide horizontal scroll carousels on mobile, Connect Your Systems redesign" },
+  { version: "2.5.5", date: "2025-12-05", time: "14:00 CST", notes: "PWA setup, DarkWave Studios product gallery with emblems and hallmarks" },
+  { version: "2.6.0", date: "2025-12-06", time: "00:30 CST", notes: "Full-screen product cards, domain redirect, soundwave AI button, minimal footer" },
 ];
 
 function FeatureInventory() {
@@ -343,7 +345,7 @@ function FeatureInventory() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div className="text-slate-400 text-[10px] sm:text-xs">
-          Powered by ORBIT v2.5.4
+          Powered by ORBIT v2.6.0
         </div>
         <Button 
           variant="outline" 
