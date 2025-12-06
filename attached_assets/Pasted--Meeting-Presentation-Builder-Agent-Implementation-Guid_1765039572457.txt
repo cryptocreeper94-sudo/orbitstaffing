@@ -1,0 +1,269 @@
+# Meeting Presentation Builder - Agent Implementation Guide
+
+## Feature Overview
+Build a Meeting Presentation Builder that allows users to:
+1. Select a presentation template (Executive Summary, Board Meeting, Team Huddle)
+2. Add meeting details (title, date, time, notes)
+3. Attach scanned/uploaded documents to the presentation
+4. Add attendee emails and names
+5. Generate a shareable slideshow-style presentation with unique link
+6. Email the presentation to all attendees via Resend API
+
+Premium "Meeting Prep" feature for B2B apps, CRM systems, or professional portfolio tools.
+
+---
+
+## 1. DATABASE SCHEMA (Drizzle ORM + PostgreSQL)
+
+Add to `shared/schema.ts`:
+
+export const meetingPresentations = pgTable(
+  "meeting_presentations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id),
+    templateType: varchar("template_type", { length: 50 }).notNull(), // 'executive', 'board', 'huddle'
+    title: varchar("title", { length: 255 }).notNull(),
+    meetingDate: varchar("meeting_date", { length: 20 }),
+    meetingTime: varchar("meeting_time", { length: 20 }),
+    notes: text("notes"),
+    documentIds: text("document_ids").array().default([]),
+    attendeeEmails: text("attendee_emails").array().default([]),
+    attendeeNames: text("attendee_names").array().default([]),
+    shareableLink: varchar("shareable_link", { length: 100 }).unique(),
+    status: varchar("status", { length: 20 }).default("draft"), // 'draft', 'ready', 'sent'
+    sentAt: timestamp("sent_at"),
+    viewCount: integer("view_count").default(0),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    userIdx: index("idx_meeting_presentations_user").on(table.userId),
+    statusIdx: index("idx_meeting_presentations_status").on(table.status),
+  })
+);
+
+export const insertMeetingPresentationSchema = createInsertSchema(meetingPresentations).omit({
+  id: true, createdAt: true, updatedAt: true, viewCount: true, sentAt: true,
+});
+export type InsertMeetingPresentation = z.infer<typeof insertMeetingPresentationSchema>;
+export type MeetingPresentation = typeof meetingPresentations.$inferSelect;
+
+export const PRESENTATION_TEMPLATES = [
+  { id: 'executive', name: 'Executive Summary', description: 'Clean, minimal layout with company branding' },
+  { id: 'board', name: 'Board Meeting', description: 'Formal structure with agenda and document sections' },
+  { id: 'huddle', name: 'Team Huddle', description: 'Casual, friendly format for quick syncs' },
+] as const;
+
+Run: npx drizzle-kit push
+
+---
+
+## 2. STORAGE INTERFACE (server/storage.ts)
+
+Add to IStorage interface:
+  createMeetingPresentation(data: InsertMeetingPresentation): Promise<MeetingPresentation>;
+  getMeetingPresentations(userId: string): Promise<MeetingPresentation[]>;
+  getMeetingPresentation(id: string): Promise<MeetingPresentation | undefined>;
+  getMeetingPresentationByLink(shareableLink: string): Promise<MeetingPresentation | undefined>;
+  updateMeetingPresentation(id: string, data: Partial<InsertMeetingPresentation>): Promise<MeetingPresentation | undefined>;
+  deleteMeetingPresentation(id: string): Promise<boolean>;
+  incrementPresentationViewCount(id: string): Promise<void>;
+  markPresentationSent(id: string): Promise<void>;
+
+Implementations:
+
+async createMeetingPresentation(data: InsertMeetingPresentation): Promise<MeetingPresentation> {
+  const [presentation] = await db.insert(meetingPresentations).values(data).returning();
+  return presentation;
+}
+
+async getMeetingPresentations(userId: string): Promise<MeetingPresentation[]> {
+  return await db.select().from(meetingPresentations)
+    .where(eq(meetingPresentations.userId, userId))
+    .orderBy(desc(meetingPresentations.createdAt));
+}
+
+async getMeetingPresentation(id: string): Promise<MeetingPresentation | undefined> {
+  const [p] = await db.select().from(meetingPresentations).where(eq(meetingPresentations.id, id));
+  return p;
+}
+
+async getMeetingPresentationByLink(shareableLink: string): Promise<MeetingPresentation | undefined> {
+  const [p] = await db.select().from(meetingPresentations).where(eq(meetingPresentations.shareableLink, shareableLink));
+  return p;
+}
+
+async updateMeetingPresentation(id: string, data: Partial<InsertMeetingPresentation>): Promise<MeetingPresentation | undefined> {
+  const [p] = await db.update(meetingPresentations).set({ ...data, updatedAt: new Date() })
+    .where(eq(meetingPresentations.id, id)).returning();
+  return p;
+}
+
+async deleteMeetingPresentation(id: string): Promise<boolean> {
+  const result = await db.delete(meetingPresentations).where(eq(meetingPresentations.id, id));
+  return result.rowCount > 0;
+}
+
+async incrementPresentationViewCount(id: string): Promise<void> {
+  await db.update(meetingPresentations)
+    .set({ viewCount: sql`${meetingPresentations.viewCount} + 1` })
+    .where(eq(meetingPresentations.id, id));
+}
+
+async markPresentationSent(id: string): Promise<void> {
+  await db.update(meetingPresentations)
+    .set({ status: 'sent', sentAt: new Date() })
+    .where(eq(meetingPresentations.id, id));
+}
+
+---
+
+## 3. API ROUTES (server/routes.ts)
+
+import { Resend } from 'resend';
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Get all presentations for user
+app.get("/api/meeting-presentations", async (req, res) => {
+  const userId = req.query.userId as string;
+  if (!userId) return res.status(400).json({ error: "userId required" });
+  const presentations = await storage.getMeetingPresentations(userId);
+  res.json(presentations);
+});
+
+// Get single presentation
+app.get("/api/meeting-presentations/:id", async (req, res) => {
+  const p = await storage.getMeetingPresentation(req.params.id);
+  if (!p) return res.status(404).json({ error: "Not found" });
+  res.json(p);
+});
+
+// Get by shareable link (public)
+app.get("/api/meeting-presentations/link/:link", async (req, res) => {
+  const p = await storage.getMeetingPresentationByLink(req.params.link);
+  if (!p) return res.status(404).json({ error: "Not found" });
+  await storage.incrementPresentationViewCount(p.id);
+  res.json(p);
+});
+
+// Create
+app.post("/api/meeting-presentations", async (req, res) => {
+  const data = insertMeetingPresentationSchema.parse(req.body);
+  const p = await storage.createMeetingPresentation(data);
+  res.status(201).json(p);
+});
+
+// Update
+app.patch("/api/meeting-presentations/:id", async (req, res) => {
+  const p = await storage.updateMeetingPresentation(req.params.id, req.body);
+  if (!p) return res.status(404).json({ error: "Not found" });
+  res.json(p);
+});
+
+// Delete
+app.delete("/api/meeting-presentations/:id", async (req, res) => {
+  const success = await storage.deleteMeetingPresentation(req.params.id);
+  if (!success) return res.status(404).json({ error: "Not found" });
+  res.json({ success: true });
+});
+
+// Send via email
+app.post("/api/meeting-presentations/:id/send", async (req, res) => {
+  const p = await storage.getMeetingPresentation(req.params.id);
+  if (!p) return res.status(404).json({ error: "Not found" });
+  if (!p.shareableLink) return res.status(400).json({ error: "No shareable link" });
+  
+  const emails = p.attendeeEmails || [];
+  if (emails.length === 0) return res.status(400).json({ error: "No attendees" });
+  
+  const template = PRESENTATION_TEMPLATES.find(t => t.id === p.templateType);
+  const viewerUrl = `${process.env.APP_URL}/presentation/${p.shareableLink}`;
+  
+  await resend.emails.send({
+    from: 'App Name <notifications@yourdomain.com>',
+    to: emails,
+    subject: `Meeting Presentation: ${p.title}`,
+    html: `<div style="font-family:Arial;max-width:600px;margin:0 auto;">
+      <h1>${p.title}</h1>
+      <p><strong>Template:</strong> ${template?.name}</p>
+      ${p.meetingDate ? `<p><strong>Date:</strong> ${p.meetingDate} ${p.meetingTime || ''}</p>` : ''}
+      <a href="${viewerUrl}" style="display:inline-block;background:#4F46E5;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin-top:20px;">View Presentation</a>
+    </div>`,
+  });
+  
+  await storage.markPresentationSent(p.id);
+  res.json({ success: true, sentTo: emails.length });
+});
+
+// Get templates
+app.get("/api/presentation-templates", (req, res) => {
+  res.json(PRESENTATION_TEMPLATES);
+});
+
+---
+
+## 4. FRONTEND PAGES
+
+### A. Builder Wizard (/meeting-presentations)
+4-step wizard:
+- Step 1: Template Selection - 3 cards (Executive, Board, Huddle) with icons
+- Step 2: Meeting Details - Title, date picker, time picker, notes textarea
+- Step 3: Documents - Select from user's scanned documents (checkboxes)
+- Step 4: Attendees - Add name+email pairs, validate emails
+
+Actions: Generate shareable link (random slug), save, option to send immediately
+
+### B. Viewer Page (/presentation/:link)
+Slideshow-style viewer:
+- Fetch by shareable link
+- Template-based themes:
+  - Executive: Dark gradient, minimal, professional
+  - Board Meeting: Navy/formal, structured
+  - Team Huddle: Warm/casual colors
+- Navigation: Arrow keys, buttons, swipe
+- Fullscreen toggle
+- Slide counter ("3 of 7")
+- Each attached document = one slide
+
+---
+
+## 5. ROUTE REGISTRATION (App.tsx)
+
+import MeetingPresentations from "./pages/meeting-presentations";
+import PresentationViewer from "./pages/presentation-viewer";
+
+<Route path="/meeting-presentations" component={MeetingPresentations} />
+<Route path="/presentation/:link" component={PresentationViewer} />
+
+---
+
+## 6. QUICK ACTION (add to CRM/Portfolio/Dashboard)
+
+<Link href="/meeting-presentations">
+  <Button><Presentation className="h-5 w-5" /> Presentations</Button>
+</Link>
+
+---
+
+## ENVIRONMENT VARIABLES
+RESEND_API_KEY=re_xxxxxx
+APP_URL=https://yourapp.com
+
+---
+
+## CUSTOMIZATION
+- Template themes: Match your app's color scheme
+- Email branding: Add your logo to Resend HTML
+- Document integration: Connect to your existing file/scan system
+- Auth: Ensure userId comes from your auth system
+
+---
+
+## FILE STRUCTURE
+shared/schema.ts - meetingPresentations table + types
+server/storage.ts - IStorage methods + implementations  
+server/routes.ts - API endpoints
+client/src/pages/meeting-presentations.tsx - Builder wizard
+client/src/pages/presentation-viewer.tsx - Slideshow viewer
+client/src/App.tsx - Register routes
