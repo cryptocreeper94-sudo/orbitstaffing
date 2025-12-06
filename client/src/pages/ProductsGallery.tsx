@@ -116,7 +116,7 @@ export default function ProductsGallery() {
   const currentProduct = products[currentIndex];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden">
       {/* Animated Background - Fixed behind everything */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Twinkling Stars */}
@@ -427,10 +427,8 @@ export default function ProductsGallery() {
         ))}
       </div>
 
-      {/* ===== SECTION 3: MINIMAL FOOTER - Pushed to bottom ===== */}
-      <div className="mt-auto">
-        <DarkwaveFooter minimal={true} />
-      </div>
+      {/* ===== SECTION 3: MINIMAL FOOTER ===== */}
+      <DarkwaveFooter minimal={true} />
 
       {/* ===== MODALS ===== */}
       
