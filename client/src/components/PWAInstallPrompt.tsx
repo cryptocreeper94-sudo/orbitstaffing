@@ -70,10 +70,10 @@ export function PWAInstallPrompt() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-[9999] animate-in slide-in-from-bottom-4 duration-300">
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl p-4 shadow-2xl shadow-cyan-500/20">
+      <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl p-4 shadow-2xl shadow-cyan-500/20">
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 p-1 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-3 right-3 p-2 text-gray-400 hover:text-white bg-slate-700/50 hover:bg-slate-600 rounded-full transition-colors z-10"
           data-testid="button-dismiss-pwa"
         >
           <X className="w-5 h-5" />
