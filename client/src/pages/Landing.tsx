@@ -32,6 +32,7 @@ import { Accordion } from "@/components/Accordion";
 import { ISO20022Banner } from "@/components/ISO20022Banner";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
+import orbyCommanderEmblem from "@assets/Screenshot_20251205_100035_Replit_1764952065470.jpg";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
@@ -769,7 +770,7 @@ export default function Landing() {
                       <img 
                         src="/mascot/clean/orbit_mascot_cyan_saturn_style_transparent_clean.png" 
                         alt="Orby Mascot" 
-                        className="w-8 h-8 sm:w-12 sm:h-12 object-contain"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
                       />
                       <div>
                         <h3 className="text-sm sm:text-xl font-bold text-violet-200">ORBIT Staffing OS</h3>
@@ -799,9 +800,9 @@ export default function Landing() {
                   <CardContent className="p-3 sm:p-6 flex flex-col h-full">
                     <div className="flex items-center gap-2 mb-2 sm:mb-3">
                       <img 
-                        src="/mascot/clean/orbit_mascot_pointing_teaching_transparent_clean.png" 
+                        src={orbyCommanderEmblem} 
                         alt="Orby Commander" 
-                        className="w-8 h-8 sm:w-12 sm:h-12 object-contain"
+                        className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-lg"
                       />
                       <div>
                         <h3 className="text-sm sm:text-xl font-bold text-cyan-200">Orby Command Center</h3>
