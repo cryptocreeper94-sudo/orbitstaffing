@@ -2363,6 +2363,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Preview payroll calculations (no records created)
+  app.post("/api/payroll/preview", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { workerIds, payPeriodStart, payPeriodEnd } = req.body;
+      
+      if (!workerIds || !Array.isArray(workerIds) || workerIds.length === 0) {
+        return res.status(400).json({ error: "workerIds array required" });
+      }
+      
+      const previews = [];
+      
+      for (const workerId of workerIds) {
+        try {
+          // Get worker data
+          const worker = await storage.getWorker(workerId);
+          if (!worker) continue;
+          
+          // Get worker's W4 data
+          const w4Data = await storage.getWorkerW4Data(workerId);
+          
+          // Get worker's garnishments
+          const garnishments = await storage.getWorkerGarnishments(workerId);
+          
+          // Get worker's timesheets for the pay period
+          const workersData = await storage.getWorkersReadyForPayroll(
+            tenantId,
+            new Date(payPeriodStart),
+            new Date(payPeriodEnd)
+          );
+          
+          const workerData = workersData.find((w: any) => w.workerId === workerId);
+          
+          const hourlyRate = parseFloat(worker.hourlyWage || "15");
+          const regularHours = parseFloat(workerData?.regularHours || "40");
+          const overtimeHours = parseFloat(workerData?.overtimeHours || "0");
+          
+          const regularPay = regularHours * hourlyRate;
+          const overtimePay = overtimeHours * hourlyRate * 1.5;
+          const grossPay = regularPay + overtimePay;
+          
+          // Calculate payroll using payrollCalculator.ts
+          if (w4Data) {
+            const payrollInput: PayrollCalculationInput = {
+              grossPay,
+              w4Data,
+              garnishmentOrders: garnishments,
+              payPeriodDays: 7,
+              workState: worker.state || 'TN',
+              workCity: worker.city,
+              annualGrossPaid: 0,
+            };
+            
+            const payrollResult = calculatePayroll(payrollInput);
+            
+            previews.push({
+              workerId: worker.id,
+              workerName: `${worker.firstName} ${worker.lastName}`,
+              regularHours,
+              overtimeHours,
+              hourlyRate,
+              grossPay: payrollResult.grossPay,
+              federalTax: payrollResult.federalIncomeTax,
+              stateTax: payrollResult.stateTax,
+              ssTax: payrollResult.socialSecurityTax,
+              medicareTax: payrollResult.medicareTax + payrollResult.additionalMedicareTax,
+              localTax: payrollResult.localTax,
+              benefitsDeductions: 0,
+              garnishments: payrollResult.totalGarnishments,
+              netPay: payrollResult.netPay,
+            });
+          } else {
+            // Fallback calculation without W4
+            const estimatedFederalTax = grossPay * 0.12;
+            const estimatedSSTax = grossPay * 0.062;
+            const estimatedMedicare = grossPay * 0.0145;
+            const estimatedStateTax = grossPay * 0.04;
+            const totalDeductions = estimatedFederalTax + estimatedSSTax + estimatedMedicare + estimatedStateTax;
+            
+            previews.push({
+              workerId: worker.id,
+              workerName: `${worker.firstName} ${worker.lastName}`,
+              regularHours,
+              overtimeHours,
+              hourlyRate,
+              grossPay,
+              federalTax: estimatedFederalTax,
+              stateTax: estimatedStateTax,
+              ssTax: estimatedSSTax,
+              medicareTax: estimatedMedicare,
+              localTax: 0,
+              benefitsDeductions: 0,
+              garnishments: 0,
+              netPay: grossPay - totalDeductions,
+            });
+          }
+        } catch (err) {
+          console.error(`Preview error for worker ${workerId}:`, err);
+        }
+      }
+      
+      res.json({ previews });
+    } catch (error) {
+      console.error("Failed to generate payroll preview:", error);
+      res.status(500).json({ error: "Failed to generate payroll preview" });
+    }
+  });
+  
   // Process payroll for worker(s)
   app.post("/api/payroll/process", async (req: Request, res: Response) => {
     try {

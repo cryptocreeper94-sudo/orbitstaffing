@@ -1986,8 +1986,23 @@ export const payrollRecords = pgTable(
     payPeriodEnd: date("pay_period_end").notNull(),
     payDate: date("pay_date"),
     
+    // Hours Breakdown
+    regularHours: decimal("regular_hours", { precision: 8, scale: 2 }).default("0"),
+    overtimeHours: decimal("overtime_hours", { precision: 8, scale: 2 }).default("0"),
+    hourlyRate: decimal("hourly_rate", { precision: 8, scale: 2 }).default("0"),
+    
     // Gross Pay
     grossPay: decimal("gross_pay", { precision: 10, scale: 2 }).notNull(),
+    regularPay: decimal("regular_pay", { precision: 10, scale: 2 }).default("0"),
+    overtimePay: decimal("overtime_pay", { precision: 10, scale: 2 }).default("0"),
+    
+    // YTD (Year-to-Date) Tracking
+    ytdGrossPay: decimal("ytd_gross_pay", { precision: 12, scale: 2 }).default("0"),
+    ytdFederalTax: decimal("ytd_federal_tax", { precision: 12, scale: 2 }).default("0"),
+    ytdStateTax: decimal("ytd_state_tax", { precision: 12, scale: 2 }).default("0"),
+    ytdSocialSecurity: decimal("ytd_social_security", { precision: 12, scale: 2 }).default("0"),
+    ytdMedicare: decimal("ytd_medicare", { precision: 12, scale: 2 }).default("0"),
+    ytdNetPay: decimal("ytd_net_pay", { precision: 12, scale: 2 }).default("0"),
     
     // Mandatory Withholdings
     federalIncomeTax: decimal("federal_income_tax", { precision: 10, scale: 2 }).default("0"),
@@ -1996,6 +2011,15 @@ export const payrollRecords = pgTable(
     additionalMedicareTax: decimal("additional_medicare_tax", { precision: 10, scale: 2 }).default("0"),
     stateTax: decimal("state_tax", { precision: 10, scale: 2 }).default("0"),
     localTax: decimal("local_tax", { precision: 10, scale: 2 }).default("0"),
+    
+    // Benefits Deductions (Pre-tax)
+    retirement401k: decimal("retirement_401k", { precision: 10, scale: 2 }).default("0"),
+    healthInsurance: decimal("health_insurance", { precision: 10, scale: 2 }).default("0"),
+    dentalInsurance: decimal("dental_insurance", { precision: 10, scale: 2 }).default("0"),
+    visionInsurance: decimal("vision_insurance", { precision: 10, scale: 2 }).default("0"),
+    hsaContribution: decimal("hsa_contribution", { precision: 10, scale: 2 }).default("0"),
+    fsaContribution: decimal("fsa_contribution", { precision: 10, scale: 2 }).default("0"),
+    totalBenefitsDeductions: decimal("total_benefits_deductions", { precision: 10, scale: 2 }).default("0"),
     
     // Total Mandatory Deductions
     totalMandatoryDeductions: decimal("total_mandatory_deductions", { precision: 10, scale: 2 }).default("0"),
@@ -2020,8 +2044,14 @@ export const payrollRecords = pgTable(
     // Full Breakdown (for audit trail)
     breakdown: jsonb("breakdown"),
     
+    // Correction/Adjustment Reference
+    isCorrection: boolean("is_correction").default(false),
+    originalPayrollRecordId: varchar("original_payroll_record_id"),
+    correctionReason: text("correction_reason"),
+    correctedBy: varchar("corrected_by").references(() => users.id),
+    
     // Status
-    status: varchar("status", { length: 50 }).default("pending"), // pending, processed, paid
+    status: varchar("status", { length: 50 }).default("pending"), // pending, preview, processed, paid, corrected, voided
     processedAt: timestamp("processed_at"),
     paidAt: timestamp("paid_at"),
     
@@ -2119,6 +2149,169 @@ export const insertGarnishmentPaymentSchema = createInsertSchema(garnishmentPaym
 
 export type InsertGarnishmentPayment = z.infer<typeof insertGarnishmentPaymentSchema>;
 export type GarnishmentPayment = typeof garnishmentPayments.$inferSelect;
+
+// ========================
+// PTO (Paid Time Off) Tracking
+// ========================
+export const ptoBalances = pgTable(
+  "pto_balances",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Current Balances (in hours)
+    vacationBalance: decimal("vacation_balance", { precision: 8, scale: 2 }).default("0"),
+    sickBalance: decimal("sick_balance", { precision: 8, scale: 2 }).default("0"),
+    personalBalance: decimal("personal_balance", { precision: 8, scale: 2 }).default("0"),
+    
+    // Accrual Rates (hours per pay period)
+    vacationAccrualRate: decimal("vacation_accrual_rate", { precision: 6, scale: 4 }).default("0"),
+    sickAccrualRate: decimal("sick_accrual_rate", { precision: 6, scale: 4 }).default("0"),
+    personalAccrualRate: decimal("personal_accrual_rate", { precision: 6, scale: 4 }).default("0"),
+    
+    // Annual Limits
+    vacationMaxCarryover: decimal("vacation_max_carryover", { precision: 8, scale: 2 }).default("40"),
+    sickMaxCarryover: decimal("sick_max_carryover", { precision: 8, scale: 2 }).default("40"),
+    
+    // Year-to-Date Usage
+    ytdVacationUsed: decimal("ytd_vacation_used", { precision: 8, scale: 2 }).default("0"),
+    ytdSickUsed: decimal("ytd_sick_used", { precision: 8, scale: 2 }).default("0"),
+    ytdPersonalUsed: decimal("ytd_personal_used", { precision: 8, scale: 2 }).default("0"),
+    
+    // Hire/Anniversary Date for accrual calculation
+    accrualStartDate: date("accrual_start_date"),
+    lastAccrualDate: date("last_accrual_date"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_pto_tenant").on(table.tenantId),
+    workerIdx: index("idx_pto_worker").on(table.workerId),
+  })
+);
+
+export const insertPtoBalanceSchema = createInsertSchema(ptoBalances).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPtoBalance = z.infer<typeof insertPtoBalanceSchema>;
+export type PtoBalance = typeof ptoBalances.$inferSelect;
+
+// ========================
+// PTO Requests
+// ========================
+export const ptoRequests = pgTable(
+  "pto_requests",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // Request Details
+    ptoType: varchar("pto_type", { length: 20 }).notNull(), // vacation, sick, personal
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    hoursRequested: decimal("hours_requested", { precision: 8, scale: 2 }).notNull(),
+    reason: text("reason"),
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("pending"), // pending, approved, denied, cancelled
+    reviewedBy: varchar("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at"),
+    reviewNotes: text("review_notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_pto_request_tenant").on(table.tenantId),
+    workerIdx: index("idx_pto_request_worker").on(table.workerId),
+    statusIdx: index("idx_pto_request_status").on(table.status),
+    dateIdx: index("idx_pto_request_dates").on(table.startDate),
+  })
+);
+
+export const insertPtoRequestSchema = createInsertSchema(ptoRequests).omit({
+  id: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPtoRequest = z.infer<typeof insertPtoRequestSchema>;
+export type PtoRequest = typeof ptoRequests.$inferSelect;
+
+// ========================
+// Worker Benefits Enrollment
+// ========================
+export const workerBenefitsEnrollment = pgTable(
+  "worker_benefits_enrollment",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // 401k/Retirement
+    has401k: boolean("has_401k").default(false),
+    contribution401kPercent: decimal("contribution_401k_percent", { precision: 5, scale: 2 }).default("0"),
+    contribution401kFlat: decimal("contribution_401k_flat", { precision: 10, scale: 2 }).default("0"),
+    employerMatchPercent: decimal("employer_match_percent", { precision: 5, scale: 2 }).default("0"),
+    employerMatchLimit: decimal("employer_match_limit", { precision: 10, scale: 2 }),
+    vestingPercent: decimal("vesting_percent", { precision: 5, scale: 2 }).default("0"),
+    
+    // Health Insurance
+    hasHealthInsurance: boolean("has_health_insurance").default(false),
+    healthPlanTier: varchar("health_plan_tier", { length: 50 }), // employee, employee_spouse, employee_children, family
+    healthDeductionPerPaycheck: decimal("health_deduction_per_paycheck", { precision: 10, scale: 2 }).default("0"),
+    
+    // Dental Insurance
+    hasDentalInsurance: boolean("has_dental_insurance").default(false),
+    dentalDeductionPerPaycheck: decimal("dental_deduction_per_paycheck", { precision: 10, scale: 2 }).default("0"),
+    
+    // Vision Insurance
+    hasVisionInsurance: boolean("has_vision_insurance").default(false),
+    visionDeductionPerPaycheck: decimal("vision_deduction_per_paycheck", { precision: 10, scale: 2 }).default("0"),
+    
+    // HSA (Health Savings Account)
+    hasHsa: boolean("has_hsa").default(false),
+    hsaContributionPerPaycheck: decimal("hsa_contribution_per_paycheck", { precision: 10, scale: 2 }).default("0"),
+    
+    // FSA (Flexible Spending Account)
+    hasFsa: boolean("has_fsa").default(false),
+    fsaContributionPerPaycheck: decimal("fsa_contribution_per_paycheck", { precision: 10, scale: 2 }).default("0"),
+    
+    // Life Insurance
+    hasLifeInsurance: boolean("has_life_insurance").default(false),
+    lifeInsuranceDeduction: decimal("life_insurance_deduction", { precision: 10, scale: 2 }).default("0"),
+    
+    // Total Pre-tax Deductions Per Paycheck
+    totalPreTaxDeductions: decimal("total_pre_tax_deductions", { precision: 10, scale: 2 }).default("0"),
+    
+    // Enrollment Dates
+    enrollmentDate: date("enrollment_date"),
+    effectiveDate: date("effective_date"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_benefits_enrollment_tenant").on(table.tenantId),
+    workerIdx: index("idx_benefits_enrollment_worker").on(table.workerId),
+  })
+);
+
+export const insertWorkerBenefitsEnrollmentSchema = createInsertSchema(workerBenefitsEnrollment).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWorkerBenefitsEnrollment = z.infer<typeof insertWorkerBenefitsEnrollmentSchema>;
+export type WorkerBenefitsEnrollment = typeof workerBenefitsEnrollment.$inferSelect;
 
 // ========================
 // Garnishment Documents

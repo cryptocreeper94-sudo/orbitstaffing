@@ -5,9 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { DollarSign, Download, Eye, FileText, ArrowLeft, Calendar, Users } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { DollarSign, Download, Eye, FileText, ArrowLeft, Calendar, Users, AlertTriangle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -66,6 +67,25 @@ interface PaystubData {
   status?: string;
 }
 
+interface PayrollPreviewData {
+  workerId: string;
+  workerName: string;
+  regularHours: number;
+  overtimeHours: number;
+  hourlyRate: number;
+  grossPay: number;
+  federalTax: number;
+  stateTax: number;
+  ssTax: number;
+  medicareTax: number;
+  localTax: number;
+  benefitsDeductions: number;
+  garnishments: number;
+  netPay: number;
+  ytdGross?: number;
+  ytdNet?: number;
+}
+
 export default function PayrollProcessing() {
   const [workers, setWorkers] = useState<WorkerPayrollData[]>([]);
   const [selectedWorkers, setSelectedWorkers] = useState<Set<string>>(new Set());
@@ -80,6 +100,12 @@ export default function PayrollProcessing() {
   // Paystub preview
   const [previewPaystub, setPreviewPaystub] = useState<PaystubData | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  
+  // Payroll confirmation preview
+  const [showPayrollPreview, setShowPayrollPreview] = useState(false);
+  const [payrollPreviewData, setPayrollPreviewData] = useState<PayrollPreviewData[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [confirmationChecked, setConfirmationChecked] = useState(false);
 
   useEffect(() => {
     loadWorkersReadyForPayroll();
@@ -103,6 +129,76 @@ export default function PayrollProcessing() {
       toast.error('Error loading workers');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const previewPayroll = async (workerIds: string[]) => {
+    if (workerIds.length === 0) {
+      toast.error('Please select workers to preview');
+      return;
+    }
+
+    setPreviewLoading(true);
+    setConfirmationChecked(false);
+    
+    try {
+      const res = await fetch('/api/payroll/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workerIds,
+          payPeriodStart: currentWeekStart.toISOString(),
+          payPeriodEnd: currentWeekEnd.toISOString(),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setPayrollPreviewData(data.previews || []);
+        setShowPayrollPreview(true);
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to generate preview');
+        
+        // Fallback: create preview from existing worker data
+        const previews: PayrollPreviewData[] = workerIds.map(id => {
+          const worker = workers.find(w => w.workerId === id);
+          if (!worker) return null;
+          
+          const hourlyRate = Number(worker.hourlyWage) || 15;
+          const regularHours = Number(worker.regularHours) || 40;
+          const overtimeHours = Number(worker.overtimeHours) || 0;
+          const grossPay = worker.grossPay || (regularHours * hourlyRate + overtimeHours * hourlyRate * 1.5);
+          const estimatedDeductions = worker.estimatedDeductions || grossPay * 0.25;
+          
+          return {
+            workerId: worker.workerId,
+            workerName: worker.workerName,
+            regularHours,
+            overtimeHours,
+            hourlyRate,
+            grossPay,
+            federalTax: grossPay * 0.12,
+            stateTax: grossPay * 0.04,
+            ssTax: grossPay * 0.062,
+            medicareTax: grossPay * 0.0145,
+            localTax: 0,
+            benefitsDeductions: 0,
+            garnishments: 0,
+            netPay: grossPay - estimatedDeductions,
+          };
+        }).filter(Boolean) as PayrollPreviewData[];
+        
+        if (previews.length > 0) {
+          setPayrollPreviewData(previews);
+          setShowPayrollPreview(true);
+        }
+      }
+    } catch (err) {
+      console.error('Preview error:', err);
+      toast.error('Error generating preview');
+    } finally {
+      setPreviewLoading(false);
     }
   };
 
@@ -135,7 +231,9 @@ export default function PayrollProcessing() {
           });
         }
         
-        // Reload workers
+        // Close preview dialog and reload
+        setShowPayrollPreview(false);
+        setConfirmationChecked(false);
         await loadWorkersReadyForPayroll();
         setSelectedWorkers(new Set());
       } else {
@@ -357,12 +455,16 @@ export default function PayrollProcessing() {
               </div>
               
               <Button
-                onClick={() => processPayroll(filteredWorkers.map(w => w.workerId))}
-                disabled={loading || filteredWorkers.length === 0}
+                onClick={() => previewPayroll(filteredWorkers.map(w => w.workerId))}
+                disabled={loading || previewLoading || filteredWorkers.length === 0}
                 className="bg-green-600 hover:bg-green-700 h-10"
                 data-testid="button-run-payroll-all"
               >
-                💰 Run Payroll for {filteredWorkers.length} worker(s)
+                {previewLoading ? (
+                  <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Calculating...</>
+                ) : (
+                  <>💰 Preview Payroll for {filteredWorkers.length} worker(s)</>
+                )}
               </Button>
             </div>
           </CardContent>
@@ -421,13 +523,16 @@ export default function PayrollProcessing() {
                 <div className="flex-1" />
                 
                 <Button
-                  onClick={() => processPayroll(Array.from(selectedWorkers))}
-                  disabled={loading || selectedWorkers.size === 0}
+                  onClick={() => previewPayroll(Array.from(selectedWorkers))}
+                  disabled={loading || previewLoading || selectedWorkers.size === 0}
                   className="bg-green-600 hover:bg-green-700"
                   data-testid="button-process-selected"
                 >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Process Selected ({selectedWorkers.size})
+                  {previewLoading ? (
+                    <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Calculating...</>
+                  ) : (
+                    <><Eye className="w-4 h-4 mr-2" /> Preview Selected ({selectedWorkers.size})</>
+                  )}
                 </Button>
                 
                 <Button
@@ -608,8 +713,8 @@ export default function PayrollProcessing() {
                         </Button>
                         <Button
                           size="sm"
-                          onClick={() => processPayroll([worker.workerId])}
-                          disabled={loading}
+                          onClick={() => previewPayroll([worker.workerId])}
+                          disabled={loading || previewLoading}
                           className="bg-green-600 hover:bg-green-700"
                         >
                           <DollarSign className="w-4 h-4 mr-2" />
@@ -624,6 +729,143 @@ export default function PayrollProcessing() {
           </div>
         )}
       </div>
+
+      {/* Payroll Preview Confirmation Dialog */}
+      <Dialog open={showPayrollPreview} onOpenChange={setShowPayrollPreview}>
+        <DialogContent className="max-w-5xl max-h-[90vh] bg-slate-900 border-slate-700" data-testid="dialog-payroll-preview">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <AlertTriangle className="w-5 h-5 text-yellow-500" />
+              Payroll Preview - Confirm Before Processing
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Review the calculated amounts carefully before processing. Once processed, changes require a correction entry.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[50vh]">
+            <div className="space-y-4">
+              {/* Summary */}
+              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <h3 className="text-lg font-semibold text-white mb-3">Payroll Summary</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-white">{payrollPreviewData.length}</p>
+                    <p className="text-xs text-gray-400">Workers</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-green-400">
+                      {formatCurrency(payrollPreviewData.reduce((sum, p) => sum + p.grossPay, 0))}
+                    </p>
+                    <p className="text-xs text-gray-400">Total Gross</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-red-400">
+                      {formatCurrency(payrollPreviewData.reduce((sum, p) => 
+                        sum + p.federalTax + p.stateTax + p.ssTax + p.medicareTax + p.localTax + p.benefitsDeductions + p.garnishments, 0))}
+                    </p>
+                    <p className="text-xs text-gray-400">Total Deductions</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-cyan-400">
+                      {formatCurrency(payrollPreviewData.reduce((sum, p) => sum + p.netPay, 0))}
+                    </p>
+                    <p className="text-xs text-gray-400">Total Net Pay</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Worker Details */}
+              <div className="space-y-2">
+                {payrollPreviewData.map((preview) => (
+                  <div key={preview.workerId} className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-white">{preview.workerName}</h4>
+                      <Badge variant="outline" className="text-cyan-400 border-cyan-400">
+                        Net: {formatCurrency(preview.netPay)}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 text-sm">
+                      <div>
+                        <p className="text-gray-500">Hours</p>
+                        <p className="text-white">{preview.regularHours} + {preview.overtimeHours} OT</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Gross</p>
+                        <p className="text-green-400">{formatCurrency(preview.grossPay)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Federal</p>
+                        <p className="text-red-400">-{formatCurrency(preview.federalTax)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">FICA</p>
+                        <p className="text-red-400">-{formatCurrency(preview.ssTax + preview.medicareTax)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">State/Local</p>
+                        <p className="text-red-400">-{formatCurrency(preview.stateTax + preview.localTax)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Other</p>
+                        <p className="text-red-400">-{formatCurrency(preview.benefitsDeductions + preview.garnishments)}</p>
+                      </div>
+                    </div>
+
+                    {preview.ytdGross && (
+                      <div className="mt-2 pt-2 border-t border-slate-700 text-xs text-gray-500">
+                        YTD: Gross {formatCurrency(preview.ytdGross)} | Net {formatCurrency(preview.ytdNet || 0)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+          
+          <div className="space-y-4 pt-4 border-t border-slate-700">
+            {/* Confirmation Checkbox */}
+            <div className="flex items-center gap-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4">
+              <Checkbox
+                id="confirm-payroll"
+                checked={confirmationChecked}
+                onCheckedChange={(checked) => setConfirmationChecked(checked === true)}
+                data-testid="checkbox-confirm-payroll"
+              />
+              <label htmlFor="confirm-payroll" className="text-sm text-yellow-200 cursor-pointer">
+                I have reviewed all calculations and confirm they are correct. I understand that processing payroll will create official pay records and cannot be undone without a correction entry.
+              </label>
+            </div>
+            
+            <DialogFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPayrollPreview(false);
+                  setConfirmationChecked(false);
+                }}
+                className="border-slate-600"
+                data-testid="button-cancel-payroll"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => processPayroll(payrollPreviewData.map(p => p.workerId))}
+                disabled={!confirmationChecked || loading}
+                className="bg-green-600 hover:bg-green-700"
+                data-testid="button-confirm-process"
+              >
+                {loading ? (
+                  <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Processing...</>
+                ) : (
+                  <><CheckCircle className="w-4 h-4 mr-2" /> Confirm & Process Payroll</>
+                )}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Paystub Preview Dialog */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>

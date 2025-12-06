@@ -33,12 +33,29 @@ interface PaystubData {
   localTax?: string | number;
   totalMandatoryDeductions: string | number;
   
+  // Benefits Deductions
+  retirement401k?: string | number;
+  healthInsurance?: string | number;
+  dentalInsurance?: string | number;
+  visionInsurance?: string | number;
+  hsaContribution?: string | number;
+  fsaContribution?: string | number;
+  totalBenefitsDeductions?: string | number;
+  
   // Garnishments
   totalGarnishments?: string | number;
   garnishmentsBreakdown?: any[];
   
   // Net
   netPay: string | number;
+  
+  // Year-to-Date (YTD)
+  ytdGrossPay?: string | number;
+  ytdFederalTax?: string | number;
+  ytdStateTax?: string | number;
+  ytdSocialSecurity?: string | number;
+  ytdMedicare?: string | number;
+  ytdNetPay?: string | number;
   
   // Metadata
   hallmarkAssetNumber?: string;
@@ -53,7 +70,8 @@ interface PaystubProps {
 }
 
 export function Paystub({ paystub, className = '' }: PaystubProps) {
-  const formatCurrency = (value: string | number) => {
+  const formatCurrency = (value: string | number | undefined | null) => {
+    if (value === undefined || value === null) return '$0.00';
     const num = typeof value === 'string' ? parseFloat(value) : value;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -192,6 +210,57 @@ export function Paystub({ paystub, className = '' }: PaystubProps) {
         </table>
       </div>
 
+      {/* Benefits Deductions (Pre-tax) */}
+      {(parseFloat(paystub.totalBenefitsDeductions?.toString() || '0') > 0) && (
+        <div className="mb-6">
+          <div className="font-bold text-sm mb-2 uppercase border-b border-black">Benefits Deductions (Pre-Tax)</div>
+          <table className="w-full text-sm">
+            <tbody>
+              {parseFloat(paystub.retirement401k?.toString() || '0') > 0 && (
+                <tr>
+                  <td className="py-1">401(k) Contribution</td>
+                  <td className="text-right text-orange-600" data-testid="text-401k">-{formatCurrency(paystub.retirement401k)}</td>
+                </tr>
+              )}
+              {parseFloat(paystub.healthInsurance?.toString() || '0') > 0 && (
+                <tr>
+                  <td className="py-1">Health Insurance</td>
+                  <td className="text-right text-orange-600" data-testid="text-health-insurance">-{formatCurrency(paystub.healthInsurance)}</td>
+                </tr>
+              )}
+              {parseFloat(paystub.dentalInsurance?.toString() || '0') > 0 && (
+                <tr>
+                  <td className="py-1">Dental Insurance</td>
+                  <td className="text-right text-orange-600" data-testid="text-dental">-{formatCurrency(paystub.dentalInsurance)}</td>
+                </tr>
+              )}
+              {parseFloat(paystub.visionInsurance?.toString() || '0') > 0 && (
+                <tr>
+                  <td className="py-1">Vision Insurance</td>
+                  <td className="text-right text-orange-600" data-testid="text-vision">-{formatCurrency(paystub.visionInsurance)}</td>
+                </tr>
+              )}
+              {parseFloat(paystub.hsaContribution?.toString() || '0') > 0 && (
+                <tr>
+                  <td className="py-1">HSA Contribution</td>
+                  <td className="text-right text-orange-600" data-testid="text-hsa">-{formatCurrency(paystub.hsaContribution)}</td>
+                </tr>
+              )}
+              {parseFloat(paystub.fsaContribution?.toString() || '0') > 0 && (
+                <tr>
+                  <td className="py-1">FSA Contribution</td>
+                  <td className="text-right text-orange-600" data-testid="text-fsa">-{formatCurrency(paystub.fsaContribution)}</td>
+                </tr>
+              )}
+              <tr className="border-t border-gray-400 font-semibold">
+                <td className="py-1">Total Benefits</td>
+                <td className="text-right text-orange-600" data-testid="text-total-benefits">-{formatCurrency(paystub.totalBenefitsDeductions)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Net Pay */}
       <div className="mb-6 bg-gray-100 p-4 border-2 border-black">
         <div className="flex justify-between items-center">
@@ -199,6 +268,52 @@ export function Paystub({ paystub, className = '' }: PaystubProps) {
           <div className="font-bold text-2xl text-green-600" data-testid="text-net-pay">{formatCurrency(paystub.netPay)}</div>
         </div>
       </div>
+
+      {/* Year-to-Date (YTD) Summary */}
+      {(parseFloat(paystub.ytdGrossPay?.toString() || '0') > 0) && (
+        <div className="mb-6">
+          <div className="font-bold text-sm mb-2 uppercase border-b border-black">Year-to-Date (YTD) Summary</div>
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="text-center p-2 bg-gray-50 rounded">
+              <div className="text-gray-500 text-xs">YTD Gross</div>
+              <div className="font-bold text-green-600" data-testid="text-ytd-gross">{formatCurrency(paystub.ytdGrossPay)}</div>
+            </div>
+            <div className="text-center p-2 bg-gray-50 rounded">
+              <div className="text-gray-500 text-xs">YTD Taxes</div>
+              <div className="font-bold text-red-600" data-testid="text-ytd-taxes">
+                -{formatCurrency(
+                  parseFloat(paystub.ytdFederalTax?.toString() || '0') +
+                  parseFloat(paystub.ytdStateTax?.toString() || '0') +
+                  parseFloat(paystub.ytdSocialSecurity?.toString() || '0') +
+                  parseFloat(paystub.ytdMedicare?.toString() || '0')
+                )}
+              </div>
+            </div>
+            <div className="text-center p-2 bg-gray-50 rounded">
+              <div className="text-gray-500 text-xs">YTD Net</div>
+              <div className="font-bold text-blue-600" data-testid="text-ytd-net">{formatCurrency(paystub.ytdNetPay)}</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-2 text-xs mt-2 text-gray-500">
+            <div className="text-center">
+              <span>Fed: </span>
+              <span data-testid="text-ytd-federal">{formatCurrency(paystub.ytdFederalTax)}</span>
+            </div>
+            <div className="text-center">
+              <span>State: </span>
+              <span data-testid="text-ytd-state">{formatCurrency(paystub.ytdStateTax)}</span>
+            </div>
+            <div className="text-center">
+              <span>SS: </span>
+              <span data-testid="text-ytd-ss">{formatCurrency(paystub.ytdSocialSecurity)}</span>
+            </div>
+            <div className="text-center">
+              <span>Med: </span>
+              <span data-testid="text-ytd-medicare">{formatCurrency(paystub.ytdMedicare)}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <Separator className="my-4 bg-black" />

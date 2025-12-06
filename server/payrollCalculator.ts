@@ -1,5 +1,6 @@
 import { Decimal } from "decimal.js";
 import type { EmployeeW4Data, GarnishmentOrder } from "@shared/schema";
+import { calculateStateTax as calculateStateTaxFromRates, stateHasLocalTax } from "./stateTaxRates";
 
 // 2025 Federal Income Tax Brackets
 const TAX_BRACKETS_2025 = {
@@ -94,7 +95,7 @@ export interface GarnishmentDeduction {
   type: string;
   amount: number;
   percentage?: number;
-  priority: number;
+  priority: number | null;
 }
 
 export interface PayrollBreakdown {
@@ -214,9 +215,9 @@ function calculateMedicareTax(
   const regularTax = grossPay * MEDICARE_RATE;
 
   // Additional Medicare tax (0.9%) on wages over threshold
-  const filingStatus = w4Data.fillingStatus as keyof typeof ADDITIONAL_MEDICARE_THRESHOLD_SINGLE;
+  const filingStatusStr = String(w4Data.fillingStatus || 'single');
   const threshold =
-    filingStatus === "married"
+    filingStatusStr === "married"
       ? ADDITIONAL_MEDICARE_THRESHOLD_MARRIED
       : ADDITIONAL_MEDICARE_THRESHOLD_SINGLE;
 
@@ -238,38 +239,90 @@ function calculateMedicareTax(
 }
 
 /**
- * Calculate state income tax
+ * Calculate state income tax using all-50-states tax tables
  */
-function calculateStateTax(grossPay: number, workState: string): number {
-  if (workState === "TN") {
-    // Tennessee has no state income tax
-    return 0;
-  }
-
-  if (workState === "KY") {
-    // Kentucky: 4% of (annualized gross - $3,270 standard deduction) / 52 weeks
-    const annualDeduction = 3270;
-    const annualizedGross = grossPay * 52;
-    const taxableIncome = Math.max(0, annualizedGross - annualDeduction);
-    const annualTax = taxableIncome * 0.04;
-    return annualTax / 52;
-  }
-
-  return 0;
+function calculateStateTax(grossPay: number, workState: string, filingStatus: 'single' | 'married' = 'single'): number {
+  // Annualize the weekly pay
+  const annualGross = grossPay * 52;
+  
+  // Calculate annual state tax using the state tax rates
+  const { tax: annualTax } = calculateStateTaxFromRates(annualGross, workState, filingStatus);
+  
+  // Return weekly amount
+  return annualTax / 52;
 }
 
 /**
- * Calculate local occupational tax (Kentucky only)
+ * Calculate local occupational tax (varies by state/city)
  */
 function calculateLocalTax(grossPay: number, workState: string, workCity?: string): number {
-  if (workState !== "KY") {
+  // Check if state has local tax
+  if (!stateHasLocalTax(workState)) {
     return 0;
   }
 
-  const cityLower = (workCity || "default").toLowerCase();
-  const rate = KY_LOCAL_TAX_RATES[cityLower] || KY_LOCAL_TAX_RATES.default;
+  // Kentucky local tax rates
+  if (workState === "KY") {
+    const cityLower = (workCity || "default").toLowerCase();
+    const rate = KY_LOCAL_TAX_RATES[cityLower] || KY_LOCAL_TAX_RATES.default;
+    return grossPay * rate;
+  }
 
-  return grossPay * rate;
+  // Ohio local taxes (vary significantly by city, using common rate)
+  if (workState === "OH") {
+    return grossPay * 0.02; // Common rate is 2%
+  }
+
+  // Pennsylvania local taxes
+  if (workState === "PA") {
+    return grossPay * 0.01; // Common rate around 1%
+  }
+
+  // Indiana local taxes
+  if (workState === "IN") {
+    return grossPay * 0.015; // Average county rate
+  }
+
+  // Michigan local taxes
+  if (workState === "MI") {
+    return grossPay * 0.01; // Common rate
+  }
+
+  // Maryland local taxes
+  if (workState === "MD") {
+    return grossPay * 0.0305; // Average county rate
+  }
+
+  // New York local taxes
+  if (workState === "NY") {
+    const cityLower = (workCity || "").toLowerCase();
+    if (cityLower.includes("new york") || cityLower.includes("nyc")) {
+      return grossPay * 0.03876; // NYC resident rate
+    }
+    if (cityLower.includes("yonkers")) {
+      return grossPay * 0.01595; // Yonkers resident rate
+    }
+    return 0;
+  }
+
+  // Illinois local taxes (only some cities)
+  if (workState === "IL") {
+    return 0; // Most IL local taxes are very small
+  }
+
+  // Missouri local taxes
+  if (workState === "MO") {
+    const cityLower = (workCity || "").toLowerCase();
+    if (cityLower.includes("kansas city")) {
+      return grossPay * 0.01;
+    }
+    if (cityLower.includes("st. louis") || cityLower.includes("saint louis")) {
+      return grossPay * 0.01;
+    }
+    return 0;
+  }
+
+  return 0;
 }
 
 /**
@@ -278,7 +331,7 @@ function calculateLocalTax(grossPay: number, workState: string, workCity?: strin
 function sortGarnishmentsByPriority(
   garnishments: GarnishmentOrder[]
 ): GarnishmentOrder[] {
-  return [...garnishments].sort((a, b) => a.priority - b.priority);
+  return [...garnishments].sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999));
 }
 
 /**

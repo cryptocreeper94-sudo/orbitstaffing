@@ -248,6 +248,64 @@ export default function EmployeeHub() {
               </TabsContent>
 
               <TabsContent value="pay" className="space-y-4">
+                {/* Upcoming Pay Preview */}
+                <Card className="bg-gradient-to-br from-cyan-900/30 to-slate-800/50 border-cyan-500/30">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-5 h-5 text-cyan-400" />
+                        Upcoming Pay Estimate
+                      </div>
+                      <Badge className="bg-cyan-600/20 text-cyan-400 border-cyan-500/30">Dec 6, 2024</Badge>
+                    </CardTitle>
+                    <CardDescription>Based on your approved hours this pay period</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="text-center p-3 rounded-lg bg-slate-900/50">
+                        <p className="text-xs text-slate-400">Regular Hours</p>
+                        <p className="text-2xl font-bold text-white" data-testid="text-upcoming-regular-hours">40.0</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-slate-900/50">
+                        <p className="text-xs text-slate-400">Overtime Hours</p>
+                        <p className="text-2xl font-bold text-amber-400" data-testid="text-upcoming-overtime-hours">4.5</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-slate-900/50">
+                        <p className="text-xs text-slate-400">Est. Gross Pay</p>
+                        <p className="text-2xl font-bold text-white" data-testid="text-upcoming-gross">$1,469.25</p>
+                      </div>
+                      <div className="text-center p-3 rounded-lg bg-slate-900/50 border border-green-500/30">
+                        <p className="text-xs text-slate-400">Est. Net Pay</p>
+                        <p className="text-2xl font-bold text-green-400" data-testid="text-upcoming-net">$1,156.89</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-center text-sm mb-4">
+                      <div className="p-2 rounded bg-slate-900/30">
+                        <p className="text-xs text-red-400">Federal Tax</p>
+                        <p className="font-medium text-red-300" data-testid="text-upcoming-fed-tax">-$176.31</p>
+                      </div>
+                      <div className="p-2 rounded bg-slate-900/30">
+                        <p className="text-xs text-red-400">State Tax</p>
+                        <p className="font-medium text-red-300" data-testid="text-upcoming-state-tax">-$0.00</p>
+                      </div>
+                      <div className="p-2 rounded bg-slate-900/30">
+                        <p className="text-xs text-red-400">FICA (SS + Med)</p>
+                        <p className="font-medium text-red-300" data-testid="text-upcoming-fica">-$112.40</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-cyan-900/20 border border-cyan-500/20">
+                      <div className="flex items-center gap-2 text-sm text-cyan-300">
+                        <Clock className="w-4 h-4" />
+                        Pay Period: Nov 25 - Dec 1, 2024
+                      </div>
+                      <Button size="sm" variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10" data-testid="button-view-detailed-breakdown">
+                        View Detailed Breakdown
+                        <ChevronRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <Card className="bg-slate-800/50 border-slate-700/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">

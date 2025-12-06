@@ -531,6 +531,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         { id: 'sandbox-demo', title: 'Sandbox demo system ready for testing', completed: true },
         { id: 'payment-integration', title: 'Stripe payment integration connected', completed: false },
         { id: 'coinbase-integration', title: 'Coinbase Commerce integration connected', completed: false },
+        { id: 'plaid-integration', title: 'Plaid integration for direct deposit ACH (dev portal setup)', completed: false },
         { id: 'google-play', title: 'Submit app to Google Play Store', completed: false },
         { id: 'app-store', title: 'Submit app to Apple App Store', completed: false },
       ]
