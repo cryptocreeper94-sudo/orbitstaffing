@@ -619,6 +619,31 @@ const TODO_TASKS = [
       '💡 ADD TO ORBIT: Add equipment ordering to franchise dashboard',
     ],
   },
+  {
+    id: 'ecosystem-hub',
+    name: '🌐 DarkWave Ecosystem Hub - Connect Products',
+    priority: 'HIGH',
+    priorityBadge: '🔗 INTEGRATION',
+    priorityColor: 'cyan',
+    why: 'Connect all DarkWave products to share workers, timesheets, 1099 data, and code snippets',
+    setupGuide: '/ecosystem-hub',
+    action: 'Register remaining DarkWave products',
+    notes: [
+      '✅ COMPLETED: ORBIT Staffing OS & Brew & Board Coffee registered',
+      '',
+      '📋 PRODUCTS TO REGISTER:',
+      '• Lot Ops Pro (lotops.pro) - Vehicle lot management',
+      '• GarageBot (garagebot.io) - Auto shop assistant',
+      '• DarkWave Pulse - Analytics dashboard',
+      '• Orby (getorby.io) - AI mascot platform',
+      '',
+      '🔑 CREDENTIALS SAVED:',
+      '• ORBIT: dw_app_4347af9... (sync:all)',
+      '• Brew & Board: dw_app_54bf4a7... (workers, timesheets, 1099, code)',
+      '',
+      '💡 NEXT: When building other products, use Ecosystem Client to connect',
+    ],
+  },
 ];
 
 // Integration status mapping to task IDs
