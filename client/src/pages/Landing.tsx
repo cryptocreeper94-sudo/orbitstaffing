@@ -167,7 +167,7 @@ export default function Landing() {
             <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
               <Link href="/changelog" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-cyan-400 hover:bg-slate-800 rounded-lg transition">
                 <FileText className="w-4 h-4" />
-                Version v2.6.5 - What's New
+                Version v2.6.7 - What's New
               </Link>
               <Link href="/solana-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-purple-400 hover:bg-slate-800 rounded-lg transition">
                 <Coins className="w-4 h-4" />
@@ -1078,7 +1078,7 @@ export default function Landing() {
           <span>© 2025</span>
           <span>|</span>
           <Link href="/changelog" className="text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version-footer">
-            v2.6.5
+            v2.6.7
           </Link>
         </div>
       </footer>
