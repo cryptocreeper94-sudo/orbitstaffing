@@ -7,21 +7,21 @@ interface DarkwaveFooterProps {
 export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot Ops Pro", hidePoweredBy = false, minimal = false }) => {
   if (minimal) {
     return (
-      <footer className="w-full bg-slate-950 border-t border-slate-800 py-3 px-6">
-        <div className="max-w-7xl mx-auto flex items-baseline justify-between text-xs">
+      <footer className="w-full bg-slate-950 border-t border-slate-800 py-4 px-6 shrink-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-xs">
           <a 
             href="/developer" 
-            className="text-slate-500 hover:text-cyan-400 transition leading-none"
+            className="text-slate-400 hover:text-cyan-400 transition"
             data-testid="link-developer-footer"
           >
             Developer
           </a>
           
-          <p className="text-slate-500 leading-none">
+          <p className="text-slate-400">
             DarkWave Studios, LLC © 2025
           </p>
           
-          <span className="text-slate-600 font-mono leading-none">
+          <span className="text-slate-500 font-mono">
             v2.6.3
           </span>
         </div>
