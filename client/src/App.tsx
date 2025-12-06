@@ -74,6 +74,7 @@ import MeetingPresentations from "@/pages/MeetingPresentations";
 import PresentationViewer from "@/pages/PresentationViewer";
 import SolanaVerification from "@/pages/SolanaVerification";
 import Changelog from "@/pages/Changelog";
+import EcosystemHub from "@/pages/EcosystemHub";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -200,6 +201,7 @@ function Router() {
       <Route path="/about" component={AboutUs} />
       <Route path="/solana-verification" component={SolanaVerification} />
       <Route path="/changelog" component={Changelog} />
+      <Route path="/ecosystem-hub" component={EcosystemHub} />
       <Route component={NotFound} />
     </Switch>
   );

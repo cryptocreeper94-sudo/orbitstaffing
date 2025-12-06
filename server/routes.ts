@@ -21,6 +21,7 @@ import path from "path";
 import fs from "fs";
 import express from "express";
 import { azureFaceService } from "./azureFaceService";
+import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -9323,9 +9324,6 @@ export function registerPayCardRoutes(app: Express) {
   // ========================
   // DARKWAVE ECOSYSTEM HUB API
   // ========================
-
-  const ecosystemModule = await import("./ecosystemHub");
-  const { ecosystemHub, externalHubManager, EcosystemClient } = ecosystemModule;
 
   // Middleware to authenticate ecosystem API requests
   async function ecosystemAuth(req: Request, res: Response, next: NextFunction) {
