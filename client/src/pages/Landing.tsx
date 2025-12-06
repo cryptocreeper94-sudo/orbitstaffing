@@ -763,7 +763,7 @@ export default function Landing() {
           <div className="grid grid-cols-2 gap-2 sm:gap-6 mb-4">
             {/* ORBIT Staffing OS */}
             <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border-violet-500/50 hover:border-violet-400/80 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">
-              <CardContent className="p-2 sm:p-6 flex flex-col h-full">
+              <CardContent className="p-2 sm:p-6 pt-4 sm:pt-8 flex flex-col h-full">
                 <div className="flex flex-col items-center text-center mb-2 sm:mb-3">
                   <img 
                     src="/mascot/clean/orbit_mascot_cyan_saturn_style_transparent_clean.png" 
