@@ -318,17 +318,17 @@ export function OrbitChatAssistant() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-4 z-[150] w-12 h-12 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 border border-cyan-400/50 shadow-lg shadow-cyan-500/30 flex items-center justify-center hover:scale-110 transition-transform"
-          style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.4))' }}
+          className="fixed bottom-20 right-4 z-[200] w-14 h-14 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-400 shadow-xl shadow-cyan-500/50 flex items-center justify-center hover:scale-110 transition-transform"
+          style={{ filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.6))' }}
           data-testid="button-orbit-chat"
           aria-label="Open Orby chat"
         >
           <img 
             src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
             alt="Orby" 
-            className="w-8 h-8 object-contain"
+            className="w-10 h-10 object-contain"
           />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
         </motion.button>
       )}
     </>

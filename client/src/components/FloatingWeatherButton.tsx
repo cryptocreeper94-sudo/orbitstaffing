@@ -179,6 +179,8 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
     },
     enabled: !!zipCode && zipCode.length === 5,
     staleTime: 1000 * 60 * 60 * 24,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   useEffect(() => {
@@ -201,6 +203,8 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
     enabled: !!coordinates,
     staleTime: 1000 * 60 * 10,
     refetchInterval: 1000 * 60 * 30,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const handleZipSubmit = (e: React.FormEvent) => {
@@ -470,23 +474,47 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             </span>
           </motion.div>
         ) : isLoading ? (
-          <motion.span
-            className="text-4xl block"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.5))' }}
-          >
-            🌀
-          </motion.span>
-        ) : (
-          <motion.span 
-            className="text-4xl block"
+          <motion.div 
+            className="relative"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.4))' }}
           >
-            🌤️
-          </motion.span>
+            <span
+              className="text-5xl leading-none block"
+              style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.5))' }}
+            >
+              ☁️
+            </span>
+            <span 
+              className="absolute bottom-1 right-0 text-[10px] font-black text-cyan-400 leading-none animate-pulse"
+              style={{ 
+                textShadow: '0 0 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,1)'
+              }}
+            >
+              ...
+            </span>
+          </motion.div>
+        ) : (
+          <motion.div 
+            className="relative"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <span
+              className="text-5xl leading-none block"
+              style={{ filter: 'drop-shadow(0 0 10px rgba(6,182,212,0.4))' }}
+            >
+              ☁️
+            </span>
+            <span 
+              className="absolute bottom-1 right-0 text-[10px] font-black text-slate-400 leading-none"
+              style={{ 
+                textShadow: '0 0 4px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,1)'
+              }}
+            >
+              --°
+            </span>
+          </motion.div>
         )}
       </motion.button>
     </div>
