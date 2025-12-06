@@ -127,10 +127,10 @@ export default function Landing() {
       {/* Header */}
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 h-11 sm:h-12">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full h-full flex items-end justify-between gap-2 sm:gap-6">
-          <div className="flex items-end gap-2 flex-shrink-0">
+          <div className="flex items-end gap-2 flex-shrink-0 pb-1">
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none sm:hidden">ORBIT</span>
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none hidden sm:inline">Why ORBIT Staffing OS</span>
-            <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors leading-none" data-testid="link-version">
+            <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors leading-none pb-[1px]" data-testid="link-version">
               v2.6.4
             </Link>
           </div>
