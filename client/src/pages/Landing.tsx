@@ -130,9 +130,6 @@ export default function Landing() {
           <div className="flex h-full items-end gap-2 flex-shrink-0 pb-2">
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none sm:hidden">ORBIT</span>
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none hidden sm:inline">Why ORBIT Staffing OS</span>
-            <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors leading-none" data-testid="link-version">
-              v2.6.4
-            </Link>
           </div>
           
           {/* Mobile Hamburger Menu */}
@@ -1084,7 +1081,12 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div>
-                <div className="font-heading font-bold text-lg text-white">ORBIT Staffing</div>
+                <div className="font-heading font-bold text-lg text-white flex items-center gap-2">
+                  ORBIT Staffing
+                  <Link href="/changelog" className="text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version-footer">
+                    v2.6.4
+                  </Link>
+                </div>
                 <div className="text-xs text-slate-400">Powered by DarkWave Studios</div>
               </div>
             </div>
