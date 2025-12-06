@@ -52,9 +52,10 @@ export default function ProductsGallery() {
       hallmark: orbyHallmark,
     },
     {
-      id: 'DarkWave Pulse',
-      name: 'DarkWave Pulse',
+      id: 'Pulse',
+      name: 'Pulse',
       tagline: 'Predictive AI Market Intelligence',
+      hasPulseAnimation: true,
       description: 'AI-powered crypto market analysis using wave pattern recognition and predictive coding. Analyzes market trends to help traders understand what they\'re dealing with. Not financial advice - for informational purposes only.',
       color: 'from-purple-500 to-pink-600',
       glowColor: 'purple',
@@ -337,7 +338,21 @@ export default function ProductsGallery() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-base sm:text-2xl font-bold text-white truncate">{currentProduct.name}</h2>
+                    <h2 className="text-base sm:text-2xl font-bold text-white truncate">
+                      {currentProduct.hasPulseAnimation ? (
+                        <span className="relative inline-block">
+                          <span className="relative z-10">{currentProduct.name}</span>
+                          <span 
+                            className="absolute inset-0 animate-pulse rounded-lg"
+                            style={{
+                              background: 'radial-gradient(circle, rgba(239,68,68,0.6) 0%, transparent 70%)',
+                              filter: 'blur(8px)',
+                              animation: 'pulse 1.5s ease-in-out infinite',
+                            }}
+                          />
+                        </span>
+                      ) : currentProduct.name}
+                    </h2>
                     <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                       {currentProduct.tagline}
                     </p>
