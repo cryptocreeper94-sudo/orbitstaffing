@@ -144,9 +144,9 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
   const [showZipInput, setShowZipInput] = useState(false);
   const [zipCode, setZipCode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('orbit-weather-zip') || '';
+      return localStorage.getItem('orbit-weather-zip') || '37090';
     }
-    return '';
+    return '37090';
   });
   const [tempZip, setTempZip] = useState('');
   const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(() => {
