@@ -167,14 +167,26 @@ export default function ProductsGallery() {
       {/* ===== SECTION 1: HEADER (Fixed height) ===== */}
       <header className="relative z-20 py-3 px-4 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Left: Title */}
-          <div className="flex items-center gap-2">
+          {/* Left: Title + Solana Badge */}
+          <div className="flex items-center gap-3">
             <span className="text-sm sm:text-base font-medium text-slate-300">darkwavestudios.io</span>
-          </div>
-          
-          {/* Center: Version (hidden on mobile) */}
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="text-xs text-slate-500 font-mono">v2.6.0</span>
+            <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.6.0</span>
+            {/* Solana Verification Badge with QR */}
+            <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg border border-purple-500/30">
+              <div className="w-6 h-6 bg-white rounded p-0.5">
+                <QRCodeSVG 
+                  value="https://darkwavestudios.io" 
+                  size={20}
+                  level="L"
+                  bgColor="white"
+                  fgColor="#0f172a"
+                />
+              </div>
+              <div className="hidden sm:flex flex-col">
+                <span className="text-[9px] text-cyan-400 font-semibold leading-tight">SOLANA</span>
+                <span className="text-[8px] text-slate-400 leading-tight">VERIFIED</span>
+              </div>
+            </div>
           </div>
           
           {/* Right: Hamburger Menu */}
