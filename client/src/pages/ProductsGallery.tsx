@@ -179,7 +179,7 @@ export default function ProductsGallery() {
           {/* Left: Title + Solana Badge */}
           <div className="flex items-center gap-3">
             <span className="text-sm sm:text-base font-medium text-slate-300">darkwavestudios.io</span>
-            <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.6.5</span>
+            <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.6.6</span>
             {/* Solana Verification Badge with QR */}
             <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg border border-purple-500/30">
               <div className="w-6 h-6 bg-white rounded p-0.5">
@@ -241,7 +241,7 @@ export default function ProductsGallery() {
                 </a>
                 <div className="border-t border-slate-700 my-2"></div>
                 <div className="px-4 py-2 text-xs text-slate-500">
-                  Version v2.6.5 • Solana Verified
+                  Version v2.6.6 • Solana Verified
                 </div>
               </div>
             </motion.div>
