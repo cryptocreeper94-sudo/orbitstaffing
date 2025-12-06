@@ -1075,33 +1075,16 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer Banner */}
-      <footer className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-primary/20">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <div className="font-heading font-bold text-lg text-white flex items-center gap-2">
-                  ORBIT Staffing
-                  <Link href="/changelog" className="text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version-footer">
-                    v2.6.4
-                  </Link>
-                </div>
-                <div className="text-xs text-slate-400">Powered by DarkWave Studios</div>
-              </div>
-            </div>
-            <div className="text-sm text-slate-400">
-              <p>© 2025 ORBIT Staffing. All rights reserved.</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="https://darkwavestudios.io" target="_blank" className="text-primary hover:text-primary/80 transition-colors font-bold">
-                DarkWave Studios →
-              </Link>
-              <Link href="/developer" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                ⚙️
-              </Link>
-            </div>
-          </div>
+      {/* Footer */}
+      <footer className="border-t border-slate-800/50 py-3">
+        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2 text-xs text-slate-500">
+          <span>DarkWave Studios, LLC</span>
+          <span>|</span>
+          <span>© 2025</span>
+          <span>|</span>
+          <Link href="/changelog" className="text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version-footer">
+            v2.6.4
+          </Link>
         </div>
       </footer>
 
