@@ -283,7 +283,7 @@ export default function ProductsGallery() {
       </div>
 
       {/* ===== SECTION 2: FULL-SCREEN PRODUCT CARD ===== */}
-      <section className="relative z-10 h-[calc(100vh-120px)] flex items-center justify-center px-4">
+      <section className="relative z-10 flex-1 flex items-center justify-center px-4 py-4 overflow-visible">
         {/* Left Arrow */}
         <motion.button
           onClick={prevProduct}
@@ -296,7 +296,7 @@ export default function ProductsGallery() {
         </motion.button>
 
         {/* Product Card - Full Screen, Nearly Full Width */}
-        <div className="w-full max-w-6xl xl:max-w-7xl h-full flex items-center justify-center py-4 mx-8 sm:mx-12">
+        <div className="w-full max-w-6xl xl:max-w-7xl flex items-center justify-center mx-8 sm:mx-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
@@ -304,28 +304,28 @@ export default function ProductsGallery() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="w-full h-full max-h-[600px] sm:max-h-[700px] relative"
+              className="w-full relative"
             >
               {/* Glow Effect */}
               <div className={`absolute -inset-2 bg-gradient-to-r ${currentProduct.color} rounded-3xl blur-xl opacity-30`} />
               
               {/* Card Container */}
               <div
-                className="relative h-full overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900/98 via-slate-800/98 to-slate-900/98 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col"
+                className="relative overflow-visible rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900/98 via-slate-800/98 to-slate-900/98 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col"
                 data-testid={`card-product-${currentProduct.id}`}
               >
                 {/* Background Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-5`} />
                 
                 {/* Card Content */}
-                <div className="relative flex-1 flex flex-col p-6 sm:p-10">
+                <div className="relative flex flex-col p-5 sm:p-8">
                   
                   {/* Top Section: Emblem + Product Info */}
                   <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mb-6">
                     {/* Emblem */}
                     <div className="shrink-0">
                       {currentProduct.emblem ? (
-                        <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl overflow-hidden`}>
+                        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl overflow-hidden`}>
                           <img 
                             src={currentProduct.emblem} 
                             alt={`${currentProduct.name} emblem`}
@@ -333,9 +333,9 @@ export default function ProductsGallery() {
                           />
                         </div>
                       ) : (
-                        <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl`}>
+                        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl`}>
                           <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-4xl sm:text-5xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                            <span className="text-3xl sm:text-5xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                               {currentProduct.name.charAt(0)}
                             </span>
                           </div>
@@ -355,19 +355,19 @@ export default function ProductsGallery() {
                   </div>
 
                   {/* Middle Section: Description */}
-                  <div className="flex-1 flex items-center justify-center mb-6">
-                    <p className="text-gray-300 text-base sm:text-lg leading-relaxed text-center max-w-2xl">
+                  <div className="flex items-center justify-center mb-4 sm:mb-6">
+                    <p className="text-gray-300 text-sm sm:text-lg leading-relaxed text-center max-w-2xl">
                       {currentProduct.description}
                     </p>
                   </div>
 
                   {/* Bottom Section: Hallmark QR + Buttons */}
-                  <div className="flex flex-col items-center gap-6">
+                  <div className="flex flex-col items-center gap-4 sm:gap-6">
                     {/* Hallmark QR Code - Full image, not cropped */}
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-xs text-gray-500 uppercase tracking-wider">Blockchain Verified</span>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Blockchain Verified</span>
                       {currentProduct.hallmark ? (
-                        <div className="w-auto h-24 sm:h-32 max-w-[200px] rounded-xl bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-1.5 shadow-lg overflow-hidden border border-cyan-500/20">
+                        <div className="w-auto h-20 sm:h-28 max-w-[160px] sm:max-w-[200px] rounded-xl bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-1 shadow-lg overflow-hidden border border-cyan-500/20">
                           <img 
                             src={currentProduct.hallmark} 
                             alt={`${currentProduct.name} hallmark`}
@@ -375,17 +375,17 @@ export default function ProductsGallery() {
                           />
                         </div>
                       ) : currentProduct.url ? (
-                        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-white p-2 shadow-lg">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white p-1.5 shadow-lg">
                           <QRCodeSVG 
                             value={currentProduct.url} 
-                            size={96}
+                            size={80}
                             className="w-full h-full"
                             bgColor="#ffffff"
                             fgColor="#0f172a"
                           />
                         </div>
                       ) : (
-                        <div className={`w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-gradient-to-br ${currentProduct.color} p-1 opacity-30`}>
+                        <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br ${currentProduct.color} p-1 opacity-30`}>
                           <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
                             <span className="text-xs text-gray-500">Pending</span>
                           </div>
@@ -394,15 +394,15 @@ export default function ProductsGallery() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-4">
+                    <div className="flex gap-3 sm:gap-4">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 bg-gradient-to-r ${currentProduct.color} rounded-xl font-bold text-sm sm:text-base shadow-lg`}
+                        className={`px-4 sm:px-8 py-2.5 sm:py-4 inline-flex items-center justify-center gap-2 bg-gradient-to-r ${currentProduct.color} rounded-xl font-bold text-xs sm:text-base shadow-lg`}
                         onClick={() => setSelectedProduct(currentProduct.id)}
                         data-testid={`button-slideshow-${currentProduct.id}`}
                       >
-                        <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <Play className="w-3 h-3 sm:w-5 sm:h-5" />
                         Slideshow
                       </motion.button>
                       
@@ -413,21 +413,21 @@ export default function ProductsGallery() {
                           rel="noopener noreferrer"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-sm sm:text-base transition-colors"
+                          className="px-4 sm:px-8 py-2.5 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs sm:text-base transition-colors"
                           data-testid={`button-visit-${currentProduct.id}`}
                         >
-                          Visit Website
-                          <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
+                          Visit Site
+                          <ExternalLink className="w-3 h-3 sm:w-5 sm:h-5" />
                         </motion.a>
                       ) : (
-                        <div className="px-6 sm:px-8 py-3 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-xl font-bold text-sm sm:text-base text-gray-500">
+                        <div className="px-4 sm:px-8 py-2.5 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-xl font-bold text-xs sm:text-base text-gray-500">
                           Coming Soon
                         </div>
                       )}
                     </div>
 
                     {/* Product Counter */}
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-gray-500 text-xs sm:text-sm">
                       {currentIndex + 1} of {products.length}
                     </p>
                   </div>
