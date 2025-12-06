@@ -313,81 +313,24 @@ export function OrbitChatAssistant() {
         )}
       </AnimatePresence>
 
-      <div className="fixed bottom-6 right-4 z-[150]" data-testid="floating-orby-container">
-          <AnimatePresence>
-          {!isOpen && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 10 }}
-              className="absolute -top-12 right-0 bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/50 rounded-xl px-3 py-1.5 shadow-lg shadow-cyan-500/20"
-              style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.3))' }}
-            >
-              <p className="text-xs text-cyan-300 font-medium">Ask Orby</p>
-              <div className="absolute -bottom-1.5 right-6 w-3 h-3 bg-slate-900 border-r border-b border-cyan-500/50 transform rotate-45" />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
+      {!isOpen && (
         <motion.button
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative bg-transparent border-none cursor-pointer p-0 outline-none focus:outline-none"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-4 z-[150] w-12 h-12 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 border border-cyan-400/50 shadow-lg shadow-cyan-500/30 flex items-center justify-center hover:scale-110 transition-transform"
+          style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.4))' }}
           data-testid="button-orbit-chat"
-          aria-label={isOpen ? "Close Orby chat" : "Open Orby chat"}
-          aria-expanded={isOpen}
+          aria-label="Open Orby chat"
         >
-          <motion.div
-            className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-full bg-cyan-500/30 blur-xl"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          <img 
+            src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
+            alt="Orby" 
+            className="w-8 h-8 object-contain"
           />
-          
-          <motion.div
-            animate={{ 
-              y: [0, -6, 0],
-              rotate: isOpen ? 0 : [0, 2, -2, 0]
-            }}
-            transition={{ 
-              y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 8, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className="relative"
-          >
-            <img 
-              src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
-              alt="Orby - AI Assistant" 
-              className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-              style={{
-                filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.2))'
-              }}
-            />
-            
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 shadow-lg shadow-green-500/50"
-            />
-            
-            <AnimatePresence>
-              {isOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  className="absolute inset-0 flex items-center justify-center bg-slate-900/80 rounded-full"
-                >
-                  <X className="w-8 h-8 text-cyan-400" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+          <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
         </motion.button>
-      </div>
+      )}
     </>
   );
 }
