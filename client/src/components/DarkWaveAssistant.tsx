@@ -76,8 +76,8 @@ export function DarkWaveAssistant() {
           <img 
             src={darkwaveSoundwave} 
             alt="DarkWave Assistant" 
-            className="w-24 h-14 sm:w-32 sm:h-20 object-contain brightness-125 saturate-150"
-            style={{ filter: 'drop-shadow(0 0 25px rgba(168, 85, 247, 1)) drop-shadow(0 0 40px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 15px rgba(6, 182, 212, 0.6))' }}
+            className="w-36 h-20 sm:w-48 sm:h-28 object-contain brightness-125 saturate-150"
+            style={{ filter: 'drop-shadow(0 0 30px rgba(168, 85, 247, 1)) drop-shadow(0 0 50px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))' }}
           />
         </motion.button>
       </div>
