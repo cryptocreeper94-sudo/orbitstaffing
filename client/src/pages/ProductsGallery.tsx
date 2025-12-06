@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, X, ExternalLink, Sparkles, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ExternalLink, Sparkles, Play, Menu, Settings, Home, Mail, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
@@ -13,6 +13,7 @@ export default function ProductsGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
   const [showSlideshow, setShowSlideshow] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const products = [
     {
@@ -106,7 +107,7 @@ export default function ProductsGallery() {
   const currentProduct = products[currentIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Animated Background - Fixed behind everything */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Twinkling Stars */}
@@ -164,7 +165,71 @@ export default function ProductsGallery() {
       </div>
 
       {/* ===== SECTION 1: HEADER (Fixed height) ===== */}
-      <header className="relative z-10 pt-6 pb-4 text-center px-4">
+      <header className="relative z-20 py-3 px-4 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Left: Title */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm sm:text-base font-medium text-slate-300">darkwavestudios.io</span>
+          </div>
+          
+          {/* Center: Version (hidden on mobile) */}
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="text-xs text-slate-500 font-mono">v2.6.0</span>
+          </div>
+          
+          {/* Right: Hamburger Menu */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-2 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
+            data-testid="button-menu-toggle"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+        
+        {/* Dropdown Menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute top-full right-4 mt-2 w-56 bg-slate-900 border border-slate-700 rounded-lg shadow-xl shadow-black/50 overflow-hidden z-50"
+            >
+              <div className="py-2">
+                <a href="/" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
+                  <Home className="w-4 h-4" />
+                  ORBIT Staffing Home
+                </a>
+                <a href="/studio" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
+                  <Sparkles className="w-4 h-4" />
+                  Product Gallery
+                </a>
+                <a href="/developer" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
+                  <Settings className="w-4 h-4" />
+                  Developer Portal
+                </a>
+                <div className="border-t border-slate-700 my-2"></div>
+                <a href="/contact" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
+                  <Mail className="w-4 h-4" />
+                  Contact
+                </a>
+                <a href="/about" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
+                  <Info className="w-4 h-4" />
+                  About
+                </a>
+                <div className="border-t border-slate-700 my-2"></div>
+                <div className="px-4 py-2 text-xs text-slate-500">
+                  Version v2.6.0 • Solana Verified
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Page Title - Centered */}
+      <div className="relative z-10 pt-4 pb-2 text-center px-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -174,7 +239,7 @@ export default function ProductsGallery() {
           <span className="text-xs text-cyan-300 uppercase tracking-widest font-semibold">Enterprise Solutions</span>
           <Sparkles className="w-4 h-4 text-cyan-400" />
         </motion.div>
-        <h1 className="text-3xl sm:text-5xl md:text-6xl mb-1">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl mb-1">
           <span 
             className="font-extralight tracking-[0.1em] sm:tracking-[0.3em] uppercase"
             style={{
@@ -203,7 +268,7 @@ export default function ProductsGallery() {
             Studios
           </span>
         </h1>
-      </header>
+      </div>
 
       {/* ===== SECTION 2: FULL-SCREEN PRODUCT CARD ===== */}
       <section className="relative z-10 h-[calc(100vh-120px)] flex items-center justify-center px-4">
