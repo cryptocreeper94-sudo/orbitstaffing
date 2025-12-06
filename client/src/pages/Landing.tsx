@@ -125,9 +125,9 @@ export default function Landing() {
       <div className="relative z-10">
       
       {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 min-h-[44px] sm:min-h-[48px] flex flex-col justify-end">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full flex items-baseline justify-between gap-2 sm:gap-8 pb-1">
-          <div className="flex items-baseline gap-2 flex-shrink-0">
+      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 h-11 sm:h-12">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full h-full flex items-end justify-between gap-2 sm:gap-6">
+          <div className="flex items-end gap-2 flex-shrink-0">
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none sm:hidden">ORBIT</span>
             <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none hidden sm:inline">Why ORBIT Staffing OS</span>
             <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors leading-none" data-testid="link-version">
@@ -138,7 +138,7 @@ export default function Landing() {
           {/* Mobile Hamburger Menu */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-2 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50 self-end"
+            className="sm:hidden p-1.5 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
             data-testid="button-mobile-menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
