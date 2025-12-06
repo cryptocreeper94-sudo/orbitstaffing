@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import darkwaveSoundwave from '@assets/darkwave_soundwave.png';
+import darkwaveSoundwave from '@assets/darkwave_soundwave_nobg.png';
 
 interface Message {
   role: 'user' | 'assistant';
