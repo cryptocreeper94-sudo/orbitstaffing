@@ -390,8 +390,8 @@ export default function ProductsGallery() {
         ))}
       </div>
 
-      {/* ===== SECTION 3: FOOTER (Scroll down to see) ===== */}
-      <DarkwaveFooter product="Darkwave Studios Ecosystem" hidePoweredBy={true} />
+      {/* ===== SECTION 3: MINIMAL FOOTER ===== */}
+      <DarkwaveFooter minimal={true} />
 
       {/* ===== MODALS ===== */}
       
