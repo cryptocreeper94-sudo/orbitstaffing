@@ -338,31 +338,20 @@ export default function ProductsGallery() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-base sm:text-2xl font-bold text-white truncate">
+                    <h2 className="text-base sm:text-2xl font-bold text-white">
                       {currentProduct.hasPulseAnimation ? (
                         <span className="relative inline-block">
-                          <span className="relative z-10">{currentProduct.name}</span>
+                          <span>{currentProduct.name}</span>
                           <span 
-                            className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden"
-                            style={{ transform: 'translateY(2px)' }}
-                          >
-                            <span 
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500 to-transparent"
-                              style={{
-                                animation: 'pulseLine 1.5s ease-in-out infinite',
-                              }}
-                            />
-                          </span>
+                            className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"
+                            style={{
+                              animation: 'pulseLineMove 1.5s ease-in-out infinite',
+                              willChange: 'transform',
+                            }}
+                          />
                         </span>
                       ) : currentProduct.name}
                     </h2>
-                    <style>{`
-                      @keyframes pulseLine {
-                        0% { transform: translateX(-100%); opacity: 0; }
-                        50% { opacity: 1; }
-                        100% { transform: translateX(100%); opacity: 0; }
-                      }
-                    `}</style>
                     <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                       {currentProduct.tagline}
                     </p>

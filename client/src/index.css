@@ -51,6 +51,20 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+@keyframes pulseLineMove {
+  0% { 
+    transform: scaleX(0) translateX(-100%);
+    opacity: 0;
+  }
+  50% { 
+    opacity: 1;
+  }
+  100% { 
+    transform: scaleX(1) translateX(100%);
+    opacity: 0;
+  }
+}
+
 /* Sparkle twinkle */
 @keyframes twinkle {
   0%, 100% { opacity: 0.3; transform: scale(0.8); }
