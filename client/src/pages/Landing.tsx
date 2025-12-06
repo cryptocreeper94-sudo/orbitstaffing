@@ -1084,15 +1084,12 @@ function BenefitCard({ icon, title, brief, onClick }: any) {
   return (
     <button
       onClick={onClick}
-      className="p-6 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all group cursor-pointer text-left"
+      className="w-full h-full p-3 sm:p-6 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all group cursor-pointer text-left"
       data-testid={`benefit-card-${title.toLowerCase().replace(/\s+/g, '-')}`}
     >
-      <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">{icon}</div>
-      <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{title}</h3>
-      <p className="text-xs text-muted-foreground mb-3">{brief}</p>
-      <div className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-        Tap to learn more →
-      </div>
+      <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform">{icon}</div>
+      <h3 className="font-bold text-sm sm:text-lg mb-1 group-hover:text-primary transition-colors">{title}</h3>
+      <p className="text-[10px] sm:text-xs text-muted-foreground">{brief}</p>
     </button>
   );
 }
