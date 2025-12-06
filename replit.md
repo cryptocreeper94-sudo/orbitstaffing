@@ -54,59 +54,48 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ---
 
-## Last Session Summary (December 5, 2025)
+## Last Session Summary (December 6, 2025)
 
-### Current Version: v2.6.0 (Publishing)
+### Current Version: v2.6.0 (Published)
 
 ### What Was Accomplished
-1. **PWA (Progressive Web App) Complete Setup**
-   - Full-color Orby mascot as home screen icon (waving pose on dark slate background)
-   - Splash screen with Orby (presenting pose) and "Welcome back! Let's get to work." message
-   - Automatic install prompt appears after 2 seconds on first visit
-   - iOS-specific instructions for manual Add to Home Screen
+1. **DarkWave Studios Full-Screen Product Gallery**
+   - Full viewport height cards (100vh - header) for immersive product viewing
+   - Left/right arrow navigation between products (horizontal carousel)
+   - Each card: emblem (top), name/tagline/description (center), hallmark QR (bottom), action buttons
+   - Soundwave floating AI assistant button with background removed
+   - Minimal footer design: Developer link (left), copyright (center), version (right)
+
+2. **Domain Redirect Configuration**
+   - darkwavestudios.io auto-redirects to /studio route
+   - All product cards accessible via horizontal navigation
+
+3. **Version Updates to v2.6.0**
+   - Updated all version references across codebase
+   - SecureSandbox.tsx, BusinessValuationDashboard.tsx, FeatureInventory.tsx, DarkwaveFooter.tsx
+   - Added v2.5.5 and v2.6.0 to publish log history
+
+4. **Previous Session (Dec 5) - PWA Complete**
+   - Full-color Orby mascot as home screen icon
+   - Splash screen with Orby presenting pose
+   - Automatic install prompt with 7-day cooldown
    - Service worker for offline caching
-   - 7-day dismissal cooldown for install prompt
-
-2. **DarkWave Studios Product Gallery - Complete with Emblems & Hallmarks**
-   - ORBIT Staffing OS: Emblem ✓ + Hallmark ✓
-   - Orby (getorby.io): Emblem ✓ + Hallmark ✓
-   - DarkWave Pulse: Pending (emblem + hallmark)
-   - Lot Ops Pro: Emblem ✓ + Hallmark ✓
-   - Brew & Board Coffee: Emblem ✓ (bg-removed, amber-tinted) + Hallmark ✓
-   - GarageBot: Emblem ✓ (bg-removed) + Hallmark ✓
-
-3. **Business Intelligence Dashboard** - Completed with real-time valuation tracking ($2M-$8M pre-revenue range)
-
-### PWA Technical Implementation
-- **Manifest:** `client/public/manifest.json` - App metadata, icons (192px, 512px, maskable variants)
-- **Service Worker:** `client/public/sw.js` - Offline caching with network-first strategy
-- **Icons:** `client/public/pwa/` - Orby icons with solid dark slate background (no transparency)
-- **Install Prompt:** `client/src/components/PWAInstallPrompt.tsx` - Auto-shows on first visit
-- **Splash Screen:** `client/src/components/PWASplashScreen.tsx` - Shows in standalone mode
-- **Apple Touch Icons:** Added to `client/index.html` for iOS home screen
-
-### Key Files Modified
-- `client/index.html` - Manifest link, apple-touch-icons, service worker registration
-- `client/src/App.tsx` - Added PWAInstallPrompt and PWASplashScreen components
-- `client/src/pages/ProductsGallery.tsx` - Added GarageBot product
 
 ### DarkWave Studios Products
 | Product | Emblem | Hallmark | URL |
 |---------|--------|----------|-----|
-| ORBIT Staffing OS | ✓ | ✓ | orbitstaffing.io |
-| Orby | ✓ | Pending | - |
-| DarkWave Pulse | ✗ | ✗ | - |
+| ORBIT Staffing OS | ✓ (Orby mascot) | ✓ (auto QR) | orbitstaffing.io |
+| Orby | ✓ | ✓ | getorby.io |
+| DarkWave Pulse | Pending | Pending | - |
 | Lot Ops Pro | ✓ | ✓ | lotops.pro |
-| Brew & Board Coffee | ✗ | ✗ | brewandboard.coffee |
-| GarageBot | ✓ | Pending | garagebot.io |
+| Brew & Board Coffee | ✓ | ✓ | brewandboard.coffee |
+| GarageBot | ✓ | ✓ | garagebot.io |
 
-### Design Patterns Established
-- **Arrow button navigation:** Rounded circular buttons (w-10 h-10) positioned absolutely on carousel sides
-- **Mobile carousel wrapper:** `relative` div containing absolute-positioned arrow buttons
-- **Scroll function:** `scrollCarousel(ref, 'left'|'right')` with 300-340px scroll amount and smooth behavior
-- **Responsive sections:** `flex flex-row flex-nowrap ... sm:grid sm:grid-cols-N sm:overflow-visible`
-- **Card pattern:** `flex-shrink-0 w-[XXpx] sm:w-auto snap-start` for grid expansion on desktop
-- **PWA Install Prompt:** Bottom slide-in card with Orby icon, dismiss stores timestamp in localStorage
+### Key Files
+- `client/src/pages/ProductsGallery.tsx` - Full-screen product cards with carousel navigation
+- `client/src/components/DarkwaveFooter.tsx` - Minimal footer with `minimal={true}` prop
+- `client/src/components/DarkWaveAssistant.tsx` - Soundwave AI button
+- `client/src/App.tsx` - Domain redirect logic for darkwavestudios.io → /studio
 
 ### Franchise System Architecture
 - **Two-tier ownership model:**
