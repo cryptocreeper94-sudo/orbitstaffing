@@ -6,6 +6,20 @@ import { ArrowLeft, Zap, Bug, Sparkles, Shield } from "lucide-react";
 
 const changelogEntries = [
   {
+    version: "v2.7.0",
+    date: "December 6, 2025",
+    type: "major",
+    changes: [
+      { type: "new", text: "Meeting Presentation Builder - Create professional slideshows for client meetings" },
+      { type: "new", text: "Three staffing-specific templates: Client Proposal, Compliance Report, Worker Brief" },
+      { type: "new", text: "Shareable presentation links with view tracking" },
+      { type: "new", text: "Email presentations directly to attendees via Resend integration" },
+      { type: "new", text: "Fullscreen slideshow viewer with keyboard navigation" },
+      { type: "new", text: "CRM integration with quick-access Presentations button" },
+      { type: "security", text: "New Solana blockchain stamp for v2.7.0" },
+    ]
+  },
+  {
     version: "v2.6.5",
     date: "December 6, 2025",
     type: "patch",

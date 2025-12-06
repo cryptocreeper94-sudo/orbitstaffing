@@ -5414,3 +5414,53 @@ export const insertFranchiseTerritorySchema = createInsertSchema(franchiseTerrit
 
 export type InsertFranchiseTerritory = z.infer<typeof insertFranchiseTerritorySchema>;
 export type FranchiseTerritory = typeof franchiseTerritories.$inferSelect;
+
+// ========================
+// Meeting Presentations (CRM Feature)
+// ========================
+export const meetingPresentations = pgTable(
+  "meeting_presentations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    userId: varchar("user_id").references(() => users.id),
+    templateType: varchar("template_type", { length: 50 }).notNull(), // 'client_proposal', 'compliance_report', 'worker_brief'
+    title: varchar("title", { length: 255 }).notNull(),
+    meetingDate: varchar("meeting_date", { length: 20 }),
+    meetingTime: varchar("meeting_time", { length: 20 }),
+    notes: text("notes"),
+    documentIds: text("document_ids").array().default([]),
+    attendeeEmails: text("attendee_emails").array().default([]),
+    attendeeNames: text("attendee_names").array().default([]),
+    shareableLink: varchar("shareable_link", { length: 100 }).unique(),
+    status: varchar("status", { length: 20 }).default("draft"), // 'draft', 'ready', 'sent'
+    sentAt: timestamp("sent_at"),
+    viewCount: integer("view_count").default(0),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_meeting_presentations_tenant").on(table.tenantId),
+    userIdx: index("idx_meeting_presentations_user").on(table.userId),
+    statusIdx: index("idx_meeting_presentations_status").on(table.status),
+    linkIdx: index("idx_meeting_presentations_link").on(table.shareableLink),
+  })
+);
+
+export const insertMeetingPresentationSchema = createInsertSchema(meetingPresentations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  viewCount: true,
+  sentAt: true,
+});
+
+export type InsertMeetingPresentation = z.infer<typeof insertMeetingPresentationSchema>;
+export type MeetingPresentation = typeof meetingPresentations.$inferSelect;
+
+// Staffing-specific presentation templates
+export const PRESENTATION_TEMPLATES = [
+  { id: 'client_proposal', name: 'Client Proposal', description: 'Professional pitch deck for prospective clients', icon: 'Briefcase', color: 'from-blue-600 to-indigo-700' },
+  { id: 'compliance_report', name: 'Compliance Report', description: 'Formal documentation for audits and reviews', icon: 'Shield', color: 'from-emerald-600 to-teal-700' },
+  { id: 'worker_brief', name: 'Worker Brief', description: 'Onboarding and orientation materials', icon: 'Users', color: 'from-amber-600 to-orange-700' },
+] as const;

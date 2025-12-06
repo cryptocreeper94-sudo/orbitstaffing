@@ -35,7 +35,9 @@ import {
   MousePointer,
   AlertCircle,
   RefreshCw,
+  Presentation,
 } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -237,6 +239,16 @@ export default function CRMDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/presentations">
+              <Button
+                variant="outline"
+                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                data-testid="button-presentations"
+              >
+                <Presentation className="w-4 h-4 mr-2" />
+                Presentations
+              </Button>
+            </Link>
             <Button
               onClick={() => setShowMeetingModal(true)}
               variant="outline"

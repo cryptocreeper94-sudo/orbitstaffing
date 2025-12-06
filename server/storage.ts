@@ -118,6 +118,9 @@ import {
   type InsertFranchisePayment,
   type FranchiseTerritory,
   type InsertFranchiseTerritory,
+  meetingPresentations,
+  type MeetingPresentation,
+  type InsertMeetingPresentation,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -3066,6 +3069,78 @@ export const storage: IStorage = {
       .where(eq(franchiseTerritories.id, id))
       .returning();
     return result[0];
+  },
+
+  // ========================
+  // MEETING PRESENTATIONS
+  // ========================
+  async createMeetingPresentation(data: InsertMeetingPresentation): Promise<MeetingPresentation> {
+    const result = await db.insert(meetingPresentations).values(data).returning();
+    return result[0];
+  },
+
+  async getMeetingPresentations(tenantId: string): Promise<MeetingPresentation[]> {
+    return await db
+      .select()
+      .from(meetingPresentations)
+      .where(eq(meetingPresentations.tenantId, tenantId))
+      .orderBy(desc(meetingPresentations.createdAt));
+  },
+
+  async getMeetingPresentationsByUser(userId: string): Promise<MeetingPresentation[]> {
+    return await db
+      .select()
+      .from(meetingPresentations)
+      .where(eq(meetingPresentations.userId, userId))
+      .orderBy(desc(meetingPresentations.createdAt));
+  },
+
+  async getMeetingPresentation(id: string): Promise<MeetingPresentation | null> {
+    const result = await db
+      .select()
+      .from(meetingPresentations)
+      .where(eq(meetingPresentations.id, id))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async getMeetingPresentationByLink(shareableLink: string): Promise<MeetingPresentation | null> {
+    const result = await db
+      .select()
+      .from(meetingPresentations)
+      .where(eq(meetingPresentations.shareableLink, shareableLink))
+      .limit(1);
+    return result[0] || null;
+  },
+
+  async updateMeetingPresentation(id: string, data: Partial<InsertMeetingPresentation>): Promise<MeetingPresentation | null> {
+    const result = await db
+      .update(meetingPresentations)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(meetingPresentations.id, id))
+      .returning();
+    return result[0] || null;
+  },
+
+  async deleteMeetingPresentation(id: string): Promise<boolean> {
+    const result = await db
+      .delete(meetingPresentations)
+      .where(eq(meetingPresentations.id, id));
+    return (result.rowCount ?? 0) > 0;
+  },
+
+  async incrementPresentationViewCount(id: string): Promise<void> {
+    await db
+      .update(meetingPresentations)
+      .set({ viewCount: sql`${meetingPresentations.viewCount} + 1` })
+      .where(eq(meetingPresentations.id, id));
+  },
+
+  async markPresentationSent(id: string): Promise<void> {
+    await db
+      .update(meetingPresentations)
+      .set({ status: 'sent', sentAt: new Date() })
+      .where(eq(meetingPresentations.id, id));
   },
 
 };

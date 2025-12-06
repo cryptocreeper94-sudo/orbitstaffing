@@ -29,7 +29,7 @@ export default function ProductsGallery() {
       id: 'ORBIT',
       name: 'ORBIT Staffing OS',
       tagline: '100% Automated Flexible Labor Marketplace',
-      description: 'Zero manual intervention staffing platform with GPS-verified check-ins, automated matching, and comprehensive payroll. Complete workforce management from recruitment to payment with blockchain-verified credentials and real-time compliance tracking.',
+      description: 'Zero manual intervention staffing platform with GPS-verified check-ins, automated matching, comprehensive payroll, and CRM with Meeting Presentation Builder. Complete workforce management from recruitment to payment with blockchain-verified credentials and real-time compliance tracking.',
       color: 'from-cyan-500 to-blue-600',
       glowColor: 'cyan',
       slides: slideContent.ORBIT,
@@ -179,7 +179,7 @@ export default function ProductsGallery() {
           {/* Left: Title + Solana Badge */}
           <div className="flex items-center gap-3">
             <span className="text-sm sm:text-base font-medium text-slate-300">darkwavestudios.io</span>
-            <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.6.6</span>
+            <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.7.0</span>
             {/* Solana Verification Badge with QR */}
             <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg border border-purple-500/30">
               <div className="w-6 h-6 bg-white rounded p-0.5">
@@ -241,7 +241,7 @@ export default function ProductsGallery() {
                 </a>
                 <div className="border-t border-slate-700 my-2"></div>
                 <div className="px-4 py-2 text-xs text-slate-500">
-                  Version v2.6.6 • Solana Verified
+                  Version v2.7.0 • Solana Verified
                 </div>
               </div>
             </motion.div>

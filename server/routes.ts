@@ -8801,4 +8801,214 @@ export function registerPayCardRoutes(app: Express) {
       res.status(500).json({ error: "Failed to create royalty invoice" });
     }
   });
+
+  // ========================
+  // MEETING PRESENTATIONS (CRM Feature)
+  // ========================
+  
+  // Get presentation templates
+  app.get("/api/presentation-templates", async (_req: Request, res: Response) => {
+    const { PRESENTATION_TEMPLATES } = await import("@shared/schema");
+    res.json(PRESENTATION_TEMPLATES);
+  });
+
+  // Get all presentations for a tenant
+  app.get("/api/meeting-presentations", async (req: Request, res: Response) => {
+    try {
+      const tenantId = req.query.tenantId as string;
+      const userId = req.query.userId as string;
+      
+      if (!tenantId && !userId) {
+        return res.status(400).json({ error: "tenantId or userId required" });
+      }
+      
+      let presentations;
+      if (tenantId) {
+        presentations = await storage.getMeetingPresentations(tenantId);
+      } else {
+        presentations = await storage.getMeetingPresentationsByUser(userId);
+      }
+      
+      res.json(presentations);
+    } catch (error) {
+      console.error("Get presentations error:", error);
+      res.status(500).json({ error: "Failed to get presentations" });
+    }
+  });
+
+  // Get single presentation by ID
+  app.get("/api/meeting-presentations/:id", async (req: Request, res: Response) => {
+    try {
+      const presentation = await storage.getMeetingPresentation(req.params.id);
+      if (!presentation) {
+        return res.status(404).json({ error: "Presentation not found" });
+      }
+      res.json(presentation);
+    } catch (error) {
+      console.error("Get presentation error:", error);
+      res.status(500).json({ error: "Failed to get presentation" });
+    }
+  });
+
+  // Get presentation by shareable link (public)
+  app.get("/api/presentation/view/:link", async (req: Request, res: Response) => {
+    try {
+      const presentation = await storage.getMeetingPresentationByLink(req.params.link);
+      if (!presentation) {
+        return res.status(404).json({ error: "Presentation not found" });
+      }
+      await storage.incrementPresentationViewCount(presentation.id);
+      res.json(presentation);
+    } catch (error) {
+      console.error("Get presentation by link error:", error);
+      res.status(500).json({ error: "Failed to get presentation" });
+    }
+  });
+
+  // Create new presentation
+  app.post("/api/meeting-presentations", async (req: Request, res: Response) => {
+    try {
+      const { insertMeetingPresentationSchema } = await import("@shared/schema");
+      const data = insertMeetingPresentationSchema.parse(req.body);
+      const presentation = await storage.createMeetingPresentation(data);
+      console.log(`[Presentations] Created presentation: ${presentation.title} (${presentation.id})`);
+      res.status(201).json(presentation);
+    } catch (error) {
+      console.error("Create presentation error:", error);
+      res.status(500).json({ error: "Failed to create presentation" });
+    }
+  });
+
+  // Update presentation
+  app.patch("/api/meeting-presentations/:id", async (req: Request, res: Response) => {
+    try {
+      const presentation = await storage.updateMeetingPresentation(req.params.id, req.body);
+      if (!presentation) {
+        return res.status(404).json({ error: "Presentation not found" });
+      }
+      console.log(`[Presentations] Updated presentation: ${presentation.title} (${presentation.id})`);
+      res.json(presentation);
+    } catch (error) {
+      console.error("Update presentation error:", error);
+      res.status(500).json({ error: "Failed to update presentation" });
+    }
+  });
+
+  // Delete presentation
+  app.delete("/api/meeting-presentations/:id", async (req: Request, res: Response) => {
+    try {
+      const success = await storage.deleteMeetingPresentation(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Presentation not found" });
+      }
+      console.log(`[Presentations] Deleted presentation: ${req.params.id}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete presentation error:", error);
+      res.status(500).json({ error: "Failed to delete presentation" });
+    }
+  });
+
+  // Generate shareable link for presentation
+  app.post("/api/meeting-presentations/:id/generate-link", async (req: Request, res: Response) => {
+    try {
+      const presentation = await storage.getMeetingPresentation(req.params.id);
+      if (!presentation) {
+        return res.status(404).json({ error: "Presentation not found" });
+      }
+      
+      // Generate unique slug
+      const slug = `pres-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      
+      const updated = await storage.updateMeetingPresentation(req.params.id, {
+        shareableLink: slug,
+        status: 'ready',
+      });
+      
+      console.log(`[Presentations] Generated link for: ${presentation.title} → ${slug}`);
+      res.json({ 
+        success: true, 
+        shareableLink: slug,
+        viewUrl: `/presentation/${slug}`,
+        presentation: updated,
+      });
+    } catch (error) {
+      console.error("Generate link error:", error);
+      res.status(500).json({ error: "Failed to generate link" });
+    }
+  });
+
+  // Send presentation via email (Resend)
+  app.post("/api/meeting-presentations/:id/send", async (req: Request, res: Response) => {
+    try {
+      const presentation = await storage.getMeetingPresentation(req.params.id);
+      if (!presentation) {
+        return res.status(404).json({ error: "Presentation not found" });
+      }
+      if (!presentation.shareableLink) {
+        return res.status(400).json({ error: "No shareable link generated. Generate a link first." });
+      }
+      
+      const emails = presentation.attendeeEmails || [];
+      if (emails.length === 0) {
+        return res.status(400).json({ error: "No attendee emails specified" });
+      }
+      
+      const { PRESENTATION_TEMPLATES } = await import("@shared/schema");
+      const template = PRESENTATION_TEMPLATES.find(t => t.id === presentation.templateType);
+      
+      // Use APP_URL from environment or construct from request
+      const appUrl = process.env.APP_URL || `https://${req.get('host')}`;
+      const viewerUrl = `${appUrl}/presentation/${presentation.shareableLink}`;
+      
+      // Send emails using Resend
+      const { Resend } = await import('resend');
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      
+      await resend.emails.send({
+        from: 'ORBIT Staffing <notifications@orbitstaffing.io>',
+        to: emails,
+        subject: `Meeting Presentation: ${presentation.title}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; padding: 40px; border-radius: 12px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <img src="https://orbitstaffing.io/mascot/clean/orbit_mascot_cyan_saturn_style_transparent_clean.png" alt="ORBIT" style="width: 80px; height: 80px;" />
+            </div>
+            <h1 style="color: #22d3ee; font-size: 24px; margin-bottom: 10px; text-align: center;">${presentation.title}</h1>
+            <p style="color: #94a3b8; text-align: center; margin-bottom: 20px;">
+              <strong>Template:</strong> ${template?.name || 'Custom'}
+            </p>
+            ${presentation.meetingDate ? `
+              <p style="color: #94a3b8; text-align: center;">
+                <strong>Date:</strong> ${presentation.meetingDate} ${presentation.meetingTime || ''}
+              </p>
+            ` : ''}
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="${viewerUrl}" style="display: inline-block; background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                View Presentation
+              </a>
+            </div>
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #334155; text-align: center;">
+              <p style="color: #64748b; font-size: 12px;">
+                Powered by ORBIT Staffing OS<br/>
+                <a href="https://orbitstaffing.io" style="color: #22d3ee;">orbitstaffing.io</a>
+              </p>
+            </div>
+          </div>
+        `,
+      });
+      
+      await storage.markPresentationSent(presentation.id);
+      console.log(`[Presentations] Sent presentation to ${emails.length} attendees: ${presentation.title}`);
+      
+      res.json({ 
+        success: true, 
+        sentTo: emails.length,
+        emails: emails,
+      });
+    } catch (error) {
+      console.error("Send presentation error:", error);
+      res.status(500).json({ error: "Failed to send presentation" });
+    }
+  });
 }

@@ -66,6 +66,8 @@ import CustomerHallmarkManager from "@/pages/CustomerHallmarkManager";
 import AdminFranchiseDashboard from "@/pages/AdminFranchiseDashboard";
 import FranchiseSuccess from "@/pages/FranchiseSuccess";
 import AboutUs from "@/pages/AboutUs";
+import MeetingPresentations from "@/pages/MeetingPresentations";
+import PresentationViewer from "@/pages/PresentationViewer";
 import SolanaVerification from "@/pages/SolanaVerification";
 import Changelog from "@/pages/Changelog";
 import { TutorialProvider } from "@/components/PageTutorial";
@@ -145,6 +147,9 @@ function Router() {
       <Route path="/admin/talent-exchange" component={AdminTalentExchange} />
       <Route path="/crm" component={CRMDashboard} />
       <Route path="/admin/crm" component={CRMDashboard} />
+      <Route path="/meeting-presentations" component={MeetingPresentations} />
+      <Route path="/presentations" component={MeetingPresentations} />
+      <Route path="/presentation/:link" component={PresentationViewer} />
       <Route path="/worker/payroll-portal" component={WorkerPayrollPortal} />
       <Route path="/worker/compliance" component={WorkerComplianceDashboard} />
       <Route path="/oauth/wizard" component={OAuthConnectionWizard} />

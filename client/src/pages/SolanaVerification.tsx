@@ -8,6 +8,22 @@ import { QRCodeSVG } from "qrcode.react";
 
 const blockchainStamps = [
   {
+    version: "v2.7.0",
+    date: "December 6, 2025",
+    products: [
+      {
+        name: "ORBIT Staffing OS",
+        hash: "5d3d537ea1e19d9487d81e4e309af09369f2a095981c6a3158947713b56d750e",
+        description: "Meeting Presentation Builder with CRM integration"
+      },
+      {
+        name: "DarkWave Studios",
+        hash: "d4f3bd5d23f7d4fd65d08c40959574e51776b6036899123de7cacc3c779a927f",
+        description: "Product descriptions updated for v2.7.0"
+      }
+    ]
+  },
+  {
     version: "v2.6.5",
     date: "December 6, 2025",
     products: [
