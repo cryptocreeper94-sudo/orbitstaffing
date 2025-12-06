@@ -796,7 +796,7 @@ export default function Landing() {
                   <img 
                     src={orbyCommanderEmblem} 
                     alt="Orby Commander" 
-                    className="w-20 h-20 sm:w-32 sm:h-32 object-contain mb-2"
+                    className="w-24 h-24 sm:w-36 sm:h-36 object-contain mb-2"
                   />
                   <h3 className="text-xs sm:text-xl font-bold text-cyan-200">Orby Command Center</h3>
                   <p className="text-[7px] sm:text-xs text-cyan-400">Real-Time Venue Operations</p>
