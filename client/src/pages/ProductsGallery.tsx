@@ -17,6 +17,7 @@ import brewBoardEmblem from '@assets/brew_board_emblem.png';
 import brewBoardHallmark from '@assets/Screenshot_20251205_135345_Replit_1764964534831.jpg';
 import garageBotEmblem from '@assets/garagebot_emblem.png';
 import garageBotHallmark from '@assets/Screenshot_20251205_150630_Chrome_1764968855422.jpg';
+import darkwaveStudiosBrand from '@assets/darkwave_studios_hallmark.png';
 
 export default function ProductsGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -61,8 +62,8 @@ export default function ProductsGallery() {
       slides: slideContent['DarkWave Pulse'],
       slideshowData: null,
       url: 'https://darkwavepulse.com',
-      emblem: null,
-      hallmark: null,
+      emblem: darkwaveStudiosBrand,
+      hallmark: darkwaveStudiosBrand,
     },
     {
       id: 'Lot Ops Pro',
