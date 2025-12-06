@@ -65,6 +65,9 @@ import FranchiseOffer from "@/pages/FranchiseOffer";
 import CustomerHallmarkManager from "@/pages/CustomerHallmarkManager";
 import AdminFranchiseDashboard from "@/pages/AdminFranchiseDashboard";
 import FranchiseSuccess from "@/pages/FranchiseSuccess";
+import AboutUs from "@/pages/AboutUs";
+import SolanaVerification from "@/pages/SolanaVerification";
+import Changelog from "@/pages/Changelog";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -177,6 +180,9 @@ function Router() {
       <Route path="/admin/franchise-dashboard" component={AdminFranchiseDashboard} />
       <Route path="/franchise-success" component={FranchiseSuccess} />
       <Route path="/franchise/success" component={FranchiseSuccess} />
+      <Route path="/about" component={AboutUs} />
+      <Route path="/solana-verification" component={SolanaVerification} />
+      <Route path="/changelog" component={Changelog} />
       <Route component={NotFound} />
     </Switch>
   );

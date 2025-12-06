@@ -12,7 +12,13 @@ import {
   Shield,
   CheckCircle2,
   Lock,
-  ChevronRight
+  ChevronRight,
+  Menu,
+  X,
+  Settings,
+  Info,
+  Coins,
+  FileText
 } from "lucide-react";
 import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
@@ -35,6 +41,7 @@ export default function Landing() {
   const [selectedBenefit, setSelectedBenefit] = useState<string | null>(null);
   const [showLotOpsSlideshow, setShowLotOpsSlideshow] = useState(false);
   const [showOrbitSlideshow, setShowOrbitSlideshow] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     // Show welcome slideshow for first-time visitors (new enhanced version)
@@ -125,7 +132,19 @@ export default function Landing() {
               <span className="block sm:hidden">ORBIT</span>
               <span className="hidden sm:block">Why ORBIT Staffing OS</span>
             </div>
+            <Link href="/changelog" className="text-[10px] sm:text-xs font-mono text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version">
+              v2.6.4
+            </Link>
           </div>
+          
+          {/* Mobile Hamburger Menu */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="sm:hidden p-2 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
+            data-testid="button-mobile-menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
           
           <nav className="hidden sm:flex items-center gap-1 bg-slate-800/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-700/50 flex-shrink-0">
             <Link href="/hallmark-seal" className="px-2 py-1 text-xs font-medium text-amber-300 hover:bg-amber-900/30 rounded transition-all flex items-center" data-testid="link-hallmark-seal">
@@ -139,8 +158,42 @@ export default function Landing() {
             <Link href="/professional-staffing" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-professional">
               Professional
             </Link>
+            <div className="h-4 w-px bg-slate-600/50" />
+            <Link href="/about" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-about">
+              About
+            </Link>
           </nav>
         </div>
+        
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden absolute top-full left-0 right-0 bg-slate-900/98 backdrop-blur-lg border-b border-slate-700/50 shadow-xl z-50">
+            <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+              <Link href="/changelog" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-cyan-400 hover:bg-slate-800 rounded-lg transition">
+                <FileText className="w-4 h-4" />
+                Version v2.6.4 - What's New
+              </Link>
+              <Link href="/solana-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-purple-400 hover:bg-slate-800 rounded-lg transition">
+                <Coins className="w-4 h-4" />
+                Solana Blockchain Verification
+              </Link>
+              <div className="border-t border-slate-700/50 my-2" />
+              <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                <Info className="w-4 h-4" />
+                About Us
+              </Link>
+              <Link href="/developer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                <Settings className="w-4 h-4" />
+                Settings / Admin
+              </Link>
+              <div className="border-t border-slate-700/50 my-2" />
+              <Link href="/hallmark-seal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-amber-400 hover:bg-slate-800 rounded-lg transition">
+                <CheckCircle2 className="w-4 h-4" />
+                Hallmark Seal
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ISO 20022 BANKING ROADMAP BANNER - Hidden on mobile */}
