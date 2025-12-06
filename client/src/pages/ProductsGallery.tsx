@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
 import { DarkwaveFooter } from '@/components/DarkwaveFooter';
-import { DarkWaveAssistant } from '@/components/DarkWaveAssistant';
+import { OrbitChatAssistant } from '@/components/OrbitChatAssistant';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides, orbySlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
@@ -488,7 +488,7 @@ export default function ProductsGallery() {
       )}
 
       {/* DarkWave AI Assistant */}
-      <DarkWaveAssistant />
+      <OrbitChatAssistant />
     </div>
   );
 }

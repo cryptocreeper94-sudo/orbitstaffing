@@ -1,12 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  MessageCircle, 
   X, 
   Send, 
-  Sparkles,
-  ChevronDown,
-  HelpCircle
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,8 +13,11 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  timestamp: Date;
+  timestamp: string;
 }
+
+const STORAGE_KEY = "orby_chat_history";
+const GREETING_SHOWN_KEY = "orby_greeting_shown";
 
 const ORBIT_RESPONSES: Record<string, string[]> = {
   payroll: [
@@ -83,20 +83,50 @@ function getOrbitResponse(message: string): string {
   return ORBIT_RESPONSES.default[Math.floor(Math.random() * ORBIT_RESPONSES.default.length)];
 }
 
+const DEFAULT_WELCOME: Message = {
+  id: "welcome",
+  role: "assistant",
+  content: "Hey! I'm Orby, your AI assistant! Ask me anything about the platform - payroll, workers, compliance, jobs, or pricing. I'm floating here to help! 🪐",
+  timestamp: new Date().toISOString(),
+};
+
 export function OrbitChatAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Hey! I'm Orby, your AI assistant! Ask me anything about the platform - payroll, workers, compliance, jobs, or pricing. I'm floating here to help! 🪐",
-      timestamp: new Date(),
-    },
-  ]);
+  const [showGreetingBubble, setShowGreetingBubble] = useState(false);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : [DEFAULT_WELCOME];
+      }
+    } catch {}
+    return [DEFAULT_WELCOME];
+  });
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    const greetingShown = sessionStorage.getItem(GREETING_SHOWN_KEY);
+    if (!greetingShown) {
+      const timer = setTimeout(() => {
+        setShowGreetingBubble(true);
+        sessionStorage.setItem(GREETING_SHOWN_KEY, "true");
+        setTimeout(() => {
+          setShowGreetingBubble(false);
+        }, 4000);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -117,7 +147,7 @@ export function OrbitChatAssistant() {
       id: `user-${Date.now()}`,
       role: "user",
       content: input.trim(),
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -130,7 +160,7 @@ export function OrbitChatAssistant() {
         id: `assistant-${Date.now()}`,
         role: "assistant",
         content: response,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
       setIsTyping(false);
@@ -142,6 +172,16 @@ export function OrbitChatAssistant() {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const clearChat = () => {
+    const welcomeMsg: Message = {
+      ...DEFAULT_WELCOME,
+      id: `welcome-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages([welcomeMsg]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([welcomeMsg]));
   };
 
   return (
@@ -171,15 +211,27 @@ export function OrbitChatAssistant() {
                     <p className="text-xs text-cyan-400">Your AI Assistant</p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                  className="text-slate-400 hover:text-white hover:bg-slate-700"
-                  data-testid="button-close-chat"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={clearChat}
+                    className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                    title="Clear chat history"
+                    data-testid="button-clear-chat"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsOpen(false)}
+                    className="text-slate-400 hover:text-white hover:bg-slate-700"
+                    data-testid="button-close-chat"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
               </div>
 
               <ScrollArea className="h-[320px] p-4" ref={scrollRef}>
@@ -262,11 +314,25 @@ export function OrbitChatAssistant() {
         )}
       </AnimatePresence>
 
-      {/* Floating Orby Mascot - True AI Representative */}
       <div className="fixed bottom-6 right-4 z-[150]" data-testid="floating-orby-container">
-        {/* Speech Bubble - Shows when chat is closed - positioned to not overflow */}
         <AnimatePresence>
-          {!isOpen && (
+          {showGreetingBubble && !isOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, x: 20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.8, x: 20 }}
+              className="absolute -top-16 right-0 bg-gradient-to-br from-cyan-600 to-blue-700 border border-cyan-400/50 rounded-2xl px-4 py-3 shadow-lg shadow-cyan-500/30 min-w-[160px]"
+              style={{ filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.4))' }}
+            >
+              <p className="text-sm text-white font-medium">Hi! I'm available 👋</p>
+              <p className="text-xs text-cyan-200 mt-1">Click me to chat!</p>
+              <div className="absolute -bottom-2 right-8 w-4 h-4 bg-blue-700 border-r border-b border-cyan-400/50 transform rotate-45" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {!isOpen && !showGreetingBubble && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -280,7 +346,6 @@ export function OrbitChatAssistant() {
           )}
         </AnimatePresence>
 
-        {/* Floating Orby Character */}
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
           className="relative bg-transparent border-none cursor-pointer p-0 outline-none focus:outline-none"
@@ -290,7 +355,6 @@ export function OrbitChatAssistant() {
           aria-label={isOpen ? "Close Orby chat" : "Open Orby chat"}
           aria-expanded={isOpen}
         >
-          {/* Glow effect underneath Orby */}
           <motion.div
             className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 h-6 rounded-full bg-cyan-500/30 blur-xl"
             animate={{ 
@@ -300,7 +364,6 @@ export function OrbitChatAssistant() {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
           
-          {/* Orby floating animation - slowed down */}
           <motion.div
             animate={{ 
               y: [0, -6, 0],
@@ -312,7 +375,6 @@ export function OrbitChatAssistant() {
             }}
             className="relative"
           >
-            {/* The actual Orby mascot image */}
             <img 
               src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
               alt="Orby - AI Assistant" 
@@ -322,14 +384,12 @@ export function OrbitChatAssistant() {
               }}
             />
             
-            {/* Online indicator */}
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
               className="absolute bottom-2 right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 shadow-lg shadow-green-500/50"
             />
             
-            {/* Close X overlay when open */}
             <AnimatePresence>
               {isOpen && (
                 <motion.div
