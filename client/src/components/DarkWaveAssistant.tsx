@@ -57,29 +57,30 @@ export function DarkWaveAssistant() {
 
   return (
     <>
-      {/* Floating Soundwave Button - No background, just the wave, matches weather button baseline */}
-      <motion.button
-        onClick={() => setIsOpen(true)}
+      {/* Floating Soundwave Button - Bottom RIGHT corner */}
+      <div
         style={{
           position: 'fixed',
-          bottom: '42px',
-          right: '8px',
-          left: 'auto',
-          top: 'auto',
-          zIndex: 140,
+          bottom: '16px',
+          right: '16px',
+          zIndex: 9999,
         }}
-        className="hover:scale-110 transition-transform"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        data-testid="button-darkwave-assistant"
       >
-        <img 
-          src={darkwaveSoundwave} 
-          alt="DarkWave Assistant" 
-          className="w-52 h-28 sm:w-72 sm:h-40 object-contain brightness-125 saturate-150"
-          style={{ filter: 'drop-shadow(0 0 35px rgba(168, 85, 247, 1)) drop-shadow(0 0 60px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))' }}
-        />
-      </motion.button>
+        <motion.button
+          onClick={() => setIsOpen(true)}
+          className="hover:scale-110 transition-transform"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          data-testid="button-darkwave-assistant"
+        >
+          <img 
+            src={darkwaveSoundwave} 
+            alt="DarkWave Assistant" 
+            className="w-24 h-14 sm:w-32 sm:h-20 object-contain brightness-125 saturate-150"
+            style={{ filter: 'drop-shadow(0 0 25px rgba(168, 85, 247, 1)) drop-shadow(0 0 40px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 15px rgba(6, 182, 212, 0.6))' }}
+          />
+        </motion.button>
+      </div>
 
       {/* Chat Panel */}
       <AnimatePresence>

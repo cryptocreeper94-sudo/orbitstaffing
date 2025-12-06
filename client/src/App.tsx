@@ -193,7 +193,7 @@ function ConditionalOrbitAssistant() {
   return <OrbitChatAssistant />;
 }
 
-function ConditionalFloatingButtons({ onOpenRadar }: { onOpenRadar: () => void }) {
+function ConditionalHomeButton() {
   const [location] = useLocation();
   const darkwavePages = ['/products', '/studio'];
   
@@ -201,12 +201,7 @@ function ConditionalFloatingButtons({ onOpenRadar }: { onOpenRadar: () => void }
     return null;
   }
   
-  return (
-    <>
-      <FloatingHomeButton />
-      <FloatingWeatherButton onOpenRadar={onOpenRadar} />
-    </>
-  );
+  return <FloatingHomeButton />;
 }
 
 export default function App() {
@@ -222,7 +217,8 @@ export default function App() {
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
               <Router />
-              <ConditionalFloatingButtons onOpenRadar={() => setIsRadarOpen(true)} />
+              <ConditionalHomeButton />
+              <FloatingWeatherButton onOpenRadar={() => setIsRadarOpen(true)} />
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
               <ConditionalOrbitAssistant />
               <Toaster />
