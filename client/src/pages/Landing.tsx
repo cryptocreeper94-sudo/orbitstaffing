@@ -759,77 +759,63 @@ export default function Landing() {
             <p className="text-muted-foreground text-[9px] sm:text-sm">Two powerful platforms that work together seamlessly.</p>
           </div>
 
-          {/* Dual Platform Cards - Horizontal on mobile, full-width on desktop */}
-          <div className="relative mb-4">
-            <div className="flex flex-row flex-nowrap gap-3 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
-              {/* ORBIT Staffing OS */}
-              <div className="flex-shrink-0 w-[260px] sm:w-auto snap-start">
-                <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border-violet-500/50 hover:border-violet-400/80 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">
-                  <CardContent className="p-3 sm:p-6 flex flex-col h-full">
-                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                      <img 
-                        src="/mascot/clean/orbit_mascot_cyan_saturn_style_transparent_clean.png" 
-                        alt="Orby Mascot" 
-                        className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
-                      />
-                      <div>
-                        <h3 className="text-sm sm:text-xl font-bold text-violet-200">ORBIT Staffing OS</h3>
-                        <p className="text-[8px] sm:text-xs text-violet-400">Full-Cycle Workforce Management</p>
-                      </div>
-                    </div>
-                    <ul className="space-y-1 text-[8px] sm:text-xs text-slate-300 flex-1">
-                      <li>✓ Recruit → Match → Payroll</li>
-                      <li>✓ Time & Attendance</li>
-                      <li>✓ Compliance & I-9</li>
-                      <li>✓ Invoicing & Billing</li>
-                    </ul>
-                    <Button 
-                      onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
-                      className="w-full h-9 sm:h-10 bg-violet-600 hover:bg-violet-700 text-white text-[10px] sm:text-sm mt-3"
-                      data-testid="button-show-orbit-slideshow"
-                    >
-                      {showOrbitSlideshow ? '▼ Hide' : '▶ View'} Walkthrough
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
+          {/* Dual Platform Cards - Two columns, full width, no scroll */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-6 mb-4">
+            {/* ORBIT Staffing OS */}
+            <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border-violet-500/50 hover:border-violet-400/80 transition-all shadow-[0_0_20px_rgba(139,92,246,0.2)]">
+              <CardContent className="p-2 sm:p-6 flex flex-col h-full">
+                <div className="flex flex-col items-center text-center mb-2 sm:mb-3">
+                  <img 
+                    src="/mascot/clean/orbit_mascot_cyan_saturn_style_transparent_clean.png" 
+                    alt="Orby Mascot" 
+                    className="w-20 h-20 sm:w-32 sm:h-32 object-contain mb-2"
+                  />
+                  <h3 className="text-xs sm:text-xl font-bold text-violet-200">ORBIT Staffing OS</h3>
+                  <p className="text-[7px] sm:text-xs text-violet-400">Full-Cycle Workforce Management</p>
+                </div>
+                <ul className="space-y-0.5 sm:space-y-1 text-[7px] sm:text-xs text-slate-300 flex-1">
+                  <li>✓ Recruit → Match → Payroll</li>
+                  <li>✓ Time & Attendance</li>
+                  <li>✓ Compliance & I-9</li>
+                  <li>✓ Invoicing & Billing</li>
+                </ul>
+                <Button 
+                  onClick={() => setShowOrbitSlideshow(!showOrbitSlideshow)}
+                  className="w-full h-7 sm:h-10 bg-violet-600 hover:bg-violet-700 text-white text-[8px] sm:text-sm mt-2"
+                  data-testid="button-show-orbit-slideshow"
+                >
+                  {showOrbitSlideshow ? '▼ Hide' : '▶ View'} Walkthrough
+                </Button>
+              </CardContent>
+            </Card>
 
-              {/* Orby Command Center */}
-              <div className="flex-shrink-0 w-[260px] sm:w-auto snap-start">
-                <Card className="h-full bg-gradient-to-br from-cyan-900/40 to-blue-900/30 border-cyan-500/50 hover:border-cyan-400/80 transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]">
-                  <CardContent className="p-3 sm:p-6 flex flex-col h-full">
-                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                      <img 
-                        src={orbyCommanderEmblem} 
-                        alt="Orby Commander" 
-                        className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
-                      />
-                      <div>
-                        <h3 className="text-sm sm:text-xl font-bold text-cyan-200">Orby Command Center</h3>
-                        <p className="text-[8px] sm:text-xs text-cyan-400">Real-Time Venue Operations</p>
-                      </div>
-                    </div>
-                    <ul className="space-y-1 text-[8px] sm:text-xs text-slate-300 flex-1">
-                      <li>✓ Emergency Command</li>
-                      <li>✓ Inventory Tracking + AI Scanner</li>
-                      <li>✓ Team Communications</li>
-                      <li>✓ Compliance Monitoring</li>
-                    </ul>
-                    <Button 
-                      className="w-full h-9 sm:h-10 bg-cyan-600 hover:bg-cyan-700 text-white text-[10px] sm:text-sm mt-3"
-                      data-testid="link-orby-command"
-                      onClick={() => window.open('https://getorby.io', '_blank')}
-                    >
-                      Visit getorby.io →
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-            {/* Scroll indicator - mobile only */}
-            <div className="absolute right-0 top-0 bottom-2 w-10 bg-gradient-to-l from-slate-900/80 to-transparent flex items-center justify-end pointer-events-none sm:hidden">
-              <ChevronRight className="w-5 h-5 text-cyan-400 animate-pulse" />
-            </div>
+            {/* Orby Command Center */}
+            <Card className="h-full bg-gradient-to-br from-cyan-900/40 to-blue-900/30 border-cyan-500/50 hover:border-cyan-400/80 transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+              <CardContent className="p-2 sm:p-6 flex flex-col h-full">
+                <div className="flex flex-col items-center text-center mb-2 sm:mb-3">
+                  <img 
+                    src={orbyCommanderEmblem} 
+                    alt="Orby Commander" 
+                    className="w-20 h-20 sm:w-32 sm:h-32 object-contain mb-2"
+                  />
+                  <h3 className="text-xs sm:text-xl font-bold text-cyan-200">Orby Command Center</h3>
+                  <p className="text-[7px] sm:text-xs text-cyan-400">Real-Time Venue Operations</p>
+                </div>
+                <ul className="space-y-0.5 sm:space-y-1 text-[7px] sm:text-xs text-slate-300 flex-1">
+                  <li>✓ Emergency Command</li>
+                  <li>✓ Inventory Tracking + AI</li>
+                  <li>✓ Team Communications</li>
+                  <li>✓ Compliance Monitoring</li>
+                </ul>
+                <Button 
+                  className="w-full h-7 sm:h-10 bg-cyan-600 hover:bg-cyan-700 text-white text-[8px] sm:text-sm mt-2"
+                  data-testid="link-orby-command"
+                  onClick={() => window.open('https://getorby.io', '_blank')}
+                >
+                  Visit getorby.io →
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           {/* ORBIT Slideshow (expandable) */}
