@@ -76,9 +76,9 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
    - SecureSandbox.tsx, BusinessValuationDashboard.tsx, FeatureInventory.tsx, DarkwaveFooter.tsx
    - Added v2.5.5 and v2.6.0 to publish log history
 
-4. **Solana Blockchain Stamps**
-   - ORBIT Staffing OS v2.6.0: Hash `b430905b6eb4535089add28290e8289caf70e77cbf94ae3c17d7fc5fb1bb96f5`
-   - DarkWave Studios v2.6.0: Hash `652f5f25d88e22e5533b6ff6510838f7f729aecb0fc6551ee1ecfe04df0430cf`
+4. **Solana Blockchain Stamps (December 6, 2025)**
+   - ORBIT Staffing OS v2.6.0: Hash `43c8a083ca6e92ad2d6a9c5ba8b14821477b40a23113107aadabb2994651ce21`
+   - DarkWave Studios v2.6.0: Hash `126de1690f4e240bee2bd2b9018348fe0e0f0ef7002bb1e20268fce9662e4f61`
 
 5. **Previous Session (Dec 5) - PWA Complete**
    - Full-color Orby mascot as home screen icon
