@@ -8,6 +8,7 @@ import { DarkWaveAssistant } from '@/components/DarkWaveAssistant';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides, orbySlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
+import orbyMascot from '@assets/generated_images/orby_mascot_presenting_pose.png';
 
 export default function ProductsGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -26,7 +27,7 @@ export default function ProductsGallery() {
       slides: slideContent.ORBIT,
       slideshowData: orbitSlides,
       url: 'https://orbitstaffing.io',
-      emblem: '/attached_assets/generated_images/orby_mascot_presenting_pose.png',
+      emblem: orbyMascot,
       hallmark: null,
     },
     {
