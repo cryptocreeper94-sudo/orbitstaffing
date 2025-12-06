@@ -343,16 +343,26 @@ export default function ProductsGallery() {
                         <span className="relative inline-block">
                           <span className="relative z-10">{currentProduct.name}</span>
                           <span 
-                            className="absolute inset-0 animate-pulse rounded-lg"
-                            style={{
-                              background: 'radial-gradient(circle, rgba(239,68,68,0.6) 0%, transparent 70%)',
-                              filter: 'blur(8px)',
-                              animation: 'pulse 1.5s ease-in-out infinite',
-                            }}
-                          />
+                            className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden"
+                            style={{ transform: 'translateY(2px)' }}
+                          >
+                            <span 
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500 to-transparent"
+                              style={{
+                                animation: 'pulseLine 1.5s ease-in-out infinite',
+                              }}
+                            />
+                          </span>
                         </span>
                       ) : currentProduct.name}
                     </h2>
+                    <style>{`
+                      @keyframes pulseLine {
+                        0% { transform: translateX(-100%); opacity: 0; }
+                        50% { opacity: 1; }
+                        100% { transform: translateX(100%); opacity: 0; }
+                      }
+                    `}</style>
                     <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
                       {currentProduct.tagline}
                     </p>
