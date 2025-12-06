@@ -5657,3 +5657,210 @@ export const PRESENTATION_TEMPLATES = [
   { id: 'compliance_report', name: 'Compliance Report', description: 'Formal documentation for audits and reviews', icon: 'Shield', color: 'from-emerald-600 to-teal-700' },
   { id: 'worker_brief', name: 'Worker Brief', description: 'Onboarding and orientation materials', icon: 'Users', color: 'from-amber-600 to-orange-700' },
 ] as const;
+
+// ========================
+// DarkWave Ecosystem Hub
+// ========================
+
+// Connected Apps (other DarkWave products connected to this hub)
+export const ecosystemConnectedApps = pgTable(
+  "ecosystem_connected_apps",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    appName: varchar("app_name", { length: 100 }).notNull(),
+    appSlug: varchar("app_slug", { length: 50 }).notNull().unique(),
+    appUrl: varchar("app_url", { length: 255 }),
+    description: text("description"),
+    logoUrl: varchar("logo_url", { length: 255 }),
+    apiKey: varchar("api_key", { length: 100 }).notNull().unique(),
+    apiSecretHash: text("api_secret_hash").notNull(),
+    permissions: text("permissions").array().default([]),
+    isActive: boolean("is_active").default(true),
+    lastSyncAt: timestamp("last_sync_at"),
+    syncCount: integer("sync_count").default(0),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    apiKeyIdx: index("idx_ecosystem_apps_api_key").on(table.apiKey),
+    slugIdx: index("idx_ecosystem_apps_slug").on(table.appSlug),
+    activeIdx: index("idx_ecosystem_apps_active").on(table.isActive),
+  })
+);
+
+export const insertEcosystemConnectedAppSchema = createInsertSchema(ecosystemConnectedApps).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastSyncAt: true,
+  syncCount: true,
+});
+
+export type InsertEcosystemConnectedApp = z.infer<typeof insertEcosystemConnectedAppSchema>;
+export type EcosystemConnectedApp = typeof ecosystemConnectedApps.$inferSelect;
+
+// Shared Code Snippets
+export const ecosystemCodeSnippets = pgTable(
+  "ecosystem_code_snippets",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    sourceAppId: varchar("source_app_id").references(() => ecosystemConnectedApps.id),
+    sourceAppName: varchar("source_app_name", { length: 100 }),
+    name: varchar("name", { length: 100 }).notNull(),
+    description: text("description"),
+    code: text("code").notNull(),
+    language: varchar("language", { length: 50 }).notNull(),
+    category: varchar("category", { length: 50 }).notNull(),
+    tags: text("tags").array().default([]),
+    isPublic: boolean("is_public").default(false),
+    usageCount: integer("usage_count").default(0),
+    version: varchar("version", { length: 20 }).default("1.0.0"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    sourceAppIdx: index("idx_ecosystem_snippets_source").on(table.sourceAppId),
+    categoryIdx: index("idx_ecosystem_snippets_category").on(table.category),
+    languageIdx: index("idx_ecosystem_snippets_language").on(table.language),
+    publicIdx: index("idx_ecosystem_snippets_public").on(table.isPublic),
+  })
+);
+
+export const insertEcosystemCodeSnippetSchema = createInsertSchema(ecosystemCodeSnippets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  usageCount: true,
+});
+
+export type InsertEcosystemCodeSnippet = z.infer<typeof insertEcosystemCodeSnippetSchema>;
+export type EcosystemCodeSnippet = typeof ecosystemCodeSnippets.$inferSelect;
+
+// Data Sync Records (contractors, 1099, workers, etc.)
+export const ecosystemDataSyncs = pgTable(
+  "ecosystem_data_syncs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    sourceAppId: varchar("source_app_id").references(() => ecosystemConnectedApps.id),
+    sourceAppName: varchar("source_app_name", { length: 100 }),
+    syncType: varchar("sync_type", { length: 50 }).notNull(),
+    direction: varchar("direction", { length: 10 }).notNull(),
+    recordCount: integer("record_count").default(0),
+    dataPayload: jsonb("data_payload"),
+    status: varchar("status", { length: 20 }).default("pending"),
+    errorMessage: text("error_message"),
+    processedAt: timestamp("processed_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    sourceAppIdx: index("idx_ecosystem_syncs_source").on(table.sourceAppId),
+    typeIdx: index("idx_ecosystem_syncs_type").on(table.syncType),
+    statusIdx: index("idx_ecosystem_syncs_status").on(table.status),
+    directionIdx: index("idx_ecosystem_syncs_direction").on(table.direction),
+  })
+);
+
+export const insertEcosystemDataSyncSchema = createInsertSchema(ecosystemDataSyncs).omit({
+  id: true,
+  createdAt: true,
+  processedAt: true,
+});
+
+export type InsertEcosystemDataSync = z.infer<typeof insertEcosystemDataSyncSchema>;
+export type EcosystemDataSync = typeof ecosystemDataSyncs.$inferSelect;
+
+// Activity Logs
+export const ecosystemActivityLogs = pgTable(
+  "ecosystem_activity_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    appId: varchar("app_id").references(() => ecosystemConnectedApps.id),
+    appName: varchar("app_name", { length: 100 }),
+    action: varchar("action", { length: 100 }).notNull(),
+    resource: varchar("resource", { length: 100 }),
+    resourceId: varchar("resource_id", { length: 100 }),
+    details: jsonb("details"),
+    ipAddress: varchar("ip_address", { length: 50 }),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    appIdx: index("idx_ecosystem_logs_app").on(table.appId),
+    actionIdx: index("idx_ecosystem_logs_action").on(table.action),
+    createdAtIdx: index("idx_ecosystem_logs_created").on(table.createdAt),
+  })
+);
+
+export const insertEcosystemActivityLogSchema = createInsertSchema(ecosystemActivityLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertEcosystemActivityLog = z.infer<typeof insertEcosystemActivityLogSchema>;
+export type EcosystemActivityLog = typeof ecosystemActivityLogs.$inferSelect;
+
+// External Hub Connections (ORBIT connecting TO other ecosystem hubs)
+export const ecosystemExternalHubs = pgTable(
+  "ecosystem_external_hubs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    hubName: varchar("hub_name", { length: 100 }).notNull(),
+    hubUrl: varchar("hub_url", { length: 255 }).notNull(),
+    apiKey: varchar("api_key", { length: 100 }),
+    apiSecretEncrypted: text("api_secret_encrypted"),
+    permissions: text("permissions").array().default([]),
+    isActive: boolean("is_active").default(true),
+    autoSync: boolean("auto_sync").default(false),
+    syncFrequency: varchar("sync_frequency", { length: 20 }).default("manual"),
+    lastSyncAt: timestamp("last_sync_at"),
+    lastSyncStatus: varchar("last_sync_status", { length: 20 }),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    hubNameIdx: index("idx_external_hubs_name").on(table.hubName),
+    activeIdx: index("idx_external_hubs_active").on(table.isActive),
+  })
+);
+
+export const insertEcosystemExternalHubSchema = createInsertSchema(ecosystemExternalHubs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastSyncAt: true,
+  lastSyncStatus: true,
+});
+
+export type InsertEcosystemExternalHub = z.infer<typeof insertEcosystemExternalHubSchema>;
+export type EcosystemExternalHub = typeof ecosystemExternalHubs.$inferSelect;
+
+// Ecosystem Permissions Reference
+export const ECOSYSTEM_PERMISSIONS = [
+  { id: 'read:code', name: 'Read Code', description: 'Access shared code snippets' },
+  { id: 'write:code', name: 'Write Code', description: 'Push code snippets to ecosystem' },
+  { id: 'read:workers', name: 'Read Workers', description: 'Access worker/contractor data' },
+  { id: 'write:workers', name: 'Write Workers', description: 'Sync worker data to ecosystem' },
+  { id: 'read:1099', name: 'Read 1099', description: 'Access 1099 compliance data' },
+  { id: 'write:1099', name: 'Write 1099', description: 'Push 1099 payment data' },
+  { id: 'read:timesheets', name: 'Read Timesheets', description: 'Access timesheet data' },
+  { id: 'write:timesheets', name: 'Write Timesheets', description: 'Sync timesheet records' },
+  { id: 'read:certifications', name: 'Read Certifications', description: 'Access worker certifications' },
+  { id: 'write:certifications', name: 'Write Certifications', description: 'Sync certification data' },
+  { id: 'read:compliance', name: 'Read Compliance', description: 'Access compliance documents' },
+  { id: 'write:compliance', name: 'Write Compliance', description: 'Push compliance records' },
+  { id: 'read:clients', name: 'Read Clients', description: 'Access client/CRM data' },
+  { id: 'write:clients', name: 'Write Clients', description: 'Sync client data' },
+  { id: 'sync:all', name: 'Full Sync', description: 'Complete read/write access' },
+] as const;
+
+// Sync Type Reference
+export const ECOSYSTEM_SYNC_TYPES = [
+  { id: 'contractors', name: 'Contractors', description: 'Worker/contractor basic info' },
+  { id: '1099_payments', name: '1099 Payments', description: 'Annual 1099 payment records' },
+  { id: 'timesheets', name: 'Timesheets', description: 'Time and attendance records' },
+  { id: 'certifications', name: 'Certifications', description: 'Worker certifications and licenses' },
+  { id: 'compliance_docs', name: 'Compliance Documents', description: 'I-9, W-4, background checks' },
+  { id: 'clients', name: 'Clients', description: 'Client/company CRM data' },
+  { id: 'jobs', name: 'Jobs', description: 'Job postings and assignments' },
+  { id: 'payroll_summary', name: 'Payroll Summary', description: 'Aggregated payroll data' },
+] as const;

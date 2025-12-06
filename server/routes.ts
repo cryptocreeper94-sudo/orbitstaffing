@@ -9319,4 +9319,427 @@ export function registerPayCardRoutes(app: Express) {
       res.status(500).json({ error: "Failed to send presentation" });
     }
   });
+
+  // ========================
+  // DARKWAVE ECOSYSTEM HUB API
+  // ========================
+
+  const ecosystemModule = await import("./ecosystemHub");
+  const { ecosystemHub, externalHubManager, EcosystemClient } = ecosystemModule;
+
+  // Middleware to authenticate ecosystem API requests
+  async function ecosystemAuth(req: Request, res: Response, next: NextFunction) {
+    const apiKey = req.headers['x-api-key'] as string;
+    const apiSecret = req.headers['x-api-secret'] as string;
+    
+    if (!apiKey || !apiSecret) {
+      return res.status(401).json({ error: 'Missing API credentials' });
+    }
+    
+    const app = await ecosystemHub.authenticateApp(apiKey, apiSecret);
+    if (!app) {
+      return res.status(401).json({ error: 'Invalid API credentials' });
+    }
+    
+    (req as any).ecosystemApp = app;
+    next();
+  }
+
+  // Status check (public endpoint for connection testing)
+  app.get("/api/ecosystem/status", ecosystemAuth, async (req: Request, res: Response) => {
+    const app = (req as any).ecosystemApp;
+    res.json({
+      connected: true,
+      hubName: 'ORBIT Staffing Ecosystem Hub',
+      appName: app.appName,
+      permissions: app.permissions || [],
+      lastSync: app.lastSyncAt,
+    });
+  });
+
+  // Get shared code snippets
+  app.get("/api/ecosystem/snippets", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'read:code')) {
+        return res.status(403).json({ error: 'Permission denied: read:code required' });
+      }
+      
+      const { category, language } = req.query;
+      const snippets = await ecosystemHub.getSnippets(
+        category as string, 
+        language as string, 
+        false // Include all accessible snippets
+      );
+      res.json(snippets);
+    } catch (error) {
+      console.error("Ecosystem snippets error:", error);
+      res.status(500).json({ error: "Failed to fetch snippets" });
+    }
+  });
+
+  // Push a code snippet
+  app.post("/api/ecosystem/snippets", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'write:code')) {
+        return res.status(403).json({ error: 'Permission denied: write:code required' });
+      }
+      
+      const snippet = await ecosystemHub.pushSnippet(app, req.body);
+      res.json(snippet);
+    } catch (error) {
+      console.error("Ecosystem push snippet error:", error);
+      res.status(500).json({ error: "Failed to push snippet" });
+    }
+  });
+
+  // Sync contractors
+  app.post("/api/ecosystem/sync/contractors", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'write:workers')) {
+        return res.status(403).json({ error: 'Permission denied: write:workers required' });
+      }
+      
+      const { contractors } = req.body;
+      const sync = await ecosystemHub.syncContractors(app, contractors);
+      res.json(sync);
+    } catch (error) {
+      console.error("Ecosystem sync contractors error:", error);
+      res.status(500).json({ error: "Failed to sync contractors" });
+    }
+  });
+
+  // Sync 1099 payment data
+  app.post("/api/ecosystem/sync/1099", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'write:1099')) {
+        return res.status(403).json({ error: 'Permission denied: write:1099 required' });
+      }
+      
+      const { year, payments } = req.body;
+      const sync = await ecosystemHub.sync1099Payments(app, year, payments);
+      res.json(sync);
+    } catch (error) {
+      console.error("Ecosystem sync 1099 error:", error);
+      res.status(500).json({ error: "Failed to sync 1099 data" });
+    }
+  });
+
+  // Sync workers
+  app.post("/api/ecosystem/sync/workers", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'write:workers')) {
+        return res.status(403).json({ error: 'Permission denied: write:workers required' });
+      }
+      
+      const { workers } = req.body;
+      const sync = await ecosystemHub.syncWorkers(app, workers);
+      res.json(sync);
+    } catch (error) {
+      console.error("Ecosystem sync workers error:", error);
+      res.status(500).json({ error: "Failed to sync workers" });
+    }
+  });
+
+  // Sync timesheets
+  app.post("/api/ecosystem/sync/timesheets", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'write:timesheets')) {
+        return res.status(403).json({ error: 'Permission denied: write:timesheets required' });
+      }
+      
+      const { timesheets } = req.body;
+      const sync = await ecosystemHub.syncTimesheets(app, timesheets);
+      res.json(sync);
+    } catch (error) {
+      console.error("Ecosystem sync timesheets error:", error);
+      res.status(500).json({ error: "Failed to sync timesheets" });
+    }
+  });
+
+  // Sync certifications
+  app.post("/api/ecosystem/sync/certifications", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      if (!ecosystemHub.hasPermission(app, 'write:certifications')) {
+        return res.status(403).json({ error: 'Permission denied: write:certifications required' });
+      }
+      
+      const { certifications } = req.body;
+      const sync = await ecosystemHub.syncCertifications(app, certifications);
+      res.json(sync);
+    } catch (error) {
+      console.error("Ecosystem sync certifications error:", error);
+      res.status(500).json({ error: "Failed to sync certifications" });
+    }
+  });
+
+  // Get activity logs
+  app.get("/api/ecosystem/logs", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      const logs = await ecosystemHub.getActivityLogs(app.id);
+      res.json(logs);
+    } catch (error) {
+      console.error("Ecosystem get logs error:", error);
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
+
+  // Push activity log
+  app.post("/api/ecosystem/logs", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const app = (req as any).ecosystemApp;
+      const { action, details } = req.body;
+      const log = await ecosystemHub.logActivity(app.id, app.appName, action, 'custom', null, details);
+      res.json(log);
+    } catch (error) {
+      console.error("Ecosystem push log error:", error);
+      res.status(500).json({ error: "Failed to log activity" });
+    }
+  });
+
+  // ========================
+  // ADMIN ECOSYSTEM MANAGEMENT (requires admin auth)
+  // ========================
+
+  // Register a new app
+  app.post("/api/admin/ecosystem/apps", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { appName, appSlug, appUrl, description, logoUrl, permissions } = req.body;
+      const result = await ecosystemHub.registerApp({
+        appName,
+        appSlug,
+        appUrl,
+        description,
+        logoUrl,
+        permissions: permissions || [],
+      });
+      
+      // Return credentials only once - they must be saved immediately
+      res.json({
+        app: result.app,
+        credentials: {
+          apiKey: result.apiKey,
+          apiSecret: result.apiSecret,
+          warning: 'Save these credentials now. The API secret will not be shown again.',
+        },
+      });
+    } catch (error) {
+      console.error("Register ecosystem app error:", error);
+      res.status(500).json({ error: "Failed to register app" });
+    }
+  });
+
+  // List connected apps
+  app.get("/api/admin/ecosystem/apps", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const apps = await ecosystemHub.getConnectedApps();
+      res.json(apps);
+    } catch (error) {
+      console.error("Get ecosystem apps error:", error);
+      res.status(500).json({ error: "Failed to fetch apps" });
+    }
+  });
+
+  // Update app permissions
+  app.put("/api/admin/ecosystem/apps/:appId/permissions", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { appId } = req.params;
+      const { permissions } = req.body;
+      const app = await ecosystemHub.updateAppPermissions(appId, permissions);
+      res.json(app);
+    } catch (error) {
+      console.error("Update app permissions error:", error);
+      res.status(500).json({ error: "Failed to update permissions" });
+    }
+  });
+
+  // Deactivate app
+  app.delete("/api/admin/ecosystem/apps/:appId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { appId } = req.params;
+      await ecosystemHub.deactivateApp(appId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Deactivate ecosystem app error:", error);
+      res.status(500).json({ error: "Failed to deactivate app" });
+    }
+  });
+
+  // Regenerate app credentials
+  app.post("/api/admin/ecosystem/apps/:appId/regenerate", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { appId } = req.params;
+      const credentials = await ecosystemHub.regenerateAppCredentials(appId);
+      if (!credentials) {
+        return res.status(404).json({ error: "App not found" });
+      }
+      res.json({
+        ...credentials,
+        warning: 'Save these credentials now. The API secret will not be shown again.',
+      });
+    } catch (error) {
+      console.error("Regenerate credentials error:", error);
+      res.status(500).json({ error: "Failed to regenerate credentials" });
+    }
+  });
+
+  // Get hub statistics
+  app.get("/api/admin/ecosystem/stats", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const stats = await ecosystemHub.getHubStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Get ecosystem stats error:", error);
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // Get sync history
+  app.get("/api/admin/ecosystem/syncs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { appId, syncType, limit } = req.query;
+      const syncs = await ecosystemHub.getSyncHistory(
+        appId as string, 
+        syncType as string, 
+        limit ? parseInt(limit as string) : 50
+      );
+      res.json(syncs);
+    } catch (error) {
+      console.error("Get sync history error:", error);
+      res.status(500).json({ error: "Failed to fetch sync history" });
+    }
+  });
+
+  // Get all snippets (admin view)
+  app.get("/api/admin/ecosystem/snippets", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { category, language } = req.query;
+      const snippets = await ecosystemHub.getSnippets(category as string, language as string, false);
+      res.json(snippets);
+    } catch (error) {
+      console.error("Get admin snippets error:", error);
+      res.status(500).json({ error: "Failed to fetch snippets" });
+    }
+  });
+
+  // ========================
+  // EXTERNAL HUB CONNECTIONS (ORBIT → Other Hubs)
+  // ========================
+
+  // Add external hub connection
+  app.post("/api/admin/ecosystem/external-hubs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hubName, hubUrl, apiKey, apiSecret, permissions, autoSync, syncFrequency } = req.body;
+      const hub = await externalHubManager.addExternalHub({
+        hubName,
+        hubUrl,
+        apiKey,
+        apiSecret,
+        permissions,
+        autoSync,
+        syncFrequency,
+      });
+      res.json(hub);
+    } catch (error: any) {
+      console.error("Add external hub error:", error);
+      res.status(500).json({ error: error.message || "Failed to add external hub" });
+    }
+  });
+
+  // List external hubs
+  app.get("/api/admin/ecosystem/external-hubs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const hubs = await externalHubManager.getExternalHubs();
+      res.json(hubs);
+    } catch (error) {
+      console.error("Get external hubs error:", error);
+      res.status(500).json({ error: "Failed to fetch external hubs" });
+    }
+  });
+
+  // Test external hub connection
+  app.post("/api/admin/ecosystem/external-hubs/:hubId/test", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hubId } = req.params;
+      const status = await externalHubManager.testHubConnection(hubId);
+      res.json(status);
+    } catch (error) {
+      console.error("Test hub connection error:", error);
+      res.status(500).json({ error: "Failed to test connection" });
+    }
+  });
+
+  // Update external hub settings
+  app.put("/api/admin/ecosystem/external-hubs/:hubId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hubId } = req.params;
+      const { autoSync, syncFrequency, isActive } = req.body;
+      const hub = await externalHubManager.updateHubSettings(hubId, { autoSync, syncFrequency, isActive });
+      res.json(hub);
+    } catch (error) {
+      console.error("Update external hub error:", error);
+      res.status(500).json({ error: "Failed to update hub" });
+    }
+  });
+
+  // Remove external hub
+  app.delete("/api/admin/ecosystem/external-hubs/:hubId", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hubId } = req.params;
+      await externalHubManager.removeExternalHub(hubId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Remove external hub error:", error);
+      res.status(500).json({ error: "Failed to remove hub" });
+    }
+  });
+
+  // Push data TO external hub
+  app.post("/api/admin/ecosystem/external-hubs/:hubId/push", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { hubId } = req.params;
+      const { syncType, data } = req.body;
+      
+      const client = await externalHubManager.getClientForHub(hubId);
+      if (!client) {
+        return res.status(404).json({ error: "Hub not found or not configured" });
+      }
+      
+      let result;
+      switch (syncType) {
+        case 'contractors':
+          result = await client.syncContractors(data);
+          break;
+        case '1099':
+          result = await client.sync1099Data(data.year, data.payments);
+          break;
+        case 'workers':
+          result = await client.syncWorkers(data);
+          break;
+        case 'timesheets':
+          result = await client.syncTimesheets(data);
+          break;
+        case 'certifications':
+          result = await client.syncCertifications(data);
+          break;
+        case 'snippet':
+          result = await client.pushSnippet(data);
+          break;
+        default:
+          return res.status(400).json({ error: `Unknown sync type: ${syncType}` });
+      }
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error("Push to external hub error:", error);
+      res.status(500).json({ error: error.message || "Failed to push data" });
+    }
+  });
 }
