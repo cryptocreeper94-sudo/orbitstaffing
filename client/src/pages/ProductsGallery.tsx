@@ -283,20 +283,20 @@ export default function ProductsGallery() {
       </div>
 
       {/* ===== SECTION 2: FULL-SCREEN PRODUCT CARD ===== */}
-      <section className="relative z-10 flex-1 flex items-center justify-center px-4 py-4 overflow-visible">
+      <section className="relative z-10 flex-1 flex items-center justify-center px-2 sm:px-4 py-2 overflow-hidden">
         {/* Left Arrow */}
         <motion.button
           onClick={prevProduct}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute left-2 sm:left-6 z-20 p-3 sm:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-xl"
+          className="absolute left-1 sm:left-6 z-20 p-2 sm:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-xl"
           data-testid="button-prev-product"
         >
-          <ChevronLeft className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
+          <ChevronLeft className="w-5 h-5 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
 
-        {/* Product Card - Full Screen, Nearly Full Width */}
-        <div className="w-full max-w-6xl xl:max-w-7xl flex items-center justify-center mx-8 sm:mx-12">
+        {/* Product Card - Constrained to fit viewport */}
+        <div className="w-full max-w-6xl xl:max-w-7xl flex items-center justify-center mx-10 sm:mx-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
@@ -309,33 +309,37 @@ export default function ProductsGallery() {
               {/* Glow Effect */}
               <div className={`absolute -inset-2 bg-gradient-to-r ${currentProduct.color} rounded-3xl blur-xl opacity-30`} />
               
-              {/* Card Container */}
+              {/* Card Container - max height constrained */}
               <div
-                className="relative overflow-visible rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900/98 via-slate-800/98 to-slate-900/98 backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col"
+                className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900/98 via-slate-800/98 to-slate-900/98 backdrop-blur-xl border border-white/10 shadow-2xl"
                 data-testid={`card-product-${currentProduct.id}`}
               >
                 {/* Background Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-5`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${currentProduct.color} opacity-5 rounded-2xl`} />
                 
-                {/* Card Content */}
-                <div className="relative flex flex-col p-5 sm:p-8">
+                {/* Card Content - Compact layout */}
+                <div className="relative flex flex-col p-4 sm:p-8">
                   
-                  {/* Top Section: Emblem + Product Info */}
-                  <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mb-6">
-                    {/* Emblem */}
+                  {/* Top Section: Emblem + Product Info - Horizontal on mobile */}
+                  <div className="flex items-center gap-3 sm:gap-8 mb-3 sm:mb-6">
+                    {/* Emblem - Smaller on mobile */}
                     <div className="shrink-0">
                       {currentProduct.emblem ? (
-                        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl overflow-hidden`}>
+                        <div className={`w-16 h-16 sm:w-28 sm:h-28 rounded-xl sm:rounded-2xl bg-gradient-to-br ${currentProduct.color} p-0.5 sm:p-1 shadow-2xl overflow-hidden`}>
                           <img 
                             src={currentProduct.emblem} 
                             alt={`${currentProduct.name} emblem`}
-                            className="w-full h-full rounded-xl object-cover"
+                            className="w-full h-full rounded-lg sm:rounded-xl object-cover bg-slate-800"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.parentElement!.innerHTML = `<div class="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center"><span class="text-2xl font-black text-cyan-400">${currentProduct.name.charAt(0)}</span></div>`;
+                            }}
                           />
                         </div>
                       ) : (
-                        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${currentProduct.color} p-1 shadow-2xl`}>
-                          <div className="w-full h-full rounded-xl bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-3xl sm:text-5xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                        <div className={`w-16 h-16 sm:w-28 sm:h-28 rounded-xl sm:rounded-2xl bg-gradient-to-br ${currentProduct.color} p-0.5 sm:p-1 shadow-2xl`}>
+                          <div className="w-full h-full rounded-lg sm:rounded-xl bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-2xl sm:text-5xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                               {currentProduct.name.charAt(0)}
                             </span>
                           </div>
@@ -344,61 +348,61 @@ export default function ProductsGallery() {
                     </div>
 
                     {/* Product Name & Tagline */}
-                    <div className="text-center sm:text-left flex-1">
-                      <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-lg sm:text-4xl font-bold text-white mb-1 sm:mb-2 truncate">
                         {currentProduct.name}
                       </h2>
-                      <p className={`text-base sm:text-xl font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
+                      <p className={`text-xs sm:text-xl font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent line-clamp-2`}>
                         {currentProduct.tagline}
                       </p>
                     </div>
                   </div>
 
-                  {/* Middle Section: Description */}
-                  <div className="flex items-center justify-center mb-4 sm:mb-6">
-                    <p className="text-gray-300 text-sm sm:text-lg leading-relaxed text-center max-w-2xl">
+                  {/* Middle Section: Description - Shorter on mobile */}
+                  <div className="mb-3 sm:mb-6">
+                    <p className="text-gray-300 text-xs sm:text-lg leading-relaxed text-center line-clamp-4 sm:line-clamp-none">
                       {currentProduct.description}
                     </p>
                   </div>
 
                   {/* Bottom Section: Hallmark QR + Buttons */}
-                  <div className="flex flex-col items-center gap-4 sm:gap-6">
-                    {/* Hallmark QR Code - Full image, not cropped */}
+                  <div className="flex flex-col items-center gap-2 sm:gap-4">
+                    {/* Hallmark QR Code - Compact on mobile */}
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wider">Blockchain Verified</span>
+                      <span className="text-[9px] sm:text-xs text-gray-500 uppercase tracking-wider">Blockchain Verified</span>
                       {currentProduct.hallmark ? (
-                        <div className="w-auto h-20 sm:h-28 max-w-[160px] sm:max-w-[200px] rounded-xl bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-1 shadow-lg overflow-hidden border border-cyan-500/20">
+                        <div className="w-auto h-14 sm:h-24 max-w-[120px] sm:max-w-[180px] rounded-lg bg-gradient-to-br from-teal-900/50 to-slate-900/50 p-0.5 shadow-lg overflow-hidden border border-cyan-500/20">
                           <img 
                             src={currentProduct.hallmark} 
                             alt={`${currentProduct.name} hallmark`}
-                            className="h-full w-auto rounded-lg object-contain"
+                            className="h-full w-auto rounded-md object-contain"
                           />
                         </div>
                       ) : currentProduct.url ? (
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-white p-1.5 shadow-lg">
+                        <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-lg bg-white p-1 shadow-lg">
                           <QRCodeSVG 
                             value={currentProduct.url} 
-                            size={80}
+                            size={56}
                             className="w-full h-full"
                             bgColor="#ffffff"
                             fgColor="#0f172a"
                           />
                         </div>
                       ) : (
-                        <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br ${currentProduct.color} p-1 opacity-30`}>
-                          <div className="w-full h-full rounded-lg bg-slate-900/90 flex items-center justify-center">
-                            <span className="text-xs text-gray-500">Pending</span>
+                        <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-lg bg-gradient-to-br ${currentProduct.color} p-0.5 opacity-30`}>
+                          <div className="w-full h-full rounded-md bg-slate-900/90 flex items-center justify-center">
+                            <span className="text-[10px] text-gray-500">Pending</span>
                           </div>
                         </div>
                       )}
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3 sm:gap-4">
+                    {/* Action Buttons - Compact on mobile */}
+                    <div className="flex gap-2 sm:gap-4">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-4 sm:px-8 py-2.5 sm:py-4 inline-flex items-center justify-center gap-2 bg-gradient-to-r ${currentProduct.color} rounded-xl font-bold text-xs sm:text-base shadow-lg`}
+                        className={`px-3 sm:px-8 py-2 sm:py-3 inline-flex items-center justify-center gap-1.5 bg-gradient-to-r ${currentProduct.color} rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-base shadow-lg`}
                         onClick={() => setSelectedProduct(currentProduct.id)}
                         data-testid={`button-slideshow-${currentProduct.id}`}
                       >
@@ -413,21 +417,21 @@ export default function ProductsGallery() {
                           rel="noopener noreferrer"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="px-4 sm:px-8 py-2.5 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-bold text-xs sm:text-base transition-colors"
+                          className="px-3 sm:px-8 py-2 sm:py-3 inline-flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-base transition-colors"
                           data-testid={`button-visit-${currentProduct.id}`}
                         >
-                          Visit Site
+                          Visit
                           <ExternalLink className="w-3 h-3 sm:w-5 sm:h-5" />
                         </motion.a>
                       ) : (
-                        <div className="px-4 sm:px-8 py-2.5 sm:py-4 inline-flex items-center justify-center gap-2 bg-white/5 border border-white/10 rounded-xl font-bold text-xs sm:text-base text-gray-500">
-                          Coming Soon
+                        <div className="px-3 sm:px-8 py-2 sm:py-3 inline-flex items-center justify-center gap-1.5 bg-white/5 border border-white/10 rounded-lg sm:rounded-xl font-bold text-[10px] sm:text-base text-gray-500">
+                          Soon
                         </div>
                       )}
                     </div>
 
                     {/* Product Counter */}
-                    <p className="text-gray-500 text-xs sm:text-sm">
+                    <p className="text-gray-500 text-[10px] sm:text-sm">
                       {currentIndex + 1} of {products.length}
                     </p>
                   </div>
@@ -442,10 +446,10 @@ export default function ProductsGallery() {
           onClick={nextProduct}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          className="absolute right-2 sm:right-6 z-20 p-3 sm:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-xl"
+          className="absolute right-1 sm:right-6 z-20 p-2 sm:p-4 bg-slate-800/90 hover:bg-cyan-500/30 border border-slate-700 hover:border-cyan-500 rounded-full transition-all group shadow-xl"
           data-testid="button-next-product"
         >
-          <ChevronRight className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
+          <ChevronRight className="w-5 h-5 sm:w-8 sm:h-8 text-cyan-400 group-hover:text-white transition" />
         </motion.button>
       </section>
 
