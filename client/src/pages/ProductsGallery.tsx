@@ -9,6 +9,14 @@ import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides, orbySlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
 import orbyMascot from '@assets/generated_images/orby_mascot_presenting_pose.png';
+import orbyEmblem from '@assets/Screenshot_20251205_100035_Replit_1764952065470.jpg';
+import orbyHallmark from '@assets/Screenshot_20251205_154312_Replit_1764971077009.jpg';
+import lotOpsEmblem from '@assets/Screenshot_20251205_080335_Replit_1764943504222.jpg';
+import lotOpsHallmark from '@assets/Screenshot_20251205_092457_Replit_1764949322382.jpg';
+import brewBoardEmblem from '@assets/brew_board_emblem.png';
+import brewBoardHallmark from '@assets/Screenshot_20251205_135345_Replit_1764964534831.jpg';
+import garageBotEmblem from '@assets/garagebot_emblem.png';
+import garageBotHallmark from '@assets/Screenshot_20251205_150630_Chrome_1764968855422.jpg';
 
 export default function ProductsGallery() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,8 +48,8 @@ export default function ProductsGallery() {
       slides: slideContent['ORBY'],
       slideshowData: orbySlides,
       url: 'https://getorby.io',
-      emblem: '/attached_assets/Screenshot_20251205_100035_Replit_1764952065470.jpg',
-      hallmark: '/attached_assets/Screenshot_20251205_154312_Replit_1764971077009.jpg',
+      emblem: orbyEmblem,
+      hallmark: orbyHallmark,
     },
     {
       id: 'DarkWave Pulse',
@@ -66,8 +74,8 @@ export default function ProductsGallery() {
       slides: slideContent['Lot Ops Pro'],
       slideshowData: slidesData,
       url: null,
-      emblem: '/attached_assets/Screenshot_20251205_080335_Replit_1764943504222.jpg',
-      hallmark: '/attached_assets/Screenshot_20251205_092457_Replit_1764949322382.jpg',
+      emblem: lotOpsEmblem,
+      hallmark: lotOpsHallmark,
     },
     {
       id: 'BrewAndBoard',
@@ -79,8 +87,8 @@ export default function ProductsGallery() {
       slides: slideContent['BREW_AND_BOARD'],
       slideshowData: brewAndBoardSlides,
       url: 'https://brewandboard.coffee',
-      emblem: '/attached_assets/brew_board_emblem.png',
-      hallmark: '/attached_assets/Screenshot_20251205_135345_Replit_1764964534831.jpg',
+      emblem: brewBoardEmblem,
+      hallmark: brewBoardHallmark,
     },
     {
       id: 'GarageBot',
@@ -92,8 +100,8 @@ export default function ProductsGallery() {
       slides: slideContent['ORBIT'] || [],
       slideshowData: null,
       url: 'https://garagebot.io',
-      emblem: '/attached_assets/garagebot_emblem.png',
-      hallmark: '/attached_assets/Screenshot_20251205_150630_Chrome_1764968855422.jpg',
+      emblem: garageBotEmblem,
+      hallmark: garageBotHallmark,
     },
   ];
 
