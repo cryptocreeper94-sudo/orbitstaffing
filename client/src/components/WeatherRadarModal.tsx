@@ -235,7 +235,7 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="absolute inset-2 sm:inset-4 bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl border border-cyan-500/30 overflow-hidden shadow-2xl"
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-96 max-w-[calc(100vw-2rem)] bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl border border-cyan-500/30 overflow-hidden shadow-2xl max-h-[90vh]"
           style={{ boxShadow: '0 0 60px rgba(6, 182, 212, 0.2)' }}
           onClick={(e) => e.stopPropagation()}
         >
