@@ -410,7 +410,7 @@ export default function ProductsGallery() {
       </section>
 
       {/* Dot Navigation */}
-      <div className="relative z-10 flex justify-center gap-2 py-4">
+      <div className="relative z-10 flex justify-center gap-2 py-3">
         {products.map((product, index) => (
           <motion.button
             key={product.id}
@@ -427,8 +427,10 @@ export default function ProductsGallery() {
         ))}
       </div>
 
-      {/* ===== SECTION 3: MINIMAL FOOTER ===== */}
-      <DarkwaveFooter minimal={true} />
+      {/* ===== SECTION 3: MINIMAL FOOTER - Pushed to bottom ===== */}
+      <div className="mt-auto">
+        <DarkwaveFooter minimal={true} />
+      </div>
 
       {/* ===== MODALS ===== */}
       
