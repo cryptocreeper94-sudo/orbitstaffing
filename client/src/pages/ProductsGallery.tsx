@@ -116,7 +116,7 @@ export default function ProductsGallery() {
   const currentProduct = products[currentIndex];
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden overflow-y-auto">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Animated Background - Fixed behind everything */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Twinkling Stars */}
