@@ -80,15 +80,21 @@ import { PWASplashScreen } from "@/components/PWASplashScreen";
 function RootPage() {
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
+  const hostname = window.location.hostname;
 
   useEffect(() => {
+    // DarkWave Studios domain shows ProductsGallery
+    if (hostname.includes('darkwavestudios')) {
+      setLocation('/studio');
+      return;
+    }
     // Auto-redirect to Developer Panel if bypass is enabled (Jason's devices)
     if (shouldBypassDeveloperLogin()) {
       setLocation('/developer');
       return;
     }
     setLoading(false);
-  }, [setLocation]);
+  }, [setLocation, hostname]);
 
   if (loading) return null;
   // Main landing page for everyone - devs can go to /dev-landing to skip
