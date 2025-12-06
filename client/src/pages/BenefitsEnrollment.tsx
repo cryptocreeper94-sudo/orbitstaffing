@@ -662,7 +662,7 @@ export default function BenefitsEnrollment() {
                           <p className="text-xs text-slate-400">{doc.type} • {doc.size}</p>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">Download</Button>
+                      <Button variant="outline" size="sm" data-testid={`button-download-${index}`}>Download</Button>
                     </div>
                   ))}
                 </div>

@@ -220,7 +220,7 @@ export default function PTOTracking() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)} data-testid="button-cancel-request">Cancel</Button>
                 <Button onClick={handleSubmitRequest} className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-submit-request">
                   <Send className="w-4 h-4 mr-2" />
                   Submit Request
@@ -323,7 +323,7 @@ export default function PTOTracking() {
                           </div>
                         </div>
                         {request.status === "pending" && (
-                          <Button variant="outline" size="sm" className="text-red-400 border-red-500/30 hover:bg-red-500/10">
+                          <Button variant="outline" size="sm" className="text-red-400 border-red-500/30 hover:bg-red-500/10" data-testid={`button-cancel-${request.id}`}>
                             Cancel
                           </Button>
                         )}
