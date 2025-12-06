@@ -26,7 +26,8 @@ import {
   RefreshCw,
   CheckCircle,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from "lucide-react";
 
 const DARKWAVE_PRODUCTS = [
@@ -95,7 +96,7 @@ const DARKWAVE_PRODUCTS = [
 export default function DarkWaveHQ() {
   const [, setLocation] = useLocation();
 
-  const { data: ecosystemStats, refetch: refetchStats } = useQuery<{
+  const { data: ecosystemStats, refetch: refetchStats, isLoading: statsLoading } = useQuery<{
     totalApps: number;
     activeApps: number;
     totalSnippets: number;
@@ -104,14 +105,17 @@ export default function DarkWaveHQ() {
   }>({
     queryKey: ['/api/admin/ecosystem/stats'],
     refetchInterval: 30000,
+    retry: false,
   });
 
-  const { data: connectedApps = [] } = useQuery<any[]>({
+  const { data: connectedApps = [], isLoading: appsLoading } = useQuery<any[]>({
     queryKey: ['/api/admin/ecosystem/apps'],
+    retry: false,
   });
 
-  const { data: syncHistory = [] } = useQuery<any[]>({
+  const { data: syncHistory = [], isLoading: syncsLoading } = useQuery<any[]>({
     queryKey: ['/api/admin/ecosystem/syncs'],
+    retry: false,
   });
 
   const getStatusBadge = (status: string) => {
