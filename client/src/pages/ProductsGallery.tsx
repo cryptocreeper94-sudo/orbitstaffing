@@ -302,8 +302,8 @@ export default function ProductsGallery() {
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
         </button>
 
-        {/* Card Container - Full width with room for arrows */}
-        <div className="w-full max-w-md sm:max-w-2xl lg:max-w-4xl mx-auto px-4">
+        {/* Card Container - Consistent width with room for arrows */}
+        <div className="w-[calc(100%-5rem)] max-w-xs sm:max-w-lg lg:max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
