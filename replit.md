@@ -56,15 +56,16 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ## Last Session Summary (December 6, 2025)
 
-### Current Version: v2.6.0 (Published)
+### Current Version: v2.6.0 (Publishing)
 
 ### What Was Accomplished
-1. **DarkWave Studios Full-Screen Product Gallery**
-   - Full viewport height cards (100vh - header) for immersive product viewing
-   - Left/right arrow navigation between products (horizontal carousel)
+1. **DarkWave Studios Landing Page Complete**
+   - Header: darkwavestudios.io title + v2.6.0 version + Solana verification badge with QR code + hamburger menu
+   - Full viewport height product cards with left/right arrow navigation
    - Each card: emblem (top), name/tagline/description (center), hallmark QR (bottom), action buttons
-   - Soundwave floating AI assistant button with background removed
-   - Minimal footer design: Developer link (left), copyright (center), version (right)
+   - Wave AI assistant floating button (bottom right) - soundwave image
+   - Minimal footer: Developer link | © 2025 | v2.6.0 (horizontally aligned with items-baseline)
+   - Hamburger menu with links: ORBIT Home, Product Gallery, Developer Portal, Contact, About
 
 2. **Domain Redirect Configuration**
    - darkwavestudios.io auto-redirects to /studio route
@@ -75,7 +76,11 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
    - SecureSandbox.tsx, BusinessValuationDashboard.tsx, FeatureInventory.tsx, DarkwaveFooter.tsx
    - Added v2.5.5 and v2.6.0 to publish log history
 
-4. **Previous Session (Dec 5) - PWA Complete**
+4. **Solana Blockchain Stamps**
+   - ORBIT Staffing OS v2.6.0: Hash `b430905b6eb4535089add28290e8289caf70e77cbf94ae3c17d7fc5fb1bb96f5`
+   - DarkWave Studios v2.6.0: Hash `652f5f25d88e22e5533b6ff6510838f7f729aecb0fc6551ee1ecfe04df0430cf`
+
+5. **Previous Session (Dec 5) - PWA Complete**
    - Full-color Orby mascot as home screen icon
    - Splash screen with Orby presenting pose
    - Automatic install prompt with 7-day cooldown
