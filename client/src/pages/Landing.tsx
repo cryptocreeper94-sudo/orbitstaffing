@@ -32,7 +32,7 @@ import { Accordion } from "@/components/Accordion";
 import { ISO20022Banner } from "@/components/ISO20022Banner";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
-import orbyCommanderEmblem from "@assets/Screenshot_20251205_100035_Replit_1764952065470.jpg";
+import orbyCommanderEmblem from "@assets/orby_commander_transparent.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
