@@ -1077,7 +1077,7 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="border-t border-slate-800/50 py-3">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-2 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 flex items-baseline justify-center gap-2 text-xs text-slate-500">
           <span>DarkWave Studios, LLC</span>
           <span>|</span>
           <span>© 2025</span>
