@@ -116,7 +116,7 @@ export default function ProductsGallery() {
   const currentProduct = products[currentIndex];
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden overflow-y-auto">
       {/* Animated Background - Fixed behind everything */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Twinkling Stars */}
@@ -302,8 +302,8 @@ export default function ProductsGallery() {
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
         </button>
 
-        {/* Card Container - Fixed height based on viewport */}
-        <div className="w-full max-w-md sm:max-w-2xl lg:max-w-4xl mx-12 sm:mx-20">
+        {/* Card Container - Full width with room for arrows */}
+        <div className="w-full max-w-md sm:max-w-2xl lg:max-w-4xl mx-auto px-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentProduct.id}
@@ -323,13 +323,12 @@ export default function ProductsGallery() {
               >
                 {/* Row 1: Emblem + Title (fixed height) */}
                 <div className="flex items-center gap-3 sm:gap-4 mb-3">
-                  <div className={`w-14 h-14 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5 overflow-hidden`}>
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5`}>
                     {currentProduct.emblem ? (
                       <img 
                         src={currentProduct.emblem} 
                         alt={currentProduct.name}
-                        className="w-full h-full rounded-lg object-cover bg-slate-800"
-                        onError={(e) => { e.currentTarget.src = ''; e.currentTarget.alt = currentProduct.name.charAt(0); }}
+                        className="w-full h-full rounded-lg object-contain bg-slate-800 p-1"
                       />
                     ) : (
                       <div className="w-full h-full rounded-lg bg-slate-800 flex items-center justify-center text-2xl font-bold text-white">
@@ -351,18 +350,20 @@ export default function ProductsGallery() {
                 </p>
 
                 {/* Row 3: QR + Buttons side by side */}
-                <div className="flex items-center justify-between gap-3">
-                  {/* QR Code */}
-                  <div className="flex flex-col items-center">
+                <div className="flex items-center justify-between gap-4">
+                  {/* QR Code / Hallmark */}
+                  <div className="flex flex-col items-center shrink-0">
                     <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase mb-1">Verified</span>
                     {currentProduct.hallmark ? (
-                      <img src={currentProduct.hallmark} alt="Hallmark" className="h-12 sm:h-16 w-auto rounded-lg border border-cyan-500/30" />
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border border-cyan-500/30 overflow-hidden bg-slate-800">
+                        <img src={currentProduct.hallmark} alt="Hallmark" className="w-full h-full object-contain" />
+                      </div>
                     ) : currentProduct.url ? (
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-lg p-1">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-lg p-1">
                         <QRCodeSVG value={currentProduct.url} size={48} className="w-full h-full" bgColor="#fff" fgColor="#0f172a" />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg bg-slate-800 flex items-center justify-center text-[8px] text-gray-500">Soon</div>
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-slate-800 flex items-center justify-center text-[8px] text-gray-500">Soon</div>
                     )}
                   </div>
 
