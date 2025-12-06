@@ -107,7 +107,7 @@ export default function ProductsGallery() {
   const currentProduct = products[currentIndex];
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden">
       {/* Animated Background - Fixed behind everything */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         {/* Twinkling Stars */}
@@ -255,12 +255,12 @@ export default function ProductsGallery() {
           <span 
             className="font-extralight tracking-[0.1em] sm:tracking-[0.3em] uppercase"
             style={{
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #16213e 100%)',
+              background: 'linear-gradient(135deg, #4a5568 0%, #667eea 25%, #7c3aed 50%, #667eea 75%, #4a5568 100%)',
               backgroundSize: '200% 200%',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',
-              textShadow: '0 0 80px rgba(6, 182, 212, 0.5), 0 0 120px rgba(139, 92, 246, 0.3)',
+              textShadow: '0 0 60px rgba(6, 182, 212, 0.8), 0 0 100px rgba(139, 92, 246, 0.6)',
               animation: 'holographic 4s ease-in-out infinite',
             }}
           >
