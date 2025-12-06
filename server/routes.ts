@@ -2671,6 +2671,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================
+  // W-4 TAX FORM ROUTES
+  // ========================
+  
+  // Get current W-4 for a worker
+  app.get("/api/w4/:workerId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const w4Data = await storage.getCurrentEmployeeW4Data(req.params.workerId, tenantId);
+      
+      if (!w4Data) {
+        return res.status(404).json({ error: "W-4 not found", needsSubmission: true });
+      }
+      
+      res.json(w4Data);
+    } catch (error) {
+      console.error("Failed to fetch W-4:", error);
+      res.status(500).json({ error: "Failed to fetch W-4 data" });
+    }
+  });
+  
+  // Get W-4 history for a worker
+  app.get("/api/w4/:workerId/history", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const w4History = await storage.listEmployeeW4Data(req.params.workerId, tenantId);
+      res.json(w4History);
+    } catch (error) {
+      console.error("Failed to fetch W-4 history:", error);
+      res.status(500).json({ error: "Failed to fetch W-4 history" });
+    }
+  });
+  
+  // Submit new W-4
+  app.post("/api/w4", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { workerId, fillingStatus, dependents, otherIncome, standardDeduction, claimableDeductions, extraWithheldPerPaycheck } = req.body;
+      
+      if (!workerId || !fillingStatus) {
+        return res.status(400).json({ error: "workerId and fillingStatus are required" });
+      }
+      
+      // Mark all existing W-4s as not current
+      const existingW4s = await storage.listEmployeeW4Data(workerId, tenantId);
+      for (const w4 of existingW4s) {
+        await storage.updateEmployeeW4Data(w4.id, tenantId, { isCurrentW4: false });
+      }
+      
+      // Create new W-4
+      const newW4 = await storage.createEmployeeW4Data({
+        tenantId,
+        workerId,
+        fillingStatus,
+        dependents: dependents || 0,
+        otherIncome: otherIncome || "0",
+        standardDeduction: standardDeduction !== false,
+        claimableDeductions: claimableDeductions || "0",
+        extraWithheldPerPaycheck: extraWithheldPerPaycheck || "0",
+        effectiveYear: new Date().getFullYear(),
+        effectiveDate: new Date().toISOString().split('T')[0],
+        isCurrentW4: true,
+      });
+      
+      res.status(201).json(newW4);
+    } catch (error) {
+      console.error("Failed to submit W-4:", error);
+      res.status(500).json({ error: "Failed to submit W-4" });
+    }
+  });
+  
+  // Update existing W-4
+  app.patch("/api/w4/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const updatedW4 = await storage.updateEmployeeW4Data(req.params.id, tenantId, {
+        ...req.body,
+        updatedAt: new Date(),
+      });
+      
+      if (!updatedW4) {
+        return res.status(404).json({ error: "W-4 not found" });
+      }
+      
+      res.json(updatedW4);
+    } catch (error) {
+      console.error("Failed to update W-4:", error);
+      res.status(500).json({ error: "Failed to update W-4" });
+    }
+  });
+  
+  // ========================
+  // PAY CORRECTIONS ROUTES
+  // ========================
+  
+  // Create pay correction/adjustment
+  app.post("/api/payroll/correction", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { originalPayrollId, correctionReason, adjustments } = req.body;
+      
+      if (!originalPayrollId || !correctionReason) {
+        return res.status(400).json({ error: "originalPayrollId and correctionReason required" });
+      }
+      
+      // Get original payroll record
+      const originalRecord = await storage.getPayrollRecord(originalPayrollId);
+      if (!originalRecord) {
+        return res.status(404).json({ error: "Original payroll record not found" });
+      }
+      
+      // Mark original as corrected
+      await storage.updatePayrollRecord(originalPayrollId, { status: 'corrected' });
+      
+      // Create correction record with adjusted values
+      const correctionRecord = await storage.createPayrollRecord({
+        ...originalRecord,
+        id: undefined,
+        isCorrection: true,
+        originalPayrollRecordId: originalPayrollId,
+        correctionReason,
+        status: 'pending',
+        processedAt: null,
+        paidAt: null,
+        hallmarkAssetNumber: `ORBIT-CORR-${Date.now()}`,
+        // Apply adjustments
+        grossPay: adjustments?.grossPay || originalRecord.grossPay,
+        netPay: adjustments?.netPay || originalRecord.netPay,
+        regularHours: adjustments?.regularHours || originalRecord.regularHours,
+        overtimeHours: adjustments?.overtimeHours || originalRecord.overtimeHours,
+        notes: `Correction for ${originalPayrollId}: ${correctionReason}`,
+      });
+      
+      res.status(201).json({
+        success: true,
+        correctionId: correctionRecord.id,
+        originalId: originalPayrollId,
+        message: "Pay correction created successfully",
+      });
+    } catch (error) {
+      console.error("Failed to create pay correction:", error);
+      res.status(500).json({ error: "Failed to create pay correction" });
+    }
+  });
+  
+  // Void a payroll record
+  app.post("/api/payroll/void/:id", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const { voidReason } = req.body;
+      
+      if (!voidReason) {
+        return res.status(400).json({ error: "voidReason is required" });
+      }
+      
+      const record = await storage.getPayrollRecord(req.params.id);
+      if (!record) {
+        return res.status(404).json({ error: "Payroll record not found" });
+      }
+      
+      await storage.updatePayrollRecord(req.params.id, {
+        status: 'voided',
+        notes: `VOIDED: ${voidReason}`,
+      });
+      
+      res.json({ success: true, message: "Payroll record voided" });
+    } catch (error) {
+      console.error("Failed to void payroll:", error);
+      res.status(500).json({ error: "Failed to void payroll record" });
+    }
+  });
+  
+  // Get corrections for a payroll record
+  app.get("/api/payroll/corrections/:originalId", async (req: Request, res: Response) => {
+    try {
+      const tenantId = validateTenantAccess(req, res);
+      if (!tenantId) return;
+      
+      const corrections = await storage.getPayrollCorrections(req.params.originalId, tenantId);
+      res.json(corrections);
+    } catch (error) {
+      console.error("Failed to fetch corrections:", error);
+      res.status(500).json({ error: "Failed to fetch corrections" });
+    }
+  });
+
+  // ========================
   // GARNISHMENT ROUTES
   // ========================
   app.post("/api/garnishments", async (req: Request, res: Response) => {

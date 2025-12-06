@@ -2520,6 +2520,20 @@ export const storage: IStorage = {
     return this.getPayrollRecord(payrollId);
   },
 
+  async getPayrollCorrections(originalId: string, tenantId: string): Promise<PayrollRecord[]> {
+    return await db
+      .select()
+      .from(payrollRecords)
+      .where(
+        and(
+          eq(payrollRecords.originalPayrollRecordId, originalId),
+          eq(payrollRecords.tenantId, tenantId),
+          eq(payrollRecords.isCorrection, true)
+        )
+      )
+      .orderBy(desc(payrollRecords.createdAt));
+  },
+
   // ========================
   // PLATFORM MODULES (À La Carte)
   // ========================

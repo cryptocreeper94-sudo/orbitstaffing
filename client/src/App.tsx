@@ -55,6 +55,7 @@ import TalentPool from "@/pages/TalentPool";
 import TalentExchangeLanding from "@/pages/TalentExchangeLanding";
 import AdminTalentExchange from "@/pages/AdminTalentExchange";
 import EmployeeHub from "@/pages/EmployeeHub";
+import TaxDocuments from "@/pages/TaxDocuments";
 import OwnerHub from "@/pages/OwnerHub";
 import CRMDashboard from "@/pages/CRMDashboard";
 import OrbitPayCard from "@/pages/OrbitPayCard";
@@ -168,6 +169,8 @@ function Router() {
       <Route path="/employer/register" component={EmployerRegister} />
       <Route path="/employee-hub" component={EmployeeHub} />
       <Route path="/my-hub" component={EmployeeHub} />
+      <Route path="/tax-documents" component={TaxDocuments} />
+      <Route path="/my-taxes" component={TaxDocuments} />
       <Route path="/owner-hub" component={OwnerHub} />
       <Route path="/orbit-pay-card" component={OrbitPayCard} />
       <Route path="/pay-card" component={OrbitPayCard} />
