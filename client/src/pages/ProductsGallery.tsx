@@ -226,9 +226,9 @@ export default function ProductsGallery() {
                   <Sparkles className="w-4 h-4" />
                   Product Gallery
                 </a>
-                <a href="/developer" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
+                <a href="/developer-hq" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">
                   <Settings className="w-4 h-4" />
-                  Developer Portal
+                  Developer HQ
                 </a>
                 <div className="border-t border-slate-700 my-2"></div>
                 <a href="/contact" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-cyan-400 transition">

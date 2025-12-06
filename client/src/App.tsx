@@ -75,6 +75,7 @@ import PresentationViewer from "@/pages/PresentationViewer";
 import SolanaVerification from "@/pages/SolanaVerification";
 import Changelog from "@/pages/Changelog";
 import EcosystemHub from "@/pages/EcosystemHub";
+import DarkWaveHQ from "@/pages/DarkWaveHQ";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -202,6 +203,8 @@ function Router() {
       <Route path="/solana-verification" component={SolanaVerification} />
       <Route path="/changelog" component={Changelog} />
       <Route path="/ecosystem-hub" component={EcosystemHub} />
+      <Route path="/developer-hq" component={DarkWaveHQ} />
+      <Route path="/studio/developer" component={DarkWaveHQ} />
       <Route component={NotFound} />
     </Switch>
   );
