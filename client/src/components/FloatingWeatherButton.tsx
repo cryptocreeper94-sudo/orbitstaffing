@@ -484,13 +484,15 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
       >
         {weatherData ? (
           <motion.div 
-            className="relative"
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '4px' }}
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           >
             <span
-              className="text-5xl leading-none block"
               style={{ 
+                fontSize: '48px',
+                lineHeight: '1',
+                display: 'block',
                 filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
               }}
             >
@@ -501,18 +503,14 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
               return (
                 <span 
                   style={{ 
-                    position: 'absolute',
-                    bottom: '0px',
-                    left: '100%',
-                    marginLeft: '3px',
-                    fontSize: '14px',
+                    fontSize: '15px',
                     fontWeight: '900',
                     lineHeight: '1',
                     color: tempColors.text,
                     WebkitTextFillColor: tempColors.text,
-                    textShadow: `0 0 6px ${tempColors.text}, 0 1px 3px rgba(0,0,0,0.9)`,
-                    zIndex: 99999,
-                    whiteSpace: 'nowrap'
+                    textShadow: `0 0 8px ${tempColors.text}, 0 1px 3px rgba(0,0,0,0.9)`,
+                    whiteSpace: 'nowrap',
+                    marginBottom: '4px'
                   }}
                 >
                   {weatherData.temperature}°
