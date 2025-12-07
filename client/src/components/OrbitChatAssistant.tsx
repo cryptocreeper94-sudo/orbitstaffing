@@ -339,7 +339,7 @@ export function OrbitChatAssistant() {
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.92 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-24 right-4 z-[99999]"
+          className="fixed bottom-6 right-4 z-[99999]"
           data-testid="button-orbit-chat"
           aria-label="Open Orby chat"
         >
