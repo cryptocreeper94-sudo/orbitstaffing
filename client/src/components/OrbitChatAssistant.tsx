@@ -92,6 +92,7 @@ const DEFAULT_WELCOME: Message = {
 };
 
 export function OrbitChatAssistant() {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
@@ -107,6 +108,10 @@ export function OrbitChatAssistant() {
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -183,6 +188,8 @@ export function OrbitChatAssistant() {
     setMessages([welcomeMsg]);
     localStorage.setItem(STORAGE_KEY, JSON.stringify([welcomeMsg]));
   };
+
+  if (!mounted) return null;
 
   return createPortal(
     <>

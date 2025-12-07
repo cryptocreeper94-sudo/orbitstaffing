@@ -141,6 +141,7 @@ interface FloatingWeatherButtonProps {
 }
 
 export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProps) {
+  const [mounted, setMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showZipInput, setShowZipInput] = useState(false);
   const [zipCode, setZipCode] = useState(() => {
@@ -185,6 +186,10 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
   });
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (geoData) {
       setCoordinates({ lat: geoData.latitude, lon: geoData.longitude });
       setLocationName(`${geoData.name}, ${geoData.admin1}`);
@@ -227,6 +232,8 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
   const glow = WEATHER_GLOWS[iconType] || WEATHER_GLOWS.sunny;
   const emoji = WEATHER_EMOJIS[iconType] || '☀️';
   const isLoading = geoLoading || weatherLoading;
+
+  if (!mounted) return null;
 
   if (!zipCode) {
     return createPortal(
