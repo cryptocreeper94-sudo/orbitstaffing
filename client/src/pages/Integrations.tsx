@@ -20,19 +20,19 @@ import {
 } from "lucide-react";
 
 const ICON_MAP: Record<string, string> = {
-  "👥": "/icons/pro/3d_people_group_icon_clean.png",
-  "💼": "/icons/pro/3d_briefcase_jobs_icon_clean.png",
-  "⚡": "/icons/pro/3d_lightning_bolt_icon_clean.png",
-  "🔗": "/icons/pro/3d_link_connection_icon_clean.png",
-  "🌐": "/icons/pro/3d_globe_network_icon_clean.png",
-  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
-  "📊": "/icons/pro/3d_chart_reports_icon_clean.png",
-  "✅": "/icons/pro/3d_checkmark_comply_icon_clean.png",
-  "🎯": "/icons/pro/3d_target_goal_icon_clean.png",
-  "⏱️": "/icons/pro/3d_clock_timer_icon_clean.png",
-  "📅": "/icons/pro/3d_calendar_schedule_icon_clean.png",
-  "🌳": "/icons/pro/3d_tree_growth_icon_clean.png",
-  "📧": "/icons/pro/3d_email_envelope_icon_clean.png",
+  "👥": "/icons/pro/3d_people_group_icon.png",
+  "💼": "/icons/pro/3d_briefcase_jobs_icon.png",
+  "⚡": "/icons/pro/3d_lightning_bolt_icon.png",
+  "🔗": "/icons/pro/3d_link_connection_icon.png",
+  "🌐": "/icons/pro/3d_globe_network_icon.png",
+  "💰": "/icons/pro/3d_money_pay_icon.png",
+  "📊": "/icons/pro/3d_chart_reports_icon.png",
+  "✅": "/icons/pro/3d_checkmark_comply_icon.png",
+  "🎯": "/icons/pro/3d_target_goal_icon.png",
+  "⏱️": "/icons/pro/3d_clock_timer_icon.png",
+  "📅": "/icons/pro/3d_calendar_schedule_icon.png",
+  "🌳": "/icons/pro/3d_tree_growth_icon.png",
+  "📧": "/icons/pro/3d_email_envelope_icon.png",
 };
 
 function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" | "xl" }) {

@@ -3,10 +3,10 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const ICON_MAP: Record<string, string> = {
-  "⚡": "/icons/pro/3d_lightning_bolt_icon_clean.png",
-  "👥": "/icons/pro/3d_people_group_icon_clean.png",
-  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
-  "📈": "/icons/pro/3d_chart_reports_icon_clean.png",
+  "⚡": "/icons/pro/3d_lightning_bolt_icon.png",
+  "👥": "/icons/pro/3d_people_group_icon.png",
+  "💰": "/icons/pro/3d_money_pay_icon.png",
+  "📈": "/icons/pro/3d_chart_reports_icon.png",
 };
 
 function Icon3D({ emoji, size = "lg" }: { emoji: string; size?: "sm" | "md" | "lg" | "xl" }) {
