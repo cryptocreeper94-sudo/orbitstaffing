@@ -5864,3 +5864,43 @@ export const ECOSYSTEM_SYNC_TYPES = [
   { id: 'jobs', name: 'Jobs', description: 'Job postings and assignments' },
   { id: 'payroll_summary', name: 'Payroll Summary', description: 'Aggregated payroll data' },
 ] as const;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RELEASE MANAGER - Cross-Product Release Tracking
+// See RELEASE_MANAGER_SPEC.md for full documentation
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const releasePackages = pgTable(
+  "release_packages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    appId: varchar("app_id").references(() => ecosystemConnectedApps.id),
+    appSlug: varchar("app_slug", { length: 50 }).notNull(),
+    appName: varchar("app_name", { length: 100 }).notNull(),
+    version: varchar("version", { length: 20 }).notNull(),
+    releaseType: varchar("release_type", { length: 10 }).notNull(), // major, minor, patch
+    changelog: text("changelog"),
+    releaseNotes: text("release_notes"),
+    breakingChanges: boolean("breaking_changes").default(false),
+    dependencies: jsonb("dependencies"),
+    releaseHash: varchar("release_hash", { length: 64 }),
+    solanaTx: varchar("solana_tx", { length: 100 }),
+    solanaExplorerUrl: text("solana_explorer_url"),
+    publishedAt: timestamp("published_at").default(sql`NOW()`),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    appSlugIdx: index("idx_releases_app_slug").on(table.appSlug),
+    versionIdx: index("idx_releases_version").on(table.version),
+    publishedIdx: index("idx_releases_published").on(table.publishedAt),
+  })
+);
+
+export const insertReleasePackageSchema = createInsertSchema(releasePackages).omit({
+  id: true,
+  createdAt: true,
+  publishedAt: true,
+});
+
+export type InsertReleasePackage = z.infer<typeof insertReleasePackageSchema>;
+export type ReleasePackage = typeof releasePackages.$inferSelect;

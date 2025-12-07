@@ -69,6 +69,7 @@ import {
   type WorkerReferralBonus,
   type Timesheet,
   type IntegrationToken,
+  releasePackages,
 } from "@shared/schema";
 
 // ========================
@@ -9862,6 +9863,216 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error: any) {
       console.error("Push to external hub error:", error);
       res.status(500).json({ error: error.message || "Failed to push data" });
+    }
+  });
+
+  // ========================
+  // RELEASE MANAGER API (Cross-Product Releases)
+  // See RELEASE_MANAGER_SPEC.md for full documentation
+  // ========================
+
+  // Register a release (authenticated ecosystem apps)
+  app.post("/api/release-manager/register", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const ecosystemApp = (req as any).ecosystemApp;
+      const { version, releaseType, changelog, releaseNotes, breakingChanges, dependencies } = req.body;
+      
+      if (!version || !releaseType) {
+        return res.status(400).json({ error: 'version and releaseType are required' });
+      }
+      
+      // Capture registration timestamp (America/Chicago with correct DST offset)
+      const registeredAt = new Date();
+      // Format as deterministic ISO-style with correct timezone offset
+      const cstFormatter = new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Chicago',
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false,
+      });
+      const parts = cstFormatter.formatToParts(registeredAt);
+      const get = (type: string) => parts.find(p => p.type === type)?.value || '00';
+      // Calculate actual timezone offset for America/Chicago
+      const chicagoDate = new Date(registeredAt.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+      const utcDate = new Date(registeredAt.toLocaleString('en-US', { timeZone: 'UTC' }));
+      const offsetMinutes = (chicagoDate.getTime() - utcDate.getTime()) / 60000;
+      const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
+      const offsetMins = Math.abs(offsetMinutes) % 60;
+      const offsetSign = offsetMinutes >= 0 ? '+' : '-';
+      const offsetStr = `${offsetSign}${String(offsetHours).padStart(2, '0')}:${String(offsetMins).padStart(2, '0')}`;
+      const cstTimestamp = `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}${offsetStr}`;
+      
+      // Generate release hash from actual content (deterministic)
+      const crypto = await import('crypto');
+      const releasePayload = JSON.stringify({
+        appSlug: ecosystemApp.appSlug,
+        version,
+        releaseType,
+        changelog: changelog || '',
+        releaseNotes: releaseNotes || '',
+        breakingChanges: breakingChanges || false,
+        dependencies: dependencies || null,
+      });
+      const releaseHash = crypto.createHash('sha256').update(releasePayload).digest('hex');
+      
+      // Anchor to Solana blockchain
+      let solanaResult = null;
+      try {
+        solanaResult = await solanaService.storeDataOnChain({
+          appName: ecosystemApp.appName,
+          version,
+          releaseType,
+          hash: releaseHash,
+          timestamp: registeredAt.toISOString(),
+        });
+        console.log(`[Release Manager] Solana anchor: ${solanaResult.transactionSignature}`);
+      } catch (solanaError) {
+        console.warn(`[Release Manager] Solana anchoring failed (non-blocking):`, solanaError);
+      }
+      
+      // Insert release with explicit timestamp
+      const [release] = await db.insert(releasePackages).values({
+        appId: ecosystemApp.id,
+        appSlug: ecosystemApp.appSlug,
+        appName: ecosystemApp.appName,
+        version,
+        releaseType,
+        changelog,
+        releaseNotes,
+        breakingChanges: breakingChanges || false,
+        dependencies: dependencies || null,
+        releaseHash,
+        solanaTx: solanaResult?.transactionSignature || null,
+        solanaExplorerUrl: solanaResult?.explorerUrl || null,
+        publishedAt: registeredAt,
+        createdAt: registeredAt,
+      }).returning();
+      
+      // Log the activity
+      await ecosystemHub.logActivity(ecosystemApp.id, ecosystemApp.appName, 'release.registered', 'release', release.id, { version, releaseType });
+      
+      console.log(`[Release Manager] ${ecosystemApp.appName} registered v${version} (${releaseType}) at ${cstTimestamp} CST`);
+      
+      res.json({
+        success: true,
+        releaseId: release.id,
+        version: release.version,
+        appName: release.appName,
+        registeredAt: registeredAt.toISOString(),
+        registeredAtCST: cstTimestamp,
+        releaseHash,
+        solanaAnchor: solanaResult ? {
+          hash: releaseHash,
+          transactionSignature: solanaResult.transactionSignature,
+          explorerUrl: solanaResult.explorerUrl,
+        } : null,
+      });
+    } catch (error) {
+      console.error("Release register error:", error);
+      res.status(500).json({ error: "Failed to register release" });
+    }
+  });
+
+  // Get all ecosystem releases
+  app.get("/api/release-manager/releases", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const { limit, since, app: appSlug } = req.query;
+      
+      const conditions: any[] = [];
+      
+      if (appSlug) {
+        conditions.push(eq(releasePackages.appSlug, appSlug as string));
+      }
+      
+      if (since) {
+        const sinceDate = new Date(since as string);
+        if (!isNaN(sinceDate.getTime())) {
+          conditions.push(gte(releasePackages.publishedAt, sinceDate));
+        }
+      }
+      
+      let query;
+      if (conditions.length > 0) {
+        query = db.select().from(releasePackages)
+          .where(conditions.length === 1 ? conditions[0] : and(...conditions))
+          .orderBy(desc(releasePackages.publishedAt))
+          .limit(parseInt(limit as string) || 50);
+      } else {
+        query = db.select().from(releasePackages)
+          .orderBy(desc(releasePackages.publishedAt))
+          .limit(parseInt(limit as string) || 50);
+      }
+      
+      const releases = await query;
+      res.json(releases);
+    } catch (error) {
+      console.error("Get releases error:", error);
+      res.status(500).json({ error: "Failed to fetch releases" });
+    }
+  });
+
+  // Get releases for specific app
+  app.get("/api/release-manager/releases/:appSlug", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const { appSlug } = req.params;
+      const releases = await db.select().from(releasePackages)
+        .where(eq(releasePackages.appSlug, appSlug))
+        .orderBy(desc(releasePackages.publishedAt))
+        .limit(50);
+      res.json(releases);
+    } catch (error) {
+      console.error("Get app releases error:", error);
+      res.status(500).json({ error: "Failed to fetch releases" });
+    }
+  });
+
+  // Get my releases
+  app.get("/api/release-manager/releases/mine", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const ecosystemApp = (req as any).ecosystemApp;
+      const releases = await db.select().from(releasePackages)
+        .where(eq(releasePackages.appId, ecosystemApp.id))
+        .orderBy(desc(releasePackages.publishedAt))
+        .limit(50);
+      res.json(releases);
+    } catch (error) {
+      console.error("Get my releases error:", error);
+      res.status(500).json({ error: "Failed to fetch releases" });
+    }
+  });
+
+  // Get aggregated changelog
+  app.get("/api/release-manager/changelog", ecosystemAuth, async (req: Request, res: Response) => {
+    try {
+      const { limit } = req.query;
+      const releases = await db.select().from(releasePackages)
+        .orderBy(desc(releasePackages.publishedAt))
+        .limit(parseInt(limit as string) || 20);
+      
+      const changelog = releases.map(r => ({
+        app: r.appName,
+        version: r.version,
+        type: r.releaseType,
+        date: r.publishedAt,
+        changes: r.changelog,
+        breaking: r.breakingChanges,
+      }));
+      
+      res.json({ changelog });
+    } catch (error) {
+      console.error("Get changelog error:", error);
+      res.status(500).json({ error: "Failed to get changelog" });
+    }
+  });
+
+  // Get release manager spec (public)
+  app.get("/api/release-manager/spec", async (req: Request, res: Response) => {
+    try {
+      const fs = await import('fs');
+      const spec = fs.readFileSync('RELEASE_MANAGER_SPEC.md', 'utf-8');
+      res.type('text/markdown').send(spec);
+    } catch (error) {
+      res.status(500).json({ error: "Spec file not found" });
     }
   });
 
