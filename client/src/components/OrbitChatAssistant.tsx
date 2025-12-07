@@ -191,8 +191,36 @@ export function OrbitChatAssistant() {
 
   if (!mounted) return null;
 
+  // Simple fallback button without portal for debugging
+  const SimpleButton = () => (
+    <button
+      onClick={() => setIsOpen(true)}
+      style={{
+        position: 'fixed',
+        bottom: '80px',
+        right: '16px',
+        width: '64px',
+        height: '64px',
+        borderRadius: '50%',
+        background: 'linear-gradient(to bottom right, #06b6d4, #2563eb)',
+        border: '3px solid #22d3ee',
+        display: isOpen ? 'none' : 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '32px',
+        cursor: 'pointer',
+        zIndex: 999999,
+        boxShadow: '0 0 30px rgba(6, 182, 212, 0.6), 0 4px 15px rgba(0,0,0,0.4)'
+      }}
+      data-testid="button-orbit-chat-simple"
+    >
+      🪐
+    </button>
+  );
+
   return createPortal(
     <>
+      <SimpleButton />
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -331,22 +359,6 @@ export function OrbitChatAssistant() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <button
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-20 right-4 z-[99999] w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 border-3 border-cyan-300 shadow-xl shadow-cyan-500/50 flex items-center justify-center hover:scale-110 transition-transform ${isOpen ? 'hidden' : ''}`}
-        style={{ 
-          filter: 'drop-shadow(0 0 20px rgba(6,182,212,0.8))',
-          boxShadow: '0 0 30px rgba(6, 182, 212, 0.6), 0 4px 15px rgba(0,0,0,0.4)'
-        }}
-        data-testid="button-orbit-chat"
-        aria-label="Open Orby chat"
-      >
-        <span className="text-4xl">🪐</span>
-        <span 
-          className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white animate-pulse"
-        />
-      </button>
     </>,
     document.body
   );
