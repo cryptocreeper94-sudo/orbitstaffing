@@ -193,42 +193,26 @@ export default function Landing() {
           />
           
           <CarouselRail showArrows={true} gap="sm">
-            <CarouselRailItem className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[120px]">
-              <Link href="/jobs" className="p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-job-board">
-                <img src="/icons/pro/3d_briefcase_jobs_icon_clean.png?v=1" alt="Jobs" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Jobs</div>
-              </Link>
-            </CarouselRailItem>
-            <CarouselRailItem className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[120px]">
-              <Link href="/talent-pool" className="p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-talent-pool">
-                <img src="/icons/pro/3d_star_talent_icon_clean.png?v=1" alt="Talent" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(234,179,8,0.5)]" />
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Talent</div>
-              </Link>
-            </CarouselRailItem>
-            <CarouselRailItem className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[120px]">
-              <Link href="/employer/register" className="p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-employer-register">
-                <img src="/icons/pro/3d_building_clients_icon_clean.png?v=1" alt="Post" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Post</div>
-              </Link>
-            </CarouselRailItem>
-            <CarouselRailItem className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[120px]">
-              <Link href="/apply" className="p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-apply">
-                <img src="/icons/pro/3d_hardhat_workers_icon_clean.png?v=1" alt="Apply" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Apply</div>
-              </Link>
-            </CarouselRailItem>
-            <CarouselRailItem className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[120px]">
-              <Link href="/employee-hub" className="p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-employee-hub">
-                <img src="/icons/pro/3d_manager_suit_icon_clean.png?v=1" alt="Hub" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Hub</div>
-              </Link>
-            </CarouselRailItem>
-            <CarouselRailItem className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[120px]">
-              <Link href="/owner-hub" className="p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-owner-hub">
-                <img src="/icons/pro/3d_tie_owner_icon_clean.png?v=1" alt="Owner" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
-                <div className="font-semibold text-white text-[9px] sm:text-sm">Owner</div>
-              </Link>
-            </CarouselRailItem>
+            {[
+              { href: "/jobs", image: "/images/scenarios/worker_matching_on_screen.png", label: "Jobs", color: "emerald", testId: "link-job-board" },
+              { href: "/talent-pool", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Talent", color: "emerald", testId: "link-talent-pool" },
+              { href: "/employer/register", image: "/images/scenarios/professional_creating_invoices.png", label: "Post", color: "cyan", testId: "link-employer-register" },
+              { href: "/apply", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "Apply", color: "cyan", testId: "link-apply" },
+              { href: "/employee-hub", image: "/images/scenarios/employee_viewing_work_calendar.png", label: "Hub", color: "violet", testId: "link-employee-hub" },
+              { href: "/owner-hub", image: "/images/scenarios/payroll_processing_scene.png", label: "Owner", color: "violet", testId: "link-owner-hub" },
+            ].map((item) => (
+              <CarouselRailItem key={item.href} className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[130px]">
+                <Link href={item.href} className={`block rounded-xl border border-${item.color}-500/40 bg-${item.color}-900/20 hover:bg-${item.color}-900/40 overflow-hidden transition-all shadow-lg hover:shadow-xl`} data-testid={item.testId}>
+                  <div className="relative h-14 sm:h-20">
+                    <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+                  </div>
+                  <div className="p-1.5 sm:p-2 text-center">
+                    <div className="font-bold text-white text-[9px] sm:text-sm">{item.label}</div>
+                  </div>
+                </Link>
+              </CarouselRailItem>
+            ))}
           </CarouselRail>
         </div>
       </section>
@@ -245,19 +229,24 @@ export default function Landing() {
           
           <CarouselRail showArrows={true} gap="sm">
             {[
-              { href: "/equipment-tracking", icon: "3d_gear_equipment_icon_clean.png", label: "Gear" },
-              { href: "/gps-clock-in", icon: "3d_gps_location_icon_clean.png", label: "GPS" },
-              { href: "/payroll-processing", icon: "3d_money_pay_icon_clean.png", label: "Pay" },
-              { href: "/worker-availability", icon: "3d_calendar_schedule_icon_clean.png", label: "Sched" },
-              { href: "/admin/compliance", icon: "3d_checkmark_comply_icon_clean.png", label: "Comply" },
-              { href: "/admin/payroll-dashboard", icon: "3d_invoice_billing_icon_clean.png", label: "Invoice" },
-              { href: "/crm", icon: "3d_crm_contacts_icon_clean.png", label: "CRM" },
-              { href: "/features", icon: "3d_chart_reports_icon_clean.png", label: "More" },
+              { href: "/equipment-tracking", image: "/images/scenarios/it_system_integration.png", label: "Gear" },
+              { href: "/gps-clock-in", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "GPS" },
+              { href: "/payroll-processing", image: "/images/scenarios/payroll_processing_scene.png", label: "Pay" },
+              { href: "/worker-availability", image: "/images/scenarios/employee_viewing_work_calendar.png", label: "Sched" },
+              { href: "/admin/compliance", image: "/images/scenarios/compliance_verification_interview.png", label: "Comply" },
+              { href: "/admin/payroll-dashboard", image: "/images/scenarios/professional_creating_invoices.png", label: "Invoice" },
+              { href: "/crm", image: "/images/scenarios/coworkers_referral_handshake.png", label: "CRM" },
+              { href: "/features", image: "/images/scenarios/worker_matching_on_screen.png", label: "More" },
             ].map((item) => (
-              <CarouselRailItem key={item.href} className="w-[70px] sm:w-auto sm:min-w-[100px]">
-                <Link href={item.href} className="p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center transition-all">
-                  <img src={`/icons/pro/${item.icon}?v=1`} alt={item.label} className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
-                  <div className="font-semibold text-white text-[9px] sm:text-xs">{item.label}</div>
+              <CarouselRailItem key={item.href} className="w-[80px] sm:w-auto sm:min-w-[110px]">
+                <Link href={item.href} className="block rounded-lg border border-cyan-500/40 bg-cyan-900/20 overflow-hidden hover:bg-cyan-900/40 transition-all">
+                  <div className="relative h-10 sm:h-16">
+                    <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                  </div>
+                  <div className="p-1 sm:p-2 text-center">
+                    <div className="font-bold text-white text-[8px] sm:text-xs">{item.label}</div>
+                  </div>
                 </Link>
               </CarouselRailItem>
             ))}
@@ -280,20 +269,23 @@ export default function Landing() {
           
           <CarouselRail showArrows={true} gap="sm">
             {[
-              { href: "/hallmark-seal", icon: "3d_padlock_security_icon_clean.png", label: "Hallmarks", testId: "card-hallmarks" },
-              { href: "/crm", icon: "3d_crm_contacts_icon_clean.png", label: "CRM", testId: "card-crm" },
-              { href: "/pay-card", icon: "3d_credit_card_icon_clean.png", label: "Pay Card", testId: "card-pay-card" },
-              { href: "/marketing-hub", icon: "3d_megaphone_announce_icon_clean.png", label: "Marketing", testId: "card-marketing" },
-              { href: "/talent-exchange", icon: "3d_sync_refresh_icon_clean.png", label: "Exchange", testId: "card-exchange" },
-              { href: "/crypto-wallet", icon: "3d_blockchain_chain_icon_clean.png", label: "Crypto", testId: "card-crypto" },
+              { href: "/hallmark-seal", image: "/images/scenarios/security_verification_process.png", label: "Hallmarks", testId: "card-hallmarks" },
+              { href: "/crm", image: "/images/scenarios/coworkers_referral_handshake.png", label: "CRM", testId: "card-crm" },
+              { href: "/pay-card", image: "/images/scenarios/diverse_workers_checking_wages.png", label: "Pay Card", testId: "card-pay-card" },
+              { href: "/marketing-hub", image: "/images/scenarios/team_celebrating_bonuses.png", label: "Marketing", testId: "card-marketing" },
+              { href: "/talent-exchange", image: "/images/scenarios/worker_matching_on_screen.png", label: "Exchange", testId: "card-exchange" },
+              { href: "/crypto-wallet", image: "/images/scenarios/it_system_integration.png", label: "Crypto", testId: "card-crypto" },
             ].map((item) => (
-              <CarouselRailItem key={item.href} className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[140px]">
+              <CarouselRailItem key={item.href} className="basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-[160px]">
                 <Link href={item.href}>
-                  <OrbitCard variant="glass" className="h-full border-green-500/50 hover:border-green-400/80 bg-gradient-to-br from-violet-900/40 to-purple-900/30 shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid={item.testId}>
-                    <OrbitCardContent className="p-2 sm:p-4">
-                      <img src={`/icons/pro/${item.icon}?v=1`} alt={item.label} className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
+                  <OrbitCard variant="glass" className="h-full border-green-500/50 hover:border-green-400/80 overflow-hidden shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid={item.testId}>
+                    <div className="relative h-16 sm:h-24">
+                      <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+                      <span className="absolute top-1 right-1 text-[6px] sm:text-[8px] bg-green-500/80 text-white px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
+                    </div>
+                    <OrbitCardContent className="p-2 sm:p-3">
                       <h3 className="text-[9px] sm:text-sm font-bold text-green-200">{item.label}</h3>
-                      <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                     </OrbitCardContent>
                   </OrbitCard>
                 </Link>
@@ -322,9 +314,12 @@ export default function Landing() {
           <CarouselRail showArrows={true} gap="sm">
             <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
               <Link href="/admin" className="block group">
-                <OrbitCard variant="glass" className="h-full border-violet-400/50 hover:border-violet-300/80 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
-                  <OrbitCardContent className="p-2 sm:p-4 text-center">
-                    <img src="/icons/pro/3d_building_clients_icon_clean.png?v=1" alt="Owner" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
+                <OrbitCard variant="glass" className="h-full border-violet-400/50 hover:border-violet-300/80 overflow-hidden shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+                  <div className="relative h-16 sm:h-24">
+                    <img src="/images/scenarios/professional_creating_invoices.png" alt="Owner" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+                  </div>
+                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
                     <h3 className="text-[10px] sm:text-sm font-bold text-violet-300">Owner</h3>
                     <Button className="w-full mt-1.5 bg-violet-500/80 hover:bg-violet-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-owner-access">
                       Login
@@ -336,9 +331,12 @@ export default function Landing() {
 
             <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
               <Link href="/worker" className="block group">
-                <OrbitCard variant="glass" className="h-full border-blue-500/50 hover:border-blue-400/80 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                  <OrbitCardContent className="p-2 sm:p-4 text-center">
-                    <img src="/icons/pro/3d_people_group_icon_clean.png?v=1" alt="Client" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(59,130,246,0.5)]" />
+                <OrbitCard variant="glass" className="h-full border-blue-500/50 hover:border-blue-400/80 overflow-hidden shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                  <div className="relative h-16 sm:h-24">
+                    <img src="/images/scenarios/coworkers_referral_handshake.png" alt="Client" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+                  </div>
+                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
                     <h3 className="text-[10px] sm:text-sm font-bold text-blue-300">Client</h3>
                     <Button className="w-full mt-1.5 bg-blue-500/80 hover:bg-blue-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-customer-access">
                       Login
@@ -350,9 +348,12 @@ export default function Landing() {
 
             <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
               <Link href="/employee-hub" className="block group">
-                <OrbitCard variant="glass" className="h-full border-emerald-500/50 hover:border-emerald-400/80 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
-                  <OrbitCardContent className="p-2 sm:p-4 text-center">
-                    <img src="/icons/pro/3d_clipboard_worker_icon_clean.png?v=1" alt="Employee" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
+                <OrbitCard variant="glass" className="h-full border-emerald-500/50 hover:border-emerald-400/80 overflow-hidden shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
+                  <div className="relative h-16 sm:h-24">
+                    <img src="/images/scenarios/diverse_workers_shift_prep.png" alt="Employee" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+                  </div>
+                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
                     <h3 className="text-[10px] sm:text-sm font-bold text-emerald-300">Employee</h3>
                     <Button className="w-full mt-1.5 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-employee-access">
                       Hub
@@ -364,9 +365,12 @@ export default function Landing() {
 
             <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
               <Link href="/developer" className="block group">
-                <OrbitCard variant="glass" className="h-full border-cyan-500/50 hover:border-cyan-400/80 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                  <OrbitCardContent className="p-2 sm:p-4 text-center">
-                    <img src="/icons/pro/3d_settings_gears_icon_clean.png?v=1" alt="Admin" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
+                <OrbitCard variant="glass" className="h-full border-cyan-500/50 hover:border-cyan-400/80 overflow-hidden shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                  <div className="relative h-16 sm:h-24">
+                    <img src="/images/scenarios/it_system_integration.png" alt="Admin" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+                  </div>
+                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
                     <h3 className="text-[10px] sm:text-sm font-bold text-cyan-300">Admin</h3>
                     <Button className="w-full mt-1.5 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-admin-access">
                       Panel
@@ -415,14 +419,14 @@ export default function Landing() {
           {/* Benefit Cards */}
           <CarouselRail showArrows={false} gap="md" className="mb-6 sm:mb-8">
             {[
-              { icon: "⚡", title: "Automate", brief: "Zero entry", id: "automate" },
-              { icon: "👥", title: "Retain", brief: "3x longer", id: "workers" },
-              { icon: "💰", title: "Save", brief: "35% off", id: "money" },
-              { icon: "📈", title: "Scale", brief: "10x capacity", id: "scale" },
+              { image: "/images/scenarios/it_system_integration.png", title: "Automate", brief: "Zero entry", id: "automate" },
+              { image: "/images/scenarios/diverse_workers_shift_prep.png", title: "Retain", brief: "3x longer", id: "workers" },
+              { image: "/images/scenarios/diverse_workers_checking_wages.png", title: "Save", brief: "35% off", id: "money" },
+              { image: "/images/scenarios/worker_matching_on_screen.png", title: "Scale", brief: "10x capacity", id: "scale" },
             ].map((item) => (
               <CarouselRailItem key={item.id} className="w-[140px] sm:w-auto sm:min-w-[160px]">
-                <BenefitCard 
-                  icon={item.icon}
+                <ScenarioBenefitCard 
+                  image={item.image}
                   title={item.title}
                   brief={item.brief}
                   onClick={() => setSelectedBenefit(item.id)}
@@ -456,23 +460,23 @@ export default function Landing() {
           <div className="sm:hidden">
             <CarouselRail showArrows={false} gap="sm">
               {[
-                { icon: "📊", name: "QuickBooks", cat: "Accounting" },
-                { icon: "👥", name: "ADP", cat: "Payroll" },
-                { icon: "📅", name: "UKG", cat: "HR" },
-                { icon: "💼", name: "Paychex", cat: "Payroll" },
-                { icon: "📈", name: "Xero", cat: "Accounting" },
-                { icon: "🔗", name: "Indeed", cat: "Job Board" },
-                { icon: "💬", name: "LinkedIn", cat: "Job Board" },
-                { icon: "📋", name: "ZipRecruiter", cat: "Job Board" },
-                { icon: "⚡", name: "Gusto", cat: "Payroll" },
-                { icon: "🏢", name: "Workday", cat: "HR" },
-                { icon: "📱", name: "Slack", cat: "Comms" },
-                { icon: "📧", name: "Gmail", cat: "Comms" },
+                { name: "QuickBooks", cat: "Accounting", color: "text-green-400" },
+                { name: "ADP", cat: "Payroll", color: "text-red-400" },
+                { name: "UKG", cat: "HR", color: "text-blue-400" },
+                { name: "Paychex", cat: "Payroll", color: "text-orange-400" },
+                { name: "Xero", cat: "Accounting", color: "text-cyan-400" },
+                { name: "Indeed", cat: "Job Board", color: "text-indigo-400" },
+                { name: "LinkedIn", cat: "Job Board", color: "text-sky-400" },
+                { name: "ZipRecruiter", cat: "Job Board", color: "text-emerald-400" },
+                { name: "Gusto", cat: "Payroll", color: "text-pink-400" },
+                { name: "Workday", cat: "HR", color: "text-amber-400" },
+                { name: "Slack", cat: "Comms", color: "text-purple-400" },
+                { name: "Gmail", cat: "Comms", color: "text-rose-400" },
               ].map((item, idx) => (
                 <CarouselRailItem key={idx} className="w-[75px]">
                   <OrbitCard variant="glass" className="border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
                     <OrbitCardContent className="p-2 text-center">
-                      <div className="text-lg">{item.icon}</div>
+                      <div className={`text-xs font-black ${item.color}`}>{item.name.slice(0, 2)}</div>
                       <div className="text-[8px] font-bold text-white truncate">{item.name}</div>
                       <div className="text-[7px] text-cyan-400">{item.cat}</div>
                     </OrbitCardContent>
@@ -848,6 +852,25 @@ function BenefitCard({ icon, title, brief, onClick }: { icon: string; title: str
       <div className="text-2xl sm:text-3xl mb-2 sm:mb-3 group-hover:scale-110 transition-transform">{icon}</div>
       <h3 className="font-bold text-sm sm:text-lg mb-1 group-hover:text-primary transition-colors">{title}</h3>
       <p className="text-[10px] sm:text-xs text-muted-foreground">{brief}</p>
+    </button>
+  );
+}
+
+function ScenarioBenefitCard({ image, title, brief, onClick }: { image: string; title: string; brief: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full h-full rounded-xl border border-primary/30 bg-slate-900/80 hover:bg-slate-800/80 hover:border-primary/60 transition-all group cursor-pointer text-left overflow-hidden shadow-lg hover:shadow-xl hover:shadow-primary/10"
+      data-testid={`benefit-card-${title.toLowerCase().replace(/\s+/g, '-')}`}
+    >
+      <div className="relative h-20 sm:h-28 overflow-hidden">
+        <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+      </div>
+      <div className="p-2 sm:p-4">
+        <h3 className="font-bold text-sm sm:text-lg text-white group-hover:text-primary transition-colors">{title}</h3>
+        <p className="text-[10px] sm:text-xs text-slate-400">{brief}</p>
+      </div>
     </button>
   );
 }
