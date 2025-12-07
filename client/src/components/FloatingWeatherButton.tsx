@@ -47,6 +47,22 @@ const WEATHER_EMOJIS: Record<string, string> = {
 
 const MOON_PHASES = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
 
+function getTemperatureColor(temp: number): { text: string; bg: string; border: string; glow: string } {
+  if (temp <= 32) {
+    return { text: '#60A5FA', bg: 'rgba(37, 99, 235, 0.9)', border: 'rgba(96, 165, 250, 0.8)', glow: '0 0 8px rgba(96, 165, 250, 0.8)' };
+  } else if (temp <= 50) {
+    return { text: '#22D3EE', bg: 'rgba(8, 145, 178, 0.9)', border: 'rgba(34, 211, 238, 0.8)', glow: '0 0 8px rgba(34, 211, 238, 0.8)' };
+  } else if (temp <= 65) {
+    return { text: '#4ADE80', bg: 'rgba(22, 101, 52, 0.9)', border: 'rgba(74, 222, 128, 0.8)', glow: '0 0 8px rgba(74, 222, 128, 0.8)' };
+  } else if (temp <= 75) {
+    return { text: '#FACC15', bg: 'rgba(113, 63, 18, 0.9)', border: 'rgba(250, 204, 21, 0.8)', glow: '0 0 8px rgba(250, 204, 21, 0.8)' };
+  } else if (temp <= 85) {
+    return { text: '#FB923C', bg: 'rgba(154, 52, 18, 0.9)', border: 'rgba(251, 146, 60, 0.8)', glow: '0 0 8px rgba(251, 146, 60, 0.8)' };
+  } else {
+    return { text: '#F87171', bg: 'rgba(153, 27, 27, 0.9)', border: 'rgba(248, 113, 113, 0.8)', glow: '0 0 8px rgba(248, 113, 113, 0.8)' };
+  }
+}
+
 function getMoonPhase(): string {
   const now = new Date();
   const year = now.getFullYear();
@@ -474,9 +490,15 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
               {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
             </span>
             <span 
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[11px] font-black text-cyan-300 leading-none px-1.5 py-0.5 bg-slate-900/90 rounded-full border border-cyan-500/50"
+              className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[12px] font-black leading-none px-2 py-1 rounded-full"
               style={{ 
-                textShadow: '0 0 6px rgba(6,182,212,0.8)'
+                color: getTemperatureColor(weatherData.temperature).text,
+                backgroundColor: getTemperatureColor(weatherData.temperature).bg,
+                borderWidth: '2px',
+                borderStyle: 'solid',
+                borderColor: getTemperatureColor(weatherData.temperature).border,
+                boxShadow: getTemperatureColor(weatherData.temperature).glow,
+                textShadow: '0 1px 2px rgba(0,0,0,0.5)'
               }}
             >
               {weatherData.temperature}°
