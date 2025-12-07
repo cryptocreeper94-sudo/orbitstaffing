@@ -19,7 +19,7 @@ function Icon3D({ emoji, size = "sm" }: { emoji: string; size?: "sm" | "md" | "l
   const iconPath = ICON_MAP[emoji];
   const sizeClasses = { sm: "w-4 h-4", md: "w-6 h-6", lg: "w-8 h-8" };
   if (iconPath) {
-    return <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} inline-block object-contain mr-1 drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} />;
+    return <img src={`${iconPath}?v=3`} alt="" className={`${sizeClasses[size]} inline-block object-contain mr-1 drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} />;
   }
   return <span>{emoji}</span>;
 }

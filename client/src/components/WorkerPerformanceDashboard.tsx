@@ -28,7 +28,7 @@ function Icon3D({ emoji, size = "lg" }: { emoji: string; size?: "sm" | "md" | "l
   const iconPath = ICON_MAP[emoji];
   const sizeClasses = { sm: "w-4 h-4", md: "w-6 h-6", lg: "w-10 h-10", xl: "w-14 h-14" };
   if (iconPath) {
-    return <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]`} />;
+    return <img src={`${iconPath}?v=3`} alt="" className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]`} />;
   }
   return <span className="text-2xl">{emoji}</span>;
 }

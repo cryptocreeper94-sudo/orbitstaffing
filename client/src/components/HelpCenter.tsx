@@ -37,7 +37,7 @@ function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "l
   if (iconPath) {
     return (
       <img 
-        src={`${iconPath}?v=1`} 
+        src={`${iconPath}?v=3`} 
         alt="" 
         className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} 
       />
