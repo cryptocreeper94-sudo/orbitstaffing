@@ -510,7 +510,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
                   iconType === 'foggy' ? 'foggy_weather_icon' :
                   iconType === 'thunderstorm' ? 'thunderstorm_icon' :
                   'cloudy_weather_icon'
-                }.png`}
+                }_clean.png?v=2`}
                 alt={iconType}
                 style={{
                   width: '52px',
