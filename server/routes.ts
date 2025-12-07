@@ -9331,15 +9331,20 @@ export function registerPayCardRoutes(app: Express) {
     const apiKey = req.headers['x-api-key'] as string;
     const apiSecret = req.headers['x-api-secret'] as string;
     
+    console.log('[Ecosystem Auth] Received key:', apiKey?.substring(0, 20) + '...');
+    
     if (!apiKey || !apiSecret) {
+      console.log('[Ecosystem Auth] Missing credentials');
       return res.status(401).json({ error: 'Missing API credentials' });
     }
     
     const app = await ecosystemHub.authenticateApp(apiKey, apiSecret);
     if (!app) {
+      console.log('[Ecosystem Auth] Auth failed for key:', apiKey?.substring(0, 20) + '...');
       return res.status(401).json({ error: 'Invalid API credentials' });
     }
     
+    console.log('[Ecosystem Auth] Success for app:', app.appName);
     (req as any).ecosystemApp = app;
     next();
   }

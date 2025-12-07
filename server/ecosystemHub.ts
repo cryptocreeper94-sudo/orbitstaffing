@@ -146,11 +146,24 @@ export class DarkWaveEcosystemHub {
   }
   
   async authenticateApp(apiKey: string, apiSecret: string): Promise<EcosystemConnectedApp | null> {
+    console.log('[EcosystemHub] Looking up app with key:', apiKey?.substring(0, 25) + '...');
+    
     const [app] = await db.select().from(ecosystemConnectedApps)
       .where(and(eq(ecosystemConnectedApps.apiKey, apiKey), eq(ecosystemConnectedApps.isActive, true)));
     
-    if (!app) return null;
-    if (!verifySecret(apiSecret, app.apiSecretHash)) return null;
+    if (!app) {
+      console.log('[EcosystemHub] No app found for key');
+      return null;
+    }
+    
+    console.log('[EcosystemHub] Found app:', app.appName);
+    
+    const secretValid = verifySecret(apiSecret, app.apiSecretHash);
+    console.log('[EcosystemHub] Secret valid:', secretValid);
+    console.log('[EcosystemHub] Provided secret hash:', hashSecret(apiSecret).substring(0, 20) + '...');
+    console.log('[EcosystemHub] Stored secret hash:', app.apiSecretHash.substring(0, 20) + '...');
+    
+    if (!secretValid) return null;
     
     // Update last sync timestamp
     await db.update(ecosystemConnectedApps)
