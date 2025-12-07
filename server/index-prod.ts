@@ -6,6 +6,7 @@ import express, { type Express, type Request } from "express";
 
 import runApp from "./app";
 import { setupWebSocket } from "./websocket";
+import { versionManager } from "./versionManager";
 
 export async function serveStatic(app: Express, server: Server) {
   // Setup WebSocket for real-time updates
@@ -39,4 +40,17 @@ export async function serveStatic(app: Express, server: Server) {
 
 (async () => {
   await runApp(serveStatic);
+  
+  // Auto-publish with version bump and Solana hash on production startup
+  console.log('[Startup] Production mode detected - auto-publishing release...');
+  try {
+    const result = await versionManager.publishRelease('patch');
+    console.log(`[Startup] ✅ Published ORBIT Staffing OS v${result.version}`);
+    console.log(`[Startup] ✅ Solana Hash: ${result.hash.substring(0, 16)}...`);
+    if (result.solanaResult) {
+      console.log(`[Startup] ✅ TX: ${result.solanaResult.transactionSignature}`);
+    }
+  } catch (error) {
+    console.error('[Startup] Auto-publish failed:', error);
+  }
 })();

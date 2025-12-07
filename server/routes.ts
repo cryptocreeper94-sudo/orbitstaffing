@@ -22,6 +22,7 @@ import fs from "fs";
 import express from "express";
 import { azureFaceService } from "./azureFaceService";
 import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
+import { versionManager } from "./versionManager";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -9837,6 +9838,57 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error: any) {
       console.error("Push to external hub error:", error);
       res.status(500).json({ error: error.message || "Failed to push data" });
+    }
+  });
+
+  // ========================
+  // VERSION MANAGEMENT & AUTO-PUBLISH
+  // ========================
+
+  // Get current version info
+  app.get("/api/version", async (req: Request, res: Response) => {
+    try {
+      const version = versionManager.getCurrentVersion();
+      res.json(version);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get version" });
+    }
+  });
+
+  // Trigger a publish with version bump and Solana hash (admin only)
+  app.post("/api/admin/publish", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const bumpType = (req.body.bumpType as 'major' | 'minor' | 'patch') || 'patch';
+      
+      console.log(`[Publish] Admin triggered publish with ${bumpType} version bump`);
+      
+      const result = await versionManager.publishRelease(bumpType);
+      
+      res.json({
+        success: true,
+        version: result.version,
+        buildNumber: result.buildNumber,
+        hash: result.hash,
+        solana: result.solanaResult ? {
+          transactionSignature: result.solanaResult.transactionSignature,
+          explorerUrl: result.solanaResult.explorerUrl,
+          merkleRoot: result.solanaResult.merkleRoot,
+        } : null,
+        publishedAt: new Date().toISOString(),
+      });
+    } catch (error: any) {
+      console.error("Publish error:", error);
+      res.status(500).json({ error: error.message || "Failed to publish" });
+    }
+  });
+
+  // Get publish history
+  app.get("/api/admin/publish/history", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const history = await versionManager.getPublishHistory();
+      res.json(history);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get publish history" });
     }
   });
 }
