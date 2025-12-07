@@ -41,16 +41,18 @@ export async function serveStatic(app: Express, server: Server) {
 (async () => {
   await runApp(serveStatic);
   
-  // Auto-publish with version bump and Solana hash on production startup
-  console.log('[Startup] Production mode detected - auto-publishing release...');
-  try {
-    const result = await versionManager.publishRelease('patch');
-    console.log(`[Startup] ✅ Published ORBIT Staffing OS v${result.version}`);
-    console.log(`[Startup] ✅ Solana Hash: ${result.hash.substring(0, 16)}...`);
-    if (result.solanaResult) {
-      console.log(`[Startup] ✅ TX: ${result.solanaResult.transactionSignature}`);
+  // Delay auto-publish to let health checks pass first
+  setTimeout(async () => {
+    console.log('[Startup] Running background auto-publish...');
+    try {
+      const result = await versionManager.publishRelease('patch');
+      console.log(`[Startup] ✅ Published ORBIT Staffing OS v${result.version}`);
+      console.log(`[Startup] ✅ Solana Hash: ${result.hash.substring(0, 16)}...`);
+      if (result.solanaResult) {
+        console.log(`[Startup] ✅ TX: ${result.solanaResult.transactionSignature}`);
+      }
+    } catch (error) {
+      console.log('[Startup] Auto-publish skipped (non-critical)');
     }
-  } catch (error) {
-    console.error('[Startup] Auto-publish failed:', error);
-  }
+  }, 10000); // Wait 10 seconds after startup
 })();
