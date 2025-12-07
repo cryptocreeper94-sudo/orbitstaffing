@@ -334,14 +334,17 @@ export function OrbitChatAssistant() {
 
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-4 z-[99999] w-14 h-14 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/40 flex items-center justify-center hover:scale-110 transition-transform ${isOpen ? 'hidden' : ''}`}
-        style={{ filter: 'drop-shadow(0 0 15px rgba(6,182,212,0.6))' }}
+        className={`fixed bottom-20 right-4 z-[99999] w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 border-3 border-cyan-300 shadow-xl shadow-cyan-500/50 flex items-center justify-center hover:scale-110 transition-transform ${isOpen ? 'hidden' : ''}`}
+        style={{ 
+          filter: 'drop-shadow(0 0 20px rgba(6,182,212,0.8))',
+          boxShadow: '0 0 30px rgba(6, 182, 212, 0.6), 0 4px 15px rgba(0,0,0,0.4)'
+        }}
         data-testid="button-orbit-chat"
         aria-label="Open Orby chat"
       >
-        <span className="text-3xl">🪐</span>
+        <span className="text-4xl">🪐</span>
         <span 
-          className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse"
+          className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white animate-pulse"
         />
       </button>
     </>,
