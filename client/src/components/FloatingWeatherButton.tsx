@@ -502,14 +502,15 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
                 <span 
                   style={{ 
                     position: 'absolute',
-                    bottom: '-8px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    fontSize: '16px',
+                    bottom: '0px',
+                    left: '100%',
+                    marginLeft: '3px',
+                    fontSize: '14px',
                     fontWeight: '900',
                     lineHeight: '1',
                     color: tempColors.text,
-                    textShadow: `0 0 8px ${tempColors.text}, 0 0 16px ${tempColors.text}, 0 2px 4px rgba(0,0,0,0.9)`,
+                    WebkitTextFillColor: tempColors.text,
+                    textShadow: `0 0 6px ${tempColors.text}, 0 1px 3px rgba(0,0,0,0.9)`,
                     zIndex: 99999,
                     whiteSpace: 'nowrap'
                   }}
