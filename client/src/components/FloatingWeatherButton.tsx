@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, X, Thermometer, Droplets, Wind, RefreshCw, Radar, Cloud } from "lucide-react";
@@ -228,8 +229,8 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
   const isLoading = geoLoading || weatherLoading;
 
   if (!zipCode) {
-    return (
-      <div className="fixed bottom-20 left-4 z-[140]" data-testid="floating-weather-container">
+    return createPortal(
+      <div className="fixed bottom-24 left-4 z-[99999]" data-testid="floating-weather-container">
         <AnimatePresence>
           {showZipInput ? (
             <motion.div
@@ -298,12 +299,13 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             </motion.button>
           )}
         </AnimatePresence>
-      </div>
+      </div>,
+      document.body
     );
   }
 
-  return (
-    <div className="fixed bottom-20 left-4 z-[140]" data-testid="floating-weather-container">
+  return createPortal(
+    <div className="fixed bottom-24 left-4 z-[99999]" data-testid="floating-weather-container">
       <AnimatePresence>
         {isExpanded && weatherData && (
           <motion.div
@@ -517,6 +519,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
           </motion.div>
         )}
       </motion.button>
-    </div>
+    </div>,
+    document.body
   );
 }

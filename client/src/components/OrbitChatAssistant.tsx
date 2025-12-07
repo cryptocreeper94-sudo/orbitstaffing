@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, 
@@ -183,7 +184,7 @@ export function OrbitChatAssistant() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([welcomeMsg]));
   };
 
-  return (
+  return createPortal(
     <>
       <AnimatePresence>
         {isOpen && (
@@ -192,7 +193,7 @@ export function OrbitChatAssistant() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-2 sm:inset-3 md:inset-4 z-[200] flex flex-col"
+            className="fixed inset-2 sm:inset-3 md:inset-4 z-[99999] flex flex-col"
           >
             <div className="w-full h-full flex flex-col sm:flex-row">
               <div className="flex items-center justify-center py-2 sm:py-0 sm:items-end sm:w-24 md:w-32 lg:w-40 flex-shrink-0">
@@ -331,28 +332,33 @@ export function OrbitChatAssistant() {
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.92 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-4 z-[200]"
+          className="fixed bottom-24 right-4 z-[99999]"
           data-testid="button-orbit-chat"
           aria-label="Open Orby chat"
         >
           <motion.div 
-            className="relative"
+            className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-600/90 to-blue-700/90 border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/40 flex items-center justify-center"
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            style={{ filter: 'drop-shadow(0 0 15px rgba(6,182,212,0.6))' }}
           >
             <img 
               src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
               alt="Orby" 
-              className="w-12 h-12 object-contain"
-              style={{ filter: 'drop-shadow(0 0 12px rgba(6,182,212,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
+              className="w-11 h-11 object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
             />
+            <span className="absolute text-2xl" style={{ display: 'none' }} data-fallback>🪐</span>
             <span 
-              className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-slate-900 animate-pulse"
+              className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse"
               style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
             />
           </motion.div>
         </motion.button>
       )}
-    </>
+    </>,
+    document.body
   );
 }
