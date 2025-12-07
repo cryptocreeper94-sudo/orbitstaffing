@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 interface DarkwaveFooterProps {
   product?: string;
   hidePoweredBy?: boolean;
@@ -5,6 +7,17 @@ interface DarkwaveFooterProps {
 }
 
 export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot Ops Pro", hidePoweredBy = false, minimal = false }) => {
+  const [version, setVersion] = useState('2.7.0');
+
+  useEffect(() => {
+    fetch('/api/version')
+      .then(res => res.json())
+      .then(data => {
+        if (data.version) setVersion(data.version);
+      })
+      .catch(() => {});
+  }, []);
+
   if (minimal) {
     return (
       <footer className="w-full bg-slate-950 border-t border-slate-800 py-4 px-6 shrink-0">
@@ -22,7 +35,7 @@ export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot O
           </p>
           
           <span className="text-slate-500 font-mono">
-            v2.7.0
+            v{version}
           </span>
         </div>
       </footer>
@@ -79,7 +92,7 @@ export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot O
             <div className="flex flex-col items-center md:items-end">
               <div className="text-[10px] text-slate-400 uppercase tracking-widest">Powered By</div>
               <div className="text-xs font-bold text-slate-300">DARKWAVE STUDIOS</div>
-              <div className="text-[9px] text-slate-600 mt-1">v2.7.0 • Enterprise Edition</div>
+              <div className="text-[9px] text-slate-600 mt-1">v{version} • Enterprise Edition</div>
             </div>
           )}
         </div>
