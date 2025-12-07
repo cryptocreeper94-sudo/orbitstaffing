@@ -489,27 +489,35 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             >
               {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
             </span>
-            <span 
-              style={{ 
-                position: 'absolute',
-                bottom: '-12px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                fontSize: '13px',
-                fontWeight: '900',
-                lineHeight: '1',
-                padding: '4px 8px',
-                borderRadius: '9999px',
-                color: getTemperatureColor(weatherData.temperature).text,
-                backgroundColor: getTemperatureColor(weatherData.temperature).bg,
-                border: `2px solid ${getTemperatureColor(weatherData.temperature).border}`,
-                boxShadow: getTemperatureColor(weatherData.temperature).glow,
-                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-                zIndex: 10
-              }}
-            >
-              {weatherData.temperature}°
-            </span>
+            {(() => {
+              const tempColors = getTemperatureColor(weatherData.temperature);
+              return (
+                <span 
+                  style={{ 
+                    position: 'absolute',
+                    bottom: '-14px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    fontSize: '14px',
+                    fontWeight: '900',
+                    lineHeight: '1',
+                    padding: '5px 10px',
+                    borderRadius: '9999px',
+                    color: tempColors.text,
+                    backgroundColor: tempColors.bg,
+                    borderWidth: '2px',
+                    borderStyle: 'solid',
+                    borderColor: tempColors.border,
+                    boxShadow: `${tempColors.glow}, 0 2px 8px rgba(0,0,0,0.6)`,
+                    textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+                    zIndex: 99999,
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {weatherData.temperature}°
+                </span>
+              );
+            })()}
           </motion.div>
         ) : isLoading ? (
           <motion.div 

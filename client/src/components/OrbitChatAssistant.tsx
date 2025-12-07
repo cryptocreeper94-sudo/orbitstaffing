@@ -191,36 +191,62 @@ export function OrbitChatAssistant() {
 
   if (!mounted) return null;
 
-  // Simple fallback button without portal for debugging
-  const SimpleButton = () => (
+  // Orby mascot button - aligned with weather button on left
+  const OrbyButton = () => (
     <button
       onClick={() => setIsOpen(true)}
       style={{
         position: 'fixed',
-        bottom: '80px',
+        bottom: '24px',
         right: '16px',
-        width: '64px',
-        height: '64px',
+        width: '56px',
+        height: '56px',
         borderRadius: '50%',
         background: 'linear-gradient(to bottom right, #06b6d4, #2563eb)',
         border: '3px solid #22d3ee',
         display: isOpen ? 'none' : 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '32px',
         cursor: 'pointer',
         zIndex: 999999,
-        boxShadow: '0 0 30px rgba(6, 182, 212, 0.6), 0 4px 15px rgba(0,0,0,0.4)'
+        boxShadow: '0 0 30px rgba(6, 182, 212, 0.6), 0 4px 15px rgba(0,0,0,0.4)',
+        overflow: 'hidden',
+        padding: '6px'
       }}
-      data-testid="button-orbit-chat-simple"
+      data-testid="button-orbit-chat"
     >
-      🪐
+      <img 
+        src="/attached_assets/orby_commander_transparent.png" 
+        alt="Orby"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.5))'
+        }}
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+          (e.target as HTMLImageElement).parentElement!.innerHTML = '🪐';
+        }}
+      />
+      <span 
+        style={{
+          position: 'absolute',
+          top: '-4px',
+          right: '-4px',
+          width: '16px',
+          height: '16px',
+          backgroundColor: '#4ade80',
+          borderRadius: '50%',
+          border: '2px solid white'
+        }}
+      />
     </button>
   );
 
   return createPortal(
     <>
-      <SimpleButton />
+      <OrbyButton />
       <AnimatePresence>
         {isOpen && (
           <motion.div
