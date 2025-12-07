@@ -30,6 +30,7 @@ import { HomeSlideshow } from "@/components/HomeSlideshow";
 import { WelcomeSlideshow } from "@/components/WelcomeSlideshow";
 import { Accordion } from "@/components/Accordion";
 import { ISO20022Banner } from "@/components/ISO20022Banner";
+import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 import orbyCommanderEmblem from "@assets/orby_commander_transparent.png";
@@ -1078,6 +1079,9 @@ export default function Landing() {
       </footer>
 
       </div>
+
+      {/* Orby AI Assistant */}
+      <OrbitChatAssistant />
     </div>
   );
 }
