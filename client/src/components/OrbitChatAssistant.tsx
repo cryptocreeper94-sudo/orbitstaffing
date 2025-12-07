@@ -191,54 +191,50 @@ export function OrbitChatAssistant() {
 
   if (!mounted) return null;
 
-  // Orby mascot button - aligned with weather button on left
+  // Orby mascot button - just the mascot floating, no background
   const OrbyButton = () => (
     <button
       onClick={() => setIsOpen(true)}
       style={{
         position: 'fixed',
-        bottom: '24px',
+        bottom: '16px',
         right: '16px',
-        width: '56px',
-        height: '56px',
-        borderRadius: '50%',
-        background: 'linear-gradient(to bottom right, #06b6d4, #2563eb)',
-        border: '3px solid #22d3ee',
-        display: isOpen ? 'none' : 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: '72px',
+        height: '72px',
+        background: 'transparent',
+        border: 'none',
+        display: isOpen ? 'none' : 'block',
         cursor: 'pointer',
         zIndex: 999999,
-        boxShadow: '0 0 30px rgba(6, 182, 212, 0.6), 0 4px 15px rgba(0,0,0,0.4)',
-        overflow: 'hidden',
-        padding: '6px'
+        padding: 0
       }}
       data-testid="button-orbit-chat"
     >
       <img 
-        src="/attached_assets/orby_commander_transparent.png" 
+        src="/mascot/clean/orbit_saturn_mascot_waving_transparent_clean.png" 
         alt="Orby"
         style={{
           width: '100%',
           height: '100%',
           objectFit: 'contain',
-          filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.5))'
+          filter: 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.7)) drop-shadow(0 4px 8px rgba(0,0,0,0.4))'
         }}
         onError={(e) => {
+          console.error('Orby mascot image failed to load');
           (e.target as HTMLImageElement).style.display = 'none';
-          (e.target as HTMLImageElement).parentElement!.innerHTML = '🪐';
         }}
       />
       <span 
         style={{
           position: 'absolute',
-          top: '-4px',
-          right: '-4px',
-          width: '16px',
-          height: '16px',
+          top: '2px',
+          right: '2px',
+          width: '14px',
+          height: '14px',
           backgroundColor: '#4ade80',
           borderRadius: '50%',
-          border: '2px solid white'
+          border: '2px solid #1e293b',
+          boxShadow: '0 0 6px rgba(74, 222, 128, 0.6)'
         }}
       />
     </button>

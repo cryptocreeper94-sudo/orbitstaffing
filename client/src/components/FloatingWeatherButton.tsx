@@ -253,7 +253,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
 
   if (!zipCode) {
     return createPortal(
-      <div className="fixed bottom-6 left-4 z-[99999]" data-testid="floating-weather-container">
+      <div style={{ position: 'fixed', bottom: '16px', left: '16px', zIndex: 99999 }} data-testid="floating-weather-container">
         <AnimatePresence>
           {showZipInput ? (
             <motion.div
@@ -328,7 +328,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
   }
 
   return createPortal(
-    <div className="fixed bottom-6 left-4 z-[99999]" data-testid="floating-weather-container">
+    <div style={{ position: 'fixed', bottom: '16px', left: '16px', zIndex: 99999 }} data-testid="floating-weather-container">
       <AnimatePresence>
         {isExpanded && weatherData && (
           <motion.div
