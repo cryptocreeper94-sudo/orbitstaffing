@@ -490,15 +490,22 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
               {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
             </span>
             <span 
-              className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-[12px] font-black leading-none px-2 py-1 rounded-full"
               style={{ 
+                position: 'absolute',
+                bottom: '-12px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontSize: '13px',
+                fontWeight: '900',
+                lineHeight: '1',
+                padding: '4px 8px',
+                borderRadius: '9999px',
                 color: getTemperatureColor(weatherData.temperature).text,
                 backgroundColor: getTemperatureColor(weatherData.temperature).bg,
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                borderColor: getTemperatureColor(weatherData.temperature).border,
+                border: `2px solid ${getTemperatureColor(weatherData.temperature).border}`,
                 boxShadow: getTemperatureColor(weatherData.temperature).glow,
-                textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                zIndex: 10
               }}
             >
               {weatherData.temperature}°
