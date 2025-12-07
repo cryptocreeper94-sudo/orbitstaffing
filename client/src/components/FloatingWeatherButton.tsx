@@ -48,25 +48,25 @@ const WEATHER_EMOJIS: Record<string, string> = {
 const MOON_PHASES = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
 
 function getTemperatureColor(temp: number): { text: string; bg: string; border: string; glow: string } {
-  // High contrast colors - white text on solid colored backgrounds
+  // Just the number is colored - no background
   if (temp <= 32) {
     // Freezing - bright blue
-    return { text: '#FFFFFF', bg: '#2563EB', border: '#60A5FA', glow: '0 0 12px rgba(96, 165, 250, 1)' };
+    return { text: '#3B82F6', bg: 'transparent', border: 'transparent', glow: '0 0 12px rgba(59, 130, 246, 1)' };
   } else if (temp <= 50) {
     // Cold - cyan
-    return { text: '#FFFFFF', bg: '#0891B2', border: '#22D3EE', glow: '0 0 12px rgba(34, 211, 238, 1)' };
+    return { text: '#06B6D4', bg: 'transparent', border: 'transparent', glow: '0 0 12px rgba(6, 182, 212, 1)' };
   } else if (temp <= 65) {
     // Cool - green
-    return { text: '#FFFFFF', bg: '#16A34A', border: '#4ADE80', glow: '0 0 12px rgba(74, 222, 128, 1)' };
+    return { text: '#22C55E', bg: 'transparent', border: 'transparent', glow: '0 0 12px rgba(34, 197, 94, 1)' };
   } else if (temp <= 75) {
     // Warm - yellow
-    return { text: '#000000', bg: '#EAB308', border: '#FACC15', glow: '0 0 12px rgba(250, 204, 21, 1)' };
+    return { text: '#EAB308', bg: 'transparent', border: 'transparent', glow: '0 0 12px rgba(234, 179, 8, 1)' };
   } else if (temp <= 85) {
     // Hot - orange
-    return { text: '#FFFFFF', bg: '#EA580C', border: '#FB923C', glow: '0 0 12px rgba(251, 146, 60, 1)' };
+    return { text: '#F97316', bg: 'transparent', border: 'transparent', glow: '0 0 12px rgba(249, 115, 22, 1)' };
   } else {
     // Very hot - red
-    return { text: '#FFFFFF', bg: '#DC2626', border: '#F87171', glow: '0 0 12px rgba(248, 113, 113, 1)' };
+    return { text: '#EF4444', bg: 'transparent', border: 'transparent', glow: '0 0 12px rgba(239, 68, 68, 1)' };
   }
 }
 
@@ -502,21 +502,14 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
                 <span 
                   style={{ 
                     position: 'absolute',
-                    bottom: '-14px',
+                    bottom: '-8px',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: '900',
                     lineHeight: '1',
-                    padding: '5px 10px',
-                    borderRadius: '9999px',
                     color: tempColors.text,
-                    backgroundColor: tempColors.bg,
-                    borderWidth: '2px',
-                    borderStyle: 'solid',
-                    borderColor: tempColors.border,
-                    boxShadow: `${tempColors.glow}, 0 2px 8px rgba(0,0,0,0.6)`,
-                    textShadow: '0 1px 3px rgba(0,0,0,0.8)',
+                    textShadow: `0 0 8px ${tempColors.text}, 0 0 16px ${tempColors.text}, 0 2px 4px rgba(0,0,0,0.9)`,
                     zIndex: 99999,
                     whiteSpace: 'nowrap'
                   }}
