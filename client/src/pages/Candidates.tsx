@@ -2,14 +2,6 @@ import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { 
   Dialog,
   DialogContent,
@@ -18,8 +10,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Search, UserPlus, FileCheck, Mail, Phone } from "lucide-react";
+import { Search, UserPlus, FileCheck, Mail, Phone, User } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { BentoGrid } from "@/components/ui/bento-grid";
+import { PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, OrbitCardFooter } from "@/components/ui/orbit-card";
 
 const mockCandidates = [
   { id: "C-001", name: "Sarah Connor", role: "Logistics Coordinator", status: "Active", email: "s.connor@email.com", phone: "+1 (555) 010-2233", verification: "Verified" },
@@ -39,107 +35,131 @@ export default function Candidates() {
 
   return (
     <Shell>
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold font-heading tracking-tight">Talent Pool</h1>
-          <p className="text-muted-foreground">Manage candidates, compliance, and onboarding.</p>
+      <PageHeader
+        title="Talent Pool"
+        subtitle="Manage candidates, compliance, and onboarding."
+        actions={
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+                <UserPlus className="w-4 h-4 mr-2" />
+                Onboard Candidate
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-card border-border text-foreground">
+              <DialogHeader>
+                <DialogTitle>New Candidate Onboarding</DialogTitle>
+                <DialogDescription>
+                  Initiate the automated onboarding sequence. This will send I-9 and tax forms to the candidate.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">First Name</label>
+                    <Input placeholder="Jane" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Last Name</label>
+                    <Input placeholder="Doe" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Email Address</label>
+                  <Input placeholder="jane.doe@example.com" type="email" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Role / Skillset</label>
+                  <Input placeholder="e.g. Warehouse Associate" />
+                </div>
+                <Button className="w-full bg-primary text-primary-foreground">Send Onboarding Package</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        }
+      />
+
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search candidates..." 
+            className="pl-9 bg-background/50 border-border/50"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            data-testid="input-search-candidates"
+          />
         </div>
-        
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Onboard Candidate
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-card border-border text-foreground">
-            <DialogHeader>
-              <DialogTitle>New Candidate Onboarding</DialogTitle>
-              <DialogDescription>
-                Initiate the automated onboarding sequence. This will send I-9 and tax forms to the candidate.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">First Name</label>
-                  <Input placeholder="Jane" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Last Name</label>
-                  <Input placeholder="Doe" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email Address</label>
-                <Input placeholder="jane.doe@example.com" type="email" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Role / Skillset</label>
-                <Input placeholder="e.g. Warehouse Associate" />
-              </div>
-              <Button className="w-full bg-primary text-primary-foreground">Send Onboarding Package</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
 
-      <div className="bg-card/50 border border-border/50 rounded-xl backdrop-blur-sm overflow-hidden">
-        <div className="p-4 border-b border-border/50 flex gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search candidates..." 
-              className="pl-9 bg-background/50 border-border/50"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-        
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-white/5 border-border/50">
-              <TableHead>ID</TableHead>
-              <TableHead>Candidate</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Compliance</TableHead>
-              <TableHead>Contact</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCandidates.map((candidate) => (
-              <TableRow key={candidate.id} className="hover:bg-white/5 border-border/50 group cursor-pointer">
-                <TableCell className="font-mono text-xs text-muted-foreground">{candidate.id}</TableCell>
-                <TableCell>
-                  <div className="font-medium text-foreground group-hover:text-primary transition-colors">{candidate.name}</div>
-                </TableCell>
-                <TableCell>{candidate.role}</TableCell>
-                <TableCell>
-                  <StatusBadge status={candidate.status} />
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileCheck className={cn("w-4 h-4", candidate.verification === "Verified" ? "text-green-500" : "text-amber-500")} />
+      <BentoGrid cols={3} gap="md">
+        {filteredCandidates.map((candidate) => (
+          <OrbitCard 
+            key={candidate.id} 
+            variant="default" 
+            hover={true}
+            className="cursor-pointer"
+            data-testid={`card-candidate-${candidate.id}`}
+          >
+            <OrbitCardHeader
+              icon={
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+              }
+              action={<StatusBadge status={candidate.status} />}
+            >
+              <OrbitCardTitle>{candidate.name}</OrbitCardTitle>
+              <OrbitCardDescription>{candidate.role}</OrbitCardDescription>
+            </OrbitCardHeader>
+            
+            <OrbitCardContent>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <span className="font-mono text-xs text-muted-foreground">{candidate.id}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FileCheck className={cn("w-4 h-4", candidate.verification === "Verified" ? "text-green-500" : "text-amber-500")} />
+                  <span className={candidate.verification === "Verified" ? "text-green-400" : "text-amber-400"}>
                     {candidate.verification}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary">
-                      <Mail className="w-4 h-4" />
-                    </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary">
-                      <Phone className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                  </span>
+                </div>
+              </div>
+            </OrbitCardContent>
+            
+            <OrbitCardFooter>
+              <div className="flex items-center gap-2 text-xs text-slate-400">
+                <Mail className="w-3 h-3" />
+                <span className="truncate max-w-[140px]">{candidate.email}</span>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-8 w-8 hover:text-primary hover:bg-cyan-500/10"
+                  data-testid={`button-email-${candidate.id}`}
+                >
+                  <Mail className="w-4 h-4" />
+                </Button>
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-8 w-8 hover:text-primary hover:bg-cyan-500/10"
+                  data-testid={`button-phone-${candidate.id}`}
+                >
+                  <Phone className="w-4 h-4" />
+                </Button>
+              </div>
+            </OrbitCardFooter>
+          </OrbitCard>
+        ))}
+      </BentoGrid>
+
+      {filteredCandidates.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-slate-400">No candidates found matching your search.</p>
+        </div>
+      )}
     </Shell>
   );
 }
@@ -157,5 +177,3 @@ function StatusBadge({ status }: { status: string }) {
     </Badge>
   );
 }
-
-import { cn } from "@/lib/utils";

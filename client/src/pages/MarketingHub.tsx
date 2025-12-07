@@ -7,12 +7,16 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
+import { SectionHeader, PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, ActionCard } from '@/components/ui/orbit-card';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface PostTemplate {
   id: string;
@@ -267,7 +271,6 @@ Reply below - we're always building.`,
   },
 ];
 
-// Flexible posting tasks - no hardcoded dates, user adds completion date when done
 const postingTasks = [
   { id: 'task-1', platform: 'twitter', type: 'Morning tip or insight', emoji: '🌅', order: 1 },
   { id: 'task-2', platform: 'facebook', type: 'Feature highlight', emoji: '✨', order: 2 },
@@ -278,8 +281,8 @@ const postingTasks = [
 ];
 
 interface TaskCompletion {
-  completedDate: string; // User enters their own date
-  completedAt: number; // Timestamp for sorting
+  completedDate: string;
+  completedAt: number;
 }
 
 const screenshotGuide = [
@@ -305,8 +308,8 @@ export default function MarketingHub() {
   const [postingPlatform, setPostingPlatform] = useState<'twitter' | 'facebook' | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
-  // Flexible task completions - stored with user-entered dates
   const [taskCompletions, setTaskCompletions] = useState<Record<string, TaskCompletion>>(() => {
     const saved = localStorage.getItem('orbit_marketing_tasks');
     return saved ? JSON.parse(saved) : {};
@@ -314,7 +317,6 @@ export default function MarketingHub() {
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [dateInput, setDateInput] = useState('');
 
-  // Save completions to localStorage
   useEffect(() => {
     localStorage.setItem('orbit_marketing_tasks', JSON.stringify(taskCompletions));
   }, [taskCompletions]);
@@ -518,47 +520,125 @@ export default function MarketingHub() {
   const twitterLimit = 280;
   const isOverTwitterLimit = characterCount > twitterLimit;
 
+  const TemplateCard = ({ template }: { template: PostTemplate }) => (
+    <OrbitCard className="h-full">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          {template.platform === 'twitter' ? (
+            <div className="p-1.5 rounded-lg bg-sky-500/20 flex-shrink-0">
+              <Twitter className="w-4 h-4 text-sky-400" />
+            </div>
+          ) : (
+            <div className="p-1.5 rounded-lg bg-blue-500/20 flex-shrink-0">
+              <Facebook className="w-4 h-4 text-blue-400" />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <h4 className="font-medium text-white text-sm truncate">{template.title}</h4>
+            <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
+              {template.category}
+            </Badge>
+          </div>
+        </div>
+        <div className="flex gap-1 flex-shrink-0">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => loadTemplate(template)}
+            className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 text-xs px-2"
+            data-testid={`button-use-${template.id}`}
+          >
+            <Send className="w-3 h-3 mr-1" />
+            Use
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => copyToClipboard(template.content, template.id)}
+            className={`text-xs px-2 ${copiedId === template.id ? 'bg-green-600' : 'bg-slate-700 hover:bg-slate-600'}`}
+            data-testid={`button-copy-${template.id}`}
+          >
+            {copiedId === template.id ? (
+              <>
+                <Check className="w-3 h-3 mr-1" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3 mr-1" />
+                Copy
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+      
+      <pre className="text-xs text-slate-300 whitespace-pre-wrap break-words font-sans bg-slate-900/50 rounded-lg p-2 md:p-3 max-h-32 overflow-y-auto overflow-x-hidden">
+        {template.content}
+      </pre>
+      
+      {template.screenshotPath && (
+        <div className="mt-2 flex flex-wrap items-center gap-1 md:gap-2 text-xs text-slate-500">
+          <Image className="w-3 h-3 flex-shrink-0" />
+          <span className="truncate max-w-[150px] md:max-w-none">Screenshot: {template.screenshotDesc}</span>
+          <a 
+            href={template.screenshotPath}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 flex-shrink-0"
+          >
+            Open <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      )}
+      
+      {template.hashtags && (
+        <div className="mt-2 flex items-center gap-1 flex-wrap">
+          <Hash className="w-3 h-3 text-slate-500" />
+          {template.hashtags.map((tag, i) => (
+            <span key={i} className="text-xs text-cyan-400">#{tag}</span>
+          ))}
+        </div>
+      )}
+    </OrbitCard>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600">
-                <Megaphone className="w-6 h-6 text-white" />
-              </div>
-              Marketing Command Center
-            </h1>
-            <p className="text-slate-400 mt-1">Your social media mission control</p>
-          </div>
-          
-          <div className="flex flex-wrap gap-2">
-            <Badge className={`${completedTaskCount === postingTasks.length ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'} px-3 py-1`} data-testid="badge-task-progress">
-              <Check className="w-3 h-3 mr-1" />
-              {completedTaskCount}/{postingTasks.length} Tasks Done
-            </Badge>
-            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 px-3 py-1" data-testid="badge-template-count">
-              <Zap className="w-3 h-3 mr-1" />
-              {postTemplates.length} Templates
-            </Badge>
-          </div>
-        </div>
+        <PageHeader
+          title="Marketing Command Center"
+          subtitle="Your social media mission control"
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Badge className={`${completedTaskCount === postingTasks.length ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'} px-3 py-1`} data-testid="badge-task-progress">
+                <Check className="w-3 h-3 mr-1" />
+                {completedTaskCount}/{postingTasks.length} Tasks Done
+              </Badge>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 px-3 py-1" data-testid="badge-template-count">
+                <Zap className="w-3 h-3 mr-1" />
+                {postTemplates.length} Templates
+              </Badge>
+            </div>
+          }
+        />
 
-        {/* Post Composer */}
-        <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-cyan-500/30 shadow-lg shadow-cyan-500/10">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-white flex items-center gap-2 text-lg">
+        <OrbitCard variant="glass" className="border-cyan-500/30 shadow-lg shadow-cyan-500/10">
+          <OrbitCardHeader
+            icon={
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600">
                 <Send className="w-4 h-4 text-white" />
               </div>
-              Post Composer
-              <Badge className="ml-2 bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+            }
+            action={
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
                 Live
               </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            }
+          >
+            <OrbitCardTitle>Post Composer</OrbitCardTitle>
+          </OrbitCardHeader>
+          <OrbitCardContent className="space-y-4">
             <div className="relative">
               <Textarea
                 placeholder="Write your post here... or click a template below to load it."
@@ -577,7 +657,6 @@ export default function MarketingHub() {
               </div>
             </div>
 
-            {/* Image Upload Section */}
             <div className="flex flex-wrap items-center gap-3">
               <input
                 type="file"
@@ -633,7 +712,6 @@ export default function MarketingHub() {
 
               <div className="flex-1" />
 
-              {/* Post Buttons */}
               <div className="flex gap-2">
                 <Button
                   onClick={postToTwitter}
@@ -676,34 +754,32 @@ export default function MarketingHub() {
             <p className="text-xs text-slate-500">
               Tip: Click any template below to load it into the composer. Add an image, edit the text, then post!
             </p>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <Card className="lg:col-span-1 bg-slate-900/50 border-slate-700/50">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-white flex items-center gap-2 text-base sm:text-lg">
-                  <Calendar className="w-5 h-5 text-cyan-400" />
-                  Posting Tasks
-                </CardTitle>
-                {Object.keys(taskCompletions).length > 0 && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={clearAllTasks}
-                    className="text-slate-400 hover:text-white h-7 px-2"
-                    data-testid="button-clear-tasks"
-                  >
-                    <RotateCcw className="w-3 h-3 mr-1" />
-                    Reset
-                  </Button>
-                )}
+        <BentoGrid cols={3} gap="md">
+          <BentoTile className="p-4 md:p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-cyan-400" />
+                <h3 className="text-white font-semibold text-base sm:text-lg">Posting Tasks</h3>
               </div>
-              <p className="text-xs text-slate-500 mt-1">Click to mark done & add date</p>
-            </CardHeader>
-            <CardContent className="space-y-2">
+              {Object.keys(taskCompletions).length > 0 && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={clearAllTasks}
+                  className="text-slate-400 hover:text-white h-7 px-2"
+                  data-testid="button-clear-tasks"
+                >
+                  <RotateCcw className="w-3 h-3 mr-1" />
+                  Reset
+                </Button>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 mb-3">Click to mark done & add date</p>
+            
+            <div className="space-y-2">
               {postingTasks.map((task) => {
                 const isCompleted = taskCompletions[task.id];
                 const isEditing = editingTask === task.id;
@@ -808,237 +884,128 @@ export default function MarketingHub() {
                   {Object.keys(taskCompletions).length}/{postingTasks.length} completed
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </BentoTile>
 
-          <Card className="lg:col-span-2 bg-slate-900/50 border-slate-700/50">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-white flex items-center gap-2 text-lg">
-                  <MessageSquare className="w-5 h-5 text-purple-400" />
-                  Ready-to-Post Templates
-                </CardTitle>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant={selectedPlatform === 'all' ? 'default' : 'outline'}
-                    onClick={() => setSelectedPlatform('all')}
-                    className={selectedPlatform === 'all' ? 'bg-purple-600' : 'border-slate-600'}
-                    data-testid="button-filter-all"
-                  >
-                    All
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={selectedPlatform === 'twitter' ? 'default' : 'outline'}
-                    onClick={() => setSelectedPlatform('twitter')}
-                    className={selectedPlatform === 'twitter' ? 'bg-sky-500' : 'border-slate-600'}
-                    data-testid="button-filter-twitter"
-                  >
-                    <Twitter className="w-3 h-3 mr-1" />
-                    X
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={selectedPlatform === 'facebook' ? 'default' : 'outline'}
-                    onClick={() => setSelectedPlatform('facebook')}
-                    className={selectedPlatform === 'facebook' ? 'bg-blue-600' : 'border-slate-600'}
-                    data-testid="button-filter-facebook"
-                  >
-                    <Facebook className="w-3 h-3 mr-1" />
-                    FB
-                  </Button>
-                </div>
+          <BentoTile span={2} className="p-4 md:p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-purple-400" />
+                <h3 className="text-white font-semibold text-lg">Ready-to-Post Templates</h3>
               </div>
-            </CardHeader>
-            <CardContent>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant={selectedPlatform === 'all' ? 'default' : 'outline'}
+                  onClick={() => setSelectedPlatform('all')}
+                  className={selectedPlatform === 'all' ? 'bg-purple-600' : 'border-slate-600'}
+                  data-testid="button-filter-all"
+                >
+                  All
+                </Button>
+                <Button
+                  size="sm"
+                  variant={selectedPlatform === 'twitter' ? 'default' : 'outline'}
+                  onClick={() => setSelectedPlatform('twitter')}
+                  className={selectedPlatform === 'twitter' ? 'bg-sky-500' : 'border-slate-600'}
+                  data-testid="button-filter-twitter"
+                >
+                  <Twitter className="w-3 h-3 mr-1" />
+                  X
+                </Button>
+                <Button
+                  size="sm"
+                  variant={selectedPlatform === 'facebook' ? 'default' : 'outline'}
+                  onClick={() => setSelectedPlatform('facebook')}
+                  className={selectedPlatform === 'facebook' ? 'bg-blue-600' : 'border-slate-600'}
+                  data-testid="button-filter-facebook"
+                >
+                  <Facebook className="w-3 h-3 mr-1" />
+                  FB
+                </Button>
+              </div>
+            </div>
+
+            {isMobile ? (
+              <CarouselRail gap="md" itemWidth="lg" showArrows={false}>
+                {filteredTemplates.map((template) => (
+                  <CarouselRailItem key={template.id}>
+                    <TemplateCard template={template} />
+                  </CarouselRailItem>
+                ))}
+              </CarouselRail>
+            ) : (
               <ScrollArea className="h-[400px] pr-4">
                 <div className="space-y-3">
                   {filteredTemplates.map((template) => (
-                    <div 
-                      key={template.id}
-                      className="p-3 md:p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-all overflow-hidden"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          {template.platform === 'twitter' ? (
-                            <div className="p-1.5 rounded-lg bg-sky-500/20 flex-shrink-0">
-                              <Twitter className="w-4 h-4 text-sky-400" />
-                            </div>
-                          ) : (
-                            <div className="p-1.5 rounded-lg bg-blue-500/20 flex-shrink-0">
-                              <Facebook className="w-4 h-4 text-blue-400" />
-                            </div>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <h4 className="font-medium text-white text-sm truncate">{template.title}</h4>
-                            <Badge variant="outline" className="text-xs border-slate-600 text-slate-400">
-                              {template.category}
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex gap-1 flex-shrink-0">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => loadTemplate(template)}
-                            className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/20 text-xs px-2"
-                            data-testid={`button-use-${template.id}`}
-                          >
-                            <Send className="w-3 h-3 mr-1" />
-                            Use
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => copyToClipboard(template.content, template.id)}
-                            className={`text-xs px-2 ${copiedId === template.id ? 'bg-green-600' : 'bg-slate-700 hover:bg-slate-600'}`}
-                            data-testid={`button-copy-${template.id}`}
-                          >
-                            {copiedId === template.id ? (
-                              <>
-                                <Check className="w-3 h-3 mr-1" />
-                                Copied!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-3 h-3 mr-1" />
-                                Copy
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <pre className="text-xs text-slate-300 whitespace-pre-wrap break-words font-sans bg-slate-900/50 rounded-lg p-2 md:p-3 max-h-32 overflow-y-auto overflow-x-hidden">
-                        {template.content}
-                      </pre>
-                      
-                      {template.screenshotPath && (
-                        <div className="mt-2 flex flex-wrap items-center gap-1 md:gap-2 text-xs text-slate-500">
-                          <Image className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate max-w-[150px] md:max-w-none">Screenshot: {template.screenshotDesc}</span>
-                          <a 
-                            href={template.screenshotPath}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 flex-shrink-0"
-                          >
-                            Open <ExternalLink className="w-3 h-3" />
-                          </a>
-                        </div>
-                      )}
-                      
-                      {template.hashtags && (
-                        <div className="mt-2 flex items-center gap-1 flex-wrap">
-                          <Hash className="w-3 h-3 text-slate-500" />
-                          {template.hashtags.map((tag, i) => (
-                            <span key={i} className="text-xs text-cyan-400">#{tag}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <TemplateCard key={template.id} template={template} />
                   ))}
                 </div>
               </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </BentoTile>
+        </BentoGrid>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <Card className="bg-slate-900/50 border-slate-700/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-white flex items-center gap-2 text-lg">
-                <Image className="w-5 h-5 text-green-400" />
-                Screenshot Guide
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {screenshotGuide.map((item, i) => (
-                  <div 
-                    key={i}
-                    data-testid={`screenshot-guide-${i}`}
-                    className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all group"
+        <BentoGrid cols={2} gap="md">
+          <BentoTile className="p-4 md:p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Image className="w-5 h-5 text-green-400" />
+              <h3 className="text-white font-semibold text-lg">Screenshot Guide</h3>
+            </div>
+            <div className="space-y-2">
+              {screenshotGuide.map((item, i) => (
+                <div 
+                  key={i}
+                  data-testid={`screenshot-guide-${i}`}
+                  className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all group"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-white text-sm">{item.page}</p>
+                    <p className="text-xs text-slate-400">{item.use}</p>
+                  </div>
+                  <a
+                    href={item.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-testid={`link-screenshot-${item.page.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <div className="flex-1">
-                      <p className="font-medium text-white text-sm">{item.page}</p>
-                      <p className="text-xs text-slate-400">{item.use}</p>
-                    </div>
-                    <a
-                      href={item.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-testid={`link-screenshot-${item.page.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Eye className="w-3 h-3" />
-                      View
-                    </a>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                    <Eye className="w-3 h-3" />
+                    View
+                  </a>
+                </div>
+              ))}
+            </div>
+          </BentoTile>
 
-          <Card className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-white flex items-center gap-2 text-lg">
-                <Sparkles className="w-5 h-5 text-yellow-400" />
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <a 
-                href="https://business.facebook.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                data-testid="link-meta-business"
-                className="flex items-center justify-between p-3 rounded-lg bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <Facebook className="w-5 h-5 text-blue-400" />
-                  <div>
-                    <p className="font-medium text-white text-sm">Meta Business Suite</p>
-                    <p className="text-xs text-slate-400">Schedule Facebook posts</p>
-                  </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-slate-400" />
-              </a>
+          <BentoTile className="p-4 md:p-5 bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-yellow-400" />
+              <h3 className="text-white font-semibold text-lg">Quick Actions</h3>
+            </div>
+            <div className="space-y-3">
+              <ActionCard
+                title="Meta Business Suite"
+                description="Schedule Facebook posts"
+                icon={<Facebook className="w-5 h-5 text-blue-400" />}
+                onClick={() => window.open('https://business.facebook.com', '_blank')}
+                className="bg-blue-600/20 border-blue-500/30"
+              />
               
-              <a 
-                href="https://buffer.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                data-testid="link-buffer"
-                className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <RefreshCw className="w-5 h-5 text-cyan-400" />
-                  <div>
-                    <p className="font-medium text-white text-sm">Buffer</p>
-                    <p className="text-xs text-slate-400">Schedule X/Twitter posts (free)</p>
-                  </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-slate-400" />
-              </a>
+              <ActionCard
+                title="Buffer"
+                description="Schedule X/Twitter posts (free)"
+                icon={<RefreshCw className="w-5 h-5 text-cyan-400" />}
+                onClick={() => window.open('https://buffer.com', '_blank')}
+              />
               
-              <a 
-                href="https://twitter.com/compose/tweet" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                data-testid="link-twitter-compose"
-                className="flex items-center justify-between p-3 rounded-lg bg-sky-600/20 border border-sky-500/30 hover:bg-sky-600/30 transition-all"
-              >
-                <div className="flex items-center gap-3">
-                  <Twitter className="w-5 h-5 text-sky-400" />
-                  <div>
-                    <p className="font-medium text-white text-sm">Post to X Now</p>
-                    <p className="text-xs text-slate-400">Open Twitter/X composer</p>
-                  </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-slate-400" />
-              </a>
+              <ActionCard
+                title="Post to X Now"
+                description="Open Twitter/X composer"
+                icon={<Twitter className="w-5 h-5 text-sky-400" />}
+                onClick={() => window.open('https://twitter.com/compose/tweet', '_blank')}
+                className="bg-sky-600/20 border-sky-500/30"
+              />
               
               <div className="pt-3 border-t border-slate-700/50">
                 <div className="flex items-center gap-2 text-sm text-slate-400">
@@ -1046,33 +1013,31 @@ export default function MarketingHub() {
                   <span>Pro tip: Batch create posts on Sunday, schedule for the week!</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </BentoTile>
+        </BentoGrid>
 
-        <Card className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-cyan-500/20">
-                  <TrendingUp className="w-6 h-6 text-cyan-400" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-white">Consistency is Key</h3>
-                  <p className="text-sm text-slate-400">Post 3-6 times daily across platforms for maximum reach</p>
-                </div>
+        <OrbitCard variant="action" hover={false} className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-cyan-500/20">
+                <TrendingUp className="w-6 h-6 text-cyan-400" />
               </div>
-              <div className="flex gap-2">
-                <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
-                  6 posts/day target
-                </Badge>
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                  42 posts/week
-                </Badge>
+              <div>
+                <h3 className="font-bold text-white">Consistency is Key</h3>
+                <p className="text-sm text-slate-400">Post 3-6 times daily across platforms for maximum reach</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex gap-2">
+              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
+                6 posts/day target
+              </Badge>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                42 posts/week
+              </Badge>
+            </div>
+          </div>
+        </OrbitCard>
 
       </div>
     </div>

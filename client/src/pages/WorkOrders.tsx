@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Plus, Eye, Download, MapPin, Clock, DollarSign } from "lucide-react";
+import { FileText, Plus, Eye, Download, MapPin, Clock, DollarSign, Zap, CheckCircle, FileEdit, Users } from "lucide-react";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail, CarouselRailItem } from "@/components/ui/carousel-rail";
+import { PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, OrbitCardFooter, StatCard } from "@/components/ui/orbit-card";
 
 interface WorkOrder {
   id: string;
@@ -65,21 +68,21 @@ export default function WorkOrders() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-green-500/20 text-green-600";
+        return "bg-green-500/20 text-green-400";
       case "approved":
-        return "bg-blue-500/20 text-blue-600";
+        return "bg-blue-500/20 text-blue-400";
       case "draft":
-        return "bg-gray-500/20 text-gray-600";
+        return "bg-slate-500/20 text-slate-400";
       case "submitted":
-        return "bg-yellow-500/20 text-yellow-600";
+        return "bg-yellow-500/20 text-yellow-400";
       case "under_review":
-        return "bg-orange-500/20 text-orange-600";
+        return "bg-orange-500/20 text-orange-400";
       case "completed":
-        return "bg-purple-500/20 text-purple-600";
+        return "bg-purple-500/20 text-purple-400";
       case "cancelled":
-        return "bg-red-500/20 text-red-600";
+        return "bg-red-500/20 text-red-400";
       default:
-        return "bg-gray-500/20 text-gray-600";
+        return "bg-slate-500/20 text-slate-400";
     }
   };
 
@@ -99,174 +102,147 @@ export default function WorkOrders() {
   const approvedCount = workOrders.filter((w) => w.status === "approved").length;
   const draftCount = workOrders.filter((w) => w.status === "draft").length;
 
+  const renderWorkOrderCards = (orders: WorkOrder[]) => (
+    <>
+      <div className="hidden md:block space-y-4">
+        {orders.map((wo) => (
+          <WorkOrderCard
+            key={wo.id}
+            workOrder={wo}
+            onView={handleViewWorkOrder}
+            onDownload={handleDownloadPDF}
+            getStatusColor={getStatusColor}
+          />
+        ))}
+      </div>
+      <div className="md:hidden">
+        <CarouselRail gap="md" itemWidth="lg">
+          {orders.map((wo) => (
+            <CarouselRailItem key={wo.id}>
+              <WorkOrderCard
+                workOrder={wo}
+                onView={handleViewWorkOrder}
+                onDownload={handleDownloadPDF}
+                getStatusColor={getStatusColor}
+              />
+            </CarouselRailItem>
+          ))}
+        </CarouselRail>
+      </div>
+    </>
+  );
+
   return (
     <Shell>
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-heading tracking-tight mb-2 flex items-center gap-2">
-            <FileText className="w-8 h-8 text-primary" />
-            Work Orders
-          </h1>
-          <p className="text-muted-foreground">
-            Detailed job specifications from clients - paired with CSA
-          </p>
-        </div>
-        <Button
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-          onClick={handleNewWorkOrder}
-          data-testid="button-new-work-order"
-        >
-          <Plus className="w-4 h-4" />
-          New Work Order
-        </Button>
-      </div>
+      <PageHeader
+        title="Work Orders"
+        subtitle="Detailed job specifications from clients - paired with CSA"
+        actions={
+          <Button
+            className="gap-2 bg-cyan-600 text-white hover:bg-cyan-500"
+            onClick={handleNewWorkOrder}
+            data-testid="button-new-work-order"
+          >
+            <Plus className="w-4 h-4" />
+            New Work Order
+          </Button>
+        }
+      />
 
-      {/* Quick Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <Card className="border-border/50">
-          <CardContent className="pt-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Active Jobs</p>
-                <p className="text-2xl font-bold">{activeCount}</p>
-              </div>
-              <Badge className="bg-green-500/20 text-green-600">Live</Badge>
-            </div>
-          </CardContent>
-        </Card>
+      <BentoGrid cols={3} gap="md" className="mb-8">
+        <BentoTile className="p-0">
+          <StatCard
+            label="Active Jobs"
+            value={activeCount}
+            icon={<Zap className="w-6 h-6" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+        <BentoTile className="p-0">
+          <StatCard
+            label="Approved & Ready"
+            value={approvedCount}
+            icon={<CheckCircle className="w-6 h-6" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+        <BentoTile className="p-0">
+          <StatCard
+            label="In Draft"
+            value={draftCount}
+            icon={<FileEdit className="w-6 h-6" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+      </BentoGrid>
 
-        <Card className="border-border/50">
-          <CardContent className="pt-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Approved & Ready</p>
-                <p className="text-2xl font-bold">{approvedCount}</p>
-              </div>
-              <Badge className="bg-blue-500/20 text-blue-600">Ready</Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50">
-          <CardContent className="pt-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">In Draft</p>
-                <p className="text-2xl font-bold">{draftCount}</p>
-              </div>
-              <Badge className="bg-gray-500/20 text-gray-600">Draft</Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tabs */}
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList className="bg-card border border-border/50">
-          <TabsTrigger value="all" className="flex-1">
+        <TabsList className="bg-slate-800/50 border border-slate-700/50">
+          <TabsTrigger value="all" className="flex-1 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
             All {workOrders.length}
           </TabsTrigger>
-          <TabsTrigger value="active" className="flex-1">
+          <TabsTrigger value="active" className="flex-1 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
             Active {activeCount}
           </TabsTrigger>
-          <TabsTrigger value="pending" className="flex-1">
+          <TabsTrigger value="pending" className="flex-1 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
             Pending {approvedCount}
           </TabsTrigger>
-          <TabsTrigger value="draft" className="flex-1">
+          <TabsTrigger value="draft" className="flex-1 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
             Draft {draftCount}
           </TabsTrigger>
         </TabsList>
 
-        {/* All Work Orders */}
-        <TabsContent value="all" className="space-y-4">
-          {workOrders.map((wo) => (
-            <WorkOrderCard
-              key={wo.id}
-              workOrder={wo}
-              onView={handleViewWorkOrder}
-              onDownload={handleDownloadPDF}
-              getStatusColor={getStatusColor}
-            />
-          ))}
+        <TabsContent value="all">
+          {renderWorkOrderCards(workOrders)}
         </TabsContent>
 
-        {/* Active Only */}
-        <TabsContent value="active" className="space-y-4">
-          {workOrders
-            .filter((w) => w.status === "active")
-            .map((wo) => (
-              <WorkOrderCard
-                key={wo.id}
-                workOrder={wo}
-                onView={handleViewWorkOrder}
-                onDownload={handleDownloadPDF}
-                getStatusColor={getStatusColor}
-              />
-            ))}
+        <TabsContent value="active">
+          {renderWorkOrderCards(workOrders.filter((w) => w.status === "active"))}
         </TabsContent>
 
-        {/* Pending Only */}
-        <TabsContent value="pending" className="space-y-4">
-          {workOrders
-            .filter((w) => w.status === "approved")
-            .map((wo) => (
-              <WorkOrderCard
-                key={wo.id}
-                workOrder={wo}
-                onView={handleViewWorkOrder}
-                onDownload={handleDownloadPDF}
-                getStatusColor={getStatusColor}
-              />
-            ))}
+        <TabsContent value="pending">
+          {renderWorkOrderCards(workOrders.filter((w) => w.status === "approved"))}
         </TabsContent>
 
-        {/* Draft Only */}
-        <TabsContent value="draft" className="space-y-4">
-          {workOrders
-            .filter((w) => w.status === "draft")
-            .map((wo) => (
-              <WorkOrderCard
-                key={wo.id}
-                workOrder={wo}
-                onView={handleViewWorkOrder}
-                onDownload={handleDownloadPDF}
-                getStatusColor={getStatusColor}
-              />
-            ))}
+        <TabsContent value="draft">
+          {renderWorkOrderCards(workOrders.filter((w) => w.status === "draft"))}
         </TabsContent>
       </Tabs>
 
-      {/* Info Box */}
-      <div className="mt-8 p-6 rounded-lg bg-blue-500/5 border border-blue-500/30">
-        <h2 className="text-lg font-bold font-heading mb-3">How Work Orders Work</h2>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-          <div>
-            <p className="font-semibold mb-2">📋 Two-Document System</p>
-            <p>
-              <strong>CSA:</strong> Legal agreement (signed once)<br />
-              <strong>Work Order:</strong> Specific job request (multiple per client)
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold mb-2">🎯 Work Order Contains</p>
-            <p>
-              Job title, skills needed, location, dates, pay rate, hours, special requirements, sourcing strategy (ORBIT pool, Indeed, LinkedIn)
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold mb-2">✅ Workflow</p>
-            <p>
-              Client submits → ORBIT reviews → Approved → Assign workers → GPS verification → Invoice → Completion
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold mb-2">🔗 Integration with Indeed</p>
-            <p>
-              If client selects "Indeed sourcing", ORBIT searches Indeed database and sources candidates with per-hire commission ($5-15)
-            </p>
-          </div>
-        </div>
-      </div>
+      <OrbitCard variant="glass" className="mt-8">
+        <OrbitCardHeader icon={<FileText className="w-5 h-5 text-cyan-400" />}>
+          <OrbitCardTitle>How Work Orders Work</OrbitCardTitle>
+        </OrbitCardHeader>
+        <OrbitCardContent>
+          <BentoGrid cols={2} gap="md">
+            <BentoTile className="p-4">
+              <p className="font-semibold text-cyan-400 mb-2">📋 Two-Document System</p>
+              <p className="text-sm text-slate-400">
+                <strong className="text-white">CSA:</strong> Legal agreement (signed once)<br />
+                <strong className="text-white">Work Order:</strong> Specific job request (multiple per client)
+              </p>
+            </BentoTile>
+            <BentoTile className="p-4">
+              <p className="font-semibold text-cyan-400 mb-2">🎯 Work Order Contains</p>
+              <p className="text-sm text-slate-400">
+                Job title, skills needed, location, dates, pay rate, hours, special requirements, sourcing strategy (ORBIT pool, Indeed, LinkedIn)
+              </p>
+            </BentoTile>
+            <BentoTile className="p-4">
+              <p className="font-semibold text-cyan-400 mb-2">✅ Workflow</p>
+              <p className="text-sm text-slate-400">
+                Client submits → ORBIT reviews → Approved → Assign workers → GPS verification → Invoice → Completion
+              </p>
+            </BentoTile>
+            <BentoTile className="p-4">
+              <p className="font-semibold text-cyan-400 mb-2">🔗 Integration with Indeed</p>
+              <p className="text-sm text-slate-400">
+                If client selects "Indeed sourcing", ORBIT searches Indeed database and sources candidates with per-hire commission ($5-15)
+              </p>
+            </BentoTile>
+          </BentoGrid>
+        </OrbitCardContent>
+      </OrbitCard>
     </Shell>
   );
 }
@@ -283,37 +259,44 @@ function WorkOrderCard({
   getStatusColor: (status: string) => string;
 }) {
   return (
-    <Card className="border-border/50 hover:border-primary/50 transition-colors" data-testid={`card-work-order-${workOrder.id}`}>
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between mb-2">
-          <div>
-            <CardTitle className="text-lg">{workOrder.positionTitle}</CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">{workOrder.referenceNumber}</p>
-          </div>
+    <OrbitCard data-testid={`card-work-order-${workOrder.id}`}>
+      <OrbitCardHeader
+        action={
           <Badge className={getStatusColor(workOrder.status)}>
             {workOrder.status.replace("_", " ").toUpperCase()}
           </Badge>
+        }
+      >
+        <div>
+          <OrbitCardTitle>{workOrder.positionTitle}</OrbitCardTitle>
+          <p className="text-xs text-slate-500 mt-1">{workOrder.referenceNumber}</p>
         </div>
-      </CardHeader>
+      </OrbitCardHeader>
 
-      <CardContent>
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
-          {/* Left Column */}
+      <OrbitCardContent>
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-3">
             <div className="flex items-start gap-2">
-              <p className="text-xs text-muted-foreground font-semibold min-w-fit">Client:</p>
-              <p className="text-sm font-semibold">{workOrder.clientName}</p>
+              <Users className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-slate-500">Client</p>
+                <p className="text-sm font-semibold text-white">{workOrder.clientName}</p>
+              </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-              <p className="text-sm">{workOrder.location}</p>
+              <MapPin className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-slate-500">Location</p>
+                <p className="text-sm text-slate-300">{workOrder.location}</p>
+              </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
-                <p>
+              <Clock className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-slate-500">Schedule</p>
+                <p className="text-sm text-slate-300">
                   {new Date(workOrder.startDate).toLocaleDateString()}
                   {workOrder.endDate && ` - ${new Date(workOrder.endDate).toLocaleDateString()}`}
                 </p>
@@ -321,47 +304,56 @@ function WorkOrderCard({
             </div>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-3">
             <div className="flex items-start gap-2">
-              <p className="text-xs text-muted-foreground font-semibold min-w-fit">Workers:</p>
-              <p className="text-sm font-bold">{workOrder.workersNeeded}</p>
+              <Users className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-slate-500">Workers Needed</p>
+                <p className="text-sm font-bold text-white">{workOrder.workersNeeded}</p>
+              </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <DollarSign className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm font-bold text-green-600">${workOrder.hourlyRate}/hr</p>
+              <DollarSign className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-slate-500">Hourly Rate</p>
+                <p className="text-sm font-bold text-emerald-400">${workOrder.hourlyRate}/hr</p>
+              </div>
             </div>
 
             <div className="flex items-start gap-2">
-              <p className="text-xs text-muted-foreground font-semibold min-w-fit">Created:</p>
-              <p className="text-xs text-muted-foreground">{new Date(workOrder.createdAt).toLocaleDateString()}</p>
+              <FileText className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-slate-500">Created</p>
+                <p className="text-xs text-slate-400">{new Date(workOrder.createdAt).toLocaleDateString()}</p>
+              </div>
             </div>
           </div>
         </div>
+      </OrbitCardContent>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 pt-4 border-t border-border/30">
-          <Button
-            variant="outline"
-            className="flex-1 text-xs gap-2"
-            onClick={() => onView(workOrder.id)}
-            data-testid={`button-view-${workOrder.id}`}
-          >
-            <Eye className="w-3 h-3" />
-            View Details
-          </Button>
-          <Button
-            variant="outline"
-            className="flex-1 text-xs gap-2"
-            onClick={() => onDownload(workOrder.id)}
-            data-testid={`button-download-${workOrder.id}`}
-          >
-            <Download className="w-3 h-3" />
-            Download PDF
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <OrbitCardFooter>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1 text-xs gap-2 border-slate-600 hover:border-cyan-500 hover:text-cyan-400"
+          onClick={() => onView(workOrder.id)}
+          data-testid={`button-view-${workOrder.id}`}
+        >
+          <Eye className="w-3 h-3" />
+          View Details
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1 text-xs gap-2 border-slate-600 hover:border-cyan-500 hover:text-cyan-400"
+          onClick={() => onDownload(workOrder.id)}
+          data-testid={`button-download-${workOrder.id}`}
+        >
+          <Download className="w-3 h-3" />
+          Download PDF
+        </Button>
+      </OrbitCardFooter>
+    </OrbitCard>
   );
 }

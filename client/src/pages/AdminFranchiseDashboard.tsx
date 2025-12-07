@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -23,6 +22,10 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail } from '@/components/ui/carousel-rail';
+import { PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardContent, OrbitCardHeader, OrbitCardTitle, StatCard } from '@/components/ui/orbit-card';
 
 interface FranchiseApplication {
   id: number;
@@ -205,66 +208,56 @@ export default function AdminFranchiseDashboard() {
   const approvedCount = applications.filter(a => a.status === 'approved').length;
   const franchiseHallmarks = hallmarks.filter(h => h.ownershipMode === 'franchise_owned');
 
+  const statCards = [
+    { label: "Pending Applications", value: pendingCount, icon: <Clock className="h-6 w-6" />, className: "border-yellow-500/30" },
+    { label: "Approved", value: approvedCount, icon: <CheckCircle2 className="h-6 w-6" />, className: "border-green-500/30" },
+    { label: "Active Franchises", value: franchiseHallmarks.length, icon: <Crown className="h-6 w-6" />, className: "border-purple-500/30" },
+    { label: "Total Hallmarks", value: hallmarks.length, icon: <Shield className="h-6 w-6" />, className: "border-cyan-500/30" },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <div className="container mx-auto px-4 py-8">
-        <Link href="/admin">
-          <Button variant="ghost" className="mb-6 text-gray-400 hover:text-white" data-testid="button-back">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Admin
-          </Button>
-        </Link>
+        <PageHeader
+          title="Franchise Management"
+          subtitle="Manage franchise applications, hallmarks, and territories"
+          breadcrumb={
+            <Link href="/admin">
+              <Button variant="ghost" className="text-gray-400 hover:text-white -ml-2" data-testid="button-back">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Admin
+              </Button>
+            </Link>
+          }
+        />
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Franchise Management</h1>
-          <p className="text-gray-400">Manage franchise applications, hallmarks, and territories</p>
+        <div className="hidden md:block mb-8">
+          <BentoGrid cols={4} gap="md">
+            {statCards.map((stat) => (
+              <BentoTile key={stat.label} className={stat.className}>
+                <StatCard
+                  label={stat.label}
+                  value={stat.value}
+                  icon={stat.icon}
+                  className="border-0 bg-transparent"
+                />
+              </BentoTile>
+            ))}
+          </BentoGrid>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-yellow-500/10 border-yellow-500/30">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-yellow-400">{pendingCount}</div>
-                  <div className="text-sm text-gray-400">Pending Applications</div>
-                </div>
-                <Clock className="h-8 w-8 text-yellow-400/50" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-green-500/10 border-green-500/30">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-green-400">{approvedCount}</div>
-                  <div className="text-sm text-gray-400">Approved</div>
-                </div>
-                <CheckCircle2 className="h-8 w-8 text-green-400/50" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-purple-500/10 border-purple-500/30">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-purple-400">{franchiseHallmarks.length}</div>
-                  <div className="text-sm text-gray-400">Active Franchises</div>
-                </div>
-                <Crown className="h-8 w-8 text-purple-400/50" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-cyan-500/10 border-cyan-500/30">
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold text-cyan-400">{hallmarks.length}</div>
-                  <div className="text-sm text-gray-400">Total Hallmarks</div>
-                </div>
-                <Shield className="h-8 w-8 text-cyan-400/50" />
-              </div>
-            </CardContent>
-          </Card>
+        <div className="md:hidden mb-8">
+          <CarouselRail gap="md" itemWidth="md" showArrows={false}>
+            {statCards.map((stat) => (
+              <StatCard
+                key={stat.label}
+                label={stat.label}
+                value={stat.value}
+                icon={stat.icon}
+                className={stat.className}
+              />
+            ))}
+          </CarouselRail>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -312,7 +305,7 @@ export default function AdminFranchiseDashboard() {
                   data-testid="input-search"
                 />
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 {['all', 'pending', 'approved', 'rejected', 'completed'].map((status) => (
                   <Button
                     key={status}
@@ -333,17 +326,17 @@ export default function AdminFranchiseDashboard() {
             {applicationsLoading ? (
               <div className="text-center py-12 text-gray-400">Loading applications...</div>
             ) : filteredApplications.length === 0 ? (
-              <Card className="bg-gray-800/50 border-gray-700">
-                <CardContent className="py-12 text-center">
+              <OrbitCard>
+                <OrbitCardContent className="py-12 text-center">
                   <FileText className="h-12 w-12 mx-auto mb-4 text-gray-500" />
                   <p className="text-gray-400">No applications found</p>
-                </CardContent>
-              </Card>
+                </OrbitCardContent>
+              </OrbitCard>
             ) : (
               <div className="space-y-4">
                 {filteredApplications.map((app) => (
-                  <Card key={app.id} className="bg-gray-800/50 border-gray-700 hover:border-gray-600 transition-colors">
-                    <CardContent className="py-4">
+                  <OrbitCard key={app.id}>
+                    <OrbitCardContent>
                       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -486,8 +479,8 @@ export default function AdminFranchiseDashboard() {
                           )}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </OrbitCardContent>
+                  </OrbitCard>
                 ))}
               </div>
             )}
@@ -497,21 +490,23 @@ export default function AdminFranchiseDashboard() {
             {hallmarksLoading ? (
               <div className="text-center py-12 text-gray-400">Loading hallmarks...</div>
             ) : hallmarks.length === 0 ? (
-              <Card className="bg-gray-800/50 border-gray-700">
-                <CardContent className="py-12 text-center">
+              <OrbitCard>
+                <OrbitCardContent className="py-12 text-center">
                   <Shield className="h-12 w-12 mx-auto mb-4 text-gray-500" />
                   <p className="text-gray-400">No hallmarks found</p>
-                </CardContent>
-              </Card>
+                </OrbitCardContent>
+              </OrbitCard>
             ) : (
               <div className="grid gap-4">
                 {hallmarks.map((hallmark) => (
-                  <Card key={hallmark.id} className={`border ${
-                    hallmark.ownershipMode === 'franchise_owned' 
-                      ? 'bg-purple-900/20 border-purple-500/30' 
-                      : 'bg-gray-800/50 border-gray-700'
-                  }`}>
-                    <CardContent className="py-4">
+                  <OrbitCard 
+                    key={hallmark.id} 
+                    className={hallmark.ownershipMode === 'franchise_owned' 
+                      ? 'border-purple-500/30' 
+                      : ''
+                    }
+                  >
+                    <OrbitCardContent>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
@@ -527,7 +522,7 @@ export default function AdminFranchiseDashboard() {
                           </div>
                           <div>
                             <h3 className="text-lg font-semibold text-white">{hallmark.hallmarkName}</h3>
-                            <div className="flex items-center gap-3 text-sm">
+                            <div className="flex items-center gap-3 text-sm flex-wrap">
                               <Badge className={`${
                                 hallmark.ownershipMode === 'franchise_owned'
                                   ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
@@ -562,45 +557,44 @@ export default function AdminFranchiseDashboard() {
                           </Button>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </OrbitCardContent>
+                  </OrbitCard>
                 ))}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="tiers" className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-3">
+            <BentoGrid cols={3} gap="md">
               {tiers.map((tier) => (
-                <Card key={tier.id} className="bg-gray-800/50 border-gray-700">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Crown className="h-5 w-5 text-purple-400" />
-                      {tier.tierName}
-                    </CardTitle>
-                    <CardDescription className="text-gray-400">
-                      {tier.tierCode}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm text-gray-500">Franchise Fee</div>
-                        <div className="text-xl font-bold text-white">{formatCurrency(tier.franchiseFee)}</div>
+                <BentoTile key={tier.id}>
+                  <OrbitCard className="h-full border-0 bg-transparent" hover={false}>
+                    <OrbitCardHeader 
+                      icon={<Crown className="h-5 w-5 text-purple-400" />}
+                    >
+                      <OrbitCardTitle>{tier.tierName}</OrbitCardTitle>
+                      <p className="text-sm text-gray-400">{tier.tierCode}</p>
+                    </OrbitCardHeader>
+                    <OrbitCardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-sm text-gray-500">Franchise Fee</div>
+                          <div className="text-xl font-bold text-white">{formatCurrency(tier.franchiseFee)}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">Royalty</div>
+                          <div className="text-xl font-bold text-white">{tier.royaltyPercent}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">Monthly Support</div>
+                          <div className="text-lg font-semibold text-white">{formatCurrency(tier.supportMonthlyFee)}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-sm text-gray-500">Royalty</div>
-                        <div className="text-xl font-bold text-white">{tier.royaltyPercent}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500">Monthly Support</div>
-                        <div className="text-lg font-semibold text-white">{formatCurrency(tier.supportMonthlyFee)}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </OrbitCardContent>
+                  </OrbitCard>
+                </BentoTile>
               ))}
-            </div>
+            </BentoGrid>
           </TabsContent>
         </Tabs>
 

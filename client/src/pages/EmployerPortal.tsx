@@ -62,6 +62,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail } from "@/components/ui/carousel-rail";
+import { PageHeader, SectionHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, OrbitCardFooter, StatCard as OrbitStatCard, ActionCard } from "@/components/ui/orbit-card";
 
 interface Employer {
   id: number;
@@ -187,41 +191,6 @@ function getStatusBadgeColor(status: string): string {
   }
 }
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  subtext,
-  color,
-  testId,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: number | string;
-  subtext?: string;
-  color: string;
-  testId: string;
-}) {
-  return (
-    <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/30 transition-all" data-testid={testId}>
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-slate-400 text-sm mb-1">{label}</p>
-            <p className="text-3xl font-bold text-white" data-testid={`${testId}-value`}>
-              {value}
-            </p>
-            {subtext && <p className="text-xs text-slate-500 mt-1">{subtext}</p>}
-          </div>
-          <div className={`p-3 rounded-lg ${color}`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 function JobCard({
   job,
   onEdit,
@@ -234,11 +203,10 @@ function JobCard({
   onView: (job: Job) => void;
 }) {
   return (
-    <Card
-      className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all"
+    <OrbitCard
       data-testid={`card-job-${job.id}`}
     >
-      <CardContent className="p-6">
+      <OrbitCardContent>
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
@@ -307,8 +275,8 @@ function JobCard({
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+    </OrbitCard>
   );
 }
 
@@ -322,11 +290,10 @@ function ApplicationCard({
   const skills = application.skills || [];
 
   return (
-    <Card
-      className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all"
+    <OrbitCard
       data-testid={`card-application-${application.id}`}
     >
-      <CardContent className="p-6">
+      <OrbitCardContent>
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="text-lg font-semibold text-white" data-testid={`text-candidate-name-${application.id}`}>
@@ -455,8 +422,8 @@ function ApplicationCard({
             </Button>
           )}
         </div>
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+    </OrbitCard>
   );
 }
 
@@ -464,28 +431,26 @@ function SubscriptionCard({ tier, status }: { tier: number; status: string }) {
   const tierInfo = SUBSCRIPTION_TIERS[tier] || SUBSCRIPTION_TIERS[1];
 
   return (
-    <Card className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-slate-700/50" data-testid="card-subscription">
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
+    <BentoTile data-testid="card-subscription">
+      <div className="p-5">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{tierInfo.icon}</span>
             <div>
-              <CardTitle className="text-white">{tierInfo.name} Plan</CardTitle>
-              <CardDescription>Your current subscription</CardDescription>
+              <h3 className="font-semibold text-white">{tierInfo.name} Plan</h3>
+              <p className="text-sm text-slate-400">Your current subscription</p>
             </div>
           </div>
           <Badge className={status === "active" ? "bg-green-600/20 text-green-300" : "bg-amber-600/20 text-amber-300"}>
             {status}
           </Badge>
         </div>
-      </CardHeader>
-      <CardFooter className="pt-0">
         <Button variant="outline" className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10" data-testid="button-upgrade-plan">
           <Crown className="w-4 h-4 mr-2" />
           Upgrade Plan
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </BentoTile>
   );
 }
 
@@ -510,14 +475,11 @@ function AccountSettingsCard({
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50" data-testid="card-account-settings">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Settings className="w-5 h-5 text-cyan-400" />
-            <CardTitle className="text-white">Account Settings</CardTitle>
-          </div>
-          {!editing && (
+    <OrbitCard data-testid="card-account-settings">
+      <OrbitCardHeader
+        icon={<Settings className="w-5 h-5 text-cyan-400" />}
+        action={
+          !editing && (
             <Button
               variant="ghost"
               size="sm"
@@ -528,10 +490,12 @@ function AccountSettingsCard({
               <Edit className="w-4 h-4 mr-1" />
               Edit
             </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+          )
+        }
+      >
+        <OrbitCardTitle>Account Settings</OrbitCardTitle>
+      </OrbitCardHeader>
+      <OrbitCardContent className="space-y-4">
         {editing ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -611,8 +575,8 @@ function AccountSettingsCard({
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+    </OrbitCard>
   );
 }
 
@@ -794,14 +758,14 @@ export default function EmployerPortal() {
   if (!employerId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <Card className="bg-slate-800/50 border-slate-700/50 p-8 text-center">
+        <OrbitCard className="p-8 text-center max-w-md">
           <AlertCircle className="w-12 h-12 text-amber-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Not Logged In</h2>
           <p className="text-slate-400 mb-4">Please log in to access the employer portal.</p>
           <Button onClick={() => setLocation("/jobs")} className="bg-cyan-600 hover:bg-cyan-500">
             Go to Job Board
           </Button>
-        </Card>
+        </OrbitCard>
       </div>
     );
   }
@@ -814,53 +778,47 @@ export default function EmployerPortal() {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <div>
+        <PageHeader
+          title={employerProfile?.company_name || "Employer Portal"}
+          subtitle="Manage your jobs and applications"
+          breadcrumb={
             <Link href="/jobs">
-              <span className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-1 transition-colors mb-2 cursor-pointer">
+              <span className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-1 transition-colors cursor-pointer">
                 <ChevronLeft className="w-4 h-4" /> Back to Job Board
               </span>
             </Link>
-            <div className="flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-cyan-400" />
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white" data-testid="text-company-name">
-                  {employerProfile?.company_name || "Employer Portal"}
-                </h1>
-                <p className="text-slate-400 text-sm">Manage your jobs and applications</p>
-              </div>
+          }
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={() => setShowJobModal(true)}
+                className="bg-cyan-600 hover:bg-cyan-500"
+                data-testid="button-post-job"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Post New Job
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setLocation("/jobs")}
+                className="border-slate-600 text-slate-300 hover:border-cyan-500"
+                data-testid="button-talent-pool"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                View Talent Pool
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="text-slate-400 hover:text-red-400"
+                data-testid="button-logout"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => setShowJobModal(true)}
-              className="bg-cyan-600 hover:bg-cyan-500"
-              data-testid="button-post-job"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Post New Job
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setLocation("/jobs")}
-              className="border-slate-600 text-slate-300 hover:border-cyan-500"
-              data-testid="button-talent-pool"
-            >
-              <Users className="w-4 h-4 mr-2" />
-              View Talent Pool
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={handleLogout}
-              className="text-slate-400 hover:text-red-400"
-              data-testid="button-logout"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
+          }
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide">
@@ -905,47 +863,38 @@ export default function EmployerPortal() {
           </div>
 
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                icon={Briefcase}
+            <BentoGrid cols={4} gap="md">
+              <OrbitStatCard
                 label="Active Jobs"
                 value={activeJobs}
-                subtext={`of ${jobs?.length || 0} total`}
-                color="bg-cyan-600"
-                testId="stat-active-jobs"
+                icon={<Briefcase className="w-6 h-6" />}
+                className="data-testid-stat-active-jobs"
               />
-              <StatCard
-                icon={Users}
+              <OrbitStatCard
                 label="Total Applications"
                 value={totalApplications}
-                color="bg-blue-600"
-                testId="stat-total-applications"
+                icon={<Users className="w-6 h-6" />}
               />
-              <StatCard
-                icon={Clock}
+              <OrbitStatCard
                 label="Pending Reviews"
                 value={pendingApplications}
-                subtext="awaiting response"
-                color="bg-amber-600"
-                testId="stat-pending-reviews"
+                icon={<Clock className="w-6 h-6" />}
               />
-              <StatCard
-                icon={CheckCircle2}
+              <OrbitStatCard
                 label="Total Hires"
                 value={totalHires}
-                color="bg-green-600"
-                testId="stat-total-hires"
+                icon={<CheckCircle2 className="w-6 h-6" />}
               />
-            </div>
+            </BentoGrid>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <Card className="bg-slate-800/50 border-slate-700/50">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-white flex items-center gap-2">
+            <BentoGrid cols={3} gap="md">
+              <BentoTile span={2}>
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                       <FileText className="w-5 h-5 text-cyan-400" />
                       Recent Applications
-                    </CardTitle>
+                    </h3>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -955,87 +904,85 @@ export default function EmployerPortal() {
                     >
                       View All
                     </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {applicationsLoading ? (
+                  </div>
+                  {applicationsLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-20 w-full" />
+                      ))}
+                    </div>
+                  ) : applications && applications.length > 0 ? (
+                    <ScrollArea className="h-[300px]">
                       <div className="space-y-3">
-                        {[1, 2, 3].map((i) => (
-                          <Skeleton key={i} className="h-20 w-full" />
+                        {applications.slice(0, 5).map((app) => (
+                          <div
+                            key={app.id}
+                            className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-slate-700/50"
+                            data-testid={`item-application-${app.id}`}
+                          >
+                            <div>
+                              <p className="text-white font-medium">{app.full_name}</p>
+                              <p className="text-slate-400 text-sm">{app.job_title}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Badge className={getStatusBadgeColor(app.status)}>{app.status}</Badge>
+                              <span className="text-xs text-slate-500">{formatDate(app.created_at)}</span>
+                            </div>
+                          </div>
                         ))}
                       </div>
-                    ) : applications && applications.length > 0 ? (
-                      <ScrollArea className="h-[300px]">
-                        <div className="space-y-3">
-                          {applications.slice(0, 5).map((app) => (
-                            <div
-                              key={app.id}
-                              className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50 border border-slate-700/50"
-                              data-testid={`item-application-${app.id}`}
-                            >
-                              <div>
-                                <p className="text-white font-medium">{app.full_name}</p>
-                                <p className="text-slate-400 text-sm">{app.job_title}</p>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <Badge className={getStatusBadgeColor(app.status)}>{app.status}</Badge>
-                                <span className="text-xs text-slate-500">{formatDate(app.created_at)}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </ScrollArea>
-                    ) : (
-                      <div className="text-center py-8 text-slate-400">
-                        <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No applications yet</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                    </ScrollArea>
+                  ) : (
+                    <div className="text-center py-8 text-slate-400">
+                      <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No applications yet</p>
+                    </div>
+                  )}
+                </div>
+              </BentoTile>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <SubscriptionCard
                   tier={employerProfile?.subscription_tier || 1}
                   status={employerProfile?.subscription_status || "active"}
                 />
 
-                <Card className="bg-slate-800/50 border-slate-700/50">
-                  <CardHeader>
-                    <CardTitle className="text-white text-sm flex items-center gap-2">
+                <BentoTile>
+                  <div className="p-5">
+                    <h4 className="text-sm font-semibold text-white flex items-center gap-2 mb-4">
                       <Briefcase className="w-4 h-4 text-cyan-400" />
                       Credits & Limits
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Job Post Credits</span>
-                      <span className="text-white font-medium" data-testid="text-job-credits">
-                        {employerProfile?.job_post_credits || 0}
-                      </span>
+                    </h4>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Job Post Credits</span>
+                        <span className="text-white font-medium" data-testid="text-job-credits">
+                          {employerProfile?.job_post_credits || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Talent Searches</span>
+                        <span className="text-white font-medium" data-testid="text-search-credits">
+                          {employerProfile?.talent_search_credits || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Featured Posts</span>
+                        <span className="text-white font-medium" data-testid="text-featured-credits">
+                          {employerProfile?.featured_post_credits || 0}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Active Jobs Limit</span>
+                        <span className="text-white font-medium">
+                          {activeJobs} / {employerProfile?.active_job_posts_limit || 5}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Talent Searches</span>
-                      <span className="text-white font-medium" data-testid="text-search-credits">
-                        {employerProfile?.talent_search_credits || 0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Featured Posts</span>
-                      <span className="text-white font-medium" data-testid="text-featured-credits">
-                        {employerProfile?.featured_post_credits || 0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Active Jobs Limit</span>
-                      <span className="text-white font-medium">
-                        {activeJobs} / {employerProfile?.active_job_posts_limit || 5}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </BentoTile>
               </div>
-            </div>
+            </BentoGrid>
           </TabsContent>
 
           <TabsContent value="jobs" className="space-y-6">
@@ -1078,13 +1025,13 @@ export default function EmployerPortal() {
             </div>
 
             {jobsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <BentoGrid cols={2} gap="md">
                 {[1, 2, 3, 4].map((i) => (
                   <Skeleton key={i} className="h-48 w-full" />
                 ))}
-              </div>
+              </BentoGrid>
             ) : filteredJobs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <BentoGrid cols={2} gap="md">
                 {filteredJobs.map((job) => (
                   <JobCard
                     key={job.id}
@@ -1094,23 +1041,21 @@ export default function EmployerPortal() {
                     onDelete={(j) => setJobToDelete(j)}
                   />
                 ))}
-              </div>
+              </BentoGrid>
             ) : (
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="py-16 text-center">
-                  <Briefcase className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">No Jobs Found</h3>
-                  <p className="text-slate-400 mb-6">
-                    {searchQuery || jobFilter !== "all"
-                      ? "Try adjusting your filters"
-                      : "Post your first job to start receiving applications"}
-                  </p>
-                  <Button onClick={() => setShowJobModal(true)} className="bg-cyan-600 hover:bg-cyan-500">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Post a Job
-                  </Button>
-                </CardContent>
-              </Card>
+              <OrbitCard className="py-16 text-center">
+                <Briefcase className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">No Jobs Found</h3>
+                <p className="text-slate-400 mb-6">
+                  {searchQuery || jobFilter !== "all"
+                    ? "Try adjusting your filters"
+                    : "Post your first job to start receiving applications"}
+                </p>
+                <Button onClick={() => setShowJobModal(true)} className="bg-cyan-600 hover:bg-cyan-500">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Post a Job
+                </Button>
+              </OrbitCard>
             )}
           </TabsContent>
 
@@ -1154,29 +1099,27 @@ export default function EmployerPortal() {
             </div>
 
             {applicationsLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <BentoGrid cols={2} gap="md">
                 {[1, 2, 3, 4].map((i) => (
                   <Skeleton key={i} className="h-64 w-full" />
                 ))}
-              </div>
+              </BentoGrid>
             ) : filteredApplications.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <BentoGrid cols={2} gap="md">
                 {filteredApplications.map((app) => (
                   <ApplicationCard key={app.id} application={app} onUpdateStatus={handleUpdateStatus} />
                 ))}
-              </div>
+              </BentoGrid>
             ) : (
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="py-16 text-center">
-                  <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-2">No Applications Found</h3>
-                  <p className="text-slate-400">
-                    {searchQuery || applicationFilter !== "all"
-                      ? "Try adjusting your filters"
-                      : "Applications will appear here when candidates apply to your jobs"}
-                  </p>
-                </CardContent>
-              </Card>
+              <OrbitCard className="py-16 text-center">
+                <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-white mb-2">No Applications Found</h3>
+                <p className="text-slate-400">
+                  {searchQuery || applicationFilter !== "all"
+                    ? "Try adjusting your filters"
+                    : "Applications will appear here when candidates apply to your jobs"}
+                </p>
+              </OrbitCard>
             )}
           </TabsContent>
 
@@ -1197,27 +1140,26 @@ export default function EmployerPortal() {
           </TabsContent>
 
           <TabsContent value="billing" className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
-              <p className="text-slate-400">
-                ORBIT beats Indeed & ZipRecruiter pricing with better candidates
-              </p>
-            </div>
+            <SectionHeader
+              title="Choose Your Plan"
+              subtitle="ORBIT beats Indeed & ZipRecruiter pricing with better candidates"
+              align="center"
+              size="md"
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Pay Per Post */}
-              <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all" data-testid="plan-payperpost">
-                <CardHeader className="text-center pb-2">
-                  <Badge className="bg-slate-600/50 text-slate-300 w-fit mx-auto mb-2">One-Time</Badge>
-                  <CardTitle className="text-white text-lg">Pay Per Post</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold text-white">$19</span>
-                    <span className="text-slate-400">/job</span>
+            <BentoGrid cols={4} gap="md">
+              <BentoTile data-testid="plan-payperpost">
+                <div className="p-5 h-full flex flex-col">
+                  <div className="text-center mb-4">
+                    <Badge className="bg-slate-600/50 text-slate-300 mb-2">One-Time</Badge>
+                    <h3 className="text-lg font-semibold text-white">Pay Per Post</h3>
+                    <div className="mt-2">
+                      <span className="text-3xl font-bold text-white">$19</span>
+                      <span className="text-slate-400">/job</span>
+                    </div>
+                    <p className="text-xs text-green-400 mt-1">vs Indeed's $15/day ($450/mo)</p>
                   </div>
-                  <p className="text-xs text-green-400 mt-1">vs Indeed's $15/day ($450/mo)</p>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4 flex-1">
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> Single job post (30 days)</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 5 candidate contacts</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> GPS-verified candidates</li>
@@ -1230,22 +1172,21 @@ export default function EmployerPortal() {
                   >
                     Buy Single Post
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </BentoTile>
 
-              {/* Starter */}
-              <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all" data-testid="plan-starter">
-                <CardHeader className="text-center pb-2">
-                  <Badge className="bg-cyan-600/50 text-cyan-300 w-fit mx-auto mb-2">Starter</Badge>
-                  <CardTitle className="text-white text-lg">Small Business</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold text-white">$39</span>
-                    <span className="text-slate-400">/mo</span>
+              <BentoTile data-testid="plan-starter">
+                <div className="p-5 h-full flex flex-col">
+                  <div className="text-center mb-4">
+                    <Badge className="bg-cyan-600/50 text-cyan-300 mb-2">Starter</Badge>
+                    <h3 className="text-lg font-semibold text-white">Small Business</h3>
+                    <div className="mt-2">
+                      <span className="text-3xl font-bold text-white">$39</span>
+                      <span className="text-slate-400">/mo</span>
+                    </div>
+                    <p className="text-xs text-green-400 mt-1">68% less than Indeed</p>
                   </div>
-                  <p className="text-xs text-green-400 mt-1">68% less than Indeed</p>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4 flex-1">
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 2 active job posts</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 20 candidate contacts/mo</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-green-400" /> 30 talent searches</li>
@@ -1259,25 +1200,24 @@ export default function EmployerPortal() {
                   >
                     Get Starter
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </BentoTile>
 
-              {/* Growth - Popular */}
-              <Card className="bg-gradient-to-b from-emerald-900/30 to-slate-800/50 border-2 border-emerald-500/50 hover:border-emerald-400 transition-all relative" data-testid="plan-growth">
+              <BentoTile className="border-2 border-emerald-500/50 relative" data-testid="plan-growth">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-emerald-500 text-white px-3">MOST POPULAR</Badge>
                 </div>
-                <CardHeader className="text-center pb-2 pt-6">
-                  <Badge className="bg-emerald-600/50 text-emerald-300 w-fit mx-auto mb-2">Growth</Badge>
-                  <CardTitle className="text-white text-lg">Growing Teams</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold text-white">$99</span>
-                    <span className="text-slate-400">/mo</span>
+                <div className="p-5 pt-6 h-full flex flex-col">
+                  <div className="text-center mb-4">
+                    <Badge className="bg-emerald-600/50 text-emerald-300 mb-2">Growth</Badge>
+                    <h3 className="text-lg font-semibold text-white">Growing Teams</h3>
+                    <div className="mt-2">
+                      <span className="text-3xl font-bold text-white">$99</span>
+                      <span className="text-slate-400">/mo</span>
+                    </div>
+                    <p className="text-xs text-green-400 mt-1">67% less than ZipRecruiter</p>
                   </div>
-                  <p className="text-xs text-green-400 mt-1">67% less than ZipRecruiter</p>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4 flex-1">
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> 8 active job posts</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> 100 candidate contacts/mo</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> Unlimited talent search</li>
@@ -1293,22 +1233,21 @@ export default function EmployerPortal() {
                   >
                     Get Growth
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </BentoTile>
 
-              {/* Enterprise */}
-              <Card className="bg-slate-800/50 border-slate-700/50 hover:border-purple-500/40 transition-all" data-testid="plan-enterprise">
-                <CardHeader className="text-center pb-2">
-                  <Badge className="bg-purple-600/50 text-purple-300 w-fit mx-auto mb-2">Enterprise</Badge>
-                  <CardTitle className="text-white text-lg">High Volume</CardTitle>
-                  <div className="mt-2">
-                    <span className="text-3xl font-bold text-white">$249</span>
-                    <span className="text-slate-400">/mo</span>
+              <BentoTile data-testid="plan-enterprise">
+                <div className="p-5 h-full flex flex-col">
+                  <div className="text-center mb-4">
+                    <Badge className="bg-purple-600/50 text-purple-300 mb-2">Enterprise</Badge>
+                    <h3 className="text-lg font-semibold text-white">High Volume</h3>
+                    <div className="mt-2">
+                      <span className="text-3xl font-bold text-white">$249</span>
+                      <span className="text-slate-400">/mo</span>
+                    </div>
+                    <p className="text-xs text-green-400 mt-1">Enterprise features at startup price</p>
                   </div>
-                  <p className="text-xs text-green-400 mt-1">Enterprise features at startup price</p>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ul className="space-y-2 text-sm text-slate-300 mb-4">
+                  <ul className="space-y-2 text-sm text-slate-300 mb-4 flex-1">
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Unlimited job posts</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Unlimited contacts</li>
                     <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> 10 featured listings/mo</li>
@@ -1324,13 +1263,12 @@ export default function EmployerPortal() {
                   >
                     Get Enterprise
                   </Button>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </BentoTile>
+            </BentoGrid>
 
-            {/* Value Proposition */}
-            <Card className="bg-gradient-to-r from-cyan-900/20 to-emerald-900/20 border-cyan-500/30 mt-8">
-              <CardContent className="p-6">
+            <BentoTile className="border-cyan-500/30">
+              <div className="p-6">
                 <h3 className="text-lg font-bold text-white mb-4 text-center">Why ORBIT Beats the Competition</h3>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                   <div>
@@ -1354,8 +1292,8 @@ export default function EmployerPortal() {
                     <div className="text-sm text-slate-400">Better value guaranteed</div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </BentoTile>
           </TabsContent>
         </Tabs>
       </div>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, CheckCircle2, MapPin, Clock, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, MapPin, Clock, ArrowLeft, Navigation, History, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, StatCard } from '@/components/ui/orbit-card';
 
 interface JobSite {
   id: string;
@@ -36,11 +38,8 @@ export default function GPSClockIn() {
   const [error, setError] = useState('');
   const [activeClockIn, setActiveClockIn] = useState<ClockInRecord | null>(null);
   const [history, setHistory] = useState<ClockInRecord[]>([]);
-  const [selectedJobSite, setSelectedJobSite] = useState<JobSite | null>(null);
   const [jobSites, setJobSites] = useState<JobSite[]>([]);
   const [workerId, setWorkerId] = useState('');
-
-  const GEOFENCE_RADIUS = 300; // 300 feet in feet, ~90 meters
 
   useEffect(() => {
     loadJobSites();
@@ -56,7 +55,6 @@ export default function GPSClockIn() {
       }
     } catch (err) {
       console.error('Load job sites error:', err);
-      // Mock job sites for demo
       setJobSites([
         {
           id: 'site-1',
@@ -117,7 +115,7 @@ export default function GPSClockIn() {
   };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 20902231; // Earth's radius in feet
+    const R = 20902231;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
@@ -216,36 +214,37 @@ export default function GPSClockIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      {/* Back Button */}
-      <div className="max-w-2xl mx-auto mb-4">
-        <Link href="/">
-          <Button variant="ghost" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20" data-testid="button-back-home">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </Link>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 md:p-6">
+      <div className="max-w-4xl mx-auto">
+        <PageHeader
+          title="GPS Clock-In System"
+          subtitle="Location-verified time tracking with geofencing"
+          breadcrumb={
+            <Link href="/">
+              <Button variant="ghost" className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/20 -ml-2" data-testid="button-back-home">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <MapPin className="w-6 h-6 text-cyan-500" />
+            </div>
+          }
+        />
 
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <MapPin className="w-8 h-8 text-cyan-500" />
-            <h1 className="text-4xl font-bold text-white">GPS Clock-In System</h1>
-          </div>
-          <p className="text-gray-400">Location-verified time tracking with geofencing</p>
-        </div>
-
-        {/* Tab Navigation - Mobile Responsive */}
-        <div className="flex flex-wrap gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-full">
+        {/* Tab Navigation */}
+        <div className="flex flex-wrap gap-2 mb-6 bg-slate-800/50 p-1 rounded-lg w-full border border-slate-700/50">
           <Button
             onClick={() => setView('checkin')}
             variant={view === 'checkin' ? 'default' : 'ghost'}
             className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-checkin"
           >
-            📍 <span className="hidden sm:inline ml-1">Check In</span>
+            <Navigation className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Check In</span>
+            <span className="sm:hidden">In</span>
           </Button>
           <Button
             onClick={() => setView('active')}
@@ -253,94 +252,107 @@ export default function GPSClockIn() {
             className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-active"
           >
-            ⏱️ Active
+            <Clock className="w-4 h-4 mr-1" />
+            Active
           </Button>
           <Button
             onClick={() => setView('history')}
             variant={view === 'history' ? 'default' : 'ghost'}
-            className="rounded text-xs sm:text-sm"
+            className="rounded text-xs sm:text-sm flex-1 sm:flex-none"
             data-testid="tab-history"
           >
-            📋 History
+            <History className="w-4 h-4 mr-1" />
+            History
           </Button>
         </div>
 
         {/* Error Display */}
         {error && (
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-red-200 text-sm">{error}</p>
-          </div>
+          <OrbitCard variant="default" className="mb-6 border-red-700/50 bg-red-900/20">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-red-200 text-sm">{error}</p>
+            </div>
+          </OrbitCard>
         )}
 
         {/* Check-In View */}
         {view === 'checkin' && (
           <div className="space-y-6">
-            {/* Location Status */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle>Current Location</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 rounded bg-slate-700/30">
-                    <p className="text-xs text-gray-400 mb-1">Latitude</p>
-                    <p className="text-lg font-mono text-cyan-400">
-                      {location?.lat.toFixed(4) || 'Not captured'}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded bg-slate-700/30">
-                    <p className="text-xs text-gray-400 mb-1">Longitude</p>
-                    <p className="text-lg font-mono text-cyan-400">
-                      {location?.lon.toFixed(4) || 'Not captured'}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded bg-slate-700/30">
-                    <p className="text-xs text-gray-400 mb-1">Accuracy (±feet)</p>
-                    <p className="text-lg font-semibold text-yellow-400">
-                      {accuracy ? Math.round(accuracy * 3.28084) : 'Unknown'}
-                    </p>
-                  </div>
-                  <div className="p-4 rounded bg-slate-700/30">
-                    <p className="text-xs text-gray-400 mb-1">Status</p>
-                    <Badge className={location ? 'bg-green-900 text-green-200' : 'bg-gray-900 text-gray-200'}>
-                      {location ? '✓ Located' : '✗ Not Located'}
-                    </Badge>
-                  </div>
+            {/* Location Stats Grid */}
+            <BentoGrid cols={2} gap="md">
+              <BentoTile>
+                <div className="p-4">
+                  <StatCard
+                    label="Latitude"
+                    value={location?.lat.toFixed(4) || 'N/A'}
+                    icon={<MapPin className="w-5 h-5" />}
+                    className="border-0 p-0 bg-transparent"
+                  />
                 </div>
+              </BentoTile>
+              <BentoTile>
+                <div className="p-4">
+                  <StatCard
+                    label="Longitude"
+                    value={location?.lon.toFixed(4) || 'N/A'}
+                    icon={<MapPin className="w-5 h-5" />}
+                    className="border-0 p-0 bg-transparent"
+                  />
+                </div>
+              </BentoTile>
+              <BentoTile>
+                <div className="p-4">
+                  <StatCard
+                    label="Accuracy (±feet)"
+                    value={accuracy ? Math.round(accuracy * 3.28084) : 'Unknown'}
+                    icon={<Navigation className="w-5 h-5" />}
+                    className="border-0 p-0 bg-transparent"
+                  />
+                </div>
+              </BentoTile>
+              <BentoTile>
+                <div className="p-4 flex flex-col justify-center h-full">
+                  <p className="text-xs md:text-sm text-slate-400 uppercase tracking-wide mb-2">Status</p>
+                  <Badge className={location ? 'bg-green-900 text-green-200 w-fit' : 'bg-gray-900 text-gray-200 w-fit'}>
+                    {location ? '✓ Located' : '✗ Not Located'}
+                  </Badge>
+                </div>
+              </BentoTile>
+            </BentoGrid>
 
-                <Button
-                  onClick={getLocation}
-                  disabled={loading}
-                  className="w-full bg-cyan-600 hover:bg-cyan-700"
-                  data-testid="button-get-location"
-                >
-                  {loading ? 'Getting Location...' : '📍 Get My Location'}
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Get Location Button */}
+            <Button
+              onClick={getLocation}
+              disabled={loading}
+              className="w-full bg-cyan-600 hover:bg-cyan-700 py-6 text-lg"
+              data-testid="button-get-location"
+            >
+              <MapPin className="w-5 h-5 mr-2" />
+              {loading ? 'Getting Location...' : 'Get My Location'}
+            </Button>
 
-            {/* Worker ID */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardContent className="pt-6">
+            {/* Worker ID Card */}
+            <OrbitCard>
+              <OrbitCardContent>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Worker ID / Email</label>
                 <input
                   type="text"
                   value={workerId}
                   onChange={(e) => setWorkerId(e.target.value)}
                   placeholder="Enter your ID"
-                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded text-white"
+                  className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors"
                   data-testid="input-worker-id-clockin"
                 />
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
 
             {/* Available Job Sites */}
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
-                <CardTitle>Available Job Sites</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <OrbitCard>
+              <OrbitCardHeader>
+                <OrbitCardTitle>Available Job Sites</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent className="space-y-3">
                 {jobSites.map(site => {
                   const distance = location ? calculateDistance(location.lat, location.lon, site.latitude, site.longitude) : null;
                   const isInGeofence = distance ? distance <= site.geofenceRadius : false;
@@ -348,7 +360,7 @@ export default function GPSClockIn() {
                   return (
                     <div
                       key={site.id}
-                      className={`p-4 rounded border-2 transition-colors ${
+                      className={`p-4 rounded-lg border-2 transition-all duration-300 ${
                         isInGeofence
                           ? 'border-green-600 bg-green-900/20'
                           : 'border-slate-700 bg-slate-700/30'
@@ -388,83 +400,94 @@ export default function GPSClockIn() {
                     </div>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </div>
         )}
 
         {/* Active Clock-In View */}
         {view === 'active' && (
-          <Card className="bg-slate-800/50 border-slate-700 border-2 border-green-600">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-400">
-                <CheckCircle2 className="w-5 h-5" />
-                Active Clock-In
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+          <OrbitCard variant="stat" className="border-2 border-green-600">
+            <OrbitCardHeader icon={<CheckCircle2 className="w-6 h-6 text-green-400" />}>
+              <OrbitCardTitle className="text-green-400">Active Clock-In</OrbitCardTitle>
+            </OrbitCardHeader>
+            <OrbitCardContent>
               {activeClockIn ? (
                 <div className="space-y-4">
-                  <div className="p-4 bg-slate-700/30 rounded space-y-3">
-                    <div>
-                      <p className="text-xs text-gray-400">Worker</p>
-                      <p className="text-lg font-semibold text-white">{activeClockIn.workerName}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400">Job Site</p>
-                      <p className="text-lg font-semibold text-white">{activeClockIn.jobSiteName}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400">Clock-In Time</p>
-                      <p className="text-lg font-semibold text-cyan-400">
-                        {new Date(activeClockIn.clockInTime).toLocaleTimeString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-4 pt-4">
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-400 mb-1">Elapsed Time</p>
-                        <p className="text-xl font-bold text-yellow-400">
-                          {Math.floor((new Date().getTime() - new Date(activeClockIn.clockInTime).getTime()) / 3600000)}h{Math.floor(((new Date().getTime() - new Date(activeClockIn.clockInTime).getTime()) % 3600000) / 60000)}m
+                  <BentoGrid cols={2} gap="sm">
+                    <BentoTile>
+                      <div className="p-4">
+                        <p className="text-xs text-gray-400 mb-1">Worker</p>
+                        <p className="text-lg font-semibold text-white">{activeClockIn.workerName}</p>
+                      </div>
+                    </BentoTile>
+                    <BentoTile>
+                      <div className="p-4">
+                        <p className="text-xs text-gray-400 mb-1">Job Site</p>
+                        <p className="text-lg font-semibold text-white">{activeClockIn.jobSiteName}</p>
+                      </div>
+                    </BentoTile>
+                    <BentoTile>
+                      <div className="p-4">
+                        <p className="text-xs text-gray-400 mb-1">Clock-In Time</p>
+                        <p className="text-lg font-semibold text-cyan-400">
+                          {new Date(activeClockIn.clockInTime).toLocaleTimeString()}
                         </p>
                       </div>
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-400 mb-1">Verified</p>
-                        <Badge className={activeClockIn.verified ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}>
-                          {activeClockIn.verified ? '✓ GPS Verified' : '✗ Not Verified'}
-                        </Badge>
+                    </BentoTile>
+                    <BentoTile>
+                      <div className="p-4">
+                        <p className="text-xs text-gray-400 mb-1">Elapsed Time</p>
+                        <p className="text-xl font-bold text-yellow-400">
+                          {Math.floor((new Date().getTime() - new Date(activeClockIn.clockInTime).getTime()) / 3600000)}h
+                          {Math.floor(((new Date().getTime() - new Date(activeClockIn.clockInTime).getTime()) % 3600000) / 60000)}m
+                        </p>
                       </div>
-                    </div>
+                    </BentoTile>
+                  </BentoGrid>
+
+                  <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                    <span className="text-sm text-gray-400">Verification Status</span>
+                    <Badge className={activeClockIn.verified ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}>
+                      {activeClockIn.verified ? '✓ GPS Verified' : '✗ Not Verified'}
+                    </Badge>
                   </div>
 
                   <Button
                     onClick={handleClockOut}
                     disabled={loading}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-6"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-6 text-lg"
                     data-testid="button-clock-out"
                   >
                     🛑 Clock Out
                   </Button>
                 </div>
               ) : (
-                <p className="text-gray-400">No active clock-in. Please check in from a job site.</p>
+                <div className="text-center py-8">
+                  <Clock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                  <p className="text-gray-400">No active clock-in. Please check in from a job site.</p>
+                </div>
               )}
-            </CardContent>
-          </Card>
+            </OrbitCardContent>
+          </OrbitCard>
         )}
 
         {/* History View */}
         {view === 'history' && (
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardHeader>
-              <CardTitle>Clock-In History</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <OrbitCard>
+            <OrbitCardHeader icon={<History className="w-5 h-5 text-cyan-400" />}>
+              <OrbitCardTitle>Clock-In History</OrbitCardTitle>
+            </OrbitCardHeader>
+            <OrbitCardContent>
               {history.length === 0 ? (
-                <p className="text-gray-400">No clock-in history yet</p>
+                <div className="text-center py-8">
+                  <History className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                  <p className="text-gray-400">No clock-in history yet</p>
+                </div>
               ) : (
                 <div className="space-y-3">
                   {history.map(record => (
-                    <div key={record.id} className="p-4 rounded bg-slate-700/30 border border-slate-600">
+                    <div key={record.id} className="p-4 rounded-lg bg-slate-700/30 border border-slate-600 hover:border-cyan-500/50 transition-colors">
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <p className="font-semibold text-white">{record.jobSiteName}</p>
@@ -474,18 +497,18 @@ export default function GPSClockIn() {
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-xs text-gray-400">
                         <div>
-                          In: {new Date(record.clockInTime).toLocaleTimeString()}
+                          <span className="text-slate-500">In:</span> {new Date(record.clockInTime).toLocaleTimeString()}
                         </div>
                         <div>
-                          Out: {record.clockOutTime ? new Date(record.clockOutTime).toLocaleTimeString() : 'N/A'}
+                          <span className="text-slate-500">Out:</span> {record.clockOutTime ? new Date(record.clockOutTime).toLocaleTimeString() : 'N/A'}
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </OrbitCardContent>
+          </OrbitCard>
         )}
       </div>
     </div>

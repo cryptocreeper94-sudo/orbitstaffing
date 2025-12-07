@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail } from "@/components/ui/carousel-rail";
+import { SectionHeader, PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, StatCard } from "@/components/ui/orbit-card";
 import {
   CreditCard,
   Zap,
@@ -116,12 +119,17 @@ export default function OrbitPayCard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <Link href="/">
-          <Button variant="ghost" className="mb-6 text-slate-400 hover:text-white" data-testid="button-back">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Button>
-        </Link>
+        <PageHeader
+          title=""
+          breadcrumb={
+            <Link href="/">
+              <Button variant="ghost" className="text-slate-400 hover:text-white -ml-2" data-testid="button-back">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
+          }
+        />
 
         <div className="text-center mb-12">
           <div className="relative inline-block mb-6">
@@ -148,9 +156,9 @@ export default function OrbitPayCard() {
           </p>
         </div>
 
-        <Card className="mb-8 bg-gradient-to-r from-cyan-900/30 via-blue-900/30 to-purple-900/30 border-cyan-500/30 overflow-hidden relative">
+        <OrbitCard variant="glass" hover={false} className="mb-8 bg-gradient-to-r from-cyan-900/30 via-blue-900/30 to-purple-900/30 border-cyan-500/30 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
-          <CardContent className="p-6 md:p-8">
+          <OrbitCardContent className="p-2 md:p-4">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="relative">
                 <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 shadow-2xl border border-cyan-500/20 transform hover:scale-105 transition-transform duration-300">
@@ -207,29 +215,50 @@ export default function OrbitPayCard() {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        <div className="grid md:grid-cols-3 gap-4 mb-12">
-          {cardFeatures.map((feature, idx) => (
-            <Card key={idx} className="bg-slate-900/50 border-slate-700/50 hover:border-cyan-500/30 transition-colors" data-testid={`card-feature-${idx}`}>
-              <CardContent className="p-6">
-                <div className="mb-4">{feature.icon}</div>
-                <h3 className="font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-sm text-slate-400">{feature.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+        <SectionHeader
+          title="Card Features"
+          subtitle="Everything you need for seamless payments"
+          align="center"
+          size="lg"
+        />
+
+        <div className="hidden md:block mb-12">
+          <BentoGrid cols={3} gap="md">
+            {cardFeatures.map((feature, idx) => (
+              <BentoTile key={idx} data-testid={`card-feature-${idx}`}>
+                <div className="p-6">
+                  <div className="mb-4">{feature.icon}</div>
+                  <h3 className="font-bold text-white mb-2">{feature.title}</h3>
+                  <p className="text-sm text-slate-400">{feature.description}</p>
+                </div>
+              </BentoTile>
+            ))}
+          </BentoGrid>
         </div>
 
-        <Card className="mb-12 bg-slate-900/50 border-slate-700/50">
-          <CardHeader>
-            <CardTitle className="text-xl text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-cyan-400" />
-              ORBIT Pay Card vs Traditional Banking
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="md:hidden mb-12">
+          <CarouselRail gap="md" itemWidth="lg" showArrows={false}>
+            {cardFeatures.map((feature, idx) => (
+              <StatCard
+                key={idx}
+                label={feature.title}
+                value=""
+                icon={feature.icon}
+                className="min-w-[280px]"
+                data-testid={`card-feature-mobile-${idx}`}
+              />
+            ))}
+          </CarouselRail>
+        </div>
+
+        <OrbitCard variant="default" className="mb-12">
+          <OrbitCardHeader icon={<TrendingUp className="w-5 h-5 text-cyan-400" />}>
+            <OrbitCardTitle>ORBIT Pay Card vs Traditional Banking</OrbitCardTitle>
+          </OrbitCardHeader>
+          <OrbitCardContent>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -262,91 +291,89 @@ export default function OrbitPayCard() {
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          <Card className="bg-slate-900/50 border-slate-700/50">
-            <CardHeader>
-              <CardTitle className="text-lg text-white flex items-center gap-2">
-                <Wallet className="w-5 h-5 text-green-400" />
-                Direct Deposit Available Now
-              </CardTitle>
-              <CardDescription className="text-slate-400">
-                Already have a bank account? Set up direct deposit today.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-300 mb-4 text-sm">
-                While you wait for the ORBIT Pay Card, you can still receive your pay directly to any bank account. Simply provide your routing and account number in your profile.
-              </p>
-              <Link href="/employee-app">
-                <Button className="w-full bg-green-600 hover:bg-green-700" data-testid="button-setup-direct-deposit">
-                  <Send className="w-4 h-4 mr-2" />
-                  Set Up Direct Deposit
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-cyan-900/30 to-purple-900/30 border-cyan-500/30">
-            <CardHeader>
-              <CardTitle className="text-lg text-white flex items-center gap-2">
-                <Star className="w-5 h-5 text-yellow-400" />
-                Join the Waitlist
-              </CardTitle>
-              <CardDescription className="text-slate-300">
-                Be the first to get the ORBIT Pay Card when it launches.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!submitted ? (
-                <form onSubmit={handleWaitlistSignup} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-slate-300">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                      className="bg-slate-800 border-slate-700 text-white"
-                      required
-                      data-testid="input-waitlist-email"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || !email}
-                    className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
-                    data-testid="button-join-waitlist"
-                  >
-                    {isSubmitting ? (
-                      <span className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 animate-spin" />
-                        Joining...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4" />
-                        Join Waitlist
-                      </span>
-                    )}
+        <BentoGrid cols={2} gap="md" className="mb-12">
+          <BentoTile>
+            <div className="p-6">
+              <OrbitCardHeader icon={<Wallet className="w-5 h-5 text-green-400" />}>
+                <OrbitCardTitle>Direct Deposit Available Now</OrbitCardTitle>
+                <OrbitCardDescription>
+                  Already have a bank account? Set up direct deposit today.
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <p className="text-slate-300 mb-4 text-sm">
+                  While you wait for the ORBIT Pay Card, you can still receive your pay directly to any bank account. Simply provide your routing and account number in your profile.
+                </p>
+                <Link href="/employee-app">
+                  <Button className="w-full bg-green-600 hover:bg-green-700" data-testid="button-setup-direct-deposit">
+                    <Send className="w-4 h-4 mr-2" />
+                    Set Up Direct Deposit
                   </Button>
-                </form>
-              ) : (
-                <div className="text-center py-4">
-                  <CheckCircle2 className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                  <p className="text-green-300 font-semibold">You're on the list!</p>
-                  <p className="text-slate-400 text-sm mt-1">We'll email you when the ORBIT Pay Card is ready.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                </Link>
+              </OrbitCardContent>
+            </div>
+          </BentoTile>
 
-        <Card className="bg-amber-900/20 border-amber-500/30 mb-8">
-          <CardContent className="p-6">
+          <BentoTile className="bg-gradient-to-br from-cyan-900/30 to-purple-900/30 border-cyan-500/30">
+            <div className="p-6">
+              <OrbitCardHeader icon={<Star className="w-5 h-5 text-yellow-400" />}>
+                <OrbitCardTitle>Join the Waitlist</OrbitCardTitle>
+                <OrbitCardDescription className="text-slate-300">
+                  Be the first to get the ORBIT Pay Card when it launches.
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                {!submitted ? (
+                  <form onSubmit={handleWaitlistSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-slate-300">Email Address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        className="bg-slate-800 border-slate-700 text-white"
+                        required
+                        data-testid="input-waitlist-email"
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting || !email}
+                      className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                      data-testid="button-join-waitlist"
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 animate-spin" />
+                          Joining...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" />
+                          Join Waitlist
+                        </span>
+                      )}
+                    </Button>
+                  </form>
+                ) : (
+                  <div className="text-center py-4">
+                    <CheckCircle2 className="w-12 h-12 text-green-400 mx-auto mb-3" />
+                    <p className="text-green-300 font-semibold">You're on the list!</p>
+                    <p className="text-slate-400 text-sm mt-1">We'll email you when the ORBIT Pay Card is ready.</p>
+                  </div>
+                )}
+              </OrbitCardContent>
+            </div>
+          </BentoTile>
+        </BentoGrid>
+
+        <OrbitCard variant="glass" hover={false} className="bg-amber-900/20 border-amber-500/30 mb-8">
+          <OrbitCardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <img
                 src={orbitThinking}
@@ -363,8 +390,8 @@ export default function OrbitPayCard() {
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
         <div className="text-center text-slate-500 text-sm pb-8">
           <div className="flex items-center justify-center gap-2 mb-2">

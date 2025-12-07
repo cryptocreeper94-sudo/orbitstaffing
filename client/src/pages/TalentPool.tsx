@@ -16,8 +16,6 @@ import {
   TrendingUp,
   UserCheck,
   Calendar,
-  Phone,
-  Mail,
   Send,
   Loader2,
   AlertCircle,
@@ -63,6 +61,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
+import { BentoGrid } from "@/components/ui/bento-grid";
+import { CarouselRail, CarouselRailItem } from "@/components/ui/carousel-rail";
+import { PageHeader, SectionHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, OrbitCardFooter } from "@/components/ui/orbit-card";
 
 interface Worker {
   id: number;
@@ -170,8 +172,8 @@ function renderStars(rating: number, count: number) {
 
 function WorkerCardSkeleton() {
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50">
-      <CardContent className="p-6">
+    <OrbitCard>
+      <OrbitCardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div className="space-y-2 flex-1">
             <Skeleton className="h-6 w-3/4" />
@@ -192,8 +194,8 @@ function WorkerCardSkeleton() {
           <Skeleton className="h-4 w-28" />
           <Skeleton className="h-4 w-24" />
         </div>
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+    </OrbitCard>
   );
 }
 
@@ -210,43 +212,44 @@ function WorkerCard({
   const displaySkills = worker.skills?.slice(0, 5) || [];
 
   return (
-    <Card
-      className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5 cursor-pointer"
+    <OrbitCard
+      className="cursor-pointer"
       data-testid={`card-worker-${worker.id}`}
       onClick={() => onViewProfile(worker)}
     >
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3
-                className="text-lg font-semibold text-white hover:text-cyan-400 transition-colors"
-                data-testid={`text-worker-name-${worker.id}`}
-              >
-                {worker.firstName} {worker.lastName}
-              </h3>
-              {worker.onboardingComplete && (
-                <CheckCircle2
-                  className="w-5 h-5 text-cyan-400"
-                  data-testid={`badge-verified-${worker.id}`}
-                />
-              )}
-            </div>
-            <div className="flex items-center gap-2 text-slate-400 text-sm">
-              <MapPin className="w-4 h-4" />
-              <span data-testid={`text-location-${worker.id}`}>
-                {worker.city}, {worker.state}
-              </span>
-            </div>
-          </div>
+      <OrbitCardHeader
+        action={
           <Badge
             className={availabilityBadge.color}
             data-testid={`badge-availability-${worker.id}`}
           >
             {availabilityBadge.label}
           </Badge>
+        }
+      >
+        <div className="flex items-center gap-2 mb-1">
+          <OrbitCardTitle
+            className="hover:text-cyan-400 transition-colors"
+            data-testid={`text-worker-name-${worker.id}`}
+          >
+            {worker.firstName} {worker.lastName}
+          </OrbitCardTitle>
+          {worker.onboardingComplete && (
+            <CheckCircle2
+              className="w-5 h-5 text-cyan-400"
+              data-testid={`badge-verified-${worker.id}`}
+            />
+          )}
         </div>
+        <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <MapPin className="w-4 h-4" />
+          <span data-testid={`text-location-${worker.id}`}>
+            {worker.city}, {worker.state}
+          </span>
+        </div>
+      </OrbitCardHeader>
 
+      <OrbitCardContent>
         <div className="flex flex-wrap gap-2 mb-4">
           {displaySkills.map((skill, index) => (
             <Badge
@@ -283,7 +286,7 @@ function WorkerCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-4">
+        <div className="flex flex-wrap gap-4 text-sm text-slate-400">
           <div className="flex items-center gap-1.5">
             <Briefcase className="w-4 h-4 text-slate-500" />
             <span data-testid={`text-experience-${worker.id}`}>
@@ -303,35 +306,35 @@ function WorkerCard({
             </span>
           </div>
         </div>
+      </OrbitCardContent>
 
-        <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-700/50">
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewProfile(worker);
-            }}
-            data-testid={`button-view-profile-${worker.id}`}
-          >
-            View Profile
-          </Button>
-          <Button
-            size="sm"
-            className="bg-cyan-600 hover:bg-cyan-500"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRequestWorker(worker);
-            }}
-            data-testid={`button-request-worker-${worker.id}`}
-          >
-            <Send className="w-4 h-4 mr-1" />
-            Request
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <OrbitCardFooter>
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewProfile(worker);
+          }}
+          data-testid={`button-view-profile-${worker.id}`}
+        >
+          View Profile
+        </Button>
+        <Button
+          size="sm"
+          className="bg-cyan-600 hover:bg-cyan-500"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRequestWorker(worker);
+          }}
+          data-testid={`button-request-worker-${worker.id}`}
+        >
+          <Send className="w-4 h-4 mr-1" />
+          Request
+        </Button>
+      </OrbitCardFooter>
+    </OrbitCard>
   );
 }
 
@@ -966,24 +969,21 @@ export default function TalentPool() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <div className="text-center mb-10">
-            <Link href="/" className="inline-block mb-6">
-              <span className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-1 transition-colors">
-                <ChevronLeft className="w-4 h-4" /> Back to ORBIT
-              </span>
-            </Link>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                ORBIT Talent Pool
-              </span>
-            </h1>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Browse pre-vetted, qualified workers ready to join your team.
-            </p>
-          </div>
+          <PageHeader
+            title="ORBIT Talent Pool"
+            subtitle="Browse pre-vetted, qualified workers ready to join your team."
+            breadcrumb={
+              <Link href="/" className="inline-block">
+                <span className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-1 transition-colors">
+                  <ChevronLeft className="w-4 h-4" /> Back to ORBIT
+                </span>
+              </Link>
+            }
+            className="text-center mb-10"
+          />
 
           <form onSubmit={handleSearch} className="max-w-3xl mx-auto">
-            <div className="bg-slate-800/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-slate-700/50 shadow-xl">
+            <OrbitCard variant="glass" className="p-4 sm:p-6">
               <div className="flex gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -1005,80 +1005,93 @@ export default function TalentPool() {
                   Search
                 </Button>
               </div>
-            </div>
+            </OrbitCard>
           </form>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Users className="w-6 h-6 text-cyan-400" />
-            <h2 className="text-xl font-semibold text-white">
-              {isLoading ? (
-                "Loading..."
-              ) : (
-                <>
-                  <span data-testid="text-total-workers">{total}</span> Workers Found
-                </>
-              )}
-            </h2>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="lg:hidden border-slate-600 text-slate-300"
-            data-testid="button-toggle-filters"
+        <div className="lg:hidden mb-6">
+          <CarouselRail
+            title="Quick Filters"
+            showArrows={false}
+            gap="sm"
           >
-            <Filter className="w-4 h-4 mr-2" />
-            {showMobileFilters ? "Hide Filters" : "Show Filters"}
-          </Button>
+            {SKILLS_LIST.map((skill) => (
+              <CarouselRailItem key={skill}>
+                <Badge
+                  variant="outline"
+                  className={`cursor-pointer whitespace-nowrap transition-all ${
+                    selectedSkills.includes(skill)
+                      ? "bg-cyan-600 text-white border-cyan-500"
+                      : "text-slate-400 border-slate-600 hover:border-cyan-500 hover:text-cyan-400"
+                  }`}
+                  onClick={() => toggleSkill(skill)}
+                  data-testid={`filter-chip-${skill.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  {skill}
+                </Badge>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
+
+        <SectionHeader
+          title={isLoading ? "Loading..." : `${total} Workers Found`}
+          size="md"
+          action={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+              className="lg:hidden border-slate-600 text-slate-300"
+              data-testid="button-toggle-filters"
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              {showMobileFilters ? "Hide Filters" : "Show Filters"}
+            </Button>
+          }
+        />
 
         <div className="flex flex-col lg:flex-row gap-8">
           <aside
             className={`lg:w-64 shrink-0 ${showMobileFilters ? "block" : "hidden lg:block"}`}
           >
-            <Card className="bg-slate-800/50 border-slate-700/50 sticky top-4">
-              <CardContent className="p-6">
-                <FiltersSidebar />
-              </CardContent>
-            </Card>
+            <OrbitCard className="sticky top-4">
+              <FiltersSidebar />
+            </OrbitCard>
           </aside>
 
           <main className="flex-1">
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <BentoGrid cols={2} gap="md">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <WorkerCardSkeleton key={i} />
                 ))}
-              </div>
+              </BentoGrid>
             ) : workers.length === 0 ? (
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="p-12 text-center">
-                  <AlertCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    No Workers Found
-                  </h3>
-                  <p className="text-slate-400 mb-4">
-                    Try adjusting your search criteria or filters.
-                  </p>
-                  {hasActiveFilters && (
-                    <Button
-                      variant="outline"
-                      onClick={clearFilters}
-                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-                      data-testid="button-clear-filters-empty"
-                    >
-                      Clear All Filters
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+              <OrbitCard className="p-12 text-center">
+                <AlertCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  No Workers Found
+                </h3>
+                <p className="text-slate-400 mb-4">
+                  Try adjusting your search criteria or filters.
+                </p>
+                {hasActiveFilters && (
+                  <Button
+                    variant="outline"
+                    onClick={clearFilters}
+                    className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                    data-testid="button-clear-filters-empty"
+                  >
+                    Clear All Filters
+                  </Button>
+                )}
+              </OrbitCard>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <BentoGrid cols={2} gap="md">
                   {workers.map((worker) => (
                     <WorkerCard
                       key={worker.id}
@@ -1087,7 +1100,7 @@ export default function TalentPool() {
                       onRequestWorker={handleRequestWorker}
                     />
                   ))}
-                </div>
+                </BentoGrid>
 
                 {totalPages > 1 && (
                   <div className="mt-8">

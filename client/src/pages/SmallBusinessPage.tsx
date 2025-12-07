@@ -1,20 +1,27 @@
 import { useState } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail } from "@/components/ui/carousel-rail";
+import { SectionHeader, PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, StatCard } from "@/components/ui/orbit-card";
 import { 
   DollarSign, 
   Clock, 
   TrendingUp, 
   CheckCircle2, 
   AlertCircle,
-  Settings,
-  Menu
+  Menu,
+  Users,
+  FileText,
+  Calendar,
+  MapPin,
+  Smartphone,
+  Shield,
+  BarChart3
 } from "lucide-react";
-import { toast } from "sonner";
 
 export default function SmallBusinessPage() {
   const [showModal, setShowModal] = useState(false);
@@ -44,14 +51,14 @@ export default function SmallBusinessPage() {
   ];
 
   const features = [
-    { title: "CRM", desc: "Worker profiles, client records, complete history, notes, compliance tracking" },
-    { title: "Payroll", desc: "Automated, state-compliant, multi-state support, TN/KY rules built-in" },
-    { title: "Invoicing", desc: "Auto-generated from assignments, customizable templates, payment tracking" },
-    { title: "Scheduling", desc: "Job posting, worker assignment, bulk ops, real-time availability" },
-    { title: "GPS Verification", desc: "Workers clock in at job site via GPS. Prevent fraud, verify attendance." },
-    { title: "Mobile App", desc: "Workers access assignments, communicate with managers, clock in/out anywhere" },
-    { title: "Compliance", desc: "TN/KY state rules, I-9 tracking, prevailing wage, audit trails" },
-    { title: "Real-Time Dashboard", desc: "See workers, clients, revenue, payroll status, everything at a glance" },
+    { title: "CRM", desc: "Worker profiles, client records, complete history, notes, compliance tracking", icon: Users },
+    { title: "Payroll", desc: "Automated, state-compliant, multi-state support, TN/KY rules built-in", icon: DollarSign },
+    { title: "Invoicing", desc: "Auto-generated from assignments, customizable templates, payment tracking", icon: FileText },
+    { title: "Scheduling", desc: "Job posting, worker assignment, bulk ops, real-time availability", icon: Calendar },
+    { title: "GPS Verification", desc: "Workers clock in at job site via GPS. Prevent fraud, verify attendance.", icon: MapPin },
+    { title: "Mobile App", desc: "Workers access assignments, communicate with managers, clock in/out anywhere", icon: Smartphone },
+    { title: "Compliance", desc: "TN/KY state rules, I-9 tracking, prevailing wage, audit trails", icon: Shield },
+    { title: "Real-Time Dashboard", desc: "See workers, clients, revenue, payroll status, everything at a glance", icon: BarChart3 },
   ];
 
   const comparison = [
@@ -67,7 +74,6 @@ export default function SmallBusinessPage() {
 
   return (
     <Shell>
-      {/* Top Right Menu Button */}
       <div className="fixed top-4 right-4 z-40">
         <Button
           variant="outline"
@@ -83,258 +89,293 @@ export default function SmallBusinessPage() {
 
       <BusinessTypeModal isOpen={showModal} onClose={() => setShowModal(false)} />
 
-      {/* Hero Section */}
-      <div className="mb-12">
-        <Badge className="bg-green-500/20 text-green-600 mb-4">For Independent Agencies</Badge>
-        <h1 className="text-4xl md:text-5xl font-bold font-heading tracking-tight mb-4">
-          Replace Your 6-7 Systems with One
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mb-6">
-          You're wasting $8,000-10,000/year and 20 hours/month on disconnected systems. ORBIT is the staffing OS that replaces everything: CRM, payroll, invoicing, scheduling, compliance. All integrated. One login.
-        </p>
+      <PageHeader
+        title="Replace Your 6-7 Systems with One"
+        subtitle="You're wasting $8,000-10,000/year and 20 hours/month on disconnected systems. ORBIT is the staffing OS that replaces everything: CRM, payroll, invoicing, scheduling, compliance. All integrated. One login."
+        breadcrumb={<Badge className="bg-green-500/20 text-green-600">For Independent Agencies</Badge>}
+        actions={
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" size="lg" data-testid="button-start-demo">
+              Start Your Demo (Free)
+            </Button>
+            <Button variant="outline" size="lg" data-testid="button-customer-story">
+              Read Customer Story
+            </Button>
+          </div>
+        }
+      />
 
-        <div className="flex flex-col md:flex-row gap-4">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 h-11" size="lg">
-            Start Your Demo (Free)
-          </Button>
-          <Button variant="outline" className="h-11" size="lg">
-            Read Customer Story: Superior Staffing
-          </Button>
-        </div>
-      </div>
-
-      {/* The Problems You Face */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold font-heading mb-8">The Problems You're Facing</h2>
-        <div className="space-y-4">
-          {problems.map((p, i) => {
-            const Icon = p.icon;
-            return (
-              <Card key={i} className="border-border/50">
-                <CardContent className="pt-6">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <Icon className="w-6 h-6 text-red-600" />
+      <section className="mb-12">
+        <SectionHeader
+          title="The Problems You're Facing"
+          subtitle="Your current setup is costing you more than you realize"
+          size="lg"
+        />
+        
+        <div className="hidden md:block">
+          <BentoGrid cols={3} gap="md">
+            {problems.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <BentoTile key={i}>
+                  <div className="p-5">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-2 rounded-lg bg-red-500/20">
+                        <Icon className="w-5 h-5 text-red-400" />
+                      </div>
+                      <h3 className="font-bold text-white">{p.title}</h3>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold mb-2">{p.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        <span className="text-red-600 font-medium">Problem:</span> {p.problem}
-                      </p>
-                      <p className="text-sm mb-2">
-                        <span className="text-green-600 font-medium">With ORBIT:</span> {p.solution}
-                      </p>
-                      <Badge className="bg-green-500/20 text-green-600">{p.savings}</Badge>
-                    </div>
+                    <p className="text-sm text-slate-400 mb-3">
+                      <span className="text-red-400 font-medium">Problem:</span> {p.problem}
+                    </p>
+                    <p className="text-sm text-slate-300 mb-3">
+                      <span className="text-emerald-400 font-medium">With ORBIT:</span> {p.solution}
+                    </p>
+                    <Badge className="bg-emerald-500/20 text-emerald-400">{p.savings}</Badge>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                </BentoTile>
+              );
+            })}
+          </BentoGrid>
         </div>
-      </div>
 
-      {/* Why Switch? */}
-      <div className="mb-12 bg-primary/5 border border-primary/30 rounded-lg p-8">
-        <h2 className="text-2xl font-bold font-heading mb-6">Why Switch From Your Current Systems?</h2>
-        <div className="space-y-4">
-          <div className="flex gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold mb-1">You're Losing Money</p>
-              <p className="text-sm text-muted-foreground">Paying for multiple subscriptions ($2,600+/year) + manual work = $8-10k/year waste</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold mb-1">Data is Fragmented</p>
-              <p className="text-sm text-muted-foreground">Worker info in one place, payroll in another, client records somewhere else. No single source of truth.</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold mb-1">You Can't Scale</p>
-              <p className="text-sm text-muted-foreground">Every new worker, new client, new assignment = manual setup in multiple systems. Growth is painful.</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold mb-1">Your Team Is Trapped</p>
-              <p className="text-sm text-muted-foreground">Phone calls to ADP, waiting on Paychex, logging into 3 different systems. Every task takes longer.</p>
-            </div>
-          </div>
+        <div className="md:hidden">
+          <CarouselRail showArrows={false} gap="md" itemWidth="lg">
+            {problems.map((p, i) => {
+              const Icon = p.icon;
+              return (
+                <OrbitCard key={i} className="w-[300px]">
+                  <OrbitCardHeader icon={
+                    <div className="p-2 rounded-lg bg-red-500/20">
+                      <Icon className="w-5 h-5 text-red-400" />
+                    </div>
+                  }>
+                    <OrbitCardTitle>{p.title}</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <p className="text-sm text-slate-400 mb-3">
+                      <span className="text-red-400 font-medium">Problem:</span> {p.problem}
+                    </p>
+                    <p className="text-sm text-slate-300 mb-3">
+                      <span className="text-emerald-400 font-medium">With ORBIT:</span> {p.solution}
+                    </p>
+                    <Badge className="bg-emerald-500/20 text-emerald-400">{p.savings}</Badge>
+                  </OrbitCardContent>
+                </OrbitCard>
+              );
+            })}
+          </CarouselRail>
         </div>
-      </div>
+      </section>
 
-      {/* Features */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold font-heading mb-8">Everything You Need, Nothing You Don't</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {features.map((f, i) => (
-            <Card key={i} className="border-border/50">
-              <CardContent className="pt-6">
-                <CheckCircle2 className="w-5 h-5 text-green-600 mb-3" />
-                <p className="font-semibold text-sm mb-2">{f.title}</p>
-                <p className="text-xs text-muted-foreground">{f.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
+      <section className="mb-12">
+        <OrbitCard variant="glass" className="p-6 md:p-8 border-amber-500/30 bg-amber-900/10">
+          <SectionHeader
+            title="Why Switch From Your Current Systems?"
+            size="md"
+            className="mb-6"
+          />
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { title: "You're Losing Money", desc: "Paying for multiple subscriptions ($2,600+/year) + manual work = $8-10k/year waste" },
+              { title: "Data is Fragmented", desc: "Worker info in one place, payroll in another, client records somewhere else. No single source of truth." },
+              { title: "You Can't Scale", desc: "Every new worker, new client, new assignment = manual setup in multiple systems. Growth is painful." },
+              { title: "Your Team Is Trapped", desc: "Phone calls to ADP, waiting on Paychex, logging into 3 different systems. Every task takes longer." },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-white mb-1">{item.title}</p>
+                  <p className="text-sm text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </OrbitCard>
+      </section>
+
+      <section className="mb-12">
+        <SectionHeader
+          title="Everything You Need, Nothing You Don't"
+          subtitle="Complete staffing operations in one platform"
+          size="lg"
+        />
+        
+        <div className="hidden md:block">
+          <BentoGrid cols={4} gap="md">
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <BentoTile key={i}>
+                  <div className="p-4">
+                    <div className="p-2 rounded-lg bg-cyan-500/20 w-fit mb-3">
+                      <Icon className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <p className="font-semibold text-white text-sm mb-2">{f.title}</p>
+                    <p className="text-xs text-slate-400">{f.desc}</p>
+                  </div>
+                </BentoTile>
+              );
+            })}
+          </BentoGrid>
         </div>
-      </div>
 
-      {/* Comparison */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold font-heading mb-8">You vs ORBIT</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border/50">
-                <th className="text-left py-3 px-4 font-semibold">Feature</th>
-                <th className="text-left py-3 px-4 font-semibold text-muted-foreground">Your Current Setup</th>
-                <th className="text-left py-3 px-4 font-semibold text-green-600">ORBIT</th>
-              </tr>
-            </thead>
-            <tbody>
-              {comparison.map((row, i) => (
-                <tr key={i} className="border-b border-border/30 hover:bg-card/50">
-                  <td className="py-3 px-4 font-medium">{row.feature}</td>
-                  <td className="py-3 px-4 text-muted-foreground text-xs">{row.current}</td>
-                  <td className="py-3 px-4 text-green-600 font-semibold">{row.orbit}</td>
+        <div className="md:hidden">
+          <CarouselRail showArrows={false} gap="md" itemWidth="md">
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <OrbitCard key={i} className="w-[260px]">
+                  <div className="p-2 rounded-lg bg-cyan-500/20 w-fit mb-3">
+                    <Icon className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <OrbitCardTitle className="text-sm mb-2">{f.title}</OrbitCardTitle>
+                  <p className="text-xs text-slate-400">{f.desc}</p>
+                </OrbitCard>
+              );
+            })}
+          </CarouselRail>
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <SectionHeader
+          title="You vs ORBIT"
+          subtitle="See how much you can save by consolidating"
+          size="lg"
+        />
+        <OrbitCard variant="default" hover={false}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-700/50">
+                  <th className="text-left py-3 px-4 font-semibold text-white">Feature</th>
+                  <th className="text-left py-3 px-4 font-semibold text-slate-400">Your Current Setup</th>
+                  <th className="text-left py-3 px-4 font-semibold text-emerald-400">ORBIT</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
+              <tbody>
+                {comparison.map((row, i) => (
+                  <tr key={i} className="border-b border-slate-700/30 hover:bg-slate-800/30">
+                    <td className="py-3 px-4 font-medium text-white">{row.feature}</td>
+                    <td className="py-3 px-4 text-slate-400 text-xs">{row.current}</td>
+                    <td className="py-3 px-4 text-emerald-400 font-semibold">{row.orbit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </OrbitCard>
+      </section>
 
-      {/* Pricing */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold font-heading mb-8">Two Simple Pricing Options</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Fixed Monthly */}
-          <Card className="border-primary/30 bg-primary/5">
-            <CardHeader>
-              <CardTitle>Monthly Subscription</CardTitle>
-              <CardDescription>Predictable costs, scale as you grow</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <div className="text-4xl font-bold text-primary">$199<span className="text-lg text-muted-foreground">/mo</span></div>
-                <p className="text-sm text-muted-foreground mt-2">Startup Tier (50 workers)</p>
+      <section className="mb-12">
+        <SectionHeader
+          title="Two Simple Pricing Options"
+          subtitle="Choose what works best for your business"
+          size="lg"
+        />
+        <BentoGrid cols={2} gap="lg">
+          <BentoTile className="border-cyan-500/30 bg-gradient-to-br from-cyan-900/20 to-slate-900">
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-1">Monthly Subscription</h3>
+              <p className="text-sm text-slate-400 mb-6">Predictable costs, scale as you grow</p>
+              
+              <div className="mb-6">
+                <div className="text-4xl font-bold text-cyan-400">$199<span className="text-lg text-slate-400">/mo</span></div>
+                <p className="text-sm text-slate-400 mt-2">Startup Tier (50 workers)</p>
               </div>
 
-              <div>
-                <div className="text-2xl font-bold mb-3">Includes:</div>
+              <div className="mb-6">
+                <div className="text-lg font-bold text-white mb-3">Includes:</div>
                 <ul className="space-y-2 text-sm">
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>CRM, payroll, invoicing</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Up to 50 workers</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Email support</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>5 active clients</span>
-                  </li>
+                  {["CRM, payroll, invoicing", "Up to 50 workers", "Email support", "5 active clients"].map((item, i) => (
+                    <li key={i} className="flex gap-2 text-slate-300">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
-              <Button className="w-full bg-primary text-primary-foreground" size="lg">
+              <Button className="w-full bg-cyan-500 hover:bg-cyan-600 text-white" size="lg" data-testid="button-start-trial">
                 Start Free Trial (14 days)
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
+              <p className="text-xs text-center text-slate-400 mt-4">
                 ROI: Save $1,600+ in Year 1. $199/mo pays for itself in 1 month.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </BentoTile>
 
-          {/* Revenue Share */}
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle>Revenue Share</CardTitle>
-              <CardDescription>Pay for what you make</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <div className="text-4xl font-bold text-primary">2%<span className="text-lg text-muted-foreground"> of revenue</span></div>
-                <p className="text-sm text-muted-foreground mt-2">Scale automatically with your success</p>
+          <BentoTile>
+            <div className="p-6">
+              <h3 className="text-xl font-bold text-white mb-1">Revenue Share</h3>
+              <p className="text-sm text-slate-400 mb-6">Pay for what you make</p>
+              
+              <div className="mb-6">
+                <div className="text-4xl font-bold text-cyan-400">2%<span className="text-lg text-slate-400"> of revenue</span></div>
+                <p className="text-sm text-slate-400 mt-2">Scale automatically with your success</p>
               </div>
 
-              <div>
-                <div className="text-2xl font-bold mb-3">Perfect if:</div>
+              <div className="mb-6">
+                <div className="text-lg font-bold text-white mb-3">Perfect if:</div>
                 <ul className="space-y-2 text-sm">
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>You have $50k+ monthly revenue</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>You want growth aligned pricing</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>No monthly minimum</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Switch back to monthly anytime</span>
-                  </li>
+                  {["You have $50k+ monthly revenue", "You want growth aligned pricing", "No monthly minimum", "Switch back to monthly anytime"].map((item, i) => (
+                    <li key={i} className="flex gap-2 text-slate-300">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
 
-              <Button variant="outline" className="w-full" size="lg">
+              <Button variant="outline" className="w-full border-slate-600 hover:border-cyan-500" size="lg" data-testid="button-compare-plans">
                 Compare All Plans
               </Button>
 
-              <p className="text-xs text-center text-muted-foreground">
+              <p className="text-xs text-center text-slate-400 mt-4">
                 Example: $96k/month = $1,920 ORBIT. Still cheaper than your current setup.
               </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </div>
+          </BentoTile>
+        </BentoGrid>
+      </section>
 
-      {/* One-Time Franchise Option */}
-      <div className="mb-12 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/50 rounded-lg p-8">
-        <div className="flex gap-4">
-          <TrendingUp className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-2xl font-bold font-heading mb-2">Want Perpetual Ownership?</h3>
-            <p className="text-muted-foreground mb-4">
-              Get the full ORBIT platform white-labeled as your own brand for a one-time franchise license. Own it forever. No recurring fees.
-            </p>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+      <section className="mb-12">
+        <OrbitCard variant="action" className="p-6 md:p-8 border-cyan-500/50" onClick={() => {}}>
+          <div className="flex flex-col md:flex-row gap-4 md:items-center">
+            <div className="p-3 rounded-lg bg-cyan-500/20 w-fit">
+              <TrendingUp className="w-6 h-6 text-cyan-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-white mb-2">Want Perpetual Ownership?</h3>
+              <p className="text-slate-400">
+                Get the full ORBIT platform white-labeled as your own brand for a one-time franchise license. Own it forever. No recurring fees.
+              </p>
+            </div>
+            <Button className="bg-cyan-500 hover:bg-cyan-600 text-white shrink-0" data-testid="button-franchise-licensing">
               Learn About Franchise Licensing
             </Button>
           </div>
-        </div>
-      </div>
+        </OrbitCard>
+      </section>
 
-      {/* CTA */}
-      <div className="text-center py-12">
-        <h2 className="text-3xl font-bold font-heading mb-4">Stop Wasting Time & Money</h2>
-        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Your competitors are already consolidating their systems. Don't get left behind with outdated disconnected software.
-        </p>
-        <div className="flex flex-col md:flex-row gap-4 justify-center">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 h-11" size="lg">
+      <section className="text-center py-12">
+        <SectionHeader
+          title="Stop Wasting Time & Money"
+          subtitle="Your competitors are already consolidating their systems. Don't get left behind with outdated disconnected software."
+          align="center"
+          size="lg"
+        />
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button className="bg-cyan-500 hover:bg-cyan-600 text-white h-11" size="lg" data-testid="button-get-started-free">
             Get Started Free (No Credit Card)
           </Button>
-          <Button variant="outline" className="h-11" size="lg">
+          <Button variant="outline" className="h-11 border-slate-600 hover:border-cyan-500" size="lg" data-testid="button-schedule-demo">
             Schedule a Demo
           </Button>
         </div>
-      </div>
+      </section>
     </Shell>
   );
 }

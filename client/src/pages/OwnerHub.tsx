@@ -34,11 +34,11 @@ import {
   CalendarDays,
   UserCheck,
   Briefcase,
-  CreditCard
+  CreditCard,
+  Receipt
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -61,7 +61,19 @@ import { Label } from "@/components/ui/label";
 import { Shell } from "@/components/layout/Shell";
 import { Separator } from "@/components/ui/separator";
 import { ReceiptScanner } from "@/components/ReceiptScanner";
-import { Receipt } from "lucide-react";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail } from "@/components/ui/carousel-rail";
+import { SectionHeader, PageHeader } from "@/components/ui/section-header";
+import { 
+  OrbitCard, 
+  OrbitCardHeader, 
+  OrbitCardTitle, 
+  OrbitCardDescription,
+  OrbitCardContent,
+  OrbitCardFooter,
+  StatCard, 
+  ActionCard 
+} from "@/components/ui/orbit-card";
 
 interface Employee {
   id: number;
@@ -174,32 +186,6 @@ function getComplianceBadge(status: ComplianceItem["status"]) {
   return <Badge className={styles[status]}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
 }
 
-function StatCard({ icon: Icon, label, value, subtext, color, testId }: {
-  icon: React.ElementType;
-  label: string;
-  value: string | number;
-  subtext?: string;
-  color: string;
-  testId: string;
-}) {
-  return (
-    <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/30 transition-all" data-testid={testId}>
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-slate-400 text-sm mb-1">{label}</p>
-            <p className="text-3xl font-bold text-white" data-testid={`${testId}-value`}>{value}</p>
-            {subtext && <p className="text-xs text-slate-500 mt-1">{subtext}</p>}
-          </div>
-          <div className={`p-3 rounded-lg ${color}`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 function WeatherVerificationWidget() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [location, setLocation] = useState("37201");
@@ -255,17 +241,14 @@ function WeatherVerificationWidget() {
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Cloud className="w-5 h-5 text-cyan-400" />
-          Weather Verification
-        </CardTitle>
-        <CardDescription className="text-slate-400">
+    <OrbitCard>
+      <OrbitCardHeader icon={<Cloud className="w-5 h-5 text-cyan-400" />}>
+        <OrbitCardTitle>Weather Verification</OrbitCardTitle>
+        <OrbitCardDescription>
           Check historical weather for any date/location for time card verification
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+        </OrbitCardDescription>
+      </OrbitCardHeader>
+      <OrbitCardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-slate-400 text-sm">Date</Label>
@@ -317,8 +300,8 @@ function WeatherVerificationWidget() {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+    </OrbitCard>
   );
 }
 
@@ -328,8 +311,8 @@ function EmployeeCard({ employee, onViewFile, onQuickAction }: {
   onQuickAction: (emp: Employee, action: string) => void;
 }) {
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all" data-testid={`card-employee-${employee.id}`}>
-      <CardContent className="p-4">
+    <OrbitCard className="h-full" data-testid={`card-employee-${employee.id}`}>
+      <OrbitCardContent>
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
             {employee.name.split(' ').map(n => n[0]).join('')}
@@ -365,39 +348,38 @@ function EmployeeCard({ employee, onViewFile, onQuickAction }: {
             </div>
           </div>
         </div>
-        
-        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-700/50">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onViewFile(employee)}
-            className="text-slate-400 hover:text-cyan-400 flex-1"
-            data-testid={`button-view-file-${employee.id}`}
-          >
-            <Eye className="w-4 h-4 mr-1" />
-            View File
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onQuickAction(employee, "message")}
-            className="text-slate-400 hover:text-cyan-400"
-            data-testid={`button-message-${employee.id}`}
-          >
-            <Mail className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onQuickAction(employee, "call")}
-            className="text-slate-400 hover:text-green-400"
-            data-testid={`button-call-${employee.id}`}
-          >
-            <Phone className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+      <OrbitCardFooter>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onViewFile(employee)}
+          className="text-slate-400 hover:text-cyan-400 flex-1"
+          data-testid={`button-view-file-${employee.id}`}
+        >
+          <Eye className="w-4 h-4 mr-1" />
+          View File
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onQuickAction(employee, "message")}
+          className="text-slate-400 hover:text-cyan-400"
+          data-testid={`button-message-${employee.id}`}
+        >
+          <Mail className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onQuickAction(employee, "call")}
+          className="text-slate-400 hover:text-green-400"
+          data-testid={`button-call-${employee.id}`}
+        >
+          <Phone className="w-4 h-4" />
+        </Button>
+      </OrbitCardFooter>
+    </OrbitCard>
   );
 }
 
@@ -450,44 +432,41 @@ export default function OwnerHub() {
   return (
     <Shell>
       <div className="min-h-screen bg-slate-900" data-testid="owner-hub-page">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+        <PageHeader
+          title="Owner Hub"
+          subtitle="Complete business management dashboard"
+          breadcrumb={
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/")}
-              className="text-slate-400 hover:text-white"
+              className="text-slate-400 hover:text-white -ml-2"
               data-testid="button-back"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                <Building2 className="w-8 h-8 text-cyan-400" />
-                Owner Hub
-              </h1>
-              <p className="text-slate-400 mt-1">Complete business management dashboard</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="border-slate-600 text-slate-300 hover:bg-slate-700"
-              data-testid="button-refresh"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-            <Button
-              className="bg-cyan-600 hover:bg-cyan-700"
-              data-testid="button-settings"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
-          </div>
-        </div>
+          }
+          actions={
+            <>
+              <Button
+                variant="outline"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                data-testid="button-refresh"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+              <Button
+                className="bg-cyan-600 hover:bg-cyan-700"
+                data-testid="button-settings"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </>
+          }
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-slate-800/50 border border-slate-700/50 p-1 flex-wrap h-auto gap-1">
@@ -558,551 +537,516 @@ export default function OwnerHub() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard
-                icon={Users}
-                label="Total Employees"
-                value={mockCompanyInfo.employeeCount}
-                subtext="Active workforce"
-                color="bg-cyan-600"
-                testId="stat-employees"
-              />
-              <StatCard
-                icon={CheckCircle2}
-                label="Compliance Score"
-                value={`${mockCompanyInfo.complianceScore}%`}
-                subtext="Overall rating"
-                color="bg-green-600"
-                testId="stat-compliance"
-              />
-              <StatCard
-                icon={Heart}
-                label="Insurance Enrolled"
-                value={mockEmployees.filter(e => e.insuranceEnrolled).length}
-                subtext="Employees covered"
-                color="bg-pink-600"
-                testId="stat-insurance"
-              />
-              <StatCard
-                icon={AlertTriangle}
-                label="Pending Items"
-                value={complianceStats.pending + complianceStats.expired}
-                subtext="Requires attention"
-                color="bg-amber-600"
-                testId="stat-pending"
-              />
-            </div>
+            <BentoGrid cols={4} gap="md">
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Total Employees"
+                  value={mockCompanyInfo.employeeCount}
+                  icon={<Users className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Compliance Score"
+                  value={`${mockCompanyInfo.complianceScore}%`}
+                  icon={<CheckCircle2 className="w-6 h-6" />}
+                  trend={{ value: 3, positive: true }}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Insurance Enrolled"
+                  value={mockEmployees.filter(e => e.insuranceEnrolled).length}
+                  icon={<Heart className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Pending Items"
+                  value={complianceStats.pending + complianceStats.expired}
+                  icon={<AlertTriangle className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+            </BentoGrid>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-cyan-400" />
-                    Company Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-slate-400 text-xs">Company Name</Label>
-                      <p className="text-white font-medium">{mockCompanyInfo.name}</p>
+            <BentoGrid cols={2} gap="md">
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<Building2 className="w-5 h-5 text-cyan-400" />}>
+                    <OrbitCardTitle>Company Information</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-slate-400 text-xs">Company Name</Label>
+                        <p className="text-white font-medium">{mockCompanyInfo.name}</p>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-xs">Industry</Label>
+                        <p className="text-white">{mockCompanyInfo.industry}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <Label className="text-slate-400 text-xs">Address</Label>
+                        <p className="text-white">{mockCompanyInfo.address}</p>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-xs">Phone</Label>
+                        <a href={`tel:${mockCompanyInfo.phone}`} className="text-cyan-400 hover:text-cyan-300 block">
+                          {mockCompanyInfo.phone}
+                        </a>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-xs">Email</Label>
+                        <a href={`mailto:${mockCompanyInfo.email}`} className="text-cyan-400 hover:text-cyan-300 block truncate">
+                          {mockCompanyInfo.email}
+                        </a>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-xs">EIN</Label>
+                        <p className="text-white">{mockCompanyInfo.ein}</p>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-xs">Insurance Provider</Label>
+                        <p className="text-white">{mockCompanyInfo.insuranceProvider}</p>
+                      </div>
                     </div>
-                    <div>
-                      <Label className="text-slate-400 text-xs">Industry</Label>
-                      <p className="text-white">{mockCompanyInfo.industry}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <Label className="text-slate-400 text-xs">Address</Label>
-                      <p className="text-white">{mockCompanyInfo.address}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-400 text-xs">Phone</Label>
-                      <a href={`tel:${mockCompanyInfo.phone}`} className="text-cyan-400 hover:text-cyan-300 block">
-                        {mockCompanyInfo.phone}
-                      </a>
-                    </div>
-                    <div>
-                      <Label className="text-slate-400 text-xs">Email</Label>
-                      <a href={`mailto:${mockCompanyInfo.email}`} className="text-cyan-400 hover:text-cyan-300 block truncate">
-                        {mockCompanyInfo.email}
-                      </a>
-                    </div>
-                    <div>
-                      <Label className="text-slate-400 text-xs">EIN</Label>
-                      <p className="text-white">{mockCompanyInfo.ein}</p>
-                    </div>
-                    <div>
-                      <Label className="text-slate-400 text-xs">Insurance Provider</Label>
-                      <p className="text-white">{mockCompanyInfo.insuranceProvider}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
 
-              <WeatherVerificationWidget />
-            </div>
+              <BentoTile className="p-0">
+                <WeatherVerificationWidget />
+              </BentoTile>
+            </BentoGrid>
 
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-400" />
-                  Recent Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {mockEmployees.filter(e => e.lastClockIn).slice(0, 4).map((emp) => (
-                    <div key={emp.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
-                          {emp.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <p className="text-white text-sm font-medium">{emp.name}</p>
-                          <p className="text-slate-400 text-xs">Clocked in</p>
-                        </div>
+            <SectionHeader
+              title="Recent Activity"
+              subtitle="Latest employee clock-ins"
+            />
+            
+            <CarouselRail showArrows gap="md" itemWidth="md">
+              {mockEmployees.filter(e => e.lastClockIn).map((emp) => (
+                <OrbitCard key={emp.id} className="min-w-[280px]">
+                  <OrbitCardContent>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+                        {emp.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-white text-sm font-medium">{emp.name}</p>
+                        <p className="text-slate-400 text-xs">Clocked in</p>
                       </div>
                       <span className="text-slate-400 text-sm">{emp.lastClockIn}</span>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </OrbitCardContent>
+                </OrbitCard>
+              ))}
+            </CarouselRail>
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-6">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-cyan-400" />
-                    All Employees ({filteredEmployees.length})
-                  </CardTitle>
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <Input
-                        placeholder="Search employees..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 bg-slate-700 border-slate-600 text-white w-64"
-                        data-testid="input-search-employees"
-                      />
-                    </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger className="w-36 bg-slate-700 border-slate-600 text-white" data-testid="select-status-filter">
-                        <Filter className="w-4 h-4 mr-2" />
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700">
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="onLeave">On Leave</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="terminated">Terminated</SelectItem>
-                      </SelectContent>
-                    </Select>
+            <SectionHeader
+              title={`All Employees (${filteredEmployees.length})`}
+              action={
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      placeholder="Search employees..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9 bg-slate-700 border-slate-600 text-white w-64"
+                      data-testid="input-search-employees"
+                    />
                   </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-36 bg-slate-700 border-slate-600 text-white" data-testid="select-status-filter">
+                      <Filter className="w-4 h-4 mr-2" />
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-slate-700">
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="onLeave">On Leave</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="terminated">Terminated</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[600px]">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {filteredEmployees.map((employee) => (
-                      <EmployeeCard
-                        key={employee.id}
-                        employee={employee}
-                        onViewFile={handleViewFile}
-                        onQuickAction={handleQuickAction}
-                      />
-                    ))}
-                    {filteredEmployees.length === 0 && (
-                      <div className="col-span-2 text-center py-12 text-slate-400">
-                        <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                        <p>No employees found matching your criteria</p>
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
+              }
+            />
+            
+            <ScrollArea className="h-[600px]">
+              <BentoGrid cols={2} gap="md">
+                {filteredEmployees.map((employee) => (
+                  <BentoTile key={employee.id} className="p-0">
+                    <EmployeeCard
+                      employee={employee}
+                      onViewFile={handleViewFile}
+                      onQuickAction={handleQuickAction}
+                    />
+                  </BentoTile>
+                ))}
+              </BentoGrid>
+              {filteredEmployees.length === 0 && (
+                <div className="text-center py-12 text-slate-400">
+                  <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No employees found matching your criteria</p>
+                </div>
+              )}
+            </ScrollArea>
           </TabsContent>
 
           <TabsContent value="files" className="space-y-6">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-cyan-400" />
-                  Employee Files
-                </CardTitle>
-                <CardDescription className="text-slate-400">
-                  Click on any employee to view their complete file including documents, pay history, and more
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[500px]">
-                  <div className="space-y-2">
-                    {mockEmployees.map((employee) => (
-                      <div
-                        key={employee.id}
-                        onClick={() => handleViewFile(employee)}
-                        className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors"
-                        data-testid={`file-row-${employee.id}`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold">
-                            {employee.name.split(' ').map(n => n[0]).join('')}
-                          </div>
-                          <div>
-                            <p className="text-white font-medium">{employee.name}</p>
-                            <p className="text-slate-400 text-sm">{employee.position} • Hired {new Date(employee.hireDate).toLocaleDateString()}</p>
-                          </div>
+            <SectionHeader
+              title="Employee Files"
+              subtitle="Click on any employee to view their complete file including documents, pay history, and more"
+            />
+            
+            <OrbitCard>
+              <ScrollArea className="h-[500px]">
+                <div className="space-y-2 p-1">
+                  {mockEmployees.map((employee) => (
+                    <div
+                      key={employee.id}
+                      onClick={() => handleViewFile(employee)}
+                      className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors"
+                      data-testid={`file-row-${employee.id}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                          {employee.name.split(' ').map(n => n[0]).join('')}
                         </div>
-                        <div className="flex items-center gap-3">
-                          {getStatusBadge(employee.status)}
-                          <Eye className="w-5 h-5 text-slate-400" />
+                        <div>
+                          <p className="text-white font-medium">{employee.name}</p>
+                          <p className="text-slate-400 text-sm">{employee.position} • Hired {new Date(employee.hireDate).toLocaleDateString()}</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
+                      <div className="flex items-center gap-3">
+                        {getStatusBadge(employee.status)}
+                        <Eye className="w-5 h-5 text-slate-400" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="reports" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-cyan-400" />
-                    Generate Reports
-                  </CardTitle>
-                  <CardDescription className="text-slate-400">
-                    Create custom reports for employees, time cards, and payroll
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-slate-400 text-sm">Report Type</Label>
-                    <Select value={reportType} onValueChange={setReportType}>
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white" data-testid="select-report-type">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700">
-                        <SelectItem value="timecard">Time Cards</SelectItem>
-                        <SelectItem value="payroll">Payroll Summary</SelectItem>
-                        <SelectItem value="attendance">Attendance Report</SelectItem>
-                        <SelectItem value="compliance">Compliance Status</SelectItem>
-                        <SelectItem value="insurance">Insurance Enrollment</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label className="text-slate-400 text-sm">Employee</Label>
-                    <Select value={reportEmployee} onValueChange={setReportEmployee}>
-                      <SelectTrigger className="bg-slate-700 border-slate-600 text-white" data-testid="select-report-employee">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700">
-                        <SelectItem value="all">All Employees</SelectItem>
-                        {mockEmployees.map((emp) => (
-                          <SelectItem key={emp.id} value={emp.id.toString()}>{emp.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
+            <BentoGrid cols={2} gap="md">
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<BarChart3 className="w-5 h-5 text-cyan-400" />}>
+                    <OrbitCardTitle>Generate Reports</OrbitCardTitle>
+                    <OrbitCardDescription>
+                      Create custom reports for employees, time cards, and payroll
+                    </OrbitCardDescription>
+                  </OrbitCardHeader>
+                  <OrbitCardContent className="space-y-4">
                     <div>
-                      <Label className="text-slate-400 text-sm">From Date</Label>
-                      <Input
-                        type="date"
-                        value={reportDateFrom}
-                        onChange={(e) => setReportDateFrom(e.target.value)}
-                        className="bg-slate-700 border-slate-600 text-white"
-                        data-testid="input-report-from"
-                      />
+                      <Label className="text-slate-400 text-sm">Report Type</Label>
+                      <Select value={reportType} onValueChange={setReportType}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white" data-testid="select-report-type">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-700">
+                          <SelectItem value="timecard">Time Cards</SelectItem>
+                          <SelectItem value="payroll">Payroll Summary</SelectItem>
+                          <SelectItem value="attendance">Attendance Report</SelectItem>
+                          <SelectItem value="compliance">Compliance Status</SelectItem>
+                          <SelectItem value="insurance">Insurance Enrollment</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
+                    
                     <div>
-                      <Label className="text-slate-400 text-sm">To Date</Label>
-                      <Input
-                        type="date"
-                        value={reportDateTo}
-                        onChange={(e) => setReportDateTo(e.target.value)}
-                        className="bg-slate-700 border-slate-600 text-white"
-                        data-testid="input-report-to"
-                      />
+                      <Label className="text-slate-400 text-sm">Employee</Label>
+                      <Select value={reportEmployee} onValueChange={setReportEmployee}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white" data-testid="select-report-employee">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-700">
+                          <SelectItem value="all">All Employees</SelectItem>
+                          {mockEmployees.map((emp) => (
+                            <SelectItem key={emp.id} value={emp.id.toString()}>{emp.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </div>
-                  
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      onClick={generateReport}
-                      className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                      data-testid="button-generate-report"
-                    >
-                      <Download className="w-4 h-4 mr-2" />
-                      Generate Report
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
-                      data-testid="button-print-report"
-                    >
-                      <Printer className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-slate-400 text-sm">From Date</Label>
+                        <Input
+                          type="date"
+                          value={reportDateFrom}
+                          onChange={(e) => setReportDateFrom(e.target.value)}
+                          className="bg-slate-700 border-slate-600 text-white"
+                          data-testid="input-report-from"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-sm">To Date</Label>
+                        <Input
+                          type="date"
+                          value={reportDateTo}
+                          onChange={(e) => setReportDateTo(e.target.value)}
+                          className="bg-slate-700 border-slate-600 text-white"
+                          data-testid="input-report-to"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        onClick={generateReport}
+                        className="flex-1 bg-cyan-600 hover:bg-cyan-700"
+                        data-testid="button-generate-report"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Generate Report
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                        data-testid="button-print-report"
+                      >
+                        <Printer className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
 
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-cyan-400" />
-                    Quick Reports
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
-                    data-testid="button-quick-weekly"
-                  >
-                    <Calendar className="w-4 h-4 mr-3 text-cyan-400" />
-                    Weekly Time Card Summary
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
-                    data-testid="button-quick-payroll"
-                  >
-                    <DollarSign className="w-4 h-4 mr-3 text-green-400" />
-                    Current Payroll Report
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
-                    data-testid="button-quick-compliance"
-                  >
-                    <Shield className="w-4 h-4 mr-3 text-amber-400" />
-                    Compliance Status Report
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start border-slate-600 text-slate-300 hover:bg-slate-700"
-                    data-testid="button-quick-attendance"
-                  >
-                    <UserCheck className="w-4 h-4 mr-3 text-purple-400" />
-                    Attendance Summary
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<Clock className="w-5 h-5 text-cyan-400" />}>
+                    <OrbitCardTitle>Quick Reports</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent className="space-y-3">
+                    <ActionCard
+                      title="Weekly Time Card Summary"
+                      icon={<Calendar className="w-5 h-5" />}
+                      onClick={() => {}}
+                    />
+                    <ActionCard
+                      title="Current Payroll Report"
+                      icon={<DollarSign className="w-5 h-5" />}
+                      onClick={() => {}}
+                    />
+                    <ActionCard
+                      title="Compliance Status Report"
+                      icon={<Shield className="w-5 h-5" />}
+                      onClick={() => {}}
+                    />
+                    <ActionCard
+                      title="Attendance Summary"
+                      icon={<UserCheck className="w-5 h-5" />}
+                      onClick={() => {}}
+                    />
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+            </BentoGrid>
 
             <WeatherVerificationWidget />
           </TabsContent>
 
           <TabsContent value="insurance" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <StatCard
-                icon={Heart}
-                label="Total Enrolled"
-                value={mockEmployees.filter(e => e.insuranceEnrolled).length}
-                subtext={`of ${mockEmployees.length} employees`}
-                color="bg-pink-600"
-                testId="stat-enrolled"
-              />
-              <StatCard
-                icon={CreditCard}
-                label="Monthly Premium"
-                value="$3,825"
-                subtext="Total company cost"
-                color="bg-green-600"
-                testId="stat-premium"
-              />
-              <StatCard
-                icon={Calendar}
-                label="Open Enrollment"
-                value={new Date(mockCompanyInfo.nextOpenEnrollment).toLocaleDateString()}
-                subtext="Next enrollment period"
-                color="bg-blue-600"
-                testId="stat-enrollment-date"
-              />
-            </div>
+            <BentoGrid cols={3} gap="md">
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Total Enrolled"
+                  value={mockEmployees.filter(e => e.insuranceEnrolled).length}
+                  icon={<Heart className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Monthly Premium"
+                  value="$3,825"
+                  icon={<CreditCard className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Open Enrollment"
+                  value={new Date(mockCompanyInfo.nextOpenEnrollment).toLocaleDateString()}
+                  icon={<Calendar className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+            </BentoGrid>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Heart className="w-5 h-5 text-pink-400" />
-                    Insurance Plans
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {mockInsurancePlans.map((plan) => (
-                      <div key={plan.id} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
-                        <div>
-                          <p className="text-white font-medium">{plan.name}</p>
-                          <p className="text-slate-400 text-sm">{plan.type}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-cyan-400 font-bold">{plan.enrolledCount} enrolled</p>
-                          <p className="text-slate-400 text-sm">
-                            {plan.monthlyCost > 0 ? `$${plan.monthlyCost}/mo` : 'Company Match'}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-cyan-400" />
-                    Employee Coverage
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[300px]">
-                    <div className="space-y-2">
-                      {mockEmployees.map((emp) => (
-                        <div key={emp.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
-                              {emp.name.split(' ').map(n => n[0]).join('')}
-                            </div>
-                            <span className="text-white">{emp.name}</span>
+            <BentoGrid cols={2} gap="md">
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<Heart className="w-5 h-5 text-pink-400" />}>
+                    <OrbitCardTitle>Insurance Plans</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <div className="space-y-3">
+                      {mockInsurancePlans.map((plan) => (
+                        <div key={plan.id} className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                          <div>
+                            <p className="text-white font-medium">{plan.name}</p>
+                            <p className="text-slate-400 text-sm">{plan.type}</p>
                           </div>
-                          <Badge className={emp.insuranceEnrolled ? "bg-green-600/20 text-green-300 border-green-500/30" : "bg-slate-600/20 text-slate-400 border-slate-500/30"}>
-                            {emp.insuranceEnrolled ? "Enrolled" : "Not Enrolled"}
-                          </Badge>
+                          <div className="text-right">
+                            <p className="text-cyan-400 font-bold">{plan.enrolledCount} enrolled</p>
+                            <p className="text-slate-400 text-sm">
+                              {plan.monthlyCost > 0 ? `$${plan.monthlyCost}/mo` : 'Company Match'}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
 
-            <Card className="bg-gradient-to-r from-pink-900/30 to-purple-900/30 border-pink-500/30">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-bold text-white mb-2">Open Enrollment Starting Soon</h3>
-                    <p className="text-slate-300">
-                      Next open enrollment period begins {new Date(mockCompanyInfo.nextOpenEnrollment).toLocaleDateString()}. 
-                      Prepare your team for benefits selection.
-                    </p>
-                  </div>
-                  <Button className="bg-pink-600 hover:bg-pink-700" data-testid="button-manage-enrollment">
-                    Manage Enrollment
-                  </Button>
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<Users className="w-5 h-5 text-cyan-400" />}>
+                    <OrbitCardTitle>Employee Coverage</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <ScrollArea className="h-[300px]">
+                      <div className="space-y-2">
+                        {mockEmployees.map((emp) => (
+                          <div key={emp.id} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+                                {emp.name.split(' ').map(n => n[0]).join('')}
+                              </div>
+                              <span className="text-white">{emp.name}</span>
+                            </div>
+                            <Badge className={emp.insuranceEnrolled ? "bg-green-600/20 text-green-300 border-green-500/30" : "bg-slate-600/20 text-slate-400 border-slate-500/30"}>
+                              {emp.insuranceEnrolled ? "Enrolled" : "Not Enrolled"}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+            </BentoGrid>
+
+            <OrbitCard variant="glass" className="bg-gradient-to-r from-pink-900/30 to-purple-900/30 border-pink-500/30">
+              <OrbitCardContent className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">Open Enrollment Starting Soon</h3>
+                  <p className="text-slate-300">
+                    Next open enrollment period begins {new Date(mockCompanyInfo.nextOpenEnrollment).toLocaleDateString()}. 
+                    Prepare your team for benefits selection.
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <Button className="bg-pink-600 hover:bg-pink-700" data-testid="button-manage-enrollment">
+                  Manage Enrollment
+                </Button>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="compliance" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <StatCard
-                icon={CheckCircle2}
-                label="Completed"
-                value={complianceStats.compliant}
-                subtext="All requirements met"
-                color="bg-green-600"
-                testId="stat-compliant"
-              />
-              <StatCard
-                icon={Clock}
-                label="Pending"
-                value={complianceStats.pending}
-                subtext="Awaiting completion"
-                color="bg-amber-600"
-                testId="stat-compliance-pending"
-              />
-              <StatCard
-                icon={AlertCircle}
-                label="Expired"
-                value={complianceStats.expired}
-                subtext="Requires immediate action"
-                color="bg-red-600"
-                testId="stat-expired"
-              />
-            </div>
+            <BentoGrid cols={3} gap="md">
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Completed"
+                  value={complianceStats.compliant}
+                  icon={<CheckCircle2 className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Pending"
+                  value={complianceStats.pending}
+                  icon={<Clock className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+              <BentoTile className="p-0">
+                <StatCard
+                  label="Expired"
+                  value={complianceStats.expired}
+                  icon={<AlertCircle className="w-6 h-6" />}
+                  className="border-0 h-full"
+                />
+              </BentoTile>
+            </BentoGrid>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-amber-400" />
-                    Items Requiring Attention
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[400px]">
-                    <div className="space-y-3">
-                      {mockComplianceItems
-                        .filter(item => item.status !== "completed")
-                        .map((item) => (
-                          <div key={item.id} className="p-4 bg-slate-700/30 rounded-lg border-l-4 border-l-amber-500">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-white font-medium">{item.employeeName}</span>
-                              {getComplianceBadge(item.status)}
+            <BentoGrid cols={2} gap="md">
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<AlertTriangle className="w-5 h-5 text-amber-400" />}>
+                    <OrbitCardTitle>Items Requiring Attention</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <ScrollArea className="h-[400px]">
+                      <div className="space-y-3">
+                        {mockComplianceItems
+                          .filter(item => item.status !== "completed")
+                          .map((item) => (
+                            <div key={item.id} className="p-4 bg-slate-700/30 rounded-lg border-l-4 border-l-amber-500">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-white font-medium">{item.employeeName}</span>
+                                {getComplianceBadge(item.status)}
+                              </div>
+                              <p className="text-slate-400 text-sm">{item.type}</p>
+                              <p className="text-slate-500 text-xs mt-1">
+                                Due: {new Date(item.dueDate).toLocaleDateString()}
+                              </p>
                             </div>
-                            <p className="text-slate-400 text-sm">{item.type}</p>
-                            <p className="text-slate-500 text-xs mt-1">
-                              Due: {new Date(item.dueDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
+                          ))}
+                      </div>
+                    </ScrollArea>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
 
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-green-400" />
-                    Recent Completions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[400px]">
-                    <div className="space-y-3">
-                      {mockComplianceItems
-                        .filter(item => item.status === "completed")
-                        .map((item) => (
-                          <div key={item.id} className="p-4 bg-slate-700/30 rounded-lg border-l-4 border-l-green-500">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-white font-medium">{item.employeeName}</span>
-                              {getComplianceBadge(item.status)}
+              <BentoTile className="p-0">
+                <OrbitCard className="border-0 h-full">
+                  <OrbitCardHeader icon={<ShieldCheck className="w-5 h-5 text-green-400" />}>
+                    <OrbitCardTitle>Recent Completions</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <ScrollArea className="h-[400px]">
+                      <div className="space-y-3">
+                        {mockComplianceItems
+                          .filter(item => item.status === "completed")
+                          .map((item) => (
+                            <div key={item.id} className="p-4 bg-slate-700/30 rounded-lg border-l-4 border-l-green-500">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-white font-medium">{item.employeeName}</span>
+                                {getComplianceBadge(item.status)}
+                              </div>
+                              <p className="text-slate-400 text-sm">{item.type}</p>
+                              <p className="text-green-400 text-xs mt-1">
+                                Completed: {item.completedDate && new Date(item.completedDate).toLocaleDateString()}
+                              </p>
                             </div>
-                            <p className="text-slate-400 text-sm">{item.type}</p>
-                            <p className="text-green-400 text-xs mt-1">
-                              Completed: {item.completedDate && new Date(item.completedDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
+                          ))}
+                      </div>
+                    </ScrollArea>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+            </BentoGrid>
 
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ClipboardCheck className="w-5 h-5 text-cyan-400" />
-                  Compliance Tracking by Employee
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            <OrbitCard>
+              <OrbitCardHeader icon={<ClipboardCheck className="w-5 h-5 text-cyan-400" />}>
+                <OrbitCardTitle>Compliance Tracking by Employee</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <div className="space-y-2">
                   {mockEmployees.map((emp) => {
                     const empCompliance = mockComplianceItems.filter(c => c.employeeId === emp.id);
@@ -1136,52 +1080,47 @@ export default function OwnerHub() {
                     );
                   })}
                 </div>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="receipts" className="space-y-6">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Receipt className="w-5 h-5 text-green-400" />
-                  Business Expense Scanner
-                </CardTitle>
-                <CardDescription className="text-slate-400">
+            <OrbitCard>
+              <OrbitCardHeader icon={<Receipt className="w-5 h-5 text-green-400" />}>
+                <OrbitCardTitle>Business Expense Scanner</OrbitCardTitle>
+                <OrbitCardDescription>
                   Scan gas receipts, office supplies, and business expenses for tax deductions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <ReceiptScanner />
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="live-dashboard" className="space-y-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Clock className="w-6 h-6 text-emerald-400" />
-                  Live Employee Dashboard
-                </h2>
-                <p className="text-slate-400 mt-1">Real-time clock-in/out status for all employees</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 text-sm text-slate-400">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  Live - Updates every 30 seconds
+            <SectionHeader
+              eyebrow="Real-time"
+              title="Live Employee Dashboard"
+              subtitle="Real-time clock-in/out status for all employees"
+              action={
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    Live - Updates every 30 seconds
+                  </div>
+                  <Button variant="outline" size="sm" className="border-slate-600 text-slate-300" data-testid="button-refresh-dashboard">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Refresh
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm" className="border-slate-600 text-slate-300" data-testid="button-refresh-dashboard">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
-              </div>
-            </div>
+              }
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card className="bg-emerald-900/30 border-emerald-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
+            <BentoGrid cols={4} gap="md">
+              <BentoTile className="p-0">
+                <OrbitCard variant="stat" className="border-0 h-full bg-emerald-900/30 border-emerald-700/50">
+                  <OrbitCardContent className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-emerald-600/30 flex items-center justify-center">
                       <CheckCircle2 className="w-6 h-6 text-emerald-400" />
                     </div>
@@ -1189,12 +1128,12 @@ export default function OwnerHub() {
                       <p className="text-3xl font-bold text-emerald-400" data-testid="count-clocked-in">12</p>
                       <p className="text-sm text-slate-400">Clocked In</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+              <BentoTile className="p-0">
+                <OrbitCard variant="stat" className="border-0 h-full">
+                  <OrbitCardContent className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-slate-600/30 flex items-center justify-center">
                       <Clock className="w-6 h-6 text-slate-400" />
                     </div>
@@ -1202,12 +1141,12 @@ export default function OwnerHub() {
                       <p className="text-3xl font-bold text-slate-300" data-testid="count-clocked-out">5</p>
                       <p className="text-sm text-slate-400">Clocked Out</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-amber-900/30 border-amber-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+              <BentoTile className="p-0">
+                <OrbitCard variant="stat" className="border-0 h-full bg-amber-900/30 border-amber-700/50">
+                  <OrbitCardContent className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-amber-600/30 flex items-center justify-center">
                       <AlertTriangle className="w-6 h-6 text-amber-400" />
                     </div>
@@ -1215,12 +1154,12 @@ export default function OwnerHub() {
                       <p className="text-3xl font-bold text-amber-400" data-testid="count-on-break">3</p>
                       <p className="text-sm text-slate-400">On Break</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-blue-900/30 border-blue-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-3">
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+              <BentoTile className="p-0">
+                <OrbitCard variant="stat" className="border-0 h-full bg-blue-900/30 border-blue-700/50">
+                  <OrbitCardContent className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-blue-600/30 flex items-center justify-center">
                       <MapPin className="w-6 h-6 text-blue-400" />
                     </div>
@@ -1228,22 +1167,19 @@ export default function OwnerHub() {
                       <p className="text-3xl font-bold text-blue-400" data-testid="count-job-sites">4</p>
                       <p className="text-sm text-slate-400">Active Job Sites</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+            </BentoGrid>
 
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-cyan-400" />
-                  Employee Status (Live)
-                </CardTitle>
-                <CardDescription className="text-slate-400">
+            <OrbitCard>
+              <OrbitCardHeader icon={<Users className="w-5 h-5 text-cyan-400" />}>
+                <OrbitCardTitle>Employee Status (Live)</OrbitCardTitle>
+                <OrbitCardDescription>
                   Click on an employee to view more details
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <div className="space-y-3">
                   {[
                     { id: 1, name: "John Smith", status: "clocked-in", clockInTime: "7:32 AM", location: "Metro Construction - Downtown", hoursToday: "4h 28m", gpsVerified: true },
@@ -1325,35 +1261,32 @@ export default function OwnerHub() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
 
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-400" />
-                  Active Job Sites
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <OrbitCard>
+              <OrbitCardHeader icon={<MapPin className="w-5 h-5 text-blue-400" />}>
+                <OrbitCardTitle>Active Job Sites</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <BentoGrid cols={2} gap="md">
                   {[
                     { name: "Metro Construction - Downtown", employees: 4, address: "123 Main St, Nashville TN" },
                     { name: "Office Complex B", employees: 3, address: "456 Business Blvd, Nashville TN" },
                     { name: "Industrial Park", employees: 3, address: "789 Industrial Way, Nashville TN" },
                     { name: "Warehouse District", employees: 2, address: "321 Warehouse Rd, Nashville TN" },
                   ].map((site, idx) => (
-                    <div key={idx} className="p-4 bg-slate-700/30 rounded-lg border border-slate-600/30">
+                    <BentoTile key={idx} className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <p className="font-medium text-white">{site.name}</p>
                         <Badge className="bg-cyan-600/20 text-cyan-300">{site.employees} workers</Badge>
                       </div>
                       <p className="text-sm text-slate-400">{site.address}</p>
-                    </div>
+                    </BentoTile>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
+                </BentoGrid>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
         </Tabs>
 
@@ -1425,8 +1358,11 @@ export default function OwnerHub() {
                   <div className="space-y-2">
                     {["W-4 Form", "I-9 Verification", "Direct Deposit", "Emergency Contact", "Signed Handbook"].map((doc, idx) => (
                       <div key={idx} className="flex items-center justify-between p-3 bg-slate-700/30 rounded-lg">
-                        <span className="text-slate-300">{doc}</span>
-                        <Button variant="ghost" size="sm" className="text-cyan-400 hover:text-cyan-300">
+                        <div className="flex items-center gap-2">
+                          <FileCheck className="w-4 h-4 text-green-400" />
+                          <span className="text-white text-sm">{doc}</span>
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-slate-400 hover:text-cyan-400">
                           <Download className="w-4 h-4" />
                         </Button>
                       </div>
@@ -1438,18 +1374,24 @@ export default function OwnerHub() {
 
                 <div>
                   <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-green-400" />
-                    Pay Information
+                    <Shield className="w-4 h-4 text-cyan-400" />
+                    Compliance Status
                   </h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-slate-700/30 rounded-lg">
-                      <Label className="text-slate-400 text-xs">Current Pay Rate</Label>
-                      <p className="text-green-400 font-bold">$25.00/hr</p>
-                    </div>
-                    <div className="p-3 bg-slate-700/30 rounded-lg">
-                      <Label className="text-slate-400 text-xs">YTD Earnings</Label>
-                      <p className="text-green-400 font-bold">$52,000.00</p>
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <Badge className={
+                      selectedEmployee.complianceStatus === "compliant" 
+                        ? "bg-green-600/20 text-green-300 border-green-500/30"
+                        : selectedEmployee.complianceStatus === "pending"
+                        ? "bg-amber-600/20 text-amber-300 border-amber-500/30"
+                        : "bg-red-600/20 text-red-300 border-red-500/30"
+                    }>
+                      {selectedEmployee.complianceStatus.charAt(0).toUpperCase() + selectedEmployee.complianceStatus.slice(1)}
+                    </Badge>
+                    <span className="text-slate-400 text-sm">
+                      {selectedEmployee.complianceStatus === "compliant" && "All requirements met"}
+                      {selectedEmployee.complianceStatus === "pending" && "Items pending completion"}
+                      {selectedEmployee.complianceStatus === "expired" && "Items need renewal"}
+                    </span>
                   </div>
                 </div>
 
@@ -1457,29 +1399,24 @@ export default function OwnerHub() {
 
                 <div>
                   <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-amber-400" />
-                    Compliance Status
+                    <Heart className="w-4 h-4 text-pink-400" />
+                    Insurance
                   </h4>
-                  <Badge className={
-                    selectedEmployee.complianceStatus === "compliant" ? "bg-green-600/20 text-green-300" :
-                    selectedEmployee.complianceStatus === "pending" ? "bg-amber-600/20 text-amber-300" :
-                    "bg-red-600/20 text-red-300"
+                  <Badge className={selectedEmployee.insuranceEnrolled 
+                    ? "bg-green-600/20 text-green-300 border-green-500/30"
+                    : "bg-slate-600/20 text-slate-400 border-slate-500/30"
                   }>
-                    {selectedEmployee.complianceStatus.charAt(0).toUpperCase() + selectedEmployee.complianceStatus.slice(1)}
+                    {selectedEmployee.insuranceEnrolled ? "Enrolled in Benefits" : "Not Enrolled"}
                   </Badge>
                 </div>
               </div>
             )}
-            
+
             <DialogFooter className="mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setEmployeeFileOpen(false)}
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
-              >
+              <Button variant="outline" onClick={() => setEmployeeFileOpen(false)} className="border-slate-600 text-slate-300">
                 Close
               </Button>
-              <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-edit-employee">
+              <Button className="bg-cyan-600 hover:bg-cyan-700">
                 Edit Employee
               </Button>
             </DialogFooter>

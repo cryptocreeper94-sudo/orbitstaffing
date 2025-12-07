@@ -1,7 +1,8 @@
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/section-header";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, OrbitCardFooter, StatCard } from "@/components/ui/orbit-card";
 import { CheckCircle2, Clock, FileText, Building, Briefcase, MoreHorizontal } from "lucide-react";
 
 const clients = [
@@ -11,68 +12,115 @@ const clients = [
   { name: "Stark Enterprises", industry: "Defense", activeRoles: 5, status: "Active", csa: "Signed 2024-02-10" },
 ];
 
+const totalActiveRoles = clients.reduce((sum, c) => sum + c.activeRoles, 0);
+const activeClients = clients.filter(c => c.status === "Active").length;
+
 export default function Clients() {
   return (
     <Shell>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold font-heading tracking-tight">Client Relations</h1>
-          <p className="text-muted-foreground">Manage CSAs, job orders, and client profiles.</p>
-        </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-          + New Client Agreement
-        </Button>
-      </div>
+      <PageHeader
+        title="Client Relations"
+        subtitle="Manage CSAs, job orders, and client profiles."
+        actions={
+          <Button 
+            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+            data-testid="button-new-client"
+          >
+            + New Client Agreement
+          </Button>
+        }
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <BentoGrid cols={4} gap="md" className="mb-8">
+        <BentoTile className="p-0">
+          <StatCard
+            label="Total Clients"
+            value={clients.length}
+            icon={<Building className="w-6 h-6" />}
+          />
+        </BentoTile>
+        <BentoTile className="p-0">
+          <StatCard
+            label="Active Clients"
+            value={activeClients}
+            icon={<CheckCircle2 className="w-6 h-6" />}
+            trend={{ value: 12, positive: true }}
+          />
+        </BentoTile>
+        <BentoTile className="p-0">
+          <StatCard
+            label="Active Roles"
+            value={totalActiveRoles}
+            icon={<Briefcase className="w-6 h-6" />}
+          />
+        </BentoTile>
+        <BentoTile className="p-0">
+          <StatCard
+            label="Pending CSAs"
+            value={clients.filter(c => c.status === "Pending").length}
+            icon={<Clock className="w-6 h-6" />}
+          />
+        </BentoTile>
+      </BentoGrid>
+
+      <BentoGrid cols={2} gap="md">
         {clients.map((client, i) => (
-          <Card key={i} className="bg-card/50 border-border/50 backdrop-blur-sm hover:border-primary/50 transition-colors group">
-            <CardHeader className="flex flex-row items-start justify-between pb-2">
-              <div className="flex gap-4">
-                <div className="h-12 w-12 rounded-lg bg-secondary flex items-center justify-center">
-                  <Building className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <div>
-                  <CardTitle className="text-xl font-heading">{client.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{client.industry}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="w-5 h-5" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="p-3 bg-background/50 rounded-lg border border-border/50">
-                  <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                    <Briefcase className="w-3 h-3" /> Active Roles
+          <BentoTile key={i} className="p-0">
+            <OrbitCard hover={true} data-testid={`card-client-${i}`}>
+              <OrbitCardHeader
+                icon={
+                  <div className="h-12 w-12 rounded-lg bg-slate-700/50 flex items-center justify-center">
+                    <Building className="w-6 h-6 text-cyan-400" />
                   </div>
-                  <div className="text-2xl font-bold font-mono">{client.activeRoles}</div>
-                </div>
-                <div className="p-3 bg-background/50 rounded-lg border border-border/50">
-                  <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                    <FileText className="w-3 h-3" /> CSA Status
+                }
+                action={
+                  <Button variant="ghost" size="icon" data-testid={`button-client-menu-${i}`}>
+                    <MoreHorizontal className="w-5 h-5" />
+                  </Button>
+                }
+              >
+                <OrbitCardTitle>{client.name}</OrbitCardTitle>
+                <p className="text-sm text-slate-400">{client.industry}</p>
+              </OrbitCardHeader>
+              
+              <OrbitCardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+                      <Briefcase className="w-3 h-3" /> Active Roles
+                    </div>
+                    <div className="text-2xl font-bold font-mono text-white">{client.activeRoles}</div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {client.status === "Active" ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Clock className="w-4 h-4 text-amber-500" />
-                    )}
-                    <span className="text-sm font-medium">{client.status}</span>
+                  <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                    <div className="text-xs text-slate-400 mb-1 flex items-center gap-1">
+                      <FileText className="w-3 h-3" /> CSA Status
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {client.status === "Active" ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      ) : (
+                        <Clock className="w-4 h-4 text-amber-500" />
+                      )}
+                      <span className="text-sm font-medium text-white">{client.status}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t border-border/30">
-                <span className="text-xs text-muted-foreground">Last Activity: 2 hours ago</span>
-                <Button variant="link" className="text-primary p-0 h-auto font-normal hover:no-underline">
+              </OrbitCardContent>
+
+              <OrbitCardFooter>
+                <span className="text-xs text-slate-500">Last Activity: 2 hours ago</span>
+                <Button 
+                  variant="link" 
+                  className="text-cyan-400 p-0 h-auto font-normal hover:text-cyan-300 hover:no-underline"
+                  data-testid={`button-view-client-${i}`}
+                >
                   View Details &rarr;
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </OrbitCardFooter>
+            </OrbitCard>
+          </BentoTile>
         ))}
-      </div>
+      </BentoGrid>
     </Shell>
   );
 }

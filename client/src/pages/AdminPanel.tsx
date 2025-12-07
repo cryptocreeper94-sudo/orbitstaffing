@@ -38,6 +38,10 @@ import { BetaTesterManagement } from '@/components/BetaTesterManagement';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
 import { BlockchainDashboard } from '@/components/BlockchainDashboard';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
+import { SectionHeader, PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, StatCard, ActionCard } from '@/components/ui/orbit-card';
 
 const ADMIN_SESSION_KEY = 'admin';
 const BETA_SESSION_KEY = 'beta_tester';
@@ -60,9 +64,7 @@ export default function AdminPanel() {
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
   const [showPinChangeModal, setShowPinChangeModal] = useState(false);
 
-  // Check if already authenticated
   useEffect(() => {
-    // Check for beta tester session first
     const betaSession = getValidSession(BETA_SESSION_KEY);
     if (betaSession?.authenticated && betaSession.isBetaTester) {
       setIsBetaTester(true);
@@ -70,14 +72,12 @@ export default function AdminPanel() {
       return;
     }
     
-    // Check for valid admin persistent session (30 days)
     const session = getValidSession(ADMIN_SESSION_KEY);
     if (session?.authenticated && session.role) {
       setIsAuthenticated(true);
       setRole(session.role as AdminRole);
       setAdminName(session.name || 'Admin');
       
-      // Show automation update for Sidonie if she hasn't seen it yet
       const hasSeenAutomationUpdate = localStorage.getItem('sidonieV1AutomationUpdate') === 'seen';
       if (session.name === 'Sidonie' && !hasSeenAutomationUpdate) {
         setShowWelcomeMessage(true);
@@ -86,7 +86,6 @@ export default function AdminPanel() {
       return;
     }
     
-    // Fallback to old localStorage flags for migration
     const adminAuth = localStorage.getItem('adminAuthenticated');
     const savedRole = localStorage.getItem('adminRole') as AdminRole;
     const savedName = localStorage.getItem('adminName');
@@ -98,7 +97,6 @@ export default function AdminPanel() {
       setRole(savedRole);
       setAdminName(savedName || 'Admin');
       
-      // Show welcome message on first login OR if she hasn't seen automation update
       if (savedName === 'Sidonie') {
         if (hasFirstLogin || !hasSeenAutomationUpdate) {
           setShowWelcomeMessage(true);
@@ -112,12 +110,7 @@ export default function AdminPanel() {
     e.preventDefault();
     setError('');
 
-    // Detect PIN length to route appropriately
-    // 3 digits = Beta Tester
-    // 4 digits = Master Admin (Sidonie)
-    
     if (pin.length === 3) {
-      // Beta Tester login
       try {
         const res = await fetch('/api/auth/verify-beta-pin', {
           method: 'POST',
@@ -127,14 +120,13 @@ export default function AdminPanel() {
 
         if (res.ok) {
           const data = await res.json();
-          // Set beta tester session (shorter TTL - 7 days)
           setSessionWithExpiry(BETA_SESSION_KEY, { 
             authenticated: true, 
             isBetaTester: true,
             name: data.testerName,
             testerId: data.testerId,
             accessLevel: data.accessLevel
-          }, 7); // 7 days for beta testers
+          }, 7);
           
           setIsBetaTester(true);
           setBetaTesterName(data.testerName);
@@ -155,7 +147,6 @@ export default function AdminPanel() {
       return;
     }
 
-    // Admin login (4+ digits)
     try {
       const res = await fetch('/api/auth/verify-admin-pin', {
         method: 'POST',
@@ -166,36 +157,28 @@ export default function AdminPanel() {
       if (res.ok) {
         const data = await res.json();
         
-        // Check if this is a developer login - redirect to developer panel
         if (data.role === 'developer' || data.redirectTo === '/developer') {
-          // Set developer session
           setSessionWithExpiry('developer', { 
             authenticated: true, 
             role: 'developer',
             name: 'Developer'
           });
           localStorage.setItem('developerAuthenticated', 'true');
-          
-          // Redirect to developer panel
           setLocation('/developer');
           return;
         }
         
-        // Set 30-day persistent session for admin
         setSessionWithExpiry(ADMIN_SESSION_KEY, { 
           authenticated: true, 
           role: 'master_admin',
           name: data.name || 'Sidonie'
         });
-        // Migrate old flags
         localStorage.setItem('adminAuthenticated', 'true');
         localStorage.setItem('adminRole', 'master_admin');
         localStorage.setItem('adminName', data.name || 'Sidonie');
         setIsAuthenticated(true);
         setRole('master_admin');
         setAdminName(data.name || 'Sidonie');
-        
-        // Always show welcome message on successful login
         setShowWelcomeMessage(true);
         setPin('');
       } else {
@@ -209,14 +192,12 @@ export default function AdminPanel() {
   };
 
   const handleLogout = async () => {
-    // Call server to destroy session
     try {
       await fetch('/api/auth/admin-logout', { method: 'POST' });
     } catch (err) {
       console.error('Server logout failed:', err);
     }
     
-    // Clear both old and new session formats
     clearSession(ADMIN_SESSION_KEY);
     clearSession(BETA_SESSION_KEY);
     setIsBetaTester(false);
@@ -228,7 +209,6 @@ export default function AdminPanel() {
     setRole(null);
     setPin('');
     setError('');
-    // Redirect to home
     setLocation('/');
   };
 
@@ -249,7 +229,6 @@ export default function AdminPanel() {
       });
 
       if (res.ok) {
-        // Redirect to developer page
         setLocation('/developer');
       } else {
         setDeveloperError('Invalid PIN.');
@@ -261,7 +240,6 @@ export default function AdminPanel() {
     }
   };
 
-  // Show Beta Tester Dashboard if logged in as beta tester
   if (isBetaTester) {
     return <BetaTesterDashboard testerName={betaTesterName} onLogout={handleLogout} />;
   }
@@ -279,7 +257,7 @@ export default function AdminPanel() {
             <ChevronLeft className="w-5 h-5" />
           </button>
         </div>
-        <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
+        <OrbitCard variant="default" className="max-w-md w-full p-8">
           <div className="flex items-center justify-center mb-6">
             <Shield className="w-8 h-8 text-cyan-400 mr-3" />
             <h1 className="text-2xl font-bold text-white">ORBIT Access</h1>
@@ -327,13 +305,12 @@ export default function AdminPanel() {
                 </Button>
               </form>
 
-              {/* Developer Access Button */}
               <button
                 onClick={() => setShowDeveloperPin(true)}
                 className="w-full mt-4 px-4 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-600 rounded-lg text-purple-300 font-bold text-sm transition-all"
                 data-testid="button-developer-access"
               >
-                🔧 Developer Access
+                Developer Access
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-6">
@@ -397,27 +374,31 @@ export default function AdminPanel() {
               </p>
             </>
           )}
-        </div>
+        </OrbitCard>
       </div>
     );
   }
 
+  const quickActions = [
+    { title: 'Incidents', icon: <AlertTriangle className="w-4 h-4" />, onClick: () => setLocation('/incident-reporting'), className: 'bg-red-600 hover:bg-red-700' },
+    { title: 'Workers Comp', icon: <Shield className="w-4 h-4" />, onClick: () => setLocation('/workers-comp-admin'), className: 'bg-orange-600 hover:bg-orange-700' },
+    { title: 'Developer', icon: <Code className="w-4 h-4" />, onClick: () => setLocation('/'), className: 'bg-purple-600 hover:bg-purple-700' },
+    { title: 'Main App', icon: <Eye className="w-4 h-4" />, onClick: () => setLocation('/dashboard'), className: 'bg-green-600 hover:bg-green-700' },
+    { title: 'Logout', icon: <LogOut className="w-4 h-4" />, onClick: handleLogout, className: 'bg-slate-600 hover:bg-slate-700' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-3 sm:p-6">
-      {/* Sidonie Welcome Modal */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-4 md:p-6">
       <SidonieWelcomeModal 
         isOpen={showWelcomeMessage} 
         onClose={() => {
           setShowWelcomeMessage(false);
-          // Mark automation update as seen
           localStorage.setItem('sidonieV1AutomationUpdate', 'seen');
           
-          // Check if Sidonie needs to change her PIN (first time login)
           const hasChangedPin = localStorage.getItem('sidonieChangedPin') === 'true';
           const hasSkippedPinChange = localStorage.getItem('sidonieSkippedPinChange') === 'true';
           
           if (adminName === 'Sidonie' && !hasChangedPin && !hasSkippedPinChange) {
-            // Show PIN change modal after welcome modal closes
             setTimeout(() => {
               setShowPinChangeModal(true);
             }, 300);
@@ -425,7 +406,6 @@ export default function AdminPanel() {
         }} 
       />
       
-      {/* PIN Change Modal (for first-time login) */}
       <PinChangeModal
         isOpen={showPinChangeModal}
         onClose={() => setShowPinChangeModal(false)}
@@ -434,64 +414,59 @@ export default function AdminPanel() {
       />
       
       <div className="max-w-6xl mx-auto">
-        {/* Header - Mobile Responsive */}
-        <div className="mb-8 sm:mb-12">
-          <div className="mb-4">
-            <h1 className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">Admin Dashboard</h1>
-            <p className="text-xs sm:text-base text-gray-400 flex items-center gap-2">
-              <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-              {adminName}
-            </p>
-          </div>
-          <div className="grid grid-cols-2 sm:flex gap-1 sm:gap-2 flex-wrap">
-            <Button
-              onClick={() => setLocation('/incident-reporting')}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
-              data-testid="button-admin-incident-report"
-            >
-              <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-              <span className="hidden sm:inline">Incident Reports</span>
-              <span className="sm:hidden">Incidents</span>
-            </Button>
-            <Button
-              onClick={() => setLocation('/workers-comp-admin')}
-              className="bg-orange-600 hover:bg-orange-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
-              data-testid="button-admin-workers-comp"
-            >
-              <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-              <span className="hidden sm:inline">Workers Comp</span>
-              <span className="sm:hidden">WC</span>
-            </Button>
-            <Button
-              onClick={() => setLocation('/')}
-              className="bg-purple-600 hover:bg-purple-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
-              data-testid="button-admin-to-dev"
-            >
-              <Code className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-              <span className="hidden sm:inline">Developer</span>
-              <span className="sm:hidden">Dev</span>
-            </Button>
-            <Button
-              onClick={() => setLocation('/dashboard')}
-              className="bg-green-600 hover:bg-green-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4"
-              data-testid="button-admin-to-app"
-            >
-              <Eye className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-              <span className="hidden sm:inline">Main App</span>
-              <span className="sm:hidden">App</span>
-            </Button>
+        <PageHeader
+          title="Admin Dashboard"
+          subtitle={adminName}
+          breadcrumb={
+            <div className="flex items-center gap-2 text-slate-400">
+              <Shield className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm">Master Control Panel</span>
+            </div>
+          }
+          actions={
             <Button
               onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-h-[40px] px-2 sm:px-4 col-span-2 sm:col-span-1"
+              variant="outline"
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
               data-testid="button-admin-logout"
             >
-              <LogOut className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+              <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
-          </div>
+          }
+        />
+
+        <div className="md:hidden mb-6">
+          <CarouselRail gap="sm" showArrows={false}>
+            {quickActions.map((action, idx) => (
+              <CarouselRailItem key={idx}>
+                <Button
+                  onClick={action.onClick}
+                  className={`${action.className} flex items-center gap-2 text-sm min-w-[120px] whitespace-nowrap`}
+                  data-testid={`button-quick-${action.title.toLowerCase().replace(' ', '-')}`}
+                >
+                  {action.icon}
+                  {action.title}
+                </Button>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
 
-        {/* Role-Based Admin Views */}
+        <div className="hidden md:flex gap-2 mb-8 flex-wrap">
+          {quickActions.slice(0, -1).map((action, idx) => (
+            <Button
+              key={idx}
+              onClick={action.onClick}
+              className={`${action.className} flex items-center gap-2 text-sm`}
+              data-testid={`button-quick-${action.title.toLowerCase().replace(' ', '-')}`}
+            >
+              {action.icon}
+              {action.title}
+            </Button>
+          ))}
+        </div>
+
         {role === 'master_admin' && <MasterAdminDashboard adminName={adminName} />}
         {role === 'franchise_admin' && <FranchiseAdminDashboard />}
         {role === 'customer_admin' && <CustomerAdminDashboard />}
@@ -500,16 +475,13 @@ export default function AdminPanel() {
   );
 }
 
-// ==========================================
-// MASTER ADMIN DASHBOARD (System Owner)
-// ==========================================
 function MasterAdminDashboard({ adminName }: { adminName: string }) {
   const [openCategory, setOpenCategory] = useState<string>('overview');
   const [activeFeature, setActiveFeature] = useState<string>('checklist');
   const [checklist, setChecklist] = useState([
     {
       id: 'v1-complete',
-      category: '🚀 Version 1 - Core Features',
+      category: 'Version 1 - Core Features',
       icon: '✅',
       tasks: [
         { id: 'web-platform', title: 'Web platform fully built & deployed', completed: true },
@@ -524,7 +496,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
     },
     {
       id: 'pre-launch',
-      category: '⚡ Pre-Launch (Sidonie Testing)',
+      category: 'Pre-Launch (Sidonie Testing)',
       icon: '📋',
       tasks: [
         { id: 'testing', title: 'End-to-end testing on real devices (Sidonie review)', completed: false },
@@ -539,8 +511,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
     },
     {
       id: 'first-franchise',
-      category: '🎯 First Franchise Launch',
-      icon: '🏆',
+      category: 'First Franchise Launch',
+      icon: '🎯',
       tasks: [
         { id: 'franchise-launch', title: 'Launch production environment for first franchise', completed: false },
         { id: 'data-migration', title: 'Migrate customer/worker data into platform', completed: false },
@@ -551,8 +523,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
     },
     {
       id: 'v2-planning',
-      category: '🚀 Version 2 Planning',
-      icon: '🗺️',
+      category: 'Version 2 Planning',
+      icon: '🚀',
       tasks: [
         { id: 'v2-roadmap', title: 'V2 roadmap document (features & timeline)', completed: true },
         { id: 'feature-prioritization', title: 'Prioritize top 10 V2 features with customers', completed: false },
@@ -668,17 +640,17 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       case 'contingency': return <ContingencyManual />;
       case 'onboarding': return <OnboardingTracker />;
       case 'messaging': return (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <BentoTile className="p-6">
           <EnhancedAdminMessaging currentUserId="admin-test-001" currentUserName={adminName} currentUserRole="admin" />
-        </div>
+        </BentoTile>
       );
       case 'availability': return (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <BentoTile className="p-6">
           <AdminWorkerAvailabilityManager />
-        </div>
+        </BentoTile>
       );
       case 'professional': return (
-        <div className="bg-slate-800 border border-purple-600/50 rounded-lg p-6">
+        <BentoTile className="p-6 border-purple-600/50">
           <div className="flex items-center gap-3 mb-6">
             <Lock className="w-6 h-6 text-purple-400" />
             <div>
@@ -692,7 +664,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
           <Button onClick={() => window.location.href = '/professional-staffing'} className="bg-purple-600 hover:bg-purple-700">
             View Professional Division Preview
           </Button>
-        </div>
+        </BentoTile>
       );
       case 'analytics': return <AdvancedAnalyticsDashboard />;
       case 'bulk-ops': return <BulkOperations />;
@@ -717,11 +689,10 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
 
   return (
     <div className="space-y-6">
-      {/* Accordion Navigation - Mobile Friendly */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+      <BentoTile className="overflow-hidden p-0">
         <Accordion type="single" collapsible value={openCategory} onValueChange={setOpenCategory} className="w-full">
           {menuCategories.map((category) => (
-            <AccordionItem key={category.id} value={category.id} className="border-b border-slate-700 last:border-b-0">
+            <AccordionItem key={category.id} value={category.id} className="border-b border-slate-700/50 last:border-b-0">
               <AccordionTrigger 
                 className="px-4 py-3 hover:bg-slate-700/50 transition-colors [&[data-state=open]]:bg-slate-700/30"
                 data-testid={`accordion-${category.id}`}
@@ -754,177 +725,194 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
             </AccordionItem>
           ))}
         </Accordion>
-      </div>
+      </BentoTile>
 
-      {/* Feature Content */}
       {activeFeature !== 'checklist' && renderFeatureContent()}
 
       {activeFeature === 'checklist' && (
-      <div className="space-y-8">
-      {/* System Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <div className="text-4xl font-bold text-cyan-400 mb-2">0</div>
-          <p className="text-gray-400 text-sm">Active Franchises</p>
-          <p className="text-xs text-gray-500 mt-2">Ready for first partners</p>
-        </div>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <div className="text-4xl font-bold text-green-400 mb-2">0</div>
-          <p className="text-gray-400 text-sm">Monthly Customers</p>
-          <p className="text-xs text-gray-500 mt-2">Subscription subscribers</p>
-        </div>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <div className="text-4xl font-bold text-yellow-400 mb-2">$0</div>
-          <p className="text-gray-400 text-sm">Monthly Revenue</p>
-          <p className="text-xs text-gray-500 mt-2">All sources combined</p>
-        </div>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-          <div className="text-4xl font-bold text-purple-400 mb-2">{stats.percentage}%</div>
-          <p className="text-gray-400 text-sm">Launch Progress</p>
-          <p className="text-xs text-gray-500 mt-2">{stats.completed}/{stats.total} tasks</p>
-        </div>
-      </div>
+        <div className="space-y-8">
+          <BentoGrid cols={4} gap="md">
+            <StatCard
+              label="Active Franchises"
+              value="0"
+              icon={<Building2 className="w-6 h-6" />}
+            />
+            <StatCard
+              label="Monthly Customers"
+              value="0"
+              icon={<Users className="w-6 h-6" />}
+            />
+            <StatCard
+              label="Monthly Revenue"
+              value="$0"
+              icon={<BarChart3 className="w-6 h-6" />}
+            />
+            <StatCard
+              label="Launch Progress"
+              value={`${stats.percentage}%`}
+              icon={<CheckCircle2 className="w-6 h-6" />}
+              trend={{ value: stats.completed, positive: true }}
+            />
+          </BentoGrid>
 
-      {/* Master Admin Info */}
-      <div className="bg-cyan-900/20 border border-cyan-700/50 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-          <Shield className="w-5 h-5" />
-          Master Admin Capabilities
-        </h2>
-        <p className="text-gray-300 mb-4">
-          As the system owner, you have full access to:
-        </p>
-        <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            Create and manage franchises
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            Manage monthly customers
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            View all system analytics
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            Configure system settings
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            Manage licenses & billing
-          </li>
-          <li className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-            Access all audit logs
-          </li>
-        </ul>
-      </div>
+          <BentoTile className="p-6 border-cyan-700/50">
+            <SectionHeader
+              eyebrow="Master Admin"
+              title="System Capabilities"
+              subtitle="As the system owner, you have full access to all features"
+              size="sm"
+            />
+            <BentoGrid cols={2} gap="sm" className="mt-4">
+              {[
+                'Create and manage franchises',
+                'Manage monthly customers',
+                'View all system analytics',
+                'Configure system settings',
+                'Manage licenses & billing',
+                'Access all audit logs',
+              ].map((capability, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+                  {capability}
+                </div>
+              ))}
+            </BentoGrid>
+          </BentoTile>
 
-      {/* Admin Checklist */}
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Admin Checklist</h2>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-cyan-400">{stats.percentage}%</div>
-            <p className="text-xs text-gray-400">{stats.completed}/{stats.total} complete</p>
-          </div>
-        </div>
+          <div className="space-y-6">
+            <SectionHeader
+              title="Admin Checklist"
+              subtitle={`${stats.completed}/${stats.total} tasks completed`}
+              action={
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-cyan-400">{stats.percentage}%</div>
+                </div>
+              }
+            />
 
-        {/* Progress Bar */}
-        <div className="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-full transition-all"
-            style={{ width: `${stats.percentage}%` }}
-          />
-        </div>
-
-        {/* Checklist Items */}
-        {checklist.map(category => {
-          const categoryCompleted = category.tasks.filter(t => t.completed).length;
-          const categoryTotal = category.tasks.length;
-          const categoryPercentage = Math.round((categoryCompleted / categoryTotal) * 100);
-
-          return (
-            <div key={category.id} className="bg-slate-800 rounded-lg border border-slate-700 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <span className="text-2xl">{category.icon}</span>
-                  {category.category}
-                </h3>
-                <span className="text-xs text-gray-400">
-                  {categoryCompleted}/{categoryTotal}
-                </span>
-              </div>
-
-              <div className="w-full bg-slate-700 rounded-full h-2 mb-6 overflow-hidden">
-                <div
-                  className="bg-cyan-500 h-full transition-all"
-                  style={{ width: `${categoryPercentage}%` }}
-                />
-              </div>
-
-              <div className="space-y-2">
-                {category.tasks.map(task => (
-                  <button
-                    key={task.id}
-                    onClick={() => toggleTask(category.id, task.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-                      task.completed
-                        ? 'bg-green-900/30 border border-green-700/50'
-                        : 'bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50'
-                    }`}
-                    data-testid={`task-${task.id}`}
-                  >
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                      task.completed
-                        ? 'bg-green-500 border-green-500'
-                        : 'border-gray-500'
-                    }`}>
-                      {task.completed && (
-                        <CheckCircle2 className="w-3 h-3 text-white" />
-                      )}
-                    </div>
-                    <span className={`flex-1 text-left text-sm font-medium ${
-                      task.completed ? 'text-green-200 line-through' : 'text-gray-200'
-                    }`}>
-                      {task.title}
-                    </span>
-                  </button>
-                ))}
-              </div>
+            <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-cyan-500 to-cyan-400 h-full transition-all duration-500"
+                style={{ width: `${stats.percentage}%` }}
+              />
             </div>
-          );
-        })}
-      </div>
 
-      {/* Quick Links */}
-      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-create-franchise" onClick={() => alert('Create franchise feature coming soon')}>
-            <Building2 className="w-4 h-4 mr-2" />
-            Create Franchise
-          </Button>
-          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-manage-customers" onClick={() => alert('Manage customers feature coming soon')}>
-            <Users className="w-4 h-4 mr-2" />
-            Manage Customers
-          </Button>
-          <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-view-analytics" onClick={() => alert('View analytics feature coming soon')}>
-            📊 View Analytics
-          </Button>
+            {checklist.map(category => {
+              const categoryCompleted = category.tasks.filter(t => t.completed).length;
+              const categoryTotal = category.tasks.length;
+              const categoryPercentage = Math.round((categoryCompleted / categoryTotal) * 100);
+
+              return (
+                <BentoTile key={category.id} className="p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                      <span className="text-xl">{category.icon}</span>
+                      {category.category}
+                    </h3>
+                    <span className="text-xs text-gray-400 bg-slate-700 px-2 py-1 rounded-full">
+                      {categoryCompleted}/{categoryTotal}
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-slate-700 rounded-full h-1.5 mb-4 overflow-hidden">
+                    <div
+                      className="bg-cyan-500 h-full transition-all"
+                      style={{ width: `${categoryPercentage}%` }}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    {category.tasks.map(task => (
+                      <button
+                        key={task.id}
+                        onClick={() => toggleTask(category.id, task.id)}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all ${
+                          task.completed
+                            ? 'bg-emerald-900/20 border border-emerald-700/30'
+                            : 'bg-slate-700/30 border border-slate-600/50 hover:border-cyan-500/50'
+                        }`}
+                        data-testid={`task-${task.id}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                          task.completed
+                            ? 'bg-emerald-500 border-emerald-500'
+                            : 'border-gray-500'
+                        }`}>
+                          {task.completed && (
+                            <CheckCircle2 className="w-3 h-3 text-white" />
+                          )}
+                        </div>
+                        <span className={`flex-1 text-left text-sm font-medium transition-all ${
+                          task.completed ? 'text-emerald-200 line-through opacity-70' : 'text-gray-200'
+                        }`}>
+                          {task.title}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </BentoTile>
+              );
+            })}
+          </div>
+
+          <SectionHeader title="Quick Actions" size="sm" />
+          <div className="md:hidden">
+            <CarouselRail gap="md" showArrows={false}>
+              <CarouselRailItem>
+                <ActionCard
+                  title="Create Franchise"
+                  description="Add new partner"
+                  icon={<Building2 className="w-5 h-5" />}
+                  onClick={() => alert('Create franchise feature coming soon')}
+                  className="min-w-[200px]"
+                />
+              </CarouselRailItem>
+              <CarouselRailItem>
+                <ActionCard
+                  title="Manage Customers"
+                  description="View subscribers"
+                  icon={<Users className="w-5 h-5" />}
+                  onClick={() => alert('Manage customers feature coming soon')}
+                  className="min-w-[200px]"
+                />
+              </CarouselRailItem>
+              <CarouselRailItem>
+                <ActionCard
+                  title="View Analytics"
+                  description="System metrics"
+                  icon={<BarChart3 className="w-5 h-5" />}
+                  onClick={() => alert('View analytics feature coming soon')}
+                  className="min-w-[200px]"
+                />
+              </CarouselRailItem>
+            </CarouselRail>
+          </div>
+          <BentoGrid cols={3} gap="md" className="hidden md:grid">
+            <ActionCard
+              title="Create Franchise"
+              description="Add new partner"
+              icon={<Building2 className="w-5 h-5" />}
+              onClick={() => alert('Create franchise feature coming soon')}
+            />
+            <ActionCard
+              title="Manage Customers"
+              description="View subscribers"
+              icon={<Users className="w-5 h-5" />}
+              onClick={() => alert('Manage customers feature coming soon')}
+            />
+            <ActionCard
+              title="View Analytics"
+              description="System metrics"
+              icon={<BarChart3 className="w-5 h-5" />}
+              onClick={() => alert('View analytics feature coming soon')}
+            />
+          </BentoGrid>
         </div>
-      </div>
-    </div>
       )}
     </div>
   );
 }
 
-// ==========================================
-// USER DATA ACCESS SECTION
-// ==========================================
 function UserDataAccessSection() {
   const [, setLocation] = useLocation();
   const [employeeSearchOpen, setEmployeeSearchOpen] = useState(true);
@@ -961,17 +949,17 @@ function UserDataAccessSection() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-emerald-900/20 border border-emerald-700/50 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-          <Search className="w-5 h-5 text-emerald-400" />
-          Employee & Owner Data Access
-        </h2>
-        <p className="text-gray-300 text-sm">
-          Search and access complete profile data for any employee or company owner. Generate reports and view detailed information.
-        </p>
-      </div>
+      <BentoTile className="p-6 border-emerald-700/30">
+        <SectionHeader
+          eyebrow="Data Access"
+          title="Employee & Owner Search"
+          subtitle="Search and access complete profile data for any employee or company owner"
+          size="sm"
+          className="mb-0"
+        />
+      </BentoTile>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+      <BentoTile className="overflow-hidden p-0">
         <button
           onClick={() => setEmployeeSearchOpen(!employeeSearchOpen)}
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
@@ -985,7 +973,7 @@ function UserDataAccessSection() {
         </button>
         
         {employeeSearchOpen && (
-          <div className="px-6 pb-6 border-t border-slate-700">
+          <div className="px-6 pb-6 border-t border-slate-700/50">
             <div className="mt-4 mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -1005,33 +993,32 @@ function UserDataAccessSection() {
                 <p className="text-gray-400 text-center py-4">No employees found matching your search</p>
               ) : (
                 filteredEmployees.map(emp => (
-                  <div
+                  <OrbitCard
                     key={emp.id}
-                    className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 hover:border-cyan-500/50 transition-all"
+                    variant="default"
+                    className="p-4"
                     data-testid={`employee-card-${emp.id}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-white">{emp.name}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded ${emp.status === 'Active' ? 'bg-green-600/20 text-green-400' : 'bg-amber-600/20 text-amber-400'}`}>
+                          <span className={`text-xs px-2 py-0.5 rounded ${emp.status === 'Active' ? 'bg-emerald-600/20 text-emerald-400' : 'bg-amber-600/20 text-amber-400'}`}>
                             {emp.status}
                           </span>
                         </div>
                         <p className="text-sm text-gray-400">{emp.position}</p>
                         <p className="text-xs text-gray-500">ID: {emp.id}</p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-600/50"
-                          onClick={() => setLocation('/employee-hub')}
-                          data-testid={`button-view-employee-${emp.id}`}
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View Hub
-                        </Button>
-                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-600/50"
+                        onClick={() => setLocation('/employee-hub')}
+                        data-testid={`button-view-employee-${emp.id}`}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Hub
+                      </Button>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-4 text-sm">
                       <div className="flex items-center gap-1 text-gray-400">
@@ -1043,42 +1030,27 @@ function UserDataAccessSection() {
                         <span>{emp.phone}</span>
                       </div>
                     </div>
-                    <div className="mt-3 flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
-                        data-testid={`button-generate-report-${emp.id}`}
-                      >
+                    <div className="mt-3 flex gap-2 flex-wrap">
+                      <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500" data-testid={`button-generate-report-${emp.id}`}>
                         <FileText className="w-3 h-3 mr-1" />
                         Generate Report
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
-                        data-testid={`button-view-timecards-${emp.id}`}
-                      >
+                      <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500" data-testid={`button-view-timecards-${emp.id}`}>
                         View Timecards
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
-                        data-testid={`button-view-pay-history-${emp.id}`}
-                      >
+                      <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500" data-testid={`button-view-pay-history-${emp.id}`}>
                         Pay History
                       </Button>
                     </div>
-                  </div>
+                  </OrbitCard>
                 ))
               )}
             </div>
           </div>
         )}
-      </div>
+      </BentoTile>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+      <BentoTile className="overflow-hidden p-0">
         <button
           onClick={() => setOwnerSearchOpen(!ownerSearchOpen)}
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
@@ -1092,7 +1064,7 @@ function UserDataAccessSection() {
         </button>
         
         {ownerSearchOpen && (
-          <div className="px-6 pb-6 border-t border-slate-700">
+          <div className="px-6 pb-6 border-t border-slate-700/50">
             <div className="mt-4 mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -1112,9 +1084,10 @@ function UserDataAccessSection() {
                 <p className="text-gray-400 text-center py-4">No companies found matching your search</p>
               ) : (
                 filteredOwners.map(owner => (
-                  <div
+                  <OrbitCard
                     key={owner.id}
-                    className="bg-slate-700/50 rounded-lg p-4 border border-slate-600 hover:border-purple-500/50 transition-all"
+                    variant="default"
+                    className="p-4"
                     data-testid={`owner-card-${owner.id}`}
                   >
                     <div className="flex items-start justify-between">
@@ -1123,17 +1096,15 @@ function UserDataAccessSection() {
                         <p className="text-sm text-gray-400">Contact: {owner.contact}</p>
                         <p className="text-xs text-gray-500">{owner.employees} employees assigned</p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-600/50"
-                          onClick={() => setLocation('/owner-hub')}
-                          data-testid={`button-view-owner-${owner.id}`}
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View Hub
-                        </Button>
-                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-600/50"
+                        onClick={() => setLocation('/owner-hub')}
+                        data-testid={`button-view-owner-${owner.id}`}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Hub
+                      </Button>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-4 text-sm">
                       <div className="flex items-center gap-1 text-gray-400">
@@ -1145,42 +1116,27 @@ function UserDataAccessSection() {
                         <span>{owner.phone}</span>
                       </div>
                     </div>
-                    <div className="mt-3 flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
-                        data-testid={`button-company-report-${owner.id}`}
-                      >
+                    <div className="mt-3 flex gap-2 flex-wrap">
+                      <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500" data-testid={`button-company-report-${owner.id}`}>
                         <FileText className="w-3 h-3 mr-1" />
                         Company Report
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
-                        data-testid={`button-employee-roster-${owner.id}`}
-                      >
+                      <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500" data-testid={`button-employee-roster-${owner.id}`}>
                         Employee Roster
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500"
-                        data-testid={`button-billing-history-${owner.id}`}
-                      >
+                      <Button size="sm" variant="outline" className="text-xs bg-slate-600/50 hover:bg-slate-600 border-slate-500" data-testid={`button-billing-history-${owner.id}`}>
                         Billing History
                       </Button>
                     </div>
-                  </div>
+                  </OrbitCard>
                 ))
               )}
             </div>
           </div>
         )}
-      </div>
+      </BentoTile>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+      <BentoTile className="overflow-hidden p-0">
         <button
           onClick={() => setQuickLinksOpen(!quickLinksOpen)}
           className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-700/50 transition-colors"
@@ -1194,38 +1150,31 @@ function UserDataAccessSection() {
         </button>
         
         {quickLinksOpen && (
-          <div className="px-6 pb-6 border-t border-slate-700">
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Button
-                className="bg-cyan-600 hover:bg-cyan-700 h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation('/employee-hub')}
-                data-testid="button-quick-employee-hub"
-              >
-                <User className="w-6 h-6" />
-                <span>Employee Hub</span>
-                <span className="text-xs opacity-75">View any worker's portal</span>
-              </Button>
-              <Button
-                className="bg-purple-600 hover:bg-purple-700 h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation('/owner-hub')}
-                data-testid="button-quick-owner-hub"
-              >
-                <Building2 className="w-6 h-6" />
-                <span>Owner Hub</span>
-                <span className="text-xs opacity-75">View any company's portal</span>
-              </Button>
-              <Button
-                className="bg-amber-600 hover:bg-amber-700 h-auto py-4 flex flex-col items-center gap-2"
-                onClick={() => setLocation('/gps-clockin')}
-                data-testid="button-quick-gps-verification"
-              >
-                <Cloud className="w-6 h-6" />
-                <span>GPS Check-In</span>
-                <span className="text-xs opacity-75">Verify worker locations</span>
-              </Button>
+          <div className="px-6 pb-6 border-t border-slate-700/50">
+            <div className="mt-4">
+              <BentoGrid cols={3} gap="md">
+                <ActionCard
+                  title="Employee Hub"
+                  description="View any worker's portal"
+                  icon={<User className="w-5 h-5" />}
+                  onClick={() => setLocation('/employee-hub')}
+                />
+                <ActionCard
+                  title="Owner Hub"
+                  description="View any company's portal"
+                  icon={<Building2 className="w-5 h-5" />}
+                  onClick={() => setLocation('/owner-hub')}
+                />
+                <ActionCard
+                  title="GPS Check-In"
+                  description="Verify worker locations"
+                  icon={<Cloud className="w-5 h-5" />}
+                  onClick={() => setLocation('/gps-clockin')}
+                />
+              </BentoGrid>
             </div>
 
-            <div className="mt-6 bg-slate-700/50 rounded-lg p-4 border border-slate-600">
+            <OrbitCard variant="glass" className="mt-6 p-4">
               <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
                 <Cloud className="w-5 h-5 text-sky-400" />
                 Weather Verification Tool
@@ -1257,130 +1206,105 @@ function UserDataAccessSection() {
                   />
                 </div>
                 <div className="flex items-end">
-                  <Button
-                    className="w-full bg-sky-600 hover:bg-sky-700"
-                    data-testid="button-check-weather"
-                  >
+                  <Button className="w-full bg-sky-600 hover:bg-sky-700" data-testid="button-check-weather">
                     Check Weather
                   </Button>
                 </div>
               </div>
-            </div>
+            </OrbitCard>
           </div>
         )}
-      </div>
+      </BentoTile>
     </div>
   );
 }
 
-// ==========================================
-// FRANCHISE ADMIN DASHBOARD
-// ==========================================
 function FranchiseAdminDashboard() {
   return (
     <div className="space-y-8">
-      <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-          <Building2 className="w-5 h-5" />
-          Franchise Admin Dashboard
-        </h2>
-        <p className="text-gray-300 mb-4">
-          You have access to your franchise data only. Your workers, clients, assignments, and billing are isolated from other franchises.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-purple-400">0</div>
-            <p className="text-sm text-gray-400">Workers</p>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-purple-400">0</div>
-            <p className="text-sm text-gray-400">Clients</p>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-purple-400">0</div>
-            <p className="text-sm text-gray-400">Active Assignments</p>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-purple-400">$0</div>
-            <p className="text-sm text-gray-400">Monthly Revenue</p>
-          </div>
-        </div>
-      </div>
+      <BentoTile className="p-6 border-purple-700/50">
+        <SectionHeader
+          eyebrow="Franchise"
+          title="Franchise Admin Dashboard"
+          subtitle="You have access to your franchise data only. Your workers, clients, assignments, and billing are isolated from other franchises."
+          size="md"
+          className="mb-6"
+        />
+        <BentoGrid cols={4} gap="md">
+          <StatCard label="Workers" value="0" icon={<Users className="w-5 h-5" />} />
+          <StatCard label="Clients" value="0" icon={<Building2 className="w-5 h-5" />} />
+          <StatCard label="Active Assignments" value="0" icon={<Briefcase className="w-5 h-5" />} />
+          <StatCard label="Monthly Revenue" value="$0" icon={<BarChart3 className="w-5 h-5" />} />
+        </BentoGrid>
+      </BentoTile>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-workers" onClick={() => alert('Manage workers feature coming soon')}>
-          <Users className="w-4 h-4 mr-2" />
-          Manage Workers
-        </Button>
-        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-manage-clients" onClick={() => alert('Manage clients feature coming soon')}>
-          <Building2 className="w-4 h-4 mr-2" />
-          Manage Clients
-        </Button>
-        <Button className="bg-purple-600 hover:bg-purple-700 py-6" data-testid="button-franchise-settings" onClick={() => alert('Franchise settings feature coming soon')}>
-          ⚙️ Franchise Settings
-        </Button>
-      </div>
+      <BentoGrid cols={3} gap="md">
+        <ActionCard
+          title="Manage Workers"
+          icon={<Users className="w-5 h-5" />}
+          onClick={() => alert('Manage workers feature coming soon')}
+        />
+        <ActionCard
+          title="Manage Clients"
+          icon={<Building2 className="w-5 h-5" />}
+          onClick={() => alert('Manage clients feature coming soon')}
+        />
+        <ActionCard
+          title="Franchise Settings"
+          icon={<Settings className="w-5 h-5" />}
+          onClick={() => alert('Franchise settings feature coming soon')}
+        />
+      </BentoGrid>
 
-      {/* DNR Management */}
       <DNRManagement />
     </div>
   );
 }
 
-// ==========================================
-// CUSTOMER ADMIN DASHBOARD (Monthly Subscription)
-// ==========================================
 function CustomerAdminDashboard() {
   return (
     <div className="space-y-8">
-      <div className="bg-blue-900/20 border border-blue-700/50 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
-          <Users className="w-5 h-5" />
-          Customer Admin Dashboard
-        </h2>
-        <p className="text-gray-300 mb-4">
-          You have access to your company data only. Your workers, clients, and assignments are isolated from other customers.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-blue-400">0</div>
-            <p className="text-sm text-gray-400">Workers</p>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-blue-400">0</div>
-            <p className="text-sm text-gray-400">Clients</p>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-blue-400">0</div>
-            <p className="text-sm text-gray-400">Active Assignments</p>
-          </div>
-          <div className="bg-slate-800 rounded-lg p-4">
-            <div className="text-3xl font-bold text-blue-400">$0</div>
-            <p className="text-sm text-gray-400">Monthly Bill</p>
-          </div>
-        </div>
-      </div>
+      <BentoTile className="p-6 border-blue-700/50">
+        <SectionHeader
+          eyebrow="Customer"
+          title="Customer Admin Dashboard"
+          subtitle="You have access to your company data only. Your workers, clients, and assignments are isolated from other customers."
+          size="md"
+          className="mb-6"
+        />
+        <BentoGrid cols={4} gap="md">
+          <StatCard label="Workers" value="0" icon={<Users className="w-5 h-5" />} />
+          <StatCard label="Clients" value="0" icon={<Building2 className="w-5 h-5" />} />
+          <StatCard label="Active Assignments" value="0" icon={<Briefcase className="w-5 h-5" />} />
+          <StatCard label="Monthly Bill" value="$0" icon={<BarChart3 className="w-5 h-5" />} />
+        </BentoGrid>
+      </BentoTile>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-workers" onClick={() => alert('Manage workers feature coming soon')}>
-          <Users className="w-4 h-4 mr-2" />
-          Manage Workers
-        </Button>
-        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-clients" onClick={() => alert('Manage clients feature coming soon')}>
-          <Building2 className="w-4 h-4 mr-2" />
-          Manage Clients
-        </Button>
-        <Button className="bg-blue-600 hover:bg-blue-700 py-6" data-testid="button-customer-billing" onClick={() => alert('Billing feature coming soon')}>
-          💳 Billing & Subscription
-        </Button>
-      </div>
+      <BentoGrid cols={3} gap="md">
+        <ActionCard
+          title="Manage Workers"
+          icon={<Users className="w-5 h-5" />}
+          onClick={() => alert('Manage workers feature coming soon')}
+        />
+        <ActionCard
+          title="Manage Clients"
+          icon={<Building2 className="w-5 h-5" />}
+          onClick={() => alert('Manage clients feature coming soon')}
+        />
+        <ActionCard
+          title="Billing & Subscription"
+          icon={<Receipt className="w-5 h-5" />}
+          onClick={() => alert('Billing feature coming soon')}
+        />
+      </BentoGrid>
     </div>
   );
 }
 
-// ==========================================
-// DNR (DO NOT RETURN) MANAGEMENT
-// ==========================================
+function DNRSection() {
+  return <DNRManagement />;
+}
+
 function DNRManagement() {
   const [dnrList, setDnrList] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -1399,12 +1323,12 @@ function DNRManagement() {
     { value: 'other', label: 'Other' },
   ];
 
-  // Mock data for demo
   useEffect(() => {
     setDnrList([
       {
         id: '1',
         workerId: 'w123',
+        workerName: 'John Smith',
         reasonCategory: 'no_show',
         description: 'Missed 3 consecutive shifts without notice',
         markedAt: new Date().toISOString(),
@@ -1413,6 +1337,7 @@ function DNRManagement() {
       {
         id: '2',
         workerId: 'w456',
+        workerName: 'Jane Doe',
         reasonCategory: 'policy_violation',
         description: 'Arrived intoxicated to job site',
         markedAt: new Date().toISOString(),
@@ -1422,12 +1347,13 @@ function DNRManagement() {
   }, []);
 
   return (
-    <div className="bg-red-900/10 border border-red-700/50 rounded-lg p-6">
+    <BentoTile className="p-6 border-red-700/30">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-red-400" />
-          DNR (Do Not Return) List
-        </h2>
+        <SectionHeader
+          title="DNR (Do Not Return) List"
+          size="sm"
+          className="mb-0"
+        />
         <Button
           className="bg-red-600 hover:bg-red-700 text-white"
           onClick={() => setShowForm(!showForm)}
@@ -1438,7 +1364,7 @@ function DNRManagement() {
       </div>
 
       {showForm && (
-        <div className="bg-slate-800 rounded-lg p-4 mb-6 border border-red-700">
+        <OrbitCard variant="default" className="mb-6 border-red-700/50 p-4">
           <h3 className="text-lg font-bold mb-4">Mark Worker as DNR</h3>
           <div className="space-y-4">
             <div>
@@ -1474,7 +1400,8 @@ function DNRManagement() {
 
             <div className="flex gap-2 justify-end">
               <Button
-                className="bg-gray-600 hover:bg-gray-700"
+                variant="outline"
+                className="border-slate-600"
                 onClick={() => setShowForm(false)}
                 data-testid="button-cancel-dnr"
               >
@@ -1488,7 +1415,7 @@ function DNRManagement() {
               </Button>
             </div>
           </div>
-        </div>
+        </OrbitCard>
       )}
 
       <div className="space-y-3">
@@ -1496,195 +1423,42 @@ function DNRManagement() {
           <p className="text-gray-400 text-center py-4">No workers on DNR list</p>
         ) : (
           dnrList.map((dnr) => (
-            <div
+            <OrbitCard
               key={dnr.id}
-              className="bg-slate-800/50 rounded-lg p-4 border border-red-700/30 flex items-center justify-between"
+              variant="default"
+              className="p-4 border-red-700/30"
               data-testid={`dnr-item-${dnr.id}`}
             >
-              <div>
-                <p className="font-bold text-red-300">Worker ID: {dnr.workerId}</p>
-                <p className="text-sm text-gray-400 capitalize">{dnr.reasonCategory.replace(/_/g, ' ')}</p>
-                {dnr.description && (
-                  <p className="text-sm text-gray-300 mt-1">{dnr.description}</p>
-                )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-600/20 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-red-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-white">{dnr.workerName || `Worker ${dnr.workerId}`}</p>
+                    <p className="text-sm text-gray-400">
+                      {dnrReasons.find(r => r.value === dnr.reasonCategory)?.label || dnr.reasonCategory}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-600/50 text-red-400 hover:bg-red-600/20"
+                  data-testid={`button-remove-dnr-${dnr.id}`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
-              <Button
-                className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-600/50"
-                onClick={() => setDnrList(dnrList.filter((d) => d.id !== dnr.id))}
-                data-testid={`button-remove-dnr-${dnr.id}`}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
+              {dnr.description && (
+                <p className="mt-3 text-sm text-gray-400 bg-slate-700/30 p-2 rounded">
+                  {dnr.description}
+                </p>
+              )}
+            </OrbitCard>
           ))
         )}
       </div>
-
-      <p className="text-xs text-gray-500 mt-6 p-3 bg-slate-800 rounded">
-        ⚠️ DNR List is used to prevent accidental rehiring of workers who have been fired or terminated. 
-        Always check this list before offering new assignments.
-      </p>
-    </div>
-  );
-}
-
-// ==========================================
-// MASTER ADMIN - DNR SECTION TAB
-// ==========================================
-function DNRSection() {
-  const [dnrList, setDnrList] = useState([
-    {
-      id: 'dnr-001',
-      workerId: 'WRK-2024-00142',
-      reasonCategory: 'theft',
-      description: 'Stealing company property from job site',
-    },
-    {
-      id: 'dnr-002',
-      workerId: 'WRK-2024-00089',
-      reasonCategory: 'violence',
-      description: 'Altercation with supervisor',
-    },
-  ]);
-
-  const [showForm, setShowForm] = useState(false);
-  const [newDNR, setNewDNR] = useState({
-    workerId: '',
-    reasonCategory: 'misconduct',
-    description: '',
-  });
-
-  const reasons = [
-    { value: 'theft', label: 'Theft' },
-    { value: 'violence', label: 'Violence' },
-    { value: 'misconduct', label: 'Misconduct' },
-    { value: 'quality_issues', label: 'Quality Issues' },
-    { value: 'attendance', label: 'Attendance' },
-    { value: 'safety_violation', label: 'Safety Violation' },
-    { value: 'other', label: 'Other' },
-  ];
-
-  if (showForm) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
-          <h2 className="text-xl font-bold mb-4">Add to DNR List</h2>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Worker ID
-            </label>
-            <input
-              type="text"
-              value={newDNR.workerId}
-              onChange={(e) => setNewDNR({ ...newDNR, workerId: e.target.value })}
-              placeholder="WRK-2024-XXXXX"
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-red-400"
-              data-testid="input-dnr-worker-id"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2 mt-4">
-              Reason Category
-            </label>
-            <select
-              value={newDNR.reasonCategory}
-              onChange={(e) => setNewDNR({ ...newDNR, reasonCategory: e.target.value })}
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-red-400"
-              data-testid="select-dnr-reason"
-            >
-              {reasons.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2 mt-4">
-              Details
-            </label>
-            <textarea
-              value={newDNR.description}
-              onChange={(e) => setNewDNR({ ...newDNR, description: e.target.value })}
-              placeholder="Describe the incident or reason for DNR..."
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-red-400 resize-none h-24"
-              data-testid="textarea-dnr-description"
-            />
-          </div>
-
-          <div className="flex gap-2 justify-end mt-4">
-            <Button
-              className="bg-gray-600 hover:bg-gray-700"
-              onClick={() => setShowForm(false)}
-              data-testid="button-cancel-dnr"
-            >
-              Cancel
-            </Button>
-            <Button
-              className="bg-red-600 hover:bg-red-700"
-              data-testid="button-submit-dnr"
-            >
-              Mark as DNR
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Sidonia Admin Business Card */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-        <h3 className="font-bold text-lg mb-4">Admin Profile Card (ORBIT-0002)</h3>
-        <PersonalCardGenerator userId="orbit-0002" userName="Sidonia Summers" cardType="admin" />
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold">Do Not Rehire List</h2>
-          <p className="text-gray-400 text-sm">Workers who should not be rehired</p>
-        </div>
-        <Button
-          onClick={() => setShowForm(true)}
-          className="bg-red-600 hover:bg-red-700"
-          data-testid="button-add-dnr"
-        >
-          + Add to DNR
-        </Button>
-      </div>
-
-      <div className="space-y-3">
-        {dnrList.length === 0 ? (
-          <p className="text-gray-400 text-center py-4">No workers on DNR list</p>
-        ) : (
-          dnrList.map((dnr) => (
-            <div
-              key={dnr.id}
-              className="bg-slate-800/50 rounded-lg p-4 border border-red-700/30 flex items-center justify-between"
-              data-testid={`dnr-item-${dnr.id}`}
-            >
-              <div>
-                <p className="font-bold text-red-300">Worker ID: {dnr.workerId}</p>
-                <p className="text-sm text-gray-400 capitalize">{dnr.reasonCategory.replace(/_/g, ' ')}</p>
-                {dnr.description && (
-                  <p className="text-sm text-gray-300 mt-1">{dnr.description}</p>
-                )}
-              </div>
-              <Button
-                className="bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-600/50"
-                onClick={() => setDnrList(dnrList.filter((d) => d.id !== dnr.id))}
-                data-testid={`button-remove-dnr-${dnr.id}`}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+    </BentoTile>
   );
 }

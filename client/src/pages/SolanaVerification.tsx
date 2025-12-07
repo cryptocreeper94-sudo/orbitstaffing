@@ -1,10 +1,13 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowLeft, Shield, ExternalLink, Copy, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Shield, ExternalLink, Copy, CheckCircle2, Blocks, Hash, Calendar } from "lucide-react";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { PageHeader, SectionHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardContent, StatCard } from "@/components/ui/orbit-card";
+import { CarouselRail } from "@/components/ui/carousel-rail";
 
 const blockchainStamps = [
   {
@@ -98,17 +101,31 @@ export default function SolanaVerification() {
     setTimeout(() => setCopiedHash(null), 2000);
   };
 
+  const totalVersions = blockchainStamps.length;
+  const totalProducts = blockchainStamps.reduce((acc, stamp) => acc + stamp.products.length, 0);
+  const uniqueHashes = new Set(blockchainStamps.flatMap(s => s.products.map(p => p.hash))).size;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 text-white">
       <header className="border-b border-purple-500/30 backdrop-blur-sm sticky top-0 z-50 bg-slate-950/80">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-          </Link>
-          <h1 className="text-lg font-bold">Solana Blockchain Verification</h1>
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <PageHeader
+            title="Solana Blockchain Verification"
+            subtitle="Immutable cryptographic verification for all platform versions"
+            breadcrumb={
+              <Link href="/">
+                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white -ml-2">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
+            }
+            actions={
+              <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                Powered by Solana Mainnet
+              </Badge>
+            }
+          />
         </div>
       </header>
 
@@ -128,69 +145,105 @@ export default function SolanaVerification() {
             Every version of ORBIT Staffing OS is cryptographically stamped on the Solana blockchain 
             for immutable verification and transparency.
           </p>
-          <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
-            Powered by Solana Mainnet via Helius RPC
-          </Badge>
         </section>
 
-        <section className="space-y-6">
-          {blockchainStamps.map((stamp, i) => (
-            <Card key={i} className="bg-slate-900/50 border-purple-500/30">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
+        <BentoGrid cols={3} gap="md">
+          <BentoTile className="p-0">
+            <StatCard
+              label="Total Versions"
+              value={totalVersions}
+              icon={<Blocks className="w-6 h-6" />}
+              className="border-0 h-full"
+            />
+          </BentoTile>
+          <BentoTile className="p-0">
+            <StatCard
+              label="Products Stamped"
+              value={totalProducts}
+              icon={<Hash className="w-6 h-6" />}
+              className="border-0 h-full"
+            />
+          </BentoTile>
+          <BentoTile className="p-0">
+            <StatCard
+              label="Unique Hashes"
+              value={uniqueHashes}
+              icon={<Calendar className="w-6 h-6" />}
+              className="border-0 h-full"
+            />
+          </BentoTile>
+        </BentoGrid>
+
+        <section>
+          <SectionHeader
+            eyebrow="Version History"
+            title="Blockchain Stamps"
+            subtitle="SHA-256 cryptographic signatures for each release"
+            size="md"
+          />
+
+          <div className="space-y-6">
+            {blockchainStamps.map((stamp, i) => (
+              <OrbitCard key={i} variant="default" className="border-purple-500/30">
+                <OrbitCardHeader
+                  icon={
                     <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 font-mono">
                       {stamp.version}
                     </Badge>
-                    <span className="text-xs text-slate-500">{stamp.date}</span>
-                  </div>
-                  {i === 0 && (
-                    <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
-                      Latest
-                    </Badge>
-                  )}
-                </div>
+                  }
+                  action={
+                    i === 0 ? (
+                      <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                        Latest
+                      </Badge>
+                    ) : undefined
+                  }
+                >
+                  <span className="text-xs text-slate-500">{stamp.date}</span>
+                </OrbitCardHeader>
 
-                <div className="space-y-4">
-                  {stamp.products.map((product, j) => (
-                    <div key={j} className="p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm text-white">{product.name}</h3>
-                          <p className="text-xs text-slate-400 mb-2">{product.description}</p>
-                          <div className="flex items-center gap-2">
-                            <code className="text-[10px] sm:text-xs font-mono text-purple-300 bg-purple-900/30 px-2 py-1 rounded truncate max-w-[200px] sm:max-w-none">
-                              {product.hash.slice(0, 16)}...{product.hash.slice(-8)}
-                            </code>
-                            <button
-                              onClick={() => copyToClipboard(product.hash)}
-                              className="p-1 hover:bg-slate-700 rounded transition"
-                              data-testid={`copy-hash-${j}`}
-                            >
-                              {copiedHash === product.hash ? (
-                                <CheckCircle2 className="w-4 h-4 text-green-400" />
-                              ) : (
-                                <Copy className="w-4 h-4 text-slate-400" />
-                              )}
-                            </button>
+                <OrbitCardContent>
+                  <CarouselRail gap="md" showArrows={false}>
+                    {stamp.products.map((product, j) => (
+                      <div key={j} className="min-w-[300px] max-w-[400px] p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm text-white">{product.name}</h3>
+                            <p className="text-xs text-slate-400 mb-2">{product.description}</p>
+                            <div className="flex items-center gap-2">
+                              <code className="text-[10px] sm:text-xs font-mono text-purple-300 bg-purple-900/30 px-2 py-1 rounded truncate max-w-[200px] sm:max-w-none">
+                                {product.hash.slice(0, 16)}...{product.hash.slice(-8)}
+                              </code>
+                              <button
+                                onClick={() => copyToClipboard(product.hash)}
+                                className="p-1 hover:bg-slate-700 rounded transition"
+                                data-testid={`copy-hash-${j}`}
+                              >
+                                {copiedHash === product.hash ? (
+                                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                ) : (
+                                  <Copy className="w-4 h-4 text-slate-400" />
+                                )}
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="hidden sm:block">
-                          <div className="w-16 h-16 bg-white rounded p-1">
-                            <QRCodeSVG
-                              value={product.hash}
-                              size={56}
-                              level="M"
-                            />
+                          <div className="hidden sm:block">
+                            <div className="w-16 h-16 bg-white rounded p-1">
+                              <QRCodeSVG
+                                value={product.hash}
+                                size={56}
+                                level="M"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    ))}
+                  </CarouselRail>
+                </OrbitCardContent>
+              </OrbitCard>
+            ))}
+          </div>
         </section>
 
         <section className="text-center py-8 border-t border-slate-800/50 space-y-4">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { 
@@ -11,7 +11,6 @@ import {
   Filter,
   X,
   ChevronLeft,
-  ChevronRight,
   Building2,
   Calendar
 } from "lucide-react";
@@ -37,6 +36,17 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail, CarouselRailItem } from "@/components/ui/carousel-rail";
+import { SectionHeader, PageHeader } from "@/components/ui/section-header";
+import { 
+  OrbitCard, 
+  OrbitCardHeader, 
+  OrbitCardTitle, 
+  OrbitCardDescription, 
+  OrbitCardContent, 
+  OrbitCardFooter 
+} from "@/components/ui/orbit-card";
 
 interface Job {
   id: number;
@@ -107,8 +117,8 @@ function getJobTypeBadgeColor(jobType: string): string {
 
 function JobCardSkeleton() {
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50">
-      <CardContent className="p-6">
+    <OrbitCard>
+      <OrbitCardContent className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div className="space-y-2 flex-1">
             <Skeleton className="h-6 w-3/4" />
@@ -122,36 +132,38 @@ function JobCardSkeleton() {
           <Skeleton className="h-4 w-28" />
         </div>
         <Skeleton className="h-16 w-full" />
-      </CardContent>
-    </Card>
+      </OrbitCardContent>
+    </OrbitCard>
   );
 }
 
 function FeaturedJobCard({ job }: { job: Job }) {
   return (
     <Link href={`/jobs/${job.id}`}>
-      <Card 
-        className="bg-gradient-to-br from-cyan-900/30 to-slate-800/50 border-cyan-500/40 hover:border-cyan-400/60 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10 cursor-pointer"
+      <OrbitCard 
+        variant="action"
+        className="h-full"
         data-testid={`card-featured-job-${job.id}`}
       >
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Star className="w-5 h-5 text-cyan-400 fill-cyan-400" />
-              <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Featured</span>
-            </div>
+        <OrbitCardHeader
+          icon={<Star className="w-5 h-5 text-cyan-400 fill-cyan-400" />}
+          action={
             <Badge className={getJobTypeBadgeColor(job.jobType)} data-testid={`badge-job-type-${job.id}`}>
               {job.jobType}
             </Badge>
-          </div>
-          <h3 className="text-xl font-bold text-white mb-2" data-testid={`text-job-title-${job.id}`}>
+          }
+        >
+          <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Featured</span>
+        </OrbitCardHeader>
+        <OrbitCardContent>
+          <OrbitCardTitle data-testid={`text-job-title-${job.id}`}>
             {job.title}
-          </h3>
-          <div className="flex items-center gap-2 text-slate-400 mb-3">
+          </OrbitCardTitle>
+          <div className="flex items-center gap-2 text-slate-400 mt-2">
             <Building2 className="w-4 h-4" />
             <span data-testid={`text-company-name-${job.id}`}>{job.companyName}</span>
           </div>
-          <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-4">
+          <div className="flex flex-wrap gap-4 text-sm text-slate-400 mt-3">
             <div className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-cyan-400" />
               <span data-testid={`text-location-${job.id}`}>{job.city}, {job.state}</span>
@@ -163,25 +175,25 @@ function FeaturedJobCard({ job }: { job: Job }) {
               </span>
             </div>
           </div>
-          <p className="text-slate-300 text-sm line-clamp-2 mb-4" data-testid={`text-description-${job.id}`}>
+          <p className="text-slate-300 text-sm line-clamp-2 mt-3" data-testid={`text-description-${job.id}`}>
             {job.description}
           </p>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500 flex items-center gap-1">
-              <Calendar className="w-3 h-3" />
-              {formatDate(job.createdAt)}
-            </span>
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="bg-cyan-600 hover:bg-cyan-500"
-              data-testid={`button-view-job-${job.id}`}
-            >
-              View Details
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        </OrbitCardContent>
+        <OrbitCardFooter>
+          <span className="text-xs text-slate-500 flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {formatDate(job.createdAt)}
+          </span>
+          <Button 
+            variant="default" 
+            size="sm" 
+            className="bg-cyan-600 hover:bg-cyan-500"
+            data-testid={`button-view-job-${job.id}`}
+          >
+            View Details
+          </Button>
+        </OrbitCardFooter>
+      </OrbitCard>
     </Link>
   );
 }
@@ -189,27 +201,29 @@ function FeaturedJobCard({ job }: { job: Job }) {
 function JobCard({ job }: { job: Job }) {
   return (
     <Link href={`/jobs/${job.id}`}>
-      <Card 
-        className="bg-slate-800/50 border-slate-700/50 hover:border-cyan-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5 cursor-pointer"
+      <OrbitCard 
+        className="h-full"
         data-testid={`card-job-${job.id}`}
       >
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-1 hover:text-cyan-400 transition-colors" data-testid={`text-job-title-${job.id}`}>
-                {job.title}
-              </h3>
-              <div className="flex items-center gap-2 text-slate-400 text-sm">
-                <Building2 className="w-4 h-4" />
-                <span data-testid={`text-company-name-${job.id}`}>{job.companyName}</span>
-              </div>
-            </div>
+        <OrbitCardHeader
+          action={
             <Badge className={getJobTypeBadgeColor(job.jobType)} data-testid={`badge-job-type-${job.id}`}>
               {job.jobType}
             </Badge>
+          }
+        >
+          <div>
+            <OrbitCardTitle className="hover:text-cyan-400 transition-colors" data-testid={`text-job-title-${job.id}`}>
+              {job.title}
+            </OrbitCardTitle>
+            <div className="flex items-center gap-2 text-slate-400 text-sm mt-1">
+              <Building2 className="w-4 h-4" />
+              <span data-testid={`text-company-name-${job.id}`}>{job.companyName}</span>
+            </div>
           </div>
-          
-          <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-4">
+        </OrbitCardHeader>
+        <OrbitCardContent>
+          <div className="flex flex-wrap gap-4 text-sm text-slate-400 mb-3">
             <div className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-slate-500" />
               <span data-testid={`text-location-${job.id}`}>{job.city}, {job.state}</span>
@@ -225,26 +239,24 @@ function JobCard({ job }: { job: Job }) {
               <span data-testid={`text-posted-date-${job.id}`}>{formatDate(job.createdAt)}</span>
             </div>
           </div>
-
-          <p className="text-slate-400 text-sm line-clamp-2 mb-4" data-testid={`text-description-${job.id}`}>
+          <p className="text-slate-400 text-sm line-clamp-2" data-testid={`text-description-${job.id}`}>
             {job.description}
           </p>
-
-          <div className="flex items-center justify-between pt-3 border-t border-slate-700/50">
-            <Badge variant="outline" className="text-xs text-slate-400" data-testid={`badge-category-${job.id}`}>
-              {job.category}
-            </Badge>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
-              data-testid={`button-view-job-${job.id}`}
-            >
-              View Details
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        </OrbitCardContent>
+        <OrbitCardFooter>
+          <Badge variant="outline" className="text-xs text-slate-400" data-testid={`badge-category-${job.id}`}>
+            {job.category}
+          </Badge>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-500/50"
+            data-testid={`button-view-job-${job.id}`}
+          >
+            View Details
+          </Button>
+        </OrbitCardFooter>
+      </OrbitCard>
     </Link>
   );
 }
@@ -426,6 +438,10 @@ export default function JobBoard() {
                 <ChevronLeft className="w-4 h-4" /> Back to ORBIT
               </span>
             </Link>
+            <PageHeader 
+              title=""
+              className="mb-0"
+            />
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
                 ORBIT Talent Exchange
@@ -438,7 +454,7 @@ export default function JobBoard() {
 
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
-            <div className="bg-slate-800/70 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-slate-700/50 shadow-xl">
+            <OrbitCard variant="glass" className="p-4 sm:p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="relative lg:col-span-2">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -526,7 +542,9 @@ export default function JobBoard() {
                   </Select>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
+              
+              {/* Job Type Filters - Desktop */}
+              <div className="hidden md:flex flex-wrap items-center justify-between gap-4 mt-4">
                 <div className="flex flex-wrap gap-2">
                   {JOB_TYPES.map((type) => (
                     <Button
@@ -569,7 +587,53 @@ export default function JobBoard() {
                   </Button>
                 </div>
               </div>
-            </div>
+
+              {/* Job Type Filters - Mobile Carousel */}
+              <div className="md:hidden mt-4">
+                <CarouselRail gap="sm" showArrows={false}>
+                  {JOB_TYPES.map((type) => (
+                    <CarouselRailItem key={type}>
+                      <Button
+                        type="button"
+                        variant={selectedJobTypes.includes(type) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleJobType(type)}
+                        className={selectedJobTypes.includes(type) 
+                          ? "bg-cyan-600 hover:bg-cyan-500" 
+                          : "border-slate-600 text-slate-300 hover:border-cyan-500 hover:text-cyan-400"
+                        }
+                        data-testid={`button-filter-mobile-${type.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        {type}
+                      </Button>
+                    </CarouselRailItem>
+                  ))}
+                </CarouselRail>
+                <div className="flex gap-2 mt-4 justify-end">
+                  {hasActiveFilters && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="text-slate-400 hover:text-white"
+                      data-testid="button-clear-filters-mobile"
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Clear
+                    </Button>
+                  )}
+                  <Button
+                    type="submit"
+                    className="bg-cyan-600 hover:bg-cyan-500"
+                    data-testid="button-search-mobile"
+                  >
+                    <Search className="w-4 h-4 mr-2" />
+                    Search
+                  </Button>
+                </div>
+              </div>
+            </OrbitCard>
           </form>
         </div>
       </div>
@@ -577,20 +641,28 @@ export default function JobBoard() {
       {/* Featured Jobs Section */}
       {featuredJobs.length > 0 && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Star className="w-6 h-6 text-cyan-400" />
-            <h2 className="text-2xl font-bold text-white">Featured Opportunities</h2>
-          </div>
+          <SectionHeader
+            eyebrow="Top Picks"
+            title="Featured Opportunities"
+            subtitle="Hand-picked positions from verified employers"
+            size="md"
+          />
           {featuredLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => <JobCardSkeleton key={i} />)}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredJobs.slice(0, 3).map((job) => (
-                <FeaturedJobCard key={job.id} job={job} />
+            <BentoGrid cols={3} gap="md">
+              {[1, 2, 3].map((i) => (
+                <BentoTile key={i}>
+                  <JobCardSkeleton />
+                </BentoTile>
               ))}
-            </div>
+            </BentoGrid>
+          ) : (
+            <BentoGrid cols={3} gap="md">
+              {featuredJobs.slice(0, 3).map((job) => (
+                <BentoTile key={job.id}>
+                  <FeaturedJobCard job={job} />
+                </BentoTile>
+              ))}
+            </BentoGrid>
           )}
         </div>
       )}
@@ -611,14 +683,11 @@ export default function JobBoard() {
 
           {/* Category Sidebar */}
           <aside className={`lg:w-64 flex-shrink-0 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
-            <Card className="bg-slate-800/50 border-slate-700/50 sticky top-4">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-cyan-400" />
-                  Categories
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
+            <OrbitCard className="sticky top-4">
+              <OrbitCardHeader icon={<Briefcase className="w-5 h-5 text-cyan-400" />}>
+                <OrbitCardTitle>Categories</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent className="space-y-3">
                 {categories.length === 0 ? (
                   <div className="space-y-2">
                     {[1, 2, 3, 4, 5].map((i) => (
@@ -647,32 +716,38 @@ export default function JobBoard() {
                     </label>
                   ))
                 )}
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </aside>
 
           {/* Job Listings */}
           <main className="flex-1">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-xl font-semibold text-white" data-testid="text-job-count">
-                  {total} Jobs Found
-                </h2>
-                {hasActiveFilters && (
-                  <p className="text-sm text-slate-400 mt-1">
-                    Filtered results
-                  </p>
-                )}
-              </div>
-            </div>
+            <SectionHeader
+              title={`${total} Jobs Found`}
+              subtitle={hasActiveFilters ? "Filtered results" : undefined}
+              size="sm"
+              action={
+                hasActiveFilters ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFilters}
+                    className="text-slate-400 hover:text-white"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Clear filters
+                  </Button>
+                ) : undefined
+              }
+            />
 
             {jobsLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => <JobCardSkeleton key={i} />)}
               </div>
             ) : jobs.length === 0 ? (
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="py-16 text-center">
+              <OrbitCard>
+                <OrbitCardContent className="py-16 text-center">
                   <Briefcase className="w-16 h-16 text-slate-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-2">No Jobs Found</h3>
                   <p className="text-slate-400 mb-6">
@@ -688,14 +763,16 @@ export default function JobBoard() {
                       Clear All Filters
                     </Button>
                   )}
-                </CardContent>
-              </Card>
+                </OrbitCardContent>
+              </OrbitCard>
             ) : (
-              <div className="space-y-4">
+              <BentoGrid cols={1} gap="md">
                 {jobs.map((job) => (
-                  <JobCard key={job.id} job={job} />
+                  <BentoTile key={job.id}>
+                    <JobCard job={job} />
+                  </BentoTile>
                 ))}
-              </div>
+              </BentoGrid>
             )}
 
             {/* Pagination */}

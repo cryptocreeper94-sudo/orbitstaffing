@@ -26,6 +26,10 @@ import { AdminLoginHistory } from '@/components/AdminLoginHistory';
 import { LegalDocs } from '@/components/LegalDocs';
 import { FloatingHelpButton } from '@/components/HelpCenter';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
+import { SectionHeader, PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, StatCard, ActionCard } from '@/components/ui/orbit-card';
 
 const DEVELOPER_SESSION_KEY = 'developer';
 
@@ -2327,27 +2331,29 @@ export default function DeveloperPanel() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-6">
+        <PageHeader
+          title="Developer Panel"
+          subtitle="Technical APIs, integrations, and configuration"
+          breadcrumb={
             <button
               onClick={() => setLocation('/')}
-              className="text-gray-400 hover:text-white transition-colors p-1"
+              className="text-gray-400 hover:text-white transition-colors flex items-center gap-2 text-sm"
               data-testid="button-back-arrow"
-              title="Back"
             >
-              <ArrowRight className="w-5 h-5 transform rotate-180" />
+              <ArrowRight className="w-4 h-4 transform rotate-180" />
+              Back
             </button>
-            <div>
-              <h1 className="text-4xl font-bold flex items-center gap-2">
-                <Code className="w-8 h-8 text-purple-400" />
-                Developer Panel
-              </h1>
-              <p className="text-gray-400">Technical APIs, integrations, and configuration</p>
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <Code className="w-6 h-6 text-purple-400" />
             </div>
-          </div>
+          }
+        />
 
-          {/* Navigation Buttons - Beautiful Grid with Hover Effects */}
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+        {/* Navigation Buttons - Desktop Grid / Mobile Carousel */}
+        <div className="hidden md:block mb-8">
+          <BentoGrid cols={4} gap="md">
             {/* REPLIT AGENT - Talk to Me Button (PRIORITY) */}
             <a
               href="https://replit.com/@JasonDark/ORBIT-Staffing-OS"
@@ -2412,18 +2418,20 @@ export default function DeveloperPanel() {
             </button>
 
             {/* Device Settings Button */}
-            <button
-              onClick={() => setShowDeviceSettings(!showDeviceSettings)}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-purple-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105 hover:-translate-y-1 group"
-              data-testid="button-device-settings"
-            >
-              <Key className="w-6 h-6 md:w-7 md:h-7 text-purple-400 group-hover:text-purple-300 transition-colors" />
-              <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Settings</span>
-            </button>
-          </div>
+            <BentoTile className="p-0">
+              <button
+                onClick={() => setShowDeviceSettings(!showDeviceSettings)}
+                className="relative w-full h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 hover:border-purple-400 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 group"
+                data-testid="button-device-settings"
+              >
+                <Key className="w-6 h-6 md:w-7 md:h-7 text-purple-400 group-hover:text-purple-300 transition-colors" />
+                <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Settings</span>
+              </button>
+            </BentoTile>
+          </BentoGrid>
 
           {/* Second Row - More Actions */}
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 mt-3">
+          <BentoGrid cols={4} gap="md" className="mt-4">
             {/* Incidents Button - goes to Employee Hub Report tab */}
             <button
               onClick={() => navigateTo('/employee-hub')}
@@ -2493,7 +2501,67 @@ export default function DeveloperPanel() {
               <LogOut className="w-5 h-5 md:w-6 md:h-6 text-red-400 group-hover:text-red-300 transition-colors" />
               <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Logout</span>
             </button>
-          </div>
+          </BentoGrid>
+        </div>
+
+        {/* Mobile Carousel Navigation */}
+        <div className="md:hidden mb-6">
+          <CarouselRail title="Quick Actions" showArrows={false} gap="sm" itemWidth="sm">
+            <ActionCard
+              title="Talk to Agent"
+              icon={<Bot className="w-5 h-5" />}
+              onClick={() => window.open('https://replit.com/@JasonDark/ORBIT-Staffing-OS', '_blank')}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Admin"
+              icon={<Shield className="w-5 h-5" />}
+              onClick={() => navigateTo('/admin')}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Employee"
+              icon={<Users className="w-5 h-5" />}
+              onClick={() => navigateTo('/employee-hub')}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Owner"
+              icon={<Briefcase className="w-5 h-5" />}
+              onClick={() => navigateTo('/owner-hub')}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Marketing"
+              icon={<Megaphone className="w-5 h-5" />}
+              onClick={() => navigateTo('/marketing')}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Dashboard"
+              icon={<BarChart3 className="w-5 h-5" />}
+              onClick={() => navigateTo('/dashboard')}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Settings"
+              icon={<Key className="w-5 h-5" />}
+              onClick={() => setShowDeviceSettings(true)}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Report Bug"
+              icon={<AlertCircle className="w-5 h-5" />}
+              onClick={() => setShowBugReport(true)}
+              className="min-w-[140px]"
+            />
+            <ActionCard
+              title="Logout"
+              icon={<LogOut className="w-5 h-5" />}
+              onClick={handleLogout}
+              className="min-w-[140px]"
+            />
+          </CarouselRail>
         </div>
 
         {/* Device Settings Modal */}
@@ -2716,18 +2784,30 @@ export default function DeveloperPanel() {
             <JasonsTodoList />
 
             {/* Widgets */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-1">
+            <SectionHeader
+              title="Dashboard Widgets"
+              subtitle="Weather, hours tracking, and team overview"
+              size="sm"
+            />
+            <BentoGrid cols={3} gap="md">
+              <BentoTile span={1}>
                 <WeatherNewsWidget userRole="dev" zipCode="37201" />
-              </div>
-              <div className="lg:col-span-2">
+              </BentoTile>
+              <BentoTile span={2}>
                 <HourCounter userRole="dev" />
-              </div>
-            </div>
+              </BentoTile>
+            </BentoGrid>
 
             {/* Universal Employee Registry */}
             <div className="mt-8">
-              <UniversalEmployeeRegistry userRole="dev" />
+              <SectionHeader
+                title="Employee Registry"
+                subtitle="Universal employee directory across all systems"
+                size="sm"
+              />
+              <OrbitCard variant="default" className="p-0">
+                <UniversalEmployeeRegistry userRole="dev" />
+              </OrbitCard>
             </div>
           </div>
         )}
@@ -2984,12 +3064,14 @@ export default function DeveloperPanel() {
         {activeTab === 'examples' && (
           <div className="space-y-8">
             {/* Digital Employee Card Example */}
-            <div>
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-cyan-400" />
-                Digital Employee Card with Hallmark
-              </h3>
-              <div className="flex justify-center mb-6">
+            <SectionHeader
+              eyebrow="Design System"
+              title="Digital Employee Card with Hallmark"
+              subtitle="Click to flip the card and see back side with verification code"
+              size="sm"
+            />
+            <OrbitCard variant="glass">
+              <div className="flex justify-center py-4">
                 <DigitalEmployeeCard
                   workerId="WRK-2024-45892"
                   employeeNumber="EMP-0892"
@@ -3005,54 +3087,59 @@ export default function DeveloperPanel() {
                   avatarUrl="https://api.dicebear.com/7.x/avataaars/svg?seed=john"
                 />
               </div>
-              <p className="text-sm text-gray-400 text-center">Click to flip the card and see back side with verification code</p>
-            </div>
+            </OrbitCard>
 
             {/* Hallmark Examples */}
-            <div>
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-purple-400" />
-                Hallmark Watermark Sizes & Usage
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Small */}
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+            <SectionHeader
+              title="Hallmark Watermark Sizes & Usage"
+              size="sm"
+            />
+            <BentoGrid cols={3} gap="md">
+              <BentoTile>
+                <div className="p-6">
                   <div className="flex justify-center mb-4">
                     <HallmarkWatermark size="small" opacity={50} />
                   </div>
                   <p className="font-bold text-cyan-300 text-center mb-2">Small</p>
                   <p className="text-xs text-gray-400 text-center">Emails, badges, inline notifications</p>
                 </div>
-
-                {/* Medium */}
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              </BentoTile>
+              <BentoTile>
+                <div className="p-6">
                   <div className="flex justify-center mb-4">
                     <HallmarkWatermark size="medium" opacity={50} />
                   </div>
                   <p className="font-bold text-cyan-300 text-center mb-2">Medium</p>
                   <p className="text-xs text-gray-400 text-center">Credentials, certificates, cards</p>
                 </div>
-
-                {/* Large */}
-                <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              </BentoTile>
+              <BentoTile>
+                <div className="p-6">
                   <div className="flex justify-center mb-4">
                     <HallmarkWatermark size="large" opacity={50} />
                   </div>
                   <p className="font-bold text-cyan-300 text-center mb-2">Large</p>
                   <p className="text-xs text-gray-400 text-center">Document watermarks, backgrounds</p>
                 </div>
-              </div>
-            </div>
+              </BentoTile>
+            </BentoGrid>
 
             {/* Developer Business Card */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 col-span-full">
-              <h3 className="font-bold text-lg mb-4">Developer Profile Card (ORBIT-0001)</h3>
-              <PersonalCardGenerator userId="orbit-0001" userName="Jason Andrews" cardType="dev" />
-            </div>
+            <OrbitCard variant="default">
+              <OrbitCardHeader icon={<Code className="w-5 h-5 text-purple-400" />}>
+                <OrbitCardTitle>Developer Profile Card (ORBIT-0001)</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <PersonalCardGenerator userId="orbit-0001" userName="Jason Andrews" cardType="dev" />
+              </OrbitCardContent>
+            </OrbitCard>
 
             {/* Assets Available */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-              <h3 className="font-bold text-lg mb-4">Available Assets & Deliverables</h3>
+            <OrbitCard variant="default">
+              <OrbitCardHeader icon={<CheckCircle2 className="w-5 h-5 text-cyan-400" />}>
+                <OrbitCardTitle>Available Assets & Deliverables</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
@@ -3097,7 +3184,8 @@ export default function DeveloperPanel() {
                   </div>
                 </div>
               </div>
-            </div>
+              </OrbitCardContent>
+            </OrbitCard>
           </div>
         )}
 

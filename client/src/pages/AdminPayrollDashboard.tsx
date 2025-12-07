@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { PageHeader, SectionHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, StatCard } from "@/components/ui/orbit-card";
 import {
   LineChart,
   Line,
@@ -13,7 +15,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Clock, CheckCircle2, AlertCircle, DollarSign } from "lucide-react";
+import { Clock, CheckCircle2, AlertCircle, DollarSign, FileText, RefreshCw } from "lucide-react";
 
 export default function AdminPayrollDashboard() {
   const [stats, setStats] = useState({
@@ -28,7 +30,6 @@ export default function AdminPayrollDashboard() {
   const [chartData, setChartData] = useState<any[]>([]);
 
   const { connected } = useWebSocket("payroll", (data) => {
-    // Update stats when WebSocket sends payroll updates
     setStats((prev) => ({
       ...prev,
       ...data,
@@ -47,7 +48,6 @@ export default function AdminPayrollDashboard() {
 
       if (result.success) {
         setStats(result.stats);
-        // Generate mock chart data
         setChartData([
           { date: "Mon", processed: 45, pending: 12, failed: 2 },
           { date: "Tue", processed: 52, pending: 8, failed: 1 },
@@ -64,164 +64,189 @@ export default function AdminPayrollDashboard() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Payroll Dashboard</h1>
-          <p className="text-gray-600 mt-1">
-            Real-time payroll processing and status tracking
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              connected ? "bg-green-500" : "bg-red-500"
-            }`}
-          ></div>
-          <span className="text-sm text-gray-600">
-            {connected ? "Live" : "Offline"}
-          </span>
-          <Button onClick={fetchPayrollStats} variant="outline" size="sm">
-            Refresh
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Records
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-green-200 bg-green-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-              Completed
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">
-              {stats.completed}
+    <div className="space-y-6 p-6 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <PageHeader
+        title="Payroll Dashboard"
+        subtitle="Real-time payroll processing and status tracking"
+        actions={
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+                }`}
+              />
+              <span className="text-sm text-slate-400">
+                {connected ? "Live" : "Offline"}
+              </span>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Clock className="w-4 h-4 text-yellow-600" />
-              Pending
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">
-              {stats.pending}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-600" />
-              Failed
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-red-600">{stats.failed}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-blue-200 bg-blue-50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-blue-600" />
-              Garnishments
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-600">
-              {stats.garnishments}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Payroll Trend (Last 5 Days)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="processed"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="pending"
-                  stroke="#f59e0b"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="failed"
-                  stroke="#ef4444"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Status Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="processed" fill="#10b981" name="Processed" />
-                <Bar dataKey="pending" fill="#f59e0b" name="Pending" />
-                <Bar dataKey="failed" fill="#ef4444" name="Failed" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Payroll Records</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>Payroll records will appear here when processing starts</p>
+            <Button 
+              onClick={fetchPayrollStats} 
+              variant="outline" 
+              size="sm"
+              className="border-slate-600 hover:border-cyan-500 hover:bg-slate-800"
+              data-testid="button-refresh-payroll"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        }
+      />
+
+      <BentoGrid cols={4} gap="md">
+        <BentoTile>
+          <StatCard
+            label="Total Records"
+            value={stats.total}
+            icon={<FileText className="w-6 h-6" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+
+        <BentoTile>
+          <StatCard
+            label="Completed"
+            value={stats.completed}
+            icon={<CheckCircle2 className="w-6 h-6 text-emerald-400" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+
+        <BentoTile>
+          <StatCard
+            label="Pending"
+            value={stats.pending}
+            icon={<Clock className="w-6 h-6 text-yellow-400" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+
+        <BentoTile>
+          <StatCard
+            label="Failed"
+            value={stats.failed}
+            icon={<AlertCircle className="w-6 h-6 text-red-400" />}
+            className="border-0 bg-transparent"
+          />
+        </BentoTile>
+      </BentoGrid>
+
+      <BentoGrid cols={1}>
+        <BentoTile>
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-slate-400 uppercase tracking-wide">Active Garnishments</p>
+                <p className="text-3xl md:text-4xl font-bold text-white mt-1">{stats.garnishments}</p>
+              </div>
+              <DollarSign className="w-8 h-8 text-cyan-400" />
+            </div>
+          </div>
+        </BentoTile>
+      </BentoGrid>
+
+      <SectionHeader
+        title="Analytics"
+        subtitle="Payroll processing trends and distribution"
+        size="md"
+      />
+
+      <BentoGrid cols={2} gap="lg">
+        <BentoTile>
+          <OrbitCard variant="glass" hover={false} className="h-full border-0 bg-transparent">
+            <OrbitCardHeader>
+              <OrbitCardTitle>Payroll Trend (Last 5 Days)</OrbitCardTitle>
+            </OrbitCardHeader>
+            <OrbitCardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="date" stroke="#94a3b8" />
+                  <YAxis stroke="#94a3b8" />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1e293b', 
+                      border: '1px solid #334155',
+                      borderRadius: '8px'
+                    }} 
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="processed"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    dot={{ fill: '#10b981' }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="pending"
+                    stroke="#f59e0b"
+                    strokeWidth={2}
+                    dot={{ fill: '#f59e0b' }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="failed"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    dot={{ fill: '#ef4444' }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </OrbitCardContent>
+          </OrbitCard>
+        </BentoTile>
+
+        <BentoTile>
+          <OrbitCard variant="glass" hover={false} className="h-full border-0 bg-transparent">
+            <OrbitCardHeader>
+              <OrbitCardTitle>Status Distribution</OrbitCardTitle>
+            </OrbitCardHeader>
+            <OrbitCardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                  <XAxis dataKey="date" stroke="#94a3b8" />
+                  <YAxis stroke="#94a3b8" />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1e293b', 
+                      border: '1px solid #334155',
+                      borderRadius: '8px'
+                    }} 
+                  />
+                  <Bar dataKey="processed" fill="#10b981" name="Processed" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="pending" fill="#f59e0b" name="Pending" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="failed" fill="#ef4444" name="Failed" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </OrbitCardContent>
+          </OrbitCard>
+        </BentoTile>
+      </BentoGrid>
+
+      <SectionHeader
+        title="Recent Activity"
+        subtitle="Latest payroll processing records"
+        size="md"
+      />
+
+      <BentoGrid cols={1}>
+        <BentoTile>
+          <OrbitCard variant="default" hover={false} className="border-0 bg-transparent">
+            <OrbitCardHeader>
+              <OrbitCardTitle>Recent Payroll Records</OrbitCardTitle>
+            </OrbitCardHeader>
+            <OrbitCardContent>
+              <div className="text-sm text-slate-400 py-8 text-center">
+                <FileText className="w-12 h-12 mx-auto mb-3 text-slate-600" />
+                <p>Payroll records will appear here when processing starts</p>
+              </div>
+            </OrbitCardContent>
+          </OrbitCard>
+        </BentoTile>
+      </BentoGrid>
     </div>
   );
 }

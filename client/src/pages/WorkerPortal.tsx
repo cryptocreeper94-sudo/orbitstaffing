@@ -1,9 +1,8 @@
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { useLocation } from 'wouter';
 import { 
   MessageSquare, 
@@ -11,153 +10,226 @@ import {
   HardHat, 
   AlertTriangle, 
   CalendarX, 
-  CheckCircle2,
   Send,
   Camera,
   Calendar,
   Zap,
   Share2,
-  Gift
+  DollarSign,
+  MapPin,
+  TrendingUp,
+  Briefcase
 } from "lucide-react";
-import { useState } from "react";
-import WeatherNewsWidget from '@/components/WeatherNewsWidget';
-import HourCounter from '@/components/HourCounter';
+
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail } from '@/components/ui/carousel-rail';
+import { PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, StatCard, ActionCard } from '@/components/ui/orbit-card';
 
 export default function WorkerPortal() {
   const [, setLocation] = useLocation();
-  const [chatOpen, setChatOpen] = useState(false);
+
+  const quickActions = [
+    { 
+      icon: <Clock className="w-5 h-5" />, 
+      title: "Report Late / Absence", 
+      description: "Let us know if you can't make it.",
+      onClick: () => {}
+    },
+    { 
+      icon: <HardHat className="w-5 h-5" />, 
+      title: "Request Equipment", 
+      description: "Need PPE, boots, or tools?",
+      onClick: () => {}
+    },
+    { 
+      icon: <AlertTriangle className="w-5 h-5" />, 
+      title: "Report Safety Issue", 
+      description: "Flag hazards immediately.",
+      onClick: () => setLocation('/incident-reporting')
+    },
+    { 
+      icon: <CalendarX className="w-5 h-5" />, 
+      title: "Time Off Request", 
+      description: "Schedule future vacation.",
+      onClick: () => {}
+    },
+  ];
+
+  const earningsLinks = [
+    { icon: <Zap className="w-4 h-4" />, label: "Bonuses", path: "/worker-bonuses", color: "text-amber-400" },
+    { icon: <Calendar className="w-4 h-4" />, label: "Shifts", path: "/worker-shifts", color: "text-blue-400" },
+    { icon: <Calendar className="w-4 h-4" />, label: "Availability", path: "/worker-availability", color: "text-purple-400" },
+    { icon: <Share2 className="w-4 h-4" />, label: "Referrals", path: "/worker-referrals", color: "text-emerald-400" },
+  ];
 
   return (
     <Shell>
-      <div className="space-y-4 sm:space-y-8 mb-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold font-heading tracking-tight">Worker Hub</h1>
-          <p className="text-xs sm:text-base text-muted-foreground">Manage your shifts, report issues, and request gear.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20 px-2 sm:px-4 py-1 text-[10px] sm:text-xs whitespace-nowrap">
-            Status: Active • On Site
-          </Badge>
-          <Button onClick={() => setLocation('/incident-reporting')} className="bg-red-600 hover:bg-red-700 text-xs min-h-[40px]" data-testid="button-worker-incident-report">
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            <span className="hidden sm:inline">Report Incident</span>
-            <span className="sm:hidden">Incident</span>
-          </Button>
-          <Button onClick={() => setLocation('/pre-apply')} variant="outline" className="text-xs min-h-[40px]" data-testid="button-worker-pre-apply">
-            <Camera className="w-3 h-3 mr-1" />
-            <span className="hidden sm:inline">ID Verification</span>
-            <span className="sm:hidden">ID Check</span>
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Quick Actions */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
-            <ActionCard 
-              icon={Clock} 
-              title="Report Late / Absence" 
-              desc="Let us know if you can't make it."
-              color="text-amber-500"
-            />
-            <ActionCard 
-              icon={HardHat} 
-              title="Request Equipment" 
-              desc="Need PPE, boots, or tools?"
-              color="text-blue-500"
-            />
-            <ActionCard 
-              icon={AlertTriangle} 
-              title="Report Safety Issue" 
-              desc="Flag hazards immediately."
-              color="text-red-500"
-            />
-            <ActionCard 
-              icon={CalendarX} 
-              title="Time Off Request" 
-              desc="Schedule future vacation."
-              color="text-purple-500"
-            />
-          </div>
-
-          <div className="bg-gradient-to-r from-emerald-500/10 to-blue-500/10 border border-emerald-500/20 rounded-lg p-3 sm:p-4">
-            <h3 className="font-bold text-white mb-3 sm:mb-4 text-sm sm:text-base">Your Earnings & Opportunities</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+      <div className="space-y-6 md:space-y-8">
+        <PageHeader
+          title="Worker Hub"
+          subtitle="Manage your shifts, report issues, and request gear."
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 px-3 py-1.5">
+                <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-pulse" />
+                Active • On Site
+              </Badge>
               <Button 
-                onClick={() => setLocation('/worker-bonuses')}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-                data-testid="button-worker-bonuses"
+                onClick={() => setLocation('/incident-reporting')} 
+                className="bg-red-600 hover:bg-red-700 text-white"
+                data-testid="button-worker-incident-report"
               >
-                <Zap className="w-4 h-4 text-amber-500" />
-                <span>Bonuses</span>
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Report Incident
               </Button>
               <Button 
-                onClick={() => setLocation('/worker-shifts')}
+                onClick={() => setLocation('/pre-apply')} 
                 variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-                data-testid="button-worker-shifts"
+                data-testid="button-worker-pre-apply"
               >
-                <Calendar className="w-4 h-4 text-blue-500" />
-                <span>Shifts</span>
-              </Button>
-              <Button 
-                onClick={() => setLocation('/worker-availability')}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-                data-testid="button-worker-availability"
-              >
-                <Calendar className="w-4 h-4 text-purple-500" />
-                <span>Availability</span>
-              </Button>
-              <Button 
-                onClick={() => setLocation('/worker-referrals')}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-                data-testid="button-worker-referrals"
-              >
-                <Share2 className="w-4 h-4 text-green-500" />
-                <span>Referrals</span>
+                <Camera className="w-4 h-4 mr-2" />
+                ID Verification
               </Button>
             </div>
-          </div>
+          }
+        />
 
-          <Card className="bg-card/50 border-border/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="font-heading">Current Assignment</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-start justify-between p-4 rounded-lg bg-background/50 border border-border/50">
-                <div>
-                  <h3 className="font-bold text-lg">TechCorp Warehouse A</h3>
-                  <p className="text-muted-foreground">123 Industrial Pkwy, Nashville, TN</p>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant="outline">Forklift Operator</Badge>
-                    <Badge variant="outline">07:00 AM - 03:30 PM</Badge>
+        <BentoGrid cols={4} gap="md">
+          <BentoTile>
+            <StatCard
+              label="This Week"
+              value="32.5 hrs"
+              icon={<Clock className="w-6 h-6" />}
+              trend={{ value: 8, positive: true }}
+            />
+          </BentoTile>
+          <BentoTile>
+            <StatCard
+              label="Pending Earnings"
+              value="$847.50"
+              icon={<DollarSign className="w-6 h-6" />}
+              trend={{ value: 12, positive: true }}
+            />
+          </BentoTile>
+          <BentoTile>
+            <StatCard
+              label="Completed Shifts"
+              value="14"
+              icon={<Briefcase className="w-6 h-6" />}
+            />
+          </BentoTile>
+          <BentoTile>
+            <StatCard
+              label="Performance"
+              value="4.8★"
+              icon={<TrendingUp className="w-6 h-6" />}
+              trend={{ value: 5, positive: true }}
+            />
+          </BentoTile>
+        </BentoGrid>
+
+        <CarouselRail
+          title="Quick Actions"
+          subtitle="Common tasks and requests"
+          showArrows={true}
+          gap="md"
+          itemWidth="md"
+        >
+          {quickActions.map((action, idx) => (
+            <ActionCard
+              key={idx}
+              title={action.title}
+              description={action.description}
+              icon={action.icon}
+              onClick={action.onClick}
+              className="min-w-[280px]"
+            />
+          ))}
+        </CarouselRail>
+
+        <BentoGrid cols={3} gap="md">
+          <BentoTile span={2}>
+            <OrbitCard variant="default" hover={false} className="h-full border-0 bg-transparent p-0">
+              <OrbitCardHeader>
+                <OrbitCardTitle className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5 text-cyan-400" />
+                  Current Assignment
+                </OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg text-white">TechCorp Warehouse A</h3>
+                      <p className="text-slate-400">123 Industrial Pkwy, Nashville, TN</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
+                          Forklift Operator
+                        </Badge>
+                        <Badge variant="outline" className="border-slate-600 text-slate-300">
+                          07:00 AM - 03:30 PM
+                        </Badge>
+                      </div>
+                    </div>
+                    <Button variant="outline" className="border-cyan-500/30 hover:bg-cyan-500/10">
+                      <MapPin className="w-4 h-4 mr-2" />
+                      View Map
+                    </Button>
                   </div>
                 </div>
-                <Button variant="outline">View Map</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </OrbitCardContent>
+            </OrbitCard>
+          </BentoTile>
 
-        {/* AI Support Chat */}
-        <Card className="h-[600px] flex flex-col bg-card/50 border-border/50 backdrop-blur-sm relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none mix-blend-overlay"></div>
-          <CardHeader className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-10">
-            <CardTitle className="font-heading flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              DarkWave Ops AI
-            </CardTitle>
-            <CardDescription>24/7 Support & Reporting</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 p-0 flex flex-col">
+          <BentoTile>
+            <OrbitCard variant="glass" hover={false} className="h-full border-0 bg-transparent p-0">
+              <OrbitCardHeader>
+                <OrbitCardTitle className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5 text-emerald-400" />
+                  Earnings & Opportunities
+                </OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <div className="grid grid-cols-2 gap-2">
+                  {earningsLinks.map((link, idx) => (
+                    <Button
+                      key={idx}
+                      onClick={() => setLocation(link.path)}
+                      variant="outline"
+                      size="sm"
+                      className="justify-start border-slate-700 hover:border-cyan-500/50 hover:bg-cyan-500/10"
+                      data-testid={`button-worker-${link.label.toLowerCase()}`}
+                    >
+                      <span className={link.color}>{link.icon}</span>
+                      <span className="ml-2">{link.label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </OrbitCardContent>
+            </OrbitCard>
+          </BentoTile>
+        </BentoGrid>
+
+        <BentoTile className="overflow-hidden">
+          <div className="h-[500px] flex flex-col relative">
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none mix-blend-overlay" />
+            
+            <div className="border-b border-slate-700/50 p-4 bg-slate-800/80 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-cyan-500/20">
+                  <MessageSquare className="w-5 h-5 text-cyan-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">Orbit AI Assistant</h3>
+                  <p className="text-xs text-slate-400">24/7 Support & Reporting</p>
+                </div>
+                <Badge className="ml-auto bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+                  Online
+                </Badge>
+              </div>
+            </div>
+
             <ScrollArea className="flex-1 p-4">
               <div className="space-y-4">
                 <ChatMessage 
@@ -165,7 +237,7 @@ export default function WorkerPortal() {
                   content="Hello, Jason. I see you're scheduled for TechCorp tomorrow. Do you need to report an issue or request equipment?" 
                   time="10:00 AM"
                 />
-                 <ChatMessage 
+                <ChatMessage 
                   role="user" 
                   content="Yeah, I'm gonna need new safety glasses." 
                   time="10:02 AM"
@@ -187,49 +259,40 @@ export default function WorkerPortal() {
                 />
               </div>
             </ScrollArea>
-            <div className="p-4 border-t border-border/50 bg-card/80 backdrop-blur-md">
+
+            <div className="p-4 border-t border-slate-700/50 bg-slate-800/80 backdrop-blur-md">
               <div className="relative">
-                <Input placeholder="Type a message..." className="pr-10" />
-                <Button size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-primary hover:bg-primary/10">
+                <Input 
+                  placeholder="Type a message..." 
+                  className="pr-12 bg-slate-900/50 border-slate-600 focus:border-cyan-500" 
+                />
+                <Button 
+                  size="icon" 
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 bg-cyan-500 hover:bg-cyan-600"
+                >
                   <Send className="w-4 h-4" />
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </BentoTile>
       </div>
     </Shell>
   );
 }
 
-function ActionCard({ icon: Icon, title, desc, color }: any) {
-  return (
-    <Card className="bg-card/50 border-border/50 backdrop-blur-sm hover:bg-card/80 hover:border-primary/30 transition-all cursor-pointer group">
-      <CardContent className="p-6 flex items-start gap-4">
-        <div className={`p-3 rounded-lg bg-background/50 ${color}`}>
-          <Icon className="w-6 h-6" />
-        </div>
-        <div>
-          <h3 className="font-bold font-heading group-hover:text-primary transition-colors">{title}</h3>
-          <p className="text-sm text-muted-foreground">{desc}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ChatMessage({ role, content, time }: any) {
+function ChatMessage({ role, content, time }: { role: 'ai' | 'user'; content: string; time: string }) {
   const isAi = role === 'ai';
   return (
     <div className={`flex flex-col ${isAi ? 'items-start' : 'items-end'}`}>
       <div className={`max-w-[85%] rounded-2xl p-3 ${
         isAi 
-          ? 'bg-secondary text-secondary-foreground rounded-tl-none' 
-          : 'bg-primary/10 text-primary rounded-tr-none border border-primary/20'
+          ? 'bg-slate-700/50 text-slate-100 rounded-tl-sm' 
+          : 'bg-cyan-500/20 text-cyan-50 rounded-tr-sm border border-cyan-500/30'
       }`}>
         <p className="text-sm">{content}</p>
       </div>
-      <span className="text-[10px] text-muted-foreground mt-1 px-1">{time}</span>
+      <span className="text-[10px] text-slate-500 mt-1 px-1">{time}</span>
     </div>
   );
 }

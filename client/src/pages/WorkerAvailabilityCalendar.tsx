@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Plus } from "lucide-react";
+import { Calendar, Clock, Plus, ArrowLeft } from "lucide-react";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent } from "@/components/ui/orbit-card";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const TIME_SLOTS = ["Morning (6-12)", "Afternoon (12-5)", "Evening (5-10)", "Night (10-6)"];
@@ -39,57 +41,52 @@ export function WorkerAvailabilityCalendar() {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Back Button */}
-        <div className="mb-4">
-          <button
-            onClick={() => window.history.back()}
-            className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 min-h-[44px] flex items-center"
-            data-testid="button-back"
-            title="Back"
-          >
-            ← Back
-          </button>
-        </div>
+        <PageHeader
+          title="Your Availability"
+          subtitle="Set when you're available for work. More availability = more shift offers!"
+          breadcrumb={
+            <button
+              onClick={() => window.history.back()}
+              className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 min-h-[44px] flex items-center gap-1"
+              data-testid="button-back"
+              title="Back"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+          }
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" className="text-[10px] sm:text-xs min-h-[40px]" data-testid="button-set-full-week">
+                Full Week
+              </Button>
+              <Button variant="outline" size="sm" className="text-[10px] sm:text-xs min-h-[40px]" data-testid="button-set-weekdays">
+                Weekdays
+              </Button>
+              <Button variant="outline" size="sm" className="text-[10px] sm:text-xs min-h-[40px]" data-testid="button-clear-all">
+                Clear All
+              </Button>
+              <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs min-h-[40px]" data-testid="button-save">
+                Save Changes
+              </Button>
+            </div>
+          }
+        />
 
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Your Availability</h1>
-          <p className="text-xs sm:text-base text-gray-400">Set when you're available for work. More availability = more shift offers!</p>
-        </div>
-
-        {/* Quick Set Buttons - Mobile Responsive */}
-        <div className="grid grid-cols-2 sm:flex gap-2 mb-6 flex-wrap">
-          <Button variant="outline" size="sm" className="text-[10px] sm:text-xs min-h-[40px]" data-testid="button-set-full-week">
-            Full Week
-          </Button>
-          <Button variant="outline" size="sm" className="text-[10px] sm:text-xs min-h-[40px]" data-testid="button-set-weekdays">
-            Weekdays
-          </Button>
-          <Button variant="outline" size="sm" className="text-[10px] sm:text-xs min-h-[40px]" data-testid="button-clear-all">
-            Clear All
-          </Button>
-          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] sm:text-xs min-h-[40px] sm:ml-auto col-span-2 sm:col-span-auto" data-testid="button-save">
-            Save Changes
-          </Button>
-        </div>
-
-        {/* Calendar Grid */}
-        <Card className="bg-card/50 border-border/50 overflow-hidden">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Next 2 Weeks
-            </CardTitle>
-            <CardDescription>Click to toggle availability. Green = available, Gray = unavailable</CardDescription>
-          </CardHeader>
-          <CardContent className="overflow-x-auto p-2 sm:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-2 sm:gap-4" style={{gap: "1rem" }}>
+        <OrbitCard variant="glass" className="mb-6">
+          <OrbitCardHeader icon={<Calendar className="w-5 h-5 text-cyan-400" />}>
+            <OrbitCardTitle>Next 2 Weeks</OrbitCardTitle>
+            <OrbitCardDescription>Click to toggle availability. Green = available, Gray = unavailable</OrbitCardDescription>
+          </OrbitCardHeader>
+          <OrbitCardContent className="overflow-x-auto">
+            <BentoGrid cols={4} gap="sm" className="lg:grid-cols-7">
               {dates.map((date, dateIdx) => {
                 const dateStr = date.toISOString().split("T")[0];
                 const dayAvail = availability[dateStr] || {};
                 const isAvailableDay = Object.values(dayAvail).some(v => v);
 
                 return (
-                  <div key={dateIdx} className="bg-slate-800/30 rounded-lg border border-slate-700/30 p-2 sm:p-4">
+                  <BentoTile key={dateIdx} className="p-2 sm:p-4">
                     <div className="mb-2 sm:mb-4 pb-2 sm:pb-3 border-b border-slate-700/30">
                       <p className="font-semibold text-white text-sm sm:text-base">{DAYS[date.getDay() === 0 ? 6 : date.getDay() - 1]}</p>
                       <p className="text-xs sm:text-sm text-muted-foreground">{date.toLocaleDateString()}</p>
@@ -118,19 +115,18 @@ export function WorkerAvailabilityCalendar() {
                         );
                       })}
                     </div>
-                  </div>
+                  </BentoTile>
                 );
               })}
-            </div>
-          </CardContent>
-        </Card>
+            </BentoGrid>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        {/* Info Card */}
-        <Card className="bg-card/50 border-border/50 mt-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Pro Tips</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <OrbitCard variant="default">
+          <OrbitCardHeader>
+            <OrbitCardTitle>Pro Tips</OrbitCardTitle>
+          </OrbitCardHeader>
+          <OrbitCardContent className="space-y-3">
             <div className="flex gap-3">
               <Plus className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-1" />
               <div>
@@ -152,8 +148,8 @@ export function WorkerAvailabilityCalendar() {
                 <p className="text-sm text-muted-foreground">Night shifts and weekends often pay 15-25% more</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
       </div>
     </div>
   );

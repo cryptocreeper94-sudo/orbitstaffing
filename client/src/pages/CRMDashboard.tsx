@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Users,
@@ -50,6 +50,10 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail } from "@/components/ui/carousel-rail";
+import { PageHeader, SectionHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, StatCard, ActionCard } from "@/components/ui/orbit-card";
 
 const PIPELINE_STAGES = [
   { id: "lead", label: "Lead", color: "bg-slate-500", probability: 10 },
@@ -225,123 +229,126 @@ export default function CRMDashboard() {
     });
   };
 
+  const statsData = [
+    {
+      label: "Pipeline Value",
+      value: formatCurrency(dashboardData?.pipeline?.total || 0),
+      icon: <DollarSign className="w-8 h-8" />,
+      testId: "text-pipeline-value",
+      subtitle: `${dashboardData?.pipeline?.dealCount || 0} active deals`,
+    },
+    {
+      label: "Closed Won",
+      value: formatCurrency(dashboardData?.pipeline?.byStage?.closed_won || 0),
+      icon: <CheckCircle2 className="w-8 h-8" />,
+      testId: "text-closed-won",
+      subtitle: "This period",
+    },
+    {
+      label: "Meetings Today",
+      value: String(dashboardData?.upcomingMeetings?.length || 0),
+      icon: <Calendar className="w-8 h-8" />,
+      testId: "text-meetings-today",
+      subtitle: "Upcoming scheduled",
+    },
+    {
+      label: "Email Open Rate",
+      value: `${emailStats.openRate || 0}%`,
+      icon: <Mail className="w-8 h-8" />,
+      testId: "text-email-open-rate",
+      subtitle: "Last 30 days",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-900 p-6">
+    <div className="min-h-screen bg-slate-900 p-4 md:p-6">
       <div className="max-w-[1800px] mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3" data-testid="text-crm-title">
-              <BarChart3 className="w-8 h-8 text-cyan-400" />
-              CRM Dashboard
-            </h1>
-            <p className="text-slate-400 mt-1">
-              Complete customer relationship management - better than HubSpot
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/presentations">
+        <PageHeader
+          title="CRM Dashboard"
+          subtitle="Complete customer relationship management - better than HubSpot"
+          breadcrumb={
+            <div className="flex items-center gap-2 text-cyan-400">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+          }
+          actions={
+            <>
+              <Link href="/presentations">
+                <Button
+                  variant="outline"
+                  className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                  data-testid="button-presentations"
+                >
+                  <Presentation className="w-4 h-4 mr-2" />
+                  Presentations
+                </Button>
+              </Link>
               <Button
+                onClick={() => setShowMeetingModal(true)}
                 variant="outline"
-                className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
-                data-testid="button-presentations"
+                className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                data-testid="button-schedule-meeting"
               >
-                <Presentation className="w-4 h-4 mr-2" />
-                Presentations
+                <Calendar className="w-4 h-4 mr-2" />
+                Schedule Meeting
               </Button>
-            </Link>
-            <Button
-              onClick={() => setShowMeetingModal(true)}
-              variant="outline"
-              className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-              data-testid="button-schedule-meeting"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              Schedule Meeting
-            </Button>
-            <Button
-              onClick={() => setShowDealModal(true)}
-              className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
-              data-testid="button-new-deal"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New Deal
-            </Button>
-          </div>
+              <Button
+                onClick={() => setShowDealModal(true)}
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
+                data-testid="button-new-deal"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Deal
+              </Button>
+            </>
+          }
+        />
+
+        <div className="hidden md:block">
+          <BentoGrid cols={4} gap="md">
+            {statsData.map((stat, index) => (
+              <BentoTile key={index}>
+                <div className="p-4 md:p-5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-xs md:text-sm text-slate-400 uppercase tracking-wide">{stat.label}</p>
+                      <p className="text-2xl md:text-3xl font-bold text-white mt-1" data-testid={stat.testId}>
+                        {stat.value}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">{stat.subtitle}</p>
+                    </div>
+                    <div className="text-cyan-400">{stat.icon}</div>
+                  </div>
+                </div>
+              </BentoTile>
+            ))}
+          </BentoGrid>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-cyan-900/50 to-slate-800 border-cyan-500/30">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">Pipeline Value</p>
-                  <p className="text-2xl font-bold text-cyan-400" data-testid="text-pipeline-value">
-                    {formatCurrency(dashboardData?.pipeline?.total || 0)}
-                  </p>
-                </div>
-                <DollarSign className="w-10 h-10 text-cyan-500/50" />
-              </div>
-              <p className="text-xs text-slate-500 mt-2">
-                {dashboardData?.pipeline?.dealCount || 0} active deals
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-900/50 to-slate-800 border-green-500/30">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">Closed Won</p>
-                  <p className="text-2xl font-bold text-green-400" data-testid="text-closed-won">
-                    {formatCurrency(dashboardData?.pipeline?.byStage?.closed_won || 0)}
-                  </p>
-                </div>
-                <CheckCircle2 className="w-10 h-10 text-green-500/50" />
-              </div>
-              <p className="text-xs text-slate-500 mt-2">This period</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-900/50 to-slate-800 border-purple-500/30">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">Meetings Today</p>
-                  <p className="text-2xl font-bold text-purple-400" data-testid="text-meetings-today">
-                    {dashboardData?.upcomingMeetings?.length || 0}
-                  </p>
-                </div>
-                <Calendar className="w-10 h-10 text-purple-500/50" />
-              </div>
-              <p className="text-xs text-slate-500 mt-2">Upcoming scheduled</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-amber-900/50 to-slate-800 border-amber-500/30">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">Email Open Rate</p>
-                  <p className="text-2xl font-bold text-amber-400" data-testid="text-email-open-rate">
-                    {emailStats.openRate || 0}%
-                  </p>
-                </div>
-                <Mail className="w-10 h-10 text-amber-500/50" />
-              </div>
-              <p className="text-xs text-slate-500 mt-2">Last 30 days</p>
-            </CardContent>
-          </Card>
+        <div className="md:hidden">
+          <CarouselRail title="Quick Stats" gap="md" itemWidth="lg">
+            {statsData.map((stat, index) => (
+              <StatCard
+                key={index}
+                label={stat.label}
+                value={stat.value}
+                icon={stat.icon}
+                className="min-w-[280px]"
+              />
+            ))}
+          </CarouselRail>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-slate-800/50 border border-slate-700/50 p-1">
+          <TabsList className="bg-slate-800/50 border border-slate-700/50 p-1 flex-wrap">
             <TabsTrigger
               value="pipeline"
               className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400"
               data-testid="tab-pipeline"
             >
               <Target className="w-4 h-4 mr-2" />
-              Pipeline Board
+              <span className="hidden sm:inline">Pipeline Board</span>
+              <span className="sm:hidden">Pipeline</span>
             </TabsTrigger>
             <TabsTrigger
               value="activities"
@@ -349,7 +356,8 @@ export default function CRMDashboard() {
               data-testid="tab-activities"
             >
               <Clock className="w-4 h-4 mr-2" />
-              Activity Timeline
+              <span className="hidden sm:inline">Activity Timeline</span>
+              <span className="sm:hidden">Activity</span>
             </TabsTrigger>
             <TabsTrigger
               value="meetings"
@@ -365,7 +373,7 @@ export default function CRMDashboard() {
               data-testid="tab-duplicates"
             >
               <GitMerge className="w-4 h-4 mr-2" />
-              Duplicates
+              <span className="hidden sm:inline">Duplicates</span>
               {duplicates.length > 0 && (
                 <Badge variant="destructive" className="ml-2 text-xs">
                   {duplicates.length}
@@ -378,7 +386,8 @@ export default function CRMDashboard() {
               data-testid="tab-emails"
             >
               <Mail className="w-4 h-4 mr-2" />
-              Email Tracking
+              <span className="hidden sm:inline">Email Tracking</span>
+              <span className="sm:hidden">Emails</span>
             </TabsTrigger>
             <TabsTrigger
               value="workflows"
@@ -391,7 +400,57 @@ export default function CRMDashboard() {
           </TabsList>
 
           <TabsContent value="pipeline" className="space-y-4">
-            <div className="flex gap-4 overflow-x-auto pb-4">
+            <div className="md:hidden">
+              <CarouselRail title="Pipeline Stages" gap="md" itemWidth="lg">
+                {PIPELINE_STAGES.slice(0, -1).map((stage) => (
+                  <OrbitCard key={stage.id} className="min-w-[280px]">
+                    <OrbitCardHeader>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${stage.color}`} />
+                        <OrbitCardTitle className="text-sm">{stage.label}</OrbitCardTitle>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {deals.filter((d: any) => d.stage === stage.id).length}
+                      </Badge>
+                    </OrbitCardHeader>
+                    <OrbitCardContent>
+                      <p className="text-xs text-slate-500 mb-3">
+                        {formatCurrency(
+                          deals
+                            .filter((d: any) => d.stage === stage.id)
+                            .reduce((sum: number, d: any) => sum + parseFloat(d.value || 0), 0)
+                        )}
+                      </p>
+                      <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                        {deals
+                          .filter((d: any) => d.stage === stage.id)
+                          .slice(0, 3)
+                          .map((deal: any) => (
+                            <div
+                              key={deal.id}
+                              className="p-2 rounded bg-slate-700/50 border border-slate-600/50"
+                              onClick={() => {
+                                setSelectedDeal(deal);
+                                setShowDealModal(true);
+                              }}
+                            >
+                              <p className="font-medium text-white text-xs">{deal.name}</p>
+                              <p className="text-cyan-400 text-xs mt-1">
+                                {formatCurrency(parseFloat(deal.value || 0))}
+                              </p>
+                            </div>
+                          ))}
+                        {deals.filter((d: any) => d.stage === stage.id).length === 0 && (
+                          <p className="text-xs text-slate-500 text-center py-4">No deals</p>
+                        )}
+                      </div>
+                    </OrbitCardContent>
+                  </OrbitCard>
+                ))}
+              </CarouselRail>
+            </div>
+
+            <div className="hidden md:flex gap-4 overflow-x-auto pb-4">
               {PIPELINE_STAGES.slice(0, -1).map((stage) => (
                 <div
                   key={stage.id}
@@ -399,26 +458,24 @@ export default function CRMDashboard() {
                   onDragOver={handleDragOver}
                   onDrop={() => handleDrop(stage.id)}
                 >
-                  <Card className="bg-slate-800/50 border-slate-700/50">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${stage.color}`} />
-                          <CardTitle className="text-sm text-white">{stage.label}</CardTitle>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {deals.filter((d: any) => d.stage === stage.id).length}
-                        </Badge>
+                  <OrbitCard className="h-full">
+                    <OrbitCardHeader>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${stage.color}`} />
+                        <OrbitCardTitle className="text-sm">{stage.label}</OrbitCardTitle>
                       </div>
-                      <p className="text-xs text-slate-500">
-                        {formatCurrency(
-                          deals
-                            .filter((d: any) => d.stage === stage.id)
-                            .reduce((sum: number, d: any) => sum + parseFloat(d.value || 0), 0)
-                        )}
-                      </p>
-                    </CardHeader>
-                    <CardContent className="space-y-2 max-h-[400px] overflow-y-auto">
+                      <Badge variant="outline" className="text-xs">
+                        {deals.filter((d: any) => d.stage === stage.id).length}
+                      </Badge>
+                    </OrbitCardHeader>
+                    <p className="text-xs text-slate-500 mb-3">
+                      {formatCurrency(
+                        deals
+                          .filter((d: any) => d.stage === stage.id)
+                          .reduce((sum: number, d: any) => sum + parseFloat(d.value || 0), 0)
+                      )}
+                    </p>
+                    <OrbitCardContent className="space-y-2 max-h-[400px] overflow-y-auto">
                       {deals
                         .filter((d: any) => d.stage === stage.id)
                         .map((deal: any) => (
@@ -464,87 +521,87 @@ export default function CRMDashboard() {
                           Drop deals here
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
+                    </OrbitCardContent>
+                  </OrbitCard>
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-green-400" />
-                    Closed Won
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-32">
-                    {deals.filter((d: any) => d.stage === "closed_won").length === 0 ? (
-                      <p className="text-slate-500 text-center py-4">No closed deals yet</p>
-                    ) : (
-                      deals
-                        .filter((d: any) => d.stage === "closed_won")
-                        .map((deal: any) => (
-                          <div
-                            key={deal.id}
-                            className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0"
-                          >
-                            <span className="text-white">{deal.name}</span>
-                            <span className="text-green-400 font-semibold">
-                              {formatCurrency(parseFloat(deal.value || 0))}
-                            </span>
-                          </div>
-                        ))
-                    )}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <XCircle className="w-5 h-5 text-red-400" />
-                    Closed Lost
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-32">
-                    {deals.filter((d: any) => d.stage === "closed_lost").length === 0 ? (
-                      <p className="text-slate-500 text-center py-4">No lost deals</p>
-                    ) : (
-                      deals
-                        .filter((d: any) => d.stage === "closed_lost")
-                        .map((deal: any) => (
-                          <div
-                            key={deal.id}
-                            className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0"
-                          >
-                            <div>
+            <BentoGrid cols={2} gap="md">
+              <BentoTile>
+                <OrbitCard hover={false} className="h-full border-0 bg-transparent">
+                  <OrbitCardHeader icon={<CheckCircle2 className="w-5 h-5 text-green-400" />}>
+                    <OrbitCardTitle>Closed Won</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <ScrollArea className="h-32">
+                      {deals.filter((d: any) => d.stage === "closed_won").length === 0 ? (
+                        <p className="text-slate-500 text-center py-4">No closed deals yet</p>
+                      ) : (
+                        deals
+                          .filter((d: any) => d.stage === "closed_won")
+                          .map((deal: any) => (
+                            <div
+                              key={deal.id}
+                              className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0"
+                            >
                               <span className="text-white">{deal.name}</span>
-                              {deal.lostReason && (
-                                <p className="text-xs text-slate-500">{deal.lostReason}</p>
-                              )}
+                              <span className="text-green-400 font-semibold">
+                                {formatCurrency(parseFloat(deal.value || 0))}
+                              </span>
                             </div>
-                            <span className="text-red-400 font-semibold">
-                              {formatCurrency(parseFloat(deal.value || 0))}
-                            </span>
-                          </div>
-                        ))
-                    )}
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
+                          ))
+                      )}
+                    </ScrollArea>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+
+              <BentoTile>
+                <OrbitCard hover={false} className="h-full border-0 bg-transparent">
+                  <OrbitCardHeader icon={<XCircle className="w-5 h-5 text-red-400" />}>
+                    <OrbitCardTitle>Closed Lost</OrbitCardTitle>
+                  </OrbitCardHeader>
+                  <OrbitCardContent>
+                    <ScrollArea className="h-32">
+                      {deals.filter((d: any) => d.stage === "closed_lost").length === 0 ? (
+                        <p className="text-slate-500 text-center py-4">No lost deals</p>
+                      ) : (
+                        deals
+                          .filter((d: any) => d.stage === "closed_lost")
+                          .map((deal: any) => (
+                            <div
+                              key={deal.id}
+                              className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0"
+                            >
+                              <div>
+                                <span className="text-white">{deal.name}</span>
+                                {deal.lostReason && (
+                                  <p className="text-xs text-slate-500">{deal.lostReason}</p>
+                                )}
+                              </div>
+                              <span className="text-red-400 font-semibold">
+                                {formatCurrency(parseFloat(deal.value || 0))}
+                              </span>
+                            </div>
+                          ))
+                      )}
+                    </ScrollArea>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </BentoTile>
+            </BentoGrid>
           </TabsContent>
 
           <TabsContent value="activities" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="text-white">Recent Activity Timeline</CardTitle>
-                <CardDescription>All interactions across your CRM</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <OrbitCard>
+              <OrbitCardHeader>
+                <div>
+                  <OrbitCardTitle>Recent Activity Timeline</OrbitCardTitle>
+                  <OrbitCardDescription>All interactions across your CRM</OrbitCardDescription>
+                </div>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <ScrollArea className="h-[500px]">
                   {(dashboardData?.recentActivities || []).length === 0 ? (
                     <div className="text-center py-12 text-slate-500">
@@ -589,27 +646,30 @@ export default function CRMDashboard() {
                     </div>
                   )}
                 </ScrollArea>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="meetings" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader className="flex flex-row items-center justify-between">
+            <OrbitCard>
+              <OrbitCardHeader
+                action={
+                  <Button
+                    onClick={() => setShowMeetingModal(true)}
+                    className="bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
+                    data-testid="button-add-meeting"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Meeting
+                  </Button>
+                }
+              >
                 <div>
-                  <CardTitle className="text-white">Upcoming Meetings</CardTitle>
-                  <CardDescription>Your scheduled meetings and calls</CardDescription>
+                  <OrbitCardTitle>Upcoming Meetings</OrbitCardTitle>
+                  <OrbitCardDescription>Your scheduled meetings and calls</OrbitCardDescription>
                 </div>
-                <Button
-                  onClick={() => setShowMeetingModal(true)}
-                  className="bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
-                  data-testid="button-add-meeting"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Meeting
-                </Button>
-              </CardHeader>
-              <CardContent>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 {meetings.length === 0 ? (
                   <div className="text-center py-12 text-slate-500">
                     <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -634,7 +694,7 @@ export default function CRMDashboard() {
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <p className="font-medium text-white">{meeting.title}</p>
-                              <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
+                              <div className="flex items-center gap-4 mt-2 text-sm text-slate-400 flex-wrap">
                                 <span className="flex items-center gap-1">
                                   <Clock className="w-4 h-4" />
                                   {formatDate(meeting.startTime)}
@@ -666,37 +726,36 @@ export default function CRMDashboard() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="duplicates" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader className="flex flex-row items-center justify-between">
+            <OrbitCard>
+              <OrbitCardHeader
+                icon={<GitMerge className="w-5 h-5 text-cyan-400" />}
+                action={
+                  <Button
+                    onClick={() => scanDuplicatesMutation.mutate()}
+                    disabled={scanDuplicatesMutation.isPending}
+                    className="bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
+                    data-testid="button-scan-duplicates"
+                  >
+                    {scanDuplicatesMutation.isPending ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Search className="w-4 h-4 mr-2" />
+                    )}
+                    Scan for Duplicates
+                  </Button>
+                }
+              >
                 <div>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <GitMerge className="w-5 h-5 text-cyan-400" />
-                    Duplicate Detection
-                  </CardTitle>
-                  <CardDescription>
-                    AI-powered duplicate record detection and merge
-                  </CardDescription>
+                  <OrbitCardTitle>Duplicate Detection</OrbitCardTitle>
+                  <OrbitCardDescription>AI-powered duplicate record detection and merge</OrbitCardDescription>
                 </div>
-                <Button
-                  onClick={() => scanDuplicatesMutation.mutate()}
-                  disabled={scanDuplicatesMutation.isPending}
-                  className="bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30"
-                  data-testid="button-scan-duplicates"
-                >
-                  {scanDuplicatesMutation.isPending ? (
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Search className="w-4 h-4 mr-2" />
-                  )}
-                  Scan for Duplicates
-                </Button>
-              </CardHeader>
-              <CardContent>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 {duplicates.length === 0 ? (
                   <div className="text-center py-12 text-slate-500">
                     <CheckCircle2 className="w-12 h-12 mx-auto mb-4 opacity-50 text-green-500" />
@@ -712,7 +771,7 @@ export default function CRMDashboard() {
                         data-testid={`duplicate-card-${dup.id}`}
                       >
                         <CardContent className="p-4">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between flex-wrap gap-4">
                             <div>
                               <div className="flex items-center gap-2">
                                 <AlertCircle className="w-4 h-4 text-amber-400" />
@@ -752,69 +811,76 @@ export default function CRMDashboard() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="emails" className="space-y-4">
-            <div className="grid grid-cols-4 gap-4">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-400">Total Sent</p>
-                      <p className="text-2xl font-bold text-white">{emailStats.total || 0}</p>
+            <div className="hidden md:block">
+              <BentoGrid cols={4} gap="md">
+                <BentoTile>
+                  <StatCard
+                    label="Total Sent"
+                    value={emailStats.total || 0}
+                    icon={<Send className="w-6 h-6" />}
+                    className="h-full border-0 bg-transparent"
+                  />
+                </BentoTile>
+                <BentoTile>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Opened</p>
+                        <p className="text-2xl font-bold text-emerald-400 mt-1">{emailStats.opened || 0}</p>
+                        <p className="text-xs text-slate-500 mt-1">{emailStats.openRate || 0}% open rate</p>
+                      </div>
+                      <Eye className="w-6 h-6 text-emerald-400" />
                     </div>
-                    <Send className="w-8 h-8 text-slate-500" />
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-400">Opened</p>
-                      <p className="text-2xl font-bold text-green-400">{emailStats.opened || 0}</p>
+                </BentoTile>
+                <BentoTile>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Clicked</p>
+                        <p className="text-2xl font-bold text-cyan-400 mt-1">{emailStats.clicked || 0}</p>
+                        <p className="text-xs text-slate-500 mt-1">{emailStats.clickRate || 0}% click rate</p>
+                      </div>
+                      <MousePointer className="w-6 h-6 text-cyan-400" />
                     </div>
-                    <Eye className="w-8 h-8 text-green-500/50" />
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">{emailStats.openRate || 0}% open rate</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-400">Clicked</p>
-                      <p className="text-2xl font-bold text-cyan-400">{emailStats.clicked || 0}</p>
+                </BentoTile>
+                <BentoTile>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs text-slate-400 uppercase tracking-wide">Bounced</p>
+                        <p className="text-2xl font-bold text-red-400 mt-1">{emailStats.bounced || 0}</p>
+                      </div>
+                      <XCircle className="w-6 h-6 text-red-400" />
                     </div>
-                    <MousePointer className="w-8 h-8 text-cyan-500/50" />
                   </div>
-                  <p className="text-xs text-slate-500 mt-2">{emailStats.clickRate || 0}% click rate</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-400">Bounced</p>
-                      <p className="text-2xl font-bold text-red-400">{emailStats.bounced || 0}</p>
-                    </div>
-                    <XCircle className="w-8 h-8 text-red-500/50" />
-                  </div>
-                </CardContent>
-              </Card>
+                </BentoTile>
+              </BentoGrid>
             </div>
 
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="text-white">Email Activity</CardTitle>
-                <CardDescription>Real-time tracking of email opens and clicks</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <div className="md:hidden">
+              <CarouselRail title="Email Stats" gap="md" itemWidth="md">
+                <StatCard label="Total Sent" value={emailStats.total || 0} icon={<Send className="w-6 h-6" />} />
+                <StatCard label="Opened" value={emailStats.opened || 0} icon={<Eye className="w-6 h-6" />} />
+                <StatCard label="Clicked" value={emailStats.clicked || 0} icon={<MousePointer className="w-6 h-6" />} />
+                <StatCard label="Bounced" value={emailStats.bounced || 0} icon={<XCircle className="w-6 h-6" />} />
+              </CarouselRail>
+            </div>
+
+            <OrbitCard>
+              <OrbitCardHeader>
+                <div>
+                  <OrbitCardTitle>Email Activity</OrbitCardTitle>
+                  <OrbitCardDescription>Real-time tracking of email opens and clicks</OrbitCardDescription>
+                </div>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 {(emailTrackingData?.emails || []).length === 0 ? (
                   <div className="text-center py-12 text-slate-500">
                     <Mail className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -827,13 +893,13 @@ export default function CRMDashboard() {
                       {(emailTrackingData?.emails || []).map((email: any) => (
                         <div
                           key={email.id}
-                          className="flex items-center justify-between p-3 rounded-lg bg-slate-700/30"
+                          className="flex items-center justify-between p-3 rounded-lg bg-slate-700/30 flex-wrap gap-2"
                         >
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-[200px]">
                             <p className="text-white text-sm">{email.subject || 'No subject'}</p>
                             <p className="text-xs text-slate-400">To: {email.toEmail}</p>
                           </div>
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2 flex-wrap">
                             {email.openedAt && (
                               <Badge className="bg-green-500/20 text-green-400">
                                 <Eye className="w-3 h-3 mr-1" />
@@ -863,31 +929,30 @@ export default function CRMDashboard() {
                     </div>
                   </ScrollArea>
                 )}
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
           <TabsContent value="workflows" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader className="flex flex-row items-center justify-between">
+            <OrbitCard>
+              <OrbitCardHeader
+                icon={<Workflow className="w-5 h-5 text-cyan-400" />}
+                action={
+                  <Button
+                    className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
+                    data-testid="button-create-workflow"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Workflow
+                  </Button>
+                }
+              >
                 <div>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Workflow className="w-5 h-5 text-cyan-400" />
-                    Automation Workflows
-                  </CardTitle>
-                  <CardDescription>
-                    Create automated actions triggered by events
-                  </CardDescription>
+                  <OrbitCardTitle>Automation Workflows</OrbitCardTitle>
+                  <OrbitCardDescription>Create automated actions triggered by events</OrbitCardDescription>
                 </div>
-                <Button
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
-                  data-testid="button-create-workflow"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Workflow
-                </Button>
-              </CardHeader>
-              <CardContent>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <div className="text-center py-12 text-slate-500">
                   <Workflow className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p>No workflows created yet</p>
@@ -896,29 +961,41 @@ export default function CRMDashboard() {
                   </p>
                 </div>
 
-                <div className="mt-8 grid grid-cols-3 gap-4">
-                  <Card className="bg-slate-700/30 border-slate-600/30 p-4">
-                    <h4 className="text-white font-medium mb-2">Deal Stage Automation</h4>
-                    <p className="text-sm text-slate-400">
-                      Automatically send emails when deals move to specific stages
-                    </p>
-                    <Badge className="mt-2 bg-cyan-500/20 text-cyan-400">Popular</Badge>
-                  </Card>
-                  <Card className="bg-slate-700/30 border-slate-600/30 p-4">
-                    <h4 className="text-white font-medium mb-2">Lead Follow-up</h4>
-                    <p className="text-sm text-slate-400">
-                      Send automatic follow-up emails to new leads
-                    </p>
-                  </Card>
-                  <Card className="bg-slate-700/30 border-slate-600/30 p-4">
-                    <h4 className="text-white font-medium mb-2">Meeting Reminders</h4>
-                    <p className="text-sm text-slate-400">
-                      Send SMS/email reminders before scheduled meetings
-                    </p>
-                  </Card>
+                <div className="mt-8">
+                  <SectionHeader
+                    title="Popular Templates"
+                    subtitle="Get started quickly with these workflow templates"
+                    size="sm"
+                  />
+                  <BentoGrid cols={3} gap="md">
+                    <BentoTile>
+                      <ActionCard
+                        title="Deal Stage Automation"
+                        description="Automatically send emails when deals move to specific stages"
+                        icon={<Target className="w-5 h-5" />}
+                        className="h-full border-0 bg-transparent"
+                      />
+                    </BentoTile>
+                    <BentoTile>
+                      <ActionCard
+                        title="Lead Follow-up"
+                        description="Send automatic follow-up emails to new leads"
+                        icon={<Mail className="w-5 h-5" />}
+                        className="h-full border-0 bg-transparent"
+                      />
+                    </BentoTile>
+                    <BentoTile>
+                      <ActionCard
+                        title="Meeting Reminders"
+                        description="Send SMS/email reminders before scheduled meetings"
+                        icon={<Calendar className="w-5 h-5" />}
+                        className="h-full border-0 bg-transparent"
+                      />
+                    </BentoTile>
+                  </BentoGrid>
                 </div>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
         </Tabs>
       </div>

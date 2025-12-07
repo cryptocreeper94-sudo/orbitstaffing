@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { Shell } from '@/components/layout/Shell';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail } from '@/components/ui/carousel-rail';
+import { SectionHeader, PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, ActionCard } from '@/components/ui/orbit-card';
 import {
   ChevronDown,
   BookOpen,
@@ -10,9 +13,7 @@ import {
   CheckSquare,
   TrendingUp,
   Settings,
-  Users,
   Zap,
-  Share2,
 } from 'lucide-react';
 
 export default function AdminLanding() {
@@ -31,114 +32,142 @@ export default function AdminLanding() {
     }));
   };
 
+  const quickActions = [
+    {
+      title: 'Main App',
+      description: 'Go to dashboard',
+      icon: <Zap className="w-5 h-5" />,
+      href: '/dashboard',
+      testId: 'button-go-dashboard',
+    },
+    {
+      title: 'Drug Tests',
+      description: 'Billing management',
+      icon: <DollarSign className="w-5 h-5" />,
+      href: '/drug-test-billing',
+      testId: 'button-go-billing',
+    },
+    {
+      title: 'Work Comp',
+      description: 'Compensation admin',
+      icon: <CheckSquare className="w-5 h-5" />,
+      href: '/workers-comp-admin',
+      testId: 'button-go-workcomp',
+    },
+    {
+      title: 'Incidents',
+      description: 'Report management',
+      icon: <TrendingUp className="w-5 h-5" />,
+      href: '/incident-reporting',
+      testId: 'button-go-incidents',
+    },
+  ];
+
   return (
     <Shell>
-      {/* Mobile-First Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold font-heading mb-2">ORBIT Admin Center</h1>
-        <p className="text-muted-foreground text-sm">Master control panel - manage platform from any device</p>
+      <PageHeader
+        title="ORBIT Admin Center"
+        subtitle="Master control panel - manage platform from any device"
+      />
+
+      {/* Quick Actions - Desktop Grid */}
+      <div className="hidden md:block mb-8">
+        <BentoGrid cols={4} gap="md">
+          {quickActions.map((action) => (
+            <BentoTile key={action.testId}>
+              <ActionCard
+                title={action.title}
+                description={action.description}
+                icon={action.icon}
+                onClick={() => window.location.href = action.href}
+                className="h-full border-0 bg-transparent hover:bg-transparent"
+                data-testid={action.testId}
+              />
+            </BentoTile>
+          ))}
+        </BentoGrid>
       </div>
 
-      {/* Quick Action Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <Button
-          onClick={() => window.location.href = '/dashboard'}
-          variant="outline"
-          className="h-20 flex flex-col items-center justify-center"
-          data-testid="button-go-dashboard"
+      {/* Quick Actions - Mobile Carousel */}
+      <div className="md:hidden mb-8">
+        <CarouselRail
+          title="Quick Actions"
+          showArrows={false}
+          gap="md"
+          itemWidth="md"
         >
-          <Zap className="w-6 h-6 mb-1 text-cyan-400" />
-          <span className="text-xs">Main App</span>
-        </Button>
-
-        <Button
-          onClick={() => window.location.href = '/drug-test-billing'}
-          variant="outline"
-          className="h-20 flex flex-col items-center justify-center"
-          data-testid="button-go-billing"
-        >
-          <DollarSign className="w-6 h-6 mb-1 text-green-400" />
-          <span className="text-xs">Drug Tests</span>
-        </Button>
-
-        <Button
-          onClick={() => window.location.href = '/workers-comp-admin'}
-          variant="outline"
-          className="h-20 flex flex-col items-center justify-center"
-          data-testid="button-go-workcomp"
-        >
-          <CheckSquare className="w-6 h-6 mb-1 text-orange-400" />
-          <span className="text-xs">Work Comp</span>
-        </Button>
-
-        <Button
-          onClick={() => window.location.href = '/incident-reporting'}
-          variant="outline"
-          className="h-20 flex flex-col items-center justify-center"
-          data-testid="button-go-incidents"
-        >
-          <TrendingUp className="w-6 h-6 mb-1 text-red-400" />
-          <span className="text-xs">Incidents</span>
-        </Button>
+          {quickActions.map((action) => (
+            <ActionCard
+              key={action.testId}
+              title={action.title}
+              description={action.description}
+              icon={action.icon}
+              onClick={() => window.location.href = action.href}
+              className="w-[200px]"
+              data-testid={action.testId}
+            />
+          ))}
+        </CarouselRail>
       </div>
 
       {/* Investor Pitch Section */}
-      <Card className="border-border/50 mb-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-700/50">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="w-5 h-5 text-blue-400" />
-              Investor Pitch & Stats
-            </CardTitle>
+      <OrbitCard 
+        variant="glass" 
+        className="mb-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-700/50"
+      >
+        <OrbitCardHeader
+          icon={<TrendingUp className="w-5 h-5 text-blue-400" />}
+          action={
             <ChevronDown
-              className={`w-5 h-5 transition-transform ${expandedSections.pitch ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 transition-transform cursor-pointer ${expandedSections.pitch ? 'rotate-180' : ''}`}
               onClick={() => toggleSection('pitch')}
-              style={{ cursor: 'pointer' }}
             />
-          </div>
-        </CardHeader>
+          }
+        >
+          <OrbitCardTitle>Investor Pitch & Stats</OrbitCardTitle>
+        </OrbitCardHeader>
 
         {expandedSections.pitch && (
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div className="bg-slate-700/30 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2"><strong>Market Opportunity</strong></p>
+          <OrbitCardContent className="space-y-4">
+            <BentoGrid cols={2} gap="md">
+              <BentoTile className="p-3">
+                <p className="text-xs text-gray-400 mb-2 font-bold">Market Opportunity</p>
                 <ul className="text-xs text-gray-300 space-y-1">
                   <li>✓ TAM: $150B+ US staffing market</li>
                   <li>✓ SAM: $2-5B digital staffing solutions</li>
                   <li>✓ Tech penetration: &lt;30% (huge gap)</li>
                 </ul>
-              </div>
+              </BentoTile>
 
-              <div className="bg-slate-700/30 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2"><strong>Financial Projections</strong></p>
+              <BentoTile className="p-3">
+                <p className="text-xs text-gray-400 mb-2 font-bold">Financial Projections</p>
                 <ul className="text-xs text-gray-300 space-y-1">
                   <li>✓ Year 1: $205K ARR</li>
                   <li>✓ Year 3: $2.68M ARR (13x growth)</li>
                   <li>✓ Year 5: $13M ARR (63x growth)</li>
                 </ul>
-              </div>
+              </BentoTile>
 
-              <div className="bg-slate-700/30 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2"><strong>Unit Economics</strong></p>
+              <BentoTile className="p-3">
+                <p className="text-xs text-gray-400 mb-2 font-bold">Unit Economics</p>
                 <ul className="text-xs text-gray-300 space-y-1">
                   <li>✓ Gross margin: 40-50%</li>
                   <li>✓ CAC: $3,000-$5,000</li>
                   <li>✓ Payback period: 6-9 months</li>
                   <li>✓ Churn: &lt;3% monthly</li>
                 </ul>
-              </div>
+              </BentoTile>
 
-              <div className="bg-slate-700/30 rounded-lg p-3">
-                <p className="text-xs text-gray-400 mb-2"><strong>Revenue Streams</strong></p>
+              <BentoTile className="p-3">
+                <p className="text-xs text-gray-400 mb-2 font-bold">Revenue Streams</p>
                 <ul className="text-xs text-gray-300 space-y-1">
                   <li>✓ SaaS subscriptions (60%)</li>
                   <li>✓ Partnerships & API (15%)</li>
                   <li>✓ Training & certifications (10%)</li>
                   <li>✓ Data marketplace, mobile, add-ons (15%)</li>
                 </ul>
-              </div>
-            </div>
+              </BentoTile>
+            </BentoGrid>
 
             <div className="bg-blue-900/10 border border-blue-700/50 rounded-lg p-4">
               <p className="text-sm text-blue-300 font-bold mb-2">🎯 Investment Ask: $500K Seed</p>
@@ -164,34 +193,36 @@ export default function AdminLanding() {
             >
               View Owner/Customer Pitch
             </Button>
-          </CardContent>
+          </OrbitCardContent>
         )}
-      </Card>
+      </OrbitCard>
 
       {/* Knowledge Base - Collapsible Sections */}
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold mb-4">Knowledge Base & Business Materials</h2>
+      <SectionHeader
+        title="Knowledge Base & Business Materials"
+        size="md"
+      />
 
+      <BentoGrid cols={1} gap="md" className="mb-8">
         {/* Compliance Roadmap */}
-        <Card
-          className="border-border/50 cursor-pointer hover:bg-card/50 transition"
+        <BentoTile
+          className="cursor-pointer p-4"
           onClick={() => toggleSection('compliance')}
           data-testid="card-compliance"
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <CheckSquare className="w-5 h-5 text-blue-400" />
-                Compliance Roadmap
-              </CardTitle>
+          <OrbitCardHeader
+            icon={<CheckSquare className="w-5 h-5 text-blue-400" />}
+            action={
               <ChevronDown
                 className={`w-5 h-5 transition-transform ${expandedSections.compliance ? 'rotate-180' : ''}`}
               />
-            </div>
-          </CardHeader>
+            }
+          >
+            <OrbitCardTitle>Compliance Roadmap</OrbitCardTitle>
+          </OrbitCardHeader>
 
           {expandedSections.compliance && (
-            <CardContent className="space-y-4">
+            <OrbitCardContent className="space-y-4">
               <div className="space-y-3 text-sm">
                 <div className="bg-slate-700/30 rounded-lg p-3">
                   <p className="font-bold text-blue-300 mb-2">📋 Phase 1: Foundation (Months 1-2)</p>
@@ -224,30 +255,29 @@ export default function AdminLanding() {
                   </ul>
                 </div>
               </div>
-            </CardContent>
+            </OrbitCardContent>
           )}
-        </Card>
+        </BentoTile>
 
         {/* Revenue Models */}
-        <Card
-          className="border-border/50 cursor-pointer hover:bg-card/50 transition"
+        <BentoTile
+          className="cursor-pointer p-4"
           onClick={() => toggleSection('revenue')}
           data-testid="card-revenue"
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <DollarSign className="w-5 h-5 text-green-400" />
-                Revenue Streams & Growth
-              </CardTitle>
+          <OrbitCardHeader
+            icon={<DollarSign className="w-5 h-5 text-green-400" />}
+            action={
               <ChevronDown
                 className={`w-5 h-5 transition-transform ${expandedSections.revenue ? 'rotate-180' : ''}`}
               />
-            </div>
-          </CardHeader>
+            }
+          >
+            <OrbitCardTitle>Revenue Streams & Growth</OrbitCardTitle>
+          </OrbitCardHeader>
 
           {expandedSections.revenue && (
-            <CardContent className="space-y-4">
+            <OrbitCardContent className="space-y-4">
               <div className="space-y-3 text-sm">
                 <div className="bg-slate-700/30 rounded-lg p-3">
                   <p className="font-bold text-green-300 mb-2">💳 Drug Test Billing</p>
@@ -276,30 +306,29 @@ export default function AdminLanding() {
                   </ul>
                 </div>
               </div>
-            </CardContent>
+            </OrbitCardContent>
           )}
-        </Card>
+        </BentoTile>
 
         {/* Blockchain */}
-        <Card
-          className="border-border/50 cursor-pointer hover:bg-card/50 transition border-purple-700/30 bg-purple-900/5"
+        <BentoTile
+          className="cursor-pointer p-4 border-purple-700/30 bg-purple-900/5"
           onClick={() => toggleSection('blockchain')}
           data-testid="card-blockchain"
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Zap className="w-5 h-5 text-purple-400" />
-                Blockchain & Crypto Opportunities
-              </CardTitle>
+          <OrbitCardHeader
+            icon={<Zap className="w-5 h-5 text-purple-400" />}
+            action={
               <ChevronDown
                 className={`w-5 h-5 transition-transform ${expandedSections.blockchain ? 'rotate-180' : ''}`}
               />
-            </div>
-          </CardHeader>
+            }
+          >
+            <OrbitCardTitle>Blockchain & Crypto Opportunities</OrbitCardTitle>
+          </OrbitCardHeader>
 
           {expandedSections.blockchain && (
-            <CardContent className="space-y-3 text-sm">
+            <OrbitCardContent className="space-y-3 text-sm">
               <div className="bg-slate-700/30 rounded-lg p-3">
                 <p className="font-bold text-purple-300 mb-2">🪙 ORBIT Loyalty Token</p>
                 <ul className="text-xs text-gray-400 space-y-1 ml-3">
@@ -317,30 +346,29 @@ export default function AdminLanding() {
                   <li>✓ $20K-$100K/year licensing potential</li>
                 </ul>
               </div>
-            </CardContent>
+            </OrbitCardContent>
           )}
-        </Card>
+        </BentoTile>
 
         {/* Learning & Resources */}
-        <Card
-          className="border-border/50 cursor-pointer hover:bg-card/50 transition"
+        <BentoTile
+          className="cursor-pointer p-4"
           onClick={() => toggleSection('learning')}
           data-testid="card-learning"
         >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <BookOpen className="w-5 h-5 text-cyan-400" />
-                Learning Materials & Resources
-              </CardTitle>
+          <OrbitCardHeader
+            icon={<BookOpen className="w-5 h-5 text-cyan-400" />}
+            action={
               <ChevronDown
                 className={`w-5 h-5 transition-transform ${expandedSections.learning ? 'rotate-180' : ''}`}
               />
-            </div>
-          </CardHeader>
+            }
+          >
+            <OrbitCardTitle>Learning Materials & Resources</OrbitCardTitle>
+          </OrbitCardHeader>
 
           {expandedSections.learning && (
-            <CardContent className="space-y-3 text-sm">
+            <OrbitCardContent className="space-y-3 text-sm">
               <div className="bg-slate-700/30 rounded-lg p-3">
                 <p className="font-bold text-cyan-300 mb-2">📖 Platform Documentation</p>
                 <ul className="text-xs text-gray-400 space-y-1 ml-3">
@@ -358,21 +386,18 @@ export default function AdminLanding() {
                   <li>✓ Workers Comp Compliance</li>
                 </ul>
               </div>
-            </CardContent>
+            </OrbitCardContent>
           )}
-        </Card>
-      </div>
+        </BentoTile>
+      </BentoGrid>
 
       {/* System Status */}
-      <Card className="border-border/50 mt-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            System Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <OrbitCard variant="default" className="mt-8">
+        <OrbitCardHeader icon={<Settings className="w-5 h-5" />}>
+          <OrbitCardTitle>System Status</OrbitCardTitle>
+        </OrbitCardHeader>
+        <OrbitCardContent>
+          <BentoGrid cols={4} gap="sm">
             <div>
               <p className="text-xs text-gray-400 mb-1">Platform Status</p>
               <Badge className="bg-green-900/30 text-green-300">✓ Production Ready</Badge>
@@ -389,9 +414,9 @@ export default function AdminLanding() {
               <p className="text-xs text-gray-400 mb-1">Mobile Apps</p>
               <Badge className="bg-yellow-900/30 text-yellow-300">⏳ Coming Soon</Badge>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </BentoGrid>
+        </OrbitCardContent>
+      </OrbitCard>
     </Shell>
   );
 }

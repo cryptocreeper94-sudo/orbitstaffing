@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,9 @@ import { Link } from 'wouter';
 import { format, startOfWeek, endOfWeek, addWeeks, subWeeks } from 'date-fns';
 import Paystub from '@/components/Paystub';
 import { downloadPaystubPDF } from '@/lib/paystubPDF';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, StatCard } from '@/components/ui/orbit-card';
 
 interface WorkerPayrollData {
   workerId: string;
@@ -93,15 +95,12 @@ export default function PayrollProcessing() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   
-  // Payroll period state
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 1 });
   
-  // Paystub preview
   const [previewPaystub, setPreviewPaystub] = useState<PaystubData | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   
-  // Payroll confirmation preview
   const [showPayrollPreview, setShowPayrollPreview] = useState(false);
   const [payrollPreviewData, setPayrollPreviewData] = useState<PayrollPreviewData[]>([]);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -160,7 +159,6 @@ export default function PayrollProcessing() {
         const error = await res.json();
         toast.error(error.error || 'Failed to generate preview');
         
-        // Fallback: create preview from existing worker data
         const previews: PayrollPreviewData[] = workerIds.map(id => {
           const worker = workers.find(w => w.workerId === id);
           if (!worker) return null;
@@ -231,7 +229,6 @@ export default function PayrollProcessing() {
           });
         }
         
-        // Close preview dialog and reload
         setShowPayrollPreview(false);
         setConfirmationChecked(false);
         await loadWorkersReadyForPayroll();
@@ -250,7 +247,6 @@ export default function PayrollProcessing() {
 
   const previewWorkerPaystub = async (workerId: string) => {
     try {
-      // First, process the payroll for this worker if not already processed
       const res = await fetch('/api/payroll/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -266,7 +262,6 @@ export default function PayrollProcessing() {
         if (data.payrolls && data.payrolls.length > 0) {
           const payrollId = data.payrolls[0].payrollId;
           
-          // Fetch the full paystub data
           const paystubRes = await fetch(`/api/payroll/paystub/${payrollId}`);
           if (paystubRes.ok) {
             const paystubData = await paystubRes.json();
@@ -310,7 +305,6 @@ export default function PayrollProcessing() {
 
     setLoading(true);
     try {
-      // Process all selected workers
       const res = await fetch('/api/payroll/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -324,7 +318,6 @@ export default function PayrollProcessing() {
       if (res.ok) {
         const data = await res.json();
         
-        // Download each paystub
         for (const payroll of data.payrolls) {
           await downloadPaystub(payroll.payrollId);
         }
@@ -372,48 +365,79 @@ export default function PayrollProcessing() {
     return (num || 0).toFixed(decimals);
   };
 
-  // Filter workers
   const filteredWorkers = workers.filter(worker => {
     const matchesSearch = worker.workerName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || worker.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
+  const totalGrossPay = filteredWorkers.reduce((sum, w) => sum + (w.grossPay || 0), 0);
+  const totalNetPay = filteredWorkers.reduce((sum, w) => sum + (w.estimatedNetPay || 0), 0);
+  const totalHours = filteredWorkers.reduce((sum, w) => {
+    return sum + (parseFloat(w.regularHours?.toString() || '0') + parseFloat(w.overtimeHours?.toString() || '0'));
+  }, 0);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6">
-      {/* Back Button */}
-      <div className="max-w-7xl mx-auto mb-4">
-        <Link href="/">
-          <Button 
-            variant="ghost" 
-            className="text-green-500 hover:text-green-400 hover:bg-green-900/20" 
-            data-testid="button-back-home"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </Link>
-      </div>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <DollarSign className="w-8 h-8 text-green-500" />
-            <h1 className="text-4xl font-bold text-white">Payroll Processing</h1>
-          </div>
-          <p className="text-gray-400">Process payroll, generate paystubs with hallmark verification</p>
-        </div>
+        <PageHeader
+          title="Payroll Processing"
+          subtitle="Process payroll, generate paystubs with hallmark verification"
+          breadcrumb={
+            <Link href="/">
+              <Button 
+                variant="ghost" 
+                className="text-cyan-500 hover:text-cyan-400 hover:bg-cyan-900/20 -ml-2" 
+                data-testid="button-back-home"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </Link>
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-8 h-8 text-green-500" />
+            </div>
+          }
+        />
 
-        {/* Payroll Period Selector */}
-        <Card className="bg-slate-800/50 border-slate-700 mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Calendar className="w-5 h-5 text-green-500" />
-              Payroll Period
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <BentoGrid cols={4} gap="md" className="mb-6">
+          <BentoTile>
+            <StatCard
+              label="Workers Ready"
+              value={filteredWorkers.length}
+              icon={<Users className="w-6 h-6" />}
+            />
+          </BentoTile>
+          <BentoTile>
+            <StatCard
+              label="Total Hours"
+              value={`${formatNumber(totalHours)}h`}
+              icon={<Clock className="w-6 h-6" />}
+            />
+          </BentoTile>
+          <BentoTile>
+            <StatCard
+              label="Total Gross"
+              value={formatCurrency(totalGrossPay)}
+              icon={<DollarSign className="w-6 h-6" />}
+            />
+          </BentoTile>
+          <BentoTile>
+            <StatCard
+              label="Total Net"
+              value={formatCurrency(totalNetPay)}
+              icon={<CheckCircle className="w-6 h-6" />}
+            />
+          </BentoTile>
+        </BentoGrid>
+
+        <OrbitCard className="mb-6">
+          <OrbitCardHeader icon={<Calendar className="w-5 h-5 text-green-500" />}>
+            <OrbitCardTitle>Payroll Period</OrbitCardTitle>
+          </OrbitCardHeader>
+          <OrbitCardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <div>
                 <label className="text-sm text-gray-400 mb-2 block">Period Type</label>
@@ -467,12 +491,11 @@ export default function PayrollProcessing() {
                 )}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        {/* Filters and Search */}
-        <Card className="bg-slate-800/50 border-slate-700 mb-6">
-          <CardContent className="pt-6">
+        <OrbitCard className="mb-6">
+          <OrbitCardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
                 <Input
@@ -497,13 +520,12 @@ export default function PayrollProcessing() {
                 </Select>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        {/* Batch Actions */}
         {filteredWorkers.length > 0 && (
-          <Card className="bg-slate-800/50 border-slate-700 mb-6">
-            <CardContent className="pt-6">
+          <OrbitCard className="mb-6">
+            <OrbitCardContent>
               <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex items-center gap-2">
                   <Checkbox
@@ -546,30 +568,28 @@ export default function PayrollProcessing() {
                   Download All Paystubs
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </OrbitCardContent>
+          </OrbitCard>
         )}
 
-        {/* Workers Table */}
         {loading && filteredWorkers.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-12 text-center">
+          <OrbitCard>
+            <OrbitCardContent className="p-12 text-center">
               <Users className="w-12 h-12 text-gray-500 mx-auto mb-4 animate-pulse" />
               <p className="text-gray-300">Loading workers...</p>
-            </CardContent>
-          </Card>
+            </OrbitCardContent>
+          </OrbitCard>
         ) : filteredWorkers.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-12 text-center">
+          <OrbitCard>
+            <OrbitCardContent className="p-12 text-center">
               <Users className="w-12 h-12 text-gray-500 mx-auto mb-4" />
               <p className="text-gray-300">No workers ready for payroll in this period</p>
-            </CardContent>
-          </Card>
+            </OrbitCardContent>
+          </OrbitCard>
         ) : (
           <div className="space-y-4">
-            {/* Desktop Table */}
             <div className="hidden lg:block">
-              <Card className="bg-slate-800/50 border-slate-700 overflow-hidden">
+              <OrbitCard className="overflow-hidden p-0">
                 <table className="w-full">
                   <thead className="bg-slate-700/50">
                     <tr>
@@ -656,81 +676,81 @@ export default function PayrollProcessing() {
                     })}
                   </tbody>
                 </table>
-              </Card>
+              </OrbitCard>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="lg:hidden space-y-4">
+            <BentoGrid cols={2} gap="md" className="lg:hidden">
               {filteredWorkers.map((worker, idx) => {
                 const totalHours = parseFloat(worker.regularHours?.toString() || '0') + 
                                   parseFloat(worker.overtimeHours?.toString() || '0');
                 
                 return (
-                  <Card key={worker.workerId} className="bg-slate-800/50 border-slate-700" data-testid={`card-worker-${idx}`}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3 mb-4">
-                        <Checkbox
-                          checked={selectedWorkers.has(worker.workerId)}
-                          onCheckedChange={() => toggleWorkerSelection(worker.workerId)}
-                          className="mt-1"
-                        />
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-white mb-1">{worker.workerName}</h3>
-                          <Badge className="bg-green-900 text-green-200 text-xs">
-                            {worker.status === 'ready' ? '✓ Ready' : worker.status}
-                          </Badge>
+                  <BentoTile key={worker.workerId}>
+                    <OrbitCard hover={false} className="h-full border-0 bg-transparent" data-testid={`card-worker-${idx}`}>
+                      <OrbitCardContent>
+                        <div className="flex items-start gap-3 mb-4">
+                          <Checkbox
+                            checked={selectedWorkers.has(worker.workerId)}
+                            onCheckedChange={() => toggleWorkerSelection(worker.workerId)}
+                            className="mt-1"
+                          />
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-white mb-1">{worker.workerName}</h3>
+                            <Badge className="bg-green-900 text-green-200 text-xs">
+                              {worker.status === 'ready' ? '✓ Ready' : worker.status}
+                            </Badge>
+                          </div>
                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-3 mb-4">
-                        <div>
-                          <p className="text-xs text-gray-400">Total Hours</p>
-                          <p className="text-lg font-semibold text-cyan-400">{formatNumber(totalHours)}h</p>
+                        
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          <div>
+                            <p className="text-xs text-gray-400">Total Hours</p>
+                            <p className="text-lg font-semibold text-cyan-400">{formatNumber(totalHours)}h</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-400">Gross Pay</p>
+                            <p className="text-lg font-semibold text-white">{formatCurrency(worker.grossPay)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-400">Deductions</p>
+                            <p className="text-lg font-semibold text-red-400">{formatCurrency(worker.estimatedDeductions)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-400">Net Pay</p>
+                            <p className="text-lg font-semibold text-green-400">{formatCurrency(worker.estimatedNetPay)}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-400">Gross Pay</p>
-                          <p className="text-lg font-semibold text-white">{formatCurrency(worker.grossPay)}</p>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => previewWorkerPaystub(worker.workerId)}
+                            className="border-cyan-600 text-cyan-400"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            Preview
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => previewPayroll([worker.workerId])}
+                            disabled={loading || previewLoading}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            <DollarSign className="w-4 h-4 mr-2" />
+                            Process
+                          </Button>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-400">Deductions</p>
-                          <p className="text-lg font-semibold text-red-400">{formatCurrency(worker.estimatedDeductions)}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400">Net Pay</p>
-                          <p className="text-lg font-semibold text-green-400">{formatCurrency(worker.estimatedNetPay)}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => previewWorkerPaystub(worker.workerId)}
-                          className="border-cyan-600 text-cyan-400"
-                        >
-                          <Eye className="w-4 h-4 mr-2" />
-                          Preview
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => previewPayroll([worker.workerId])}
-                          disabled={loading || previewLoading}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <DollarSign className="w-4 h-4 mr-2" />
-                          Process
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </OrbitCardContent>
+                    </OrbitCard>
+                  </BentoTile>
                 );
               })}
-            </div>
+            </BentoGrid>
           </div>
         )}
       </div>
 
-      {/* Payroll Preview Confirmation Dialog */}
       <Dialog open={showPayrollPreview} onOpenChange={setShowPayrollPreview}>
         <DialogContent className="max-w-5xl max-h-[90vh] bg-slate-900 border-slate-700" data-testid="dialog-payroll-preview">
           <DialogHeader>
@@ -745,8 +765,7 @@ export default function PayrollProcessing() {
           
           <ScrollArea className="max-h-[50vh]">
             <div className="space-y-4">
-              {/* Summary */}
-              <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+              <OrbitCard variant="stat">
                 <h3 className="text-lg font-semibold text-white mb-3">Payroll Summary</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
@@ -773,12 +792,11 @@ export default function PayrollProcessing() {
                     <p className="text-xs text-gray-400">Total Net Pay</p>
                   </div>
                 </div>
-              </div>
+              </OrbitCard>
 
-              {/* Worker Details */}
               <div className="space-y-2">
                 {payrollPreviewData.map((preview) => (
-                  <div key={preview.workerId} className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
+                  <OrbitCard key={preview.workerId} variant="glass">
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold text-white">{preview.workerName}</h4>
                       <Badge variant="outline" className="text-cyan-400 border-cyan-400">
@@ -818,14 +836,13 @@ export default function PayrollProcessing() {
                         YTD: Gross {formatCurrency(preview.ytdGross)} | Net {formatCurrency(preview.ytdNet || 0)}
                       </div>
                     )}
-                  </div>
+                  </OrbitCard>
                 ))}
               </div>
             </div>
           </ScrollArea>
           
           <div className="space-y-4 pt-4 border-t border-slate-700">
-            {/* Confirmation Checkbox */}
             <div className="flex items-center gap-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4">
               <Checkbox
                 id="confirm-payroll"
@@ -867,7 +884,6 @@ export default function PayrollProcessing() {
         </DialogContent>
       </Dialog>
 
-      {/* Paystub Preview Dialog */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white" data-testid="dialog-paystub-preview">
           <DialogHeader>

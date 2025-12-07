@@ -1,8 +1,10 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ArrowLeft, Zap, Bug, Sparkles, Shield } from "lucide-react";
+import { PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent } from "@/components/ui/orbit-card";
+import { BentoGrid } from "@/components/ui/bento-grid";
 
 const changelogEntries = [
   {
@@ -127,38 +129,47 @@ export default function Changelog() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        <section className="text-center space-y-2 mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold">Changelog</h1>
-          <p className="text-slate-400 text-sm">Track all updates and improvements to ORBIT Staffing OS</p>
-        </section>
+        <PageHeader
+          title="Changelog"
+          subtitle="Track all updates and improvements to ORBIT Staffing OS"
+        />
 
-        {changelogEntries.map((entry, i) => (
-          <Card key={i} className="bg-slate-900/50 border-slate-700/50">
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 font-mono">
-                  {entry.version}
-                </Badge>
-                {getTypeBadge(entry.type)}
-                <span className="text-xs text-slate-500">{entry.date}</span>
-                {i === 0 && (
-                  <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-xs ml-auto">
-                    Latest
-                  </Badge>
-                )}
-              </div>
+        <BentoGrid cols={1} gap="md">
+          {changelogEntries.map((entry, i) => (
+            <OrbitCard key={i} variant="default">
+              <OrbitCardHeader
+                action={
+                  i === 0 ? (
+                    <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-xs">
+                      Latest
+                    </Badge>
+                  ) : undefined
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <OrbitCardTitle>
+                    <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 font-mono">
+                      {entry.version}
+                    </Badge>
+                  </OrbitCardTitle>
+                  {getTypeBadge(entry.type)}
+                  <span className="text-xs text-slate-500">{entry.date}</span>
+                </div>
+              </OrbitCardHeader>
 
-              <ul className="space-y-2">
-                {entry.changes.map((change, j) => (
-                  <li key={j} className="flex items-start gap-2 text-sm">
-                    {getTypeIcon(change.type)}
-                    <span className="text-slate-300">{change.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        ))}
+              <OrbitCardContent>
+                <ul className="space-y-2">
+                  {entry.changes.map((change, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm">
+                      {getTypeIcon(change.type)}
+                      <span className="text-slate-300">{change.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </OrbitCardContent>
+            </OrbitCard>
+          ))}
+        </BentoGrid>
 
         <section className="text-center py-8 border-t border-slate-800/50">
           <p className="text-xs text-slate-500">

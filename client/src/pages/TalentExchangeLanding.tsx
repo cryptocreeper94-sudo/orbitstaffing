@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail, CarouselRailItem } from "@/components/ui/carousel-rail";
+import { SectionHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, StatCard, ActionCard } from "@/components/ui/orbit-card";
 import { 
   Users, Building2, Rocket, Star, CheckCircle2, Zap, 
-  ArrowRight, Sparkles, Trophy, Gift, Clock, Shield,
-  Briefcase, DollarSign, MapPin
+  Sparkles, Trophy, Gift, Clock,
+  Briefcase
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -92,6 +95,35 @@ export default function TalentExchangeLanding() {
     }
   };
 
+  const foundingMemberBenefits = [
+    {
+      icon: <Trophy className="w-10 h-10 text-amber-400" />,
+      title: "Founding Badge",
+      description: "Permanent \"Founding Member\" status on your profile"
+    },
+    {
+      icon: <Gift className="w-10 h-10 text-green-400" />,
+      title: "Free Features",
+      description: "Lock in free access to premium features forever"
+    },
+    {
+      icon: <Star className="w-10 h-10 text-cyan-400" />,
+      title: "Priority Matching",
+      description: "Get matched before regular users as we grow"
+    },
+    {
+      icon: <Zap className="w-10 h-10 text-purple-400" />,
+      title: "Shape the Platform",
+      description: "Your feedback directly influences our features"
+    }
+  ];
+
+  const howItWorksSteps = [
+    { step: 1, title: "Quick Sign Up", description: "Just enter your email - takes 30 seconds" },
+    { step: 2, title: "Complete Profile", description: "Add your skills or post your first job" },
+    { step: 3, title: "Get Matched", description: "Our AI connects you with perfect matches" }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
       {/* Hero Section */}
@@ -119,214 +151,211 @@ export default function TalentExchangeLanding() {
             talent marketplace. Free signup. Help us build something amazing.
           </p>
 
-          {/* Two-Column Signup */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto px-4">
-            
+          {/* Two-Column Signup using BentoGrid */}
+          <BentoGrid cols={2} gap="md" className="max-w-4xl mx-auto">
             {/* Worker Quick Signup */}
-            <Card className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300" data-testid="card-worker-signup">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-cyan-500/25">
-                  <Users className="w-8 h-8 text-white" />
-                </div>
-                <CardTitle className="text-xl sm:text-2xl text-white">Find Work</CardTitle>
-                <CardDescription className="text-slate-300">
-                  Join our talent pool - it takes 30 seconds
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-green-400">
-                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                    <span>Free forever for workers</span>
+            <BentoTile className="p-0 border-cyan-500/30 hover:border-cyan-500/50" data-testid="card-worker-signup">
+              <OrbitCard variant="default" hover={false} className="h-full border-0 bg-transparent">
+                <OrbitCardHeader className="flex-col items-center text-center mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-cyan-500/25">
+                    <Users className="w-8 h-8 text-white" />
                   </div>
-                  <div className="flex items-center gap-2 text-green-400">
-                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                    <span>Get matched to jobs automatically</span>
+                  <OrbitCardTitle className="text-xl sm:text-2xl">Find Work</OrbitCardTitle>
+                  <OrbitCardDescription>Join our talent pool - it takes 30 seconds</OrbitCardDescription>
+                </OrbitCardHeader>
+                <OrbitCardContent className="space-y-4">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-green-400">
+                      <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                      <span>Free forever for workers</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-green-400">
+                      <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                      <span>Get matched to jobs automatically</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-amber-400">
+                      <Star className="w-4 h-4 flex-shrink-0" />
+                      <span className="font-semibold">Founding Member badge on profile</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-amber-400">
-                    <Star className="w-4 h-4 flex-shrink-0" />
-                    <span className="font-semibold">Founding Member badge on profile</span>
-                  </div>
-                </div>
 
-                <form onSubmit={handleWorkerQuickSignup} className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={workerEmail}
-                    onChange={(e) => setWorkerEmail(e.target.value)}
-                    className="bg-slate-900/50 border-slate-600 focus:border-cyan-500 text-white"
-                    data-testid="input-worker-email"
-                  />
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold py-3"
-                    disabled={isWorkerLoading}
-                    data-testid="button-worker-signup"
-                  >
-                    {isWorkerLoading ? (
-                      <span className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 animate-spin" />
-                        Joining...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Rocket className="w-4 h-4" />
-                        Join as Founding Member
-                      </span>
-                    )}
-                  </Button>
-                </form>
+                  <form onSubmit={handleWorkerQuickSignup} className="space-y-3">
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={workerEmail}
+                      onChange={(e) => setWorkerEmail(e.target.value)}
+                      className="bg-slate-900/50 border-slate-600 focus:border-cyan-500 text-white"
+                      data-testid="input-worker-email"
+                    />
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold py-3"
+                      disabled={isWorkerLoading}
+                      data-testid="button-worker-signup"
+                    >
+                      {isWorkerLoading ? (
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 animate-spin" />
+                          Joining...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Rocket className="w-4 h-4" />
+                          Join as Founding Member
+                        </span>
+                      )}
+                    </Button>
+                  </form>
 
-                <p className="text-xs text-slate-500 text-center">
-                  Already have an account?{" "}
-                  <Link href="/apply" className="text-cyan-400 hover:underline">
-                    Complete your profile
-                  </Link>
-                </p>
-              </CardContent>
-            </Card>
+                  <p className="text-xs text-slate-500 text-center">
+                    Already have an account?{" "}
+                    <Link href="/apply" className="text-cyan-400 hover:underline">
+                      Complete your profile
+                    </Link>
+                  </p>
+                </OrbitCardContent>
+              </OrbitCard>
+            </BentoTile>
 
             {/* Employer Quick Signup */}
-            <Card className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-purple-500/30 hover:border-purple-500/50 transition-all duration-300" data-testid="card-employer-signup">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/25">
-                  <Building2 className="w-8 h-8 text-white" />
-                </div>
-                <CardTitle className="text-xl sm:text-2xl text-white">Hire Talent</CardTitle>
-                <CardDescription className="text-slate-300">
-                  Post jobs and find workers instantly
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-green-400">
-                    <Gift className="w-4 h-4 flex-shrink-0" />
-                    <span className="font-semibold">First job post FREE</span>
+            <BentoTile className="p-0 border-purple-500/30 hover:border-purple-500/50" data-testid="card-employer-signup">
+              <OrbitCard variant="default" hover={false} className="h-full border-0 bg-transparent">
+                <OrbitCardHeader className="flex-col items-center text-center mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/25">
+                    <Building2 className="w-8 h-8 text-white" />
                   </div>
-                  <div className="flex items-center gap-2 text-green-400">
-                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                    <span>AI-powered candidate matching</span>
+                  <OrbitCardTitle className="text-xl sm:text-2xl">Hire Talent</OrbitCardTitle>
+                  <OrbitCardDescription>Post jobs and find workers instantly</OrbitCardDescription>
+                </OrbitCardHeader>
+                <OrbitCardContent className="space-y-4">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2 text-green-400">
+                      <Gift className="w-4 h-4 flex-shrink-0" />
+                      <span className="font-semibold">First job post FREE</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-green-400">
+                      <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                      <span>AI-powered candidate matching</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-amber-400">
+                      <Trophy className="w-4 h-4 flex-shrink-0" />
+                      <span className="font-semibold">Founding Employer status</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-amber-400">
-                    <Trophy className="w-4 h-4 flex-shrink-0" />
-                    <span className="font-semibold">Founding Employer status</span>
-                  </div>
-                </div>
 
-                <form onSubmit={handleEmployerQuickSignup} className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Enter your work email"
-                    value={employerEmail}
-                    onChange={(e) => setEmployerEmail(e.target.value)}
-                    className="bg-slate-900/50 border-slate-600 focus:border-purple-500 text-white"
-                    data-testid="input-employer-email"
-                  />
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3"
-                    disabled={isEmployerLoading}
-                    data-testid="button-employer-signup"
-                  >
-                    {isEmployerLoading ? (
-                      <span className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 animate-spin" />
-                        Joining...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
-                        Join as Founding Employer
-                      </span>
-                    )}
-                  </Button>
-                </form>
+                  <form onSubmit={handleEmployerQuickSignup} className="space-y-3">
+                    <Input
+                      type="email"
+                      placeholder="Enter your work email"
+                      value={employerEmail}
+                      onChange={(e) => setEmployerEmail(e.target.value)}
+                      className="bg-slate-900/50 border-slate-600 focus:border-purple-500 text-white"
+                      data-testid="input-employer-email"
+                    />
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3"
+                      disabled={isEmployerLoading}
+                      data-testid="button-employer-signup"
+                    >
+                      {isEmployerLoading ? (
+                        <span className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 animate-spin" />
+                          Joining...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <Sparkles className="w-4 h-4" />
+                          Join as Founding Employer
+                        </span>
+                      )}
+                    </Button>
+                  </form>
 
-                <p className="text-xs text-slate-500 text-center">
-                  Already registered?{" "}
-                  <Link href="/employer/login" className="text-purple-400 hover:underline">
-                    Log in here
-                  </Link>
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+                  <p className="text-xs text-slate-500 text-center">
+                    Already registered?{" "}
+                    <Link href="/employer/login" className="text-purple-400 hover:underline">
+                      Log in here
+                    </Link>
+                  </p>
+                </OrbitCardContent>
+              </OrbitCard>
+            </BentoTile>
+          </BentoGrid>
         </div>
       </div>
 
       {/* Why Join Early Section */}
       <div className="container mx-auto px-4 py-12 sm:py-16">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-3">
-          Why Be a <span className="text-amber-400">Founding Member</span>?
-        </h2>
-        <p className="text-slate-400 text-center max-w-xl mx-auto mb-8 sm:mb-12">
-          Join now and get exclusive benefits that will never be offered again
-        </p>
+        <SectionHeader
+          eyebrow="Exclusive Benefits"
+          title="Why Be a Founding Member?"
+          subtitle="Join now and get exclusive benefits that will never be offered again"
+          align="center"
+          size="lg"
+        />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-          <Card className="bg-slate-800/50 border-slate-700/50 text-center p-4 sm:p-6">
-            <Trophy className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-            <h3 className="font-semibold text-white mb-2">Founding Badge</h3>
-            <p className="text-sm text-slate-400">Permanent "Founding Member" status on your profile</p>
-          </Card>
+        {/* Desktop: BentoGrid */}
+        <div className="hidden md:block">
+          <BentoGrid cols={4} gap="md" className="max-w-5xl mx-auto">
+            {foundingMemberBenefits.map((benefit, index) => (
+              <BentoTile key={index}>
+                <div className="flex flex-col items-center text-center p-2">
+                  {benefit.icon}
+                  <h3 className="font-semibold text-white mt-3 mb-2">{benefit.title}</h3>
+                  <p className="text-sm text-slate-400">{benefit.description}</p>
+                </div>
+              </BentoTile>
+            ))}
+          </BentoGrid>
+        </div>
 
-          <Card className="bg-slate-800/50 border-slate-700/50 text-center p-4 sm:p-6">
-            <Gift className="w-10 h-10 text-green-400 mx-auto mb-3" />
-            <h3 className="font-semibold text-white mb-2">Free Features</h3>
-            <p className="text-sm text-slate-400">Lock in free access to premium features forever</p>
-          </Card>
-
-          <Card className="bg-slate-800/50 border-slate-700/50 text-center p-4 sm:p-6">
-            <Star className="w-10 h-10 text-cyan-400 mx-auto mb-3" />
-            <h3 className="font-semibold text-white mb-2">Priority Matching</h3>
-            <p className="text-sm text-slate-400">Get matched before regular users as we grow</p>
-          </Card>
-
-          <Card className="bg-slate-800/50 border-slate-700/50 text-center p-4 sm:p-6">
-            <Zap className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-            <h3 className="font-semibold text-white mb-2">Shape the Platform</h3>
-            <p className="text-sm text-slate-400">Your feedback directly influences our features</p>
-          </Card>
+        {/* Mobile: CarouselRail */}
+        <div className="md:hidden">
+          <CarouselRail gap="md" itemWidth="lg" showArrows={false}>
+            {foundingMemberBenefits.map((benefit, index) => (
+              <CarouselRailItem key={index}>
+                <OrbitCard variant="stat" className="text-center p-6 h-full min-w-[280px]">
+                  <div className="flex flex-col items-center">
+                    {benefit.icon}
+                    <h3 className="font-semibold text-white mt-3 mb-2">{benefit.title}</h3>
+                    <p className="text-sm text-slate-400">{benefit.description}</p>
+                  </div>
+                </OrbitCard>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
       </div>
 
       {/* How It Works */}
       <div className="container mx-auto px-4 py-12 sm:py-16 border-t border-slate-800">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-8 sm:mb-12">
-          How It Works
-        </h2>
+        <SectionHeader
+          title="How It Works"
+          align="center"
+          size="lg"
+          className="mb-8 sm:mb-12"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-cyan-500">
-              <span className="text-cyan-400 font-bold text-lg">1</span>
-            </div>
-            <h3 className="font-semibold text-white mb-2">Quick Sign Up</h3>
-            <p className="text-sm text-slate-400">Just enter your email - takes 30 seconds</p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-cyan-500">
-              <span className="text-cyan-400 font-bold text-lg">2</span>
-            </div>
-            <h3 className="font-semibold text-white mb-2">Complete Profile</h3>
-            <p className="text-sm text-slate-400">Add your skills or post your first job</p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-cyan-500">
-              <span className="text-cyan-400 font-bold text-lg">3</span>
-            </div>
-            <h3 className="font-semibold text-white mb-2">Get Matched</h3>
-            <p className="text-sm text-slate-400">Our AI connects you with perfect matches</p>
-          </div>
-        </div>
+        <BentoGrid cols={3} gap="lg" className="max-w-4xl mx-auto">
+          {howItWorksSteps.map((item) => (
+            <BentoTile key={item.step} className="bg-transparent border-0 hover:border-0">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-cyan-500">
+                  <span className="text-cyan-400 font-bold text-lg">{item.step}</span>
+                </div>
+                <h3 className="font-semibold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-slate-400">{item.description}</p>
+              </div>
+            </BentoTile>
+          ))}
+        </BentoGrid>
       </div>
 
       {/* Bottom CTA */}
       <div className="container mx-auto px-4 py-12 sm:py-16">
-        <Card className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border-cyan-500/30 p-6 sm:p-8 text-center max-w-2xl mx-auto">
+        <OrbitCard variant="action" hover={false} className="p-6 sm:p-8 text-center max-w-2xl mx-auto bg-gradient-to-r from-cyan-900/30 to-purple-900/30 cursor-default">
           <Sparkles className="w-12 h-12 text-amber-400 mx-auto mb-4" />
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
             Help Us Build Something Great
@@ -349,7 +378,7 @@ export default function TalentExchangeLanding() {
               </Button>
             </Link>
           </div>
-        </Card>
+        </OrbitCard>
       </div>
 
       {/* Footer */}

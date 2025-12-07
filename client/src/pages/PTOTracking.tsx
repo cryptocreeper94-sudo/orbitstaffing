@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,7 +12,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import { format, differenceInBusinessDays, addDays } from "date-fns";
+import { format, differenceInBusinessDays } from "date-fns";
+import { BentoGrid } from "@/components/ui/bento-grid";
+import { PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent, StatCard } from "@/components/ui/orbit-card";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -26,9 +27,7 @@ import {
   XCircle,
   AlertCircle,
   Send,
-  TrendingUp,
-  Users,
-  Filter
+  Users
 } from "lucide-react";
 
 export default function PTOTracking() {
@@ -125,110 +124,110 @@ export default function PTOTracking() {
   return (
     <Shell>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight" data-testid="text-page-title">Time Off</h1>
-            <p className="text-muted-foreground">Track your PTO, request time off, and view company holidays</p>
-          </div>
-          <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-request-pto">
-                <Plus className="w-4 h-4 mr-2" />
-                Request Time Off
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Request Time Off</DialogTitle>
-                <DialogDescription>Submit a new PTO request for approval</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Type of Time Off</Label>
-                  <Select value={requestForm.type} onValueChange={(v) => setRequestForm({...requestForm, type: v})}>
-                    <SelectTrigger data-testid="select-pto-type">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="vacation">Vacation (12 days available)</SelectItem>
-                      <SelectItem value="sick">Sick Leave (5 days available)</SelectItem>
-                      <SelectItem value="personal">Personal Day (3 days available)</SelectItem>
-                      <SelectItem value="unpaid">Unpaid Leave</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Start Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-start-date">
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {startDate ? format(startDate, "PPP") : "Pick date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={startDate}
-                          onSelect={setStartDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>End Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-end-date">
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {endDate ? format(endDate, "PPP") : "Pick date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={endDate}
-                          onSelect={setEndDate}
-                          disabled={(date) => startDate ? date < startDate : false}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                </div>
-
-                {startDate && endDate && (
-                  <div className="p-3 rounded-lg bg-cyan-900/20 border border-cyan-500/30">
-                    <p className="text-sm text-cyan-300">
-                      Requesting <strong>{differenceInBusinessDays(endDate, startDate) + 1}</strong> business day(s)
-                    </p>
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="reason">Reason (Optional)</Label>
-                  <Textarea
-                    id="reason"
-                    placeholder="Brief description of your time off..."
-                    value={requestForm.reason}
-                    onChange={(e) => setRequestForm({...requestForm, reason: e.target.value})}
-                    data-testid="input-reason"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)} data-testid="button-cancel-request">Cancel</Button>
-                <Button onClick={handleSubmitRequest} className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-submit-request">
-                  <Send className="w-4 h-4 mr-2" />
-                  Submit Request
+        <PageHeader
+          title="Time Off"
+          subtitle="Track your PTO, request time off, and view company holidays"
+          actions={
+            <Dialog open={isRequestDialogOpen} onOpenChange={setIsRequestDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-request-pto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Request Time Off
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Request Time Off</DialogTitle>
+                  <DialogDescription>Submit a new PTO request for approval</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>Type of Time Off</Label>
+                    <Select value={requestForm.type} onValueChange={(v) => setRequestForm({...requestForm, type: v})}>
+                      <SelectTrigger data-testid="select-pto-type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="vacation">Vacation (12 days available)</SelectItem>
+                        <SelectItem value="sick">Sick Leave (5 days available)</SelectItem>
+                        <SelectItem value="personal">Personal Day (3 days available)</SelectItem>
+                        <SelectItem value="unpaid">Unpaid Leave</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Start Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-start-date">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {startDate ? format(startDate, "PPP") : "Pick date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={startDate}
+                            onSelect={setStartDate}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>End Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal" data-testid="button-end-date">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {endDate ? format(endDate, "PPP") : "Pick date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={endDate}
+                            onSelect={setEndDate}
+                            disabled={(date) => startDate ? date < startDate : false}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  {startDate && endDate && (
+                    <div className="p-3 rounded-lg bg-cyan-900/20 border border-cyan-500/30">
+                      <p className="text-sm text-cyan-300">
+                        Requesting <strong>{differenceInBusinessDays(endDate, startDate) + 1}</strong> business day(s)
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="reason">Reason (Optional)</Label>
+                    <Textarea
+                      id="reason"
+                      placeholder="Brief description of your time off..."
+                      value={requestForm.reason}
+                      onChange={(e) => setRequestForm({...requestForm, reason: e.target.value})}
+                      data-testid="input-reason"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsRequestDialogOpen(false)} data-testid="button-cancel-request">Cancel</Button>
+                  <Button onClick={handleSubmitRequest} className="bg-cyan-600 hover:bg-cyan-700" data-testid="button-submit-request">
+                    <Send className="w-4 h-4 mr-2" />
+                    Submit Request
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          }
+        />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="grid grid-cols-3 bg-slate-800/50 p-1" data-testid="tabs-pto">
@@ -246,50 +245,30 @@ export default function PTOTracking() {
             </TabsTrigger>
           </TabsList>
 
-          {/* MY PTO TAB */}
           <TabsContent value="my-pto" className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <BentoGrid cols={4} gap="md">
               {[
-                { type: "vacation", label: "Vacation", color: "yellow", data: mockPtoBalances.vacation },
-                { type: "sick", label: "Sick Leave", color: "red", data: mockPtoBalances.sick },
-                { type: "personal", label: "Personal", color: "purple", data: mockPtoBalances.personal },
-                { type: "unpaid", label: "Unpaid", color: "slate", data: mockPtoBalances.unpaid },
+                { type: "vacation", label: "Vacation", icon: <Sun className="w-5 h-5" />, data: mockPtoBalances.vacation },
+                { type: "sick", label: "Sick Leave", icon: <Heart className="w-5 h-5" />, data: mockPtoBalances.sick },
+                { type: "personal", label: "Personal", icon: <Briefcase className="w-5 h-5" />, data: mockPtoBalances.personal },
+                { type: "unpaid", label: "Unpaid", icon: <Clock className="w-5 h-5" />, data: mockPtoBalances.unpaid },
               ].map((pto) => (
-                <Card key={pto.type} className="bg-slate-800/50 border-slate-700/50" data-testid={`card-balance-${pto.type}`}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      {getTypeIcon(pto.type)}
-                      <span className="text-sm font-medium">{pto.label}</span>
-                    </div>
-                    <div className="text-3xl font-bold mb-1">
-                      {typeof pto.data.available === 'number' ? pto.data.available : pto.data.available}
-                      <span className="text-sm font-normal text-slate-400 ml-1">days</span>
-                    </div>
-                    {typeof pto.data.accrued === 'number' && (
-                      <Progress 
-                        value={(pto.data.used / pto.data.accrued) * 100} 
-                        className="h-2 mb-2" 
-                      />
-                    )}
-                    <div className="flex justify-between text-xs text-slate-400">
-                      <span>Used: {pto.data.used}</span>
-                      {pto.data.pending > 0 && (
-                        <span className="text-yellow-400">Pending: {pto.data.pending}</span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <StatCard
+                  key={pto.type}
+                  label={pto.label}
+                  value={`${pto.data.available} days`}
+                  icon={pto.icon}
+                  className="data-testid-wrapper"
+                  data-testid={`card-balance-${pto.type}`}
+                />
               ))}
-            </div>
+            </BentoGrid>
 
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-cyan-400" />
-                  My Requests
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+            <OrbitCard>
+              <OrbitCardHeader icon={<Clock className="w-5 h-5 text-cyan-400" />}>
+                <OrbitCardTitle>My Requests</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <ScrollArea className="h-[300px]">
                   <div className="space-y-3">
                     {mockRequests.map((request) => (
@@ -331,28 +310,24 @@ export default function PTOTracking() {
                     ))}
                   </div>
                 </ScrollArea>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
 
-          {/* APPROVE REQUESTS TAB (ADMIN) */}
           <TabsContent value="approve" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-cyan-400" />
-                      Pending Approvals
-                    </CardTitle>
-                    <CardDescription>Review and approve team time off requests</CardDescription>
-                  </div>
+            <OrbitCard>
+              <OrbitCardHeader 
+                icon={<Users className="w-5 h-5 text-cyan-400" />}
+                action={
                   <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500/30">
                     {mockTeamRequests.length} pending
                   </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
+                }
+              >
+                <OrbitCardTitle>Pending Approvals</OrbitCardTitle>
+                <p className="text-sm text-slate-400 mt-1">Review and approve team time off requests</p>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <div className="space-y-4">
                   {mockTeamRequests.map((request) => (
                     <div 
@@ -402,42 +377,35 @@ export default function PTOTracking() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-4 text-center">
-                  <div className="text-3xl font-bold text-green-400">24</div>
-                  <p className="text-sm text-slate-400">Approved This Month</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-4 text-center">
-                  <div className="text-3xl font-bold text-yellow-400">3</div>
-                  <p className="text-sm text-slate-400">Pending Review</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-slate-800/50 border-slate-700/50">
-                <CardContent className="pt-4 text-center">
-                  <div className="text-3xl font-bold text-cyan-400">156</div>
-                  <p className="text-sm text-slate-400">Total Days Used (Team)</p>
-                </CardContent>
-              </Card>
-            </div>
+            <BentoGrid cols={3} gap="md">
+              <StatCard
+                label="Approved This Month"
+                value="24"
+                icon={<CheckCircle2 className="w-5 h-5 text-green-400" />}
+              />
+              <StatCard
+                label="Pending Review"
+                value="3"
+                icon={<Clock className="w-5 h-5 text-yellow-400" />}
+              />
+              <StatCard
+                label="Total Days Used (Team)"
+                value="156"
+                icon={<Users className="w-5 h-5 text-cyan-400" />}
+              />
+            </BentoGrid>
           </TabsContent>
 
-          {/* COMPANY HOLIDAYS TAB */}
           <TabsContent value="holidays" className="space-y-4">
-            <Card className="bg-slate-800/50 border-slate-700/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sun className="w-5 h-5 text-yellow-400" />
-                  2025 Company Holidays
-                </CardTitle>
-                <CardDescription>Paid holidays observed by the company</CardDescription>
-              </CardHeader>
-              <CardContent>
+            <OrbitCard>
+              <OrbitCardHeader icon={<Sun className="w-5 h-5 text-yellow-400" />}>
+                <OrbitCardTitle>2025 Company Holidays</OrbitCardTitle>
+                <p className="text-sm text-slate-400 mt-1">Paid holidays observed by the company</p>
+              </OrbitCardHeader>
+              <OrbitCardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {mockCompanyHolidays.map((holiday, index) => (
                     <div 
@@ -458,16 +426,16 @@ export default function PTOTracking() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-              <CardFooter className="bg-slate-900/50 border-t border-slate-700/50">
-                <p className="text-xs text-slate-500 w-full text-center">
-                  10 paid holidays per year • Holiday schedule set by company policy
-                </p>
-              </CardFooter>
-            </Card>
+                <div className="mt-4 pt-3 border-t border-slate-700/50">
+                  <p className="text-xs text-slate-500 text-center">
+                    10 paid holidays per year • Holiday schedule set by company policy
+                  </p>
+                </div>
+              </OrbitCardContent>
+            </OrbitCard>
 
-            <Card className="bg-cyan-900/20 border-cyan-500/30">
-              <CardContent className="pt-4">
+            <OrbitCard variant="glass" className="bg-cyan-900/20 border-cyan-500/30">
+              <OrbitCardContent>
                 <div className="flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                   <div>
@@ -478,8 +446,8 @@ export default function PTOTracking() {
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </OrbitCardContent>
+            </OrbitCard>
           </TabsContent>
         </Tabs>
       </div>

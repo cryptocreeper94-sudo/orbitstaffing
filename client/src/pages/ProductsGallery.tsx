@@ -7,6 +7,10 @@ import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides, orbySlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail } from '@/components/ui/carousel-rail';
+import { SectionHeader, PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, OrbitCardFooter } from '@/components/ui/orbit-card';
 import orbyMascot from '@assets/generated_images/orby_mascot_presenting_pose.png';
 import orbyEmblem from '@assets/Screenshot_20251205_100035_Replit_1764952065470.jpg';
 import orbyHallmark from '@assets/Screenshot_20251205_154312_Replit_1764971077009.jpg';
@@ -116,11 +120,103 @@ export default function ProductsGallery() {
 
   const currentProduct = products[currentIndex];
 
+  const ProductCard = ({ product, isActive = false }: { product: typeof products[0], isActive?: boolean }) => (
+    <OrbitCard 
+      variant="glass" 
+      hover={true}
+      className={`relative ${isActive ? 'ring-2 ring-cyan-500/50' : ''}`}
+      data-testid={`card-product-${product.id}`}
+    >
+      <div className={`absolute -inset-0.5 bg-gradient-to-r ${product.color} rounded-xl blur opacity-20`} />
+      <div className="relative">
+        <OrbitCardHeader
+          icon={
+            <div className={`w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-xl bg-gradient-to-br ${product.color} p-0.5`}>
+              {product.emblem ? (
+                <img 
+                  src={product.emblem} 
+                  alt={product.name}
+                  className="w-full h-full rounded-lg object-contain bg-slate-800 p-1"
+                />
+              ) : (
+                <div className="w-full h-full rounded-lg bg-slate-800 flex items-center justify-center text-xl font-bold text-white">
+                  {product.name.charAt(0)}
+                </div>
+              )}
+            </div>
+          }
+        >
+          <OrbitCardTitle>
+            {product.hasPulseAnimation ? (
+              <span className="relative inline-block">
+                <span>{product.name}</span>
+                <span 
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"
+                  style={{
+                    animation: 'pulseLineMove 1.5s ease-in-out infinite',
+                    willChange: 'transform',
+                  }}
+                />
+              </span>
+            ) : product.name}
+          </OrbitCardTitle>
+          <OrbitCardDescription className={`font-medium bg-gradient-to-r ${product.color} bg-clip-text text-transparent`}>
+            {product.tagline}
+          </OrbitCardDescription>
+        </OrbitCardHeader>
+
+        <OrbitCardContent>
+          <p className="text-gray-400 text-xs sm:text-sm leading-relaxed line-clamp-3">
+            {product.description}
+          </p>
+        </OrbitCardContent>
+
+        <OrbitCardFooter className="flex-col sm:flex-row gap-3">
+          <div className="flex flex-col items-center shrink-0">
+            <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase mb-1">Verified</span>
+            {product.hallmark ? (
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg border border-cyan-500/30 overflow-hidden bg-slate-800">
+                <img src={product.hallmark} alt="Hallmark" className="w-full h-full object-contain" />
+              </div>
+            ) : product.url ? (
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-lg p-1">
+                <QRCodeSVG value={product.url} size={40} className="w-full h-full" bgColor="#fff" fgColor="#0f172a" />
+              </div>
+            ) : (
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-slate-800 flex items-center justify-center text-[8px] text-gray-500">Soon</div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 flex-1">
+            <button
+              onClick={() => setSelectedProduct(product.id)}
+              className={`px-4 py-2 bg-gradient-to-r ${product.color} rounded-lg font-semibold text-xs sm:text-sm flex items-center gap-1.5 justify-center shadow-lg`}
+              data-testid={`button-slideshow-${product.id}`}
+            >
+              <Play className="w-3 h-3 sm:w-4 sm:h-4" /> Slideshow
+            </button>
+            {product.url ? (
+              <a
+                href={product.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-semibold text-xs sm:text-sm flex items-center gap-1.5 justify-center"
+                data-testid={`button-visit-${product.id}`}
+              >
+                Visit <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+              </a>
+            ) : (
+              <span className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs sm:text-sm text-gray-500 text-center">Coming Soon</span>
+            )}
+          </div>
+        </OrbitCardFooter>
+      </div>
+    </OrbitCard>
+  );
+
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden">
-      {/* Animated Background - Fixed behind everything */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        {/* Twinkling Stars */}
         {[...Array(60)].map((_, i) => (
           <div
             key={i}
@@ -133,7 +229,6 @@ export default function ProductsGallery() {
             }}
           />
         ))}
-        {/* Colored Stars */}
         {[...Array(25)].map((_, i) => (
           <div
             key={`cyan-${i}`}
@@ -159,7 +254,6 @@ export default function ProductsGallery() {
           />
         ))}
         
-        {/* Gradient Orbs */}
         <div className="absolute inset-0 opacity-40">
           <motion.div 
             className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/30 rounded-full blur-3xl"
@@ -174,14 +268,11 @@ export default function ProductsGallery() {
         </div>
       </div>
 
-      {/* ===== SECTION 1: HEADER (Fixed height) ===== */}
       <header className="relative z-20 py-3 px-4 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Left: Title + Solana Badge */}
           <div className="flex items-center gap-3">
             <span className="text-sm sm:text-base font-medium text-slate-300">darkwavestudios.io</span>
             <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.7.0</span>
-            {/* Solana Verification Badge with QR */}
             <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg border border-purple-500/30">
               <div className="w-6 h-6 bg-white rounded p-0.5">
                 <QRCodeSVG 
@@ -199,7 +290,6 @@ export default function ProductsGallery() {
             </div>
           </div>
           
-          {/* Right: Hamburger Menu */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="p-2 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
@@ -209,7 +299,6 @@ export default function ProductsGallery() {
           </button>
         </div>
         
-        {/* Dropdown Menu */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
@@ -250,18 +339,17 @@ export default function ProductsGallery() {
         </AnimatePresence>
       </header>
 
-      {/* Page Title - Centered */}
-      <div className="relative z-10 pt-4 pb-2 text-center px-4">
+      <div className="relative z-10 pt-6 pb-4 px-4 text-center">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-center gap-2 mb-2"
+          className="flex items-center justify-center gap-2 mb-4"
         >
           <Sparkles className="w-4 h-4 text-cyan-400" />
           <span className="text-xs text-cyan-300 uppercase tracking-widest font-semibold">Enterprise Solutions</span>
           <Sparkles className="w-4 h-4 text-cyan-400" />
         </motion.div>
-        <h1 className="text-2xl sm:text-4xl md:text-5xl mb-1">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl">
           <span 
             className="font-extralight tracking-[0.1em] sm:tracking-[0.3em] uppercase"
             style={{
@@ -292,9 +380,22 @@ export default function ProductsGallery() {
         </h1>
       </div>
 
-      {/* ===== SECTION 2: PREMIUM CARD CAROUSEL ===== */}
-      <section className="relative z-10 flex-1 flex items-center justify-center">
-        {/* Left Arrow - Outside card */}
+      <section className="relative z-10 flex-1 md:hidden px-4 py-4">
+        <CarouselRail
+          showArrows={true}
+          arrowsOnMobile={true}
+          gap="md"
+          itemWidth="lg"
+        >
+          {products.map((product) => (
+            <div key={product.id} className="min-w-[300px] max-w-[320px]">
+              <ProductCard product={product} isActive={product.id === currentProduct.id} />
+            </div>
+          ))}
+        </CarouselRail>
+      </section>
+
+      <section className="relative z-10 flex-1 hidden md:flex items-center justify-center py-6">
         <button
           onClick={prevProduct}
           className="absolute left-2 sm:left-8 z-30 p-2 sm:p-3 bg-black/60 hover:bg-cyan-500/40 border border-cyan-500/50 rounded-full transition-all shadow-lg"
@@ -303,7 +404,6 @@ export default function ProductsGallery() {
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
         </button>
 
-        {/* Card Container - Consistent width with room for arrows */}
         <div className="w-[calc(100%-5rem)] max-w-xs sm:max-w-lg lg:max-w-2xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
@@ -312,108 +412,13 @@ export default function ProductsGallery() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
-              className="relative"
             >
-              {/* Glow */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${currentProduct.color} rounded-2xl blur-lg opacity-40`} />
-              
-              {/* Card */}
-              <div
-                className="relative bg-slate-900/95 backdrop-blur rounded-2xl border border-white/10 shadow-2xl p-4 sm:p-6"
-                data-testid={`card-product-${currentProduct.id}`}
-              >
-                {/* Row 1: Emblem + Title (fixed height) */}
-                <div className="flex items-center gap-3 sm:gap-4 mb-3">
-                  <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl bg-gradient-to-br ${currentProduct.color} p-0.5`}>
-                    {currentProduct.emblem ? (
-                      <img 
-                        src={currentProduct.emblem} 
-                        alt={currentProduct.name}
-                        className="w-full h-full rounded-lg object-contain bg-slate-800 p-1"
-                      />
-                    ) : (
-                      <div className="w-full h-full rounded-lg bg-slate-800 flex items-center justify-center text-2xl font-bold text-white">
-                        {currentProduct.name.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-base sm:text-2xl font-bold text-white">
-                      {currentProduct.hasPulseAnimation ? (
-                        <span className="relative inline-block">
-                          <span>{currentProduct.name}</span>
-                          <span 
-                            className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"
-                            style={{
-                              animation: 'pulseLineMove 1.5s ease-in-out infinite',
-                              willChange: 'transform',
-                            }}
-                          />
-                        </span>
-                      ) : currentProduct.name}
-                    </h2>
-                    <p className={`text-xs sm:text-sm font-medium bg-gradient-to-r ${currentProduct.color} bg-clip-text text-transparent`}>
-                      {currentProduct.tagline}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Row 2: Description (clamped) */}
-                <p className="text-gray-400 text-xs sm:text-sm leading-relaxed line-clamp-3 sm:line-clamp-4 mb-3 sm:mb-4">
-                  {currentProduct.description}
-                </p>
-
-                {/* Row 3: QR + Buttons side by side */}
-                <div className="flex items-center justify-between gap-4">
-                  {/* QR Code / Hallmark */}
-                  <div className="flex flex-col items-center shrink-0">
-                    <span className="text-[8px] sm:text-[10px] text-gray-500 uppercase mb-1">Verified</span>
-                    {currentProduct.hallmark ? (
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg border border-cyan-500/30 overflow-hidden bg-slate-800">
-                        <img src={currentProduct.hallmark} alt="Hallmark" className="w-full h-full object-contain" />
-                      </div>
-                    ) : currentProduct.url ? (
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white rounded-lg p-1">
-                        <QRCodeSVG value={currentProduct.url} size={48} className="w-full h-full" bgColor="#fff" fgColor="#0f172a" />
-                      </div>
-                    ) : (
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-slate-800 flex items-center justify-center text-[8px] text-gray-500">Soon</div>
-                    )}
-                  </div>
-
-                  {/* Buttons */}
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => setSelectedProduct(currentProduct.id)}
-                      className={`px-4 sm:px-6 py-2 bg-gradient-to-r ${currentProduct.color} rounded-lg font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-lg`}
-                      data-testid={`button-slideshow-${currentProduct.id}`}
-                    >
-                      <Play className="w-3 h-3 sm:w-4 sm:h-4" /> Slideshow
-                    </button>
-                    {currentProduct.url ? (
-                      <a
-                        href={currentProduct.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-4 sm:px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-semibold text-xs sm:text-sm flex items-center gap-1.5 justify-center"
-                        data-testid={`button-visit-${currentProduct.id}`}
-                      >
-                        Visit <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </a>
-                    ) : (
-                      <span className="px-4 sm:px-6 py-2 bg-white/5 border border-white/10 rounded-lg text-xs sm:text-sm text-gray-500 text-center">Coming Soon</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Counter */}
-                <p className="text-center text-gray-500 text-[10px] sm:text-xs mt-3">{currentIndex + 1} / {products.length}</p>
-              </div>
+              <ProductCard product={currentProduct} isActive={true} />
+              <p className="text-center text-gray-500 text-[10px] sm:text-xs mt-3">{currentIndex + 1} / {products.length}</p>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Right Arrow - Outside card */}
         <button
           onClick={nextProduct}
           className="absolute right-2 sm:right-8 z-30 p-2 sm:p-3 bg-black/60 hover:bg-cyan-500/40 border border-cyan-500/50 rounded-full transition-all shadow-lg"
@@ -423,8 +428,7 @@ export default function ProductsGallery() {
         </button>
       </section>
 
-      {/* Dot Navigation */}
-      <div className="relative z-10 flex justify-center gap-2 py-3">
+      <div className="relative z-10 hidden md:flex justify-center gap-2 py-3">
         {products.map((product, index) => (
           <motion.button
             key={product.id}
@@ -441,12 +445,8 @@ export default function ProductsGallery() {
         ))}
       </div>
 
-      {/* ===== SECTION 3: MINIMAL FOOTER ===== */}
       <DarkwaveFooter minimal={true} />
 
-      {/* ===== MODALS ===== */}
-      
-      {/* Product Presentation Modal */}
       {selectedProduct && (
         <ProductSlideshow
           productName={selectedProduct}
@@ -455,7 +455,6 @@ export default function ProductsGallery() {
         />
       )}
 
-      {/* Slideshow View */}
       {showSlideshow && (
         <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-sm z-50 overflow-y-auto">
           <div className="min-h-screen flex flex-col items-center justify-center p-4">

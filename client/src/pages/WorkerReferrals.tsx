@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Share2, DollarSign, TrendingUp, Copy, Check } from "lucide-react";
+import { Users, Share2, DollarSign, TrendingUp, Copy, Check, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardContent, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, StatCard } from "@/components/ui/orbit-card";
 
 interface Referral {
   id: string;
@@ -123,68 +125,64 @@ export function WorkerReferrals() {
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-3 sm:p-6">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <div className="mb-4">
-          <button
-            onClick={() => window.history.back()}
-            className="text-gray-400 hover:text-white transition-colors p-2 -ml-2 min-h-[44px] flex items-center"
-            data-testid="button-back"
-            title="Back"
-          >
-            ← Back
-          </button>
-        </div>
+        <PageHeader
+          title="Referral Program"
+          subtitle="Earn $100 for each qualified worker you refer"
+          breadcrumb={
+            <button
+              onClick={() => window.history.back()}
+              className="text-gray-400 hover:text-white transition-colors flex items-center gap-1 text-sm"
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+          }
+        />
 
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Referral Program</h1>
-          <p className="text-xs sm:text-base text-gray-400">Earn $100 for each qualified worker you refer</p>
-        </div>
+        <BentoGrid cols={3} gap="md" className="mb-8">
+          <BentoTile className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-emerald-500" />
+                  Total Paid
+                </p>
+                <p className="text-2xl md:text-3xl font-bold text-emerald-500 mt-1" data-testid="total-paid-earnings">${earnings.totalPaid}</p>
+                <p className="text-xs text-muted-foreground mt-1">From paid referrals</p>
+              </div>
+            </div>
+          </BentoTile>
 
-        {/* Summary Cards - Mobile Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 mb-8">
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-emerald-500" />
-                Total Paid
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-emerald-500" data-testid="total-paid-earnings">${earnings.totalPaid}</div>
-              <p className="text-xs text-muted-foreground mt-1">From paid referrals</p>
-            </CardContent>
-          </Card>
+          <BentoTile className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                  <Users className="w-4 h-4 text-blue-500" />
+                  Total Referrals
+                </p>
+                <p className="text-2xl md:text-3xl font-bold text-blue-500 mt-1" data-testid="total-referrals">{referrals.length}</p>
+                <p className="text-xs text-muted-foreground mt-1">Workers referred</p>
+              </div>
+            </div>
+          </BentoTile>
 
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <Users className="w-4 h-4 text-blue-500" />
-                Total Referrals
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-500" data-testid="total-referrals">{referrals.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">Workers referred</p>
-            </CardContent>
-          </Card>
+          <BentoTile className="p-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs md:text-sm text-slate-400 uppercase tracking-wide flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-yellow-500" />
+                  Pending Bonuses
+                </p>
+                <p className="text-2xl md:text-3xl font-bold text-yellow-500 mt-1" data-testid="earned-unpaid">${earnings.earnedButUnpaid}</p>
+                <p className="text-xs text-muted-foreground mt-1">Earned, awaiting payroll</p>
+              </div>
+            </div>
+          </BentoTile>
+        </BentoGrid>
 
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-yellow-500" />
-                Pending Bonuses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-yellow-500" data-testid="earned-unpaid">${earnings.earnedButUnpaid}</div>
-              <p className="text-xs text-muted-foreground mt-1">Earned, awaiting payroll</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Share Button */}
-        <Card className="bg-card/50 border-border/50 mb-8 border-2 border-emerald-500/30">
-          <CardContent className="pt-4 sm:pt-6">
+        <OrbitCard variant="action" hover className="mb-8 border-2 border-emerald-500/30">
+          <OrbitCardContent>
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -220,16 +218,17 @@ export function WorkerReferrals() {
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        {/* Referrals List */}
-        <Card className="bg-card/50 border-border/50">
-          <CardHeader>
-            <CardTitle>Your Referrals</CardTitle>
-            <CardDescription>Track who you've referred and bonus status</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <OrbitCard className="mb-8">
+          <OrbitCardHeader>
+            <div>
+              <OrbitCardTitle>Your Referrals</OrbitCardTitle>
+              <OrbitCardDescription>Track who you've referred and bonus status</OrbitCardDescription>
+            </div>
+          </OrbitCardHeader>
+          <OrbitCardContent>
             {loading ? (
               <p className="text-center text-muted-foreground py-8">Loading referrals...</p>
             ) : (
@@ -273,15 +272,14 @@ export function WorkerReferrals() {
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
 
-        {/* How It Works */}
-        <Card className="bg-card/50 border-border/50 mt-8">
-          <CardHeader>
-            <CardTitle>How It Works</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <OrbitCard>
+          <OrbitCardHeader>
+            <OrbitCardTitle>How It Works</OrbitCardTitle>
+          </OrbitCardHeader>
+          <OrbitCardContent>
             <div className="space-y-4">
               <div className="flex gap-4">
                 <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-500 font-semibold flex-shrink-0">1</div>
@@ -305,8 +303,8 @@ export function WorkerReferrals() {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
       </div>
     </div>
   );

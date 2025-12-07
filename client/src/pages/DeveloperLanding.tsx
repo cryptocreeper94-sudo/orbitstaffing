@@ -3,18 +3,21 @@
  * Public sandbox entry point - join as Owner or Employee with PIN 7777
  */
 import React, { useState } from 'react';
-import { Code, Shield, Users, LogOut, Lock, Briefcase } from 'lucide-react';
+import { Code, Shield, Users, LogOut, Briefcase, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
-import { AlertCircle } from 'lucide-react';
+import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
+import { CarouselRail } from '@/components/ui/carousel-rail';
+import { SectionHeader, PageHeader } from '@/components/ui/section-header';
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent, ActionCard } from '@/components/ui/orbit-card';
 
 export default function DeveloperLanding() {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [pinInput, setPinInput] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'admin' | 'owner' | null>(null);
+  const [selectedRole, setSelectedRole] = useState<'owner' | 'employee' | null>(null);
   const [error, setError] = useState('');
   const [showOwnerCodeInput, setShowOwnerCodeInput] = useState(false);
   const [showEmployeeCodeInput, setShowEmployeeCodeInput] = useState(false);
@@ -41,11 +44,10 @@ export default function DeveloperLanding() {
       localStorage.setItem('currentUser', JSON.stringify(user));
       localStorage.setItem('userRole', user.role);
       
-      // Navigate to appropriate dashboard
-      if (sandboxRole === 'admin') {
-        setLocation('/admin');
-      } else {
+      if (sandboxRole === 'owner') {
         setLocation('/dashboard');
+      } else {
+        setLocation('/employee-app');
       }
     },
     onError: () => {
@@ -67,7 +69,6 @@ export default function DeveloperLanding() {
       setAccessCodeError('Access code required');
       return;
     }
-    // For now, accept any non-empty code - would validate against backend in production
     localStorage.setItem('userAccessCode', code);
     localStorage.setItem('userRole', 'owner');
     localStorage.setItem('currentUser', JSON.stringify({ role: 'owner', accessCode: code }));
@@ -80,7 +81,6 @@ export default function DeveloperLanding() {
       setAccessCodeError('Access code required');
       return;
     }
-    // For now, accept any non-empty code - would validate against backend in production
     localStorage.setItem('userAccessCode', code);
     localStorage.setItem('userRole', 'worker');
     localStorage.setItem('currentUser', JSON.stringify({ role: 'worker', accessCode: code }));
@@ -97,359 +97,372 @@ export default function DeveloperLanding() {
     localStorage.removeItem('userRole');
   };
 
-  // Authenticated state - show user dashboard
+  const ownerFeatures = [
+    'Create & manage jobs',
+    'Assign workers instantly',
+    'Process instant payroll',
+    'Track earnings and bonuses',
+  ];
+
+  const employeeFeatures = [
+    'View assigned jobs',
+    'GPS clock-in/out',
+    'Real-time earnings',
+    'Track bonuses and payments',
+  ];
+
   if (isAuthenticated && currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 relative">
-        {/* Admin Button for logged in view */}
-        <div className="absolute top-6 right-6">
-          <Button
-            onClick={handleLogout}
-            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-            data-testid="button-sandbox-logout"
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-4 md:p-6">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-start mb-8">
-            <div>
-              <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
-                <Code className="w-8 h-8 text-purple-400" />
-                ORBIT Sandbox
-              </h1>
-              <p className="text-gray-400">
-                Logged in as {currentUser.firstName} ({currentUser.role})
-              </p>
-            </div>
-            <Button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
-              data-testid="button-sandbox-logout"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {currentUser.role === 'admin' && (
-              <div
-                onClick={() => setLocation('/admin')}
-                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-cyan-500 transition-all group"
-              >
-                <Shield className="w-8 h-8 text-cyan-400 mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Admin Dashboard</h2>
-                <p className="text-gray-400 text-sm mb-4">
-                  View all companies, workers, and system metrics
-                </p>
-                <Button className="w-full bg-cyan-600 hover:bg-cyan-700">
-                  Go to Admin →
-                </Button>
+          <PageHeader
+            title="ORBIT Sandbox"
+            subtitle={`Logged in as ${currentUser.firstName} (${currentUser.role})`}
+            breadcrumb={
+              <div className="flex items-center gap-2">
+                <Code className="w-6 h-6 text-purple-400" />
               </div>
+            }
+            actions={
+              <Button
+                onClick={handleLogout}
+                className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
+                data-testid="button-sandbox-logout"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
+            }
+          />
+
+          <BentoGrid cols={2} gap="md">
+            {currentUser.role === 'admin' && (
+              <BentoTile>
+                <ActionCard
+                  title="Admin Dashboard"
+                  description="View all companies, workers, and system metrics"
+                  icon={<Shield className="w-8 h-8 text-cyan-400" />}
+                  onClick={() => setLocation('/admin')}
+                  className="h-full border-0"
+                />
+              </BentoTile>
             )}
 
             {currentUser.role === 'owner' && (
-              <div
-                onClick={() => setLocation('/dashboard')}
-                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-green-500 transition-all group"
-              >
-                <Users className="w-8 h-8 text-green-400 mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Owner Dashboard</h2>
-                <p className="text-gray-400 text-sm mb-4">
-                  Manage jobs, assignments, and payroll
-                </p>
-                <Button className="w-full bg-green-600 hover:bg-green-700">
-                  Go to Dashboard →
-                </Button>
-              </div>
+              <BentoTile>
+                <ActionCard
+                  title="Owner Dashboard"
+                  description="Manage jobs, assignments, and payroll"
+                  icon={<Users className="w-8 h-8 text-green-400" />}
+                  onClick={() => setLocation('/dashboard')}
+                  className="h-full border-0"
+                />
+              </BentoTile>
             )}
-          </div>
+          </BentoGrid>
         </div>
       </div>
     );
   }
 
-  // Unauthenticated - show sandbox join options
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 relative">
-      <div className="max-w-2xl w-full">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Code className="w-10 h-10 text-purple-400 mr-3" />
-            <h1 className="text-4xl font-bold text-white">ORBIT Staffing OS</h1>
-          </div>
-          <p className="text-gray-300 text-lg">
-            Complete Staffing Platform Demo
-          </p>
+  const SandboxCard = ({ 
+    type, 
+    icon, 
+    color, 
+    features 
+  }: { 
+    type: 'owner' | 'employee'; 
+    icon: React.ReactNode; 
+    color: 'green' | 'purple'; 
+    features: string[] 
+  }) => (
+    <OrbitCard variant="default" className="flex flex-col h-full min-w-[280px] md:min-w-0">
+      <OrbitCardHeader icon={icon}>
+        <OrbitCardTitle className="text-center w-full">
+          {type === 'owner' ? 'Owner Sandbox' : 'Employee Sandbox'}
+        </OrbitCardTitle>
+        <OrbitCardDescription className="text-center">
+          {type === 'owner' 
+            ? 'Full control - manage jobs, workers, payroll, and invoices'
+            : 'View jobs, clock in, track earnings and bonuses'}
+        </OrbitCardDescription>
+      </OrbitCardHeader>
+      <OrbitCardContent className="flex-grow">
+        <div className="space-y-3 bg-slate-700/30 p-4 rounded mb-4">
+          {features.map((feature, idx) => (
+            <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
+              <span className={color === 'green' ? 'text-green-400' : 'text-purple-400'}>✓</span>
+              {feature}
+            </div>
+          ))}
         </div>
+      </OrbitCardContent>
+      <div className="mt-auto">
+        <Button
+          onClick={() => handleJoinSandbox(type)}
+          disabled={loginMutation.isPending}
+          className={`w-full ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-purple-600 hover:bg-purple-700 glow-purple'} text-white py-2 text-base mb-2 font-bold`}
+          data-testid={`button-join-${type}-sandbox`}
+        >
+          {loginMutation.isPending && selectedRole === type
+            ? 'Joining...'
+            : `Join as ${type === 'owner' ? 'Owner' : 'Employee'}`}
+        </Button>
+        <p className="text-xs text-gray-500 text-center">
+          {type === 'owner' ? 'Full control sandbox' : 'Worker experience sandbox'}
+        </p>
+      </div>
+    </OrbitCard>
+  );
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 flex items-center gap-3 mb-8">
-            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-            <p className="text-red-200">{error}</p>
+  const LoginCard = ({
+    type,
+    icon,
+    color,
+    showInput,
+    setShowInput,
+    accessCode,
+    setAccessCode,
+    onSubmit,
+    disabled = false
+  }: {
+    type: 'owner' | 'employee' | 'admin';
+    icon: React.ReactNode;
+    color: 'green' | 'purple' | 'cyan';
+    showInput?: boolean;
+    setShowInput?: (v: boolean) => void;
+    accessCode?: string;
+    setAccessCode?: (v: string) => void;
+    onSubmit?: () => void;
+    disabled?: boolean;
+  }) => (
+    <OrbitCard 
+      variant="glass" 
+      className={`min-w-[200px] md:min-w-0 ${disabled ? 'opacity-60 cursor-not-allowed' : ''} ${showInput ? `border-${color}-500/50` : ''}`}
+    >
+      <div className="flex items-center justify-center mb-3">
+        {icon}
+      </div>
+      <h3 className={`text-lg font-bold mb-2 text-center ${disabled ? 'text-gray-500' : 'text-white'}`}>
+        {type === 'owner' ? 'Owner Login' : type === 'employee' ? 'Employee Login' : 'Admin Portal'}
+      </h3>
+      <p className={`text-xs mb-4 text-center ${disabled ? 'text-gray-500' : 'text-gray-400'}`}>
+        {type === 'owner' 
+          ? 'Access your staffing business dashboard'
+          : type === 'employee'
+          ? 'View assignments and track earnings'
+          : 'System administration and oversight'}
+      </p>
+      
+      {type === 'admin' ? (
+        <Button
+          onClick={() => setLocation('/admin')}
+          className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold glow-cyan"
+          data-testid="button-admin-login-section"
+        >
+          Admin Access
+        </Button>
+      ) : !showInput ? (
+        <Button
+          onClick={() => setShowInput?.(true)}
+          className={`w-full ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-purple-600 hover:bg-purple-700 glow-purple'} text-white font-bold py-2 px-4`}
+          data-testid={`button-${type}-login-enable`}
+        >
+          Access Code
+        </Button>
+      ) : (
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Enter access code"
+            value={accessCode}
+            onChange={(e) => {
+              setAccessCode?.(e.target.value);
+              setAccessCodeError('');
+            }}
+            className={`w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-${color}-400`}
+            data-testid={`input-${type}-access-code`}
+          />
+          {accessCodeError && <p className="text-xs text-red-400">{accessCodeError}</p>}
+          <div className="flex gap-2">
+            <Button
+              onClick={onSubmit}
+              className={`flex-1 ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-purple-600 hover:bg-purple-700 glow-purple'} text-white font-bold text-sm py-2`}
+              data-testid={`button-${type}-access-submit`}
+            >
+              Submit
+            </Button>
+            <Button
+              onClick={() => {
+                setShowInput?.(false);
+                setAccessCode?.('');
+                setAccessCodeError('');
+              }}
+              variant="outline"
+              className="flex-1 text-sm border-gray-500 text-gray-300 hover:bg-slate-700"
+              data-testid={`button-${type}-access-cancel`}
+            >
+              Cancel
+            </Button>
           </div>
+        </div>
+      )}
+    </OrbitCard>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="max-w-3xl w-full">
+        <PageHeader
+          title="ORBIT Staffing OS"
+          subtitle="Complete Staffing Platform Demo"
+          breadcrumb={
+            <div className="flex items-center justify-center w-full">
+              <Code className="w-10 h-10 text-purple-400" />
+            </div>
+          }
+          className="text-center mb-8"
+        />
+
+        {error && (
+          <OrbitCard variant="default" className="border-red-700 bg-red-900/20 mb-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <p className="text-red-200">{error}</p>
+            </div>
+          </OrbitCard>
         )}
 
-        {/* Sandbox Options */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Owner Sandbox */}
-          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-green-500 transition-all flex flex-col h-full">
-            <div className="flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-green-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-3 text-center">
-              Owner Sandbox
-            </h2>
-            <p className="text-gray-400 text-sm mb-6 text-center">
-              Full control - manage jobs, workers, payroll, and invoices
-            </p>
+        <SectionHeader
+          title="Try the Sandbox"
+          subtitle="Experience the full platform without registration"
+          align="center"
+          size="md"
+          className="mb-6"
+        />
 
-            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-green-400">✓</span>
-                Create & manage jobs
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-green-400">✓</span>
-                Assign workers instantly
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-green-400">✓</span>
-                Process instant payroll
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-green-400">✓</span>
-                Track earnings and bonuses
-              </div>
-            </div>
-
-            <Button
-              onClick={() => handleJoinSandbox('owner')}
-              disabled={loginMutation.isPending}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 text-base mb-3 font-bold glow-green"
-              data-testid="button-join-owner-sandbox"
-            >
-              {loginMutation.isPending && selectedRole === 'owner'
-                ? 'Joining...'
-                : 'Join as Owner'}
-            </Button>
-
-            <p className="text-xs text-gray-500 text-center">
-              Full control sandbox
-            </p>
-          </div>
-
-          {/* Employee Sandbox */}
-          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-purple-500 transition-all flex flex-col h-full">
-            <div className="flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-purple-400" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-3 text-center">
-              Employee Sandbox
-            </h2>
-            <p className="text-gray-400 text-sm mb-6 text-center">
-              View jobs, clock in, track earnings and bonuses
-            </p>
-
-            <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
-                View assigned jobs
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
-                GPS clock-in/out
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
-                Real-time earnings
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
-                Track bonuses and payments
-              </div>
-            </div>
-
-            <Button
-              onClick={() => handleJoinSandbox('employee')}
-              disabled={loginMutation.isPending}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 text-base mb-3 font-bold glow-purple"
-              data-testid="button-join-employee-sandbox"
-            >
-              {loginMutation.isPending && selectedRole === 'employee'
-                ? 'Joining...'
-                : 'Join as Employee'}
-            </Button>
-
-            <p className="text-xs text-gray-500 text-center">
-              Worker experience sandbox
-            </p>
-          </div>
+        <div className="hidden md:block mb-8">
+          <BentoGrid cols={2} gap="md">
+            <BentoTile>
+              <SandboxCard 
+                type="owner" 
+                icon={<Users className="w-8 h-8 text-green-400" />}
+                color="green"
+                features={ownerFeatures}
+              />
+            </BentoTile>
+            <BentoTile>
+              <SandboxCard 
+                type="employee" 
+                icon={<Users className="w-8 h-8 text-purple-400" />}
+                color="purple"
+                features={employeeFeatures}
+              />
+            </BentoTile>
+          </BentoGrid>
         </div>
 
-        {/* Real User Logins Section */}
-        <div className="mb-8">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-bold text-white mb-2">Production Access</h3>
-            <p className="text-gray-400 text-sm">
-              Sign in with your registered account or access code
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Real Owner Login */}
-            <div className={`glow-card bg-slate-800 rounded-lg p-6 border transition-all ${showOwnerCodeInput ? 'border-green-500/50 glow-button-green' : 'border-slate-600 hover:border-green-500/30'} relative backdrop-blur-sm`}>
-              <div className="flex items-center justify-center mb-3">
-                <Briefcase className="w-6 h-6 text-green-400" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2 text-center">
-                Owner Login
-              </h3>
-              <p className="text-gray-400 text-xs mb-4 text-center">
-                Access your staffing business dashboard
-              </p>
-              
-              {!showOwnerCodeInput ? (
-                <Button
-                  onClick={() => setShowOwnerCodeInput(true)}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 glow-green"
-                  data-testid="button-owner-login-enable"
-                >
-                  Access Code
-                </Button>
-              ) : (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Enter access code"
-                    value={ownerAccessCode}
-                    onChange={(e) => {
-                      setOwnerAccessCode(e.target.value);
-                      setAccessCodeError('');
-                    }}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-green-400"
-                    data-testid="input-owner-access-code"
-                  />
-                  {accessCodeError && <p className="text-xs text-red-400">{accessCodeError}</p>}
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleOwnerLogin(ownerAccessCode)}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold text-sm py-2 glow-green"
-                      data-testid="button-owner-access-submit"
-                    >
-                      Submit
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setShowOwnerCodeInput(false);
-                        setOwnerAccessCode('');
-                        setAccessCodeError('');
-                      }}
-                      variant="outline"
-                      className="flex-1 text-sm border-gray-500 text-gray-300 hover:bg-slate-700"
-                      data-testid="button-owner-access-cancel"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Real Employee Login */}
-            <div className={`glow-card bg-slate-800 rounded-lg p-6 border transition-all ${showEmployeeCodeInput ? 'border-purple-500/50 glow-button-purple' : 'border-slate-600 hover:border-purple-500/30'} relative backdrop-blur-sm`}>
-              <div className="flex items-center justify-center mb-3">
-                <Users className="w-6 h-6 text-purple-400" />
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2 text-center">
-                Employee Login
-              </h3>
-              <p className="text-gray-400 text-xs mb-4 text-center">
-                View assignments and track earnings
-              </p>
-              
-              {!showEmployeeCodeInput ? (
-                <Button
-                  onClick={() => setShowEmployeeCodeInput(true)}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 glow-purple"
-                  data-testid="button-employee-login-enable"
-                >
-                  Access Code
-                </Button>
-              ) : (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Enter access code"
-                    value={employeeAccessCode}
-                    onChange={(e) => {
-                      setEmployeeAccessCode(e.target.value);
-                      setAccessCodeError('');
-                    }}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white text-sm focus:outline-none focus:border-purple-400"
-                    data-testid="input-employee-access-code"
-                  />
-                  {accessCodeError && <p className="text-xs text-red-400">{accessCodeError}</p>}
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleEmployeeLogin(employeeAccessCode)}
-                      className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm py-2 glow-purple"
-                      data-testid="button-employee-access-submit"
-                    >
-                      Submit
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setShowEmployeeCodeInput(false);
-                        setEmployeeAccessCode('');
-                        setAccessCodeError('');
-                      }}
-                      variant="outline"
-                      className="flex-1 text-sm border-gray-500 text-gray-300 hover:bg-slate-700"
-                      data-testid="button-employee-access-cancel"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Real Admin Login */}
-            <div className="bg-slate-800 rounded-lg p-6 border border-slate-600 opacity-60 cursor-not-allowed relative">
-              <div className="flex items-center justify-center mb-3">
-                <Shield className="w-6 h-6 text-gray-500" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-500 mb-2 text-center">
-                Admin Portal
-              </h3>
-              <p className="text-gray-500 text-xs mb-4 text-center">
-                System administration and oversight
-              </p>
-              <Button
-                onClick={() => setLocation('/admin')}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold glow-cyan"
-                data-testid="button-admin-login-section"
-              >
-                Admin Access
-              </Button>
-            </div>
-          </div>
+        <div className="md:hidden mb-8">
+          <CarouselRail gap="md" itemWidth="lg" showArrows={false}>
+            <SandboxCard 
+              type="owner" 
+              icon={<Users className="w-8 h-8 text-green-400" />}
+              color="green"
+              features={ownerFeatures}
+            />
+            <SandboxCard 
+              type="employee" 
+              icon={<Users className="w-8 h-8 text-purple-400" />}
+              color="purple"
+              features={employeeFeatures}
+            />
+          </CarouselRail>
         </div>
 
-        {/* Footer */}
-        <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 text-center">
+        <SectionHeader
+          title="Production Access"
+          subtitle="Sign in with your registered account or access code"
+          align="center"
+          size="md"
+          className="mb-6"
+        />
+
+        <div className="hidden md:block mb-8">
+          <BentoGrid cols={3} gap="md">
+            <BentoTile>
+              <LoginCard
+                type="owner"
+                icon={<Briefcase className="w-6 h-6 text-green-400" />}
+                color="green"
+                showInput={showOwnerCodeInput}
+                setShowInput={setShowOwnerCodeInput}
+                accessCode={ownerAccessCode}
+                setAccessCode={setOwnerAccessCode}
+                onSubmit={() => handleOwnerLogin(ownerAccessCode)}
+              />
+            </BentoTile>
+            <BentoTile>
+              <LoginCard
+                type="employee"
+                icon={<Users className="w-6 h-6 text-purple-400" />}
+                color="purple"
+                showInput={showEmployeeCodeInput}
+                setShowInput={setShowEmployeeCodeInput}
+                accessCode={employeeAccessCode}
+                setAccessCode={setEmployeeAccessCode}
+                onSubmit={() => handleEmployeeLogin(employeeAccessCode)}
+              />
+            </BentoTile>
+            <BentoTile>
+              <LoginCard
+                type="admin"
+                icon={<Shield className="w-6 h-6 text-gray-500" />}
+                color="cyan"
+                disabled
+              />
+            </BentoTile>
+          </BentoGrid>
+        </div>
+
+        <div className="md:hidden mb-8">
+          <CarouselRail gap="md" itemWidth="md" showArrows={false}>
+            <LoginCard
+              type="owner"
+              icon={<Briefcase className="w-6 h-6 text-green-400" />}
+              color="green"
+              showInput={showOwnerCodeInput}
+              setShowInput={setShowOwnerCodeInput}
+              accessCode={ownerAccessCode}
+              setAccessCode={setOwnerAccessCode}
+              onSubmit={() => handleOwnerLogin(ownerAccessCode)}
+            />
+            <LoginCard
+              type="employee"
+              icon={<Users className="w-6 h-6 text-purple-400" />}
+              color="purple"
+              showInput={showEmployeeCodeInput}
+              setShowInput={setShowEmployeeCodeInput}
+              accessCode={employeeAccessCode}
+              setAccessCode={setEmployeeAccessCode}
+              onSubmit={() => handleEmployeeLogin(employeeAccessCode)}
+            />
+            <LoginCard
+              type="admin"
+              icon={<Shield className="w-6 h-6 text-gray-500" />}
+              color="cyan"
+              disabled
+            />
+          </CarouselRail>
+        </div>
+
+        <OrbitCard variant="glass" className="text-center">
           <p className="text-gray-400 text-sm mb-2">
             Complete demo environment ready for production testing
           </p>
           <p className="text-xs text-gray-500">
             Request a free demo to get your access code
           </p>
-        </div>
+        </OrbitCard>
       </div>
     </div>
   );

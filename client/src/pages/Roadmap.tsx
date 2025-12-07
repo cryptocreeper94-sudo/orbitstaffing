@@ -1,9 +1,15 @@
 import { Shell } from "@/components/layout/Shell";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Zap, Users, DollarSign, Camera, Brain, MessageSquare, CheckCircle2 } from "lucide-react";
+import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
+import { CarouselRail, CarouselRailItem } from "@/components/ui/carousel-rail";
+import { SectionHeader, PageHeader } from "@/components/ui/section-header";
+import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardDescription, OrbitCardContent } from "@/components/ui/orbit-card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Roadmap() {
+  const isMobile = useIsMobile();
+
   const features = [
     {
       category: "Q4 2025 (NOW)",
@@ -37,85 +43,117 @@ export default function Roadmap() {
     }
   ];
 
+  const renderFeatureCard = (item: typeof features[0]["items"][0], idx: number) => {
+    const Icon = item.icon;
+    const isLive = item.status === "live";
+    const isLocked = item.status === "locked";
+
+    return (
+      <OrbitCard
+        key={idx}
+        variant={isLive ? "default" : "glass"}
+        hover={true}
+        className={`h-full ${
+          isLive
+            ? "border-green-500/50 bg-gradient-to-br from-green-500/10 to-slate-900"
+            : isLocked
+              ? "border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-slate-900 opacity-90"
+              : ""
+        }`}
+        data-testid={`roadmap-item-${idx}`}
+      >
+        <OrbitCardHeader
+          icon={
+            <Icon className={`w-5 h-5 ${
+              isLive ? "text-green-400" : isLocked ? "text-amber-400" : "text-cyan-400"
+            }`} />
+          }
+          action={
+            <Badge
+              className={`flex-shrink-0 ${
+                isLive
+                  ? "bg-green-500/20 text-green-400 border-green-500/30"
+                  : isLocked
+                    ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                    : "bg-slate-700 text-gray-300"
+              }`}
+              variant="outline"
+            >
+              {isLocked ? (
+                <><Lock className="w-3 h-3 mr-1" />Coming</>
+              ) : isLive ? (
+                "✓ Live"
+              ) : (
+                "Beta"
+              )}
+            </Badge>
+          }
+        >
+          <OrbitCardTitle>{item.name}</OrbitCardTitle>
+          <OrbitCardDescription>{item.description}</OrbitCardDescription>
+        </OrbitCardHeader>
+      </OrbitCard>
+    );
+  };
+
   return (
     <Shell>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">ORBIT V2 Roadmap</h1>
-          <p className="text-gray-400 text-lg">Coming Q2 2026: SMS, Instant Pay, Skills, QA & More</p>
-        </div>
+        <PageHeader
+          title="ORBIT V2 Roadmap"
+          subtitle="Coming Q2 2026: SMS, Instant Pay, Skills, QA & More"
+          className="text-center mb-12"
+        />
 
-        {features.map((section) => (
-          <div key={section.category} className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-cyan-400">{section.category}</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {section.items.map((item, idx) => {
-                const Icon = item.icon;
-                const isLive = item.status === "live";
-                const isLocked = item.status === "locked";
-
-                return (
-                  <Card
-                    key={idx}
-                    className={`${
-                      isLive
-                        ? "border-green-500/50 bg-green-500/5"
-                        : isLocked
-                          ? "border-amber-500/30 bg-amber-500/5 opacity-75"
-                          : "border-slate-700"
-                    }`}
-                  >
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-3 flex-1">
-                          <Icon className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                            isLive ? "text-green-400" : isLocked ? "text-amber-400" : "text-cyan-400"
-                          }`} />
-                          <div>
-                            <CardTitle className="text-base">{item.name}</CardTitle>
-                            <p className="text-xs text-gray-400 mt-1">{item.description}</p>
-                          </div>
-                        </div>
-                        <Badge
-                          className={`flex-shrink-0 ${
-                            isLive
-                              ? "bg-green-500/20 text-green-400 border-green-500/30"
-                              : isLocked
-                                ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
-                                : "bg-slate-700 text-gray-300"
-                          }`}
-                          variant="outline"
-                        >
-                          {isLocked ? (
-                            <><Lock className="w-3 h-3 mr-1" />Coming</>
-                          ) : isLive ? (
-                            "✓ Live"
-                          ) : (
-                            "Beta"
-                          )}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                );
-              })}
-            </div>
+        {features.map((section, sectionIdx) => (
+          <div key={section.category} className="mb-12" data-testid={`roadmap-section-${sectionIdx}`}>
+            <SectionHeader
+              title={section.category}
+              size="md"
+              className="mb-6"
+            />
+            
+            {isMobile ? (
+              <CarouselRail
+                showArrows={false}
+                gap="md"
+                itemWidth="lg"
+              >
+                {section.items.map((item, idx) => (
+                  <CarouselRailItem key={idx} className="w-[300px]">
+                    {renderFeatureCard(item, idx)}
+                  </CarouselRailItem>
+                ))}
+              </CarouselRail>
+            ) : (
+              <BentoGrid cols={2} gap="md">
+                {section.items.map((item, idx) => (
+                  <BentoTile key={idx} className="p-0 border-0 bg-transparent">
+                    {renderFeatureCard(item, idx)}
+                  </BentoTile>
+                ))}
+              </BentoGrid>
+            )}
           </div>
         ))}
 
-        <Card className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30">
-          <CardHeader>
-            <CardTitle>Feature Requests Welcome</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <OrbitCard 
+          variant="action" 
+          className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30"
+          data-testid="feature-request-card"
+        >
+          <OrbitCardHeader>
+            <OrbitCardTitle className="text-lg">Feature Requests Welcome</OrbitCardTitle>
+          </OrbitCardHeader>
+          <OrbitCardContent>
             <p className="text-gray-300 mb-4">
               Don't see what you need? Submit feature requests directly in the app. Your feedback shapes V2 priorities.
             </p>
             <p className="text-sm text-gray-400">
               Our goal: Build the staffing platform that ACTUALLY meets your needs.
             </p>
-          </CardContent>
-        </Card>
+          </OrbitCardContent>
+        </OrbitCard>
       </div>
     </Shell>
   );

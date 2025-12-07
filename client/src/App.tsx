@@ -65,6 +65,7 @@ import OrbitPayCard from "@/pages/OrbitPayCard";
 import MarketingHub from "@/pages/MarketingHub";
 import CryptoWallet from "@/pages/CryptoWallet";
 import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
+import Features from "@/pages/Features";
 import FranchiseOffer from "@/pages/FranchiseOffer";
 import CustomerHallmarkManager from "@/pages/CustomerHallmarkManager";
 import AdminFranchiseDashboard from "@/pages/AdminFranchiseDashboard";
@@ -76,6 +77,7 @@ import SolanaVerification from "@/pages/SolanaVerification";
 import Changelog from "@/pages/Changelog";
 import EcosystemHub from "@/pages/EcosystemHub";
 import DarkWaveHQ from "@/pages/DarkWaveHQ";
+import HelpCenterPage from "@/pages/HelpCenter";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -140,6 +142,8 @@ function Router() {
       <Route path="/send-welcome-letters" component={SendWelcomeLetters} />
       <Route path="/hallmark-registry" component={HallmarkRegistry} />
       <Route path="/hallmark-seal" component={HallmarkSeal} />
+      <Route path="/help" component={HelpCenterPage} />
+      <Route path="/help-center" component={HelpCenterPage} />
       <Route path="/client/request-workers" component={ClientRequestDashboard} />
       <Route path="/clients/:clientId/csa/sign" component={CSASigningPage} />
       <Route path="/rate-confirmation/:requestId" component={RateConfirmation} />
@@ -190,7 +194,7 @@ function Router() {
       <Route path="/crypto-wallet" component={CryptoWallet} />
       <Route path="/crypto" component={CryptoWallet} />
       <Route path="/feature-inventory" component={FeatureInventoryPage} />
-      <Route path="/features" component={FeatureInventoryPage} />
+      <Route path="/features" component={Features} />
       <Route path="/franchise" component={FranchiseOffer} />
       <Route path="/franchise-offer" component={FranchiseOffer} />
       <Route path="/my-hallmark" component={CustomerHallmarkManager} />
