@@ -192,59 +192,59 @@ export function OrbitChatAssistant() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-3 sm:inset-4 md:inset-6 z-[200] flex"
+            className="fixed inset-2 sm:inset-3 md:inset-4 z-[200] flex flex-col"
           >
-            <div className="w-full h-full flex">
-              <div className="hidden sm:flex items-end justify-center w-24 sm:w-32 md:w-40 lg:w-52 flex-shrink-0">
+            <div className="w-full h-full flex flex-col sm:flex-row">
+              <div className="flex items-center justify-center py-2 sm:py-0 sm:items-end sm:w-24 md:w-32 lg:w-40 flex-shrink-0">
                 <motion.img
                   initial={{ scale: 0.5, y: 50 }}
                   animate={{ scale: 1, y: 0 }}
                   src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png"
                   alt="Orby"
-                  className="w-full h-auto max-h-[80%] object-contain"
+                  className="w-20 h-20 sm:w-full sm:h-auto sm:max-h-[70%] object-contain"
                   style={{ filter: 'drop-shadow(0 0 30px rgba(6, 182, 212, 0.6))' }}
                 />
               </div>
               
-              <div className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-500/30 overflow-hidden flex flex-col">
-                <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
-                  <div className="flex items-center gap-3">
+              <div className="flex-1 min-h-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-500/30 overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between p-3 sm:p-4 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                        <span className="text-2xl">🪐</span>
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                        <span className="text-xl sm:text-2xl">🪐</span>
                       </div>
-                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800" />
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-slate-800" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white text-lg">Orby</h3>
-                      <p className="text-sm text-cyan-400">Your AI Assistant</p>
+                      <h3 className="font-bold text-white text-base sm:text-lg">Orby</h3>
+                      <p className="text-xs sm:text-sm text-cyan-400">Your AI Assistant</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={clearChat}
-                      className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                      className="text-slate-400 hover:text-red-400 hover:bg-red-500/10 w-8 h-8 sm:w-10 sm:h-10"
                       title="Clear chat history"
                       data-testid="button-clear-chat"
                     >
-                      <Trash2 className="w-5 h-5" />
+                      <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setIsOpen(false)}
-                      className="text-slate-400 hover:text-white hover:bg-slate-700"
+                      className="text-slate-400 hover:text-white hover:bg-slate-700 w-8 h-8 sm:w-10 sm:h-10"
                       data-testid="button-close-chat"
                     >
-                      <X className="w-6 h-6" />
+                      <X className="w-5 h-5 sm:w-6 sm:h-6" />
                     </Button>
                   </div>
                 </div>
 
-                <ScrollArea className="flex-1 p-4 sm:p-6" ref={scrollRef}>
-                  <div className="space-y-4">
+                <ScrollArea className="flex-1 p-3 sm:p-4 md:p-6" ref={scrollRef}>
+                  <div className="space-y-3 sm:space-y-4">
                     {messages.map((message) => (
                       <motion.div
                         key={message.id}
@@ -253,13 +253,13 @@ export function OrbitChatAssistant() {
                         className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[85%] rounded-2xl px-5 py-3 ${
+                          className={`max-w-[90%] sm:max-w-[85%] rounded-2xl px-3 py-2 sm:px-5 sm:py-3 ${
                             message.role === "user"
                               ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
                               : "bg-slate-700/50 text-slate-200 border border-slate-600/50"
                           }`}
                         >
-                          <p className="text-base leading-relaxed">{message.content}</p>
+                          <p className="text-sm sm:text-base leading-relaxed">{message.content}</p>
                         </div>
                       </motion.div>
                     ))}
@@ -270,22 +270,22 @@ export function OrbitChatAssistant() {
                         animate={{ opacity: 1 }}
                         className="flex justify-start"
                       >
-                        <div className="bg-slate-700/50 rounded-2xl px-5 py-4 border border-slate-600/50">
-                          <div className="flex gap-2">
+                        <div className="bg-slate-700/50 rounded-2xl px-4 py-3 sm:px-5 sm:py-4 border border-slate-600/50">
+                          <div className="flex gap-1.5 sm:gap-2">
                             <motion.span
                               animate={{ y: [0, -6, 0] }}
                               transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                              className="w-3 h-3 bg-cyan-400 rounded-full"
+                              className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-cyan-400 rounded-full"
                             />
                             <motion.span
                               animate={{ y: [0, -6, 0] }}
                               transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
-                              className="w-3 h-3 bg-cyan-400 rounded-full"
+                              className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-cyan-400 rounded-full"
                             />
                             <motion.span
                               animate={{ y: [0, -6, 0] }}
                               transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
-                              className="w-3 h-3 bg-cyan-400 rounded-full"
+                              className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-cyan-400 rounded-full"
                             />
                           </div>
                         </div>
@@ -294,27 +294,27 @@ export function OrbitChatAssistant() {
                   </div>
                 </ScrollArea>
 
-                <div className="p-4 sm:p-5 border-t border-slate-700/50 bg-slate-900/50">
-                  <div className="flex gap-3">
+                <div className="p-3 sm:p-4 md:p-5 border-t border-slate-700/50 bg-slate-900/50">
+                  <div className="flex gap-2 sm:gap-3">
                     <Input
                       ref={inputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Ask me anything..."
-                      className="flex-1 bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-cyan-500/50 h-12 text-base"
+                      className="flex-1 bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-cyan-500/50 h-10 sm:h-12 text-sm sm:text-base"
                       data-testid="input-chat-message"
                     />
                     <Button
                       onClick={handleSend}
                       disabled={!input.trim() || isTyping}
-                      className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-6 h-12"
+                      className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-4 sm:px-6 h-10 sm:h-12"
                       data-testid="button-send-message"
                     >
-                      <Send className="w-5 h-5" />
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
                   </div>
-                  <p className="text-sm text-slate-500 mt-3 text-center">
+                  <p className="text-xs sm:text-sm text-slate-500 mt-2 sm:mt-3 text-center">
                     Powered by Orby AI 🪐
                   </p>
                 </div>
@@ -326,25 +326,31 @@ export function OrbitChatAssistant() {
 
       {!isOpen && (
         <motion.button
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.92 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 z-[200] w-14 h-14 rounded-full overflow-hidden border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/40 flex items-center justify-center"
-          style={{ 
-            filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.6))',
-            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(37, 99, 235, 0.2))'
-          }}
+          className="fixed bottom-4 right-4 z-[200]"
           data-testid="button-orbit-chat"
           aria-label="Open Orby chat"
         >
-          <img 
-            src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
-            alt="Orby" 
-            className="w-11 h-11 object-contain"
-          />
-          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
+          <motion.div 
+            className="relative"
+            animate={{ y: [0, -4, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <img 
+              src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
+              alt="Orby" 
+              className="w-12 h-12 object-contain"
+              style={{ filter: 'drop-shadow(0 0 12px rgba(6,182,212,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
+            />
+            <span 
+              className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-slate-900 animate-pulse"
+              style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+            />
+          </motion.div>
         </motion.button>
       )}
     </>
