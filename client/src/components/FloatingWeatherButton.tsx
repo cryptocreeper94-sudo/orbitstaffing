@@ -484,20 +484,39 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
       >
         {weatherData ? (
           <motion.div 
-            style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '4px' }}
+            style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '2px' }}
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           >
-            <span
-              style={{ 
-                fontSize: '48px',
-                lineHeight: '1',
-                display: 'block',
-                filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
-              }}
-            >
-              {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
-            </span>
+            {iconType === 'night' || iconType === 'night-cloudy' ? (
+              <span
+                style={{ 
+                  fontSize: '48px',
+                  lineHeight: '1',
+                  display: 'block',
+                  filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
+                }}
+              >
+                {getMoonPhase()}
+              </span>
+            ) : (
+              <img 
+                src={`/weather-icons/${iconType === 'partly-cloudy' ? 'partly-cloudy' : iconType === 'clear' ? 'sunny' : iconType}.png`}
+                alt={iconType}
+                style={{
+                  width: '52px',
+                  height: '52px',
+                  objectFit: 'contain',
+                  filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
+                }}
+                onError={(e) => {
+                  // Fallback to emoji if image fails
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  target.insertAdjacentHTML('afterend', `<span style="font-size: 48px; line-height: 1; display: block; filter: drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5));">${emoji}</span>`);
+                }}
+              />
+            )}
             {(() => {
               const tempColors = getTemperatureColor(weatherData.temperature);
               return (
