@@ -212,7 +212,7 @@ function Router() {
 
 function ConditionalOrbitAssistant() {
   const [location] = useLocation();
-  const darkwavePages = ['/products', '/studio'];
+  const darkwavePages = ['/products'];
   
   if (darkwavePages.some(page => location.startsWith(page))) {
     return null;
