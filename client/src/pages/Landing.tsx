@@ -134,7 +134,7 @@ export default function Landing() {
               alt="Orby" 
               className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
             />
-            <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none">Welcome to ORBIT</span>
+            <span className="font-heading font-bold text-xs sm:text-base tracking-wider text-white whitespace-nowrap leading-none">Welcome to ORBIT Full Cycle Staffing</span>
           </div>
           
           {/* Hamburger Menu - All Screens */}
