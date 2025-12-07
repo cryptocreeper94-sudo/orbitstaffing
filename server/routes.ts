@@ -9394,6 +9394,25 @@ export function registerPayCardRoutes(app: Express) {
     }
   });
 
+  // Debug endpoint (temporary - shows registered app keys for troubleshooting)
+  app.get("/api/ecosystem/debug", async (req: Request, res: Response) => {
+    try {
+      const apps = await ecosystemHub.getConnectedApps();
+      res.json({
+        timestamp: new Date().toISOString(),
+        appCount: apps.length,
+        registeredKeys: apps.map(a => ({
+          name: a.appName,
+          keyPrefix: a.apiKey.substring(0, 25) + '...',
+          isActive: a.isActive,
+        })),
+      });
+    } catch (error) {
+      console.error("Ecosystem debug error:", error);
+      res.status(500).json({ error: "Debug failed", details: String(error) });
+    }
+  });
+
   // Status check (public endpoint for connection testing)
   app.get("/api/ecosystem/status", ecosystemAuth, async (req: Request, res: Response) => {
     const app = (req as any).ecosystemApp;
