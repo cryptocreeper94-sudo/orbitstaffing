@@ -36,6 +36,7 @@ import { WorkerPerformanceDashboard } from '@/components/WorkerPerformanceDashbo
 import { BetaTesterDashboard } from '@/components/BetaTesterDashboard';
 import { BetaTesterManagement } from '@/components/BetaTesterManagement';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
+import { BlockchainDashboard } from '@/components/BlockchainDashboard';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const ADMIN_SESSION_KEY = 'admin';
@@ -638,6 +639,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       icon: <Settings className="w-5 h-5" />,
       color: 'purple',
       items: [
+        { id: 'blockchain', label: 'Blockchain & Version', icon: <Shield className="w-4 h-4" /> },
         { id: 'messaging', label: 'Secure Messaging', icon: <MessageCircle className="w-4 h-4" /> },
         { id: 'ocr', label: 'Document OCR', icon: <FileText className="w-4 h-4" /> },
         { id: 'receipts', label: 'Receipt Scanner', icon: <Receipt className="w-4 h-4" /> },
@@ -708,6 +710,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       case 'beta-testers': return <BetaTesterManagement />;
       case 'user-data-access': return <UserDataAccessSection />;
       case 'receipts': return <ReceiptScanner />;
+      case 'blockchain': return <BlockchainDashboard />;
       default: return null;
     }
   };
