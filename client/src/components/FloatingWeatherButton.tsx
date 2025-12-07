@@ -48,18 +48,25 @@ const WEATHER_EMOJIS: Record<string, string> = {
 const MOON_PHASES = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
 
 function getTemperatureColor(temp: number): { text: string; bg: string; border: string; glow: string } {
+  // High contrast colors - white text on solid colored backgrounds
   if (temp <= 32) {
-    return { text: '#60A5FA', bg: 'rgba(37, 99, 235, 0.9)', border: 'rgba(96, 165, 250, 0.8)', glow: '0 0 8px rgba(96, 165, 250, 0.8)' };
+    // Freezing - bright blue
+    return { text: '#FFFFFF', bg: '#2563EB', border: '#60A5FA', glow: '0 0 12px rgba(96, 165, 250, 1)' };
   } else if (temp <= 50) {
-    return { text: '#22D3EE', bg: 'rgba(8, 145, 178, 0.9)', border: 'rgba(34, 211, 238, 0.8)', glow: '0 0 8px rgba(34, 211, 238, 0.8)' };
+    // Cold - cyan
+    return { text: '#FFFFFF', bg: '#0891B2', border: '#22D3EE', glow: '0 0 12px rgba(34, 211, 238, 1)' };
   } else if (temp <= 65) {
-    return { text: '#4ADE80', bg: 'rgba(22, 101, 52, 0.9)', border: 'rgba(74, 222, 128, 0.8)', glow: '0 0 8px rgba(74, 222, 128, 0.8)' };
+    // Cool - green
+    return { text: '#FFFFFF', bg: '#16A34A', border: '#4ADE80', glow: '0 0 12px rgba(74, 222, 128, 1)' };
   } else if (temp <= 75) {
-    return { text: '#FACC15', bg: 'rgba(113, 63, 18, 0.9)', border: 'rgba(250, 204, 21, 0.8)', glow: '0 0 8px rgba(250, 204, 21, 0.8)' };
+    // Warm - yellow
+    return { text: '#000000', bg: '#EAB308', border: '#FACC15', glow: '0 0 12px rgba(250, 204, 21, 1)' };
   } else if (temp <= 85) {
-    return { text: '#FB923C', bg: 'rgba(154, 52, 18, 0.9)', border: 'rgba(251, 146, 60, 0.8)', glow: '0 0 8px rgba(251, 146, 60, 0.8)' };
+    // Hot - orange
+    return { text: '#FFFFFF', bg: '#EA580C', border: '#FB923C', glow: '0 0 12px rgba(251, 146, 60, 1)' };
   } else {
-    return { text: '#F87171', bg: 'rgba(153, 27, 27, 0.9)', border: 'rgba(248, 113, 113, 0.8)', glow: '0 0 8px rgba(248, 113, 113, 0.8)' };
+    // Very hot - red
+    return { text: '#FFFFFF', bg: '#DC2626', border: '#F87171', glow: '0 0 12px rgba(248, 113, 113, 1)' };
   }
 }
 
