@@ -188,125 +188,136 @@ export function OrbitChatAssistant() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-32 right-6 z-[150] w-[380px] max-w-[calc(100vw-48px)]"
+            className="fixed inset-3 sm:inset-4 md:inset-6 z-[200] flex"
           >
-            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <img
-                      src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png"
-                      alt="Orbit"
-                      className="w-10 h-10 object-contain"
-                    />
-                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white">Orby</h3>
-                    <p className="text-xs text-cyan-400">Your AI Assistant</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={clearChat}
-                    className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
-                    title="Clear chat history"
-                    data-testid="button-clear-chat"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsOpen(false)}
-                    className="text-slate-400 hover:text-white hover:bg-slate-700"
-                    data-testid="button-close-chat"
-                  >
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
+            <div className="w-full h-full flex">
+              <div className="hidden sm:flex items-end justify-center w-24 sm:w-32 md:w-40 lg:w-52 flex-shrink-0">
+                <motion.img
+                  initial={{ scale: 0.5, y: 50 }}
+                  animate={{ scale: 1, y: 0 }}
+                  src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png"
+                  alt="Orby"
+                  className="w-full h-auto max-h-[80%] object-contain"
+                  style={{ filter: 'drop-shadow(0 0 30px rgba(6, 182, 212, 0.6))' }}
+                />
               </div>
-
-              <ScrollArea className="h-[320px] p-4" ref={scrollRef}>
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              
+              <div className="flex-1 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-500/30 overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-700/50 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                        <span className="text-2xl">🪐</span>
+                      </div>
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-800" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-white text-lg">Orby</h3>
+                      <p className="text-sm text-cyan-400">Your AI Assistant</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={clearChat}
+                      className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                      title="Clear chat history"
+                      data-testid="button-clear-chat"
                     >
-                      <div
-                        className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
-                          message.role === "user"
-                            ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
-                            : "bg-slate-700/50 text-slate-200 border border-slate-600/50"
-                        }`}
+                      <Trash2 className="w-5 h-5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsOpen(false)}
+                      className="text-slate-400 hover:text-white hover:bg-slate-700"
+                      data-testid="button-close-chat"
+                    >
+                      <X className="w-6 h-6" />
+                    </Button>
+                  </div>
+                </div>
+
+                <ScrollArea className="flex-1 p-4 sm:p-6" ref={scrollRef}>
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                       >
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                  
-                  {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex justify-start"
-                    >
-                      <div className="bg-slate-700/50 rounded-2xl px-4 py-3 border border-slate-600/50">
-                        <div className="flex gap-1.5">
-                          <motion.span
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
-                            className="w-2 h-2 bg-cyan-400 rounded-full"
-                          />
-                          <motion.span
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
-                            className="w-2 h-2 bg-cyan-400 rounded-full"
-                          />
-                          <motion.span
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
-                            className="w-2 h-2 bg-cyan-400 rounded-full"
-                          />
+                        <div
+                          className={`max-w-[85%] rounded-2xl px-5 py-3 ${
+                            message.role === "user"
+                              ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white"
+                              : "bg-slate-700/50 text-slate-200 border border-slate-600/50"
+                          }`}
+                        >
+                          <p className="text-base leading-relaxed">{message.content}</p>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              </ScrollArea>
+                      </motion.div>
+                    ))}
+                    
+                    {isTyping && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex justify-start"
+                      >
+                        <div className="bg-slate-700/50 rounded-2xl px-5 py-4 border border-slate-600/50">
+                          <div className="flex gap-2">
+                            <motion.span
+                              animate={{ y: [0, -6, 0] }}
+                              transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                              className="w-3 h-3 bg-cyan-400 rounded-full"
+                            />
+                            <motion.span
+                              animate={{ y: [0, -6, 0] }}
+                              transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                              className="w-3 h-3 bg-cyan-400 rounded-full"
+                            />
+                            <motion.span
+                              animate={{ y: [0, -6, 0] }}
+                              transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                              className="w-3 h-3 bg-cyan-400 rounded-full"
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </ScrollArea>
 
-              <div className="p-4 border-t border-slate-700/50">
-                <div className="flex gap-2">
-                  <Input
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Ask me anything..."
-                    className="flex-1 bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-cyan-500/50"
-                    data-testid="input-chat-message"
-                  />
-                  <Button
-                    onClick={handleSend}
-                    disabled={!input.trim() || isTyping}
-                    className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-4"
-                    data-testid="button-send-message"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                <div className="p-4 sm:p-5 border-t border-slate-700/50 bg-slate-900/50">
+                  <div className="flex gap-3">
+                    <Input
+                      ref={inputRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Ask me anything..."
+                      className="flex-1 bg-slate-800/50 border-slate-600/50 text-white placeholder:text-slate-400 focus:border-cyan-500/50 h-12 text-base"
+                      data-testid="input-chat-message"
+                    />
+                    <Button
+                      onClick={handleSend}
+                      disabled={!input.trim() || isTyping}
+                      className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-6 h-12"
+                      data-testid="button-send-message"
+                    >
+                      <Send className="w-5 h-5" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-slate-500 mt-3 text-center">
+                    Powered by Orby AI 🪐
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 mt-2 text-center">
-                  Powered by Orby AI 🪐
-                </p>
               </div>
             </div>
           </motion.div>
@@ -317,18 +328,23 @@ export function OrbitChatAssistant() {
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 z-[200] w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 border border-cyan-400 shadow-lg shadow-cyan-500/40 flex items-center justify-center hover:scale-110 transition-transform"
-          style={{ filter: 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5))' }}
+          className="fixed bottom-4 right-4 z-[200] w-14 h-14 rounded-full overflow-hidden border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/40 flex items-center justify-center"
+          style={{ 
+            filter: 'drop-shadow(0 0 15px rgba(6, 182, 212, 0.6))',
+            background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(37, 99, 235, 0.2))'
+          }}
           data-testid="button-orbit-chat"
           aria-label="Open Orby chat"
         >
           <img 
             src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
             alt="Orby" 
-            className="w-7 h-7 object-contain"
+            className="w-11 h-11 object-contain"
           />
-          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-slate-900 animate-pulse" />
+          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
         </motion.button>
       )}
     </>
