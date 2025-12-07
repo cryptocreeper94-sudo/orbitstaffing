@@ -7,6 +7,7 @@ import { DarkwaveFooter } from '@/components/DarkwaveFooter';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides, orbySlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
+import { OrbitChatAssistant } from '@/components/OrbitChatAssistant';
 import orbyMascot from '@assets/generated_images/orby_mascot_presenting_pose.png';
 import orbyEmblem from '@assets/Screenshot_20251205_100035_Replit_1764952065470.jpg';
 import orbyHallmark from '@assets/Screenshot_20251205_154312_Replit_1764971077009.jpg';
@@ -500,6 +501,9 @@ export default function ProductsGallery() {
           </div>
         </div>
       )}
+
+      {/* Orby AI Assistant */}
+      <OrbitChatAssistant />
 
     </div>
   );
