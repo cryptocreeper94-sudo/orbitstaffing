@@ -9343,6 +9343,51 @@ export function registerPayCardRoutes(app: Express) {
     next();
   }
 
+  // Register a new app with the ecosystem hub (public endpoint - no auth required)
+  app.post("/api/admin/ecosystem/register-app", async (req: Request, res: Response) => {
+    try {
+      const { appName, appSlug, description } = req.body;
+      
+      if (!appName || !appSlug) {
+        return res.status(400).json({ error: 'appName and appSlug are required' });
+      }
+      
+      const result = await ecosystemHub.registerApp({
+        appName,
+        appSlug,
+        appUrl: req.body.appUrl,
+        description,
+        permissions: req.body.permissions || [
+          'read:workers',
+          'write:workers',
+          'read:contractors',
+          'write:contractors',
+          'read:1099',
+          'write:1099',
+          'read:timesheets',
+          'write:timesheets',
+          'read:certifications',
+          'write:certifications',
+          'read:code',
+          'write:code',
+        ],
+      });
+      
+      res.status(201).json({
+        success: true,
+        id: result.app.id,
+        appName: result.app.appName,
+        apiKey: result.apiKey,
+        apiSecret: result.apiSecret,
+        permissions: result.app.permissions,
+        createdAt: result.app.createdAt,
+      });
+    } catch (error) {
+      console.error("Ecosystem register app error:", error);
+      res.status(500).json({ error: "Failed to register app" });
+    }
+  });
+
   // Status check (public endpoint for connection testing)
   app.get("/api/ecosystem/status", ecosystemAuth, async (req: Request, res: Response) => {
     const app = (req as any).ecosystemApp;
