@@ -488,16 +488,38 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           >
-            <span
-              style={{ 
-                fontSize: '48px',
-                lineHeight: '1',
-                display: 'block',
-                filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
-              }}
-            >
-              {iconType === 'night' || iconType === 'night-cloudy' ? getMoonPhase() : emoji}
-            </span>
+            {iconType === 'night' || iconType === 'night-cloudy' ? (
+              <span
+                style={{ 
+                  fontSize: '48px',
+                  lineHeight: '1',
+                  display: 'block',
+                  filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
+                }}
+              >
+                {getMoonPhase()}
+              </span>
+            ) : (
+              <img 
+                src={`/weather-icons/transparent/3d_${
+                  iconType === 'sunny' || iconType === 'clear' ? 'sunny_weather_icon' :
+                  iconType === 'cloudy' ? 'cloudy_weather_icon' :
+                  iconType === 'partly-cloudy' ? 'partly_cloudy_icon' :
+                  iconType === 'rainy' ? 'rainy_weather_icon' :
+                  iconType === 'snowy' ? 'snowy_weather_icon' :
+                  iconType === 'foggy' ? 'foggy_weather_icon' :
+                  iconType === 'thunderstorm' ? 'thunderstorm_icon' :
+                  'cloudy_weather_icon'
+                }.png`}
+                alt={iconType}
+                style={{
+                  width: '52px',
+                  height: '52px',
+                  objectFit: 'contain',
+                  filter: `drop-shadow(0 0 15px ${glow.color}) drop-shadow(0 2px 4px rgba(0,0,0,0.5))`,
+                }}
+              />
+            )}
             {(() => {
               const tempColors = getTemperatureColor(weatherData.temperature);
               return (
