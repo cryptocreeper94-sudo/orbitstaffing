@@ -54,32 +54,34 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ---
 
-## Last Session Summary (December 6, 2025)
+## Last Session Summary (December 7, 2025)
 
-### Current Version: v2.6.1 (Publishing)
+### Current Version: v2.7.0 (Ready for Publishing)
 
 ### What Was Accomplished
-1. **DarkWave Studios Landing Page Complete**
-   - Header: darkwavestudios.io title + v2.6.1 version + Solana verification badge with QR code + hamburger menu
-   - Full viewport height product cards with left/right arrow navigation
-   - Each card: emblem (top), name/tagline/description (center), hallmark QR (bottom), action buttons
-   - Wave AI assistant floating button (bottom right) - fixed mobile visibility
-   - Minimal footer: Developer link | © 2025 | v2.6.1 (horizontally aligned)
-   - Hamburger menu with links: ORBIT Home, Product Gallery, Developer Portal, Contact, About
+1. **DarkWave Ecosystem Hub - COMPLETE ✅**
+   - POST /api/admin/ecosystem/register-app - app registration endpoint
+   - GET /api/ecosystem/status - connection status
+   - POST /api/ecosystem/sync/* - workers, contractors, W-2, 1099, timesheets, certifications
+   - GET /api/ecosystem/shops/* - worker and payroll queries
+   - POST/GET /api/ecosystem/snippets - code snippet sharing
+   - POST/GET /api/ecosystem/logs - activity logging
+   - HMAC-SHA256 authentication on all endpoints
 
-2. **v2.6.1 Mobile Fixes**
-   - Fixed Wave AI button visibility on mobile (was positioned outside viewport)
-   - Reduced button offset to bottom-4 with safe-area-inset support
-   - Improved card layout to prevent QR code cutoff
-   - Smaller elements on mobile for better fit
+2. **GarageBot Integration - CONNECTED ✅**
+   - GarageBot app registered: `dw_app_3c88bda688e781b58b2b46144bf6006a49add5c28eed327e`
+   - EcosystemClient class provided for external agents
+   - Full endpoint matrix ready for syncing operations
+   - Cross-product data exchange activated (workers, contractors, payroll data)
 
-3. **Version Updates to v2.6.1**
-   - Updated all version references across codebase
-   - SecureSandbox.tsx, BusinessValuationDashboard.tsx, FeatureInventory.tsx, DarkwaveFooter.tsx, ProductsGallery.tsx
+3. **API Route Fixes**
+   - Fixed SPA catch-all middleware to skip /api/* routes
+   - Vite middleware now passes API requests to Express handlers
+   - All 13+ ecosystem endpoints responding with JSON
 
-4. **Solana Blockchain Stamps (December 6, 2025)**
-   - ORBIT Staffing OS v2.6.1: Hash `ea7987aeae03ddd1d21c20e4931b7abbbf0ba1bc7b847f8494d0cd4a6c5a80dd`
-   - DarkWave Studios v2.6.1: Hash `68fc1b0a7f0e31e3404083a3cd90ea22a34df0478e94f12e5f7b21c5a3f53fba`
+4. **Solana Blockchain Stamps (December 7, 2025)**
+   - ORBIT Staffing OS v2.7.0: Hash `55e9cc3f6404342bcad7739df4e0723ef49dfdad30f21a0ac2ecdf1fe37e7cdf`
+   - Previous v2.6.1: Hash `ea7987aeae03ddd1d21c20e4931b7abbbf0ba1bc7b847f8494d0cd4a6c5a80dd`
 
 5. **Previous Session (Dec 5) - PWA Complete**
    - Full-color Orby mascot as home screen icon
@@ -87,15 +89,25 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
    - Automatic install prompt with 7-day cooldown
    - Service worker for offline caching
 
+### DarkWave Ecosystem Integration Status
+| App | Integration | Status | API Key |
+|-----|-------------|--------|---------|
+| ORBIT Staffing OS | Developer Hub | ✅ Live | dw_app_orbit |
+| Brew & Board Coffee | Connected | ✅ Active | dw_app_brewandboard |
+| GarageBot | Connected | ✅ Active | dw_app_3c88bda... |
+| Lot Ops Pro | Ready | Pending | - |
+| DarkWave Pulse | Ready | Pending | - |
+| Orby | Ready | Pending | - |
+
 ### DarkWave Studios Products
-| Product | Emblem | Hallmark | URL |
-|---------|--------|----------|-----|
-| ORBIT Staffing OS | ✓ (Orby mascot) | ✓ (auto QR) | orbitstaffing.io |
-| Orby | ✓ | ✓ | getorby.io |
-| DarkWave Pulse | Pending | Pending | - |
-| Lot Ops Pro | ✓ | ✓ | lotops.pro |
-| Brew & Board Coffee | ✓ | ✓ | brewandboard.coffee |
-| GarageBot | ✓ | ✓ | garagebot.io |
+| Product | Emblem | Hallmark | URL | Hub Status |
+|---------|--------|----------|-----|-----------|
+| ORBIT Staffing OS | ✓ (Orby mascot) | ✓ (auto QR) | orbitstaffing.io | ✅ Hub Live |
+| Orby | ✓ | ✓ | getorby.io | Pending |
+| DarkWave Pulse | ✓ | ✓ | - | Pending |
+| Lot Ops Pro | ✓ | ✓ | lotops.pro | Pending |
+| Brew & Board Coffee | ✓ | ✓ | brewandboard.coffee | ✅ Connected |
+| GarageBot | ✓ | ✓ | garagebot.io | ✅ Connected |
 
 ### Key Files
 - `client/src/pages/ProductsGallery.tsx` - Full-screen product cards with carousel navigation
