@@ -33,7 +33,7 @@ function ScenarioImage({ emoji }: { emoji: string }) {
     return (
       <div className="w-full h-32 overflow-hidden rounded-t-lg">
         <img 
-          src={`${imagePath}?v=1`} 
+          src={`${imagePath}?v=2`} 
           alt="" 
           className="w-full h-full object-cover"
         />
