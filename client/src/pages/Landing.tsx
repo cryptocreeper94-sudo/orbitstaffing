@@ -129,63 +129,57 @@ export default function Landing() {
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 h-11 sm:h-12">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full h-full flex items-end justify-between gap-2 sm:gap-6">
           <div className="flex h-full items-end gap-2 flex-shrink-0 pb-2">
-            <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none sm:hidden">ORBIT</span>
-            <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none hidden sm:inline">Why ORBIT Staffing OS</span>
+            <img 
+              src={orbyCommanderEmblem} 
+              alt="Orby" 
+              className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
+            />
+            <span className="font-heading font-bold text-sm sm:text-lg tracking-wider text-white whitespace-nowrap leading-none">Welcome to ORBIT</span>
           </div>
           
-          {/* Mobile Hamburger Menu */}
+          {/* Hamburger Menu - All Screens */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="sm:hidden p-1.5 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
+            className="p-1.5 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
             data-testid="button-mobile-menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
-          
-          <nav className="hidden sm:flex items-center gap-1 bg-slate-800/50 backdrop-blur-sm px-3 py-2 rounded-lg border border-slate-700/50 flex-shrink-0">
-            <Link href="/hallmark-seal" className="px-2 py-1 text-xs font-medium text-amber-300 hover:bg-amber-900/30 rounded transition-all flex items-center" data-testid="link-hallmark-seal">
-              ✓ Hallmark
-            </Link>
-            <div className="h-4 w-px bg-slate-600/50" />
-            <Link href="/why-orbit" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-why-orbit">
-              Why ORBIT
-            </Link>
-            <div className="h-4 w-px bg-slate-600/50" />
-            <Link href="/professional-staffing" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-professional">
-              Professional
-            </Link>
-            <div className="h-4 w-px bg-slate-600/50" />
-            <Link href="/about" className="px-2 py-1 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded transition-all" data-testid="link-about">
-              About
-            </Link>
-          </nav>
         </div>
         
-        {/* Mobile Menu Dropdown */}
+        {/* Menu Dropdown - All Screens */}
         {mobileMenuOpen && (
-          <div className="sm:hidden absolute top-full left-0 right-0 bg-slate-900/98 backdrop-blur-lg border-b border-slate-700/50 shadow-xl z-50">
+          <div className="absolute top-full left-0 right-0 bg-slate-900/98 backdrop-blur-lg border-b border-slate-700/50 shadow-xl z-50">
             <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+              <Link href="/hallmark-seal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-amber-300 hover:bg-slate-800 rounded-lg transition font-medium">
+                <CheckCircle2 className="w-4 h-4" />
+                ✓ Hallmark
+              </Link>
+              <Link href="/why-orbit" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                <Info className="w-4 h-4" />
+                Why ORBIT
+              </Link>
+              <Link href="/professional-staffing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                <Users className="w-4 h-4" />
+                Professional
+              </Link>
+              <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                <Info className="w-4 h-4" />
+                About
+              </Link>
+              <div className="border-t border-slate-700/50 my-2" />
               <Link href="/changelog" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-cyan-400 hover:bg-slate-800 rounded-lg transition">
                 <FileText className="w-4 h-4" />
-                Version v2.7.0 - What's New
+                What's New
               </Link>
               <Link href="/solana-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-purple-400 hover:bg-slate-800 rounded-lg transition">
                 <Coins className="w-4 h-4" />
-                Solana Blockchain Verification
+                Blockchain
               </Link>
               <div className="border-t border-slate-700/50 my-2" />
-              <Link href="/about" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
-                <Info className="w-4 h-4" />
-                About Us
-              </Link>
               <Link href="/developer" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-slate-800 rounded-lg transition">
                 <Settings className="w-4 h-4" />
-                Settings / Admin
-              </Link>
-              <div className="border-t border-slate-700/50 my-2" />
-              <Link href="/hallmark-seal" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-amber-400 hover:bg-slate-800 rounded-lg transition">
-                <CheckCircle2 className="w-4 h-4" />
-                Hallmark Seal
+                Admin
               </Link>
             </div>
           </div>
