@@ -2,47 +2,49 @@ import React, { useState, useMemo } from 'react';
 import { Search, X, ExternalLink, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const ICON_MAP: Record<string, string> = {
-  "📄": "/icons/pro/3d_document_file_icon.png",
-  "💰": "/icons/pro/3d_money_pay_icon.png",
-  "📍": "/icons/pro/3d_gps_location_icon.png",
-  "🏆": "/icons/pro/3d_trophy_winner_icon.png",
-  "🛠️": "/icons/pro/3d_tools_wrench_icon.png",
-  "📅": "/icons/pro/3d_calendar_schedule_icon.png",
-  "🤝": "/icons/pro/3d_handshake_partner_icon.png",
-  "💳": "/icons/pro/3d_credit_card_icon.png",
-  "✅": "/icons/pro/3d_checkmark_comply_icon.png",
-  "🎯": "/icons/pro/3d_target_goal_icon.png",
-  "📋": "/icons/pro/3d_clipboard_worker_icon.png",
-  "⚠️": "/icons/pro/3d_warning_alert_icon.png",
-  "🔐": "/icons/pro/3d_padlock_security_icon.png",
-  "🔗": "/icons/pro/3d_link_connection_icon.png",
-  "👤": "/icons/pro/3d_user_profile_icon.png",
-  "📊": "/icons/pro/3d_chart_reports_icon.png",
-  "👥": "/icons/pro/3d_people_group_icon.png",
-  "🏢": "/icons/pro/3d_building_clients_icon.png",
-  "📚": "/icons/pro/3d_document_file_icon.png",
-  "🔍": "/icons/pro/3d_target_goal_icon.png",
-  "💡": "/icons/pro/3d_lightbulb_idea_icon.png",
+const SCENARIO_MAP: Record<string, string> = {
+  "📄": "/images/scenarios/employee_reviewing_tax_documents.png",
+  "💰": "/images/scenarios/diverse_workers_checking_wages.png",
+  "📍": "/images/scenarios/multi-industry_gps_clock-in.png",
+  "🏆": "/images/scenarios/team_celebrating_bonuses.png",
+  "🛠️": "/images/scenarios/diverse_workers_shift_prep.png",
+  "📅": "/images/scenarios/employee_viewing_work_calendar.png",
+  "🤝": "/images/scenarios/coworkers_referral_handshake.png",
+  "💳": "/images/scenarios/payroll_processing_scene.png",
+  "✅": "/images/scenarios/compliance_verification_interview.png",
+  "🎯": "/images/scenarios/worker_matching_on_screen.png",
+  "📋": "/images/scenarios/professional_creating_invoices.png",
+  "⚠️": "/images/scenarios/safety_incident_meeting.png",
+  "🔐": "/images/scenarios/security_verification_process.png",
+  "🔗": "/images/scenarios/it_system_integration.png",
+  "👤": "/images/scenarios/workers_updating_profiles.png",
+  "📊": "/images/scenarios/worker_matching_on_screen.png",
+  "👥": "/images/scenarios/diverse_workers_shift_prep.png",
+  "🏢": "/images/scenarios/professional_creating_invoices.png",
+  "📚": "/images/scenarios/employee_reviewing_tax_documents.png",
+  "🔍": "/images/scenarios/worker_matching_on_screen.png",
+  "💡": "/images/scenarios/it_system_integration.png",
 };
 
-function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" }) {
-  const iconPath = ICON_MAP[emoji];
-  const sizeClasses = {
-    sm: "w-4 h-4",
-    md: "w-6 h-6",
-    lg: "w-10 h-10"
-  };
+function ScenarioImage({ emoji }: { emoji: string }) {
+  const imagePath = SCENARIO_MAP[emoji];
   
-  if (iconPath) {
+  if (imagePath) {
     return (
-      <img 
-        src={`${iconPath}?v=3`} 
-        alt="" 
-        className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} 
-      />
+      <div className="w-full h-32 overflow-hidden rounded-t-lg">
+        <img 
+          src={`${imagePath}?v=1`} 
+          alt="" 
+          className="w-full h-full object-cover"
+        />
+      </div>
     );
   }
+  return null;
+}
+
+function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" }) {
+  const sizeClasses = { sm: "w-4 h-4 text-sm", md: "w-6 h-6 text-base", lg: "w-10 h-10 text-2xl" };
   return <span className={sizeClasses[size]}>{emoji}</span>;
 }
 
@@ -345,12 +347,12 @@ export function HelpCenter({ isOpen, onClose }: HelpCenterProps) {
         {/* Featured Guides Carousel */}
         {activeTab === 'featured' && (
           <div className="flex-1 overflow-hidden flex flex-col p-4">
-            <div className="relative flex-1 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-lg p-4 border border-slate-600 mb-4">
-              <div className="text-center">
-                <div className="flex justify-center mb-2"><Icon3D emoji={FEATURED_GUIDES[currentSlide].icon} size="lg" /></div>
+            <div className="relative flex-1 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-lg border border-slate-600 mb-4 overflow-hidden">
+              <ScenarioImage emoji={FEATURED_GUIDES[currentSlide].icon} />
+              <div className="p-4 text-center">
                 <h4 className="font-bold text-white text-lg mb-1">{FEATURED_GUIDES[currentSlide].title}</h4>
                 <p className="text-xs text-slate-300 mb-4">{FEATURED_GUIDES[currentSlide].description}</p>
-                <div className="space-y-2 text-xs text-slate-300 text-left max-h-[180px] overflow-y-auto">
+                <div className="space-y-2 text-xs text-slate-300 text-left max-h-[140px] overflow-y-auto">
                   {FEATURED_GUIDES[currentSlide].steps.map((step, idx) => (
                     <div key={idx} className="flex items-start gap-2">
                       <span className="text-cyan-400 flex-shrink-0">•</span>
@@ -426,20 +428,20 @@ export function HelpCenter({ isOpen, onClose }: HelpCenterProps) {
                   window.location.href = topic.route;
                   onClose();
                 }}
-                className="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-600 border border-slate-600 hover:border-cyan-500 rounded-lg transition-all group"
+                className="w-full text-left bg-slate-700/50 hover:bg-slate-600 border border-slate-600 hover:border-cyan-500 rounded-lg transition-all group overflow-hidden"
                 data-testid={`help-link-${idx}`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Icon3D emoji={topic.icon} size="md" />
+                <ScenarioImage emoji={topic.icon} />
+                <div className="p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
                       <h4 className="font-semibold text-white group-hover:text-cyan-300 transition-colors">
                         {topic.title}
                       </h4>
+                      <p className="text-xs text-slate-400 mt-1">{topic.description}</p>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">{topic.description}</p>
+                    <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 flex-shrink-0 mt-1" />
                   </div>
-                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 flex-shrink-0 mt-1" />
                 </div>
               </button>
             ))
