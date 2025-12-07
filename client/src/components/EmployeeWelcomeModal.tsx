@@ -3,6 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Clock, DollarSign, MapPin, Users } from "lucide-react";
 
+const ICON_MAP: Record<string, string> = {
+  "🎯": "/icons/pro/3d_target_goal_icon_clean.png",
+  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
+  "🎁": "/icons/pro/3d_diamond_gem_icon_clean.png",
+  "📊": "/icons/pro/3d_chart_reports_icon_clean.png",
+  "📱": "/icons/pro/3d_smartphone_mobile_icon_clean.png",
+  "📍": "/icons/pro/3d_gps_location_icon_clean.png",
+  "🔔": "/icons/pro/3d_megaphone_announce_icon_clean.png",
+  "💪": "/icons/pro/3d_trophy_winner_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "sm" }: { emoji: string; size?: "sm" | "md" | "lg" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = { sm: "w-4 h-4", md: "w-6 h-6", lg: "w-8 h-8" };
+  if (iconPath) {
+    return <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} inline-block object-contain mr-1 drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} />;
+  }
+  return <span>{emoji}</span>;
+}
+
 interface EmployeeWelcomeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,7 +34,7 @@ export function EmployeeWelcomeModal({ isOpen, onClose, employeeName = "Team Mem
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-950 border border-cyan-500/30">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-cyan-300">Welcome to ORBIT, {employeeName}! 🎯</DialogTitle>
+          <DialogTitle className="text-2xl text-cyan-300 flex items-center gap-2">Welcome to ORBIT, {employeeName}! <Icon3D emoji="🎯" size="md" /></DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -41,9 +61,9 @@ export function EmployeeWelcomeModal({ isOpen, onClose, employeeName = "Team Mem
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-300">
-              <p>💰 Instant payroll processing</p>
-              <p>🎁 Bonus opportunities</p>
-              <p>📊 Real-time earnings dashboard</p>
+              <p className="flex items-center gap-2"><Icon3D emoji="💰" /> Instant payroll processing</p>
+              <p className="flex items-center gap-2"><Icon3D emoji="🎁" /> Bonus opportunities</p>
+              <p className="flex items-center gap-2"><Icon3D emoji="📊" /> Real-time earnings dashboard</p>
             </CardContent>
           </Card>
 
@@ -55,10 +75,10 @@ export function EmployeeWelcomeModal({ isOpen, onClose, employeeName = "Team Mem
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-slate-300">
-              <p>📱 Download the ORBIT mobile app (iOS/Android)</p>
+              <p className="flex items-center gap-2"><Icon3D emoji="📱" /> Download the ORBIT mobile app (iOS/Android)</p>
               <p>🔐 Biometric login for security</p>
-              <p>📍 GPS-verified clock-in at job sites</p>
-              <p>🔔 Real-time shift notifications</p>
+              <p className="flex items-center gap-2"><Icon3D emoji="📍" /> GPS-verified clock-in at job sites</p>
+              <p className="flex items-center gap-2"><Icon3D emoji="🔔" /> Real-time shift notifications</p>
             </CardContent>
           </Card>
 
@@ -69,8 +89,8 @@ export function EmployeeWelcomeModal({ isOpen, onClose, employeeName = "Team Mem
           </div>
         </div>
 
-        <Button onClick={onClose} className="w-full bg-cyan-600 hover:bg-cyan-700" data-testid="button-employee-welcome-close">
-          Ready to Work! 💪
+        <Button onClick={onClose} className="w-full bg-cyan-600 hover:bg-cyan-700 flex items-center justify-center gap-2" data-testid="button-employee-welcome-close">
+          Ready to Work! <Icon3D emoji="💪" />
         </Button>
       </DialogContent>
     </Dialog>

@@ -4,6 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Edit2, Download, Share2, Copy } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
+const ICON_MAP: Record<string, string> = {
+  "📧": "/icons/pro/3d_email_envelope_icon_clean.png",
+  "📱": "/icons/pro/3d_smartphone_mobile_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "sm" }: { emoji: string; size?: "sm" | "md" | "lg" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = { sm: "w-4 h-4", md: "w-5 h-5", lg: "w-6 h-6" };
+  if (iconPath) {
+    return <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} inline-block object-contain mr-1 drop-shadow-[0_0_4px_rgba(6,182,212,0.5)]`} />;
+  }
+  return <span>{emoji}</span>;
+}
+
 interface AdminBusinessCardDisplayProps {
   assetNumber: number;
   name: string;
@@ -80,8 +94,8 @@ export function AdminBusinessCardDisplay({
               <div>
                 <h2 className="text-xl font-bold text-white mb-1">{name}</h2>
                 <p className="text-cyan-300 font-semibold text-sm mb-4">{title}</p>
-                {email && <p className="text-xs text-slate-300 mb-1">📧 {email}</p>}
-                {phone && <p className="text-xs text-slate-300 mb-4">📱 {phone}</p>}
+                {email && <p className="text-xs text-slate-300 mb-1 flex items-center"><Icon3D emoji="📧" />{email}</p>}
+                {phone && <p className="text-xs text-slate-300 mb-4 flex items-center"><Icon3D emoji="📱" />{phone}</p>}
               </div>
 
               <div className="pt-4 border-t border-slate-600">

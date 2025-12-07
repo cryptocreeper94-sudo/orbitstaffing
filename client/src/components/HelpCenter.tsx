@@ -2,6 +2,50 @@ import React, { useState, useMemo } from 'react';
 import { Search, X, ExternalLink, HelpCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+const ICON_MAP: Record<string, string> = {
+  "📄": "/icons/pro/3d_document_file_icon_clean.png",
+  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
+  "📍": "/icons/pro/3d_gps_location_icon_clean.png",
+  "🏆": "/icons/pro/3d_trophy_winner_icon_clean.png",
+  "🛠️": "/icons/pro/3d_tools_wrench_icon_clean.png",
+  "📅": "/icons/pro/3d_calendar_schedule_icon_clean.png",
+  "🤝": "/icons/pro/3d_handshake_partner_icon_clean.png",
+  "💳": "/icons/pro/3d_credit_card_icon_clean.png",
+  "✅": "/icons/pro/3d_checkmark_comply_icon_clean.png",
+  "🎯": "/icons/pro/3d_target_goal_icon_clean.png",
+  "📋": "/icons/pro/3d_clipboard_worker_icon_clean.png",
+  "⚠️": "/icons/pro/3d_warning_alert_icon_clean.png",
+  "🔐": "/icons/pro/3d_padlock_security_icon_clean.png",
+  "🔗": "/icons/pro/3d_link_connection_icon_clean.png",
+  "👤": "/icons/pro/3d_user_profile_icon_clean.png",
+  "📊": "/icons/pro/3d_chart_reports_icon_clean.png",
+  "👥": "/icons/pro/3d_people_group_icon_clean.png",
+  "🏢": "/icons/pro/3d_building_clients_icon_clean.png",
+  "📚": "/icons/pro/3d_document_file_icon_clean.png",
+  "🔍": "/icons/pro/3d_target_goal_icon_clean.png",
+  "💡": "/icons/pro/3d_lightbulb_idea_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-10 h-10"
+  };
+  
+  if (iconPath) {
+    return (
+      <img 
+        src={`${iconPath}?v=1`} 
+        alt="" 
+        className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} 
+      />
+    );
+  }
+  return <span className={sizeClasses[size]}>{emoji}</span>;
+}
+
 interface HelpTopic {
   keywords: string[];
   title: string;
@@ -276,25 +320,25 @@ export function HelpCenter({ isOpen, onClose }: HelpCenterProps) {
         <div className="flex border-b border-slate-700 bg-slate-800/50">
           <button
             onClick={() => { setActiveTab('featured'); setCurrentSlide(0); }}
-            className={`flex-1 px-4 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center gap-1 ${
               activeTab === 'featured'
                 ? 'text-cyan-300 border-b-2 border-cyan-400'
                 : 'text-slate-400 hover:text-slate-300'
             }`}
             data-testid="tab-featured"
           >
-            📚 Guides
+            <Icon3D emoji="📚" size="sm" /> Guides
           </button>
           <button
             onClick={() => setActiveTab('search')}
-            className={`flex-1 px-4 py-2 text-sm font-semibold transition-colors ${
+            className={`flex-1 px-4 py-2 text-sm font-semibold transition-colors flex items-center justify-center gap-1 ${
               activeTab === 'search'
                 ? 'text-cyan-300 border-b-2 border-cyan-400'
                 : 'text-slate-400 hover:text-slate-300'
             }`}
             data-testid="tab-search"
           >
-            🔍 Search
+            <Icon3D emoji="🔍" size="sm" /> Search
           </button>
         </div>
 
@@ -303,7 +347,7 @@ export function HelpCenter({ isOpen, onClose }: HelpCenterProps) {
           <div className="flex-1 overflow-hidden flex flex-col p-4">
             <div className="relative flex-1 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-lg p-4 border border-slate-600 mb-4">
               <div className="text-center">
-                <div className="text-4xl mb-2">{FEATURED_GUIDES[currentSlide].icon}</div>
+                <div className="flex justify-center mb-2"><Icon3D emoji={FEATURED_GUIDES[currentSlide].icon} size="lg" /></div>
                 <h4 className="font-bold text-white text-lg mb-1">{FEATURED_GUIDES[currentSlide].title}</h4>
                 <p className="text-xs text-slate-300 mb-4">{FEATURED_GUIDES[currentSlide].description}</p>
                 <div className="space-y-2 text-xs text-slate-300 text-left max-h-[180px] overflow-y-auto">
@@ -388,7 +432,7 @@ export function HelpCenter({ isOpen, onClose }: HelpCenterProps) {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{topic.icon}</span>
+                      <Icon3D emoji={topic.icon} size="md" />
                       <h4 className="font-semibold text-white group-hover:text-cyan-300 transition-colors">
                         {topic.title}
                       </h4>
@@ -403,8 +447,8 @@ export function HelpCenter({ isOpen, onClose }: HelpCenterProps) {
             </div>
 
             {/* Footer */}
-            <div className="border-t border-slate-700 p-3 bg-slate-900/50 rounded-b-lg text-xs text-slate-400">
-              <p>💡 Tip: Search for keywords like "W-2", "GPS", "prevailing wage", or "bonus"</p>
+            <div className="border-t border-slate-700 p-3 bg-slate-900/50 rounded-b-lg text-xs text-slate-400 flex items-center gap-1">
+              <Icon3D emoji="💡" size="sm" /> Tip: Search for keywords like "W-2", "GPS", "prevailing wage", or "bonus"
             </div>
           </>
         )}

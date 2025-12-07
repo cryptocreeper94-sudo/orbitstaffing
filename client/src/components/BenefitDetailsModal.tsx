@@ -2,6 +2,22 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const ICON_MAP: Record<string, string> = {
+  "⚡": "/icons/pro/3d_lightning_bolt_icon_clean.png",
+  "👥": "/icons/pro/3d_people_group_icon_clean.png",
+  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
+  "📈": "/icons/pro/3d_chart_reports_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "lg" }: { emoji: string; size?: "sm" | "md" | "lg" | "xl" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = { sm: "w-4 h-4", md: "w-6 h-6", lg: "w-10 h-10", xl: "w-14 h-14" };
+  if (iconPath) {
+    return <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]`} />;
+  }
+  return <span>{emoji}</span>;
+}
+
 interface BenefitDetail {
   id: string;
   title: string;
@@ -65,7 +81,7 @@ export function BenefitDetailsModal({ isOpen, benefitId, onClose }: ModalProps) 
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-primary/20 to-primary/10 border-b border-primary/20 p-6 flex justify-between items-center gap-4">
           <div>
-            <div className="text-4xl mb-2">{benefit.icon}</div>
+            <div className="mb-2"><Icon3D emoji={benefit.icon} size="xl" /></div>
             <h2 className="text-3xl font-bold text-foreground">{benefit.title}</h2>
           </div>
           <button

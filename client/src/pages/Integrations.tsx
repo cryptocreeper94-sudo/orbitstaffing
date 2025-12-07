@@ -19,6 +19,43 @@ import {
   Loader,
 } from "lucide-react";
 
+const ICON_MAP: Record<string, string> = {
+  "👥": "/icons/pro/3d_people_group_icon_clean.png",
+  "💼": "/icons/pro/3d_briefcase_jobs_icon_clean.png",
+  "⚡": "/icons/pro/3d_lightning_bolt_icon_clean.png",
+  "🔗": "/icons/pro/3d_link_connection_icon_clean.png",
+  "🌐": "/icons/pro/3d_globe_network_icon_clean.png",
+  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
+  "📊": "/icons/pro/3d_chart_reports_icon_clean.png",
+  "✅": "/icons/pro/3d_checkmark_comply_icon_clean.png",
+  "🎯": "/icons/pro/3d_target_goal_icon_clean.png",
+  "⏱️": "/icons/pro/3d_clock_timer_icon_clean.png",
+  "📅": "/icons/pro/3d_calendar_schedule_icon_clean.png",
+  "🌳": "/icons/pro/3d_tree_growth_icon_clean.png",
+  "📧": "/icons/pro/3d_email_envelope_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" | "xl" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8",
+    xl: "w-10 h-10"
+  };
+  
+  if (iconPath) {
+    return (
+      <img 
+        src={`${iconPath}?v=1`} 
+        alt="" 
+        className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} 
+      />
+    );
+  }
+  return <span>{emoji}</span>;
+}
+
 interface Integration {
   id: string;
   type:
@@ -356,90 +393,90 @@ export default function Integrations() {
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">
-                <span className="text-xl mr-2">👥</span> ADP Workforce Now
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Icon3D emoji="👥" size="md" /> ADP Workforce Now
               </CardTitle>
               <p className="text-xs text-muted-foreground font-normal mt-1">#1 Market Leader</p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ Employees & pay rates</div>
-              <div>✓ Payroll runs & tax info</div>
-              <div>✓ Timesheets & compliance</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Employees & pay rates</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Payroll runs & tax info</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Timesheets & compliance</div>
               <div className="text-xs text-primary font-semibold mt-2">Enterprise-grade</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">
-                <span className="text-xl mr-2">💼</span> Paychex Flex
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Icon3D emoji="💼" size="md" /> Paychex Flex
               </CardTitle>
               <p className="text-xs text-muted-foreground font-normal mt-1">#2 Market Leader</p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ Payroll & tax automation</div>
-              <div>✓ Employee data & rates</div>
-              <div>✓ Multi-state compliance</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Payroll & tax automation</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Employee data & rates</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Multi-state compliance</div>
               <div className="text-xs text-primary font-semibold mt-2">Small-to-mid agencies</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">
-                <span className="text-xl mr-2">⚡</span> Gusto
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Icon3D emoji="⚡" size="md" /> Gusto
               </CardTitle>
               <p className="text-xs text-muted-foreground font-normal mt-1">Most Popular for Small Business</p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ Payroll & benefits</div>
-              <div>✓ Employee self-service</div>
-              <div>✓ Contractors & temps</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Payroll & benefits</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Employee self-service</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Contractors & temps</div>
               <div className="text-xs text-primary font-semibold mt-2">Simple & affordable</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">
-                <span className="text-xl mr-2">🔗</span> Rippling
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Icon3D emoji="🔗" size="md" /> Rippling
               </CardTitle>
               <p className="text-xs text-muted-foreground font-normal mt-1">Modern All-in-One</p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ HR + Payroll + IT</div>
-              <div>✓ Benefits & compliance</div>
-              <div>✓ Unified platform</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> HR + Payroll + IT</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Benefits & compliance</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Unified platform</div>
               <div className="text-xs text-primary font-semibold mt-2">Tech-forward companies</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">
-                <span className="text-xl mr-2">🌐</span> Workday
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Icon3D emoji="🌐" size="md" /> Workday
               </CardTitle>
               <p className="text-xs text-muted-foreground font-normal mt-1">Enterprise Solution</p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ Advanced analytics</div>
-              <div>✓ AI-powered compliance</div>
-              <div>✓ Global payroll</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Advanced analytics</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> AI-powered compliance</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Global payroll</div>
               <div className="text-xs text-primary font-semibold mt-2">Large enterprises</div>
             </CardContent>
           </Card>
 
           <Card className="border-border/50">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm">
-                <span className="text-xl mr-2">💰</span> Paylocity
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Icon3D emoji="💰" size="md" /> Paylocity
               </CardTitle>
               <p className="text-xs text-muted-foreground font-normal mt-1">HCM Platform</p>
             </CardHeader>
             <CardContent className="text-xs text-muted-foreground space-y-1">
-              <div>✓ Payroll & HR</div>
-              <div>✓ Benefits & compliance</div>
-              <div>✓ Analytics dashboard</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Payroll & HR</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Benefits & compliance</div>
+              <div className="flex items-center gap-1"><Icon3D emoji="✅" size="sm" /> Analytics dashboard</div>
               <div className="text-xs text-primary font-semibold mt-2">Scaling agencies</div>
             </CardContent>
           </Card>
@@ -652,7 +689,7 @@ function AvailableIntegrationCard({
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
-              <span className="text-2xl">{integration.icon}</span>
+              <Icon3D emoji={integration.icon} size="lg" />
               {integration.name}
             </CardTitle>
             <CardDescription className="text-xs mt-2">{integration.description}</CardDescription>

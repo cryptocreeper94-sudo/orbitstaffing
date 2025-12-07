@@ -17,6 +17,22 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+const ICON_MAP: Record<string, string> = {
+  "🏆": "/icons/pro/3d_trophy_winner_icon_clean.png",
+  "✅": "/icons/pro/3d_checkmark_comply_icon_clean.png",
+  "🛡️": "/icons/pro/3d_shield_protection_icon_clean.png",
+  "🌅": "/icons/pro/3d_sunny_weather_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "lg" }: { emoji: string; size?: "sm" | "md" | "lg" | "xl" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = { sm: "w-4 h-4", md: "w-6 h-6", lg: "w-10 h-10", xl: "w-14 h-14" };
+  if (iconPath) {
+    return <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]`} />;
+  }
+  return <span className="text-2xl">{emoji}</span>;
+}
+
 const mockPerformanceData = {
   workerId: 'W-001',
   workerName: 'John Smith',
@@ -261,7 +277,7 @@ export function WorkerPerformanceDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {mockPerformanceData.badges.map((badge) => (
             <div key={badge.id} className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 border border-purple-700/50 rounded-lg p-4 text-center">
-              <div className="text-4xl mb-2">{badge.icon}</div>
+              <div className="mb-2 flex justify-center"><Icon3D emoji={badge.icon} /></div>
               <p className="text-white font-bold mb-1">{badge.name}</p>
               <p className="text-xs text-gray-400 mb-2">{badge.description}</p>
               <p className="text-xs text-purple-400">Earned {badge.earnedDate}</p>

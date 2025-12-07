@@ -206,27 +206,27 @@ export default function Landing() {
           <div className="relative">
             <div className="flex flex-row flex-nowrap carousel-flex sm:grid sm:grid-cols-6 gap-2 sm:gap-3 overflow-x-auto pb-2 sm:pb-0 snap-x snap-mandatory scrollbar-hide pr-8 sm:pr-0">
               <Link href="/jobs" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-job-board">
-                <div className="text-xl sm:text-3xl mb-0.5">💼</div>
+                <img src="/icons/pro/3d_briefcase_jobs_icon_clean.png?v=1" alt="Jobs" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Jobs</div>
               </Link>
               <Link href="/talent-pool" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-emerald-500/40 bg-emerald-900/30 hover:bg-emerald-900/50 hover:border-emerald-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" data-testid="link-talent-pool">
-                <div className="text-xl sm:text-3xl mb-0.5">⭐</div>
+                <img src="/icons/pro/3d_star_talent_icon_clean.png?v=1" alt="Talent" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(234,179,8,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Talent</div>
               </Link>
               <Link href="/employer/register" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-employer-register">
-                <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
+                <img src="/icons/pro/3d_building_clients_icon_clean.png?v=1" alt="Post" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Post</div>
               </Link>
               <Link href="/apply" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 hover:border-cyan-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(6,182,212,0.2)] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)]" data-testid="link-apply">
-                <div className="text-xl sm:text-3xl mb-0.5">👷</div>
+                <img src="/icons/pro/3d_hardhat_workers_icon_clean.png?v=1" alt="Apply" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Apply</div>
               </Link>
               <Link href="/employee-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-employee-hub">
-                <div className="text-xl sm:text-3xl mb-0.5">🧑‍💼</div>
+                <img src="/icons/pro/3d_manager_suit_icon_clean.png?v=1" alt="Hub" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Hub</div>
               </Link>
               <Link href="/owner-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start p-2 sm:p-4 rounded-lg border border-violet-500/40 bg-violet-900/30 hover:bg-violet-900/50 hover:border-violet-400/70 transition-all flex flex-col items-center text-center shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_25px_rgba(139,92,246,0.4)]" data-testid="link-owner-hub">
-                <div className="text-xl sm:text-3xl mb-0.5">👔</div>
+                <img src="/icons/pro/3d_tie_owner_icon_clean.png?v=1" alt="Owner" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-sm">Owner</div>
               </Link>
             </div>
@@ -247,35 +247,35 @@ export default function Landing() {
           <div className="relative">
             <div className="flex flex-row flex-nowrap gap-2 overflow-x-auto pb-2 pr-10 sm:pr-0 sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible scrollbar-hide snap-x snap-mandatory">
               <Link href="/equipment-tracking" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">📦</div>
+                <img src="/icons/pro/3d_gear_equipment_icon_clean.png?v=1" alt="Gear" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">Gear</div>
               </Link>
               <Link href="/gps-clock-in" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">📍</div>
+                <img src="/icons/pro/3d_gps_location_icon_clean.png?v=1" alt="GPS" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">GPS</div>
               </Link>
               <Link href="/payroll-processing" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">💰</div>
+                <img src="/icons/pro/3d_money_pay_icon_clean.png?v=1" alt="Pay" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">Pay</div>
               </Link>
               <Link href="/worker-availability" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">📅</div>
+                <img src="/icons/pro/3d_calendar_schedule_icon_clean.png?v=1" alt="Schedule" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">Sched</div>
               </Link>
               <Link href="/admin/compliance" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">✅</div>
+                <img src="/icons/pro/3d_checkmark_comply_icon_clean.png?v=1" alt="Comply" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">Comply</div>
               </Link>
               <Link href="/admin/payroll-dashboard" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">🧾</div>
+                <img src="/icons/pro/3d_invoice_billing_icon_clean.png?v=1" alt="Invoice" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">Invoice</div>
               </Link>
               <Link href="/crm" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">📇</div>
+                <img src="/icons/pro/3d_crm_contacts_icon_clean.png?v=1" alt="CRM" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">CRM</div>
               </Link>
               <Link href="/features" className="flex-shrink-0 w-[70px] sm:w-auto snap-start p-2 sm:p-3 rounded-lg border border-cyan-500/40 bg-cyan-900/30 hover:bg-cyan-900/50 flex flex-col items-center text-center">
-                <div className="text-xl sm:text-2xl mb-0.5">📊</div>
+                <img src="/icons/pro/3d_chart_reports_icon_clean.png?v=1" alt="More" className="w-5 h-5 sm:w-8 sm:h-8 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                 <div className="font-semibold text-white text-[9px] sm:text-xs">More</div>
               </Link>
             </div>
@@ -305,7 +305,7 @@ export default function Landing() {
               <Link href="/hallmark-seal" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-hallmarks">
                   <CardContent className="p-2 sm:p-4">
-                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔐</div>
+                    <img src="/icons/pro/3d_padlock_security_icon_clean.png?v=1" alt="Hallmarks" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
                     <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Hallmarks</h3>
                     <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                   </CardContent>
@@ -315,7 +315,7 @@ export default function Landing() {
               <Link href="/crm" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crm">
                   <CardContent className="p-2 sm:p-4">
-                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📇</div>
+                    <img src="/icons/pro/3d_crm_contacts_icon_clean.png?v=1" alt="CRM" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
                     <h3 className="text-[9px] sm:text-sm font-bold text-green-200">CRM</h3>
                     <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                   </CardContent>
@@ -325,7 +325,7 @@ export default function Landing() {
               <Link href="/pay-card" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-pay-card">
                   <CardContent className="p-2 sm:p-4">
-                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">💳</div>
+                    <img src="/icons/pro/3d_credit_card_icon_clean.png?v=1" alt="Pay Card" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
                     <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Pay Card</h3>
                     <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                   </CardContent>
@@ -335,7 +335,7 @@ export default function Landing() {
               <Link href="/marketing-hub" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-marketing">
                   <CardContent className="p-2 sm:p-4">
-                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">📢</div>
+                    <img src="/icons/pro/3d_megaphone_announce_icon_clean.png?v=1" alt="Marketing" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
                     <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Marketing</h3>
                     <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                   </CardContent>
@@ -345,7 +345,7 @@ export default function Landing() {
               <Link href="/talent-exchange" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-exchange">
                   <CardContent className="p-2 sm:p-4">
-                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">🔄</div>
+                    <img src="/icons/pro/3d_sync_refresh_icon_clean.png?v=1" alt="Exchange" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
                     <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Exchange</h3>
                     <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                   </CardContent>
@@ -355,7 +355,7 @@ export default function Landing() {
               <Link href="/crypto-wallet" className="flex-shrink-0 basis-[48%] min-w-[48%] sm:basis-auto sm:min-w-0 sm:w-auto snap-start">
                 <Card className="h-full bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-green-500/50 hover:border-green-400/80 transition-all group shadow-[0_0_18px_rgba(34,197,94,0.2)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)]" data-testid="card-crypto">
                   <CardContent className="p-2 sm:p-4">
-                    <div className="text-xl sm:text-3xl mb-0.5 group-hover:scale-110 transition-transform">⛓️</div>
+                    <img src="/icons/pro/3d_blockchain_chain_icon_clean.png?v=1" alt="Crypto" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 object-contain drop-shadow-[0_0_6px_rgba(34,197,94,0.5)] group-hover:scale-110 transition-transform" />
                     <h3 className="text-[9px] sm:text-sm font-bold text-green-200">Crypto</h3>
                     <span className="text-[7px] sm:text-[10px] bg-green-500/30 text-green-300 px-1 rounded">LIVE</span>
                   </CardContent>
@@ -389,7 +389,7 @@ export default function Landing() {
               <Link href="/admin" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-violet-400/50 hover:border-violet-300/80 bg-gradient-to-br from-violet-400/15 to-purple-400/10 hover:from-violet-400/25 transition-all cursor-pointer shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
                   <CardContent className="p-2 sm:p-4 text-center">
-                    <div className="text-xl sm:text-3xl mb-0.5">🏢</div>
+                    <img src="/icons/pro/3d_building_clients_icon_clean.png?v=1" alt="Owner" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(139,92,246,0.5)]" />
                     <h3 className="text-[10px] sm:text-sm font-bold text-violet-300">Owner</h3>
                     <Button className="w-full mt-1.5 bg-violet-500/80 hover:bg-violet-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-owner-access">
                       Login
@@ -402,7 +402,7 @@ export default function Landing() {
               <Link href="/worker" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-blue-500/50 hover:border-blue-400/80 bg-gradient-to-br from-blue-900/20 to-blue-950/10 hover:from-blue-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
                   <CardContent className="p-2 sm:p-4 text-center">
-                    <div className="text-xl sm:text-3xl mb-0.5">👥</div>
+                    <img src="/icons/pro/3d_people_group_icon_clean.png?v=1" alt="Client" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(59,130,246,0.5)]" />
                     <h3 className="text-[10px] sm:text-sm font-bold text-blue-300">Client</h3>
                     <Button className="w-full mt-1.5 bg-blue-500/80 hover:bg-blue-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-customer-access">
                       Login
@@ -415,7 +415,7 @@ export default function Landing() {
               <Link href="/employee-hub" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-emerald-500/50 hover:border-emerald-400/80 bg-gradient-to-br from-emerald-900/20 to-emerald-950/10 hover:from-emerald-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
                   <CardContent className="p-2 sm:p-4 text-center">
-                    <div className="text-xl sm:text-3xl mb-0.5">📋</div>
+                    <img src="/icons/pro/3d_clipboard_worker_icon_clean.png?v=1" alt="Employee" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
                     <h3 className="text-[10px] sm:text-sm font-bold text-emerald-300">Employee</h3>
                     <Button className="w-full mt-1.5 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-employee-access">
                       Hub
@@ -428,7 +428,7 @@ export default function Landing() {
               <Link href="/developer" className="flex-shrink-0 w-[140px] sm:w-auto snap-start group">
                 <Card className="h-full border border-cyan-500/50 hover:border-cyan-400/80 bg-gradient-to-br from-cyan-900/20 to-cyan-950/10 hover:from-cyan-900/40 transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
                   <CardContent className="p-2 sm:p-4 text-center">
-                    <div className="text-xl sm:text-3xl mb-0.5">⚙️</div>
+                    <img src="/icons/pro/3d_settings_gears_icon_clean.png?v=1" alt="Admin" className="w-6 h-6 sm:w-10 sm:h-10 mb-0.5 mx-auto object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]" />
                     <h3 className="text-[10px] sm:text-sm font-bold text-cyan-300">Admin</h3>
                     <Button className="w-full mt-1.5 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-admin-access">
                       Panel

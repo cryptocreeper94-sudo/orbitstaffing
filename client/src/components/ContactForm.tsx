@@ -10,6 +10,26 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Send, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
 
+const ICON_MAP: Record<string, string> = {
+  "👷": "/icons/pro/3d_hardhat_workers_icon_clean.png",
+  "💻": "/icons/pro/3d_settings_gears_icon_clean.png",
+  "👔": "/icons/pro/3d_tie_owner_icon_clean.png",
+  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
+  "📧": "/icons/pro/3d_email_envelope_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = { sm: "w-4 h-4", md: "w-6 h-6", lg: "w-8 h-8" };
+  
+  if (iconPath) {
+    return (
+      <img src={`${iconPath}?v=1`} alt="" className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} />
+    );
+  }
+  return <span>{emoji}</span>;
+}
+
 interface ContactFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -29,12 +49,12 @@ export function ContactForm({ open, onOpenChange }: ContactFormProps) {
     message: '',
   });
 
-  const categories: { value: MessageCategory; label: string; description: string }[] = [
-    { value: 'IT worker', label: '👷 IT Worker', description: 'Technical inquiries and support' },
-    { value: 'developer', label: '💻 Developer', description: 'Integration and API questions' },
-    { value: 'owner', label: '👔 Business Owner', description: 'General inquiries' },
-    { value: 'investor', label: '💰 Investor', description: 'Partnership and investment' },
-    { value: 'general', label: '📧 General', description: 'Other inquiries' },
+  const categories: { value: MessageCategory; label: string; icon: string; description: string }[] = [
+    { value: 'IT worker', icon: '👷', label: 'IT Worker', description: 'Technical inquiries and support' },
+    { value: 'developer', icon: '💻', label: 'Developer', description: 'Integration and API questions' },
+    { value: 'owner', icon: '👔', label: 'Business Owner', description: 'General inquiries' },
+    { value: 'investor', icon: '💰', label: 'Investor', description: 'Partnership and investment' },
+    { value: 'general', icon: '📧', label: 'General', description: 'Other inquiries' },
   ];
 
   const handleCategorySelect = (selected: MessageCategory) => {
@@ -126,8 +146,11 @@ export function ContactForm({ open, onOpenChange }: ContactFormProps) {
                   className="w-full p-3 rounded-lg border border-border/30 hover:border-primary/50 hover:bg-primary/5 transition-colors text-left"
                   data-testid={`button-category-${cat.value}`}
                 >
-                  <div className="font-medium text-foreground">{cat.label}</div>
-                  <div className="text-xs text-muted-foreground">{cat.description}</div>
+                  <div className="font-medium text-foreground flex items-center gap-2">
+                    <Icon3D emoji={cat.icon} size="md" />
+                    {cat.label}
+                  </div>
+                  <div className="text-xs text-muted-foreground ml-8">{cat.description}</div>
                 </button>
               ))}
             </div>

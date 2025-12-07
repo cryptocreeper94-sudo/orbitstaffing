@@ -1,6 +1,49 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
+const ICON_MAP: Record<string, string> = {
+  "📱": "/icons/pro/3d_smartphone_mobile_icon_clean.png",
+  "✅": "/icons/pro/3d_checkmark_comply_icon_clean.png",
+  "🔔": "/icons/pro/3d_megaphone_announce_icon_clean.png",
+  "📍": "/icons/pro/3d_gps_location_icon_clean.png",
+  "💰": "/icons/pro/3d_money_pay_icon_clean.png",
+  "✔️": "/icons/pro/3d_checkmark_comply_icon_clean.png",
+  "🏆": "/icons/pro/3d_trophy_winner_icon_clean.png",
+  "💳": "/icons/pro/3d_credit_card_icon_clean.png",
+  "📊": "/icons/pro/3d_chart_reports_icon_clean.png",
+  "💵": "/icons/pro/3d_money_pay_icon_clean.png",
+  "🏢": "/icons/pro/3d_building_clients_icon_clean.png",
+  "📝": "/icons/pro/3d_document_file_icon_clean.png",
+  "🤖": "/icons/pro/3d_robot_ai_icon_clean.png",
+  "⏱️": "/icons/pro/3d_clock_timer_icon_clean.png",
+  "✨": "/icons/pro/3d_sparkles_magic_icon_clean.png",
+  "💼": "/icons/pro/3d_briefcase_jobs_icon_clean.png",
+  "📄": "/icons/pro/3d_document_file_icon_clean.png",
+  "🎯": "/icons/pro/3d_target_goal_icon_clean.png",
+  "👷": "/icons/pro/3d_hardhat_workers_icon_clean.png",
+};
+
+function Icon3D({ emoji, size = "md" }: { emoji: string; size?: "sm" | "md" | "lg" | "xl" }) {
+  const iconPath = ICON_MAP[emoji];
+  const sizeClasses = {
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-10 h-10",
+    xl: "w-16 h-16"
+  };
+  
+  if (iconPath) {
+    return (
+      <img 
+        src={`${iconPath}?v=1`} 
+        alt="" 
+        className={`${sizeClasses[size]} object-contain drop-shadow-[0_0_6px_rgba(6,182,212,0.5)]`} 
+      />
+    );
+  }
+  return <span>{emoji}</span>;
+}
+
 type DemoFlow = 'employee' | 'owner';
 
 interface Slide {
@@ -230,31 +273,31 @@ export default function WorkflowDemo({
         <div className="bg-gray-100 p-3 sm:p-4 flex gap-2 sm:gap-4 justify-center border-b flex-wrap">
           <button
             onClick={() => handleFlowChange('employee')}
-            className={`px-3 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition ${
+            className={`px-3 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition flex items-center gap-2 ${
               flow === 'employee'
                 ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
             data-testid="button-flow-employee"
           >
-            👷 Worker
+            <Icon3D emoji="👷" size="md" /> Worker
           </button>
           <button
             onClick={() => handleFlowChange('owner')}
-            className={`px-3 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition ${
+            className={`px-3 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base transition flex items-center gap-2 ${
               flow === 'owner'
                 ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
             data-testid="button-flow-owner"
           >
-            🏢 Owner
+            <Icon3D emoji="🏢" size="md" /> Owner
           </button>
         </div>
 
         {/* Slide Content */}
         <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 overflow-y-auto">
-          <div className="text-5xl sm:text-6xl mb-4 sm:mb-6">{slide.icon}</div>
+          <div className="mb-4 sm:mb-6 flex justify-center"><Icon3D emoji={slide.icon} size="xl" /></div>
           <div className="text-center max-w-sm sm:max-w-md">
             <p className="text-xs sm:text-sm font-medium text-blue-600 mb-2">
               Step {slide.step} of {slides.length}
