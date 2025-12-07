@@ -333,37 +333,22 @@ export function OrbitChatAssistant() {
       </AnimatePresence>
 
       {!isOpen && (
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.92 }}
+        <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-4 z-[99999]"
+          className="fixed bottom-6 right-4 z-[99999] w-14 h-14 rounded-full bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/40 flex items-center justify-center hover:scale-110 transition-transform"
+          style={{ filter: 'drop-shadow(0 0 15px rgba(6,182,212,0.6))' }}
           data-testid="button-orbit-chat"
           aria-label="Open Orby chat"
         >
-          <motion.div 
-            className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-600/90 to-blue-700/90 border-2 border-cyan-400/60 shadow-lg shadow-cyan-500/40 flex items-center justify-center"
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            style={{ filter: 'drop-shadow(0 0 15px rgba(6,182,212,0.6))' }}
-          >
-            <img 
-              src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
-              alt="Orby" 
-              className="w-11 h-11 object-contain"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            <span className="absolute text-2xl" style={{ display: 'none' }} data-fallback>🪐</span>
-            <span 
-              className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse"
-              style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
-            />
-          </motion.div>
-        </motion.button>
+          <img 
+            src="/mascot/orbit_mascot_cyan_saturn_style_transparent.png" 
+            alt="Orby" 
+            className="w-11 h-11 object-contain"
+          />
+          <span 
+            className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse"
+          />
+        </button>
       )}
     </>,
     document.body
