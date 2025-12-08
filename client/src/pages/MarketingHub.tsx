@@ -946,98 +946,37 @@ export default function MarketingHub() {
           </BentoTile>
         </BentoGrid>
 
-        <BentoGrid cols={2} gap="md">
-          <BentoTile className="p-4 md:p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Image className="w-5 h-5 text-green-400" />
-              <h3 className="text-white font-semibold text-lg">Screenshot Guide</h3>
-            </div>
-            <div className="space-y-2">
-              {screenshotGuide.map((item, i) => (
-                <div 
-                  key={i}
-                  data-testid={`screenshot-guide-${i}`}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:border-cyan-500/30 transition-all group"
-                >
-                  <div className="flex-1">
-                    <p className="font-medium text-white text-sm">{item.page}</p>
-                    <p className="text-xs text-slate-400">{item.use}</p>
-                  </div>
-                  <a
-                    href={item.path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid={`link-screenshot-${item.page.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="flex items-center gap-1 text-xs text-cyan-400 hover:text-cyan-300 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <Eye className="w-3 h-3" />
-                    View
-                  </a>
-                </div>
-              ))}
-            </div>
-          </BentoTile>
-
-          <BentoTile className="p-4 md:p-5 bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-yellow-400" />
-              <h3 className="text-white font-semibold text-lg">Quick Actions</h3>
-            </div>
-            <div className="space-y-3">
-              <ActionCard
-                title="Meta Business Suite"
-                description="Schedule Facebook posts"
-                icon={<Facebook className="w-5 h-5 text-blue-400" />}
-                onClick={() => window.open('https://business.facebook.com', '_blank')}
-                className="bg-blue-600/20 border-blue-500/30"
-              />
-              
-              <ActionCard
-                title="Buffer"
-                description="Schedule X/Twitter posts (free)"
-                icon={<RefreshCw className="w-5 h-5 text-cyan-400" />}
-                onClick={() => window.open('https://buffer.com', '_blank')}
-              />
-              
-              <ActionCard
-                title="Post to X Now"
-                description="Open Twitter/X composer"
-                icon={<Twitter className="w-5 h-5 text-sky-400" />}
-                onClick={() => window.open('https://twitter.com/compose/tweet', '_blank')}
-                className="bg-sky-600/20 border-sky-500/30"
-              />
-              
-              <div className="pt-3 border-t border-slate-700/50">
-                <div className="flex items-center gap-2 text-sm text-slate-400">
-                  <Target className="w-4 h-4" />
-                  <span>Pro tip: Batch create posts on Sunday, schedule for the week!</span>
-                </div>
-              </div>
-            </div>
-          </BentoTile>
-        </BentoGrid>
-
-        <OrbitCard variant="action" hover={false} className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-cyan-500/20">
-                <TrendingUp className="w-6 h-6 text-cyan-400" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white">Consistency is Key</h3>
-                <p className="text-sm text-slate-400">Post 3-6 times daily across platforms for maximum reach</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
-                6 posts/day target
-              </Badge>
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                42 posts/week
-              </Badge>
-            </div>
+        {/* Compact Quick Links Row */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => window.open('https://business.facebook.com', '_blank')}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 hover:bg-blue-600/30 transition-colors"
+            data-testid="button-meta-suite"
+          >
+            <Facebook className="w-4 h-4 text-blue-400" />
+            <span className="text-xs text-white">Meta Suite</span>
+          </button>
+          <button
+            onClick={() => window.open('https://buffer.com', '_blank')}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600/50 hover:bg-slate-700 transition-colors"
+            data-testid="button-buffer"
+          >
+            <RefreshCw className="w-4 h-4 text-cyan-400" />
+            <span className="text-xs text-white">Buffer</span>
+          </button>
+          <button
+            onClick={() => window.open('https://twitter.com/compose/tweet', '_blank')}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-600/20 border border-sky-500/30 hover:bg-sky-600/30 transition-colors"
+            data-testid="button-post-x"
+          >
+            <Twitter className="w-4 h-4 text-sky-400" />
+            <span className="text-xs text-white">Post to X</span>
+          </button>
+          <div className="flex items-center gap-2 px-3 py-2 text-xs text-slate-400">
+            <Target className="w-3 h-3" />
+            <span>6 posts/day · 42/week</span>
           </div>
-        </OrbitCard>
+        </div>
 
       </div>
     </div>
