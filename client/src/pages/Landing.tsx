@@ -17,8 +17,10 @@ import {
   Settings,
   Info,
   Coins,
-  FileText
+  FileText,
+  Search
 } from "lucide-react";
+import { Web3SearchBar } from "@/components/Web3SearchBar";
 import { Link } from "wouter";
 import { BusinessTypeModal } from "@/components/BusinessTypeModal";
 import { ValuePropositionModal } from "@/components/ValuePropositionModal";
@@ -48,6 +50,7 @@ export default function Landing() {
   const [showLotOpsSlideshow, setShowLotOpsSlideshow] = useState(false);
   const [showOrbitSlideshow, setShowOrbitSlideshow] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem("hasSeenWelcomeSlideshow");
@@ -118,25 +121,48 @@ export default function Landing() {
 
       <div className="relative z-10">
       
-      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 h-11 sm:h-12">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full h-full flex items-end justify-between gap-2 sm:gap-6">
-          <div className="flex h-full items-end gap-2 flex-shrink-0 pb-2">
+      <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full py-2 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <img 
               src={orbyCommanderEmblem} 
               alt="Orby" 
               className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
             />
-            <span className="font-heading font-bold text-xs sm:text-base tracking-wider text-white whitespace-nowrap leading-none">Welcome to ORBIT Full Cycle Staffing</span>
+            <span className="font-heading font-bold text-xs sm:text-base tracking-wider text-white whitespace-nowrap leading-none hidden sm:inline">Welcome to ORBIT Full Cycle Staffing</span>
+            <span className="font-heading font-bold text-xs tracking-wider text-white sm:hidden">ORBIT</span>
           </div>
           
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
-            data-testid="button-mobile-menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Desktop: Full search bar */}
+          <div className="hidden md:flex flex-1 max-w-md mx-4">
+            <Web3SearchBar />
+          </div>
+          
+          {/* Mobile: Search icon + Menu */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+              className="p-1.5 text-cyan-400 hover:text-cyan-300 transition rounded-lg hover:bg-slate-800/50 md:hidden"
+              data-testid="button-landing-search"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-1.5 text-slate-400 hover:text-cyan-400 transition rounded-lg hover:bg-slate-800/50"
+              data-testid="button-mobile-menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
+        
+        {/* Mobile search bar dropdown */}
+        {mobileSearchOpen && (
+          <div className="md:hidden px-3 pb-3 bg-slate-900/95 backdrop-blur-lg border-b border-slate-700/50">
+            <Web3SearchBar />
+          </div>
+        )}
         
         {mobileMenuOpen && (
           <div className="absolute top-full left-0 right-0 bg-slate-900/98 backdrop-blur-lg border-b border-slate-700/50 shadow-xl z-50">
