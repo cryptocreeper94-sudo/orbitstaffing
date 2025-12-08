@@ -591,357 +591,150 @@ export default function Landing() {
           </div>
         </div>
         
-        <div className="relative max-w-4xl mx-auto px-3 sm:px-6 text-center">
-
-          {/* Stats Grid */}
-          <BentoGrid cols={4} gap="sm">
-            <BentoTile><LandingStatCard number="35%" label="Savings" /></BentoTile>
-            <BentoTile><LandingStatCard number="2hrs" label="Onboard" /></BentoTile>
-            <BentoTile><LandingStatCard number="$0" label="Setup" /></BentoTile>
-            <BentoTile><LandingStatCard number="24/7" label="Support" /></BentoTile>
-          </BentoGrid>
+        {/* Stats Row - Inline */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex justify-center gap-4 sm:gap-8 text-center">
+            {[
+              { num: "35%", label: "Savings" },
+              { num: "2hrs", label: "Onboard" },
+              { num: "$0", label: "Setup" },
+              { num: "24/7", label: "Support" },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="text-lg sm:text-xl font-bold text-primary">{s.num}</div>
+                <div className="text-[9px] sm:text-xs text-slate-400">{s.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Connect Your Systems */}
-      <section className="py-3 sm:py-8 bg-gradient-to-br from-cyan-950/30 via-blue-950/20 to-background border-y border-cyan-500/30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <SectionHeader 
-            title="Connect Your Systems"
-            subtitle="16+ integrations to streamline your workflow"
-            align="center"
-            size="md"
-            className="mb-3 sm:mb-6"
-          />
-
-          {/* Mobile Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={false} gap="sm">
-              {[
-                { name: "QuickBooks", cat: "Accounting", color: "text-green-400" },
-                { name: "ADP", cat: "Payroll", color: "text-red-400" },
-                { name: "UKG", cat: "HR", color: "text-blue-400" },
-                { name: "Paychex", cat: "Payroll", color: "text-orange-400" },
-                { name: "Xero", cat: "Accounting", color: "text-cyan-400" },
-                { name: "Indeed", cat: "Job Board", color: "text-indigo-400" },
-                { name: "LinkedIn", cat: "Job Board", color: "text-sky-400" },
-                { name: "ZipRecruiter", cat: "Job Board", color: "text-emerald-400" },
-                { name: "Gusto", cat: "Payroll", color: "text-pink-400" },
-                { name: "Workday", cat: "HR", color: "text-amber-400" },
-                { name: "Slack", cat: "Comms", color: "text-purple-400" },
-                { name: "Gmail", cat: "Comms", color: "text-rose-400" },
-              ].map((item, idx) => (
-                <CarouselRailItem key={idx} className="w-[75px]">
-                  <OrbitCard variant="glass" className="border-cyan-500/40 shadow-[0_0_10px_rgba(6,182,212,0.1)]">
-                    <OrbitCardContent className="p-2 text-center">
-                      <div className={`text-xs font-black ${item.color}`}>{item.name.slice(0, 2)}</div>
-                      <div className="text-[8px] font-bold text-white truncate">{item.name}</div>
-                      <div className="text-[7px] text-cyan-400">{item.cat}</div>
-                    </OrbitCardContent>
-                  </OrbitCard>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop Grid */}
-          <div className="hidden sm:block">
-            <BentoGrid cols={4} gap="md">
-              {[
-                { icon: "💰", title: "Payroll", items: ["ADP", "Paychex", "Gusto", "OnPay"] },
-                { icon: "📊", title: "Accounting", items: ["QuickBooks", "Xero", "FreshBooks", "Wave"] },
-                { icon: "👥", title: "HR Systems", items: ["UKG", "Workday", "BambooHR", "Rippling"] },
-                { icon: "🔗", title: "Job Boards", items: ["Indeed", "LinkedIn", "ZipRecruiter", "Glassdoor"] },
-              ].map((category, idx) => (
-                <BentoTile key={idx}>
-                  <OrbitCard variant="glass" className="h-full border-cyan-500/30">
-                    <OrbitCardContent className="p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-lg">{category.icon}</span>
-                        <h3 className="font-semibold text-cyan-400 text-sm">{category.title}</h3>
-                      </div>
-                      <div className="space-y-2">
-                        {category.items.map(name => (
-                          <div key={name} className="flex items-center gap-2 text-xs text-slate-300 hover:text-white cursor-pointer transition-colors">
-                            <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                            {name}
-                          </div>
-                        ))}
-                      </div>
-                    </OrbitCardContent>
-                  </OrbitCard>
-                </BentoTile>
-              ))}
-            </BentoGrid>
-          </div>
-
-          <div className="text-center mt-3 sm:mt-6">
-            <Link href="/integrations">
-              <Button className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] text-[9px] sm:text-sm h-7 sm:h-9 px-3">
-                View All Integrations <ArrowRight className="w-2.5 h-2.5 sm:w-4 sm:h-4 ml-1" />
-              </Button>
+      {/* Integrations - Compact Banner */}
+      <section className="py-3 sm:py-4 bg-gradient-to-r from-cyan-950/30 via-blue-950/20 to-cyan-950/30 border-y border-cyan-500/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-white">16+ Integrations</h3>
+            <Link href="/integrations" className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1">
+              View All <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Markup Comparison */}
-      <section className="py-3 sm:py-10 bg-gradient-to-br from-green-950/20 via-background to-emerald-950/10 border-y border-green-500/20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          {/* Mobile View */}
-          <div className="sm:hidden">
-            <SectionHeader 
-              title="Save Up to 35%"
-              subtitle="1.45x markup vs industry 1.6x"
-              align="center"
-              size="sm"
-              className="mb-3"
-            />
-            <div className="flex gap-2 mb-2">
-              <OrbitCard variant="glass" className="flex-1 bg-red-950/30 border-red-500/40">
-                <OrbitCardContent className="p-2 text-center">
-                  <div className="text-[8px] text-red-400">Others</div>
-                  <div className="text-lg font-bold text-red-400">1.6x</div>
-                  <div className="text-[8px] text-slate-400">$32/hr</div>
-                </OrbitCardContent>
-              </OrbitCard>
-              <OrbitCard variant="glass" className="flex-1 bg-green-950/30 border-green-500/50 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-                <OrbitCardContent className="p-2 text-center">
-                  <div className="text-[8px] text-green-400">ORBIT</div>
-                  <div className="text-lg font-bold text-green-400">1.45x</div>
-                  <div className="text-[8px] text-green-300">$29/hr</div>
-                </OrbitCardContent>
-              </OrbitCard>
-            </div>
-            <OrbitCard variant="glass" className="bg-amber-500/10 border-amber-500/40 mb-2">
-              <OrbitCardContent className="p-2 text-center">
-                <div className="text-[9px] text-amber-400">Your Savings</div>
-                <div className="text-xl font-bold text-green-400">$3/hr · $6K/yr</div>
-              </OrbitCardContent>
-            </OrbitCard>
-            <div className="text-center">
-              <Link href="/pricing">
-                <Button className="bg-green-600/80 hover:bg-green-600 text-white text-[9px] h-7 px-3 shadow-[0_0_15px_rgba(34,197,94,0.2)]">
-                  See Full Breakdown <ArrowRight className="w-2.5 h-2.5 ml-1" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-
-          {/* Desktop View */}
-          <div className="hidden sm:block">
-            <SectionHeader 
-              eyebrow="Transparent Pricing"
-              title="Lower Markup = More Savings"
-              subtitle="ORBIT charges just 1.45x vs industry 1.6x"
-              align="center"
-              size="lg"
-              className="mb-8"
-            />
-
-            <BentoGrid cols={2} gap="md" className="mb-6">
-              <BentoTile>
-                <OrbitCard variant="glass" className="h-full bg-red-950/30 border-red-500/30">
-                  <OrbitCardContent className="p-6 text-center">
-                    <div className="text-3xl mb-2">🏢</div>
-                    <h3 className="text-lg font-bold text-red-300 mb-1">Typical Agencies</h3>
-                    <div className="text-4xl font-bold text-red-400 mb-2">1.6x</div>
-                    <div className="bg-slate-950/50 rounded p-3 border border-red-900/30">
-                      <div className="text-xs text-slate-400">$20/hr worker = <span className="text-white font-bold">$32/hr</span></div>
-                    </div>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </BentoTile>
-              <BentoTile>
-                <OrbitCard variant="glass" className="h-full bg-green-950/30 border-green-500/50 shadow-[0_0_30px_rgba(34,197,94,0.15)]">
-                  <OrbitCardContent className="p-6 text-center">
-                    <div className="text-3xl mb-2">✨</div>
-                    <h3 className="text-lg font-bold text-green-300 mb-1">ORBIT</h3>
-                    <div className="text-4xl font-bold text-green-400 mb-2">1.45x</div>
-                    <div className="bg-slate-950/50 rounded p-3 border border-green-500/30">
-                      <div className="text-xs text-slate-400">$20/hr worker = <span className="text-green-400 font-bold">$29/hr</span></div>
-                    </div>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </BentoTile>
-            </BentoGrid>
-
-            <OrbitCard variant="stat" className="max-w-md mx-auto bg-amber-500/10 border-amber-500/40 mb-6">
-              <OrbitCardContent className="p-6 text-center">
-                <div className="text-sm text-amber-400 mb-2">Your Annual Savings</div>
-                <div className="text-4xl font-bold text-green-400">$6,240</div>
-                <div className="text-xs text-slate-400 mt-1">Based on 10 workers at 40hr/week</div>
-              </OrbitCardContent>
-            </OrbitCard>
-
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => setShowDemoForm(true)}
-                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.4)] text-sm px-6 py-3"
-              >
-                Calculate My Savings <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-              <Link href="/pricing" className="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-primary/30 hover:bg-primary/10 text-primary font-medium text-sm transition-colors" data-testid="link-pricing-comparison">
-                Compare Plans <ChevronRight className="w-4 h-4 ml-1" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-4 sm:py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <SectionHeader 
-            eyebrow="All-in-One"
-            title="Everything You Need"
-            subtitle="Recruit, onboard, schedule, and pay — all automated"
-            align="center"
-            size="md"
-            className="mb-4 sm:mb-8"
-          />
-          
-          <BentoGrid cols={3} gap="md">
-            <BentoTile>
-              <FeatureCard icon={Clock} title="Time & Attendance" desc="GPS clock-in, real-time tracking, overtime alerts" />
-            </BentoTile>
-            <BentoTile>
-              <FeatureCard icon={Users} title="Hiring Pipeline" desc="ATS, job posting, AI matching, onboarding" />
-            </BentoTile>
-            <BentoTile>
-              <FeatureCard icon={DollarSign} title="Payroll & Billing" desc="Auto pay processing, invoicing, reports" />
-            </BentoTile>
-            <BentoTile>
-              <FeatureCard icon={Shield} title="Compliance" desc="I-9, E-Verify, tax forms, certifications" />
-            </BentoTile>
-            <BentoTile>
-              <FeatureCard icon={BarChart3} title="Analytics" desc="Real-time dashboards, KPIs, forecasting" />
-            </BentoTile>
-            <BentoTile>
-              <FeatureCard icon={Lock} title="Security" desc="SOC 2 certified, 256-bit encryption, SSO" />
-            </BentoTile>
-          </BentoGrid>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="py-6 sm:py-12 bg-gradient-to-br from-violet-950/20 via-background to-cyan-950/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <SectionHeader 
-            eyebrow="Pricing"
-            title="Simple, Transparent Pricing"
-            subtitle="No hidden fees. Cancel anytime."
-            align="center"
-            size="md"
-            className="mb-4 sm:mb-8"
-          />
-
-          <BentoGrid cols={3} gap="md" className="mb-6">
-            <BentoTile>
-              <PricingCard 
-                tier="Starter"
-                price="$39"
-                period="mo"
-                desc="Perfect for small teams"
-                workers="Up to 10 workers"
-                features={[
-                  "GPS clock-in/out",
-                  "Basic scheduling",
-                  "Payroll processing",
-                  "Email support"
-                ]}
-                cta="Start Free Trial"
-              />
-            </BentoTile>
-            <BentoTile>
-              <PricingCard 
-                tier="Pro"
-                price="$99"
-                period="mo"
-                desc="Most popular for agencies"
-                workers="Up to 50 workers"
-                features={[
-                  "Everything in Starter",
-                  "Advanced analytics",
-                  "ATS & job posting",
-                  "Priority support"
-                ]}
-                cta="Start Free Trial"
-                featured
-              />
-            </BentoTile>
-            <BentoTile>
-              <PricingCard 
-                tier="Enterprise"
-                price="Custom"
-                period="pricing"
-                desc="White-label & franchises"
-                workers="200+ workers"
-                features={[
-                  "Everything in Pro",
-                  "White-label platform",
-                  "Custom branding",
-                  "Multi-tenant support",
-                  "Account manager",
-                  "24/7 phone support"
-                ]}
-                cta="Contact Sales"
-              />
-            </BentoTile>
-          </BentoGrid>
-
-          <div className="mt-8 text-center">
-            <Link href="/pricing" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary font-semibold transition-colors" data-testid="link-view-pricing">
-              View Full Pricing & Payment Options
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-          {/* Pricing Info Cards */}
-          <CarouselRail showArrows={true} gap="md" className="mt-6 sm:mt-12">
-            <CarouselRailItem className="w-[200px] sm:w-auto sm:min-w-[300px]">
-              <OrbitCard variant="glass" className="h-full">
-                <OrbitCardContent className="p-3 sm:p-6">
-                  <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-3">💰 Fixed Monthly</h3>
-                  <p className="text-[9px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                    Predictable monthly fee based on worker volume. Best for established agencies.
-                  </p>
-                  <p className="text-[8px] sm:text-xs text-primary font-medium">No per-placement fees.</p>
-                </OrbitCardContent>
-              </OrbitCard>
-            </CarouselRailItem>
-            <CarouselRailItem className="w-[200px] sm:w-auto sm:min-w-[300px]">
-              <OrbitCard variant="glass" className="h-full">
-                <OrbitCardContent className="p-3 sm:p-6">
-                  <h3 className="font-bold text-sm sm:text-lg mb-1 sm:mb-3">📈 Revenue Share</h3>
-                  <p className="text-[9px] sm:text-sm text-muted-foreground mb-2 sm:mb-4">
-                    Pay 3-6% of placements. Perfect for franchises. Pay only when you earn.
-                  </p>
-                  <p className="text-[8px] sm:text-xs text-primary font-medium">Scale without upfront costs.</p>
-                </OrbitCardContent>
-              </OrbitCard>
-            </CarouselRailItem>
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { name: "QuickBooks", color: "text-green-400" },
+              { name: "ADP", color: "text-red-400" },
+              { name: "UKG", color: "text-blue-400" },
+              { name: "Indeed", color: "text-indigo-400" },
+              { name: "LinkedIn", color: "text-sky-400" },
+              { name: "Slack", color: "text-purple-400" },
+              { name: "Xero", color: "text-cyan-400" },
+              { name: "Gusto", color: "text-pink-400" },
+            ].map((item, idx) => (
+              <CarouselRailItem key={idx} className="w-[70px] sm:w-[80px]">
+                <div className="text-center px-2 py-1.5 rounded bg-slate-800/50 border border-cyan-500/30">
+                  <div className={`text-[10px] font-bold ${item.color}`}>{item.name}</div>
+                </div>
+              </CarouselRailItem>
+            ))}
           </CarouselRail>
         </div>
       </section>
 
-      {/* Payment Banner */}
-      <section className="py-8 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border-y border-primary/30">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <DollarSign className="w-6 h-6 text-primary" />
-            <h2 className="text-2xl font-bold font-heading">Flexible Pricing Plans Available</h2>
-            <DollarSign className="w-6 h-6 text-primary" />
-          </div>
-          <p className="text-muted-foreground text-sm mb-5">Pay as you grow. Monthly plans from $39. Or revenue-share options for franchises.</p>
-          <div className="flex flex-col md:flex-row gap-3 justify-center">
-            <Link href="/pricing" className="h-10 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)]" data-testid="button-upgrade-now">
-              💳 Upgrade Now
+      {/* Savings Banner - Compact */}
+      <section className="py-3 sm:py-4 bg-gradient-to-r from-green-950/30 via-background to-green-950/30 border-y border-green-500/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex gap-2">
+                <div className="text-center px-3 py-1 rounded bg-red-950/40 border border-red-500/30">
+                  <div className="text-[8px] text-red-400">Others</div>
+                  <div className="text-sm font-bold text-red-400">1.6x</div>
+                </div>
+                <div className="text-center px-3 py-1 rounded bg-green-950/40 border border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+                  <div className="text-[8px] text-green-400">ORBIT</div>
+                  <div className="text-sm font-bold text-green-400">1.45x</div>
+                </div>
+              </div>
+              <div className="hidden sm:block">
+                <div className="text-sm font-bold text-white">Save up to 35%</div>
+                <div className="text-[10px] text-green-400">$6K+ annually</div>
+              </div>
+            </div>
+            <Link href="/pricing" className="text-xs bg-green-600/80 hover:bg-green-600 text-white px-3 py-1.5 rounded font-medium">
+              Calculate Savings
             </Link>
-            <Button variant="outline" className="h-10 text-sm" data-testid="button-contact-sales">
-              📞 Contact Sales for Enterprise
-            </Button>
           </div>
+        </div>
+      </section>
+
+      {/* Features - Compact Carousel */}
+      <section className="py-3 sm:py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-white">All-in-One Platform</h3>
+            <Link href="/features" className="text-[10px] text-primary hover:underline">View All</Link>
+          </div>
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { icon: Clock, title: "Time", desc: "GPS clock-in" },
+              { icon: Users, title: "Hiring", desc: "AI matching" },
+              { icon: DollarSign, title: "Payroll", desc: "Auto process" },
+              { icon: Shield, title: "Compliance", desc: "I-9, E-Verify" },
+              { icon: BarChart3, title: "Analytics", desc: "Real-time" },
+              { icon: Lock, title: "Security", desc: "SOC 2" },
+            ].map((f) => (
+              <CarouselRailItem key={f.title} className="w-[100px] sm:w-[120px]">
+                <OrbitCard variant="glass" className="h-full border-slate-700/50">
+                  <OrbitCardContent className="p-2 sm:p-3 text-center">
+                    <f.icon className="w-5 h-5 mx-auto mb-1 text-primary" />
+                    <div className="text-[10px] font-bold text-white">{f.title}</div>
+                    <div className="text-[8px] text-slate-400">{f.desc}</div>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
+        </div>
+      </section>
+
+      {/* Pricing Section - Compact Carousel */}
+      <section className="py-4 sm:py-8 bg-gradient-to-br from-violet-950/20 via-background to-cyan-950/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-3">
+            <SectionHeader 
+              title="Pricing"
+              subtitle="From $39/mo. No hidden fees."
+              align="left"
+              size="sm"
+              className="mb-0"
+            />
+            <Link href="/pricing" className="text-xs text-primary hover:underline flex items-center gap-1" data-testid="link-view-pricing">
+              View All <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { tier: "Starter", price: "$39", workers: "10 workers", color: "cyan" },
+              { tier: "Pro", price: "$99", workers: "50 workers", color: "violet", featured: true },
+              { tier: "Enterprise", price: "Custom", workers: "200+", color: "amber" },
+            ].map((plan) => (
+              <CarouselRailItem key={plan.tier} className="w-[180px] sm:w-[220px]">
+                <OrbitCard variant="glass" className={`h-full border-${plan.color}-500/40 ${plan.featured ? 'shadow-[0_0_20px_rgba(139,92,246,0.3)]' : ''}`}>
+                  <OrbitCardContent className="p-3 sm:p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`text-xs font-bold text-${plan.color}-400`}>{plan.tier}</span>
+                      {plan.featured && <span className="text-[8px] bg-violet-500 text-white px-1.5 py-0.5 rounded">Popular</span>}
+                    </div>
+                    <div className="text-xl font-bold text-white mb-1">{plan.price}<span className="text-xs text-slate-400">/mo</span></div>
+                    <div className="text-[10px] text-slate-400 mb-2">{plan.workers}</div>
+                    <Link href="/pricing" className={`block text-center text-[10px] py-1.5 rounded bg-${plan.color}-500/20 hover:bg-${plan.color}-500/30 text-${plan.color}-300 font-medium transition-colors`}>
+                      {plan.tier === "Enterprise" ? "Contact Sales" : "Start Trial"}
+                    </Link>
+                  </OrbitCardContent>
+                </OrbitCard>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
       </section>
 
