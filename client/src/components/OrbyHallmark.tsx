@@ -24,38 +24,38 @@ export function OrbyHallmark({
   
   const sizeConfig = {
     thumbnail: { 
-      container: 'w-36 h-20',
-      orby: 'w-16 h-16',
-      cert: 'w-14 h-16',
+      container: 'w-36 h-24',
+      orby: 'w-12 h-12',
+      cert: 'w-16 h-20',
       qr: 28,
       serial: 'text-[6px]',
       powered: 'text-[5px]',
       stars: 6
     },
     small: { 
-      container: 'w-48 h-24',
-      orby: 'w-20 h-20',
-      cert: 'w-[72px] h-[80px]',
+      container: 'w-44 h-28',
+      orby: 'w-14 h-14',
+      cert: 'w-20 h-24',
       qr: 36,
-      serial: 'text-[8px]',
+      serial: 'text-[7px]',
       powered: 'text-[6px]',
       stars: 8
     },
     medium: { 
-      container: 'w-64 h-36',
-      orby: 'w-28 h-28',
+      container: 'w-56 h-40',
+      orby: 'w-20 h-20',
       cert: 'w-28 h-32',
-      qr: 56,
-      serial: 'text-xs',
+      qr: 50,
+      serial: 'text-[9px]',
       powered: 'text-[8px]',
       stars: 10
     },
     large: { 
-      container: 'w-96 h-48',
-      orby: 'w-40 h-40',
-      cert: 'w-40 h-44',
-      qr: 80,
-      serial: 'text-sm',
+      container: 'w-72 h-52',
+      orby: 'w-24 h-24',
+      cert: 'w-36 h-40',
+      qr: 70,
+      serial: 'text-xs',
       powered: 'text-[10px]',
       stars: 14
     }
@@ -152,20 +152,20 @@ export function OrbyHallmark({
       >
         <TwinklingStars count={config.stars} />
         
-        {/* Orby positioned to the left, presenting the certificate */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-20" style={{ animation: 'float 8s ease-in-out infinite' }}>
+        {/* Certificate centered in the container */}
+        <div 
+          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform z-10`}
+          style={{ animation: 'certGlow 3s ease-in-out infinite' }}
+        >
+        
+        {/* Orby positioned at bottom-left, pointing up at the certificate */}
+        <div className="absolute -left-6 -bottom-4 z-20" style={{ animation: 'float 4s ease-in-out infinite' }}>
           <img 
             src="/mascot/clean/orbit_mascot_presenting_certificate.png" 
             alt="Orby" 
-            className={`${config.orby} object-contain drop-shadow-[0_0_20px_rgba(6,182,212,0.5)] group-hover:drop-shadow-[0_0_30px_rgba(6,182,212,0.8)] transition-all duration-300`}
+            className={`${config.orby} object-contain drop-shadow-[0_0_15px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] transition-all duration-300 -rotate-12`}
           />
         </div>
-        
-        {/* Certificate positioned to the right, as if being presented by Orby - moved up 60px */}
-        <div 
-          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform ml-auto -mt-[60px]`}
-          style={{ animation: 'certGlow 3s ease-in-out infinite' }}
-        >
           <div className={`${config.powered} text-cyan-400 font-bold tracking-wider mb-0.5`}>
             ORBIT
           </div>
