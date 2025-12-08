@@ -83,10 +83,14 @@ interface ChatMessage {
   content: string;
 }
 
+// Voice types for browser compatibility
+type SpeechRecognitionType = typeof window extends { SpeechRecognition: infer T } ? T : any;
+
 // Voice helper functions
-const getSpeechRecognition = (): typeof SpeechRecognition | null => {
+const getSpeechRecognition = (): SpeechRecognitionType | null => {
   if (typeof window === 'undefined') return null;
-  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null;
+  const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  return SR || null;
 };
 
 const getSpeechSynthesis = (): SpeechSynthesis | null => {
@@ -108,7 +112,7 @@ export function OrbitChatAssistant() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [speechSupported, setSpeechSupported] = useState(false);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
@@ -131,7 +135,7 @@ export function OrbitChatAssistant() {
     recognition.interimResults = false;
     recognition.lang = 'en-US';
     
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       setInput(transcript);
       setIsListening(false);
@@ -142,7 +146,7 @@ export function OrbitChatAssistant() {
       }, 300);
     };
     
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsListening(false);
     };
