@@ -41,6 +41,14 @@ import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
 import orbyCommanderEmblem from "@assets/orby_commander_transparent.png";
+import quickbooksLogo from "@assets/generated_images/quickbooks_logo_emblem.png";
+import adpLogo from "@assets/generated_images/adp_logo_emblem.png";
+import indeedLogo from "@assets/generated_images/indeed_logo_emblem.png";
+import linkedinLogo from "@assets/generated_images/linkedin_logo_emblem.png";
+import slackLogo from "@assets/generated_images/slack_logo_emblem.png";
+import stripeLogo from "@assets/generated_images/stripe_logo_emblem.png";
+import xeroLogo from "@assets/generated_images/xero_logo_emblem.png";
+import gustoLogo from "@assets/generated_images/gusto_logo_emblem.png";
 
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
@@ -614,20 +622,18 @@ export default function Landing() {
           </div>
           <CarouselRail showArrows={true} gap="md">
             {[
-              { name: "QuickBooks", logo: "/images/logos/quickbooks.svg", bg: "from-green-900/40 to-green-950/60" },
-              { name: "ADP", logo: "/images/logos/adp.svg", bg: "from-red-900/40 to-red-950/60" },
-              { name: "Indeed", logo: "/images/logos/indeed.svg", bg: "from-indigo-900/40 to-indigo-950/60" },
-              { name: "LinkedIn", logo: "/images/logos/linkedin.svg", bg: "from-sky-900/40 to-sky-950/60" },
-              { name: "Slack", logo: "/images/logos/slack.svg", bg: "from-purple-900/40 to-purple-950/60" },
-              { name: "Stripe", logo: "/images/logos/stripe.svg", bg: "from-violet-900/40 to-violet-950/60" },
-              { name: "Xero", logo: "/images/logos/xero.svg", bg: "from-cyan-900/40 to-cyan-950/60" },
-              { name: "Gusto", logo: "/images/logos/gusto.svg", bg: "from-orange-900/40 to-orange-950/60" },
+              { name: "QuickBooks", logo: quickbooksLogo, bg: "from-green-900/40 to-green-950/60" },
+              { name: "ADP", logo: adpLogo, bg: "from-red-900/40 to-red-950/60" },
+              { name: "Indeed", logo: indeedLogo, bg: "from-indigo-900/40 to-indigo-950/60" },
+              { name: "LinkedIn", logo: linkedinLogo, bg: "from-sky-900/40 to-sky-950/60" },
+              { name: "Slack", logo: slackLogo, bg: "from-purple-900/40 to-purple-950/60" },
+              { name: "Stripe", logo: stripeLogo, bg: "from-violet-900/40 to-violet-950/60" },
+              { name: "Xero", logo: xeroLogo, bg: "from-cyan-900/40 to-cyan-950/60" },
+              { name: "Gusto", logo: gustoLogo, bg: "from-orange-900/40 to-orange-950/60" },
             ].map((item, idx) => (
               <CarouselRailItem key={idx} className="w-[120px] sm:w-[140px]">
-                <div className={`rounded-xl overflow-hidden bg-gradient-to-br ${item.bg} border border-slate-700/50 hover:border-cyan-500/50 transition-all p-4 h-[80px] flex flex-col items-center justify-center`}>
-                  <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center mb-2">
-                    <span className="text-lg font-bold text-white">{item.name.charAt(0)}</span>
-                  </div>
+                <div className={`rounded-xl overflow-hidden bg-gradient-to-br ${item.bg} border border-slate-700/50 hover:border-cyan-500/50 transition-all p-3 h-[90px] flex flex-col items-center justify-center`}>
+                  <img src={item.logo} alt={item.name} className="w-10 h-10 rounded-lg object-cover mb-1" />
                   <span className="text-[10px] font-medium text-slate-300">{item.name}</span>
                 </div>
               </CarouselRailItem>
