@@ -152,20 +152,20 @@ export function OrbyHallmark({
       >
         <TwinklingStars count={config.stars} />
         
-        {/* Certificate centered in the container */}
-        <div 
-          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform z-10`}
-          style={{ animation: 'certGlow 3s ease-in-out infinite' }}
-        >
-        
-        {/* Orby positioned at bottom-left, pointing up at the certificate */}
-        <div className="absolute -left-6 -bottom-4 z-20" style={{ animation: 'float 4s ease-in-out infinite' }}>
+        {/* Orby positioned at bottom-left OUTSIDE the certificate, pointing up */}
+        <div className="absolute left-0 bottom-0 z-20" style={{ animation: 'float 4s ease-in-out infinite' }}>
           <img 
             src="/mascot/clean/orbit_mascot_presenting_certificate.png" 
             alt="Orby" 
-            className={`${config.orby} object-contain drop-shadow-[0_0_15px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] transition-all duration-300 -rotate-12`}
+            className={`${config.orby} object-contain drop-shadow-[0_0_15px_rgba(6,182,212,0.6)] group-hover:drop-shadow-[0_0_25px_rgba(6,182,212,0.9)] transition-all duration-300`}
           />
         </div>
+
+        {/* Certificate positioned to the right of Orby */}
+        <div 
+          className={`relative ${config.cert} bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/60 p-1.5 flex flex-col items-center justify-center group-hover:scale-105 transition-transform z-10 ml-auto`}
+          style={{ animation: 'certGlow 3s ease-in-out infinite' }}
+        >
           <div className={`${config.powered} text-cyan-400 font-bold tracking-wider mb-0.5`}>
             ORBIT
           </div>
