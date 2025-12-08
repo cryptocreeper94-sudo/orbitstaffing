@@ -33,7 +33,6 @@ import { HomeSlideshow } from "@/components/HomeSlideshow";
 import { WelcomeSlideshow } from "@/components/WelcomeSlideshow";
 import { Accordion } from "@/components/Accordion";
 import { ISO20022Banner } from "@/components/ISO20022Banner";
-import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { slidesData, orbitSlides } from "@/data/slidesData";
 import { CarouselRail, CarouselRailItem } from "@/components/ui/carousel-rail";
 import { SectionHeader } from "@/components/ui/section-header";
@@ -41,7 +40,7 @@ import { OrbitCard, OrbitCardContent, OrbitCardHeader, OrbitCardTitle, StatCard,
 import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
 import { Card, CardContent } from "@/components/ui/card";
 import saturnWatermark from "@assets/generated_images/floating_saturn_planet_pure_transparency.png";
-import orbyCommanderEmblem from "@assets/orby_commander_transparent.png";
+import orbyMascot from "@assets/generated_images/orby_mascot_presenting_pose.png";
 import quickbooksLogo from "@assets/generated_images/quickbooks_logo_emblem.png";
 import adpLogo from "@assets/generated_images/adp_logo_emblem.png";
 import indeedLogo from "@assets/generated_images/indeed_logo_emblem.png";
@@ -266,7 +265,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 w-full py-2 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2 flex-shrink-0">
             <img 
-              src={orbyCommanderEmblem} 
+              src={orbyMascot} 
               alt="Orby" 
               className="w-6 h-6 sm:w-7 sm:h-7 object-contain"
             />
@@ -976,8 +975,6 @@ export default function Landing() {
       </footer>
 
       </div>
-
-      <OrbitChatAssistant />
     </div>
   );
 }
