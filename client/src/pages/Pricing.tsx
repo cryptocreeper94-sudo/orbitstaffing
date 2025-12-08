@@ -352,8 +352,8 @@ export default function Pricing() {
         data-testid={`bundle-card-${plan.id}`}
       >
         {plan.badgeText && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-            <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4">
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10">
+            <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-3 py-0.5 text-xs">
               <Star className="w-3 h-3 mr-1" />
               {plan.badgeText}
             </Badge>
@@ -414,7 +414,7 @@ export default function Pricing() {
               <Button
                 onClick={() => handleCheckout(priceId, 'bundle', 'coinbase')}
                 variant="outline"
-                className="w-full border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                className="w-full border-violet-500/30 text-violet-400 hover:bg-violet-500/10"
                 disabled={checkoutMutation.isPending}
                 data-testid={`button-crypto-${plan.id}`}
               >
@@ -1035,15 +1035,15 @@ export default function Pricing() {
               </CarouselRail>
             </div>
 
-            <OrbitCard variant="action" className="bg-gradient-to-r from-amber-900/30 to-orange-900/30 border-amber-500/30">
+            <OrbitCard variant="action" className="bg-gradient-to-r from-emerald-900/30 to-cyan-900/30 border-emerald-500/30">
               <div className="flex items-start gap-4">
-                <Gift className="w-8 h-8 text-amber-400 flex-shrink-0 mt-1" />
+                <Gift className="w-8 h-8 text-emerald-400 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">Customer Referral Bonus</h3>
                   <p className="text-slate-300 mb-4">
-                    Already a customer? Refer other businesses and get <span className="text-amber-400 font-bold">$50 credit</span> for each successful referral, plus <span className="text-amber-400 font-bold">10% recurring</span> on their subscription.
+                    Already a customer? Refer other businesses and get <span className="text-emerald-400 font-bold">$50 credit</span> for each successful referral, plus <span className="text-emerald-400 font-bold">10% recurring</span> on their subscription.
                   </p>
-                  <Button variant="outline" className="border-amber-500/30 text-amber-400 hover:bg-amber-500/10" data-testid="button-refer-friend">
+                  <Button variant="outline" className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10" data-testid="button-refer-friend">
                     Refer a Friend
                   </Button>
                 </div>
@@ -1117,10 +1117,9 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="mt-12 text-center text-slate-400">
+        <div className="mt-12 text-center text-slate-500">
           <p className="text-sm">
-            Have questions? <Link href="/contact" className="text-cyan-400 hover:text-cyan-300">Contact our sales team</Link> or 
-            call <span className="text-cyan-400">(555) 123-4567</span>
+            Powered by DarkWave Studios, LLC &copy; 2025
           </p>
         </div>
       </div>
