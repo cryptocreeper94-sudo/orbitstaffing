@@ -622,19 +622,22 @@ export default function Landing() {
           </div>
           <CarouselRail showArrows={true} gap="md">
             {[
-              { name: "QuickBooks", logo: quickbooksLogo, bg: "from-green-900/40 to-green-950/60" },
-              { name: "ADP", logo: adpLogo, bg: "from-red-900/40 to-red-950/60" },
-              { name: "Indeed", logo: indeedLogo, bg: "from-indigo-900/40 to-indigo-950/60" },
-              { name: "LinkedIn", logo: linkedinLogo, bg: "from-sky-900/40 to-sky-950/60" },
-              { name: "Slack", logo: slackLogo, bg: "from-purple-900/40 to-purple-950/60" },
-              { name: "Stripe", logo: stripeLogo, bg: "from-violet-900/40 to-violet-950/60" },
-              { name: "Xero", logo: xeroLogo, bg: "from-cyan-900/40 to-cyan-950/60" },
-              { name: "Gusto", logo: gustoLogo, bg: "from-orange-900/40 to-orange-950/60" },
+              { name: "QuickBooks", logo: quickbooksLogo },
+              { name: "ADP", logo: adpLogo },
+              { name: "Indeed", logo: indeedLogo },
+              { name: "LinkedIn", logo: linkedinLogo },
+              { name: "Slack", logo: slackLogo },
+              { name: "Stripe", logo: stripeLogo },
+              { name: "Xero", logo: xeroLogo },
+              { name: "Gusto", logo: gustoLogo },
             ].map((item, idx) => (
               <CarouselRailItem key={idx} className="w-[120px] sm:w-[140px]">
-                <div className={`rounded-xl overflow-hidden bg-gradient-to-br ${item.bg} border border-slate-700/50 hover:border-cyan-500/50 transition-all p-3 h-[90px] flex flex-col items-center justify-center`}>
-                  <img src={item.logo} alt={item.name} className="w-10 h-10 rounded-lg object-cover mb-1" />
-                  <span className="text-[10px] font-medium text-slate-300">{item.name}</span>
+                <div className="relative rounded-xl overflow-hidden border border-slate-700/50 hover:border-cyan-500/50 transition-all h-[90px]">
+                  <img src={item.logo} alt={item.name} className="absolute inset-0 w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-2 left-0 right-0 text-center">
+                    <span className="text-[10px] font-medium text-white">{item.name}</span>
+                  </div>
                 </div>
               </CarouselRailItem>
             ))}
