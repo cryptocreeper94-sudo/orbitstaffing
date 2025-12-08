@@ -11,7 +11,9 @@ import {
   Activity,
   MessageCircle,
   Zap,
-  Camera
+  Camera,
+  Search,
+  X
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
@@ -118,25 +120,54 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [ocrScannerOpen, setOcrScannerOpen] = useState(false);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground">
       <Sidebar mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
       <main className="flex-1 overflow-y-auto relative">
         {/* Mobile header with hamburger menu */}
-        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-sidebar-border/50 p-3 flex items-center gap-3 md:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMobileMenuOpen(true)}
-            className="text-sidebar-foreground"
-            data-testid="button-mobile-menu"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="font-heading font-bold text-lg text-sidebar-primary tracking-wider">
-            ORBIT
-          </div>
+        <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-sidebar-border/50 p-3 md:hidden">
+          {mobileSearchOpen ? (
+            <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <Web3SearchBar />
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileSearchOpen(false)}
+                className="text-sidebar-foreground shrink-0"
+                data-testid="button-close-mobile-search"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(true)}
+                className="text-sidebar-foreground"
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className="font-heading font-bold text-lg text-sidebar-primary tracking-wider flex-1">
+                ORBIT
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileSearchOpen(true)}
+                className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+                data-testid="button-open-mobile-search"
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
         </div>
         {/* App Store Coming Soon Banner + Web3 Search + OCR Scanner Button - Hidden on mobile */}
         <div className="sticky top-0 z-50 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b-2 border-cyan-500/50 backdrop-blur-sm hidden md:block">
