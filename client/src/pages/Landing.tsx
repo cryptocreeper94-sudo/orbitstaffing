@@ -431,75 +431,81 @@ export default function Landing() {
             className="mb-2 sm:mb-6"
           />
 
-          <CarouselRail showArrows={true} gap="sm">
-            <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
-              <Link href="/admin" className="block group">
-                <OrbitCard variant="glass" className="h-full border-violet-400/50 hover:border-violet-300/80 overflow-hidden shadow-[0_0_12px_rgba(139,92,246,0.15)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)]">
-                  <div className="relative h-16 sm:h-24">
-                    <img src="/images/scenarios/professional_creating_invoices.png" alt="Owner" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-                  </div>
-                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
-                    <h3 className="text-[10px] sm:text-sm font-bold text-violet-300">Owner</h3>
-                    <Button className="w-full mt-1.5 bg-violet-500/80 hover:bg-violet-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-owner-access">
-                      Login
-                    </Button>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </Link>
-            </CarouselRailItem>
+          {/* Mobile: Horizontal carousel with uniform cards */}
+          <div className="sm:hidden">
+            <CarouselRail showArrows={true} gap="sm">
+              {[
+                { href: "/admin", image: "/images/scenarios/professional_creating_invoices.png", label: "Owner", btn: "Login", color: "violet", testId: "button-owner-access" },
+                { href: "/worker", image: "/images/scenarios/coworkers_referral_handshake.png", label: "Client", btn: "Login", color: "blue", testId: "button-customer-access" },
+                { href: "/employee-hub", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Staff", btn: "Hub", color: "emerald", testId: "button-employee-access" },
+                { href: "/developer", image: "/images/scenarios/it_system_integration.png", label: "Admin", btn: "Panel", color: "cyan", testId: "button-admin-access" },
+              ].map((item) => (
+                <CarouselRailItem key={item.href} className="basis-[42%] min-w-[42%]">
+                  <Link href={item.href} className="block">
+                    <div className={`rounded-xl overflow-hidden border border-${item.color}-500/50 shadow-lg`}>
+                      <div className="relative h-20">
+                        <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+                      </div>
+                      <div className="p-2 text-center bg-slate-900/80">
+                        <h3 className={`text-xs font-bold text-${item.color}-300 whitespace-nowrap`}>{item.label}</h3>
+                        <button className={`w-full mt-1 bg-${item.color}-500/80 text-white text-[9px] py-1 rounded font-semibold`} data-testid={item.testId}>
+                          {item.btn}
+                        </button>
+                      </div>
+                    </div>
+                  </Link>
+                </CarouselRailItem>
+              ))}
+            </CarouselRail>
+          </div>
 
-            <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
-              <Link href="/worker" className="block group">
-                <OrbitCard variant="glass" className="h-full border-blue-500/50 hover:border-blue-400/80 overflow-hidden shadow-[0_0_12px_rgba(59,130,246,0.15)] hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]">
-                  <div className="relative h-16 sm:h-24">
-                    <img src="/images/scenarios/coworkers_referral_handshake.png" alt="Client" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-                  </div>
-                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
-                    <h3 className="text-[10px] sm:text-sm font-bold text-blue-300">Client</h3>
-                    <Button className="w-full mt-1.5 bg-blue-500/80 hover:bg-blue-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-customer-access">
-                      Login
-                    </Button>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </Link>
-            </CarouselRailItem>
+          {/* Desktop: Bento grid */}
+          <div className="hidden sm:grid grid-cols-4 gap-4">
+            <Link href="/admin" className="group relative rounded-xl overflow-hidden border border-violet-400/50 hover:border-violet-300 shadow-lg h-[180px]">
+              <img src="/images/scenarios/professional_creating_invoices.png" alt="Owner" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 text-center">
+                <h3 className="text-lg font-bold text-violet-300">Owner</h3>
+                <Button className="w-full mt-2 bg-violet-500/80 hover:bg-violet-600 text-white text-xs h-8" data-testid="button-owner-access">
+                  Login
+                </Button>
+              </div>
+            </Link>
 
-            <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
-              <Link href="/employee-hub" className="block group">
-                <OrbitCard variant="glass" className="h-full border-emerald-500/50 hover:border-emerald-400/80 overflow-hidden shadow-[0_0_12px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" data-testid="card-employee-self-service">
-                  <div className="relative h-16 sm:h-24">
-                    <img src="/images/scenarios/diverse_workers_shift_prep.png" alt="Employee" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-                  </div>
-                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
-                    <h3 className="text-[10px] sm:text-sm font-bold text-emerald-300">Employee</h3>
-                    <Button className="w-full mt-1.5 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-employee-access">
-                      Hub
-                    </Button>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </Link>
-            </CarouselRailItem>
+            <Link href="/worker" className="group relative rounded-xl overflow-hidden border border-blue-500/50 hover:border-blue-400 shadow-lg h-[180px]">
+              <img src="/images/scenarios/coworkers_referral_handshake.png" alt="Client" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 text-center">
+                <h3 className="text-lg font-bold text-blue-300">Client</h3>
+                <Button className="w-full mt-2 bg-blue-500/80 hover:bg-blue-600 text-white text-xs h-8" data-testid="button-customer-access">
+                  Login
+                </Button>
+              </div>
+            </Link>
 
-            <CarouselRailItem className="w-[140px] sm:w-auto sm:min-w-[200px]">
-              <Link href="/developer" className="block group">
-                <OrbitCard variant="glass" className="h-full border-cyan-500/50 hover:border-cyan-400/80 overflow-hidden shadow-[0_0_12px_rgba(6,182,212,0.15)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                  <div className="relative h-16 sm:h-24">
-                    <img src="/images/scenarios/it_system_integration.png" alt="Admin" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-                  </div>
-                  <OrbitCardContent className="p-2 sm:p-4 text-center -mt-2">
-                    <h3 className="text-[10px] sm:text-sm font-bold text-cyan-300">Admin</h3>
-                    <Button className="w-full mt-1.5 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[8px] sm:text-xs h-6 sm:h-8" data-testid="button-admin-access">
-                      Panel
-                    </Button>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </Link>
-            </CarouselRailItem>
-          </CarouselRail>
+            <Link href="/employee-hub" className="group relative rounded-xl overflow-hidden border border-emerald-500/50 hover:border-emerald-400 shadow-lg h-[180px]" data-testid="card-employee-self-service">
+              <img src="/images/scenarios/diverse_workers_shift_prep.png" alt="Staff" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 text-center">
+                <h3 className="text-lg font-bold text-emerald-300">Staff Hub</h3>
+                <Button className="w-full mt-2 bg-emerald-500/80 hover:bg-emerald-600 text-white text-xs h-8" data-testid="button-employee-access">
+                  Enter
+                </Button>
+              </div>
+            </Link>
+
+            <Link href="/developer" className="group relative rounded-xl overflow-hidden border border-cyan-500/50 hover:border-cyan-400 shadow-lg h-[180px]">
+              <img src="/images/scenarios/it_system_integration.png" alt="Admin" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 right-4 text-center">
+                <h3 className="text-lg font-bold text-cyan-300">Admin</h3>
+                <Button className="w-full mt-2 bg-cyan-500/80 hover:bg-cyan-600 text-white text-xs h-8" data-testid="button-admin-access">
+                  Panel
+                </Button>
+              </div>
+            </Link>
+          </div>
         </div>
       </section>
 
