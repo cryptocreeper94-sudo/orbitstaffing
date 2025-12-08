@@ -13,8 +13,12 @@ import { sql } from 'drizzle-orm';
  * - 2 digits for sub-sequence (100 per asset)
  * - Total capacity: 100 BILLION hallmarks
  * 
- * FOUNDING ASSETS:
- * #000000001-00 = ORBIT Staffing OS (Platform)
+ * FOUNDING ASSETS (Apps):
+ * #000000001-01 = ORBIT Staffing OS (Platform)
+ * #000000001-02 = Second App
+ * #000000001-03 = Third App
+ * 
+ * PEOPLE/ENTITIES:
  * #000000002-00 = Jason (Developer/Founder)
  * #000000003-00 = Sidonie (Team Member)
  */

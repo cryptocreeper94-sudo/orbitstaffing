@@ -994,7 +994,7 @@ export default function SecureSandbox() {
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-xl">🪐</span>
                 <div>
-                  <p className="font-mono text-yellow-400 text-sm">#000000001-00</p>
+                  <p className="font-mono text-yellow-400 text-sm">#000000001-01</p>
                   <p className="text-[10px] text-gray-500">Genesis Platform</p>
                 </div>
               </div>
