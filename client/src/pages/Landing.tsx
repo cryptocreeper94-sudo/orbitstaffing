@@ -50,6 +50,57 @@ import stripeLogo from "@assets/generated_images/stripe_logo_emblem.png";
 import xeroLogo from "@assets/generated_images/xero_logo_emblem.png";
 import gustoLogo from "@assets/generated_images/gusto_logo_emblem.png";
 
+const integrationDetails: Record<string, { title: string; description: string; features: string[]; status: string }> = {
+  "QuickBooks": {
+    title: "QuickBooks Integration",
+    description: "Seamlessly sync your ORBIT payroll data with QuickBooks for automated accounting and financial reporting.",
+    features: ["Auto-sync payroll expenses", "Export invoices directly", "Real-time financial reconciliation", "Tax-ready reports"],
+    status: "Live"
+  },
+  "ADP": {
+    title: "ADP Integration",
+    description: "Connect ORBIT with ADP for enterprise-grade payroll processing and compliance management.",
+    features: ["Payroll data export", "Benefits administration sync", "Compliance reporting", "W-2 and 1099 generation"],
+    status: "Live"
+  },
+  "Indeed": {
+    title: "Indeed Integration",
+    description: "Post jobs directly from ORBIT to Indeed and import applicants automatically into your talent pool.",
+    features: ["One-click job posting", "Applicant auto-import", "Job performance analytics", "Sponsored job support"],
+    status: "Live"
+  },
+  "LinkedIn": {
+    title: "LinkedIn Integration",
+    description: "Leverage LinkedIn's professional network to find qualified candidates and verify work history.",
+    features: ["Job posting sync", "Profile verification", "Candidate messaging", "Recruiter tools access"],
+    status: "Coming Soon"
+  },
+  "Slack": {
+    title: "Slack Integration",
+    description: "Get real-time notifications and manage staffing operations directly from your Slack workspace.",
+    features: ["Shift alerts & reminders", "Clock-in/out notifications", "Approval workflows", "Team communication"],
+    status: "Live"
+  },
+  "Stripe": {
+    title: "Stripe Integration",
+    description: "Process payments, handle invoicing, and manage the ORBIT Pay Card system with Stripe.",
+    features: ["Invoice payments", "Pay card issuing", "Instant payouts", "Subscription billing"],
+    status: "Live"
+  },
+  "Xero": {
+    title: "Xero Integration",
+    description: "Sync your ORBIT financial data with Xero for streamlined bookkeeping and accounting.",
+    features: ["Expense tracking sync", "Invoice generation", "Bank reconciliation", "Multi-currency support"],
+    status: "Live"
+  },
+  "Gusto": {
+    title: "Gusto Integration",
+    description: "Connect ORBIT timesheets and worker data with Gusto for simplified payroll and benefits.",
+    features: ["Timesheet sync", "PTO management", "Benefits enrollment", "Tax filing automation"],
+    status: "Coming Soon"
+  }
+};
+
 export default function Landing() {
   const [showModal, setShowModal] = useState(false);
   const [showDemoForm, setShowDemoForm] = useState(false);
@@ -60,6 +111,7 @@ export default function Landing() {
   const [showOrbitSlideshow, setShowOrbitSlideshow] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [selectedIntegration, setSelectedIntegration] = useState<string | null>(null);
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem("hasSeenWelcomeSlideshow");
@@ -116,6 +168,85 @@ export default function Landing() {
       />
 
       {showDemoForm && <DemoRequestForm onClose={() => setShowDemoForm(false)} />}
+
+      {selectedIntegration && integrationDetails[selectedIntegration] && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" data-testid="integration-modal">
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setSelectedIntegration(null)}
+          />
+          <div className="relative bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => setSelectedIntegration(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+              data-testid="close-integration-modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-16 h-16 rounded-xl overflow-hidden border border-slate-600 flex-shrink-0">
+                <img 
+                  src={
+                    selectedIntegration === "QuickBooks" ? quickbooksLogo :
+                    selectedIntegration === "ADP" ? adpLogo :
+                    selectedIntegration === "Indeed" ? indeedLogo :
+                    selectedIntegration === "LinkedIn" ? linkedinLogo :
+                    selectedIntegration === "Slack" ? slackLogo :
+                    selectedIntegration === "Stripe" ? stripeLogo :
+                    selectedIntegration === "Xero" ? xeroLogo :
+                    gustoLogo
+                  }
+                  alt={selectedIntegration}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">{integrationDetails[selectedIntegration].title}</h3>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                  integrationDetails[selectedIntegration].status === "Live" 
+                    ? "bg-emerald-500/20 text-emerald-400" 
+                    : "bg-amber-500/20 text-amber-400"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    integrationDetails[selectedIntegration].status === "Live" ? "bg-emerald-400" : "bg-amber-400"
+                  }`} />
+                  {integrationDetails[selectedIntegration].status}
+                </span>
+              </div>
+            </div>
+            
+            <p className="text-slate-300 text-sm mb-4">{integrationDetails[selectedIntegration].description}</p>
+            
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-cyan-400 uppercase tracking-wider">Key Features</h4>
+              <ul className="space-y-2">
+                {integrationDetails[selectedIntegration].features.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-sm text-slate-300">
+                    <Check className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="mt-6 flex gap-3">
+              <Link 
+                href="/integrations"
+                className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white text-center py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                View All Integrations
+              </Link>
+              <button 
+                onClick={() => setSelectedIntegration(null)}
+                className="px-4 py-2 border border-slate-600 hover:border-slate-500 rounded-lg text-sm text-slate-300 hover:text-white transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="fixed inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
         <img 
@@ -632,13 +763,17 @@ export default function Landing() {
               { name: "Gusto", logo: gustoLogo },
             ].map((item, idx) => (
               <CarouselRailItem key={idx} className="w-[120px] sm:w-[140px]">
-                <div className="relative rounded-xl overflow-hidden border border-slate-700/50 hover:border-cyan-500/50 transition-all h-[90px]">
+                <button 
+                  onClick={() => setSelectedIntegration(item.name)}
+                  className="relative rounded-xl overflow-hidden border border-slate-700/50 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/20 transition-all h-[90px] w-full cursor-pointer"
+                  data-testid={`integration-${item.name.toLowerCase()}`}
+                >
                   <img src={item.logo} alt={item.name} className="absolute inset-0 w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
                   <div className="absolute bottom-2 left-0 right-0 text-center">
                     <span className="text-[10px] font-medium text-white">{item.name}</span>
                   </div>
-                </div>
+                </button>
               </CarouselRailItem>
             ))}
           </CarouselRail>
