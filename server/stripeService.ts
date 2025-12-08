@@ -13,7 +13,7 @@ export class StripeService {
   async createCheckoutSession(customerId: string | null, priceId: string, successUrl: string, cancelUrl: string) {
     const stripe = await getUncachableStripeClient();
     
-    const sessionParams: any = {
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
@@ -21,11 +21,9 @@ export class StripeService {
       cancel_url: cancelUrl,
     };
     
-    // Only add customer if provided, otherwise Stripe will create one
+    // Only add customer if provided - Stripe auto-creates for subscription mode
     if (customerId) {
       sessionParams.customer = customerId;
-    } else {
-      sessionParams.customer_creation = 'always';
     }
     
     return await stripe.checkout.sessions.create(sessionParams);

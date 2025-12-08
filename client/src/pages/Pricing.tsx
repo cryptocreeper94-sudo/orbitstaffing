@@ -404,7 +404,7 @@ export default function Pricing() {
             <div className="space-y-2">
               <Button
                 onClick={() => handleCheckout(priceId, 'bundle', 'stripe')}
-                className={`w-full ${plan.isPopular ? 'bg-gradient-to-r from-cyan-500 to-blue-600' : 'bg-slate-700 hover:bg-slate-600'}`}
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
                 disabled={checkoutMutation.isPending}
                 data-testid={`button-checkout-${plan.id}`}
               >
