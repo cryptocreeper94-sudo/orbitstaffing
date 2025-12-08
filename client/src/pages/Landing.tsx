@@ -568,24 +568,30 @@ export default function Landing() {
             </Link>
           </div>
 
-          {/* Benefit Cards */}
-          <CarouselRail showArrows={false} gap="md" className="mb-6 sm:mb-8">
+        </div>
+        
+        {/* Benefit Cards - Full Width */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 mb-6 sm:mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {[
               { image: "/images/scenarios/it_system_integration.png", title: "Automate", brief: "Zero entry", id: "automate" },
               { image: "/images/scenarios/diverse_workers_shift_prep.png", title: "Retain", brief: "3x longer", id: "workers" },
               { image: "/images/scenarios/diverse_workers_checking_wages.png", title: "Save", brief: "35% off", id: "money" },
               { image: "/images/scenarios/worker_matching_on_screen.png", title: "Scale", brief: "10x capacity", id: "scale" },
             ].map((item) => (
-              <CarouselRailItem key={item.id} className="w-[140px] sm:w-auto sm:min-w-[160px]">
+              <div key={item.id} className="flex-1">
                 <ScenarioBenefitCard 
                   image={item.image}
                   title={item.title}
                   brief={item.brief}
                   onClick={() => setSelectedBenefit(item.id)}
                 />
-              </CarouselRailItem>
+              </div>
             ))}
-          </CarouselRail>
+          </div>
+        </div>
+        
+        <div className="relative max-w-4xl mx-auto px-3 sm:px-6 text-center">
 
           {/* Stats Grid */}
           <BentoGrid cols={4} gap="sm">
