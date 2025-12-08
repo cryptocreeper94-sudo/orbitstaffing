@@ -10,7 +10,7 @@ import { OrbitCard, OrbitCardHeader, OrbitCardTitle, OrbitCardContent } from '@/
 
 export default function HallmarkSeal() {
   const [copied, setCopied] = useState(false);
-  const serialNumber = '000000001-01';
+  const serialNumber = '000000000-01';
   const hallmarkCode = `ORBIT-${serialNumber}`;
   const verificationUrl = `${window.location.origin}/verify/${hallmarkCode}`;
 

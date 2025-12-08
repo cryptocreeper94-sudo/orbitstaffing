@@ -11,7 +11,7 @@ interface OrbyHallmarkProps {
 }
 
 export function OrbyHallmark({ 
-  serialNumber = '000000001-01', 
+  serialNumber = '000000000-01', 
   size = 'medium',
   verificationUrl,
   showExpand = true,

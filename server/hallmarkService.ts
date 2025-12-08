@@ -14,9 +14,9 @@ import { sql } from 'drizzle-orm';
  * - Total capacity: 100 BILLION hallmarks
  * 
  * FOUNDING ASSETS (Apps):
- * #000000001-01 = ORBIT Staffing OS (Platform)
- * #000000001-02 = Second App
- * #000000001-03 = Third App
+ * #000000000-01 = ORBIT Staffing OS (Platform)
+ * #000000000-02 = Second App
+ * #000000000-03 = Third App
  * 
  * PEOPLE/ENTITIES:
  * #000000002-00 = Jason (Developer/Founder)
