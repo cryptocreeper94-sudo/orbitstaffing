@@ -7690,6 +7690,177 @@ export function registerBlockchainRoutes(app: Express) {
       description: "Document types that are automatically queued for blockchain anchoring"
     });
   });
+
+  // ========================
+  // Web3 Search Endpoint
+  // ========================
+  app.get("/api/web3/search", async (req: Request, res: Response) => {
+    try {
+      const { q } = req.query;
+      
+      if (!q || typeof q !== 'string' || q.trim().length === 0) {
+        return res.status(400).json({ error: "Query parameter 'q' is required" });
+      }
+      
+      const query = q.trim();
+      
+      // Check if it's a URL
+      const urlPattern = /^(https?:\/\/|www\.)/i;
+      if (urlPattern.test(query)) {
+        const url = query.startsWith('www.') ? `https://${query}` : query;
+        return res.json({
+          type: 'url',
+          query,
+          result: { url, redirect: true }
+        });
+      }
+      
+      // Check if it's a Solana address (base58, 32-44 characters)
+      const base58Pattern = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+      if (base58Pattern.test(query)) {
+        // Use Helius API if configured
+        const heliusKey = process.env.HELIUS_API_KEY;
+        
+        if (!heliusKey) {
+          return res.json({
+            type: 'solana_address',
+            query,
+            result: {
+              address: query,
+              explorerUrl: `https://explorer.solana.com/address/${query}`,
+              note: 'Helius API not configured - showing explorer link only'
+            }
+          });
+        }
+        
+        try {
+          // Try to get asset info from Helius DAS API
+          const heliusResponse = await fetch(`https://mainnet.helius-rpc.com/?api-key=${heliusKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 'orbit-web3-search',
+              method: 'getAsset',
+              params: { id: query }
+            })
+          });
+          
+          const heliusData = await heliusResponse.json();
+          
+          if (heliusData.result) {
+            const asset = heliusData.result;
+            return res.json({
+              type: 'solana_token',
+              query,
+              result: {
+                address: query,
+                name: asset.content?.metadata?.name || 'Unknown Token',
+                symbol: asset.content?.metadata?.symbol || '',
+                image: asset.content?.links?.image || asset.content?.files?.[0]?.uri || null,
+                description: asset.content?.metadata?.description || null,
+                tokenStandard: asset.interface || 'Unknown',
+                owner: asset.ownership?.owner || null,
+                explorerUrl: `https://explorer.solana.com/address/${query}`
+              }
+            });
+          }
+          
+          // If not a token, check if it's a wallet/account
+          const balanceResponse = await fetch(`https://mainnet.helius-rpc.com/?api-key=${heliusKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 'orbit-balance-check',
+              method: 'getBalance',
+              params: [query]
+            })
+          });
+          
+          const balanceData = await balanceResponse.json();
+          
+          if (balanceData.result !== undefined) {
+            const lamports = balanceData.result?.value || balanceData.result || 0;
+            const sol = lamports / 1e9;
+            
+            return res.json({
+              type: 'solana_wallet',
+              query,
+              result: {
+                address: query,
+                balance: sol,
+                balanceFormatted: `${sol.toFixed(4)} SOL`,
+                explorerUrl: `https://explorer.solana.com/address/${query}`
+              }
+            });
+          }
+          
+          // Fallback - address exists but no specific info
+          return res.json({
+            type: 'solana_address',
+            query,
+            result: {
+              address: query,
+              explorerUrl: `https://explorer.solana.com/address/${query}`
+            }
+          });
+          
+        } catch (heliusError) {
+          console.error('[Web3 Search] Helius API error:', heliusError);
+          return res.json({
+            type: 'solana_address',
+            query,
+            result: {
+              address: query,
+              explorerUrl: `https://explorer.solana.com/address/${query}`,
+              note: 'Could not fetch details from Helius'
+            }
+          });
+        }
+      }
+      
+      // Check for common token symbols (basic matching)
+      const tokenSymbols: Record<string, { name: string; address: string }> = {
+        'SOL': { name: 'Solana', address: 'So11111111111111111111111111111111111111112' },
+        'USDC': { name: 'USD Coin', address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
+        'USDT': { name: 'Tether', address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' },
+        'BONK': { name: 'Bonk', address: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263' },
+        'JUP': { name: 'Jupiter', address: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN' },
+        'RAY': { name: 'Raydium', address: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R' },
+        'ORCA': { name: 'Orca', address: 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE' },
+      };
+      
+      const upperQuery = query.toUpperCase();
+      if (tokenSymbols[upperQuery]) {
+        const token = tokenSymbols[upperQuery];
+        return res.json({
+          type: 'token_symbol',
+          query,
+          result: {
+            symbol: upperQuery,
+            name: token.name,
+            address: token.address,
+            explorerUrl: `https://explorer.solana.com/address/${token.address}`
+          }
+        });
+      }
+      
+      // Default: treat as general search term
+      return res.json({
+        type: 'search',
+        query,
+        result: {
+          suggestion: 'Enter a Solana address, token symbol, or URL to search',
+          examples: ['So11111111111111111111111111111111111111112', 'SOL', 'USDC', 'https://solana.com']
+        }
+      });
+      
+    } catch (error) {
+      console.error('[Web3 Search] Error:', error);
+      res.status(500).json({ error: 'Failed to process web3 search' });
+    }
+  });
 }
 
 // ========================
@@ -9915,17 +10086,20 @@ export function registerPayCardRoutes(app: Express) {
       });
       const releaseHash = crypto.createHash('sha256').update(releasePayload).digest('hex');
       
-      // Anchor to Solana blockchain
+      // Anchor to Solana blockchain via queue
       let solanaResult = null;
       try {
-        solanaResult = await solanaService.storeDataOnChain({
-          appName: ecosystemApp.appName,
-          version,
-          releaseType,
-          hash: releaseHash,
-          timestamp: registeredAt.toISOString(),
-        });
-        console.log(`[Release Manager] Solana anchor: ${solanaResult.transactionSignature}`);
+        // Queue the release hash for blockchain anchoring
+        await solanaService.queueForAnchoring(
+          `release-${ecosystemApp.appSlug}-${version}`,
+          releaseHash,
+          'release'
+        );
+        solanaResult = {
+          transactionSignature: `pending-${releaseHash.substring(0, 16)}`,
+          explorerUrl: `https://explorer.solana.com/search?q=${releaseHash}`
+        };
+        console.log(`[Release Manager] Queued for Solana anchoring: ${releaseHash.substring(0, 16)}...`);
       } catch (solanaError) {
         console.warn(`[Release Manager] Solana anchoring failed (non-blocking):`, solanaError);
       }
