@@ -358,32 +358,8 @@ export default function Landing() {
             className="mb-6"
           />
           
-          {/* Mobile: Horizontal Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/jobs", image: "/images/scenarios/worker_matching_on_screen.png", label: "Browse Jobs" },
-                { href: "/talent-pool", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Find Talent" },
-                { href: "/employer/register", image: "/images/scenarios/professional_creating_invoices.png", label: "Post Jobs" },
-                { href: "/apply", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "Apply Now" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[70%] min-w-[70%]">
-                  <Link href={item.href} className="block rounded-xl overflow-hidden border border-emerald-500/40 shadow-lg">
-                    <div className="relative h-32">
-                      <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
-                      <div className="absolute bottom-2 left-3 right-3">
-                        <h3 className="font-bold text-white text-sm">{item.label}</h3>
-                      </div>
-                    </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: True Bento Grid with varied sizes */}
-          <div className="hidden sm:grid grid-cols-4 gap-4 auto-rows-[120px]">
+          {/* Bento Grid - 2 cols mobile, 4 cols desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 auto-rows-[100px] sm:auto-rows-[120px]">
             <Link href="/jobs" className="col-span-2 row-span-2 group relative rounded-2xl overflow-hidden border border-emerald-500/40 hover:border-emerald-400 transition-all shadow-lg hover:shadow-2xl hover:shadow-emerald-500/20" data-testid="link-job-board">
               <img src="/images/scenarios/worker_matching_on_screen.png" alt="Jobs" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
@@ -433,33 +409,8 @@ export default function Landing() {
             className="mb-6"
           />
           
-          {/* Mobile: Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/gps-clock-in", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "GPS Clock-In", desc: "Verified time tracking" },
-                { href: "/payroll-processing", image: "/images/scenarios/payroll_processing_scene.png", label: "Payroll", desc: "Automated processing" },
-                { href: "/admin/compliance", image: "/images/scenarios/compliance_verification_interview.png", label: "Compliance", desc: "Stay compliant" },
-                { href: "/crm", image: "/images/scenarios/coworkers_referral_handshake.png", label: "CRM", desc: "Client management" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[75%] min-w-[75%]">
-                  <Link href={item.href} className="block rounded-xl overflow-hidden border border-cyan-500/30 shadow-lg">
-                    <div className="relative h-36">
-                      <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <h3 className="font-bold text-white">{item.label}</h3>
-                        <p className="text-cyan-300 text-xs">{item.desc}</p>
-                      </div>
-                    </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: Bento Grid */}
-          <div className="hidden sm:grid grid-cols-3 gap-4 auto-rows-[140px]">
+          {/* Bento Grid - 2 cols mobile, 3 cols desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 auto-rows-[110px] sm:auto-rows-[140px]">
             <Link href="/gps-clock-in" className="col-span-2 row-span-1 group relative rounded-xl overflow-hidden border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-lg">
               <img src="/images/scenarios/multi-industry_gps_clock-in.png" alt="GPS" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
@@ -590,76 +541,47 @@ export default function Landing() {
             className="mb-6"
           />
 
-          {/* Mobile: Horizontal carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/admin", image: "/images/scenarios/professional_creating_invoices.png", label: "Owner", btn: "Login", color: "violet", testId: "button-owner-access" },
-                { href: "/worker", image: "/images/scenarios/coworkers_referral_handshake.png", label: "Client", btn: "Login", color: "blue", testId: "button-customer-access" },
-                { href: "/employee-hub", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Staff", btn: "Hub", color: "emerald", testId: "button-employee-access" },
-                { href: "/developer", image: "/images/scenarios/it_system_integration.png", label: "Admin", btn: "Panel", color: "cyan", testId: "button-admin-access" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[42%] min-w-[42%]">
-                  <Link href={item.href} className="block">
-                    <div className={`rounded-xl overflow-hidden border border-${item.color}-500/50 shadow-lg`}>
-                      <div className="relative h-20">
-                        <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-                      </div>
-                      <div className="p-2 text-center bg-slate-900/80">
-                        <h3 className={`text-xs font-bold text-${item.color}-300 whitespace-nowrap`}>{item.label}</h3>
-                        <button className={`w-full mt-1 bg-${item.color}-500/80 text-white text-[9px] py-1 rounded font-semibold`} data-testid={item.testId}>
-                          {item.btn}
-                        </button>
-                      </div>
-                    </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: Bento grid */}
-          <div className="hidden sm:grid grid-cols-4 gap-4">
-            <Link href="/admin" className="group relative rounded-xl overflow-hidden border border-violet-400/50 hover:border-violet-300 shadow-lg h-[180px]">
+          {/* Bento Grid - 2 cols mobile, 4 cols desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <Link href="/admin" className="group relative rounded-xl overflow-hidden border border-violet-400/50 hover:border-violet-300 shadow-lg h-[140px] sm:h-[180px]">
               <img src="/images/scenarios/professional_creating_invoices.png" alt="Owner" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-violet-300">Owner</h3>
-                <Button className="w-full mt-2 bg-violet-500/80 hover:bg-violet-600 text-white text-xs h-8" data-testid="button-owner-access">
+              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-center">
+                <h3 className="text-sm sm:text-lg font-bold text-violet-300">Owner</h3>
+                <Button className="w-full mt-1.5 sm:mt-2 bg-violet-500/80 hover:bg-violet-600 text-white text-[10px] sm:text-xs h-7 sm:h-8" data-testid="button-owner-access">
                   Login
                 </Button>
               </div>
             </Link>
 
-            <Link href="/worker" className="group relative rounded-xl overflow-hidden border border-blue-500/50 hover:border-blue-400 shadow-lg h-[180px]">
+            <Link href="/worker" className="group relative rounded-xl overflow-hidden border border-blue-500/50 hover:border-blue-400 shadow-lg h-[140px] sm:h-[180px]">
               <img src="/images/scenarios/coworkers_referral_handshake.png" alt="Client" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-blue-300">Client</h3>
-                <Button className="w-full mt-2 bg-blue-500/80 hover:bg-blue-600 text-white text-xs h-8" data-testid="button-customer-access">
+              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-center">
+                <h3 className="text-sm sm:text-lg font-bold text-blue-300">Client</h3>
+                <Button className="w-full mt-1.5 sm:mt-2 bg-blue-500/80 hover:bg-blue-600 text-white text-[10px] sm:text-xs h-7 sm:h-8" data-testid="button-customer-access">
                   Login
                 </Button>
               </div>
             </Link>
 
-            <Link href="/employee-hub" className="group relative rounded-xl overflow-hidden border border-emerald-500/50 hover:border-emerald-400 shadow-lg h-[180px]" data-testid="card-employee-self-service">
+            <Link href="/employee-hub" className="group relative rounded-xl overflow-hidden border border-emerald-500/50 hover:border-emerald-400 shadow-lg h-[140px] sm:h-[180px]" data-testid="card-employee-self-service">
               <img src="/images/scenarios/diverse_workers_shift_prep.png" alt="Staff" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-emerald-300">Staff Hub</h3>
-                <Button className="w-full mt-2 bg-emerald-500/80 hover:bg-emerald-600 text-white text-xs h-8" data-testid="button-employee-access">
+              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-center">
+                <h3 className="text-sm sm:text-lg font-bold text-emerald-300">Staff Hub</h3>
+                <Button className="w-full mt-1.5 sm:mt-2 bg-emerald-500/80 hover:bg-emerald-600 text-white text-[10px] sm:text-xs h-7 sm:h-8" data-testid="button-employee-access">
                   Enter
                 </Button>
               </div>
             </Link>
 
-            <Link href="/developer" className="group relative rounded-xl overflow-hidden border border-cyan-500/50 hover:border-cyan-400 shadow-lg h-[180px]">
+            <Link href="/developer" className="group relative rounded-xl overflow-hidden border border-cyan-500/50 hover:border-cyan-400 shadow-lg h-[140px] sm:h-[180px]">
               <img src="/images/scenarios/it_system_integration.png" alt="Admin" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-cyan-300">Admin</h3>
-                <Button className="w-full mt-2 bg-cyan-500/80 hover:bg-cyan-600 text-white text-xs h-8" data-testid="button-admin-access">
+              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-center">
+                <h3 className="text-sm sm:text-lg font-bold text-cyan-300">Admin</h3>
+                <Button className="w-full mt-1.5 sm:mt-2 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[10px] sm:text-xs h-7 sm:h-8" data-testid="button-admin-access">
                   Panel
                 </Button>
               </div>
@@ -855,60 +777,28 @@ export default function Landing() {
             <span className="text-[10px] text-slate-400 hidden sm:inline">Pick individual tools starting at $15/mo</span>
           </div>
 
-          {/* Mobile: Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="md">
-              {[
-                { tier: "Starter", price: "$39", workers: "Up to 10 workers", features: ["GPS Clock-In", "Basic Payroll", "Email Support"] },
-                { tier: "Pro", price: "$99", workers: "Up to 50 workers", features: ["Everything in Starter", "AI Matching", "Priority Support"], featured: true },
-                { tier: "Enterprise", price: "Custom", workers: "Unlimited workers", features: ["Everything in Pro", "Dedicated Manager", "Custom Integrations"] },
-              ].map((plan) => (
-                <CarouselRailItem key={plan.tier} className="w-[260px]">
-                  <div className={`rounded-xl p-4 h-full ${plan.featured ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-2 border-violet-500/50' : 'bg-slate-800/50 border border-slate-700/50'}`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className={`text-sm font-bold ${plan.featured ? 'text-violet-300' : 'text-cyan-300'}`}>{plan.tier}</span>
-                      {plan.featured && <span className="text-[8px] bg-violet-500 text-white px-2 py-0.5 rounded-full">POPULAR</span>}
-                    </div>
-                    <div className="text-2xl font-bold text-white mb-1">{plan.price}<span className="text-xs text-slate-400">/mo</span></div>
-                    <div className="text-[10px] text-slate-400 mb-3">{plan.workers}</div>
-                    <ul className="space-y-1 mb-3">
-                      {plan.features.map((f, i) => (
-                        <li key={i} className="text-[10px] text-slate-300 flex items-center gap-1">
-                          <Check className="w-3 h-3 text-green-400" /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link href="/pricing" className={`block text-center text-xs py-2 rounded-lg font-medium transition-colors ${plan.featured ? 'bg-violet-500 hover:bg-violet-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
-                      {plan.tier === "Enterprise" ? "Contact Sales" : "Start Free Trial"}
-                    </Link>
-                  </div>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: 3-Column Grid */}
-          <div className="hidden sm:grid grid-cols-3 gap-4">
+          {/* Bento Grid - stacked on mobile, 3 cols desktop */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {[
               { tier: "Starter", price: "$39", workers: "Up to 10 workers", features: ["GPS Clock-In", "Basic Payroll", "Email Support", "Mobile App"] },
               { tier: "Pro", price: "$99", workers: "Up to 50 workers", features: ["Everything in Starter", "AI Worker Matching", "Priority Support", "Analytics Dashboard"], featured: true },
               { tier: "Enterprise", price: "Custom", workers: "Unlimited workers", features: ["Everything in Pro", "Dedicated Account Manager", "Custom Integrations", "SLA Guarantee"] },
             ].map((plan) => (
-              <div key={plan.tier} className={`rounded-2xl p-5 ${plan.featured ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-2 border-violet-500/50 shadow-[0_0_30px_rgba(139,92,246,0.2)]' : 'bg-slate-800/50 border border-slate-700/50'}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <span className={`text-lg font-bold ${plan.featured ? 'text-violet-300' : 'text-cyan-300'}`}>{plan.tier}</span>
-                  {plan.featured && <span className="text-[10px] bg-violet-500 text-white px-2 py-1 rounded-full font-medium">MOST POPULAR</span>}
+              <div key={plan.tier} className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 ${plan.featured ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-2 border-violet-500/50 shadow-[0_0_30px_rgba(139,92,246,0.2)]' : 'bg-slate-800/50 border border-slate-700/50'}`}>
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
+                  <span className={`text-sm sm:text-lg font-bold ${plan.featured ? 'text-violet-300' : 'text-cyan-300'}`}>{plan.tier}</span>
+                  {plan.featured && <span className="text-[8px] sm:text-[10px] bg-violet-500 text-white px-2 py-0.5 sm:py-1 rounded-full font-medium">MOST POPULAR</span>}
                 </div>
-                <div className="text-3xl font-bold text-white mb-1">{plan.price}<span className="text-sm text-slate-400">/mo</span></div>
-                <div className="text-xs text-slate-400 mb-4">{plan.workers}</div>
-                <ul className="space-y-2 mb-4">
+                <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{plan.price}<span className="text-xs sm:text-sm text-slate-400">/mo</span></div>
+                <div className="text-[10px] sm:text-xs text-slate-400 mb-3 sm:mb-4">{plan.workers}</div>
+                <ul className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
                   {plan.features.map((f, i) => (
-                    <li key={i} className="text-sm text-slate-300 flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" /> {f}
+                    <li key={i} className="text-[10px] sm:text-sm text-slate-300 flex items-center gap-1.5 sm:gap-2">
+                      <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-400 flex-shrink-0" /> {f}
                     </li>
                   ))}
                 </ul>
-                <Link href="/pricing" className={`block text-center py-2.5 rounded-lg font-semibold transition-colors ${plan.featured ? 'bg-violet-500 hover:bg-violet-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
+                <Link href="/pricing" className={`block text-center py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${plan.featured ? 'bg-violet-500 hover:bg-violet-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
                   {plan.tier === "Enterprise" ? "Contact Sales" : "Start Free Trial"}
                 </Link>
               </div>
