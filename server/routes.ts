@@ -7848,7 +7848,7 @@ export function registerBlockchainRoutes(app: Express) {
       
       // Default: use OpenAI for general web research queries
       try {
-        const openaiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+        const openaiKey = process.env.OPENAI_API_KEY || process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
         
         if (!openaiKey) {
           return res.json({
