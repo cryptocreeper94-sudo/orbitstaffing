@@ -21,6 +21,7 @@ import { ContactForm } from "@/components/ContactForm";
 import { OCRScannerModal } from "@/components/layout/OCRScannerModal";
 import { CameraModal } from "@/components/layout/CameraModal";
 import { FloatingHelpButton } from "@/components/HelpCenter";
+import { Web3SearchBar } from "@/components/Web3SearchBar";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
@@ -137,16 +138,22 @@ export function Shell({ children }: { children: React.ReactNode }) {
             ORBIT
           </div>
         </div>
-        {/* App Store Coming Soon Banner + OCR Scanner Button - Hidden on mobile */}
+        {/* App Store Coming Soon Banner + Web3 Search + OCR Scanner Button - Hidden on mobile */}
         <div className="sticky top-0 z-50 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b-2 border-cyan-500/50 backdrop-blur-sm hidden md:block">
           <div className="px-8 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3 flex-1">
               <div className="text-xl">📱</div>
-              <div className="flex-1">
+              <div className="flex-1 max-w-[200px]">
                 <div className="text-sm font-bold text-cyan-300">Coming Soon</div>
-                <div className="text-xs text-cyan-200/80">Google Play Store & Apple App Store Native Apps</div>
+                <div className="text-xs text-cyan-200/80">Native Mobile Apps</div>
               </div>
             </div>
+            
+            {/* Web3 Search Bar - Center */}
+            <div className="flex-1 max-w-lg mx-4">
+              <Web3SearchBar />
+            </div>
+            
             <div className="flex items-center gap-3">
               <Button
                 onClick={() => setOcrScannerOpen(true)}
@@ -155,7 +162,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 data-testid="button-open-ocr-scanner"
               >
                 <Zap className="w-4 h-4" />
-                <span className="hidden sm:inline">Scan</span>
+                <span className="hidden lg:inline">Scan</span>
               </Button>
               <Button
                 onClick={() => setCameraOpen(true)}
@@ -164,9 +171,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 data-testid="button-open-camera"
               >
                 <Camera className="w-4 h-4" />
-                <span className="hidden sm:inline">Camera</span>
+                <span className="hidden lg:inline">Camera</span>
               </Button>
-              <div className="text-xs text-cyan-300/70 hidden md:block">Get native mobile experience</div>
             </div>
           </div>
         </div>

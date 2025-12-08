@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X } from "lucide-react";
+import { Send, X, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 
 const GREETING_SHOWN_KEY = "orby_greeting_shown";
 
@@ -83,6 +83,17 @@ interface ChatMessage {
   content: string;
 }
 
+// Voice helper functions
+const getSpeechRecognition = (): typeof SpeechRecognition | null => {
+  if (typeof window === 'undefined') return null;
+  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null;
+};
+
+const getSpeechSynthesis = (): SpeechSynthesis | null => {
+  if (typeof window === 'undefined') return null;
+  return window.speechSynthesis || null;
+};
+
 export function OrbitChatAssistant() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -91,10 +102,126 @@ export function OrbitChatAssistant() {
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Voice state
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
     setMounted(true);
+    // Check browser support for speech APIs
+    const SpeechRecognitionClass = getSpeechRecognition();
+    const synth = getSpeechSynthesis();
+    setSpeechSupported(!!(SpeechRecognitionClass && synth));
   }, []);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const SpeechRecognitionClass = getSpeechRecognition();
+    if (!SpeechRecognitionClass) return;
+    
+    const recognition = new SpeechRecognitionClass();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0][0].transcript;
+      setInput(transcript);
+      setIsListening(false);
+      // Auto-send after voice input
+      setTimeout(() => {
+        const sendBtn = document.querySelector('[data-testid="button-send-orby"]') as HTMLButtonElement;
+        if (sendBtn) sendBtn.click();
+      }, 300);
+    };
+    
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+    };
+    
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+    
+    recognitionRef.current = recognition;
+    
+    return () => {
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch {}
+      }
+    };
+  }, [mounted]);
+
+  // Text-to-speech function
+  const speakText = useCallback((text: string) => {
+    if (!voiceEnabled) return;
+    
+    const synth = getSpeechSynthesis();
+    if (!synth) return;
+    
+    // Cancel any ongoing speech
+    synth.cancel();
+    
+    // Remove emojis for cleaner speech
+    const cleanText = text.replace(/[\\u{1F600}-\\u{1F64F}]|[\\u{1F300}-\\u{1F5FF}]|[\\u{1F680}-\\u{1F6FF}]|[\\u{1F1E0}-\u{1F1FF}]|[\\u{2600}-\u{26FF}]|[\\u{2700}-\\u{27BF}]/gu, '').trim();
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.1;
+    utterance.volume = 0.9;
+    
+    // Try to get a friendly voice
+    const voices = synth.getVoices();
+    const preferredVoice = voices.find(v => 
+      v.name.toLowerCase().includes('samantha') || 
+      v.name.toLowerCase().includes('google') ||
+      v.name.toLowerCase().includes('female')
+    ) || voices.find(v => v.lang.startsWith('en'));
+    
+    if (preferredVoice) utterance.voice = preferredVoice;
+    
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    
+    utteranceRef.current = utterance;
+    synth.speak(utterance);
+  }, [voiceEnabled]);
+
+  // Toggle voice listening
+  const toggleListening = useCallback(() => {
+    if (!recognitionRef.current) return;
+    
+    if (isListening) {
+      recognitionRef.current.abort();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (e) {
+        console.error('Failed to start recognition:', e);
+      }
+    }
+  }, [isListening]);
+
+  // Toggle voice output
+  const toggleVoiceOutput = useCallback(() => {
+    const synth = getSpeechSynthesis();
+    if (isSpeaking && synth) {
+      synth.cancel();
+      setIsSpeaking(false);
+    }
+    setVoiceEnabled(prev => !prev);
+  }, [isSpeaking]);
 
   // Show greeting on first visit
   useEffect(() => {
@@ -138,7 +265,7 @@ export function OrbitChatAssistant() {
     }
   };
 
-  const handleSend = () => {
+  const handleSend = useCallback(() => {
     if (!input.trim()) return;
 
     const userMessage: ChatMessage = {
@@ -160,8 +287,13 @@ export function OrbitChatAssistant() {
         content: response
       }]);
       setIsTyping(false);
+      
+      // Speak the response if voice is enabled
+      if (voiceEnabled) {
+        speakText(response);
+      }
     }, 800 + Math.random() * 600);
-  };
+  }, [input, voiceEnabled, speakText]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -278,6 +410,64 @@ export function OrbitChatAssistant() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Voice controls bar */}
+            {speechSupported && (
+              <div style={{
+                padding: '8px 12px',
+                borderTop: '1px solid #e2e8f0',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '8px',
+                background: '#f1f5f9'
+              }}>
+                <button
+                  onClick={toggleVoiceOutput}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: voiceEnabled ? 'rgba(6, 182, 212, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s'
+                  }}
+                  title={voiceEnabled ? 'Mute Orby' : 'Unmute Orby'}
+                  data-testid="button-toggle-voice"
+                >
+                  {voiceEnabled ? (
+                    <Volume2 size={16} color={isSpeaking ? '#06b6d4' : '#64748b'} />
+                  ) : (
+                    <VolumeX size={16} color="#ef4444" />
+                  )}
+                </button>
+                {isSpeaking && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '2px',
+                    padding: '0 8px'
+                  }}>
+                    {[0, 1, 2, 3].map(i => (
+                      <motion.div
+                        key={i}
+                        animate={{ scaleY: [1, 1.8, 1] }}
+                        transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
+                        style={{
+                          width: '3px',
+                          height: '12px',
+                          background: '#06b6d4',
+                          borderRadius: '2px'
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Input area */}
             <div style={{
               padding: '12px',
@@ -286,21 +476,64 @@ export function OrbitChatAssistant() {
               gap: '8px',
               background: '#f8fafc'
             }}>
+              {/* Mic button */}
+              {speechSupported && (
+                <button
+                  onClick={toggleListening}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: isListening 
+                      ? 'linear-gradient(135deg, #ef4444, #dc2626)' 
+                      : 'rgba(6, 182, 212, 0.1)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    transition: 'all 0.2s'
+                  }}
+                  title={isListening ? 'Stop listening' : 'Speak to Orby'}
+                  data-testid="button-mic-orby"
+                >
+                  {isListening ? (
+                    <>
+                      <MicOff size={18} color="white" />
+                      <motion.div
+                        animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        style={{
+                          position: 'absolute',
+                          inset: '-4px',
+                          borderRadius: '50%',
+                          border: '2px solid #ef4444'
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <Mic size={18} color="#06b6d4" />
+                  )}
+                </button>
+              )}
+              
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask me anything..."
+                placeholder={isListening ? "Listening..." : "Ask me anything..."}
                 style={{
                   flex: 1,
                   padding: '10px 14px',
                   borderRadius: '20px',
-                  border: '1px solid #e2e8f0',
+                  border: isListening ? '2px solid #ef4444' : '1px solid #e2e8f0',
                   fontSize: '14px',
                   outline: 'none',
-                  background: 'white'
+                  background: 'white',
+                  transition: 'border 0.2s'
                 }}
                 data-testid="input-orby-chat"
               />
