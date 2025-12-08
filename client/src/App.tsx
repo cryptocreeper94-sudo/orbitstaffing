@@ -66,6 +66,7 @@ import MarketingHub from "@/pages/MarketingHub";
 import CryptoWallet from "@/pages/CryptoWallet";
 import FeatureInventoryPage from "@/pages/FeatureInventoryPage";
 import Features from "@/pages/Features";
+import Integrations from "@/pages/Integrations";
 import FranchiseOffer from "@/pages/FranchiseOffer";
 import CustomerHallmarkManager from "@/pages/CustomerHallmarkManager";
 import AdminFranchiseDashboard from "@/pages/AdminFranchiseDashboard";
@@ -124,6 +125,7 @@ function Router() {
       <Route path="/worker" component={WorkerPortal} />
       <Route path="/home" component={Landing} />
       <Route path="/pricing" component={Pricing} />
+      <Route path="/integrations" component={Integrations} />
       <Route path="/equipment-tracking" component={EquipmentTrackingAdmin} />
       <Route path="/gps-clock-in" component={GPSClockIn} />
       <Route path="/payroll-processing" component={PayrollProcessing} />
