@@ -406,35 +406,35 @@ export default function Landing() {
             </CarouselRail>
           </div>
 
-          {/* Desktop: Bento Grid */}
-          <div className="hidden sm:grid grid-cols-4 gap-4 auto-rows-[160px]">
-            {/* Large feature */}
-            <Link href="/hallmark-seal" className="col-span-2 row-span-1 group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg" data-testid="card-hallmarks">
+          {/* Desktop: Equal height cards */}
+          <div className="hidden sm:grid grid-cols-3 gap-4">
+            <Link href="/hallmark-seal" className="group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg h-[160px]" data-testid="card-hallmarks">
               <img src="/images/scenarios/security_verification_process.png" alt="Hallmarks" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
               <span className="absolute top-3 right-3 text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
               <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
-                <h3 className="text-2xl font-bold text-white">Hallmark Seals</h3>
+                <h3 className="text-xl font-bold text-white">Hallmark Seals</h3>
                 <p className="text-green-300 text-sm">Verified authenticity badges</p>
               </div>
             </Link>
 
-            {/* Smaller tiles */}
-            <Link href="/pay-card" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg" data-testid="card-pay-card">
+            <Link href="/pay-card" className="group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg h-[160px]" data-testid="card-pay-card">
               <img src="/images/scenarios/diverse_workers_checking_wages.png" alt="Pay Card" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-              <span className="absolute top-2 right-2 text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-lg font-bold text-white">Pay Card</h3>
+              <span className="absolute top-3 right-3 text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
+              <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
+                <h3 className="text-xl font-bold text-white">Pay Card</h3>
+                <p className="text-green-300 text-sm">Instant worker payments</p>
               </div>
             </Link>
 
-            <Link href="/marketing-hub" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg" data-testid="card-marketing">
+            <Link href="/marketing-hub" className="group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg h-[160px]" data-testid="card-marketing">
               <img src="/images/scenarios/team_celebrating_bonuses.png" alt="Marketing" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-              <span className="absolute top-2 right-2 text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-bold">LIVE</span>
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-lg font-bold text-white">Marketing</h3>
+              <span className="absolute top-3 right-3 text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
+              <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
+                <h3 className="text-xl font-bold text-white">Marketing</h3>
+                <p className="text-green-300 text-sm">Recruitment campaigns</p>
               </div>
             </Link>
           </div>
