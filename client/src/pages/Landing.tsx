@@ -10,6 +10,7 @@ import {
   Users, 
   Shield,
   CheckCircle2,
+  Check,
   Lock,
   ChevronRight,
   Menu,
@@ -602,29 +603,32 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Integrations - Compact Banner */}
-      <section className="py-3 sm:py-4 bg-gradient-to-r from-cyan-950/30 via-blue-950/20 to-cyan-950/30 border-y border-cyan-500/30">
+      {/* Integrations - Cards with Logos */}
+      <section className="py-4 sm:py-6 bg-gradient-to-r from-cyan-950/30 via-blue-950/20 to-cyan-950/30 border-y border-cyan-500/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold text-white">16+ Integrations</h3>
             <Link href="/integrations" className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1">
               View All <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-          <CarouselRail showArrows={true} gap="sm">
+          <CarouselRail showArrows={true} gap="md">
             {[
-              { name: "QuickBooks", color: "text-green-400" },
-              { name: "ADP", color: "text-red-400" },
-              { name: "UKG", color: "text-blue-400" },
-              { name: "Indeed", color: "text-indigo-400" },
-              { name: "LinkedIn", color: "text-sky-400" },
-              { name: "Slack", color: "text-purple-400" },
-              { name: "Xero", color: "text-cyan-400" },
-              { name: "Gusto", color: "text-pink-400" },
+              { name: "QuickBooks", logo: "/images/logos/quickbooks.svg", bg: "from-green-900/40 to-green-950/60" },
+              { name: "ADP", logo: "/images/logos/adp.svg", bg: "from-red-900/40 to-red-950/60" },
+              { name: "Indeed", logo: "/images/logos/indeed.svg", bg: "from-indigo-900/40 to-indigo-950/60" },
+              { name: "LinkedIn", logo: "/images/logos/linkedin.svg", bg: "from-sky-900/40 to-sky-950/60" },
+              { name: "Slack", logo: "/images/logos/slack.svg", bg: "from-purple-900/40 to-purple-950/60" },
+              { name: "Stripe", logo: "/images/logos/stripe.svg", bg: "from-violet-900/40 to-violet-950/60" },
+              { name: "Xero", logo: "/images/logos/xero.svg", bg: "from-cyan-900/40 to-cyan-950/60" },
+              { name: "Gusto", logo: "/images/logos/gusto.svg", bg: "from-orange-900/40 to-orange-950/60" },
             ].map((item, idx) => (
-              <CarouselRailItem key={idx} className="w-[70px] sm:w-[80px]">
-                <div className="text-center px-2 py-1.5 rounded bg-slate-800/50 border border-cyan-500/30">
-                  <div className={`text-[10px] font-bold ${item.color}`}>{item.name}</div>
+              <CarouselRailItem key={idx} className="w-[120px] sm:w-[140px]">
+                <div className={`rounded-xl overflow-hidden bg-gradient-to-br ${item.bg} border border-slate-700/50 hover:border-cyan-500/50 transition-all p-4 h-[80px] flex flex-col items-center justify-center`}>
+                  <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center mb-2">
+                    <span className="text-lg font-bold text-white">{item.name.charAt(0)}</span>
+                  </div>
+                  <span className="text-[10px] font-medium text-slate-300">{item.name}</span>
                 </div>
               </CarouselRailItem>
             ))}
@@ -632,102 +636,131 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Savings Banner - Compact */}
-      <section className="py-3 sm:py-4 bg-gradient-to-r from-green-950/30 via-background to-green-950/30 border-y border-green-500/20">
+      {/* Savings Banner - Compact Inline */}
+      <section className="py-2 sm:py-3 bg-green-950/20 border-y border-green-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-2">
-                <div className="text-center px-3 py-1 rounded bg-red-950/40 border border-red-500/30">
-                  <div className="text-[8px] text-red-400">Others</div>
-                  <div className="text-sm font-bold text-red-400">1.6x</div>
-                </div>
-                <div className="text-center px-3 py-1 rounded bg-green-950/40 border border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
-                  <div className="text-[8px] text-green-400">ORBIT</div>
-                  <div className="text-sm font-bold text-green-400">1.45x</div>
-                </div>
-              </div>
-              <div className="hidden sm:block">
-                <div className="text-sm font-bold text-white">Save up to 35%</div>
-                <div className="text-[10px] text-green-400">$6K+ annually</div>
-              </div>
+          <div className="flex items-center justify-center gap-3 sm:gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-red-400 line-through">1.6x</span>
+              <span className="text-sm font-bold text-green-400">1.45x markup</span>
             </div>
-            <Link href="/pricing" className="text-xs bg-green-600/80 hover:bg-green-600 text-white px-3 py-1.5 rounded font-medium">
-              Calculate Savings
+            <div className="h-4 w-px bg-slate-700" />
+            <span className="text-xs text-white font-medium">Save 35% · $6K+/year</span>
+            <Link href="/pricing" className="text-[10px] bg-green-600/80 hover:bg-green-600 text-white px-2 py-1 rounded font-medium">
+              Calculate
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features - Compact Carousel */}
-      <section className="py-3 sm:py-6">
+      {/* All-in-One Platform - Image Cards */}
+      <section className="py-4 sm:py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-bold text-white">All-in-One Platform</h3>
             <Link href="/features" className="text-[10px] text-primary hover:underline">View All</Link>
           </div>
-          <CarouselRail showArrows={true} gap="sm">
+          <CarouselRail showArrows={true} gap="md">
             {[
-              { icon: Clock, title: "Time", desc: "GPS clock-in" },
-              { icon: Users, title: "Hiring", desc: "AI matching" },
-              { icon: DollarSign, title: "Payroll", desc: "Auto process" },
-              { icon: Shield, title: "Compliance", desc: "I-9, E-Verify" },
-              { icon: BarChart3, title: "Analytics", desc: "Real-time" },
-              { icon: Lock, title: "Security", desc: "SOC 2" },
+              { image: "/images/scenarios/multi-industry_gps_clock-in.png", title: "Time", desc: "GPS Clock-In", href: "/gps-clock-in" },
+              { image: "/images/scenarios/worker_matching_on_screen.png", title: "Hiring", desc: "AI Matching", href: "/hiring" },
+              { image: "/images/scenarios/payroll_processing_scene.png", title: "Payroll", desc: "Auto Process", href: "/payroll-processing" },
+              { image: "/images/scenarios/compliance_verification_interview.png", title: "Compliance", desc: "I-9, E-Verify", href: "/admin/compliance" },
+              { image: "/images/scenarios/team_celebrating_bonuses.png", title: "Analytics", desc: "Real-time", href: "/analytics" },
+              { image: "/images/scenarios/security_verification_process.png", title: "Security", desc: "SOC 2", href: "/security" },
             ].map((f) => (
-              <CarouselRailItem key={f.title} className="w-[100px] sm:w-[120px]">
-                <OrbitCard variant="glass" className="h-full border-slate-700/50">
-                  <OrbitCardContent className="p-2 sm:p-3 text-center">
-                    <f.icon className="w-5 h-5 mx-auto mb-1 text-primary" />
-                    <div className="text-[10px] font-bold text-white">{f.title}</div>
-                    <div className="text-[8px] text-slate-400">{f.desc}</div>
-                  </OrbitCardContent>
-                </OrbitCard>
+              <CarouselRailItem key={f.title} className="w-[140px] sm:w-[180px]">
+                <Link href={f.href} className="block rounded-xl overflow-hidden border border-cyan-500/30 hover:border-cyan-400 transition-all">
+                  <div className="relative h-24 sm:h-28">
+                    <img src={f.image} alt={f.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <div className="text-xs font-bold text-white">{f.title}</div>
+                      <div className="text-[9px] text-cyan-300">{f.desc}</div>
+                    </div>
+                  </div>
+                </Link>
               </CarouselRailItem>
             ))}
           </CarouselRail>
         </div>
       </section>
 
-      {/* Pricing Section - Compact Carousel */}
-      <section className="py-4 sm:py-8 bg-gradient-to-br from-violet-950/20 via-background to-cyan-950/10">
+      {/* Pricing Section - Full Width Grid */}
+      <section className="py-6 sm:py-10 bg-gradient-to-br from-slate-900 via-background to-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <SectionHeader 
-              title="Pricing"
-              subtitle="From $39/mo. No hidden fees."
+              title="Simple Pricing"
+              subtitle="No hidden fees. Cancel anytime."
               align="left"
               size="sm"
               className="mb-0"
             />
             <Link href="/pricing" className="text-xs text-primary hover:underline flex items-center gap-1" data-testid="link-view-pricing">
-              View All <ArrowRight className="w-3 h-3" />
+              Compare Plans <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <CarouselRail showArrows={true} gap="sm">
-            {[
-              { tier: "Starter", price: "$39", workers: "10 workers", color: "cyan" },
-              { tier: "Pro", price: "$99", workers: "50 workers", color: "violet", featured: true },
-              { tier: "Enterprise", price: "Custom", workers: "200+", color: "amber" },
-            ].map((plan) => (
-              <CarouselRailItem key={plan.tier} className="w-[180px] sm:w-[220px]">
-                <OrbitCard variant="glass" className={`h-full border-${plan.color}-500/40 ${plan.featured ? 'shadow-[0_0_20px_rgba(139,92,246,0.3)]' : ''}`}>
-                  <OrbitCardContent className="p-3 sm:p-4">
+          {/* Mobile: Carousel */}
+          <div className="sm:hidden">
+            <CarouselRail showArrows={true} gap="md">
+              {[
+                { tier: "Starter", price: "$39", workers: "Up to 10 workers", features: ["GPS Clock-In", "Basic Payroll", "Email Support"] },
+                { tier: "Pro", price: "$99", workers: "Up to 50 workers", features: ["Everything in Starter", "AI Matching", "Priority Support"], featured: true },
+                { tier: "Enterprise", price: "Custom", workers: "Unlimited workers", features: ["Everything in Pro", "Dedicated Manager", "Custom Integrations"] },
+              ].map((plan) => (
+                <CarouselRailItem key={plan.tier} className="w-[260px]">
+                  <div className={`rounded-xl p-4 h-full ${plan.featured ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-2 border-violet-500/50' : 'bg-slate-800/50 border border-slate-700/50'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`text-xs font-bold text-${plan.color}-400`}>{plan.tier}</span>
-                      {plan.featured && <span className="text-[8px] bg-violet-500 text-white px-1.5 py-0.5 rounded">Popular</span>}
+                      <span className={`text-sm font-bold ${plan.featured ? 'text-violet-300' : 'text-cyan-300'}`}>{plan.tier}</span>
+                      {plan.featured && <span className="text-[8px] bg-violet-500 text-white px-2 py-0.5 rounded-full">POPULAR</span>}
                     </div>
-                    <div className="text-xl font-bold text-white mb-1">{plan.price}<span className="text-xs text-slate-400">/mo</span></div>
-                    <div className="text-[10px] text-slate-400 mb-2">{plan.workers}</div>
-                    <Link href="/pricing" className={`block text-center text-[10px] py-1.5 rounded bg-${plan.color}-500/20 hover:bg-${plan.color}-500/30 text-${plan.color}-300 font-medium transition-colors`}>
-                      {plan.tier === "Enterprise" ? "Contact Sales" : "Start Trial"}
+                    <div className="text-2xl font-bold text-white mb-1">{plan.price}<span className="text-xs text-slate-400">/mo</span></div>
+                    <div className="text-[10px] text-slate-400 mb-3">{plan.workers}</div>
+                    <ul className="space-y-1 mb-3">
+                      {plan.features.map((f, i) => (
+                        <li key={i} className="text-[10px] text-slate-300 flex items-center gap-1">
+                          <Check className="w-3 h-3 text-green-400" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link href="/pricing" className={`block text-center text-xs py-2 rounded-lg font-medium transition-colors ${plan.featured ? 'bg-violet-500 hover:bg-violet-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
+                      {plan.tier === "Enterprise" ? "Contact Sales" : "Start Free Trial"}
                     </Link>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </CarouselRailItem>
+                  </div>
+                </CarouselRailItem>
+              ))}
+            </CarouselRail>
+          </div>
+
+          {/* Desktop: 3-Column Grid */}
+          <div className="hidden sm:grid grid-cols-3 gap-4">
+            {[
+              { tier: "Starter", price: "$39", workers: "Up to 10 workers", features: ["GPS Clock-In", "Basic Payroll", "Email Support", "Mobile App"] },
+              { tier: "Pro", price: "$99", workers: "Up to 50 workers", features: ["Everything in Starter", "AI Worker Matching", "Priority Support", "Analytics Dashboard"], featured: true },
+              { tier: "Enterprise", price: "Custom", workers: "Unlimited workers", features: ["Everything in Pro", "Dedicated Account Manager", "Custom Integrations", "SLA Guarantee"] },
+            ].map((plan) => (
+              <div key={plan.tier} className={`rounded-2xl p-5 ${plan.featured ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-2 border-violet-500/50 shadow-[0_0_30px_rgba(139,92,246,0.2)]' : 'bg-slate-800/50 border border-slate-700/50'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`text-lg font-bold ${plan.featured ? 'text-violet-300' : 'text-cyan-300'}`}>{plan.tier}</span>
+                  {plan.featured && <span className="text-[10px] bg-violet-500 text-white px-2 py-1 rounded-full font-medium">MOST POPULAR</span>}
+                </div>
+                <div className="text-3xl font-bold text-white mb-1">{plan.price}<span className="text-sm text-slate-400">/mo</span></div>
+                <div className="text-xs text-slate-400 mb-4">{plan.workers}</div>
+                <ul className="space-y-2 mb-4">
+                  {plan.features.map((f, i) => (
+                    <li key={i} className="text-sm text-slate-300 flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-400 flex-shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/pricing" className={`block text-center py-2.5 rounded-lg font-semibold transition-colors ${plan.featured ? 'bg-violet-500 hover:bg-violet-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
+                  {plan.tier === "Enterprise" ? "Contact Sales" : "Start Free Trial"}
+                </Link>
+              </div>
             ))}
-          </CarouselRail>
+          </div>
         </div>
       </section>
 
