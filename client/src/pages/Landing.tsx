@@ -206,332 +206,125 @@ export default function Landing() {
         <ISO20022Banner />
       </div>
 
-      {/* TALENT EXCHANGE - TRUE BENTO GRID */}
-      <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-4 sm:py-8">
+      {/* TALENT EXCHANGE - Compact Carousel */}
+      <section className="bg-gradient-to-r from-emerald-900/30 via-cyan-900/20 to-emerald-900/30 border-b border-emerald-500/30 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <SectionHeader 
-            eyebrow="NEW - Talent Exchange"
-            title="ORBIT Talent Exchange"
-            subtitle="Two-way job marketplace"
-            align="center"
-            size="md"
-            className="mb-4 sm:mb-6"
-          />
-          
-          {/* Mobile: Horizontal Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/jobs", image: "/images/scenarios/worker_matching_on_screen.png", label: "Browse Jobs" },
-                { href: "/talent-pool", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Find Talent" },
-                { href: "/employer/register", image: "/images/scenarios/professional_creating_invoices.png", label: "Post Jobs" },
-                { href: "/apply", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "Apply Now" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[70%] min-w-[70%]">
-                  <Link href={item.href} className="block rounded-xl overflow-hidden border border-emerald-500/40 shadow-lg">
-                    <div className="relative h-32">
-                      <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
-                      <div className="absolute bottom-2 left-3 right-3">
-                        <h3 className="font-bold text-white text-sm">{item.label}</h3>
-                      </div>
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-medium">NEW</span>
+              <h3 className="text-sm font-bold text-white mt-1">Talent Exchange</h3>
+            </div>
+            <Link href="/jobs" className="text-[10px] text-emerald-400 hover:underline" data-testid="link-job-board">Browse Jobs</Link>
+          </div>
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { href: "/jobs", image: "/images/scenarios/worker_matching_on_screen.png", label: "Browse Jobs" },
+              { href: "/talent-pool", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Find Talent" },
+              { href: "/employer/register", image: "/images/scenarios/professional_creating_invoices.png", label: "Post Jobs" },
+              { href: "/apply", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "Apply Now" },
+            ].map((item) => (
+              <CarouselRailItem key={item.href} className="w-[140px] sm:w-[180px]">
+                <Link href={item.href} className="block rounded-lg overflow-hidden border border-emerald-500/30" data-testid={`link-${item.label.toLowerCase().replace(' ', '-')}`}>
+                  <div className="relative h-20 sm:h-24">
+                    <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                    <div className="absolute bottom-2 left-2">
+                      <span className="text-xs font-bold text-white">{item.label}</span>
                     </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: True Bento Grid with varied sizes */}
-          <div className="hidden sm:grid grid-cols-4 gap-4 auto-rows-[120px]">
-            {/* Large hero tile - spans 2 cols, 2 rows */}
-            <Link href="/jobs" className="col-span-2 row-span-2 group relative rounded-2xl overflow-hidden border border-emerald-500/40 hover:border-emerald-400 transition-all shadow-lg hover:shadow-2xl hover:shadow-emerald-500/20" data-testid="link-job-board">
-              <img src="/images/scenarios/worker_matching_on_screen.png" alt="Jobs" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
-                <span className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">Featured</span>
-                <h3 className="text-2xl font-bold text-white mt-1">Browse Jobs</h3>
-                <p className="text-slate-300 text-sm mt-1">Find your next opportunity</p>
-              </div>
-            </Link>
-
-            {/* Medium tile - 2 cols, 1 row */}
-            <Link href="/talent-pool" className="col-span-2 row-span-1 group relative rounded-xl overflow-hidden border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-lg" data-testid="link-talent-pool">
-              <img src="/images/scenarios/diverse_workers_shift_prep.png" alt="Talent" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
-              <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
-                <h3 className="text-xl font-bold text-white">Find Talent</h3>
-                <p className="text-cyan-300 text-sm">Skilled workers ready now</p>
-              </div>
-            </Link>
-
-            {/* Small tile */}
-            <Link href="/employer/register" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-violet-500/40 hover:border-violet-400 transition-all shadow-lg" data-testid="link-employer-register">
-              <img src="/images/scenarios/professional_creating_invoices.png" alt="Post" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-lg font-bold text-white">Post Jobs</h3>
-              </div>
-            </Link>
-
-            {/* Small tile */}
-            <Link href="/apply" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-amber-500/40 hover:border-amber-400 transition-all shadow-lg" data-testid="link-apply">
-              <img src="/images/scenarios/multi-industry_gps_clock-in.png" alt="Apply" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-lg font-bold text-white">Apply Now</h3>
-              </div>
-            </Link>
-          </div>
+                  </div>
+                </Link>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
       </section>
 
-      {/* PLATFORM FEATURES - BENTO GRID */}
-      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-4 sm:py-8">
+      {/* PLATFORM FEATURES - Compact Carousel */}
+      <section className="bg-slate-900/50 border-b border-cyan-500/20 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <SectionHeader 
-            title="Platform Features"
-            subtitle="Everything you need to run your staffing operation"
-            align="center"
-            size="md"
-            className="mb-4 sm:mb-6"
-          />
-          
-          {/* Mobile: Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/gps-clock-in", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "GPS Clock-In", desc: "Verified time tracking" },
-                { href: "/payroll-processing", image: "/images/scenarios/payroll_processing_scene.png", label: "Payroll", desc: "Automated processing" },
-                { href: "/admin/compliance", image: "/images/scenarios/compliance_verification_interview.png", label: "Compliance", desc: "Stay compliant" },
-                { href: "/crm", image: "/images/scenarios/coworkers_referral_handshake.png", label: "CRM", desc: "Client management" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[75%] min-w-[75%]">
-                  <Link href={item.href} className="block rounded-xl overflow-hidden border border-cyan-500/30 shadow-lg">
-                    <div className="relative h-36">
-                      <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <h3 className="font-bold text-white">{item.label}</h3>
-                        <p className="text-cyan-300 text-xs">{item.desc}</p>
-                      </div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-white">Platform Features</h3>
+            <Link href="/features" className="text-[10px] text-cyan-400 hover:underline">View All</Link>
+          </div>
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { href: "/gps-clock-in", image: "/images/scenarios/multi-industry_gps_clock-in.png", label: "GPS Clock-In" },
+              { href: "/payroll-processing", image: "/images/scenarios/payroll_processing_scene.png", label: "Payroll" },
+              { href: "/admin/compliance", image: "/images/scenarios/compliance_verification_interview.png", label: "Compliance" },
+              { href: "/crm", image: "/images/scenarios/coworkers_referral_handshake.png", label: "CRM" },
+            ].map((item) => (
+              <CarouselRailItem key={item.href} className="w-[140px] sm:w-[180px]">
+                <Link href={item.href} className="block rounded-lg overflow-hidden border border-cyan-500/30">
+                  <div className="relative h-20 sm:h-24">
+                    <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                    <div className="absolute bottom-2 left-2">
+                      <span className="text-xs font-bold text-white">{item.label}</span>
                     </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: Bento Grid */}
-          <div className="hidden sm:grid grid-cols-3 gap-4 auto-rows-[140px]">
-            {/* Wide tile - spans 2 cols */}
-            <Link href="/gps-clock-in" className="col-span-2 row-span-1 group relative rounded-xl overflow-hidden border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-lg">
-              <img src="/images/scenarios/multi-industry_gps_clock-in.png" alt="GPS" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/60 to-transparent" />
-              <div className="absolute inset-y-0 left-5 flex flex-col justify-center">
-                <span className="text-cyan-400 text-xs font-semibold uppercase">Location Verified</span>
-                <h3 className="text-2xl font-bold text-white mt-1">GPS Clock-In</h3>
-                <p className="text-slate-300 text-sm">Fraud-proof time tracking with geofencing</p>
-              </div>
-            </Link>
-
-            {/* Tall tile - spans 2 rows */}
-            <Link href="/payroll-processing" className="col-span-1 row-span-2 group relative rounded-xl overflow-hidden border border-emerald-500/40 hover:border-emerald-400 transition-all shadow-lg">
-              <img src="/images/scenarios/payroll_processing_scene.png" alt="Payroll" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
-                <span className="text-emerald-400 text-xs font-semibold uppercase">Automated</span>
-                <h3 className="text-xl font-bold text-white mt-1">Payroll Processing</h3>
-                <p className="text-slate-300 text-sm mt-1">Multi-state compliant payroll automation</p>
-              </div>
-            </Link>
-
-            {/* Small tiles */}
-            <Link href="/admin/compliance" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-amber-500/40 hover:border-amber-400 transition-all shadow-lg">
-              <img src="/images/scenarios/compliance_verification_interview.png" alt="Compliance" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-lg font-bold text-white">Compliance</h3>
-                <p className="text-amber-300 text-xs">I-9, E-Verify, certifications</p>
-              </div>
-            </Link>
-
-            <Link href="/crm" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-violet-500/40 hover:border-violet-400 transition-all shadow-lg">
-              <img src="/images/scenarios/coworkers_referral_handshake.png" alt="CRM" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-3 left-3">
-                <h3 className="text-lg font-bold text-white">CRM</h3>
-                <p className="text-violet-300 text-xs">Client relationships</p>
-              </div>
-            </Link>
-          </div>
+                  </div>
+                </Link>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
       </section>
 
-      {/* RECENTLY LAUNCHED - BENTO STYLE */}
-      <section className="bg-gradient-to-br from-violet-950/40 via-purple-900/30 to-violet-950/40 border-b border-violet-500/30 py-4 sm:py-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-600/10 via-transparent to-transparent pointer-events-none"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-          <SectionHeader 
-            eyebrow="Live"
-            title="Recently Launched"
-            align="center"
-            size="md"
-            className="mb-4 sm:mb-6"
-          />
-          
-          {/* Mobile Carousel */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/hallmark-seal", image: "/images/scenarios/security_verification_process.png", label: "Hallmarks" },
-                { href: "/pay-card", image: "/images/scenarios/diverse_workers_checking_wages.png", label: "Pay Card" },
-                { href: "/marketing-hub", image: "/images/scenarios/team_celebrating_bonuses.png", label: "Marketing" },
-                { href: "/crypto-wallet", image: "/images/scenarios/it_system_integration.png", label: "Crypto" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[65%] min-w-[65%]">
-                  <Link href={item.href} className="block rounded-xl overflow-hidden border border-green-500/50 shadow-lg">
-                    <div className="relative h-28">
-                      <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
-                      <span className="absolute top-2 right-2 text-[8px] bg-green-500 text-white px-2 py-0.5 rounded-full font-bold">LIVE</span>
-                      <div className="absolute bottom-2 left-3">
-                        <h3 className="font-bold text-white text-sm">{item.label}</h3>
-                      </div>
+      {/* RECENTLY LAUNCHED - Compact Carousel */}
+      <section className="bg-gradient-to-br from-violet-950/40 via-purple-900/30 to-violet-950/40 border-b border-violet-500/30 py-3 sm:py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] bg-green-500 text-white px-2 py-0.5 rounded font-bold">LIVE</span>
+              <h3 className="text-sm font-bold text-white">Recently Launched</h3>
+            </div>
+            <Link href="/roadmap" className="text-[10px] text-violet-400 hover:underline flex items-center gap-1" data-testid="link-view-roadmap">
+              Roadmap <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { href: "/hallmark-seal", image: "/images/scenarios/security_verification_process.png", label: "Hallmarks" },
+              { href: "/pay-card", image: "/images/scenarios/diverse_workers_checking_wages.png", label: "Pay Card" },
+              { href: "/marketing-hub", image: "/images/scenarios/team_celebrating_bonuses.png", label: "Marketing" },
+              { href: "/crypto-wallet", image: "/images/scenarios/it_system_integration.png", label: "Crypto" },
+            ].map((item) => (
+              <CarouselRailItem key={item.href} className="w-[140px] sm:w-[180px]">
+                <Link href={item.href} className="block rounded-lg overflow-hidden border border-green-500/40" data-testid={`card-${item.label.toLowerCase()}`}>
+                  <div className="relative h-20 sm:h-24">
+                    <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+                    <span className="absolute top-1.5 right-1.5 text-[7px] bg-green-500 text-white px-1.5 py-0.5 rounded font-bold">LIVE</span>
+                    <div className="absolute bottom-2 left-2">
+                      <span className="text-xs font-bold text-white">{item.label}</span>
                     </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
-          </div>
-
-          {/* Desktop: Equal height cards */}
-          <div className="hidden sm:grid grid-cols-3 gap-4">
-            <Link href="/hallmark-seal" className="group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg h-[160px]" data-testid="card-hallmarks">
-              <img src="/images/scenarios/security_verification_process.png" alt="Hallmarks" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/50 to-transparent" />
-              <span className="absolute top-3 right-3 text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
-              <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
-                <h3 className="text-xl font-bold text-white">Hallmark Seals</h3>
-                <p className="text-green-300 text-sm">Verified authenticity badges</p>
-              </div>
-            </Link>
-
-            <Link href="/pay-card" className="group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg h-[160px]" data-testid="card-pay-card">
-              <img src="/images/scenarios/diverse_workers_checking_wages.png" alt="Pay Card" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-              <span className="absolute top-3 right-3 text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
-              <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
-                <h3 className="text-xl font-bold text-white">Pay Card</h3>
-                <p className="text-green-300 text-sm">Instant worker payments</p>
-              </div>
-            </Link>
-
-            <Link href="/marketing-hub" className="group relative rounded-xl overflow-hidden border border-green-500/50 hover:border-green-400 shadow-lg h-[160px]" data-testid="card-marketing">
-              <img src="/images/scenarios/team_celebrating_bonuses.png" alt="Marketing" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-              <span className="absolute top-3 right-3 text-xs bg-green-500 text-white px-2 py-1 rounded-full font-bold">LIVE</span>
-              <div className="absolute inset-y-0 left-4 flex flex-col justify-center">
-                <h3 className="text-xl font-bold text-white">Marketing</h3>
-                <p className="text-green-300 text-sm">Recruitment campaigns</p>
-              </div>
-            </Link>
-          </div>
-          
-          <div className="text-center mt-4 sm:mt-6">
-            <Link href="/roadmap" className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 text-violet-200 font-semibold text-sm transition-all" data-testid="link-view-roadmap">
-              View Roadmap <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+                  </div>
+                </Link>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
       </section>
 
-      {/* ACCESS BOXES */}
-      <section className="bg-gradient-to-b from-background to-slate-900/30 py-3 sm:py-8">
+      {/* ACCESS BOXES - Compact */}
+      <section className="bg-gradient-to-b from-background to-slate-900/30 py-3 sm:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <SectionHeader 
-            title="Get Started"
-            align="center"
-            size="md"
-            className="mb-2 sm:mb-6"
-          />
-
-          {/* Mobile: Horizontal carousel with uniform cards */}
-          <div className="sm:hidden">
-            <CarouselRail showArrows={true} gap="sm">
-              {[
-                { href: "/admin", image: "/images/scenarios/professional_creating_invoices.png", label: "Owner", btn: "Login", color: "violet", testId: "button-owner-access" },
-                { href: "/worker", image: "/images/scenarios/coworkers_referral_handshake.png", label: "Client", btn: "Login", color: "blue", testId: "button-customer-access" },
-                { href: "/employee-hub", image: "/images/scenarios/diverse_workers_shift_prep.png", label: "Staff", btn: "Hub", color: "emerald", testId: "button-employee-access" },
-                { href: "/developer", image: "/images/scenarios/it_system_integration.png", label: "Admin", btn: "Panel", color: "cyan", testId: "button-admin-access" },
-              ].map((item) => (
-                <CarouselRailItem key={item.href} className="basis-[42%] min-w-[42%]">
-                  <Link href={item.href} className="block">
-                    <div className={`rounded-xl overflow-hidden border border-${item.color}-500/50 shadow-lg`}>
-                      <div className="relative h-20">
-                        <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent" />
-                      </div>
-                      <div className="p-2 text-center bg-slate-900/80">
-                        <h3 className={`text-xs font-bold text-${item.color}-300 whitespace-nowrap`}>{item.label}</h3>
-                        <button className={`w-full mt-1 bg-${item.color}-500/80 text-white text-[9px] py-1 rounded font-semibold`} data-testid={item.testId}>
-                          {item.btn}
-                        </button>
-                      </div>
-                    </div>
-                  </Link>
-                </CarouselRailItem>
-              ))}
-            </CarouselRail>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-bold text-white">Get Started</h3>
           </div>
-
-          {/* Desktop: Bento grid */}
-          <div className="hidden sm:grid grid-cols-4 gap-4">
-            <Link href="/admin" className="group relative rounded-xl overflow-hidden border border-violet-400/50 hover:border-violet-300 shadow-lg h-[180px]">
-              <img src="/images/scenarios/professional_creating_invoices.png" alt="Owner" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-violet-300">Owner</h3>
-                <Button className="w-full mt-2 bg-violet-500/80 hover:bg-violet-600 text-white text-xs h-8" data-testid="button-owner-access">
-                  Login
-                </Button>
-              </div>
-            </Link>
-
-            <Link href="/worker" className="group relative rounded-xl overflow-hidden border border-blue-500/50 hover:border-blue-400 shadow-lg h-[180px]">
-              <img src="/images/scenarios/coworkers_referral_handshake.png" alt="Client" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-blue-300">Client</h3>
-                <Button className="w-full mt-2 bg-blue-500/80 hover:bg-blue-600 text-white text-xs h-8" data-testid="button-customer-access">
-                  Login
-                </Button>
-              </div>
-            </Link>
-
-            <Link href="/employee-hub" className="group relative rounded-xl overflow-hidden border border-emerald-500/50 hover:border-emerald-400 shadow-lg h-[180px]" data-testid="card-employee-self-service">
-              <img src="/images/scenarios/diverse_workers_shift_prep.png" alt="Staff" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-emerald-300">Staff Hub</h3>
-                <Button className="w-full mt-2 bg-emerald-500/80 hover:bg-emerald-600 text-white text-xs h-8" data-testid="button-employee-access">
-                  Enter
-                </Button>
-              </div>
-            </Link>
-
-            <Link href="/developer" className="group relative rounded-xl overflow-hidden border border-cyan-500/50 hover:border-cyan-400 shadow-lg h-[180px]">
-              <img src="/images/scenarios/it_system_integration.png" alt="Admin" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 text-center">
-                <h3 className="text-lg font-bold text-cyan-300">Admin</h3>
-                <Button className="w-full mt-2 bg-cyan-500/80 hover:bg-cyan-600 text-white text-xs h-8" data-testid="button-admin-access">
-                  Panel
-                </Button>
-              </div>
-            </Link>
-          </div>
+          <CarouselRail showArrows={true} gap="sm">
+            {[
+              { href: "/admin", label: "Owner", color: "violet", testId: "button-owner-access" },
+              { href: "/worker", label: "Client", color: "blue", testId: "button-customer-access" },
+              { href: "/employee-hub", label: "Staff", color: "emerald", testId: "button-employee-access" },
+              { href: "/developer", label: "Admin", color: "cyan", testId: "button-admin-access" },
+            ].map((item) => (
+              <CarouselRailItem key={item.href} className="w-[90px] sm:w-[110px]">
+                <Link href={item.href} className={`block text-center px-3 py-2.5 rounded-lg bg-${item.color}-500/20 border border-${item.color}-500/40 hover:bg-${item.color}-500/30 transition-colors`} data-testid={item.testId}>
+                  <span className={`text-xs font-bold text-${item.color}-300`}>{item.label}</span>
+                </Link>
+              </CarouselRailItem>
+            ))}
+          </CarouselRail>
         </div>
       </section>
 
