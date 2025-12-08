@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, ExternalLink, Wallet, Coins, Globe, Loader2 } from "lucide-react";
+import { Search, X, ExternalLink, Wallet, Coins, Globe, Loader2, Sparkles } from "lucide-react";
 
 interface SearchResult {
-  type: 'url' | 'solana_address' | 'solana_token' | 'solana_wallet' | 'token_symbol' | 'search';
+  type: 'url' | 'solana_address' | 'solana_token' | 'solana_wallet' | 'token_symbol' | 'search' | 'web_search';
   query: string;
   result: {
     url?: string;
@@ -19,6 +19,8 @@ interface SearchResult {
     note?: string;
     suggestion?: string;
     examples?: string[];
+    answer?: string;
+    source?: string;
   };
 }
 
@@ -172,7 +174,7 @@ export function Web3SearchBar() {
             onChange={handleInputChange}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="Search Solana address, token, or URL..."
+            placeholder="Search anything, Solana, or enter URL..."
             className="w-full py-2.5 pl-10 pr-20 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none"
             data-testid="input-web3-search"
           />
@@ -213,7 +215,26 @@ export function Web3SearchBar() {
             className="absolute top-full left-0 right-0 mt-2 bg-slate-800/95 backdrop-blur-md rounded-xl border border-slate-700/50 shadow-xl shadow-black/30 overflow-hidden z-50"
             data-testid="dropdown-web3-results"
           >
-            {result.type === 'search' ? (
+            {result.type === 'web_search' ? (
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-white font-medium text-sm">AI Research</span>
+                      <span className="px-1.5 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded">
+                        {result.result.source}
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+                      {result.result.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : result.type === 'search' ? (
               <div className="p-4 text-center">
                 <p className="text-slate-400 text-sm">{result.result.suggestion}</p>
                 {result.result.examples && (

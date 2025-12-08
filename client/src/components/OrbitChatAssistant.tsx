@@ -174,8 +174,8 @@ export function OrbitChatAssistant() {
     // Cancel any ongoing speech
     synth.cancel();
     
-    // Remove emojis for cleaner speech
-    const cleanText = text.replace(/[\\u{1F600}-\\u{1F64F}]|[\\u{1F300}-\\u{1F5FF}]|[\\u{1F680}-\\u{1F6FF}]|[\\u{1F1E0}-\u{1F1FF}]|[\\u{2600}-\u{26FF}]|[\\u{2700}-\\u{27BF}]/gu, '').trim();
+    // Clean text for speech - just pass through, let browser handle emojis
+    const cleanText = text.trim();
     
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = 1.0;

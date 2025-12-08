@@ -7846,15 +7846,81 @@ export function registerBlockchainRoutes(app: Express) {
         });
       }
       
-      // Default: treat as general search term
-      return res.json({
-        type: 'search',
-        query,
-        result: {
-          suggestion: 'Enter a Solana address, token symbol, or URL to search',
-          examples: ['So11111111111111111111111111111111111111112', 'SOL', 'USDC', 'https://solana.com']
+      // Default: use OpenAI for general web research queries
+      try {
+        const openaiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+        
+        if (!openaiKey) {
+          return res.json({
+            type: 'search',
+            query,
+            result: {
+              suggestion: 'Enter a Solana address, token symbol, or URL to search',
+              examples: ['So11111111111111111111111111111111111111112', 'SOL', 'USDC', 'https://solana.com']
+            }
+          });
         }
-      });
+        
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openaiKey}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a helpful search assistant for ORBIT Staffing OS, a staffing agency platform. Provide concise, factual answers to questions about staffing, employment, compliance, labor laws, HR practices, payroll, and business topics. Keep responses under 150 words. If the query is too vague or unrelated, provide a brief helpful suggestion.`
+              },
+              {
+                role: 'user',
+                content: query
+              }
+            ],
+            max_tokens: 200,
+            temperature: 0.7
+          })
+        });
+        
+        const openaiData = await openaiResponse.json();
+        
+        // Handle API errors
+        if (!openaiResponse.ok || openaiData.error) {
+          console.error('[Web3 Search] OpenAI API error:', openaiData.error?.message || 'Unknown error');
+          return res.json({
+            type: 'search',
+            query,
+            result: {
+              suggestion: 'Web search is currently unavailable. Try a URL or Solana address.',
+              examples: ['https://solana.com', 'SOL', 'USDC', 'www.google.com']
+            }
+          });
+        }
+        
+        const answer = openaiData.choices?.[0]?.message?.content || 'No results found for your query.';
+        
+        return res.json({
+          type: 'web_search',
+          query,
+          result: {
+            answer,
+            source: 'AI Research Assistant'
+          }
+        });
+        
+      } catch (aiError) {
+        console.error('[Web3 Search] OpenAI error:', aiError);
+        return res.json({
+          type: 'search',
+          query,
+          result: {
+            suggestion: 'Search temporarily unavailable. Try a URL or Solana address.',
+            examples: ['https://solana.com', 'SOL', 'USDC']
+          }
+        });
+      }
       
     } catch (error) {
       console.error('[Web3 Search] Error:', error);
