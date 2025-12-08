@@ -346,7 +346,7 @@ export default function Pricing() {
     return (
       <OrbitCard
         key={plan.id}
-        className={`relative flex flex-col h-full ${
+        className={`relative flex flex-col h-full overflow-visible mt-4 ${
           plan.isPopular ? 'ring-2 ring-cyan-500/50 border-cyan-500/50' : ''
         }`}
         data-testid={`bundle-card-${plan.id}`}
@@ -552,10 +552,10 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto px-4 -mt-6">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
           <div className="flex justify-center overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-            <TabsList className="bg-slate-800 border border-slate-700 p-1 flex-shrink-0">
+            <TabsList className="bg-slate-800 border border-slate-700 p-1 flex-shrink-0 rounded-lg overflow-hidden">
               <TabsTrigger 
                 value="bundles" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 rounded-md px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-bundles"
               >
                 <Package className="w-4 h-4 mr-1 sm:mr-2" />
@@ -563,7 +563,7 @@ export default function Pricing() {
               </TabsTrigger>
               <TabsTrigger 
                 value="modular" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 rounded-md px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-modular"
               >
                 <Layers className="w-4 h-4 mr-1 sm:mr-2" />
@@ -571,7 +571,7 @@ export default function Pricing() {
               </TabsTrigger>
               <TabsTrigger 
                 value="tools" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 rounded-md px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-tools"
               >
                 <Zap className="w-4 h-4 mr-1 sm:mr-2" />
@@ -579,7 +579,7 @@ export default function Pricing() {
               </TabsTrigger>
               <TabsTrigger 
                 value="affiliate" 
-                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
+                className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 rounded-md px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base whitespace-nowrap"
                 data-testid="tab-affiliate"
               >
                 <Gift className="w-4 h-4 mr-1 sm:mr-2" />
@@ -900,9 +900,9 @@ export default function Pricing() {
                   </OrbitCard>
                 </BentoTile>
 
-                <BentoTile className="p-0 border-0 bg-transparent">
-                  <OrbitCard className="text-center h-full ring-2 ring-cyan-500/20 relative">
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-500 z-10">
+                <BentoTile className="p-0 border-0 bg-transparent overflow-visible">
+                  <OrbitCard className="text-center h-full ring-2 ring-cyan-500/20 relative overflow-visible mt-4">
+                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cyan-500 z-10">
                       Best Value
                     </Badge>
                     <OrbitCardContent className="pt-6">
@@ -980,9 +980,9 @@ export default function Pricing() {
                   </OrbitCard>
                 </CarouselRailItem>
 
-                <CarouselRailItem className="w-[280px]">
-                  <OrbitCard className="text-center h-full ring-2 ring-cyan-500/20 relative">
-                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan-500 z-10">
+                <CarouselRailItem className="w-[280px] overflow-visible mt-4">
+                  <OrbitCard className="text-center h-full ring-2 ring-cyan-500/20 relative overflow-visible">
+                    <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cyan-500 z-10">
                       Best Value
                     </Badge>
                     <OrbitCardContent className="pt-6">

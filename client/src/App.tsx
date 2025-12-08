@@ -236,6 +236,17 @@ function ConditionalHomeButton() {
   return <FloatingHomeButton />;
 }
 
+function ConditionalWeatherButton({ onOpenRadar }: { onOpenRadar: () => void }) {
+  const [location] = useLocation();
+  const hiddenPages = ['/pricing', '/products', '/studio'];
+  
+  if (hiddenPages.some(page => location.startsWith(page))) {
+    return null;
+  }
+  
+  return <FloatingWeatherButton onOpenRadar={onOpenRadar} />;
+}
+
 export default function App() {
   const [isRadarOpen, setIsRadarOpen] = useState(false);
   
@@ -250,7 +261,7 @@ export default function App() {
               <div className="sandbox-banner-spacer" />
               <Router />
               <ConditionalHomeButton />
-              <FloatingWeatherButton onOpenRadar={() => setIsRadarOpen(true)} />
+              <ConditionalWeatherButton onOpenRadar={() => setIsRadarOpen(true)} />
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
               <ConditionalOrbitAssistant />
               <Toaster />
