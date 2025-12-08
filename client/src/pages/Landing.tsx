@@ -836,7 +836,7 @@ export default function Landing() {
           <div className="flex items-center justify-between mb-4">
             <SectionHeader 
               title="Simple Pricing"
-              subtitle="No hidden fees. Cancel anytime."
+              subtitle="Bundles or à la carte. No hidden fees."
               align="left"
               size="sm"
               className="mb-0"
@@ -844,6 +844,15 @@ export default function Landing() {
             <Link href="/pricing" className="text-xs text-primary hover:underline flex items-center gap-1" data-testid="link-view-pricing">
               Compare Plans <ArrowRight className="w-3 h-3" />
             </Link>
+          </div>
+
+          {/* Pricing Mode Toggle */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-2 bg-slate-800/50 rounded-full p-1">
+              <span className="px-3 py-1.5 text-xs font-medium text-white bg-cyan-500/20 rounded-full">Bundles</span>
+              <Link href="/pricing?tab=tools" className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white transition-colors">À La Carte</Link>
+            </div>
+            <span className="text-[10px] text-slate-400 hidden sm:inline">Pick individual tools starting at $15/mo</span>
           </div>
 
           {/* Mobile: Carousel */}
@@ -904,6 +913,38 @@ export default function Landing() {
                 </Link>
               </div>
             ))}
+          </div>
+
+          {/* À La Carte Preview */}
+          <div className="mt-6 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="text-sm font-bold text-white">Or Build Your Own</h4>
+                <p className="text-[10px] text-slate-400">Pick only the tools you need</p>
+              </div>
+              <Link href="/pricing?tab=tools" className="text-[10px] text-cyan-400 hover:underline flex items-center gap-1">
+                See All Tools <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { name: "CRM", price: "$19", icon: "📊" },
+                { name: "Time & GPS", price: "$15", icon: "📍" },
+                { name: "Payroll", price: "$39", icon: "💵" },
+                { name: "Talent Pool", price: "$29", icon: "👥" },
+                { name: "Compliance", price: "$25", icon: "🛡️" },
+              ].map((tool) => (
+                <Link 
+                  key={tool.name}
+                  href="/pricing?tab=tools"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-700/50 hover:border-cyan-500/50 transition-colors"
+                >
+                  <span className="text-sm">{tool.icon}</span>
+                  <span className="text-xs text-white font-medium">{tool.name}</span>
+                  <span className="text-xs text-cyan-400">{tool.price}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
