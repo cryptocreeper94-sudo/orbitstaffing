@@ -60,7 +60,7 @@ const DARKWAVE_PRODUCTS = [
     name: 'Lot Ops Pro',
     tagline: 'Vehicle Lot Management',
     description: 'Inventory tracking and lot operations for dealerships',
-    url: 'https://lotops.pro',
+    url: 'https://lotopspro.io',
     internalPath: null,
     icon: Car,
     color: 'from-emerald-600 to-emerald-800',

@@ -636,7 +636,7 @@ const TODO_TASKS = [
       '✅ COMPLETED: ORBIT Staffing OS & Brew & Board Coffee registered',
       '',
       '📋 PRODUCTS TO REGISTER:',
-      '• Lot Ops Pro (lotops.pro) - Vehicle lot management',
+      '• Lot Ops Pro (lotopspro.io) - Vehicle lot management',
       '• GarageBot (garagebot.io) - Auto shop assistant',
       '• DarkWave Pulse - Analytics dashboard',
       '• Orby (getorby.io) - AI mascot platform',

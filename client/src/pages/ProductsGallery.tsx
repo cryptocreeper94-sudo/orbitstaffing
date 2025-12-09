@@ -78,7 +78,7 @@ export default function ProductsGallery() {
       glowColor: 'amber',
       slides: slideContent['Lot Ops Pro'],
       slideshowData: slidesData,
-      url: 'https://lotopspro.com',
+      url: 'https://lotopspro.io',
       emblem: lotOpsEmblem,
       hallmark: lotOpsHallmark,
     },

@@ -105,7 +105,7 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 | ORBIT Staffing OS | ✓ (Orby mascot) | ✓ (auto QR) | orbitstaffing.io | ✅ Hub Live |
 | Orby | ✓ | ✓ | getorby.io | Pending |
 | DarkWave Pulse | ✓ | ✓ | - | Pending |
-| Lot Ops Pro | ✓ | ✓ | lotops.pro | Pending |
+| Lot Ops Pro | ✓ | ✓ | lotopspro.io | Pending |
 | Brew & Board Coffee | ✓ | ✓ | brewandboard.coffee | ✅ Connected |
 | GarageBot | ✓ | ✓ | garagebot.io | ✅ Connected |
 
