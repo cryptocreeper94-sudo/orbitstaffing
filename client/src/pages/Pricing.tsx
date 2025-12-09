@@ -323,14 +323,15 @@ export default function Pricing() {
       });
       if (!res.ok) throw new Error('Checkout failed');
       const result = await res.json();
-      return { ...result, method: data.method };
-    },
-    onSuccess: (data) => {
-      if (data.method === 'stripe' && data.url) {
-        window.location.href = data.url;
-      } else if (data.method === 'coinbase' && data.charge) {
-        window.location.href = data.charge.hosted_url;
+      
+      // Redirect immediately after getting the URL
+      if (data.method === 'stripe' && result.url) {
+        window.location.href = result.url;
+      } else if (data.method === 'coinbase' && result.charge) {
+        window.location.href = result.charge.hosted_url;
       }
+      
+      return { ...result, method: data.method };
     },
   });
 
