@@ -1054,67 +1054,28 @@ export default function Pricing() {
         </Tabs>
 
         <div className="mt-16">
-          <div className="hidden sm:block">
-            <BentoGrid cols={3} gap="md">
-              <BentoTile className="p-0 border-0 bg-transparent">
-                <OrbitCard className="text-center h-full">
-                  <OrbitCardContent className="py-6">
-                    <CreditCard className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-                    <h3 className="font-bold text-white mb-2">Secure Payments</h3>
-                    <p className="text-sm text-slate-400">Credit card, ACH, and crypto accepted. PCI-DSS compliant.</p>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </BentoTile>
-              <BentoTile className="p-0 border-0 bg-transparent">
-                <OrbitCard className="text-center h-full">
-                  <OrbitCardContent className="py-6">
-                    <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                    <h3 className="font-bold text-white mb-2">14-Day Free Trial</h3>
-                    <p className="text-sm text-slate-400">Try any plan free. No credit card required to start.</p>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </BentoTile>
-              <BentoTile className="p-0 border-0 bg-transparent">
-                <OrbitCard className="text-center h-full">
-                  <OrbitCardContent className="py-6">
-                    <HelpCircle className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-                    <h3 className="font-bold text-white mb-2">Expert Support</h3>
-                    <p className="text-sm text-slate-400">Live chat, phone, and email support from real humans.</p>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </BentoTile>
-            </BentoGrid>
-          </div>
-          <div className="sm:hidden">
-            <CarouselRail showArrows={false} gap="md" itemWidth="sm">
-              <CarouselRailItem className="w-[220px]">
-                <OrbitCard className="text-center h-full">
-                  <OrbitCardContent className="py-6">
-                    <CreditCard className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-                    <h3 className="font-bold text-white mb-2">Secure Payments</h3>
-                    <p className="text-sm text-slate-400">Credit card, ACH, and crypto accepted. PCI-DSS compliant.</p>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </CarouselRailItem>
-              <CarouselRailItem className="w-[220px]">
-                <OrbitCard className="text-center h-full">
-                  <OrbitCardContent className="py-6">
-                    <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                    <h3 className="font-bold text-white mb-2">14-Day Free Trial</h3>
-                    <p className="text-sm text-slate-400">Try any plan free. No credit card required to start.</p>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </CarouselRailItem>
-              <CarouselRailItem className="w-[220px]">
-                <OrbitCard className="text-center h-full">
-                  <OrbitCardContent className="py-6">
-                    <HelpCircle className="w-10 h-10 text-purple-400 mx-auto mb-3" />
-                    <h3 className="font-bold text-white mb-2">Expert Support</h3>
-                    <p className="text-sm text-slate-400">Live chat, phone, and email support from real humans.</p>
-                  </OrbitCardContent>
-                </OrbitCard>
-              </CarouselRailItem>
-            </CarouselRail>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <OrbitCard className="text-center h-full">
+              <OrbitCardContent className="py-6">
+                <CreditCard className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+                <h3 className="font-bold text-white mb-2">Secure Payments</h3>
+                <p className="text-sm text-slate-400">Credit card, ACH, and crypto accepted. PCI-DSS compliant.</p>
+              </OrbitCardContent>
+            </OrbitCard>
+            <OrbitCard className="text-center h-full">
+              <OrbitCardContent className="py-6">
+                <Rocket className="w-10 h-10 text-green-400 mx-auto mb-3" />
+                <h3 className="font-bold text-white mb-2">14-Day Free Trial</h3>
+                <p className="text-sm text-slate-400">Try any plan free. No credit card required to start.</p>
+              </OrbitCardContent>
+            </OrbitCard>
+            <OrbitCard className="text-center h-full">
+              <OrbitCardContent className="py-6">
+                <HelpCircle className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+                <h3 className="font-bold text-white mb-2">Expert Support</h3>
+                <p className="text-sm text-slate-400">Live chat, phone, and email support from real humans.</p>
+              </OrbitCardContent>
+            </OrbitCard>
           </div>
         </div>
 
