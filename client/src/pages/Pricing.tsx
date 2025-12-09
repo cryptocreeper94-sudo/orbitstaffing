@@ -7,7 +7,7 @@ import {
   Users, Calendar, DollarSign, MapPin, Shield, BarChart3,
   Briefcase, Clock, FileCheck, Zap, Building2, Rocket,
   Gift, Share2, Crown, HelpCircle, ChevronRight, Package,
-  Plus, Minus, Layers
+  Plus, Minus, Layers, Loader2
 } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
@@ -409,8 +409,12 @@ export default function Pricing() {
                 disabled={checkoutMutation.isPending}
                 data-testid={`button-checkout-${plan.id}`}
               >
-                <CreditCard className="w-4 h-4 mr-2" />
-                {checkoutMutation.isPending && selectedPlan === priceId ? 'Processing...' : 'Subscribe with Card'}
+                {checkoutMutation.isPending && selectedPlan === priceId ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <CreditCard className="w-4 h-4 mr-2" />
+                )}
+                {checkoutMutation.isPending && selectedPlan === priceId ? 'Redirecting...' : 'Subscribe with Card'}
               </Button>
               <Button
                 onClick={() => handleCheckout(priceId, 'bundle', 'coinbase')}
@@ -495,8 +499,12 @@ export default function Pricing() {
                 disabled={checkoutMutation.isPending}
                 data-testid={`button-subscribe-${module.id}`}
               >
-                <CreditCard className="w-4 h-4 mr-2" />
-                {checkoutMutation.isPending && selectedPlan === priceId ? 'Processing...' : 'Add Module'}
+                {checkoutMutation.isPending && selectedPlan === priceId ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <CreditCard className="w-4 h-4 mr-2" />
+                )}
+                {checkoutMutation.isPending && selectedPlan === priceId ? 'Redirecting...' : 'Add Module'}
               </Button>
             ) : (
               <Button
