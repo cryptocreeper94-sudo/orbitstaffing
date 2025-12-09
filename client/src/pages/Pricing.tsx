@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MainHeader } from '@/components/MainHeader';
+import { MainFooter } from '@/components/MainFooter';
 import { 
   Check, CreditCard, Bitcoin, ArrowLeft, TrendingDown, Star,
   Users, Calendar, DollarSign, MapPin, Shield, BarChart3,
@@ -532,7 +534,9 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white pb-12">
+    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+      <MainHeader />
+      <div className="flex-1 pb-12">
       <div className="bg-gradient-to-b from-slate-800 to-slate-900 pt-6 pb-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6">
@@ -1090,12 +1094,9 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="mt-12 text-center text-slate-500">
-          <p className="text-sm">
-            Powered by DarkWave Studios, LLC &copy; 2025
-          </p>
         </div>
       </div>
+      <MainFooter />
     </div>
   );
 }

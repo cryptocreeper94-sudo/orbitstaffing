@@ -3,7 +3,8 @@ import { ChevronLeft, ChevronRight, X, ExternalLink, Sparkles, Play, Menu, Setti
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProductSlideshow } from '@/components/ProductSlideshow';
 import { HomeSlideshow } from '@/components/HomeSlideshow';
-import { DarkwaveFooter } from '@/components/DarkwaveFooter';
+import { MainHeader } from '@/components/MainHeader';
+import { MainFooter } from '@/components/MainFooter';
 import { slideContent } from '@/data/slideContent';
 import { slidesData, orbitSlides, brewAndBoardSlides, orbySlides } from '@/data/slidesData';
 import { QRCodeSVG } from 'qrcode.react';
@@ -445,7 +446,7 @@ export default function ProductsGallery() {
         ))}
       </div>
 
-      <DarkwaveFooter minimal={true} />
+      <MainFooter />
 
       {selectedProduct && (
         <ProductSlideshow

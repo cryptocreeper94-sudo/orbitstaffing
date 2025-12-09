@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MainHeader } from "@/components/MainHeader";
+import { MainFooter } from "@/components/MainFooter";
 import { 
   ArrowRight, 
   Zap, 
@@ -851,18 +853,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-800/50 py-3">
-        <div className="max-w-7xl mx-auto px-4 flex items-baseline justify-center gap-2 text-xs text-slate-500">
-          <span>DarkWave Studios, LLC</span>
-          <span>|</span>
-          <span>© 2025</span>
-          <span>|</span>
-          <Link href="/changelog" className="text-cyan-400 hover:text-cyan-300 transition-colors" data-testid="link-version-footer">
-            v2.7.0
-          </Link>
-        </div>
-      </footer>
+      <MainFooter />
 
       </div>
     </div>
