@@ -849,21 +849,23 @@ export default function Pricing() {
                   </OrbitCardContent>
                 </OrbitCard>
 
-                <OrbitCard variant="action" className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30 mt-6">
-                  <h4 className="font-semibold text-white mb-2">Compare to Pre-built Plans</h4>
-                  <p className="text-sm text-slate-400 mb-3">
-                    Pre-built bundles may save you money if you need multiple modules.
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => handleTabChange('bundles')}
-                    className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-                    data-testid="button-compare-plans"
-                  >
-                    View Pre-built Plans
-                    <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </OrbitCard>
+                <div className="mt-4 p-3 rounded-lg border border-slate-700/50 bg-slate-800/30">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-xs text-slate-400">
+                      Pre-built bundles may save you money.
+                    </p>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleTabChange('bundles')}
+                      className="text-cyan-400 hover:bg-cyan-500/10 text-xs px-2 h-7 shrink-0"
+                      data-testid="button-compare-plans"
+                    >
+                      Compare
+                      <ChevronRight className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>
