@@ -229,9 +229,9 @@ function ConditionalOrbitAssistant() {
 
 function ConditionalHomeButton() {
   const [location] = useLocation();
-  const darkwavePages = ['/products', '/studio'];
+  const hiddenPages = ['/products', '/studio', '/pricing'];
   
-  if (darkwavePages.some(page => location.startsWith(page))) {
+  if (hiddenPages.some(page => location.startsWith(page))) {
     return null;
   }
   
