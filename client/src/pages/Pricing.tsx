@@ -315,19 +315,20 @@ export default function Pricing() {
   };
 
   const checkoutMutation = useMutation({
-    mutationFn: async (data: { priceId: string; productType: string }) => {
+    mutationFn: async (data: { priceId: string; productType: string; method: 'stripe' | 'coinbase' }) => {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, paymentMethod }),
+        body: JSON.stringify({ priceId: data.priceId, productType: data.productType, paymentMethod: data.method }),
       });
       if (!res.ok) throw new Error('Checkout failed');
-      return res.json();
+      const result = await res.json();
+      return { ...result, method: data.method };
     },
     onSuccess: (data) => {
-      if (paymentMethod === 'stripe' && data.url) {
+      if (data.method === 'stripe' && data.url) {
         window.location.href = data.url;
-      } else if (paymentMethod === 'coinbase' && data.charge) {
+      } else if (data.method === 'coinbase' && data.charge) {
         window.location.href = data.charge.hosted_url;
       }
     },
@@ -336,7 +337,7 @@ export default function Pricing() {
   const handleCheckout = (priceId: string, productType: string, method: 'stripe' | 'coinbase') => {
     setPaymentMethod(method);
     setSelectedPlan(priceId);
-    checkoutMutation.mutate({ priceId, productType });
+    checkoutMutation.mutate({ priceId, productType, method });
   };
 
   const renderPlanCard = (plan: SubscriptionPlan) => {
