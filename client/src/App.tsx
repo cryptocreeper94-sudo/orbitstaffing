@@ -80,6 +80,14 @@ import Changelog from "@/pages/Changelog";
 import EcosystemHub from "@/pages/EcosystemHub";
 import DarkWaveHQ from "@/pages/DarkWaveHQ";
 import HelpCenterPage from "@/pages/HelpCenter";
+import AIAssistant from "@/pages/AIAssistant";
+import DigitalHallmark from "@/pages/DigitalHallmark";
+import EmployeeApp from "@/pages/EmployeeApp";
+import EmployeePreApplication from "@/pages/EmployeePreApplication";
+import FeatureRequests from "@/pages/FeatureRequests";
+import IncidentReporting from "@/pages/IncidentReporting";
+import Sales from "@/pages/Sales";
+import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
@@ -213,6 +221,43 @@ function Router() {
       <Route path="/ecosystem-hub" component={EcosystemHub} />
       <Route path="/developer-hq" component={DarkWaveHQ} />
       <Route path="/studio/developer" component={DarkWaveHQ} />
+      
+      {/* Missing routes - fixed 404s */}
+      <Route path="/ai-assistant" component={AIAssistant} />
+      <Route path="/digital-hallmark" component={DigitalHallmark} />
+      <Route path="/employee-app" component={EmployeeApp} />
+      <Route path="/employee-pre-app" component={EmployeePreApplication} />
+      <Route path="/pre-apply" component={EmployeePreApplication} />
+      <Route path="/feature-requests" component={FeatureRequests} />
+      <Route path="/incident-reporting" component={IncidentReporting} />
+      <Route path="/sales" component={Sales} />
+      <Route path="/workers-comp-admin" component={WorkersCompAdmin} />
+      <Route path="/worker-shift-offers" component={WorkerShiftOffers} />
+      
+      {/* Route aliases/redirects for typos */}
+      <Route path="/admin-panel" component={AdminPanel} />
+      <Route path="/developer-panel" component={DeveloperPanel} />
+      <Route path="/gps-clockin" component={GPSClockIn} />
+      <Route path="/job-board" component={JobBoard} />
+      <Route path="/compliance" component={ComplianceDashboard} />
+      <Route path="/compliance-dashboard" component={ComplianceDashboard} />
+      <Route path="/new-placement" component={AdminWorkerMatchingPanel} />
+      <Route path="/timesheet-approval" component={TimesheetApproval} />
+      <Route path="/shift-scheduling" component={WorkerShiftOffers} />
+      <Route path="/invoicing" component={AdminPayrollDashboard} />
+      <Route path="/collections-dashboard" component={AdminPayrollDashboard} />
+      <Route path="/background-checks" component={ComplianceDashboard} />
+      <Route path="/drug-test-scheduling" component={ComplianceDashboard} />
+      <Route path="/i9-verification" component={ComplianceDashboard} />
+      <Route path="/analytics" component={OwnerHub} />
+      <Route path="/workforce-forecasting" component={OwnerHub} />
+      <Route path="/worker-performance" component={OwnerHub} />
+      <Route path="/financial-reports" component={AdminPayrollDashboard} />
+      <Route path="/admin-sms-dashboard" component={AdminSMSDashboard} />
+      <Route path="/client-portal" component={EmployerPortal} />
+      <Route path="/csa-signing" component={CSASigningPage} />
+      <Route path="/work-orders" component={ClientRequestDashboard} />
+      
       <Route component={NotFound} />
     </Switch>
   );
