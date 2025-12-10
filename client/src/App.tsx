@@ -53,6 +53,7 @@ import EmployerLogin from "@/pages/EmployerLogin";
 import EmployerRegister from "@/pages/EmployerRegister";
 import TalentPool from "@/pages/TalentPool";
 import TalentExchangeLanding from "@/pages/TalentExchangeLanding";
+import Dashboard from "@/pages/Dashboard";
 import AdminTalentExchange from "@/pages/AdminTalentExchange";
 import EmployeeHub from "@/pages/EmployeeHub";
 import TaxDocuments from "@/pages/TaxDocuments";
@@ -122,6 +123,7 @@ function Router() {
       <Route path="/dev-landing" component={DeveloperLanding} />
       <Route path="/developer" component={DeveloperPanel} />
       <Route path="/admin" component={AdminPanel} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/worker" component={WorkerPortal} />
       <Route path="/home" component={Landing} />
       <Route path="/pricing" component={Pricing} />

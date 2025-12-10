@@ -5898,8 +5898,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let whereConditions = [`(w.status = 'approved' OR w.status = 'active')`];
       
-      if (city) whereConditions.push(`LOWER(w.city) = LOWER('${city}')`);
-      if (state) whereConditions.push(`w.state = '${state}'`);
       if (available === 'true') whereConditions.push(`w.availability_status = 'available'`);
       if (search) {
         whereConditions.push(`(
@@ -5912,8 +5910,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const result = await db.execute(sql`
         SELECT 
-          w.id, w.full_name, w.city, w.state, w.skills, w.availability_status,
-          w.years_experience, w.preferred_shift,
+          w.id, w.full_name, w.skills, w.availability_status,
+          w.phone, w.email, w.profile_photo_url,
           ps.overall_score, ps.customer_feedback_score, ps.reliability_score,
           ps.total_assignments_completed, ps.average_customer_rating,
           ps.badges, ps.profile_highlights, ps.on_time_arrival_rate
@@ -5949,9 +5947,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const result = await db.execute(sql`
         SELECT 
-          w.id, w.full_name, w.city, w.state, w.skills, w.availability_status,
-          w.years_experience, w.preferred_shift, w.days_available,
-          w.i9_verified, w.background_check_status, w.onboarding_completed,
+          w.id, w.full_name, w.skills, w.availability_status,
+          w.phone, w.email, w.profile_photo_url,
+          w.i9_verified, w.background_check_status, w.onboarding_status,
           ps.overall_score, ps.customer_feedback_score, ps.reliability_score,
           ps.availability_score, ps.productivity_score, ps.loyalty_score,
           ps.total_assignments_completed, ps.total_hours_worked, 
@@ -5961,7 +5959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ps.current_streak, ps.longest_streak, ps.tenure_months
         FROM workers w
         LEFT JOIN worker_performance_scores ps ON w.id = ps.worker_id
-        WHERE w.id = ${workerId} AND w.status = 'approved'
+        WHERE w.id = ${workerId} AND (w.status = 'approved' OR w.status = 'active')
       `);
       
       if (result.rows.length === 0) {
