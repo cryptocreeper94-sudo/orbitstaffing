@@ -78,10 +78,8 @@ export default function AdminPanel() {
       setRole(session.role as AdminRole);
       setAdminName(session.name || 'Admin');
       
-      const hasSeenAutomationUpdate = localStorage.getItem('sidonieV1AutomationUpdate') === 'seen';
-      if (session.name === 'Sidonie' && !hasSeenAutomationUpdate) {
-        setShowWelcomeMessage(true);
-      }
+      // Sid (partner) skips welcome modal - goes straight to dashboard
+      // She understands staffing and doesn't need update checklists
       
       return;
     }
@@ -97,11 +95,9 @@ export default function AdminPanel() {
       setRole(savedRole);
       setAdminName(savedName || 'Admin');
       
+      // Sid (partner) skips welcome modal - clean dashboard experience
       if (savedName === 'Sidonie') {
-        if (hasFirstLogin || !hasSeenAutomationUpdate) {
-          setShowWelcomeMessage(true);
-          localStorage.removeItem('sidonieFirstLogin');
-        }
+        localStorage.removeItem('sidonieFirstLogin');
       }
     }
   }, []);
