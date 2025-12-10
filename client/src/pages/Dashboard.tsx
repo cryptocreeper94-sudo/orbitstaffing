@@ -1,7 +1,8 @@
 import { Shell } from "@/components/layout/Shell";
 import { Button } from "@/components/ui/button";
 import { useLocation } from 'wouter';
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { 
@@ -41,29 +42,15 @@ import {
   Wallet,
   CreditCard,
   Globe,
-  Lock
+  Lock,
+  HelpCircle,
+  Plus,
+  ArrowRight,
+  Loader2
 } from "lucide-react";
-import { 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
-
-const revenueData = [
-  { name: 'Mon', revenue: 4000 },
-  { name: 'Tue', revenue: 3000 },
-  { name: 'Wed', revenue: 9000 },
-  { name: 'Thu', revenue: 2780 },
-  { name: 'Fri', revenue: 1890 },
-  { name: 'Sat', revenue: 2390 },
-  { name: 'Sun', revenue: 3490 },
-];
+import { motion, AnimatePresence } from "framer-motion";
+import { useTutorial, PageTutorialContent } from "@/components/PageTutorial";
 
 interface CategoryItem {
   label: string;
@@ -115,7 +102,7 @@ const categories: { id: string; title: string; icon: React.ReactNode; color: str
     id: "clients",
     title: "Client Management",
     icon: <Building2 className="w-5 h-5" />,
-    color: "amber",
+    color: "cyan",
     items: [
       { label: "CRM Dashboard", path: "/crm", icon: <BarChart3 className="w-4 h-4" />, description: "Sales pipeline" },
       { label: "Client Portal", path: "/client-portal", icon: <Globe className="w-4 h-4" />, description: "Client access" },
@@ -127,7 +114,7 @@ const categories: { id: string; title: string; icon: React.ReactNode; color: str
     id: "analytics",
     title: "Reports & Analytics",
     icon: <PieChart className="w-5 h-5" />,
-    color: "rose",
+    color: "violet",
     items: [
       { label: "Analytics Dashboard", path: "/analytics", icon: <BarChart3 className="w-4 h-4" />, description: "Insights" },
       { label: "Workforce Forecast", path: "/workforce-forecasting", icon: <TrendingUp className="w-4 h-4" />, description: "AI predictions" },
@@ -159,46 +146,220 @@ const colorMap: Record<string, { bg: string; border: string; text: string; glow:
     glow: "shadow-[0_0_20px_rgba(139,92,246,0.15)]",
     hover: "hover:border-violet-400/50 hover:shadow-[0_0_30px_rgba(139,92,246,0.25)]"
   },
-  amber: { 
-    bg: "from-amber-500/10 to-amber-600/5", 
-    border: "border-amber-500/30", 
-    text: "text-amber-400",
-    glow: "shadow-[0_0_20px_rgba(245,158,11,0.15)]",
-    hover: "hover:border-amber-400/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.25)]"
-  },
-  rose: { 
-    bg: "from-rose-500/10 to-rose-600/5", 
-    border: "border-rose-500/30", 
-    text: "text-rose-400",
-    glow: "shadow-[0_0_20px_rgba(244,63,94,0.15)]",
-    hover: "hover:border-rose-400/50 hover:shadow-[0_0_30px_rgba(244,63,94,0.25)]"
-  },
 };
+
+const dashboardTutorialContent: PageTutorialContent = {
+  pageTitle: "Command Center",
+  pageIcon: <Sparkles className="w-6 h-6" />,
+  introduction: "Welcome to your ORBIT Command Center! This is your home base for managing your entire staffing operation. Let me show you around.",
+  slides: [
+    {
+      title: "Quick Stats Overview",
+      description: "The top cards show your key metrics at a glance - workers in your talent pool, active clients, open job orders, and overall business health. These update in real-time as you add data.",
+      icon: <BarChart3 className="w-6 h-6" />,
+      tips: [
+        "Empty stats? Click 'Get Started' to add your first workers or clients",
+        "Stats turn green when you have active, healthy data"
+      ]
+    },
+    {
+      title: "Core Operations",
+      description: "This section handles day-to-day staffing tasks - managing your talent pool, processing work orders, scheduling shifts, and approving timesheets.",
+      icon: <Zap className="w-6 h-6" />,
+      tips: [
+        "Start by adding workers to your Talent Pool",
+        "Work Orders come from client requests for workers"
+      ],
+      connections: ["Talent Pool", "Workers", "Scheduling"]
+    },
+    {
+      title: "Payroll & Billing",
+      description: "Process payroll, generate invoices for clients, manage the ORBIT Pay Card program, and track outstanding payments.",
+      icon: <DollarSign className="w-6 h-6" />,
+      tips: [
+        "Payroll runs automatically based on approved timesheets",
+        "Invoicing pulls from completed work orders"
+      ],
+      connections: ["Payroll", "Invoicing"]
+    },
+    {
+      title: "Compliance & Safety",
+      description: "Stay compliant with background checks, drug testing, I-9 verification, and workers compensation management.",
+      icon: <Shield className="w-6 h-6" />,
+      tips: [
+        "Compliance alerts appear when workers need renewals",
+        "All documents are securely stored and tracked"
+      ],
+      connections: ["Compliance"]
+    },
+    {
+      title: "Need Help?",
+      description: "Click the floating help button anytime to replay this guide or get context-specific help on any page.",
+      icon: <HelpCircle className="w-6 h-6" />,
+      tips: [
+        "Each page has its own tutorial",
+        "Orby the AI assistant can answer questions too"
+      ]
+    }
+  ]
+};
+
+function EmptyStatCard({ 
+  icon, 
+  label, 
+  actionLabel, 
+  actionPath 
+}: { 
+  icon: React.ReactNode; 
+  label: string; 
+  actionLabel: string; 
+  actionPath: string;
+}) {
+  const [, setLocation] = useLocation();
+  
+  return (
+    <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 border border-dashed border-slate-600/50 rounded-xl p-4 flex flex-col items-center justify-center text-center min-h-[120px]">
+      <div className="p-2 rounded-lg bg-slate-700/30 text-slate-400 mb-2">
+        {icon}
+      </div>
+      <p className="text-xs text-slate-500 mb-2">{label}</p>
+      <Button 
+        size="sm" 
+        variant="ghost" 
+        className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-xs gap-1"
+        onClick={() => setLocation(actionPath)}
+        data-testid={`button-add-${label.toLowerCase().replace(/\s+/g, '-')}`}
+      >
+        <Plus className="w-3 h-3" />
+        {actionLabel}
+      </Button>
+    </div>
+  );
+}
+
+function StatCard({ 
+  icon, 
+  label, 
+  value, 
+  actionPath,
+  isLoading
+}: { 
+  icon: React.ReactNode; 
+  label: string; 
+  value: number;
+  actionPath: string;
+  isLoading?: boolean;
+}) {
+  const [, setLocation] = useLocation();
+  
+  if (isLoading) {
+    return (
+      <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 rounded-xl p-4 flex flex-col min-h-[120px]">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400">
+            {icon}
+          </div>
+        </div>
+        <Loader2 className="w-5 h-5 text-slate-500 animate-spin" />
+        <p className="text-xs text-slate-400 mt-2">{label}</p>
+      </div>
+    );
+  }
+  
+  if (value === 0) {
+    return (
+      <EmptyStatCard 
+        icon={icon} 
+        label={`No ${label.toLowerCase()} yet`}
+        actionLabel="Get Started"
+        actionPath={actionPath}
+      />
+    );
+  }
+  
+  return (
+    <motion.div 
+      className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 rounded-xl p-4 flex flex-col min-h-[120px] cursor-pointer hover:border-cyan-500/50 transition-all group"
+      onClick={() => setLocation(actionPath)}
+      whileHover={{ scale: 1.02 }}
+      data-testid={`stat-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div className="p-2 rounded-lg bg-cyan-500/20 text-cyan-400">
+          {icon}
+        </div>
+        <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 transition-colors" />
+      </div>
+      <p className="text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors">
+        {value.toLocaleString()}
+      </p>
+      <p className="text-xs text-slate-400 mt-1">{label}</p>
+    </motion.div>
+  );
+}
+
+function FloatingTutorialButton() {
+  const { openTutorial, hasSeenTutorial } = useTutorial();
+  const [pulse, setPulse] = useState(!hasSeenTutorial('dashboard'));
+  
+  useEffect(() => {
+    if (!hasSeenTutorial('dashboard')) {
+      const timer = setTimeout(() => {
+        openTutorial(dashboardTutorialContent);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+  
+  return (
+    <motion.button
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ delay: 0.5, type: "spring" }}
+      onClick={() => openTutorial(dashboardTutorialContent)}
+      className={cn(
+        "fixed bottom-24 right-6 z-40 p-3 rounded-full",
+        "bg-gradient-to-br from-cyan-500 to-violet-600",
+        "text-white shadow-lg shadow-cyan-500/30",
+        "hover:shadow-cyan-500/50 hover:scale-110 transition-all",
+        pulse && "animate-pulse"
+      )}
+      data-testid="button-tutorial-help"
+    >
+      <HelpCircle className="w-5 h-5" />
+    </motion.button>
+  );
+}
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
 
-  const stats = [
-    { label: "Active Workers", value: "1,284", icon: <Users className="w-5 h-5" />, trend: "+12%", positive: true },
-    { label: "Weekly Revenue", value: "$48,290", icon: <DollarSign className="w-5 h-5" />, trend: "+8.2%", positive: true },
-    { label: "Open Orders", value: "42", icon: <Briefcase className="w-5 h-5" />, trend: "-3", positive: false },
-    { label: "Fill Rate", value: "94.2%", icon: <TrendingUp className="w-5 h-5" />, trend: "+1.1%", positive: true },
-  ];
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['/api/admin/business-stats'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/business-stats');
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      return res.json();
+    },
+    refetchInterval: 30000,
+  });
+
+  const hasAnyData = stats && (stats.workers > 0 || stats.clients > 0 || stats.activeJobs > 0);
 
   return (
     <Shell>
       <div className="space-y-6">
-        {/* Header - Clean and minimal */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-cyan-400" />
               Command Center
             </h1>
-            <p className="text-sm text-slate-400 mt-1">All systems operational</p>
+            <p className="text-sm text-slate-400 mt-1">
+              {hasAnyData ? "Your staffing operation at a glance" : "Let's get you set up!"}
+            </p>
           </div>
           
-          {/* More Actions Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
@@ -213,13 +374,17 @@ export default function Dashboard() {
             <DropdownMenuContent align="end" className="w-56 bg-slate-900 border-slate-700">
               <DropdownMenuLabel className="text-slate-400">Quick Actions</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-slate-700" />
-              <DropdownMenuItem onClick={() => setLocation('/incident-reporting')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
-                <AlertTriangle className="w-4 h-4 mr-2 text-red-400" />
-                Report Incident
+              <DropdownMenuItem onClick={() => setLocation('/talent-pool')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                <Users className="w-4 h-4 mr-2 text-cyan-400" />
+                Add Workers
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLocation('/new-placement')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
-                <UserCheck className="w-4 h-4 mr-2 text-cyan-400" />
-                New Placement
+              <DropdownMenuItem onClick={() => setLocation('/crm')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                <Building2 className="w-4 h-4 mr-2 text-emerald-400" />
+                Add Clients
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setLocation('/work-orders')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
+                <ClipboardList className="w-4 h-4 mr-2 text-violet-400" />
+                Create Work Order
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-slate-700" />
               <DropdownMenuLabel className="text-slate-400">Admin</DropdownMenuLabel>
@@ -235,134 +400,72 @@ export default function Dashboard() {
           </DropdownMenu>
         </div>
 
-        {/* Stats Row - Bento Grid with 3D effect */}
-        <BentoGrid cols={4} gap="md" className="hidden sm:grid">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <BentoTile className="group">
-                <div className="p-4 h-full flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={cn(
-                      "p-2 rounded-lg bg-gradient-to-br",
-                      stat.positive ? "from-cyan-500/20 to-cyan-600/10" : "from-red-500/20 to-red-600/10"
-                    )}>
-                      <span className={stat.positive ? "text-cyan-400" : "text-red-400"}>{stat.icon}</span>
-                    </div>
-                    <span className={cn(
-                      "text-xs font-medium px-2 py-1 rounded-full",
-                      stat.positive ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
-                    )}>
-                      {stat.trend}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-white group-hover:text-cyan-300 transition-colors">{stat.value}</p>
-                    <p className="text-xs text-slate-400 mt-1">{stat.label}</p>
-                  </div>
-                </div>
-              </BentoTile>
-            </motion.div>
-          ))}
-        </BentoGrid>
-
-        {/* Mobile Stats - 2 column grid */}
-        <div className="grid grid-cols-2 gap-3 sm:hidden">
-          {stats.map((stat, index) => (
-            <div 
-              key={index}
-              className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 rounded-xl p-3"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span className={stat.positive ? "text-cyan-400" : "text-red-400"}>{stat.icon}</span>
-                <span className={cn(
-                  "text-[10px] font-medium px-1.5 py-0.5 rounded-full",
-                  stat.positive ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"
-                )}>
-                  {stat.trend}
-                </span>
-              </div>
-              <p className="text-xl font-bold text-white">{stat.value}</p>
-              <p className="text-[10px] text-slate-400">{stat.label}</p>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+          <StatCard
+            icon={<Users className="w-5 h-5" />}
+            label="Workers"
+            value={stats?.workers || 0}
+            actionPath="/talent-pool"
+            isLoading={isLoading}
+          />
+          <StatCard
+            icon={<Building2 className="w-5 h-5" />}
+            label="Clients"
+            value={stats?.clients || 0}
+            actionPath="/crm"
+            isLoading={isLoading}
+          />
+          <StatCard
+            icon={<Briefcase className="w-5 h-5" />}
+            label="Active Jobs"
+            value={stats?.activeJobs || 0}
+            actionPath="/work-orders"
+            isLoading={isLoading}
+          />
+          <StatCard
+            icon={<TrendingUp className="w-5 h-5" />}
+            label="Tenants"
+            value={stats?.tenants || 0}
+            actionPath="/admin"
+            isLoading={isLoading}
+          />
         </div>
 
-        {/* Main Content - Chart + Categories */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Revenue Chart */}
-          <div className="lg:col-span-2">
-            <BentoTile className="h-full">
-              <div className="p-4">
-                <h3 className="text-sm font-medium text-slate-300 mb-4">Weekly Revenue</h3>
-                <div className="h-[200px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={revenueData}>
-                      <defs>
-                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4}/>
-                          <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-                      <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
-                      <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `$${v/1000}k`} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#1e293b', 
-                          borderColor: '#334155',
-                          borderRadius: '8px',
-                          color: '#fff',
-                          fontSize: '12px'
-                        }} 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
-                      />
-                      <Area 
-                        type="monotone" 
-                        dataKey="revenue" 
-                        stroke="#06b6d4" 
-                        strokeWidth={2}
-                        fillOpacity={1} 
-                        fill="url(#colorRevenue)" 
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </BentoTile>
-          </div>
-
-          {/* Quick Stats Summary */}
-          <BentoTile>
-            <div className="p-4 h-full flex flex-col">
-              <h3 className="text-sm font-medium text-slate-300 mb-4">Today's Snapshot</h3>
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50">
-                  <span className="text-xs text-slate-400">Pending Approvals</span>
-                  <span className="text-sm font-bold text-amber-400">12</span>
-                </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50">
-                  <span className="text-xs text-slate-400">Active Shifts</span>
-                  <span className="text-sm font-bold text-emerald-400">47</span>
-                </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50">
-                  <span className="text-xs text-slate-400">New Applications</span>
-                  <span className="text-sm font-bold text-cyan-400">8</span>
-                </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-slate-800/50">
-                  <span className="text-xs text-slate-400">Compliance Alerts</span>
-                  <span className="text-sm font-bold text-red-400">3</span>
-                </div>
-              </div>
+        {!hasAnyData && !isLoading && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-cyan-500/10 border border-cyan-500/30 rounded-xl p-6 text-center"
+          >
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-cyan-500/20 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-cyan-400" />
             </div>
-          </BentoTile>
-        </div>
+            <h3 className="text-lg font-semibold text-white mb-2">Welcome to ORBIT!</h3>
+            <p className="text-sm text-slate-400 mb-4 max-w-md mx-auto">
+              Your staffing command center is ready. Start by adding your first workers or clients to see your dashboard come to life.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Button 
+                onClick={() => setLocation('/talent-pool')}
+                className="bg-cyan-600 hover:bg-cyan-500 gap-2"
+                data-testid="button-add-first-worker"
+              >
+                <Users className="w-4 h-4" />
+                Add Workers
+              </Button>
+              <Button 
+                onClick={() => setLocation('/crm')}
+                variant="outline"
+                className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 gap-2"
+                data-testid="button-add-first-client"
+              >
+                <Building2 className="w-4 h-4" />
+                Add Clients
+              </Button>
+            </div>
+          </motion.div>
+        )}
 
-        {/* Category Accordions - The Heart of the Clean UI */}
         <div className="space-y-3">
           <h2 className="text-sm font-medium text-slate-400 uppercase tracking-wider">Navigate</h2>
           
@@ -385,6 +488,7 @@ export default function Dashboard() {
                       "px-4 py-3 hover:no-underline bg-gradient-to-r",
                       colors.bg
                     )}
+                    data-testid={`accordion-${category.id}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={cn("p-2 rounded-lg bg-slate-800/50", colors.text)}>
@@ -430,6 +534,8 @@ export default function Dashboard() {
           </Accordion>
         </div>
       </div>
+      
+      <FloatingTutorialButton />
     </Shell>
   );
 }
