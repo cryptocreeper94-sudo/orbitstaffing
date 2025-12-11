@@ -18,6 +18,7 @@ export interface Theme {
   watermark?: string;
   category: ThemeCategory;
   description?: string;
+  isLight: boolean;
 }
 
 export const allThemes: Theme[] = [
@@ -26,6 +27,7 @@ export const allThemes: Theme[] = [
     name: "Light Mode",
     category: "classic",
     description: "Clean, bright interface",
+    isLight: true,
     colors: {
       primary: "from-slate-100 via-slate-50 to-white",
       secondary: "from-cyan-500 to-blue-500",
@@ -42,6 +44,7 @@ export const allThemes: Theme[] = [
     name: "Soft Light",
     category: "classic",
     description: "Gentle, easy on eyes",
+    isLight: true,
     colors: {
       primary: "from-gray-100 via-gray-50 to-white",
       secondary: "from-blue-400 to-indigo-500",
@@ -58,6 +61,7 @@ export const allThemes: Theme[] = [
     name: "Cream",
     category: "classic",
     description: "Warm, paper-like feel",
+    isLight: true,
     colors: {
       primary: "from-amber-50 via-orange-50 to-yellow-50",
       secondary: "from-amber-500 to-orange-500",
@@ -74,6 +78,7 @@ export const allThemes: Theme[] = [
     name: "ORBIT Dark",
     category: "classic",
     description: "Default dark industrial",
+    isLight: false,
     colors: {
       primary: "from-slate-900 via-slate-800 to-slate-900",
       secondary: "from-cyan-500 to-violet-500",
@@ -90,6 +95,7 @@ export const allThemes: Theme[] = [
     name: "Pure Black",
     category: "classic",
     description: "OLED-friendly dark",
+    isLight: false,
     colors: {
       primary: "from-black via-zinc-950 to-black",
       secondary: "from-cyan-600 to-blue-600",
@@ -106,6 +112,7 @@ export const allThemes: Theme[] = [
     name: "Midnight Blue",
     category: "classic",
     description: "Deep blue professional",
+    isLight: false,
     colors: {
       primary: "from-blue-950 via-slate-900 to-blue-950",
       secondary: "from-blue-500 to-cyan-500",
@@ -122,6 +129,7 @@ export const allThemes: Theme[] = [
     name: "Corporate Blue",
     category: "professional",
     description: "Business professional",
+    isLight: true,
     colors: {
       primary: "from-slate-100 via-blue-50 to-slate-100",
       secondary: "from-blue-600 to-blue-700",
@@ -138,6 +146,7 @@ export const allThemes: Theme[] = [
     name: "Executive",
     category: "professional",
     description: "Premium dark gray",
+    isLight: false,
     colors: {
       primary: "from-gray-900 via-gray-800 to-gray-900",
       secondary: "from-amber-500 to-yellow-500",
@@ -154,6 +163,7 @@ export const allThemes: Theme[] = [
     name: "Emerald Pro",
     category: "professional",
     description: "Success & growth",
+    isLight: false,
     colors: {
       primary: "from-emerald-950 via-slate-900 to-emerald-950",
       secondary: "from-emerald-500 to-green-500",
@@ -170,6 +180,7 @@ export const allThemes: Theme[] = [
     name: "Lavender",
     category: "nature",
     description: "Calm purple tones",
+    isLight: true,
     colors: {
       primary: "from-violet-100 via-purple-50 to-violet-100",
       secondary: "from-violet-500 to-purple-500",
@@ -186,6 +197,7 @@ export const allThemes: Theme[] = [
     name: "Ocean",
     category: "nature",
     description: "Deep sea vibes",
+    isLight: false,
     colors: {
       primary: "from-cyan-950 via-blue-900 to-cyan-950",
       secondary: "from-cyan-400 to-blue-400",
@@ -202,6 +214,7 @@ export const allThemes: Theme[] = [
     name: "Forest",
     category: "nature",
     description: "Natural green tones",
+    isLight: false,
     colors: {
       primary: "from-green-950 via-emerald-900 to-green-950",
       secondary: "from-green-500 to-emerald-500",
@@ -218,6 +231,7 @@ export const allThemes: Theme[] = [
     name: "Sunset",
     category: "vibrant",
     description: "Warm orange glow",
+    isLight: false,
     colors: {
       primary: "from-orange-900 via-rose-800 to-orange-900",
       secondary: "from-orange-500 to-rose-500",
@@ -234,6 +248,7 @@ export const allThemes: Theme[] = [
     name: "Neon Cyber",
     category: "vibrant",
     description: "Cyberpunk aesthetic",
+    isLight: false,
     colors: {
       primary: "from-fuchsia-950 via-violet-900 to-fuchsia-950",
       secondary: "from-fuchsia-500 to-cyan-500",
@@ -250,6 +265,7 @@ export const allThemes: Theme[] = [
     name: "Rose Gold",
     category: "vibrant",
     description: "Elegant pink gold",
+    isLight: true,
     colors: {
       primary: "from-rose-100 via-pink-50 to-rose-100",
       secondary: "from-rose-400 to-pink-400",

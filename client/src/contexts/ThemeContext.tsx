@@ -24,19 +24,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     const theme = currentTheme;
     
-    root.style.setProperty('--theme-bg', theme.colors.background);
-    root.style.setProperty('--theme-card', theme.colors.cardBg);
-    root.style.setProperty('--theme-text', theme.colors.textPrimary);
-    root.style.setProperty('--theme-text-secondary', theme.colors.textSecondary);
+    root.setAttribute('data-theme', theme.id);
     
-    if (theme.colors.background.includes('slate-50') || 
-        theme.colors.background.includes('white') ||
-        theme.colors.background.includes('gray-50')) {
+    if (theme.isLight) {
       document.body.classList.remove('dark');
       document.body.classList.add('light-mode');
+      root.classList.add('light-mode');
+      root.classList.remove('dark');
     } else {
       document.body.classList.add('dark');
       document.body.classList.remove('light-mode');
+      root.classList.remove('light-mode');
+      root.classList.add('dark');
     }
   }, [currentTheme]);
 

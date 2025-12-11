@@ -64,7 +64,7 @@ export function ThemeSelector() {
           />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              {currentTheme.colors.background.includes('50') || currentTheme.colors.background.includes('white') 
+              {currentTheme.isLight 
                 ? <Sun className="h-4 w-4 text-yellow-400" />
                 : <Moon className="h-4 w-4 text-blue-400" />
               }
@@ -112,8 +112,7 @@ export function ThemeSelector() {
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                   {themes.map((theme) => {
                     const isSelected = currentTheme.id === theme.id;
-                    const isLight = theme.colors.background.includes('50') || 
-                                   theme.colors.background.includes('white');
+                    const isLight = theme.isLight;
                     return (
                       <button
                         key={theme.id}
