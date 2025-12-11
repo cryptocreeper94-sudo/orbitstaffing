@@ -112,6 +112,7 @@ export function OrbitChatAssistant() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceGender, setVoiceGender] = useState<'female' | 'male'>('female');
   const [speechSupported, setSpeechSupported] = useState(false);
   const recognitionRef = useRef<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -122,6 +123,12 @@ export function OrbitChatAssistant() {
     const SpeechRecognitionClass = getSpeechRecognition();
     const synth = getSpeechSynthesis();
     setSpeechSupported(!!(SpeechRecognitionClass && synth));
+    
+    // Load saved voice gender preference
+    const savedGender = localStorage.getItem('orby_voice_gender');
+    if (savedGender === 'male' || savedGender === 'female') {
+      setVoiceGender(savedGender);
+    }
   }, []);
 
   // Initialize speech recognition
@@ -165,7 +172,7 @@ export function OrbitChatAssistant() {
     };
   }, [mounted]);
 
-  // Text-to-speech function
+  // Text-to-speech function with gender-based voice selection
   const speakText = useCallback((text: string) => {
     if (!voiceEnabled) return;
     
@@ -175,23 +182,51 @@ export function OrbitChatAssistant() {
     // Cancel any ongoing speech
     synth.cancel();
     
-    // Clean text for speech - just pass through, let browser handle emojis
-    const cleanText = text.trim();
+    // Clean text for speech - remove emojis for cleaner audio
+    const cleanText = text.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').replace(/[^\x00-\x7F]/g, ' ').replace(/\s+/g, ' ').trim();
     
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = 1.0;
-    utterance.pitch = 1.1;
+    utterance.pitch = voiceGender === 'female' ? 1.1 : 0.95;
     utterance.volume = 0.9;
     
-    // Try to get a friendly voice
+    // Get available voices
     const voices = synth.getVoices();
-    const preferredVoice = voices.find(v => 
-      v.name.toLowerCase().includes('samantha') || 
-      v.name.toLowerCase().includes('google') ||
-      v.name.toLowerCase().includes('female')
-    ) || voices.find(v => v.lang.startsWith('en'));
     
-    if (preferredVoice) utterance.voice = preferredVoice;
+    // Voice preference lists for natural-sounding voices
+    const femaleVoiceNames = [
+      'samantha', 'victoria', 'karen', 'moira', 'tessa', 'fiona',
+      'google us english female', 'google uk english female',
+      'microsoft aria', 'microsoft zira', 'microsoft jenny',
+      'female', 'woman'
+    ];
+    
+    const maleVoiceNames = [
+      'alex', 'daniel', 'fred', 'tom', 'oliver', 'ralph',
+      'google us english male', 'google uk english male',
+      'microsoft guy', 'microsoft david', 'microsoft mark',
+      'male', 'man'
+    ];
+    
+    const preferredNames = voiceGender === 'female' ? femaleVoiceNames : maleVoiceNames;
+    
+    // Find best matching voice
+    let selectedVoice: SpeechSynthesisVoice | undefined;
+    
+    // First try to find a natural/premium voice
+    for (const name of preferredNames) {
+      selectedVoice = voices.find(v => 
+        v.name.toLowerCase().includes(name) && v.lang.startsWith('en')
+      );
+      if (selectedVoice) break;
+    }
+    
+    // Fallback to any English voice
+    if (!selectedVoice) {
+      selectedVoice = voices.find(v => v.lang.startsWith('en'));
+    }
+    
+    if (selectedVoice) utterance.voice = selectedVoice;
     
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
@@ -199,7 +234,7 @@ export function OrbitChatAssistant() {
     
     utteranceRef.current = utterance;
     synth.speak(utterance);
-  }, [voiceEnabled]);
+  }, [voiceEnabled, voiceGender]);
 
   // Toggle voice listening
   const toggleListening = useCallback(() => {
@@ -227,6 +262,15 @@ export function OrbitChatAssistant() {
     }
     setVoiceEnabled(prev => !prev);
   }, [isSpeaking]);
+
+  // Toggle voice gender
+  const toggleVoiceGender = useCallback(() => {
+    setVoiceGender(prev => {
+      const newGender = prev === 'female' ? 'male' : 'female';
+      localStorage.setItem('orby_voice_gender', newGender);
+      return newGender;
+    });
+  }, []);
 
   // Show greeting on first visit - auto-minimize after 3 seconds
   useEffect(() => {
@@ -438,55 +482,85 @@ export function OrbitChatAssistant() {
                 padding: '8px 12px',
                 borderTop: '1px solid #e2e8f0',
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 gap: '8px',
                 background: '#f1f5f9'
               }}>
+                {/* Voice gender toggle */}
                 <button
-                  onClick={toggleVoiceOutput}
+                  onClick={toggleVoiceGender}
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '50%',
+                    height: '28px',
+                    padding: '0 10px',
+                    borderRadius: '14px',
                     border: 'none',
-                    background: voiceEnabled ? 'rgba(6, 182, 212, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    background: voiceGender === 'female' 
+                      ? 'linear-gradient(135deg, #f472b6, #ec4899)' 
+                      : 'linear-gradient(135deg, #60a5fa, #3b82f6)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s'
+                    gap: '4px',
+                    transition: 'all 0.2s',
+                    color: 'white',
+                    fontSize: '11px',
+                    fontWeight: '600'
                   }}
-                  title={voiceEnabled ? 'Mute Orby' : 'Unmute Orby'}
-                  data-testid="button-toggle-voice"
+                  title={`Switch to ${voiceGender === 'female' ? 'male' : 'female'} voice`}
+                  data-testid="button-toggle-gender"
                 >
-                  {voiceEnabled ? (
-                    <Volume2 size={16} color={isSpeaking ? '#06b6d4' : '#64748b'} />
-                  ) : (
-                    <VolumeX size={16} color="#ef4444" />
-                  )}
+                  <span>{voiceGender === 'female' ? '♀' : '♂'}</span>
+                  <span>{voiceGender === 'female' ? 'Female' : 'Male'}</span>
                 </button>
-                {isSpeaking && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '2px',
-                    padding: '0 8px'
-                  }}>
-                    {[0, 1, 2, 3].map(i => (
-                      <motion.div
-                        key={i}
-                        animate={{ scaleY: [1, 1.8, 1] }}
-                        transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
-                        style={{
-                          width: '3px',
-                          height: '12px',
-                          background: '#06b6d4',
-                          borderRadius: '2px'
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    onClick={toggleVoiceOutput}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: voiceEnabled ? 'rgba(6, 182, 212, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'all 0.2s'
+                    }}
+                    title={voiceEnabled ? 'Mute Orby' : 'Unmute Orby'}
+                    data-testid="button-toggle-voice"
+                  >
+                    {voiceEnabled ? (
+                      <Volume2 size={16} color={isSpeaking ? '#06b6d4' : '#64748b'} />
+                    ) : (
+                      <VolumeX size={16} color="#ef4444" />
+                    )}
+                  </button>
+                  {isSpeaking && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '2px',
+                      padding: '0 8px'
+                    }}>
+                      {[0, 1, 2, 3].map(i => (
+                        <motion.div
+                          key={i}
+                          animate={{ scaleY: [1, 1.8, 1] }}
+                          transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.1 }}
+                          style={{
+                            width: '3px',
+                            height: '12px',
+                            background: '#06b6d4',
+                            borderRadius: '2px'
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
