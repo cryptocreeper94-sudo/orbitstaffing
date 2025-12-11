@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import NotFound from "@/pages/not-found";
 import AdminPanel from "@/pages/AdminPanel";
 import WorkerPortal from "@/pages/WorkerPortal";
@@ -73,6 +74,7 @@ import CustomerHallmarkManager from "@/pages/CustomerHallmarkManager";
 import AdminFranchiseDashboard from "@/pages/AdminFranchiseDashboard";
 import FranchiseSuccess from "@/pages/FranchiseSuccess";
 import AboutUs from "@/pages/AboutUs";
+import Settings from "@/pages/Settings";
 import MeetingPresentations from "@/pages/MeetingPresentations";
 import PresentationViewer from "@/pages/PresentationViewer";
 import SolanaVerification from "@/pages/SolanaVerification";
@@ -216,6 +218,7 @@ function Router() {
       <Route path="/franchise-success" component={FranchiseSuccess} />
       <Route path="/franchise/success" component={FranchiseSuccess} />
       <Route path="/about" component={AboutUs} />
+      <Route path="/settings" component={Settings} />
       <Route path="/solana-verification" component={SolanaVerification} />
       <Route path="/changelog" component={Changelog} />
       <Route path="/ecosystem-hub" component={EcosystemHub} />
@@ -301,10 +304,11 @@ export default function App() {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ModeProvider>
-          <OrbitExperienceProvider>
-            <TutorialProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <ModeProvider>
+            <OrbitExperienceProvider>
+              <TutorialProvider>
               <SandboxBanner />
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
@@ -316,10 +320,11 @@ export default function App() {
               <Toaster />
               <PWAInstallPrompt />
               <PWASplashScreen />
-            </TutorialProvider>
-          </OrbitExperienceProvider>
-        </ModeProvider>
-      </TooltipProvider>
+              </TutorialProvider>
+            </OrbitExperienceProvider>
+          </ModeProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

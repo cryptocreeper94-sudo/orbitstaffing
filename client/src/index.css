@@ -333,7 +333,58 @@ body:has([data-testid="sandbox-banner"]) .sandbox-banner-spacer {
 .dark {
   --background: 224 15% 8%;
   --foreground: 210 20% 98%;
-  /* ... (same as root since we want dark by default) */
+}
+
+/* Light Mode - Clean professional look */
+.light-mode {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  --primary: 190 80% 45%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  --accent: 190 80% 45%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 190 80% 45%;
+
+  --sidebar: 210 40% 96%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-primary: 190 80% 45%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 40% 93%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-ring: 190 80% 45%;
+  
+  --chart-1: 190 80% 45%;
+  --chart-2: 280 65% 55%;
+  --chart-3: 340 75% 50%;
+  --chart-4: 142 70% 45%;
+  --chart-5: 30 80% 50%;
+}
+
+/* Light mode - hide dark watermark, use subtle version */
+.light-mode body::before {
+  opacity: 0.02;
+  filter: invert(1);
 }
 
 @layer base {
