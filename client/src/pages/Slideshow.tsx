@@ -227,8 +227,8 @@ export default function Slideshow() {
                           }`}>
                             {s.title}
                           </div>
-                          {s.subtitle && (
-                            <div className="text-sm text-slate-400">{s.subtitle}</div>
+                          {s.content.subheadline && (
+                            <div className="text-sm text-slate-400">{s.content.subheadline}</div>
                           )}
                           <div className="text-xs text-slate-500 mt-1">{s.section}</div>
                         </div>
@@ -367,14 +367,14 @@ function SlideRenderer({ slide }: { slide: Slide }) {
             >
               {content.headline}
             </motion.h2>
-            {content.subtitle && (
+            {content.subheadline && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
                 className="text-lg text-cyan-300"
               >
-                {content.subtitle}
+                {content.subheadline}
               </motion.p>
             )}
           </div>
