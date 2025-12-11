@@ -1,5 +1,29 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { allThemes, Theme } from "../data/themes";
+import { allThemes } from "@/data/themes";
+
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  cardBg: string;
+  textPrimary: string;
+  textSecondary: string;
+}
+
+export interface Theme {
+  id: string;
+  name: string;
+  colors: ThemeColors;
+  watermark?: string;
+  category: ThemeCategory;
+}
+
+export type ThemeCategory = 
+  | "classic" 
+  | "nfl" | "mlb" | "nba" | "nhl" | "mls" 
+  | "wsl" | "epl" | "laliga" | "bundesliga" | "seriea" | "ligue1" 
+  | "college" | "golf" | "nature";
 
 interface ThemeContextType {
   currentTheme: Theme;
@@ -9,24 +33,39 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const STORAGE_KEY = "orbit_theme";
+const STORAGE_KEY = "orbit_theme_id";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const savedThemeId = localStorage.getItem(STORAGE_KEY);
-      return allThemes.find((t: Theme) => t.id === savedThemeId) || allThemes[0];
+    if (typeof window !== "undefined") {
+      const savedId = localStorage.getItem(STORAGE_KEY);
+      if (savedId) {
+        const found = allThemes.find(t => t.id === savedId);
+        if (found) return found;
+      }
     }
-    return allThemes[0];
+    return allThemes.find(t => t.id === "orbit-dark") || allThemes[0];
   });
 
+  const setTheme = (themeId: string) => {
+    const theme = allThemes.find(t => t.id === themeId);
+    if (theme) {
+      setCurrentTheme(theme);
+      localStorage.setItem(STORAGE_KEY, themeId);
+    }
+  };
+
   useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, currentTheme.id);
+    
     const root = document.documentElement;
-    const theme = currentTheme;
+    root.setAttribute('data-theme', currentTheme.id);
     
-    root.setAttribute('data-theme', theme.id);
+    const isLight = currentTheme.colors.background.includes('slate-50') || 
+                    currentTheme.colors.background.includes('bg-white') ||
+                    currentTheme.colors.textPrimary.includes('text-slate-900');
     
-    if (theme.isLight) {
+    if (isLight) {
       document.body.classList.remove('dark');
       document.body.classList.add('light-mode');
       root.classList.add('light-mode');
@@ -39,14 +78,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [currentTheme]);
 
-  const setTheme = (themeId: string) => {
-    const theme = allThemes.find((t: Theme) => t.id === themeId);
-    if (theme) {
-      setCurrentTheme(theme);
-      localStorage.setItem(STORAGE_KEY, themeId);
-    }
-  };
-
   return (
     <ThemeContext.Provider value={{ currentTheme, setTheme, availableThemes: allThemes }}>
       {children}
@@ -57,9 +88,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useTheme must be used within ThemeProvider");
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 }
-
-export type { Theme };
