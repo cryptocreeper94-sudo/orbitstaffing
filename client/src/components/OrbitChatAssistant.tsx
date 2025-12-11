@@ -101,6 +101,7 @@ const getSpeechSynthesis = (): SpeechSynthesis | null => {
 export function OrbitChatAssistant() {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true); // Start minimized - nearly invisible
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -227,22 +228,30 @@ export function OrbitChatAssistant() {
     setVoiceEnabled(prev => !prev);
   }, [isSpeaking]);
 
-  // Show greeting on first visit
+  // Show greeting on first visit - auto-minimize after 3 seconds
   useEffect(() => {
     if (!mounted) return;
     
     const greetingShown = sessionStorage.getItem(GREETING_SHOWN_KEY);
     if (!greetingShown) {
-      const timer = setTimeout(() => {
+      // Show greeting after 1.5s
+      const showTimer = setTimeout(() => {
         setIsOpen(true);
+        setIsMinimized(false);
         setMessages([{
           id: "welcome",
           role: "assistant",
-          content: "Hey there! 👋 I'm Orby, your ORBIT assistant. Ask me anything about staffing, payroll, or compliance!"
+          content: "Hey there! 👋 I'm Orby, your ORBIT assistant. Click on me anytime to ask questions!"
         }]);
         sessionStorage.setItem(GREETING_SHOWN_KEY, "true");
+        
+        // Auto-minimize after 3 seconds
+        setTimeout(() => {
+          setIsOpen(false);
+          setIsMinimized(true);
+        }, 3000);
       }, 1500);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(showTimer);
     }
   }, [mounted]);
 
@@ -260,6 +269,7 @@ export function OrbitChatAssistant() {
 
   const handleOpen = () => {
     setIsOpen(true);
+    setIsMinimized(false);
     if (messages.length === 0) {
       setMessages([{
         id: "welcome",
@@ -267,6 +277,11 @@ export function OrbitChatAssistant() {
         content: "Hey there! 👋 I'm Orby, your ORBIT assistant. What can I help you with?"
       }]);
     }
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsMinimized(true);
   };
 
   const handleSend = useCallback(() => {
@@ -334,7 +349,10 @@ export function OrbitChatAssistant() {
           >
             {/* Close button */}
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClose();
+              }}
               style={{
                 position: 'absolute',
                 top: '8px',
@@ -343,12 +361,12 @@ export function OrbitChatAssistant() {
                 height: '28px',
                 borderRadius: '50%',
                 border: 'none',
-                background: 'rgba(0,0,0,0.1)',
+                background: 'rgba(0,0,0,0.15)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 10
+                zIndex: 100
               }}
               data-testid="button-close-orby"
             >
@@ -576,65 +594,97 @@ export function OrbitChatAssistant() {
         )}
       </AnimatePresence>
 
-      {/* Orby Mascot Button */}
+      {/* Orby Mascot Button - Tiny when minimized, full when active */}
       <motion.button
         onClick={handleOpen}
+        initial={false}
         animate={{
-          scale: isOpen ? 1.15 : 1,
+          width: isMinimized ? '28px' : '72px',
+          height: isMinimized ? '28px' : '72px',
+          scale: isOpen ? 1.1 : 1,
           y: isOpen ? -5 : 0
         }}
-        whileHover={{ scale: isOpen ? 1.2 : 1.1 }}
+        whileHover={{ scale: isMinimized ? 1.15 : (isOpen ? 1.15 : 1.08) }}
         whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", damping: 15, stiffness: 300 }}
+        transition={{ type: "spring", damping: 20, stiffness: 300 }}
         style={{
-          width: '72px',
-          height: '72px',
-          background: 'transparent',
+          background: isMinimized 
+            ? 'linear-gradient(135deg, #06b6d4, #0284c7)' 
+            : 'transparent',
           border: 'none',
+          borderRadius: isMinimized ? '50%' : '0',
           cursor: 'pointer',
           padding: 0,
-          position: 'relative'
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: isMinimized 
+            ? '0 2px 8px rgba(6, 182, 212, 0.5)' 
+            : 'none'
         }}
         data-testid="button-orbit-chat"
+        title="Click to chat with Orby"
       >
-        <motion.img 
-          src="/mascot/clean/orbit_saturn_mascot_waving_transparent_clean.png" 
-          alt="Orby - Your AI Assistant"
-          animate={{
-            filter: isOpen 
-              ? 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.8)) drop-shadow(0 6px 12px rgba(0,0,0,0.4))'
-              : 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-          }}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain'
-          }}
-        />
-        
-        {/* Online indicator */}
-        <motion.span 
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [1, 0.8, 1]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          style={{
-            position: 'absolute',
-            top: '4px',
-            right: '4px',
-            width: '14px',
-            height: '14px',
-            backgroundColor: '#4ade80',
-            borderRadius: '50%',
-            border: '2px solid white',
-            boxShadow: '0 0 8px rgba(74, 222, 128, 0.7)'
-          }}
-        />
+        {isMinimized ? (
+          /* Tiny indicator - just a small icon */
+          <motion.svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </motion.svg>
+        ) : (
+          /* Full Orby mascot */
+          <>
+            <motion.img 
+              src="/mascot/clean/orbit_saturn_mascot_waving_transparent_clean.png" 
+              alt="Orby - Your AI Assistant"
+              animate={{
+                filter: isOpen 
+                  ? 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.8)) drop-shadow(0 6px 12px rgba(0,0,0,0.4))'
+                  : 'drop-shadow(0 0 10px rgba(6, 182, 212, 0.5)) drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
+              }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain'
+              }}
+            />
+            
+            {/* Online indicator */}
+            <motion.span 
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [1, 0.8, 1]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              style={{
+                position: 'absolute',
+                top: '4px',
+                right: '4px',
+                width: '14px',
+                height: '14px',
+                backgroundColor: '#4ade80',
+                borderRadius: '50%',
+                border: '2px solid white',
+                boxShadow: '0 0 8px rgba(74, 222, 128, 0.7)'
+              }}
+            />
+          </>
+        )}
       </motion.button>
     </div>,
     document.body
