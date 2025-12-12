@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Shield, Hash } from 'lucide-react';
 import { FooterWeatherWidget } from './FooterWeatherWidget';
+import { FooterOrbyChat } from './FooterOrbyChat';
 
 interface VersionInfo {
   version: string;
@@ -74,6 +75,8 @@ export function MainFooter() {
           <Link href="/developer">
             <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-dev">Dev</span>
           </Link>
+          <span className="text-slate-700">|</span>
+          <FooterOrbyChat />
         </div>
       </div>
     </footer>

@@ -95,7 +95,6 @@ import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { WeatherRadarModal } from "@/components/WeatherRadarModal";
 import { MainFooter } from "@/components/MainFooter";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
-import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
 import { SandboxBanner } from "@/components/SandboxBanner";
 import { SandboxWelcome } from "@/components/SandboxWelcome";
@@ -266,16 +265,6 @@ function Router() {
   );
 }
 
-function ConditionalOrbitAssistant() {
-  const [location] = useLocation();
-  const darkwavePages = ['/products'];
-  
-  if (darkwavePages.some(page => location.startsWith(page))) {
-    return null;
-  }
-  
-  return <OrbitChatAssistant />;
-}
 
 function ConditionalHomeButton() {
   const [location] = useLocation();
@@ -316,7 +305,6 @@ export default function App() {
               <ConditionalMainFooter />
               <ConditionalHomeButton />
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
-              <ConditionalOrbitAssistant />
               <Toaster />
               <PWAInstallPrompt />
               <PWASplashScreen />
