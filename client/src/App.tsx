@@ -92,8 +92,8 @@ import Sales from "@/pages/Sales";
 import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
-import { FloatingWeatherButton } from "@/components/FloatingWeatherButton";
 import { WeatherRadarModal } from "@/components/WeatherRadarModal";
+import { MainFooter } from "@/components/MainFooter";
 import { OrbitExperienceProvider } from "@/components/OrbitExperience";
 import { OrbitChatAssistant } from "@/components/OrbitChatAssistant";
 import { ModeProvider } from "@/contexts/ModeContext";
@@ -288,15 +288,15 @@ function ConditionalHomeButton() {
   return <FloatingHomeButton />;
 }
 
-function ConditionalWeatherButton({ onOpenRadar }: { onOpenRadar: () => void }) {
+function ConditionalMainFooter() {
   const [location] = useLocation();
-  const hiddenPages = ['/pricing', '/products', '/studio'];
+  const hiddenPages = ['/slideshow'];
   
   if (hiddenPages.some(page => location.startsWith(page))) {
     return null;
   }
   
-  return <FloatingWeatherButton onOpenRadar={onOpenRadar} />;
+  return <MainFooter />;
 }
 
 export default function App() {
@@ -313,8 +313,8 @@ export default function App() {
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
               <Router />
+              <ConditionalMainFooter />
               <ConditionalHomeButton />
-              <ConditionalWeatherButton onOpenRadar={() => setIsRadarOpen(true)} />
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
               <ConditionalOrbitAssistant />
               <Toaster />

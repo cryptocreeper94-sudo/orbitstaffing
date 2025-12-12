@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Shield, Hash } from 'lucide-react';
+import { FooterWeatherWidget } from './FooterWeatherWidget';
 
 interface VersionInfo {
   version: string;
@@ -31,33 +32,39 @@ export function MainFooter() {
   const shortHash = versionInfo.solanaHash ? versionInfo.solanaHash.substring(0, 8) : null;
 
   return (
-    <footer className="w-full bg-slate-950 border-t border-slate-800 py-4 px-4 shrink-0">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-        <div className="flex items-center gap-4">
+    <footer 
+      className="w-full bg-slate-950/95 backdrop-blur-sm border-t border-slate-800 py-2 px-4 shrink-0"
+      style={{
+        position: 'sticky',
+        bottom: 0,
+        zIndex: 999
+      }}
+      data-testid="main-footer"
+    >
+      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+          <FooterWeatherWidget />
+          <span className="text-slate-700 hidden sm:inline">|</span>
           <Link href="/solana-verification">
-            <div className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition cursor-pointer" data-testid="link-footer-verified">
-              <Shield className="w-3.5 h-3.5" />
-              <span>Solana Verified</span>
+            <div className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition cursor-pointer" data-testid="link-footer-verified">
+              <Shield className="w-3 h-3" />
+              <span className="hidden sm:inline">Verified</span>
             </div>
           </Link>
-          <span className="text-slate-600 hidden sm:inline">•</span>
           <span className="text-slate-500 font-mono">v{versionInfo.version}</span>
           {shortHash && (
-            <>
-              <span className="text-slate-600 hidden sm:inline">•</span>
-              <div className="flex items-center gap-1 text-cyan-500/70 font-mono" title={`Full hash: ${versionInfo.solanaHash}`}>
-                <Hash className="w-3 h-3" />
-                <span>{shortHash}</span>
-              </div>
-            </>
+            <div className="flex items-center gap-1 text-cyan-500/70 font-mono hidden md:flex" title={`Full hash: ${versionInfo.solanaHash}`}>
+              <Hash className="w-3 h-3" />
+              <span>{shortHash}</span>
+            </div>
           )}
         </div>
         
-        <p className="text-slate-400 text-center">
-          Powered by DarkWave Studios, LLC © 2025
+        <p className="text-slate-500 text-center text-[10px] sm:text-xs hidden md:block">
+          Powered by DarkWave Studios © 2025
         </p>
         
-        <div className="flex items-center gap-4 text-slate-500">
+        <div className="flex items-center gap-3 text-slate-500">
           <Link href="/investors">
             <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-investors">Investors</span>
           </Link>
@@ -65,7 +72,7 @@ export function MainFooter() {
             <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-admin">Admin</span>
           </Link>
           <Link href="/developer">
-            <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-dev">Developer</span>
+            <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-dev">Dev</span>
           </Link>
         </div>
       </div>
