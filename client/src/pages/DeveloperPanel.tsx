@@ -2827,6 +2827,31 @@ export default function DeveloperPanel() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="business-control" className="border-b border-slate-700">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-amber-900/20 to-orange-900/20" data-testid="accordion-dev-business-control">
+                <div className="flex items-center gap-3">
+                  <Briefcase className="w-5 h-5 text-amber-400" />
+                  <span className="font-bold text-white">Business Control Panel</span>
+                  <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full ml-2">OWNER</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'licenses', label: 'Software Licenses', icon: <FileText className="w-4 h-4" /> },
+                    { id: 'franchises', label: 'Franchise Agreements', icon: <Building2 className="w-4 h-4" /> },
+                    { id: 'invoices', label: 'License Invoices', icon: <Scale className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-amber-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="intelligence" className="border-b-0">
               <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-purple-900/20 to-cyan-900/20" data-testid="accordion-dev-intelligence">
                 <div className="flex items-center gap-3">
@@ -3320,6 +3345,96 @@ export default function DeveloperPanel() {
         {/* BUSINESS INTELLIGENCE & VALUATION TAB */}
         {activeTab === 'valuation' && (
           <BusinessValuationDashboard isPartnerView={false} />
+        )}
+
+        {/* BUSINESS CONTROL PANEL - SOFTWARE LICENSES */}
+        {activeTab === 'licenses' && (
+          <div className="space-y-6">
+            <OrbitCard>
+              <OrbitCardHeader>
+                <OrbitCardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-amber-400" />
+                  Software License Management
+                </OrbitCardTitle>
+                <OrbitCardDescription>
+                  Issue and manage software licenses for DarkWave Studios products
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-4">Full license management with PDF generation, tracking, and invoicing</p>
+                  <Button
+                    onClick={() => setLocation('/admin/licenses')}
+                    className="bg-amber-600 hover:bg-amber-700"
+                    data-testid="button-open-license-manager"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Open License Manager
+                  </Button>
+                </div>
+              </OrbitCardContent>
+            </OrbitCard>
+          </div>
+        )}
+
+        {/* BUSINESS CONTROL PANEL - FRANCHISE AGREEMENTS */}
+        {activeTab === 'franchises' && (
+          <div className="space-y-6">
+            <OrbitCard>
+              <OrbitCardHeader>
+                <OrbitCardTitle className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-amber-400" />
+                  Franchise Agreement Management
+                </OrbitCardTitle>
+                <OrbitCardDescription>
+                  Review and manage franchise applications and agreements
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-4">Manage franchise applications, territory assignments, and agreements</p>
+                  <Button
+                    onClick={() => setLocation('/admin/franchises')}
+                    className="bg-amber-600 hover:bg-amber-700"
+                    data-testid="button-open-franchise-manager"
+                  >
+                    <Building2 className="w-4 h-4 mr-2" />
+                    Open Franchise Dashboard
+                  </Button>
+                </div>
+              </OrbitCardContent>
+            </OrbitCard>
+          </div>
+        )}
+
+        {/* BUSINESS CONTROL PANEL - LICENSE INVOICES */}
+        {activeTab === 'invoices' && (
+          <div className="space-y-6">
+            <OrbitCard>
+              <OrbitCardHeader>
+                <OrbitCardTitle className="flex items-center gap-2">
+                  <Scale className="w-5 h-5 text-amber-400" />
+                  License Invoice Management
+                </OrbitCardTitle>
+                <OrbitCardDescription>
+                  Track and manage invoices for software licenses and monthly support
+                </OrbitCardDescription>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-4">Invoice tracking, payment status, and billing history for all licenses</p>
+                  <Button
+                    onClick={() => setLocation('/admin/licenses')}
+                    className="bg-amber-600 hover:bg-amber-700"
+                    data-testid="button-open-invoice-manager"
+                  >
+                    <Scale className="w-4 h-4 mr-2" />
+                    Open Invoice Manager
+                  </Button>
+                </div>
+              </OrbitCardContent>
+            </OrbitCard>
+          </div>
         )}
       </div>
 
