@@ -43,15 +43,14 @@ export function MainFooter() {
       <div className="max-w-7xl mx-auto flex items-center justify-between text-[10px] sm:text-xs">
         <div className="flex items-center gap-2">
           <FooterWeatherWidget />
+        </div>
+        
+        <div className="flex items-center gap-2 sm:gap-3 text-slate-500">
           <Link href="/solana-verification">
             <div className="flex items-center text-emerald-400 hover:text-emerald-300 transition cursor-pointer" data-testid="link-footer-verified">
               <Shield className="w-3 h-3" />
             </div>
           </Link>
-        </div>
-        
-        <div className="flex items-center gap-2 sm:gap-3 text-slate-500">
-          <span className="text-slate-500 font-mono">v{versionInfo.version}</span>
           <Link href="/investors">
             <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-investors">Investors</span>
           </Link>
@@ -61,6 +60,7 @@ export function MainFooter() {
           <Link href="/developer">
             <span className="hover:text-cyan-400 transition cursor-pointer" data-testid="link-footer-dev">Dev</span>
           </Link>
+          <span className="text-slate-500 font-mono">v{versionInfo.version}</span>
           <span className="text-slate-700">|</span>
           <FooterOrbyChat />
         </div>

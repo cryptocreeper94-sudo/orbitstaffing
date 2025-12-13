@@ -1,13 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { ArrowLeft, Shield, ExternalLink, Copy, CheckCircle2, Blocks, Hash, Calendar } from "lucide-react";
-import { useState } from "react";
+import { useLocation } from "wouter";
+import { ArrowLeft, ExternalLink, Copy, CheckCircle2, Blocks, Hash, Calendar } from "lucide-react";
+import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { BentoGrid, BentoTile } from "@/components/ui/bento-grid";
 import { PageHeader, SectionHeader } from "@/components/ui/section-header";
 import { OrbitCard, OrbitCardHeader, OrbitCardContent, StatCard } from "@/components/ui/orbit-card";
 import { CarouselRail } from "@/components/ui/carousel-rail";
+import { OrbyHallmark } from "@/components/OrbyHallmark";
 
 const blockchainStamps = [
   {
@@ -94,11 +95,20 @@ const blockchainStamps = [
 
 export default function SolanaVerification() {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const copyToClipboard = (hash: string) => {
     navigator.clipboard.writeText(hash);
     setCopiedHash(hash);
     setTimeout(() => setCopiedHash(null), 2000);
+  };
+
+  const handleBack = () => {
+    navigate('/');
   };
 
   const totalVersions = blockchainStamps.length;
@@ -113,12 +123,16 @@ export default function SolanaVerification() {
             title="Solana Blockchain Verification"
             subtitle="Immutable cryptographic verification for all platform versions"
             breadcrumb={
-              <Link href="/">
-                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white -ml-2">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-              </Link>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-slate-400 hover:text-white -ml-2"
+                onClick={handleBack}
+                data-testid="button-back"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
             }
             actions={
               <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
@@ -130,12 +144,7 @@ export default function SolanaVerification() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-        <section className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-          </div>
+        <section className="text-center space-y-6">
           <h1 className="text-2xl sm:text-4xl font-bold">
             <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
               Blockchain Verified
@@ -145,6 +154,14 @@ export default function SolanaVerification() {
             Every version of ORBIT Staffing OS is cryptographically stamped on the Solana blockchain 
             for immutable verification and transparency.
           </p>
+          
+          <div className="flex justify-center py-4">
+            <OrbyHallmark 
+              serialNumber="000000000-01" 
+              size="large"
+              showExpand={true}
+            />
+          </div>
         </section>
 
         <BentoGrid cols={3} gap="md">
