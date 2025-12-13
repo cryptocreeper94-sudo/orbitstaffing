@@ -109,6 +109,19 @@ export default function ProductsGallery() {
       emblem: garageBotEmblem,
       hallmark: garageBotHallmark,
     },
+    {
+      id: 'PaintPros',
+      name: 'Paint Pros',
+      tagline: 'Professional Painting Contractor Management',
+      description: 'Complete painting contractor platform with job scheduling, crew management, and automated invoicing. Powered by ORBIT staffing, payroll systems, and blockchain-verified credentials for commercial and residential painting operations.',
+      color: 'from-rose-500 to-red-600',
+      glowColor: 'rose',
+      slides: [],
+      slideshowData: null,
+      url: null,
+      emblem: null,
+      hallmark: null,
+    },
   ];
 
   const nextProduct = () => {
