@@ -118,7 +118,7 @@ export default function ProductsGallery() {
       glowColor: 'rose',
       slides: [],
       slideshowData: null,
-      url: null,
+      url: 'https://paintpros.io',
       emblem: null,
       hallmark: null,
     },
