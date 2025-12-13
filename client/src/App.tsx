@@ -90,6 +90,7 @@ import FeatureRequests from "@/pages/FeatureRequests";
 import IncidentReporting from "@/pages/IncidentReporting";
 import Sales from "@/pages/Sales";
 import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
+import AdminLicenseManager from "@/pages/AdminLicenseManager";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { WeatherRadarModal } from "@/components/WeatherRadarModal";
@@ -214,6 +215,8 @@ function Router() {
       <Route path="/hallmark-manager" component={CustomerHallmarkManager} />
       <Route path="/admin/franchise" component={AdminFranchiseDashboard} />
       <Route path="/admin/franchise-dashboard" component={AdminFranchiseDashboard} />
+      <Route path="/admin/licenses" component={AdminLicenseManager} />
+      <Route path="/admin/license-manager" component={AdminLicenseManager} />
       <Route path="/franchise-success" component={FranchiseSuccess} />
       <Route path="/franchise/success" component={FranchiseSuccess} />
       <Route path="/about" component={AboutUs} />

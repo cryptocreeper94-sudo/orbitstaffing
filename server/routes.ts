@@ -10364,4 +10364,164 @@ export function registerPayCardRoutes(app: Express) {
       res.status(500).json({ error: "Failed to get publish history" });
     }
   });
+
+  // ========================
+  // SOFTWARE LICENSE MANAGEMENT
+  // ========================
+
+  // Get all software licenses
+  app.get("/api/admin/software-licenses", async (req: Request, res: Response) => {
+    try {
+      const { softwareLicenses } = await import("@shared/schema");
+      const licenses = await db.select().from(softwareLicenses).orderBy(desc(softwareLicenses.createdAt));
+      res.json(licenses);
+    } catch (error) {
+      console.error("Get software licenses error:", error);
+      res.status(500).json({ error: "Failed to fetch software licenses" });
+    }
+  });
+
+  // Get single software license
+  app.get("/api/admin/software-licenses/:id", async (req: Request, res: Response) => {
+    try {
+      const { softwareLicenses } = await import("@shared/schema");
+      const { id } = req.params;
+      const [license] = await db.select().from(softwareLicenses).where(eq(softwareLicenses.id, id));
+      if (!license) {
+        res.status(404).json({ error: "License not found" });
+        return;
+      }
+      res.json(license);
+    } catch (error) {
+      console.error("Get software license error:", error);
+      res.status(500).json({ error: "Failed to fetch software license" });
+    }
+  });
+
+  // Create new software license
+  app.post("/api/admin/software-licenses", async (req: Request, res: Response) => {
+    try {
+      const { softwareLicenses, insertSoftwareLicenseSchema } = await import("@shared/schema");
+      
+      // Generate license number: DWS-YYYY-XXXXX
+      const year = new Date().getFullYear();
+      const existingLicenses = await db.select({ count: count() }).from(softwareLicenses);
+      const nextNumber = (existingLicenses[0]?.count || 0) + 1;
+      const licenseNumber = `DWS-${year}-${nextNumber.toString().padStart(5, '0')}`;
+      
+      const body = req.body;
+      const licenseData = {
+        licenseNumber,
+        licenseeCompanyName: body.licenseeCompanyName,
+        licenseeContactName: body.licenseeContactName,
+        licenseeEmail: body.licenseeEmail,
+        licenseePhone: body.licenseePhone || null,
+        licenseeAddress: body.licenseeAddress || null,
+        licenseeDomain: body.licenseeDomain || null,
+        productName: body.productName,
+        licenseFee: body.licenseFee.toString(),
+        monthlySupportFee: body.monthlySupportFee.toString(),
+        effectiveDate: body.effectiveDate,
+        termYears: body.termYears,
+        status: 'draft',
+      };
+      
+      const [newLicense] = await db.insert(softwareLicenses).values(licenseData).returning();
+      res.json(newLicense);
+    } catch (error) {
+      console.error("Create software license error:", error);
+      res.status(500).json({ error: "Failed to create software license" });
+    }
+  });
+
+  // Update software license status
+  app.patch("/api/admin/software-licenses/:id/status", async (req: Request, res: Response) => {
+    try {
+      const { softwareLicenses } = await import("@shared/schema");
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      const validStatuses = ['draft', 'sent', 'signed', 'active', 'expired', 'cancelled'];
+      if (!validStatuses.includes(status)) {
+        res.status(400).json({ error: "Invalid status" });
+        return;
+      }
+      
+      const [updatedLicense] = await db.update(softwareLicenses)
+        .set({ status, updatedAt: sql`NOW()` })
+        .where(eq(softwareLicenses.id, id))
+        .returning();
+      
+      if (!updatedLicense) {
+        res.status(404).json({ error: "License not found" });
+        return;
+      }
+      
+      res.json(updatedLicense);
+    } catch (error) {
+      console.error("Update software license status error:", error);
+      res.status(500).json({ error: "Failed to update software license status" });
+    }
+  });
+
+  // Update software license
+  app.patch("/api/admin/software-licenses/:id", async (req: Request, res: Response) => {
+    try {
+      const { softwareLicenses } = await import("@shared/schema");
+      const { id } = req.params;
+      const body = req.body;
+      
+      const updateData: any = { updatedAt: sql`NOW()` };
+      
+      if (body.licenseeCompanyName) updateData.licenseeCompanyName = body.licenseeCompanyName;
+      if (body.licenseeContactName) updateData.licenseeContactName = body.licenseeContactName;
+      if (body.licenseeEmail) updateData.licenseeEmail = body.licenseeEmail;
+      if (body.licenseePhone !== undefined) updateData.licenseePhone = body.licenseePhone || null;
+      if (body.licenseeAddress !== undefined) updateData.licenseeAddress = body.licenseeAddress || null;
+      if (body.licenseeDomain !== undefined) updateData.licenseeDomain = body.licenseeDomain || null;
+      if (body.productName) updateData.productName = body.productName;
+      if (body.licenseFee) updateData.licenseFee = body.licenseFee.toString();
+      if (body.monthlySupportFee) updateData.monthlySupportFee = body.monthlySupportFee.toString();
+      if (body.effectiveDate) updateData.effectiveDate = body.effectiveDate;
+      if (body.termYears) updateData.termYears = body.termYears;
+      if (body.signedByLicensee !== undefined) updateData.signedByLicensee = body.signedByLicensee || null;
+      if (body.signedByLicensor !== undefined) updateData.signedByLicensor = body.signedByLicensor || null;
+      if (body.signedDate !== undefined) updateData.signedDate = body.signedDate || null;
+      
+      const [updatedLicense] = await db.update(softwareLicenses)
+        .set(updateData)
+        .where(eq(softwareLicenses.id, id))
+        .returning();
+      
+      if (!updatedLicense) {
+        res.status(404).json({ error: "License not found" });
+        return;
+      }
+      
+      res.json(updatedLicense);
+    } catch (error) {
+      console.error("Update software license error:", error);
+      res.status(500).json({ error: "Failed to update software license" });
+    }
+  });
+
+  // Delete software license
+  app.delete("/api/admin/software-licenses/:id", async (req: Request, res: Response) => {
+    try {
+      const { softwareLicenses } = await import("@shared/schema");
+      const { id } = req.params;
+      
+      const [deletedLicense] = await db.delete(softwareLicenses).where(eq(softwareLicenses.id, id)).returning();
+      
+      if (!deletedLicense) {
+        res.status(404).json({ error: "License not found" });
+        return;
+      }
+      
+      res.json({ success: true, message: "License deleted" });
+    } catch (error) {
+      console.error("Delete software license error:", error);
+      res.status(500).json({ error: "Failed to delete software license" });
+    }
+  });
 }

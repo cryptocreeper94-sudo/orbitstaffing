@@ -3,14 +3,15 @@ import { format } from 'date-fns';
 
 export interface SoftwareLicenseData {
   licenseNumber: string;
+  
   licenseeCompanyName: string;
   licenseeContactName: string;
   licenseeEmail: string;
   licenseePhone?: string;
   licenseeAddress?: string;
+  licenseeDomain?: string;
   
   productName: string;
-  productDomain?: string;
   
   licenseFee: number;
   monthlySupportFee: number;
@@ -110,9 +111,9 @@ export function generateSoftwareLicensePDF(data: SoftwareLicenseData): jsPDF {
   doc.setFont('helvetica', 'normal');
   doc.text(`Product Name: ${data.productName}`, leftMargin, yPos);
   
-  if (data.productDomain) {
+  if (data.licenseeDomain) {
     yPos += lineHeight;
-    doc.text(`Domain: ${data.productDomain}`, leftMargin, yPos);
+    doc.text(`Licensee Domain: ${data.licenseeDomain}`, leftMargin, yPos);
   }
   
   yPos += 10;

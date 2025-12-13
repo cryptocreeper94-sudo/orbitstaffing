@@ -5904,3 +5904,111 @@ export const insertReleasePackageSchema = createInsertSchema(releasePackages).om
 
 export type InsertReleasePackage = z.infer<typeof insertReleasePackageSchema>;
 export type ReleasePackage = typeof releasePackages.$inferSelect;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SOFTWARE LICENSES - White-Label Software License Management
+// For DarkWave Studios products (Paint Pros, ORBIT, etc.)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const softwareLicenses = pgTable(
+  "software_licenses",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    licenseNumber: varchar("license_number", { length: 50 }).notNull().unique(),
+    
+    // Licensee (Customer) Information
+    licenseeCompanyName: varchar("licensee_company_name", { length: 255 }).notNull(),
+    licenseeContactName: varchar("licensee_contact_name", { length: 255 }).notNull(),
+    licenseeEmail: varchar("licensee_email", { length: 255 }).notNull(),
+    licenseePhone: varchar("licensee_phone", { length: 20 }),
+    licenseeAddress: text("licensee_address"),
+    licenseeDomain: varchar("licensee_domain", { length: 255 }),
+    
+    // Product Information
+    productName: varchar("product_name", { length: 100 }).notNull(),
+    
+    // Financial Terms
+    licenseFee: decimal("license_fee", { precision: 10, scale: 2 }).notNull(),
+    monthlySupportFee: decimal("monthly_support_fee", { precision: 10, scale: 2 }).notNull(),
+    
+    // Agreement Terms
+    effectiveDate: date("effective_date").notNull(),
+    termYears: integer("term_years").default(1),
+    
+    // Signatures
+    signedByLicensee: varchar("signed_by_licensee", { length: 255 }),
+    signedByLicensor: varchar("signed_by_licensor", { length: 255 }),
+    signedDate: timestamp("signed_date"),
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("draft"), // draft, sent, signed, active, expired, cancelled
+    
+    // Stripe Integration
+    stripeCustomerId: varchar("stripe_customer_id", { length: 100 }),
+    stripeLicensePaymentId: varchar("stripe_license_payment_id", { length: 100 }),
+    stripeSubscriptionId: varchar("stripe_subscription_id", { length: 100 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    licenseNumberIdx: index("idx_software_licenses_number").on(table.licenseNumber),
+    licenseeEmailIdx: index("idx_software_licenses_email").on(table.licenseeEmail),
+    productIdx: index("idx_software_licenses_product").on(table.productName),
+    statusIdx: index("idx_software_licenses_status").on(table.status),
+  })
+);
+
+export const insertSoftwareLicenseSchema = createInsertSchema(softwareLicenses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSoftwareLicense = z.infer<typeof insertSoftwareLicenseSchema>;
+export type SoftwareLicense = typeof softwareLicenses.$inferSelect;
+
+// License Invoices - Track payments for licenses
+export const licenseInvoices = pgTable(
+  "license_invoices",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(),
+    licenseId: varchar("license_id").references(() => softwareLicenses.id),
+    
+    // Invoice Details
+    invoiceType: varchar("invoice_type", { length: 20 }).notNull(), // license_fee, monthly_support
+    description: text("description"),
+    amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+    
+    // Dates
+    invoiceDate: date("invoice_date").notNull(),
+    dueDate: date("due_date").notNull(),
+    paidDate: date("paid_date"),
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("pending"), // pending, sent, paid, overdue, cancelled
+    
+    // Payment
+    stripePaymentIntentId: varchar("stripe_payment_intent_id", { length: 100 }),
+    stripeInvoiceId: varchar("stripe_invoice_id", { length: 100 }),
+    paymentMethod: varchar("payment_method", { length: 50 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    invoiceNumberIdx: index("idx_license_invoices_number").on(table.invoiceNumber),
+    licenseIdx: index("idx_license_invoices_license").on(table.licenseId),
+    statusIdx: index("idx_license_invoices_status").on(table.status),
+  })
+);
+
+export const insertLicenseInvoiceSchema = createInsertSchema(licenseInvoices).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertLicenseInvoice = z.infer<typeof insertLicenseInvoiceSchema>;
+export type LicenseInvoice = typeof licenseInvoices.$inferSelect;
