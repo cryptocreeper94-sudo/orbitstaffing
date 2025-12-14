@@ -121,6 +121,9 @@ import {
   meetingPresentations,
   type MeetingPresentation,
   type InsertMeetingPresentation,
+  pageViews,
+  type PageView,
+  type InsertPageView,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -3155,6 +3158,109 @@ export const storage: IStorage = {
       .update(meetingPresentations)
       .set({ status: 'sent', sentAt: new Date() })
       .where(eq(meetingPresentations.id, id));
+  },
+
+  // ========================
+  // ANALYTICS (Page Views)
+  // ========================
+  async trackPageView(view: InsertPageView): Promise<PageView> {
+    const [result] = await db.insert(pageViews).values(view).returning();
+    return result;
+  },
+
+  async getLiveVisitorCount(): Promise<number> {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const result = await db
+      .select({ count: sql<number>`count(distinct ${pageViews.sessionId})::int` })
+      .from(pageViews)
+      .where(gte(pageViews.createdAt, fiveMinutesAgo));
+    return result[0]?.count || 0;
+  },
+
+  async getAnalyticsDashboard(): Promise<any> {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [todayStats] = await db
+      .select({
+        views: sql<number>`count(*)::int`,
+        visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`,
+      })
+      .from(pageViews)
+      .where(gte(pageViews.createdAt, startOfToday));
+
+    const [weekStats] = await db
+      .select({
+        views: sql<number>`count(*)::int`,
+        visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`,
+      })
+      .from(pageViews)
+      .where(gte(pageViews.createdAt, startOfWeek));
+
+    const [monthStats] = await db
+      .select({
+        views: sql<number>`count(*)::int`,
+        visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`,
+      })
+      .from(pageViews)
+      .where(gte(pageViews.createdAt, startOfMonth));
+
+    const [allTimeStats] = await db
+      .select({
+        views: sql<number>`count(*)::int`,
+        visitors: sql<number>`count(distinct ${pageViews.sessionId})::int`,
+      })
+      .from(pageViews);
+
+    const topPages = await db
+      .select({
+        page: pageViews.page,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(pageViews)
+      .groupBy(pageViews.page)
+      .orderBy(desc(sql`count(*)`))
+      .limit(10);
+
+    const deviceStats = await db
+      .select({
+        deviceType: pageViews.deviceType,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(pageViews)
+      .groupBy(pageViews.deviceType);
+
+    const deviceBreakdown = { desktop: 0, mobile: 0, tablet: 0 };
+    const total = deviceStats.reduce((sum, d) => sum + (d.count || 0), 0);
+    deviceStats.forEach((d) => {
+      if (d.deviceType && d.deviceType in deviceBreakdown) {
+        deviceBreakdown[d.deviceType as keyof typeof deviceBreakdown] = d.count;
+      }
+    });
+
+    const hourlyTraffic = await db
+      .select({
+        hour: sql<number>`extract(hour from ${pageViews.createdAt})::int`,
+        views: sql<number>`count(*)::int`,
+      })
+      .from(pageViews)
+      .where(gte(pageViews.createdAt, startOfToday))
+      .groupBy(sql`extract(hour from ${pageViews.createdAt})`);
+
+    return {
+      today: { views: todayStats?.views || 0, visitors: todayStats?.visitors || 0 },
+      week: { views: weekStats?.views || 0, visitors: weekStats?.visitors || 0 },
+      month: { views: monthStats?.views || 0, visitors: monthStats?.visitors || 0 },
+      allTime: { views: allTimeStats?.views || 0, visitors: allTimeStats?.visitors || 0 },
+      topPages,
+      deviceBreakdown,
+      deviceTotal: total,
+      hourlyTraffic,
+    };
   },
 
 };

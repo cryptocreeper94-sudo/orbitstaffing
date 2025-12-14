@@ -84,6 +84,7 @@ import DarkWaveHQ from "@/pages/DarkWaveHQ";
 import HelpCenterPage from "@/pages/HelpCenter";
 import AIAssistant from "@/pages/AIAssistant";
 import DigitalHallmark from "@/pages/DigitalHallmark";
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import EmployeeApp from "@/pages/EmployeeApp";
 import EmployeePreApplication from "@/pages/EmployeePreApplication";
 import FeatureRequests from "@/pages/FeatureRequests";
@@ -101,6 +102,7 @@ import { SandboxBanner } from "@/components/SandboxBanner";
 import { SandboxWelcome } from "@/components/SandboxWelcome";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import { PWASplashScreen } from "@/components/PWASplashScreen";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 function RootPage() {
   const [, setLocation] = useLocation();
@@ -254,7 +256,8 @@ function Router() {
       <Route path="/background-checks" component={ComplianceDashboard} />
       <Route path="/drug-test-scheduling" component={ComplianceDashboard} />
       <Route path="/i9-verification" component={ComplianceDashboard} />
-      <Route path="/analytics" component={OwnerHub} />
+      <Route path="/analytics" component={AnalyticsDashboard} />
+      <Route path="/admin/analytics" component={AnalyticsDashboard} />
       <Route path="/workforce-forecasting" component={OwnerHub} />
       <Route path="/worker-performance" component={OwnerHub} />
       <Route path="/financial-reports" component={AdminPayrollDashboard} />
@@ -268,6 +271,11 @@ function Router() {
   );
 }
 
+
+function AnalyticsTracker() {
+  useAnalytics();
+  return null;
+}
 
 function ConditionalHomeButton() {
   const [location] = useLocation();
@@ -301,6 +309,7 @@ export default function App() {
           <ModeProvider>
             <OrbitExperienceProvider>
               <TutorialProvider>
+              <AnalyticsTracker />
               <SandboxBanner />
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />

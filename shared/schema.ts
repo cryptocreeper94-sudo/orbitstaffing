@@ -6012,3 +6012,39 @@ export const insertLicenseInvoiceSchema = createInsertSchema(licenseInvoices).om
 
 export type InsertLicenseInvoice = z.infer<typeof insertLicenseInvoiceSchema>;
 export type LicenseInvoice = typeof licenseInvoices.$inferSelect;
+
+// ========================
+// Page Views (Analytics)
+// ========================
+export const pageViews = pgTable(
+  "page_views",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: text("tenant_id").default("orbit"),
+    page: text("page").notNull(),
+    referrer: text("referrer"),
+    userAgent: text("user_agent"),
+    ipHash: text("ip_hash"),
+    sessionId: text("session_id"),
+    deviceType: text("device_type"), // desktop, mobile, tablet
+    browser: text("browser"),
+    country: text("country"),
+    city: text("city"),
+    duration: integer("duration"),
+    createdAt: timestamp("created_at").default(sql`NOW()`).notNull(),
+  },
+  (table) => ({
+    tenantIdx: index("idx_page_views_tenant").on(table.tenantId),
+    pageIdx: index("idx_page_views_page").on(table.page),
+    sessionIdx: index("idx_page_views_session").on(table.sessionId),
+    createdAtIdx: index("idx_page_views_created_at").on(table.createdAt),
+  })
+);
+
+export const insertPageViewSchema = createInsertSchema(pageViews).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPageView = z.infer<typeof insertPageViewSchema>;
+export type PageView = typeof pageViews.$inferSelect;

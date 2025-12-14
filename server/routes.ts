@@ -129,6 +129,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Blockchain routes (Solana hash anchoring for Hallmarks)
   registerBlockchainRoutes(app);
+  
+  // Register Analytics routes (Page tracking and dashboard)
+  registerAnalyticsRoutes(app);
 
   // ========================
   // SYSTEM STATUS CHECK (For Developer Checklist Auto-Update)
@@ -8145,6 +8148,62 @@ export function registerCryptoPaymentRoutes(app: Express) {
       res.json({ invoices: result.rows });
     } catch (error) {
       res.status(500).json({ error: "Failed to list crypto invoices" });
+    }
+  });
+}
+
+// ========================
+// Analytics API Routes
+// ========================
+
+export function registerAnalyticsRoutes(app: Express) {
+  app.post("/api/analytics/track", async (req: Request, res: Response) => {
+    try {
+      const { page, referrer, sessionId, deviceType, browser, duration } = req.body;
+      
+      if (!page) {
+        return res.status(400).json({ error: "Page is required" });
+      }
+      
+      const userAgent = req.headers["user-agent"] || "";
+      const ipHash = req.ip ? Buffer.from(req.ip).toString("base64").slice(0, 16) : null;
+      
+      await storage.trackPageView({
+        tenantId: "orbit",
+        page,
+        referrer: referrer || null,
+        userAgent,
+        ipHash,
+        sessionId: sessionId || null,
+        deviceType: deviceType || null,
+        browser: browser || null,
+        duration: duration || null,
+      });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Analytics track error:", error);
+      res.status(500).json({ error: "Failed to track page view" });
+    }
+  });
+
+  app.get("/api/analytics/dashboard", async (req: Request, res: Response) => {
+    try {
+      const dashboard = await storage.getAnalyticsDashboard();
+      res.json(dashboard);
+    } catch (error) {
+      console.error("Analytics dashboard error:", error);
+      res.status(500).json({ error: "Failed to get dashboard data" });
+    }
+  });
+
+  app.get("/api/analytics/live", async (req: Request, res: Response) => {
+    try {
+      const count = await storage.getLiveVisitorCount();
+      res.json({ count });
+    } catch (error) {
+      console.error("Analytics live error:", error);
+      res.status(500).json({ error: "Failed to get live count" });
     }
   });
 }
