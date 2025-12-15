@@ -54,9 +54,35 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ---
 
-## Last Session Summary (December 7, 2025)
+## Last Session Summary (December 15, 2025)
 
-### Current Version: v2.7.0 (Ready for Publishing)
+### Current Version: v2.7.1 (Ready for Publishing)
+
+### What Was Accomplished
+1. **Weather Radar Modal - FIXED ✅**
+   - Fixed modal sizing to fit on screen (max-height 600px)
+   - Added body scroll lock when modal is open
+   - Side-by-side layout (weather info + radar map) works in landscape mobile
+   - Reduced typography sizes and padding for compact display
+   - Weather panel scrolls independently within modal
+
+2. **Footer Weather Widget - CONNECTED ✅**
+   - Clicking temperature in footer opens Weather Radar Modal
+   - Prop chain: FooterWeatherWidget → MainFooter → App.tsx
+
+3. **Pre-Publish Sweep - COMPLETE ✅**
+   - LSP/TypeScript: No errors
+   - Database: Healthy
+   - API Endpoints: Working
+   - Authentication flows verified (PINs 0424, 4444, 777, 5555)
+   - Mobile responsiveness verified
+   - Version v2.7.1 confirmed
+
+---
+
+## Previous Session Summary (December 7, 2025)
+
+### Version: v2.7.0
 
 ### What Was Accomplished
 1. **DarkWave Ecosystem Hub - COMPLETE ✅**

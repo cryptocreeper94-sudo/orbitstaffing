@@ -205,6 +205,18 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
     };
   }, [isPlaying, radarFrames.length, isOpen]);
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -235,12 +247,12 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-4xl bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl border border-cyan-500/30 overflow-hidden shadow-2xl max-h-[90vh]"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] h-[90vh] max-w-3xl max-h-[600px] bg-gradient-to-br from-slate-900 to-slate-950 rounded-xl border border-cyan-500/30 shadow-2xl flex flex-col overflow-hidden"
           style={{ boxShadow: '0 0 60px rgba(6, 182, 212, 0.2)' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="h-full flex flex-col lg:flex-row">
-            <div className="lg:w-1/3 bg-gradient-to-b from-slate-800/80 to-slate-900/80 border-b lg:border-b-0 lg:border-r border-cyan-500/20 p-4 overflow-y-auto">
+          <div className="h-full flex flex-row overflow-hidden">
+            <div className="w-2/5 min-w-[200px] max-w-[280px] bg-gradient-to-b from-slate-800/80 to-slate-900/80 border-r border-cyan-500/20 p-3 overflow-y-auto flex-shrink-0">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
                   <CloudRain className="w-5 h-5 text-cyan-400" />
@@ -270,51 +282,51 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
                   <div className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 border border-cyan-500/20">
                     <div className="flex items-center gap-4">
                       <motion.span 
-                        className="text-6xl"
-                        animate={{ y: [0, -5, 0] }}
+                        className="text-4xl"
+                        animate={{ y: [0, -3, 0] }}
                         transition={{ duration: 3, repeat: Infinity }}
                       >
                         {weather.icon}
                       </motion.span>
                       <div>
-                        <div className="text-5xl font-bold text-white">{weather.temp}°</div>
-                        <div className="text-sm text-slate-400">{weather.condition}</div>
-                        <div className="text-xs text-slate-500">Feels like {weather.feelsLike}°</div>
+                        <div className="text-3xl font-bold text-white">{weather.temp}°</div>
+                        <div className="text-xs text-slate-400">{weather.condition}</div>
+                        <div className="text-[10px] text-slate-500">Feels like {weather.feelsLike}°</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
-                      <div className="flex items-center gap-2 text-blue-400 mb-1">
-                        <Droplets className="w-4 h-4" />
-                        <span className="text-xs">Humidity</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                      <div className="flex items-center gap-1 text-blue-400 mb-0.5">
+                        <Droplets className="w-3 h-3" />
+                        <span className="text-[10px]">Humidity</span>
                       </div>
-                      <div className="text-lg font-semibold text-white">{weather.humidity}%</div>
+                      <div className="text-sm font-semibold text-white">{weather.humidity}%</div>
                     </div>
                     
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
-                      <div className="flex items-center gap-2 text-cyan-400 mb-1">
-                        <Wind className="w-4 h-4" />
-                        <span className="text-xs">Wind</span>
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                      <div className="flex items-center gap-1 text-cyan-400 mb-0.5">
+                        <Wind className="w-3 h-3" />
+                        <span className="text-[10px]">Wind</span>
                       </div>
-                      <div className="text-lg font-semibold text-white">{weather.windSpeed} mph {weather.windDirection}</div>
+                      <div className="text-sm font-semibold text-white">{weather.windSpeed} {weather.windDirection}</div>
                     </div>
                     
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
-                      <div className="flex items-center gap-2 text-purple-400 mb-1">
-                        <CloudRain className="w-4 h-4" />
-                        <span className="text-xs">Precipitation</span>
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                      <div className="flex items-center gap-1 text-purple-400 mb-0.5">
+                        <CloudRain className="w-3 h-3" />
+                        <span className="text-[10px]">Precip</span>
                       </div>
-                      <div className="text-lg font-semibold text-white">{weather.precipitation}%</div>
+                      <div className="text-sm font-semibold text-white">{weather.precipitation}%</div>
                     </div>
                     
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700/50">
-                      <div className="flex items-center gap-2 text-orange-400 mb-1">
-                        <Thermometer className="w-4 h-4" />
-                        <span className="text-xs">Pressure</span>
+                    <div className="bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                      <div className="flex items-center gap-1 text-orange-400 mb-0.5">
+                        <Thermometer className="w-3 h-3" />
+                        <span className="text-[10px]">Pressure</span>
                       </div>
-                      <div className="text-lg font-semibold text-white">{weather.pressure} inHg</div>
+                      <div className="text-sm font-semibold text-white">{weather.pressure}"</div>
                     </div>
                   </div>
 
@@ -359,11 +371,10 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
               )}
             </div>
 
-            <div className="lg:w-2/3 relative flex flex-col bg-slate-950">
+            <div className="flex-1 relative flex flex-col bg-slate-950 min-w-0">
               <div 
                 ref={mapContainerRef}
                 className="flex-1 relative overflow-hidden"
-                style={{ minHeight: '300px' }}
               >
                 {location && (
                   <>
