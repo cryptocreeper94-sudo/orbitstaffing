@@ -290,7 +290,7 @@ function ConditionalHomeButton() {
   return <FloatingHomeButton />;
 }
 
-function ConditionalMainFooter() {
+function ConditionalMainFooter({ onOpenRadar }: { onOpenRadar?: () => void }) {
   const [location] = useLocation();
   const hiddenPages = ['/slideshow'];
   
@@ -298,7 +298,7 @@ function ConditionalMainFooter() {
     return null;
   }
   
-  return <MainFooter />;
+  return <MainFooter onOpenRadar={onOpenRadar} />;
 }
 
 export default function App() {
@@ -316,7 +316,7 @@ export default function App() {
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
               <Router />
-              <ConditionalMainFooter />
+              <ConditionalMainFooter onOpenRadar={() => setIsRadarOpen(true)} />
               <ConditionalHomeButton />
               <WeatherRadarModal isOpen={isRadarOpen} onClose={() => setIsRadarOpen(false)} />
               <Toaster />

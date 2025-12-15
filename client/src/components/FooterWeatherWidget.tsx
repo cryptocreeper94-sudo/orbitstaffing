@@ -66,7 +66,11 @@ function getTemperatureColor(temp: number): string {
   return '#EF4444';
 }
 
-export function FooterWeatherWidget() {
+interface FooterWeatherWidgetProps {
+  onOpenRadar?: () => void;
+}
+
+export function FooterWeatherWidget({ onOpenRadar }: FooterWeatherWidgetProps) {
   const [zipCode, setZipCode] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('orbit-weather-zip') || '';
@@ -188,16 +192,23 @@ export function FooterWeatherWidget() {
     <div className="flex items-center gap-2 text-xs">
       {weatherData ? (
         <>
-          <span className="text-base" title={weatherData.condition}>{emoji}</span>
-          <span 
-            className="font-bold"
-            style={{ color: tempColor }}
+          <button
+            onClick={onOpenRadar}
+            className="flex items-center gap-2 hover:opacity-80 transition cursor-pointer"
+            title="Click for detailed weather & radar"
+            data-testid="button-footer-weather-open"
           >
-            {weatherData.temperature}°F
-          </span>
-          <span className="text-slate-500 hidden sm:inline">
-            {locationName.split(',')[0]}
-          </span>
+            <span className="text-base">{emoji}</span>
+            <span 
+              className="font-bold"
+              style={{ color: tempColor }}
+            >
+              {weatherData.temperature}°F
+            </span>
+            <span className="text-slate-500 hidden sm:inline">
+              {locationName.split(',')[0]}
+            </span>
+          </button>
         </>
       ) : isLoading ? (
         <span className="text-slate-500">Loading...</span>

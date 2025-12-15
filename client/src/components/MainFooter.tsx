@@ -12,7 +12,11 @@ interface VersionInfo {
   transactionSignature: string | null;
 }
 
-export function MainFooter() {
+interface MainFooterProps {
+  onOpenRadar?: () => void;
+}
+
+export function MainFooter({ onOpenRadar }: MainFooterProps) {
   const [versionInfo, setVersionInfo] = useState<VersionInfo>({
     version: '2.7.1',
     buildNumber: 1,
@@ -42,7 +46,7 @@ export function MainFooter() {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between text-[10px] sm:text-xs">
         <div className="flex items-center gap-2">
-          <FooterWeatherWidget />
+          <FooterWeatherWidget onOpenRadar={onOpenRadar} />
         </div>
         
         <div className="flex items-center gap-2 sm:gap-3 text-slate-500">
