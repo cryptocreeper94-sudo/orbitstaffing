@@ -210,10 +210,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid ZIP code format" });
       }
       
-      // Use Open-Meteo geocoding API
-      const geoResponse = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${zip}&count=1&language=en&format=json&country_code=US`
-      );
+      // Use Zippopotam.us for ZIP code geocoding - specifically designed for postal codes
+      const geoResponse = await fetch(`https://api.zippopotam.us/us/${zip}`);
+      
+      if (geoResponse.status === 404) {
+        return res.status(404).json({ error: "ZIP code not found" });
+      }
       
       if (!geoResponse.ok) {
         throw new Error("Geocoding service unavailable");
@@ -221,34 +223,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const geoData = await geoResponse.json();
       
-      if (!geoData.results || geoData.results.length === 0) {
-        // Try with city name approach for ZIP
-        const fallbackResponse = await fetch(
-          `https://geocoding-api.open-meteo.com/v1/search?name=United%20States%20${zip}&count=1&language=en&format=json`
-        );
-        const fallbackData = await fallbackResponse.json();
-        
-        if (!fallbackData.results || fallbackData.results.length === 0) {
-          return res.status(404).json({ error: "Location not found for ZIP code" });
-        }
-        
-        const location = fallbackData.results[0];
-        return res.json({
-          latitude: location.latitude,
-          longitude: location.longitude,
-          name: location.name,
-          admin1: location.admin1,
-          country: location.country,
-        });
+      // Check if we got valid data (empty object means not found)
+      if (!geoData.places || geoData.places.length === 0) {
+        return res.status(404).json({ error: "Location not found for ZIP code" });
       }
       
-      const location = geoData.results[0];
+      const place = geoData.places[0];
+      
       res.json({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        name: location.name,
-        admin1: location.admin1,
-        country: location.country,
+        latitude: parseFloat(place.latitude),
+        longitude: parseFloat(place.longitude),
+        name: place["place name"],
+        admin1: place.state,
+        country: 'United States',
       });
     } catch (error) {
       console.error("[Weather Geocode] Error:", error);
