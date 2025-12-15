@@ -8,6 +8,19 @@ import { BentoGrid } from "@/components/ui/bento-grid";
 
 const changelogEntries = [
   {
+    version: "v2.7.1",
+    date: "December 15, 2025",
+    type: "minor",
+    changes: [
+      { type: "new", text: "Full analytics tracking system with page views, live visitors, device detection" },
+      { type: "new", text: "Bento-grid analytics dashboard at /analytics with real-time stats" },
+      { type: "new", text: "OrbyHallmark component with QR code on Solana Verification page" },
+      { type: "fix", text: "Footer alignment - all links and version on same baseline" },
+      { type: "fix", text: "Solana verification page scrolls to top on load" },
+      { type: "fix", text: "Back button navigation fixed throughout app" },
+    ]
+  },
+  {
     version: "v2.7.0",
     date: "December 6, 2025",
     type: "major",

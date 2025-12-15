@@ -12,6 +12,17 @@ import { OrbyHallmark } from "@/components/OrbyHallmark";
 
 const blockchainStamps = [
   {
+    version: "v2.7.1",
+    date: "December 15, 2025",
+    products: [
+      {
+        name: "ORBIT Staffing OS",
+        hash: "74ed0196855cefa3926e64680686d2b5396003faed0ac9f8ec2450d69ba25771",
+        description: "Analytics system, bento dashboard, footer fixes"
+      }
+    ]
+  },
+  {
     version: "v2.7.0",
     date: "December 6, 2025",
     products: [

@@ -92,6 +92,7 @@ import IncidentReporting from "@/pages/IncidentReporting";
 import Sales from "@/pages/Sales";
 import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import AdminLicenseManager from "@/pages/AdminLicenseManager";
+import AdminLanding from "@/pages/AdminLanding";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { WeatherRadarModal } from "@/components/WeatherRadarModal";
@@ -135,6 +136,7 @@ function Router() {
       <Route path="/dev-landing" component={DeveloperLanding} />
       <Route path="/developer" component={DeveloperPanel} />
       <Route path="/admin" component={AdminPanel} />
+      <Route path="/admin-landing" component={AdminLanding} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/worker" component={WorkerPortal} />
       <Route path="/home" component={Landing} />
