@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone, TrendingUp } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone, TrendingUp, Search, PieChart, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -25,6 +25,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { AdminLoginHistory } from '@/components/AdminLoginHistory';
 import { LegalDocs } from '@/components/LegalDocs';
 import { FloatingHelpButton } from '@/components/HelpCenter';
+import { FullAnalyticsDashboard } from '@/components/FullAnalyticsDashboard';
+import { SEOManager } from '@/components/SEOManager';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
 import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
 import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
@@ -2852,6 +2854,30 @@ export default function DeveloperPanel() {
               </AccordionContent>
             </AccordionItem>
 
+            <AccordionItem value="analytics" className="border-b border-slate-700">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-cyan-900/20 to-blue-900/20" data-testid="accordion-dev-analytics">
+                <div className="flex items-center gap-3">
+                  <Activity className="w-5 h-5 text-cyan-400" />
+                  <span className="font-bold text-white">Analytics & SEO</span>
+                  <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-0.5 rounded-full ml-2">NEW</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {[
+                    { id: 'analytics', label: 'Analytics Dashboard', icon: <PieChart className="w-4 h-4" /> },
+                    { id: 'seo', label: 'SEO Manager', icon: <Search className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
             <AccordionItem value="intelligence" className="border-b-0">
               <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-purple-900/20 to-cyan-900/20" data-testid="accordion-dev-intelligence">
                 <div className="flex items-center gap-3">
@@ -3345,6 +3371,16 @@ export default function DeveloperPanel() {
         {/* BUSINESS INTELLIGENCE & VALUATION TAB */}
         {activeTab === 'valuation' && (
           <BusinessValuationDashboard isPartnerView={false} />
+        )}
+
+        {/* ANALYTICS DASHBOARD */}
+        {activeTab === 'analytics' && (
+          <FullAnalyticsDashboard />
+        )}
+
+        {/* SEO MANAGER */}
+        {activeTab === 'seo' && (
+          <SEOManager />
         )}
 
         {/* BUSINESS CONTROL PANEL - SOFTWARE LICENSES */}

@@ -37,6 +37,8 @@ import { BetaTesterDashboard } from '@/components/BetaTesterDashboard';
 import { BetaTesterManagement } from '@/components/BetaTesterManagement';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
 import { BlockchainDashboard } from '@/components/BlockchainDashboard';
+import { FullAnalyticsDashboard } from '@/components/FullAnalyticsDashboard';
+import { SEOManager } from '@/components/SEOManager';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
 import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
@@ -581,6 +583,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       icon: <BarChart3 className="w-5 h-5" />,
       color: 'green',
       items: [
+        { id: 'full-analytics', label: 'Full Analytics Dashboard', icon: <BarChart3 className="w-4 h-4" /> },
+        { id: 'seo', label: 'SEO Manager', icon: <Search className="w-4 h-4" /> },
         { id: 'analytics', label: 'Advanced Analytics', icon: <BarChart3 className="w-4 h-4" /> },
         { id: 'compliance', label: 'Compliance Reports', icon: <Shield className="w-4 h-4" /> },
         { id: 'worker-performance', label: 'Worker Performance', icon: <BarChart3 className="w-4 h-4" /> },
@@ -662,6 +666,8 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
           </Button>
         </BentoTile>
       );
+      case 'full-analytics': return <FullAnalyticsDashboard />;
+      case 'seo': return <SEOManager />;
       case 'analytics': return <AdvancedAnalyticsDashboard />;
       case 'bulk-ops': return <BulkOperations />;
       case 'search': return <AdvancedSearch />;
