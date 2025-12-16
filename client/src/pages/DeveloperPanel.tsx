@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone, TrendingUp, Search, PieChart, Activity } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone, TrendingUp, Search, PieChart, Activity, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -29,6 +29,7 @@ import { FullAnalyticsDashboard } from '@/components/FullAnalyticsDashboard';
 import { SEOManager } from '@/components/SEOManager';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
 import { PartnerApiManager } from '@/components/PartnerApiManager';
+import { AccountingIntegrations } from '@/components/AccountingIntegrations';
 import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
 import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
 import { SectionHeader, PageHeader } from '@/components/ui/section-header';
@@ -2914,6 +2915,7 @@ export default function DeveloperPanel() {
                 <div className="grid grid-cols-1 gap-2">
                   {[
                     { id: 'partner-api', label: 'API Credentials & Logs', icon: <Key className="w-4 h-4" /> },
+                    { id: 'accounting', label: 'QuickBooks & Xero', icon: <DollarSign className="w-4 h-4" /> },
                   ].map(item => (
                     <button key={item.id} onClick={() => setActiveTab(item.id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
@@ -3410,6 +3412,11 @@ export default function DeveloperPanel() {
         {/* PARTNER API MANAGER */}
         {activeTab === 'partner-api' && (
           <PartnerApiManager />
+        )}
+
+        {/* ACCOUNTING INTEGRATIONS */}
+        {activeTab === 'accounting' && (
+          <AccountingIntegrations />
         )}
 
         {/* BUSINESS CONTROL PANEL - SOFTWARE LICENSES */}

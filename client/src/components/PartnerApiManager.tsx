@@ -446,11 +446,23 @@ export function PartnerApiManager() {
         <TabsContent value="docs" className="mt-4">
           <Card className="bg-gray-900/50 border-gray-800">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Code2 className="h-5 w-5 text-cyan-400" />
-                API Documentation
-              </CardTitle>
-              <CardDescription>Quick reference for Partner API v1</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Code2 className="h-5 w-5 text-cyan-400" />
+                    API Documentation
+                  </CardTitle>
+                  <CardDescription>Quick reference for Partner API v1</CardDescription>
+                </div>
+                <Button
+                  onClick={() => window.open('/api/docs', '_blank')}
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+                  data-testid="btn-view-interactive-docs"
+                >
+                  <Globe className="h-4 w-4 mr-2" />
+                  View Interactive Docs
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>

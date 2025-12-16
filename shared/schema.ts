@@ -2363,7 +2363,7 @@ export type InsertGarnishmentDocument = z.infer<typeof insertGarnishmentDocument
 export type GarnishmentDocument = typeof garnishmentDocuments.$inferSelect;
 
 // ========================
-// Background Checks
+// Background Checks (Checkr Integration)
 // ========================
 export const backgroundChecks = pgTable(
   "background_checks",
@@ -2372,22 +2372,37 @@ export const backgroundChecks = pgTable(
     tenantId: varchar("tenant_id").notNull().references(() => companies.id),
     workerId: varchar("worker_id").notNull().references(() => workers.id),
     
+    // Checkr Integration Fields
+    checkrCandidateId: varchar("checkr_candidate_id", { length: 100 }),
+    checkrReportId: varchar("checkr_report_id", { length: 100 }),
+    checkrInvitationId: varchar("checkr_invitation_id", { length: 100 }),
+    
+    // Package Selection (basic, standard, pro)
+    package: varchar("package", { length: 50 }).default("basic"), // basic, standard, pro
+    
     // Check Details
     checkType: varchar("check_type", { length: 50 }).notNull(), // criminal, motor_vehicle, employment_history
-    requestedDate: timestamp("requested_date").default(sql`NOW()`),
-    completedDate: timestamp("completed_date"),
+    requestedAt: timestamp("requested_at").default(sql`NOW()`),
+    completedAt: timestamp("completed_at"),
     
-    // Status
-    status: varchar("status", { length: 50 }).default("pending"), // pending, processing, completed, failed
+    // Status (Checkr statuses: pending, clear, consider, suspended, dispute)
+    status: varchar("status", { length: 50 }).default("pending"), // pending, clear, consider, suspended, dispute
+    
+    // Adjudication (post_adverse_action, engaged, adverse_action)
+    adjudication: varchar("adjudication", { length: 50 }),
+    
+    // Legacy fields for compatibility
     resultStatus: varchar("result_status", { length: 50 }), // clear, issues_found, disqualified
     resultDetails: jsonb("result_details"), // violations, incidents, etc
     
+    // Report URL
+    reportUrl: varchar("report_url", { length: 500 }),
+    
     // Expiration
     expiryDate: date("expiry_date"),
-    reportUrl: varchar("report_url", { length: 255 }),
     
-    // Third-party Integration
-    externalId: varchar("external_id", { length: 100 }), // Checkr candidate_id, request_id
+    // Third-party Integration (legacy)
+    externalId: varchar("external_id", { length: 100 }),
     externalStatus: varchar("external_status", { length: 50 }),
     
     // Audit Trail
@@ -2395,6 +2410,10 @@ export const backgroundChecks = pgTable(
     reviewedBy: varchar("reviewed_by").references(() => users.id),
     reviewedAt: timestamp("reviewed_at"),
     notes: text("notes"),
+    
+    // Webhook tracking
+    lastWebhookAt: timestamp("last_webhook_at"),
+    webhookEventType: varchar("webhook_event_type", { length: 100 }),
     
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -2407,13 +2426,17 @@ export const backgroundChecks = pgTable(
     resultStatusIdx: index("idx_bg_check_result_status").on(table.resultStatus),
     expiryIdx: index("idx_bg_check_expiry").on(table.expiryDate),
     externalIdIdx: index("idx_bg_check_external_id").on(table.externalId),
+    checkrCandidateIdx: index("idx_bg_check_checkr_candidate").on(table.checkrCandidateId),
+    checkrReportIdx: index("idx_bg_check_checkr_report").on(table.checkrReportId),
+    packageIdx: index("idx_bg_check_package").on(table.package),
   })
 );
 
 export const insertBackgroundCheckSchema = createInsertSchema(backgroundChecks).omit({
   id: true,
-  requestedDate: true,
+  requestedAt: true,
   reviewedAt: true,
+  lastWebhookAt: true,
   createdAt: true,
   updatedAt: true,
 });
@@ -6380,3 +6403,97 @@ export const insertWebhookDeliveryLogSchema = createInsertSchema(webhookDelivery
 
 export type InsertWebhookDeliveryLog = z.infer<typeof insertWebhookDeliveryLogSchema>;
 export type WebhookDeliveryLog = typeof webhookDeliveryLogs.$inferSelect;
+
+// ========================
+// Accounting Connections (QuickBooks / Xero OAuth)
+// ========================
+export const accountingConnections = pgTable(
+  "accounting_connections",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    provider: varchar("provider", { length: 20 }).notNull(), // "quickbooks" or "xero"
+    
+    // OAuth Tokens (encrypted in practice)
+    accessToken: text("access_token").notNull(),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at"),
+    
+    // Provider-specific identifiers
+    realmId: varchar("realm_id", { length: 255 }), // QuickBooks realm ID
+    xeroTenantId: varchar("xero_tenant_id", { length: 255 }), // Xero tenant ID
+    
+    // Company info from provider
+    companyName: varchar("company_name", { length: 255 }),
+    
+    // Connection status
+    isActive: boolean("is_active").default(true),
+    connectionStatus: varchar("connection_status", { length: 50 }).default("connected"), // connected, error, expired, disconnected
+    lastError: text("last_error"),
+    
+    // Sync tracking
+    lastSyncAt: timestamp("last_sync_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_accounting_conn_tenant").on(table.tenantId),
+    providerIdx: index("idx_accounting_conn_provider").on(table.provider),
+    tenantProviderIdx: index("idx_accounting_conn_tenant_provider").on(table.tenantId, table.provider),
+    activeIdx: index("idx_accounting_conn_active").on(table.isActive),
+  })
+);
+
+export const insertAccountingConnectionSchema = createInsertSchema(accountingConnections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAccountingConnection = z.infer<typeof insertAccountingConnectionSchema>;
+export type AccountingConnection = typeof accountingConnections.$inferSelect;
+
+// ========================
+// Accounting Sync Logs - Track sync operations
+// ========================
+export const accountingSyncLogs = pgTable(
+  "accounting_sync_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    connectionId: varchar("connection_id").notNull().references(() => accountingConnections.id),
+    
+    // Sync details
+    syncType: varchar("sync_type", { length: 50 }).notNull(), // "invoice", "payroll", "worker"
+    direction: varchar("direction", { length: 10 }).notNull(), // "push" or "pull"
+    
+    // Results
+    recordCount: integer("record_count").default(0),
+    successCount: integer("success_count").default(0),
+    failedCount: integer("failed_count").default(0),
+    
+    // Status
+    status: varchar("status", { length: 20 }).default("pending"), // "pending", "in_progress", "success", "failed"
+    errorMessage: text("error_message"),
+    
+    // Timing
+    startedAt: timestamp("started_at").default(sql`NOW()`),
+    completedAt: timestamp("completed_at"),
+    
+    // Details for debugging
+    details: jsonb("details"), // Store specifics about what was synced
+  },
+  (table) => ({
+    connectionIdx: index("idx_accounting_sync_connection").on(table.connectionId),
+    statusIdx: index("idx_accounting_sync_status").on(table.status),
+    typeIdx: index("idx_accounting_sync_type").on(table.syncType),
+    startedAtIdx: index("idx_accounting_sync_started").on(table.startedAt),
+  })
+);
+
+export const insertAccountingSyncLogSchema = createInsertSchema(accountingSyncLogs).omit({
+  id: true,
+});
+
+export type InsertAccountingSyncLog = z.infer<typeof insertAccountingSyncLogSchema>;
+export type AccountingSyncLog = typeof accountingSyncLogs.$inferSelect;

@@ -15,6 +15,13 @@
       "when": 1764312702435,
       "tag": "0001_luxuriant_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765905545724,
+      "tag": "0002_third_legion",
+      "breakpoints": true
     }
   ]
 }

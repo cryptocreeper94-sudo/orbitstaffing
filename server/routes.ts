@@ -15,7 +15,9 @@ import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
 import { registerCrmRoutes } from "./crmRoutes";
 import { coinbaseService } from "./coinbaseService";
 import { solanaService } from "./solanaService";
+import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
+import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -24,6 +26,8 @@ import { azureFaceService } from "./azureFaceService";
 import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
 import { versionManager } from "./versionManager";
 import { webhookService, emitWebhookEvent, sendTestWebhook, startWebhookRetryProcessor } from "./webhookService";
+import swaggerUi from "swagger-ui-express";
+import { openApiSpec } from "./openapi";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -138,6 +142,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Analytics routes (Page tracking and dashboard)
   registerAnalyticsRoutes(app);
+
+  // ========================
+  // API DOCUMENTATION (OpenAPI/Swagger)
+  // ========================
+  
+  // Serve raw OpenAPI spec JSON
+  app.get("/api/docs/openapi.json", (req: Request, res: Response) => {
+    res.json(openApiSpec);
+  });
+
+  // Serve Swagger UI
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec, {
+    customCss: `
+      .swagger-ui .topbar { display: none }
+      .swagger-ui { background: #1a1a2e; }
+      .swagger-ui .info .title { color: #22d3ee; }
+      .swagger-ui .info .description { color: #94a3b8; }
+      .swagger-ui .opblock-tag { color: #22d3ee !important; }
+      .swagger-ui .opblock .opblock-summary-operation-id { color: #e2e8f0; }
+    `,
+    customSiteTitle: "ORBIT Partner API Documentation",
+    swaggerOptions: {
+      docExpansion: 'list',
+      filter: true,
+      showRequestDuration: true,
+      persistAuthorization: true,
+    },
+  }));
 
   // ========================
   // SYSTEM STATUS CHECK (For Developer Checklist Auto-Update)
@@ -11548,6 +11580,335 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Delete franchise location error:", error);
       res.status(500).json({ error: "Failed to delete location" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Accounting Integrations (QuickBooks, Xero)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // List accounting connections
+  app.get("/api/admin/accounting/connections", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { tenantId } = req.query;
+      const connections = await accountingService.getConnections(tenantId as string | undefined);
+      res.json({
+        connections,
+        providers: {
+          quickbooks: {
+            configured: accountingService.isConfigured("quickbooks"),
+            name: "QuickBooks Online",
+          },
+          xero: {
+            configured: accountingService.isConfigured("xero"),
+            name: "Xero",
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get accounting connections error:", error);
+      res.status(500).json({ error: "Failed to fetch connections" });
+    }
+  });
+
+  // Start OAuth flow for a provider
+  app.post("/api/admin/accounting/connect/:provider", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const { tenantId } = req.body;
+
+      if (!["quickbooks", "xero"].includes(provider)) {
+        return res.status(400).json({ error: "Invalid provider. Use 'quickbooks' or 'xero'" });
+      }
+
+      if (!tenantId) {
+        return res.status(400).json({ error: "tenantId is required" });
+      }
+
+      const authData = await accountingService.getAuthUrl(provider, tenantId);
+      if (!authData) {
+        return res.status(400).json({ 
+          error: `${provider} is not configured. Please set ${provider.toUpperCase()}_CLIENT_ID and ${provider.toUpperCase()}_CLIENT_SECRET environment variables.` 
+        });
+      }
+
+      res.json({ authUrl: authData.url, state: authData.state });
+    } catch (error) {
+      console.error("Start OAuth flow error:", error);
+      res.status(500).json({ error: "Failed to start OAuth flow" });
+    }
+  });
+
+  // OAuth callback handler
+  app.get("/api/admin/accounting/callback/:provider", async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const { code, state, realmId } = req.query;
+
+      if (!code || !state) {
+        return res.redirect("/developer?accounting_error=missing_params");
+      }
+
+      const connection = await accountingService.handleOAuthCallback(
+        provider,
+        code as string,
+        state as string,
+        realmId as string | undefined
+      );
+
+      if (!connection) {
+        return res.redirect("/developer?accounting_error=oauth_failed");
+      }
+
+      res.redirect(`/developer?accounting_success=${provider}&connection=${connection.id}`);
+    } catch (error) {
+      console.error("OAuth callback error:", error);
+      res.redirect("/developer?accounting_error=callback_failed");
+    }
+  });
+
+  // Disconnect an accounting provider
+  app.post("/api/admin/accounting/disconnect/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const success = await accountingService.disconnect(id);
+      if (!success) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+      res.json({ success: true, message: "Disconnected successfully" });
+    } catch (error) {
+      console.error("Disconnect accounting error:", error);
+      res.status(500).json({ error: "Failed to disconnect" });
+    }
+  });
+
+  // Trigger manual sync
+  app.post("/api/admin/accounting/sync/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { syncType } = req.body;
+
+      const connection = await accountingService.getConnection(id);
+      if (!connection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+
+      if (!connection.isActive) {
+        return res.status(400).json({ error: "Connection is not active" });
+      }
+
+      let syncLog;
+      switch (syncType) {
+        case "invoice":
+          syncLog = await accountingService.syncInvoices(id);
+          break;
+        case "payroll":
+          syncLog = await accountingService.syncPayroll(id);
+          break;
+        case "worker":
+          syncLog = await accountingService.syncWorkers(id);
+          break;
+        default:
+          return res.status(400).json({ error: "Invalid syncType. Use 'invoice', 'payroll', or 'worker'" });
+      }
+
+      res.json({ success: true, syncLog });
+    } catch (error) {
+      console.error("Sync error:", error);
+      res.status(500).json({ error: "Failed to sync" });
+    }
+  });
+
+  // Get sync logs for a connection
+  app.get("/api/admin/accounting/sync-logs/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { limit } = req.query;
+      const logs = await accountingService.getSyncLogs(id, limit ? parseInt(limit as string) : 20);
+      res.json({ logs });
+    } catch (error) {
+      console.error("Get sync logs error:", error);
+      res.status(500).json({ error: "Failed to fetch sync logs" });
+    }
+  });
+
+  // ========================
+  // CHECKR BACKGROUND CHECK ROUTES
+  // ========================
+  registerBackgroundCheckRoutes(app);
+}
+
+// ========================
+// CHECKR BACKGROUND CHECK API ROUTES
+// ========================
+export function registerBackgroundCheckRoutes(app: Express) {
+
+  // Get all background checks for admin
+  app.get("/api/admin/background-checks", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || "default";
+      const checks = await checkrService.getBackgroundChecks(tenantId);
+      
+      // Enrich with worker names
+      const enrichedChecks = await Promise.all(
+        checks.map(async (check: any) => {
+          try {
+            const worker = await db
+              .select({ fullName: workers.fullName })
+              .from(workers)
+              .where(eq(workers.id, check.workerId))
+              .limit(1);
+            return {
+              ...check,
+              workerName: worker[0]?.fullName || "Unknown Worker",
+            };
+          } catch {
+            return { ...check, workerName: "Unknown Worker" };
+          }
+        })
+      );
+      
+      res.json(enrichedChecks);
+    } catch (error) {
+      console.error("[Background Checks] List error:", error);
+      res.status(500).json({ error: "Failed to fetch background checks" });
+    }
+  });
+
+  // Get available packages with pricing
+  app.get("/api/admin/background-checks/packages", async (req: Request, res: Response) => {
+    try {
+      res.json(CHECKR_PACKAGES);
+    } catch (error) {
+      console.error("[Background Checks] Packages error:", error);
+      res.status(500).json({ error: "Failed to fetch packages" });
+    }
+  });
+
+  // Get background checks for a specific worker
+  app.get("/api/admin/background-checks/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const tenantId = getTenantIdFromRequest(req) || "default";
+      const checks = await checkrService.getWorkerBackgroundChecks(tenantId, workerId);
+      res.json(checks);
+    } catch (error) {
+      console.error("[Background Checks] Worker checks error:", error);
+      res.status(500).json({ error: "Failed to fetch worker background checks" });
+    }
+  });
+
+  // Initiate a new background check
+  app.post("/api/admin/background-checks/initiate", async (req: Request, res: Response) => {
+    try {
+      const { workerId, package: packageId } = req.body;
+      
+      if (!workerId) {
+        return res.status(400).json({ error: "workerId is required" });
+      }
+      
+      if (!packageId || !["basic", "standard", "pro"].includes(packageId)) {
+        return res.status(400).json({ error: "Valid package (basic, standard, pro) is required" });
+      }
+      
+      const tenantId = getTenantIdFromRequest(req) || "default";
+      const requestedBy = (req as any).user?.id || "admin";
+      
+      const check = await checkrService.initiateCheck(
+        tenantId,
+        workerId,
+        packageId,
+        requestedBy
+      );
+      
+      // Get worker name for response
+      const worker = await db
+        .select({ fullName: workers.fullName })
+        .from(workers)
+        .where(eq(workers.id, workerId))
+        .limit(1);
+      
+      res.json({
+        ...check,
+        workerName: worker[0]?.fullName || "Unknown Worker",
+      });
+    } catch (error: any) {
+      console.error("[Background Checks] Initiate error:", error);
+      res.status(500).json({ error: error.message || "Failed to initiate background check" });
+    }
+  });
+
+  // Checkr webhook callback
+  app.post("/api/admin/background-checks/webhook", async (req: Request, res: Response) => {
+    try {
+      const payload = req.body;
+      
+      console.log("[Checkr Webhook] Received:", payload.type);
+      
+      // Process the webhook
+      const result = await checkrService.handleWebhook(payload);
+      
+      if (result) {
+        console.log("[Checkr Webhook] Updated check:", result.id);
+      }
+      
+      res.status(200).json({ received: true });
+    } catch (error) {
+      console.error("[Checkr Webhook] Error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
+
+  // Get report details for a specific check
+  app.get("/api/admin/background-checks/:id/report", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const check = await checkrService.getBackgroundCheck(id);
+      
+      if (!check) {
+        return res.status(404).json({ error: "Background check not found" });
+      }
+      
+      // If we have a Checkr report ID, try to fetch fresh data
+      let reportData = null;
+      if (check.checkrReportId && checkrService.isConfigured()) {
+        try {
+          reportData = await checkrService.getReport(check.checkrReportId);
+        } catch (err) {
+          console.warn("[Background Check] Could not fetch Checkr report:", err);
+        }
+      }
+      
+      // Get worker info
+      const worker = await db
+        .select({ fullName: workers.fullName, email: workers.email })
+        .from(workers)
+        .where(eq(workers.id, check.workerId))
+        .limit(1);
+      
+      res.json({
+        check,
+        reportData,
+        worker: worker[0] || null,
+        package: CHECKR_PACKAGES.find((p: any) => p.id === check.package) || null,
+      });
+    } catch (error) {
+      console.error("[Background Checks] Report error:", error);
+      res.status(500).json({ error: "Failed to fetch report details" });
+    }
+  });
+
+  // Check Checkr configuration status
+  app.get("/api/admin/background-checks/status", async (req: Request, res: Response) => {
+    try {
+      res.json({
+        configured: checkrService.isConfigured(),
+        sandboxMode: !process.env.CHECKR_API_KEY || process.env.NODE_ENV !== "production",
+        packages: CHECKR_PACKAGES.map((p: any) => ({ id: p.id, name: p.name, price: p.price })),
+      });
+    } catch (error) {
+      console.error("[Background Checks] Status error:", error);
+      res.status(500).json({ error: "Failed to get status" });
     }
   });
 }
