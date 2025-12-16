@@ -20,6 +20,7 @@ import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import { jobBoardService } from "./jobBoardService";
 import { everifyService } from "./everifyService";
+import { reportService, REPORT_TYPE_INFO } from "./reportService";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -151,6 +152,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register E-Verify routes (Employment eligibility verification)
   registerEVerifyRoutes(app);
+  
+  // Register Compliance Report routes (Automated report generation)
+  registerComplianceReportRoutes(app);
+  
+  // Register Time Clock routes (Physical time clock hardware integration)
+  registerTimeClockRoutes(app);
+  
+  // Register Integration Marketplace routes
+  registerMarketplaceRoutes(app);
 
   // ========================
   // API DOCUMENTATION (OpenAPI/Swagger)
@@ -13158,6 +13168,694 @@ export function registerEVerifyRoutes(app: Express) {
     } catch (error) {
       console.error("[E-Verify] Webhook error:", error);
       res.status(500).json({ error: "Failed to process webhook" });
+    }
+  });
+}
+
+// ========================
+// COMPLIANCE REPORT ROUTES
+// ========================
+export function registerComplianceReportRoutes(app: Express) {
+  
+  // GET /api/admin/compliance/reports - List available report types
+  app.get("/api/admin/compliance/reports", async (req: Request, res: Response) => {
+    try {
+      res.json({
+        reportTypes: REPORT_TYPE_INFO.map(rt => ({
+          id: rt.id,
+          name: rt.name,
+          description: rt.description,
+          icon: rt.icon,
+          fields: rt.fields,
+        })),
+        formats: ['pdf', 'csv', 'excel'],
+      });
+    } catch (error) {
+      console.error("[Compliance Reports] List types error:", error);
+      res.status(500).json({ error: "Failed to list report types" });
+    }
+  });
+
+  // POST /api/admin/compliance/reports/generate - Generate a report
+  app.post("/api/admin/compliance/reports/generate", async (req: Request, res: Response) => {
+    try {
+      const { reportType, dateRange, format, filters } = req.body;
+      const tenantId = getTenantIdFromRequest(req) || req.body.tenantId || "default";
+
+      if (!reportType) {
+        return res.status(400).json({ error: "Report type is required" });
+      }
+
+      const validTypes = ['i9_audit', 'tax_summary', 'certification_tracker', 'worker_status', 'payroll_summary', 'insurance_compliance'];
+      if (!validTypes.includes(reportType)) {
+        return res.status(400).json({ error: `Invalid report type. Valid types: ${validTypes.join(', ')}` });
+      }
+
+      const validFormats = ['pdf', 'csv', 'excel'];
+      const reportFormat = validFormats.includes(format) ? format : 'pdf';
+
+      const report = await reportService.generateReport({
+        tenantId,
+        reportType,
+        dateRange,
+        format: reportFormat,
+        filters,
+        createdBy: (req as any).user?.id,
+      });
+
+      res.json(report);
+    } catch (error) {
+      console.error("[Compliance Reports] Generate error:", error);
+      res.status(500).json({ error: "Failed to generate report" });
+    }
+  });
+
+  // GET /api/admin/compliance/reports/history - List generated reports
+  app.get("/api/admin/compliance/reports/history", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      const reports = await reportService.getReportHistory(tenantId, limit);
+      res.json({ reports });
+    } catch (error) {
+      console.error("[Compliance Reports] History error:", error);
+      res.status(500).json({ error: "Failed to fetch report history" });
+    }
+  });
+
+  // GET /api/admin/compliance/reports/:id - Get report status/download
+  app.get("/api/admin/compliance/reports/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+
+      const report = await reportService.getReportById(id, tenantId);
+
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+
+      res.json(report);
+    } catch (error) {
+      console.error("[Compliance Reports] Get report error:", error);
+      res.status(500).json({ error: "Failed to get report" });
+    }
+  });
+
+  // GET /api/admin/compliance/reports/:id/download - Download the report file
+  app.get("/api/admin/compliance/reports/:id/download", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+
+      const report = await reportService.getReportById(id, tenantId);
+
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+
+      if (report.status !== 'completed' || !report.filePath) {
+        return res.status(400).json({ error: "Report not ready for download" });
+      }
+
+      const filePath = path.join(process.cwd(), report.filePath.replace(/^\//, ''));
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "Report file not found" });
+      }
+
+      await reportService.markReportDownloaded(id);
+
+      const filename = `${report.reportType}_${new Date(report.createdAt!).toISOString().split('T')[0]}`;
+      const ext = report.format === 'csv' || report.format === 'excel' ? 'csv' : 'html';
+      
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}.${ext}"`);
+      res.setHeader('Content-Type', ext === 'csv' ? 'text/csv' : 'text/html');
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error("[Compliance Reports] Download error:", error);
+      res.status(500).json({ error: "Failed to download report" });
+    }
+  });
+}
+
+// ========================
+// Time Clock Hardware Integration
+// ========================
+import { timeClockService } from "./timeClockService";
+import { insertTimeClockDeviceSchema, insertTimeClockPunchSchema } from "@shared/schema";
+
+export function registerTimeClockRoutes(app: Express) {
+  
+  // GET /api/admin/time-clocks/devices - List all devices for tenant
+  app.get("/api/admin/time-clocks/devices", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+      const devices = await timeClockService.listDevices(tenantId);
+      res.json({ devices });
+    } catch (error) {
+      console.error("[Time Clock] List devices error:", error);
+      res.status(500).json({ error: "Failed to list devices" });
+    }
+  });
+
+  // POST /api/admin/time-clocks/devices - Register new device
+  app.post("/api/admin/time-clocks/devices", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || req.body.tenantId || "default";
+      
+      const deviceData = {
+        tenantId,
+        deviceId: req.body.deviceId,
+        deviceType: req.body.deviceType,
+        vendor: req.body.vendor || 'generic_api',
+        name: req.body.name,
+        location: req.body.location,
+        ipAddress: req.body.ipAddress,
+        serialNumber: req.body.serialNumber,
+        apiKey: req.body.apiKey,
+        apiEndpoint: req.body.apiEndpoint,
+        settings: req.body.settings,
+      };
+
+      const device = await timeClockService.registerDevice(deviceData);
+      console.log(`[Time Clock] Registered device ${device.name} (${device.deviceId})`);
+      res.json({ success: true, device });
+    } catch (error) {
+      console.error("[Time Clock] Register device error:", error);
+      res.status(500).json({ error: "Failed to register device" });
+    }
+  });
+
+  // PATCH /api/admin/time-clocks/devices/:id - Update device
+  app.patch("/api/admin/time-clocks/devices/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const updates = {
+        name: req.body.name,
+        location: req.body.location,
+        ipAddress: req.body.ipAddress,
+        apiKey: req.body.apiKey,
+        apiEndpoint: req.body.apiEndpoint,
+        isActive: req.body.isActive,
+        settings: req.body.settings,
+      };
+
+      Object.keys(updates).forEach(key => {
+        if (updates[key as keyof typeof updates] === undefined) {
+          delete updates[key as keyof typeof updates];
+        }
+      });
+
+      const device = await timeClockService.updateDevice(id, updates);
+      if (!device) {
+        return res.status(404).json({ error: "Device not found" });
+      }
+      res.json({ success: true, device });
+    } catch (error) {
+      console.error("[Time Clock] Update device error:", error);
+      res.status(500).json({ error: "Failed to update device" });
+    }
+  });
+
+  // DELETE /api/admin/time-clocks/devices/:id - Remove device
+  app.delete("/api/admin/time-clocks/devices/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const deleted = await timeClockService.deleteDevice(id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Device not found" });
+      }
+      console.log(`[Time Clock] Deleted device ${id}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[Time Clock] Delete device error:", error);
+      res.status(500).json({ error: "Failed to delete device" });
+    }
+  });
+
+  // POST /api/admin/time-clocks/devices/:id/ping - Test device connection
+  app.post("/api/admin/time-clocks/devices/:id/ping", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const status = await timeClockService.pingDevice(id);
+      res.json(status);
+    } catch (error) {
+      console.error("[Time Clock] Ping device error:", error);
+      res.status(500).json({ error: "Failed to ping device" });
+    }
+  });
+
+  // GET /api/admin/time-clocks/punches - List punches
+  app.get("/api/admin/time-clocks/punches", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+      const options: any = {};
+      
+      if (req.query.deviceId) options.deviceId = req.query.deviceId as string;
+      if (req.query.workerId) options.workerId = req.query.workerId as string;
+      if (req.query.startDate) options.startDate = new Date(req.query.startDate as string);
+      if (req.query.endDate) options.endDate = new Date(req.query.endDate as string);
+      if (req.query.unprocessedOnly === 'true') options.unprocessedOnly = true;
+      if (req.query.limit) options.limit = parseInt(req.query.limit as string);
+
+      const punches = await timeClockService.listPunches(tenantId, options);
+      res.json({ punches });
+    } catch (error) {
+      console.error("[Time Clock] List punches error:", error);
+      res.status(500).json({ error: "Failed to list punches" });
+    }
+  });
+
+  // POST /api/admin/time-clocks/sync - Sync punches to timesheets
+  app.post("/api/admin/time-clocks/sync", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || req.body.tenantId || "default";
+      const result = await timeClockService.syncPunchesToTimesheets(tenantId);
+      console.log(`[Time Clock] Synced ${result.synced} punches to timesheets`);
+      res.json(result);
+    } catch (error) {
+      console.error("[Time Clock] Sync error:", error);
+      res.status(500).json({ error: "Failed to sync punches" });
+    }
+  });
+
+  // GET /api/admin/time-clocks/health - Monitor device health
+  app.get("/api/admin/time-clocks/health", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+      const statuses = await timeClockService.monitorDeviceHealth(tenantId);
+      res.json({ statuses });
+    } catch (error) {
+      console.error("[Time Clock] Health check error:", error);
+      res.status(500).json({ error: "Failed to check device health" });
+    }
+  });
+
+  // GET /api/admin/time-clocks/vendors - Get supported vendors
+  app.get("/api/admin/time-clocks/vendors", async (req: Request, res: Response) => {
+    try {
+      const vendors = timeClockService.getSupportedVendors();
+      res.json({ vendors });
+    } catch (error) {
+      console.error("[Time Clock] Get vendors error:", error);
+      res.status(500).json({ error: "Failed to get vendors" });
+    }
+  });
+
+  // ========================
+  // Device-facing endpoints (API key auth)
+  // ========================
+
+  // POST /api/time-clocks/punch - Receive punch from device
+  app.post("/api/time-clocks/punch", async (req: Request, res: Response) => {
+    try {
+      const apiKey = req.headers['x-api-key'] as string;
+      const { tenantId, deviceId, workerIdentifier, punchType, punchTime, latitude, longitude, rawData } = req.body;
+
+      if (!tenantId || !deviceId || !workerIdentifier || !punchType) {
+        return res.status(400).json({ error: "Missing required fields: tenantId, deviceId, workerIdentifier, punchType" });
+      }
+
+      const validPunchTypes = ['in', 'out', 'break_start', 'break_end'];
+      if (!validPunchTypes.includes(punchType)) {
+        return res.status(400).json({ error: `Invalid punch type. Valid: ${validPunchTypes.join(', ')}` });
+      }
+
+      const punch = await timeClockService.processIncomingPunch(tenantId, {
+        deviceId,
+        workerIdentifier,
+        punchType,
+        punchTime: punchTime ? new Date(punchTime) : new Date(),
+        latitude,
+        longitude,
+        rawData,
+      });
+
+      console.log(`[Time Clock] Punch ${punchType} from ${deviceId} for worker ${workerIdentifier}`);
+      res.json({ success: true, punchId: punch.id, isValid: punch.isValid });
+    } catch (error) {
+      console.error("[Time Clock] Punch error:", error);
+      res.status(500).json({ error: "Failed to process punch" });
+    }
+  });
+
+  // POST /api/time-clocks/heartbeat - Device heartbeat
+  app.post("/api/time-clocks/heartbeat", async (req: Request, res: Response) => {
+    try {
+      const { tenantId, deviceId, status, firmwareVersion } = req.body;
+
+      if (!tenantId || !deviceId) {
+        return res.status(400).json({ error: "Missing required fields: tenantId, deviceId" });
+      }
+
+      const device = await timeClockService.handleHeartbeat(deviceId, tenantId);
+      
+      if (!device) {
+        return res.status(404).json({ error: "Device not found" });
+      }
+
+      res.json({ success: true, acknowledged: true, serverTime: new Date().toISOString() });
+    } catch (error) {
+      console.error("[Time Clock] Heartbeat error:", error);
+      res.status(500).json({ error: "Failed to process heartbeat" });
+    }
+  });
+}
+
+// ========================
+// INTEGRATION MARKETPLACE ROUTES
+// ========================
+
+// Seed data for initial marketplace apps
+const SEED_MARKETPLACE_APPS = [
+  {
+    name: "QuickBooks",
+    slug: "quickbooks",
+    description: "Sync payroll data, invoices, and expenses with QuickBooks Online. Automate your accounting workflow.",
+    category: "accounting",
+    provider: "Intuit",
+    iconUrl: "/icons/pro/3d_invoice_billing_icon.png",
+    websiteUrl: "https://quickbooks.intuit.com",
+    docsUrl: "https://developer.intuit.com/app/developer/qbo/docs/get-started",
+    pricingType: "paid",
+    monthlyPrice: "25.00",
+    features: ["Auto-sync invoices", "Payroll export", "Expense tracking", "Tax reports"],
+    requiredScopes: ["payroll:read", "invoices:write", "expenses:read"],
+    isFeatured: true,
+    rating: "4.8",
+    installCount: 1250,
+  },
+  {
+    name: "Xero",
+    slug: "xero",
+    description: "Beautiful accounting software for small business. Sync timesheets, invoices, and payroll seamlessly.",
+    category: "accounting",
+    provider: "Xero Limited",
+    iconUrl: "/icons/pro/3d_chart_reports_icon.png",
+    websiteUrl: "https://www.xero.com",
+    docsUrl: "https://developer.xero.com/documentation/api/api-overview",
+    pricingType: "paid",
+    monthlyPrice: "20.00",
+    features: ["Bank reconciliation", "Invoice sync", "Payroll integration", "Multi-currency"],
+    requiredScopes: ["payroll:read", "invoices:write", "banking:read"],
+    isFeatured: true,
+    rating: "4.7",
+    installCount: 890,
+  },
+  {
+    name: "Checkr",
+    slug: "checkr",
+    description: "Fast, AI-powered background checks. Screen candidates quickly with comprehensive reports.",
+    category: "compliance",
+    provider: "Checkr Inc.",
+    iconUrl: "/icons/pro/3d_shield_protection_icon.png",
+    websiteUrl: "https://checkr.com",
+    docsUrl: "https://docs.checkr.com",
+    pricingType: "paid",
+    monthlyPrice: "0",
+    features: ["Criminal records", "Employment verification", "Education check", "SSN trace"],
+    requiredScopes: ["workers:read", "compliance:write"],
+    isFeatured: true,
+    rating: "4.6",
+    installCount: 2100,
+  },
+  {
+    name: "Indeed",
+    slug: "indeed",
+    description: "Post jobs and source candidates from the world's largest job site. Reach millions of job seekers.",
+    category: "hr",
+    provider: "Indeed Inc.",
+    iconUrl: "/icons/pro/3d_briefcase_jobs_icon.png",
+    websiteUrl: "https://www.indeed.com",
+    docsUrl: "https://developer.indeed.com/docs",
+    pricingType: "freemium",
+    monthlyPrice: "0",
+    features: ["Job posting", "Resume search", "Candidate sync", "Sponsored jobs"],
+    requiredScopes: ["jobs:write", "candidates:read"],
+    isFeatured: true,
+    rating: "4.5",
+    installCount: 3200,
+  },
+  {
+    name: "LinkedIn Recruiter",
+    slug: "linkedin",
+    description: "Find and connect with top talent on the world's largest professional network.",
+    category: "hr",
+    provider: "Microsoft",
+    iconUrl: "/icons/pro/3d_people_group_icon.png",
+    websiteUrl: "https://business.linkedin.com/talent-solutions",
+    docsUrl: "https://learn.microsoft.com/en-us/linkedin/",
+    pricingType: "paid",
+    monthlyPrice: "119.99",
+    features: ["InMail credits", "Talent insights", "Candidate tracking", "Job posting"],
+    requiredScopes: ["jobs:write", "candidates:read", "profiles:read"],
+    isFeatured: false,
+    rating: "4.4",
+    installCount: 1800,
+  },
+  {
+    name: "ZipRecruiter",
+    slug: "ziprecruiter",
+    description: "AI-powered job matching to find the perfect candidates. Post to 100+ job boards instantly.",
+    category: "hr",
+    provider: "ZipRecruiter Inc.",
+    iconUrl: "/icons/pro/3d_star_talent_icon.png",
+    websiteUrl: "https://www.ziprecruiter.com",
+    docsUrl: "https://www.ziprecruiter.com/partner/developers",
+    pricingType: "paid",
+    monthlyPrice: "299.00",
+    features: ["Multi-board posting", "AI matching", "Candidate scoring", "Email campaigns"],
+    requiredScopes: ["jobs:write", "candidates:read"],
+    isFeatured: false,
+    rating: "4.3",
+    installCount: 1450,
+  },
+  {
+    name: "E-Verify",
+    slug: "e-verify",
+    description: "Verify employment eligibility for new hires. Streamline I-9 compliance and avoid penalties.",
+    category: "compliance",
+    provider: "USCIS",
+    iconUrl: "/icons/pro/3d_checkmark_comply_icon.png",
+    websiteUrl: "https://www.e-verify.gov",
+    docsUrl: "https://www.e-verify.gov/employers/e-verify-user-manual",
+    pricingType: "free",
+    monthlyPrice: "0",
+    features: ["I-9 verification", "Photo matching", "Case management", "Compliance reports"],
+    requiredScopes: ["workers:read", "compliance:write", "documents:read"],
+    isFeatured: true,
+    rating: "4.2",
+    installCount: 4500,
+  },
+  {
+    name: "Stripe",
+    slug: "stripe",
+    description: "Accept payments and manage payouts. The complete payment platform for staffing.",
+    category: "payments",
+    provider: "Stripe Inc.",
+    iconUrl: "/icons/pro/3d_credit_card_icon.png",
+    websiteUrl: "https://stripe.com",
+    docsUrl: "https://stripe.com/docs/api",
+    pricingType: "freemium",
+    monthlyPrice: "0",
+    features: ["Invoice payments", "Worker payouts", "Subscription billing", "Fraud protection"],
+    requiredScopes: ["payments:write", "payouts:write", "invoices:read"],
+    isFeatured: true,
+    rating: "4.9",
+    installCount: 5600,
+  },
+  {
+    name: "Twilio",
+    slug: "twilio",
+    description: "Send SMS notifications, reminders, and alerts. Keep workers informed in real-time.",
+    category: "communication",
+    provider: "Twilio Inc.",
+    iconUrl: "/icons/pro/3d_smartphone_mobile_icon.png",
+    websiteUrl: "https://www.twilio.com",
+    docsUrl: "https://www.twilio.com/docs",
+    pricingType: "paid",
+    monthlyPrice: "0",
+    features: ["SMS notifications", "Voice calls", "WhatsApp", "Two-factor auth"],
+    requiredScopes: ["workers:read", "notifications:write"],
+    isFeatured: false,
+    rating: "4.7",
+    installCount: 2800,
+  },
+];
+
+export function registerMarketplaceRoutes(app: Express) {
+  // GET /api/marketplace/apps - List available apps with optional filtering
+  app.get("/api/marketplace/apps", async (req: Request, res: Response) => {
+    try {
+      const { category, search, featured } = req.query;
+      
+      let apps = await storage.getMarketplaceApps({
+        category: category as string,
+        search: search as string,
+        featured: featured === 'true',
+      });
+
+      // If no apps in DB, seed with initial data
+      if (apps.length === 0) {
+        console.log("[Marketplace] Seeding initial apps...");
+        for (const appData of SEED_MARKETPLACE_APPS) {
+          await storage.createMarketplaceApp(appData as any);
+        }
+        apps = await storage.getMarketplaceApps({});
+      }
+
+      // Filter by search if provided
+      if (search) {
+        const searchLower = (search as string).toLowerCase();
+        apps = apps.filter(app => 
+          app.name.toLowerCase().includes(searchLower) ||
+          (app.description && app.description.toLowerCase().includes(searchLower)) ||
+          (app.provider && app.provider.toLowerCase().includes(searchLower))
+        );
+      }
+
+      res.json({ apps });
+    } catch (error) {
+      console.error("[Marketplace] List apps error:", error);
+      res.status(500).json({ error: "Failed to list marketplace apps" });
+    }
+  });
+
+  // GET /api/marketplace/apps/:slug - Get single app details
+  app.get("/api/marketplace/apps/:slug", async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const app = await storage.getMarketplaceAppBySlug(slug);
+
+      if (!app) {
+        return res.status(404).json({ error: "App not found" });
+      }
+
+      res.json({ app });
+    } catch (error) {
+      console.error("[Marketplace] Get app error:", error);
+      res.status(500).json({ error: "Failed to get app details" });
+    }
+  });
+
+  // GET /api/marketplace/categories - List categories
+  app.get("/api/marketplace/categories", async (req: Request, res: Response) => {
+    try {
+      const categories = [
+        { id: "accounting", name: "Accounting", description: "Financial and bookkeeping integrations", icon: "chart" },
+        { id: "hr", name: "HR & Recruiting", description: "Job boards and candidate management", icon: "users" },
+        { id: "payroll", name: "Payroll", description: "Payroll processing and tax services", icon: "money" },
+        { id: "communication", name: "Communication", description: "SMS, email, and messaging", icon: "message" },
+        { id: "compliance", name: "Compliance", description: "Background checks and verification", icon: "shield" },
+        { id: "payments", name: "Payments", description: "Payment processing and invoicing", icon: "credit-card" },
+      ];
+      res.json({ categories });
+    } catch (error) {
+      console.error("[Marketplace] List categories error:", error);
+      res.status(500).json({ error: "Failed to list categories" });
+    }
+  });
+
+  // GET /api/admin/marketplace/installed - List installed apps for tenant
+  app.get("/api/admin/marketplace/installed", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+      const installed = await storage.getInstalledApps(tenantId);
+      res.json({ installed });
+    } catch (error) {
+      console.error("[Marketplace] List installed error:", error);
+      res.status(500).json({ error: "Failed to list installed apps" });
+    }
+  });
+
+  // POST /api/admin/marketplace/install/:appId - Install an app
+  app.post("/api/admin/marketplace/install/:appId", async (req: Request, res: Response) => {
+    try {
+      const { appId } = req.params;
+      const tenantId = getTenantIdFromRequest(req) || req.body.tenantId || "default";
+      const { configData } = req.body;
+
+      // Check if app exists
+      const app = await storage.getMarketplaceAppById(appId);
+      if (!app) {
+        return res.status(404).json({ error: "App not found" });
+      }
+
+      // Check if already installed
+      const existing = await storage.getInstalledAppByAppId(tenantId, appId);
+      if (existing) {
+        return res.status(400).json({ error: "App already installed" });
+      }
+
+      // Install the app
+      const installed = await storage.installApp({
+        tenantId,
+        appId,
+        status: "active",
+        configData: configData || {},
+      });
+
+      // Increment install count
+      await storage.incrementAppInstallCount(appId);
+
+      console.log(`[Marketplace] Installed ${app.name} for tenant ${tenantId}`);
+      res.json({ installed, app });
+    } catch (error) {
+      console.error("[Marketplace] Install error:", error);
+      res.status(500).json({ error: "Failed to install app" });
+    }
+  });
+
+  // DELETE /api/admin/marketplace/uninstall/:appId - Uninstall an app
+  app.delete("/api/admin/marketplace/uninstall/:appId", async (req: Request, res: Response) => {
+    try {
+      const { appId } = req.params;
+      const tenantId = getTenantIdFromRequest(req) || (req.query.tenantId as string) || "default";
+
+      // Check if installed
+      const existing = await storage.getInstalledAppByAppId(tenantId, appId);
+      if (!existing) {
+        return res.status(404).json({ error: "App not installed" });
+      }
+
+      // Uninstall
+      await storage.uninstallApp(tenantId, appId);
+
+      // Decrement install count
+      await storage.decrementAppInstallCount(appId);
+
+      console.log(`[Marketplace] Uninstalled app ${appId} for tenant ${tenantId}`);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[Marketplace] Uninstall error:", error);
+      res.status(500).json({ error: "Failed to uninstall app" });
+    }
+  });
+
+  // PATCH /api/admin/marketplace/apps/:appId/config - Update app config
+  app.patch("/api/admin/marketplace/apps/:appId/config", async (req: Request, res: Response) => {
+    try {
+      const { appId } = req.params;
+      const tenantId = getTenantIdFromRequest(req) || req.body.tenantId || "default";
+      const { configData } = req.body;
+
+      if (!configData) {
+        return res.status(400).json({ error: "Config data required" });
+      }
+
+      const updated = await storage.updateInstalledAppConfig(tenantId, appId, configData);
+
+      if (!updated) {
+        return res.status(404).json({ error: "Installed app not found" });
+      }
+
+      console.log(`[Marketplace] Updated config for app ${appId}, tenant ${tenantId}`);
+      res.json({ installed: updated });
+    } catch (error) {
+      console.error("[Marketplace] Update config error:", error);
+      res.status(500).json({ error: "Failed to update app config" });
     }
   });
 }

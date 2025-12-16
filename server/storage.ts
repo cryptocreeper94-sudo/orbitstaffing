@@ -40,6 +40,8 @@ import {
   hallmarkCustodyTransfers,
   franchisePayments,
   franchiseTerritories,
+  marketplaceApps,
+  installedApps,
   type User,
   type InsertUser,
   type Company,
@@ -118,6 +120,10 @@ import {
   type InsertFranchisePayment,
   type FranchiseTerritory,
   type InsertFranchiseTerritory,
+  type MarketplaceApp,
+  type InsertMarketplaceApp,
+  type InstalledApp,
+  type InsertInstalledApp,
   meetingPresentations,
   type MeetingPresentation,
   type InsertMeetingPresentation,
@@ -3545,6 +3551,132 @@ export const storage: IStorage = {
       .orderBy(desc(webhookDeliveryLogs.createdAt))
       .limit(limit)
       .then(rows => rows.map(r => r.log));
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // TIME CLOCK DEVICES
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getTimeClockDevices(tenantId: string): Promise<any[]> {
+    return db.select()
+      .from(require("@shared/schema").timeClockDevices)
+      .where(eq(require("@shared/schema").timeClockDevices.tenantId, tenantId))
+      .orderBy(desc(require("@shared/schema").timeClockDevices.createdAt));
+  },
+
+  async getTimeClockPunches(tenantId: string, limit: number = 100): Promise<any[]> {
+    return db.select()
+      .from(require("@shared/schema").timeClockPunches)
+      .where(eq(require("@shared/schema").timeClockPunches.tenantId, tenantId))
+      .orderBy(desc(require("@shared/schema").timeClockPunches.punchTime))
+      .limit(limit);
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // MARKETPLACE APPS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getMarketplaceApps(filters?: { category?: string; search?: string; featured?: boolean }): Promise<MarketplaceApp[]> {
+    let query = db.select().from(marketplaceApps).where(eq(marketplaceApps.isActive, true));
+    
+    if (filters?.category) {
+      query = db.select().from(marketplaceApps).where(
+        and(eq(marketplaceApps.isActive, true), eq(marketplaceApps.category, filters.category))
+      );
+    }
+    
+    if (filters?.featured) {
+      query = db.select().from(marketplaceApps).where(
+        and(eq(marketplaceApps.isActive, true), eq(marketplaceApps.isFeatured, true))
+      );
+    }
+    
+    return query.orderBy(desc(marketplaceApps.installCount));
+  },
+
+  async getMarketplaceAppBySlug(slug: string): Promise<MarketplaceApp | undefined> {
+    const [app] = await db.select().from(marketplaceApps).where(eq(marketplaceApps.slug, slug));
+    return app;
+  },
+
+  async getMarketplaceAppById(id: string): Promise<MarketplaceApp | undefined> {
+    const [app] = await db.select().from(marketplaceApps).where(eq(marketplaceApps.id, id));
+    return app;
+  },
+
+  async createMarketplaceApp(data: InsertMarketplaceApp): Promise<MarketplaceApp> {
+    const [app] = await db.insert(marketplaceApps).values(data).returning();
+    return app;
+  },
+
+  async updateMarketplaceApp(id: string, data: Partial<InsertMarketplaceApp>): Promise<MarketplaceApp | undefined> {
+    const [app] = await db.update(marketplaceApps)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(marketplaceApps.id, id))
+      .returning();
+    return app;
+  },
+
+  async incrementAppInstallCount(id: string): Promise<void> {
+    await db.update(marketplaceApps)
+      .set({ installCount: sql`${marketplaceApps.installCount} + 1`, updatedAt: new Date() })
+      .where(eq(marketplaceApps.id, id));
+  },
+
+  async decrementAppInstallCount(id: string): Promise<void> {
+    await db.update(marketplaceApps)
+      .set({ installCount: sql`GREATEST(${marketplaceApps.installCount} - 1, 0)`, updatedAt: new Date() })
+      .where(eq(marketplaceApps.id, id));
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // INSTALLED APPS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getInstalledApps(tenantId: string): Promise<(InstalledApp & { app: MarketplaceApp })[]> {
+    const results = await db.select({
+      installed: installedApps,
+      app: marketplaceApps,
+    })
+      .from(installedApps)
+      .innerJoin(marketplaceApps, eq(installedApps.appId, marketplaceApps.id))
+      .where(eq(installedApps.tenantId, tenantId))
+      .orderBy(desc(installedApps.installedAt));
+    
+    return results.map(r => ({ ...r.installed, app: r.app }));
+  },
+
+  async getInstalledAppByAppId(tenantId: string, appId: string): Promise<InstalledApp | undefined> {
+    const [installed] = await db.select()
+      .from(installedApps)
+      .where(and(eq(installedApps.tenantId, tenantId), eq(installedApps.appId, appId)));
+    return installed;
+  },
+
+  async installApp(data: InsertInstalledApp): Promise<InstalledApp> {
+    const [installed] = await db.insert(installedApps).values(data).returning();
+    return installed;
+  },
+
+  async uninstallApp(tenantId: string, appId: string): Promise<void> {
+    await db.delete(installedApps)
+      .where(and(eq(installedApps.tenantId, tenantId), eq(installedApps.appId, appId)));
+  },
+
+  async updateInstalledAppConfig(tenantId: string, appId: string, configData: any): Promise<InstalledApp | undefined> {
+    const [updated] = await db.update(installedApps)
+      .set({ configData, lastUsedAt: new Date() })
+      .where(and(eq(installedApps.tenantId, tenantId), eq(installedApps.appId, appId)))
+      .returning();
+    return updated;
+  },
+
+  async updateInstalledAppStatus(tenantId: string, appId: string, status: string): Promise<InstalledApp | undefined> {
+    const [updated] = await db.update(installedApps)
+      .set({ status })
+      .where(and(eq(installedApps.tenantId, tenantId), eq(installedApps.appId, appId)))
+      .returning();
+    return updated;
   },
 
 };

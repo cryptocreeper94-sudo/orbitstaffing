@@ -1,106 +1,206 @@
-import { useState } from 'react';
-import { FileText, Download, Calendar, CheckCircle2, AlertTriangle, Shield, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { FileText, Download, Calendar, CheckCircle2, AlertTriangle, Shield, Filter, Users, DollarSign, Award, ShieldCheck, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-type ReportType = 'i9_audit' | 'state_filing' | 'payroll_summary' | 'worker_comp' | 'safety_incidents';
+type ReportType = 'i9_audit' | 'tax_summary' | 'certification_tracker' | 'worker_status' | 'payroll_summary' | 'insurance_compliance';
+type ReportFormat = 'pdf' | 'csv' | 'excel';
 
 interface ComplianceReport {
   id: string;
-  type: ReportType;
-  name: string;
-  period: string;
-  generatedAt: Date;
-  status: 'compliant' | 'warning' | 'critical';
-  findings: number;
+  reportType: ReportType;
+  reportName: string;
+  status: 'pending' | 'generating' | 'completed' | 'failed';
+  format: ReportFormat;
+  filePath?: string;
+  recordCount?: number;
+  findings?: number;
+  complianceStatus?: 'compliant' | 'warning' | 'critical';
+  generatedAt?: string;
+  createdAt: string;
+  errorMessage?: string;
 }
 
-export function ComplianceReports() {
-  const [selectedType, setSelectedType] = useState<ReportType>('i9_audit');
-  const [reports, setReports] = useState<ComplianceReport[]>([
-    {
-      id: 'rep-001',
-      type: 'i9_audit',
-      name: 'I-9 Compliance Audit - November 2024',
-      period: 'Nov 2024',
-      generatedAt: new Date('2024-11-25'),
-      status: 'compliant',
-      findings: 0,
-    },
-    {
-      id: 'rep-002',
-      type: 'state_filing',
-      name: 'Tennessee State Filing Summary',
-      period: 'Q3 2024',
-      generatedAt: new Date('2024-11-20'),
-      status: 'warning',
-      findings: 2,
-    },
-    {
-      id: 'rep-003',
-      type: 'payroll_summary',
-      name: 'Payroll Compliance Summary',
-      period: 'Oct 2024',
-      generatedAt: new Date('2024-11-01'),
-      status: 'compliant',
-      findings: 0,
-    },
-  ]);
+interface ReportTypeInfo {
+  id: ReportType;
+  name: string;
+  description: string;
+  icon: string;
+  fields: string[];
+}
 
-  const reportTypes = [
-    {
-      type: 'i9_audit' as ReportType,
-      name: 'I-9 Audit Reports',
-      description: 'Employment eligibility verification compliance',
-      icon: Shield,
-      color: 'cyan',
+const reportTypeIcons: Record<string, React.ElementType> = {
+  Shield: Shield,
+  FileText: FileText,
+  Award: Award,
+  Users: Users,
+  DollarSign: DollarSign,
+  ShieldCheck: ShieldCheck,
+};
+
+export function ComplianceReports() {
+  const queryClient = useQueryClient();
+  const [selectedType, setSelectedType] = useState<ReportType>('i9_audit');
+  const [selectedFormat, setSelectedFormat] = useState<ReportFormat>('pdf');
+  const [selectedPeriod, setSelectedPeriod] = useState('current');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const { data: reportTypesData } = useQuery({
+    queryKey: ['/api/admin/compliance/reports'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/compliance/reports');
+      if (!res.ok) throw new Error('Failed to fetch report types');
+      return res.json();
+    }
+  });
+
+  const { data: historyData, isLoading: historyLoading, refetch: refetchHistory } = useQuery({
+    queryKey: ['/api/admin/compliance/reports/history'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/compliance/reports/history?limit=20');
+      if (!res.ok) throw new Error('Failed to fetch report history');
+      return res.json();
     },
-    {
-      type: 'state_filing' as ReportType,
-      name: 'State Filing Reports',
-      description: 'Multi-state tax and compliance filings',
-      icon: FileText,
-      color: 'purple',
+    refetchInterval: 5000,
+  });
+
+  const generateMutation = useMutation({
+    mutationFn: async (params: { reportType: ReportType; format: ReportFormat; dateRange?: { startDate: string; endDate: string } }) => {
+      const res = await fetch('/api/admin/compliance/reports/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+      if (!res.ok) throw new Error('Failed to generate report');
+      return res.json();
     },
-    {
-      type: 'payroll_summary' as ReportType,
-      name: 'Payroll Summaries',
-      description: 'Payroll tax and withholding reports',
-      icon: Calendar,
-      color: 'green',
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/compliance/reports/history'] });
     },
-    {
-      type: 'worker_comp' as ReportType,
-      name: "Workers' Comp Reports",
-      description: 'Insurance and claim compliance',
-      icon: CheckCircle2,
-      color: 'orange',
-    },
-    {
-      type: 'safety_incidents' as ReportType,
-      name: 'Safety Incident Reports',
-      description: 'OSHA compliance and incident tracking',
-      icon: AlertTriangle,
-      color: 'red',
-    },
+  });
+
+  const reportTypes: ReportTypeInfo[] = reportTypesData?.reportTypes || [
+    { id: 'i9_audit', name: 'I-9 Audit Report', description: 'All workers with I-9 verification status and expiration dates', icon: 'Shield', fields: [] },
+    { id: 'tax_summary', name: 'Tax Summary Report', description: 'W-2/1099 summary by reporting period', icon: 'FileText', fields: [] },
+    { id: 'certification_tracker', name: 'Certification Tracker', description: 'Worker certifications with upcoming expirations', icon: 'Award', fields: [] },
+    { id: 'worker_status', name: 'Worker Status Report', description: 'Active/inactive workers with complete details', icon: 'Users', fields: [] },
+    { id: 'payroll_summary', name: 'Payroll Summary Report', description: 'Payroll totals by period, client, and worker', icon: 'DollarSign', fields: [] },
+    { id: 'insurance_compliance', name: 'Insurance Compliance Report', description: "Workers' comp and liability insurance status", icon: 'ShieldCheck', fields: [] },
   ];
 
-  const generateReport = () => {
-    const newReport: ComplianceReport = {
-      id: `rep-${Date.now()}`,
-      type: selectedType,
-      name: `${reportTypes.find(r => r.type === selectedType)?.name} - ${new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`,
-      period: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
-      generatedAt: new Date(),
-      status: Math.random() > 0.7 ? 'warning' : 'compliant',
-      findings: Math.random() > 0.7 ? Math.floor(Math.random() * 5) + 1 : 0,
-    };
+  const reports: ComplianceReport[] = historyData?.reports || [];
 
-    setReports([newReport, ...reports]);
+  const generateReport = () => {
+    let dateRange;
+    const now = new Date();
+    
+    switch (selectedPeriod) {
+      case 'current':
+        dateRange = {
+          startDate: new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0],
+          endDate: now.toISOString().split('T')[0],
+        };
+        break;
+      case 'last':
+        dateRange = {
+          startDate: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0],
+          endDate: new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0],
+        };
+        break;
+      case 'quarter':
+        const quarterStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 - 3, 1);
+        const quarterEnd = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 0);
+        dateRange = {
+          startDate: quarterStart.toISOString().split('T')[0],
+          endDate: quarterEnd.toISOString().split('T')[0],
+        };
+        break;
+      case 'year':
+        dateRange = {
+          startDate: new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0],
+          endDate: now.toISOString().split('T')[0],
+        };
+        break;
+      case 'custom':
+        if (startDate && endDate) {
+          dateRange = { startDate, endDate };
+        }
+        break;
+    }
+
+    generateMutation.mutate({
+      reportType: selectedType,
+      format: selectedFormat,
+      dateRange,
+    });
   };
 
-  const downloadReport = (report: ComplianceReport) => {
-    // Simulate PDF download
-    alert(`Downloading ${report.name}.pdf`);
+  const downloadReport = async (report: ComplianceReport) => {
+    if (report.status !== 'completed') return;
+    
+    try {
+      const res = await fetch(`/api/admin/compliance/reports/${report.id}/download`);
+      if (!res.ok) throw new Error('Download failed');
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${report.reportType}_${new Date(report.createdAt).toISOString().split('T')[0]}.${report.format === 'pdf' ? 'html' : 'csv'}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download error:', error);
+    }
+  };
+
+  const getStatusBadge = (report: ComplianceReport) => {
+    if (report.status === 'generating' || report.status === 'pending') {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-blue-500/20 text-blue-400">
+          <Loader2 className="w-3 h-3 animate-spin" />
+          Generating...
+        </span>
+      );
+    }
+    
+    if (report.status === 'failed') {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-red-500/20 text-red-400">
+          <AlertTriangle className="w-3 h-3" />
+          Failed
+        </span>
+      );
+    }
+
+    const complianceStatus = report.complianceStatus || 'compliant';
+    const findings = report.findings || 0;
+
+    if (complianceStatus === 'compliant') {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-green-500/20 text-green-400">
+          <CheckCircle2 className="w-3 h-3" />
+          Compliant
+        </span>
+      );
+    } else if (complianceStatus === 'warning') {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400">
+          <AlertTriangle className="w-3 h-3" />
+          {findings} Warning{findings > 1 ? 's' : ''}
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full bg-red-500/20 text-red-400">
+          <AlertTriangle className="w-3 h-3" />
+          {findings} Critical
+        </span>
+      );
+    }
   };
 
   return (
@@ -110,22 +210,22 @@ export function ComplianceReports() {
         <p className="text-gray-400 text-sm">Generate and download compliance reports automatically</p>
       </div>
 
-      {/* Report Type Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {reportTypes.map((report) => {
-          const Icon = report.icon;
+          const IconComponent = reportTypeIcons[report.icon] || FileText;
+          const isSelected = selectedType === report.id;
           return (
             <button
-              key={report.type}
-              onClick={() => setSelectedType(report.type)}
+              key={report.id}
+              onClick={() => setSelectedType(report.id)}
               className={`p-4 rounded-lg border-2 transition-all text-left ${
-                selectedType === report.type
-                  ? `border-${report.color}-500 bg-${report.color}-500/10`
+                isSelected
+                  ? 'border-cyan-500 bg-cyan-500/10'
                   : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
               }`}
-              data-testid={`button-report-${report.type}`}
+              data-testid={`button-report-${report.id}`}
             >
-              <Icon className={`w-6 h-6 mb-2 text-${report.color}-400`} />
+              <IconComponent className={`w-6 h-6 mb-2 ${isSelected ? 'text-cyan-400' : 'text-gray-400'}`} />
               <h3 className="font-bold text-sm mb-1">{report.name}</h3>
               <p className="text-xs text-gray-400">{report.description}</p>
             </button>
@@ -133,32 +233,42 @@ export function ComplianceReports() {
         })}
       </div>
 
-      {/* Generate Report Section */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-bold mb-1">Generate New Report</h3>
             <p className="text-sm text-gray-400">
-              {reportTypes.find(r => r.type === selectedType)?.description}
+              {reportTypes.find(r => r.id === selectedType)?.description}
             </p>
           </div>
           <Button
             onClick={generateReport}
             className="bg-cyan-600 hover:bg-cyan-700"
+            disabled={generateMutation.isPending}
             data-testid="button-generate-report"
           >
-            <FileText className="w-4 h-4 mr-2" />
-            Generate Report
+            {generateMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <FileText className="w-4 h-4 mr-2" />
+                Generate Report
+              </>
+            )}
           </Button>
         </div>
 
-        {/* Period Selector */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Reporting Period
             </label>
             <select
+              value={selectedPeriod}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
               className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
               data-testid="select-report-period"
             >
@@ -175,36 +285,59 @@ export function ComplianceReports() {
               Format
             </label>
             <select
+              value={selectedFormat}
+              onChange={(e) => setSelectedFormat(e.target.value as ReportFormat)}
               className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
               data-testid="select-report-format"
             >
-              <option value="pdf">PDF</option>
-              <option value="excel">Excel</option>
+              <option value="pdf">PDF (HTML)</option>
               <option value="csv">CSV</option>
+              <option value="excel">Excel (CSV)</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Include Details
-            </label>
-            <select
-              className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
-              data-testid="select-report-details"
-            >
-              <option value="summary">Summary Only</option>
-              <option value="detailed">Detailed</option>
-              <option value="full">Full Breakdown</option>
-            </select>
-          </div>
+          {selectedPeriod === 'custom' && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
+                  data-testid="input-start-date"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-cyan-400"
+                  data-testid="input-end-date"
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Report History */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold">Generated Reports</h3>
           <div className="flex gap-2">
+            <button 
+              onClick={() => refetchHistory()}
+              className="p-2 hover:bg-slate-700 rounded transition" 
+              data-testid="button-refresh-reports"
+            >
+              <RefreshCw className={`w-4 h-4 text-gray-400 ${historyLoading ? 'animate-spin' : ''}`} />
+            </button>
             <button className="p-2 hover:bg-slate-700 rounded transition" data-testid="button-filter-reports">
               <Filter className="w-4 h-4 text-gray-400" />
             </button>
@@ -223,47 +356,28 @@ export function ComplianceReports() {
               >
                 <div className="flex items-center gap-3 flex-1">
                   <FileText className={`w-5 h-5 ${
-                    report.status === 'compliant' ? 'text-green-400' :
-                    report.status === 'warning' ? 'text-yellow-400' :
-                    'text-red-400'
+                    report.status === 'completed' && report.complianceStatus === 'compliant' ? 'text-green-400' :
+                    report.status === 'completed' && report.complianceStatus === 'warning' ? 'text-yellow-400' :
+                    report.status === 'failed' || report.complianceStatus === 'critical' ? 'text-red-400' :
+                    'text-blue-400'
                   }`} />
                   <div className="flex-1">
-                    <p className="font-bold text-sm">{report.name}</p>
+                    <p className="font-bold text-sm">{report.reportName}</p>
                     <p className="text-xs text-gray-400">
-                      Generated {report.generatedAt.toLocaleDateString()} • {report.period}
+                      Generated {new Date(report.createdAt).toLocaleDateString()} • {report.recordCount || 0} records • {report.format?.toUpperCase()}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="text-right mr-4">
-                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full ${
-                      report.status === 'compliant' ? 'bg-green-500/20 text-green-400' :
-                      report.status === 'warning' ? 'bg-yellow-500/20 text-yellow-400' :
-                      'bg-red-500/20 text-red-400'
-                    }`}>
-                      {report.status === 'compliant' ? (
-                        <>
-                          <CheckCircle2 className="w-3 h-3" />
-                          Compliant
-                        </>
-                      ) : report.status === 'warning' ? (
-                        <>
-                          <AlertTriangle className="w-3 h-3" />
-                          {report.findings} Warning{report.findings > 1 ? 's' : ''}
-                        </>
-                      ) : (
-                        <>
-                          <AlertTriangle className="w-3 h-3" />
-                          {report.findings} Critical
-                        </>
-                      )}
-                    </span>
+                    {getStatusBadge(report)}
                   </div>
 
                   <Button
                     onClick={() => downloadReport(report)}
-                    className="bg-slate-600 hover:bg-slate-500"
+                    disabled={report.status !== 'completed'}
+                    className="bg-slate-600 hover:bg-slate-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     data-testid={`button-download-${report.id}`}
                   >
                     <Download className="w-4 h-4" />
@@ -275,7 +389,6 @@ export function ComplianceReports() {
         </div>
       </div>
 
-      {/* Compliance Insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -283,7 +396,7 @@ export function ComplianceReports() {
             <h4 className="font-bold text-sm">Compliant Reports</h4>
           </div>
           <p className="text-2xl font-bold text-green-400">
-            {reports.filter(r => r.status === 'compliant').length}
+            {reports.filter(r => r.status === 'completed' && r.complianceStatus === 'compliant').length}
           </p>
           <p className="text-xs text-gray-400 mt-1">No issues found</p>
         </div>
@@ -294,7 +407,7 @@ export function ComplianceReports() {
             <h4 className="font-bold text-sm">Warnings</h4>
           </div>
           <p className="text-2xl font-bold text-yellow-400">
-            {reports.filter(r => r.status === 'warning').length}
+            {reports.filter(r => r.status === 'completed' && r.complianceStatus === 'warning').length}
           </p>
           <p className="text-xs text-gray-400 mt-1">Requires attention</p>
         </div>
@@ -305,7 +418,7 @@ export function ComplianceReports() {
             <h4 className="font-bold text-sm">Critical Issues</h4>
           </div>
           <p className="text-2xl font-bold text-red-400">
-            {reports.filter(r => r.status === 'critical').length}
+            {reports.filter(r => r.status === 'completed' && r.complianceStatus === 'critical').length}
           </p>
           <p className="text-xs text-gray-400 mt-1">Immediate action needed</p>
         </div>

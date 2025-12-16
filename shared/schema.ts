@@ -6683,3 +6683,265 @@ export const insertExternalJobPostingSchema = createInsertSchema(externalJobPost
 
 export type InsertExternalJobPosting = z.infer<typeof insertExternalJobPostingSchema>;
 export type ExternalJobPosting = typeof externalJobPostings.$inferSelect;
+
+// ========================
+// Compliance Reports (Automated Report Generation)
+// ========================
+export const COMPLIANCE_REPORT_TYPES = [
+  'i9_audit',
+  'tax_summary',
+  'certification_tracker',
+  'worker_status',
+  'payroll_summary',
+  'insurance_compliance'
+] as const;
+export type ComplianceReportType = typeof COMPLIANCE_REPORT_TYPES[number];
+
+export const REPORT_FORMATS = ['pdf', 'csv', 'excel'] as const;
+export type ReportFormat = typeof REPORT_FORMATS[number];
+
+export const REPORT_STATUSES = ['pending', 'generating', 'completed', 'failed'] as const;
+export type ReportStatus = typeof REPORT_STATUSES[number];
+
+export const complianceReports = pgTable(
+  "compliance_reports",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    reportType: varchar("report_type", { length: 50 }).notNull(),
+    reportName: varchar("report_name", { length: 255 }).notNull(),
+    status: varchar("status", { length: 20 }).default("pending"),
+    format: varchar("format", { length: 10 }).default("pdf"),
+    
+    parameters: jsonb("parameters"),
+    
+    filePath: text("file_path"),
+    fileSize: integer("file_size"),
+    
+    recordCount: integer("record_count"),
+    findings: integer("findings").default(0),
+    complianceStatus: varchar("compliance_status", { length: 20 }).default("compliant"),
+    
+    errorMessage: text("error_message"),
+    
+    generatedAt: timestamp("generated_at"),
+    expiresAt: timestamp("expires_at"),
+    downloadedAt: timestamp("downloaded_at"),
+    
+    createdBy: varchar("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_compliance_reports_tenant").on(table.tenantId),
+    typeIdx: index("idx_compliance_reports_type").on(table.reportType),
+    statusIdx: index("idx_compliance_reports_status").on(table.status),
+    createdAtIdx: index("idx_compliance_reports_created").on(table.createdAt),
+  })
+);
+
+export const insertComplianceReportSchema = createInsertSchema(complianceReports).omit({
+  id: true,
+  generatedAt: true,
+  downloadedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertComplianceReport = z.infer<typeof insertComplianceReportSchema>;
+export type ComplianceReport = typeof complianceReports.$inferSelect;
+
+// ========================
+// Time Clock Devices - Physical time clock hardware at job sites
+// ========================
+export const TIME_CLOCK_DEVICE_TYPES = ['biometric', 'rfid', 'pin', 'facial', 'mobile'] as const;
+export type TimeClockDeviceType = typeof TIME_CLOCK_DEVICE_TYPES[number];
+
+export const TIME_CLOCK_VENDORS = ['generic_api', 'adp', 'kronos', 'timeforce', 'ukg', 'paychex'] as const;
+export type TimeClockVendor = typeof TIME_CLOCK_VENDORS[number];
+
+export const timeClockDevices = pgTable(
+  "time_clock_devices",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    
+    deviceId: varchar("device_id", { length: 100 }).notNull(),
+    deviceType: varchar("device_type", { length: 50 }).notNull(),
+    vendor: varchar("vendor", { length: 50 }).default("generic_api"),
+    name: varchar("name", { length: 255 }).notNull(),
+    location: varchar("location", { length: 255 }),
+    
+    ipAddress: varchar("ip_address", { length: 45 }),
+    serialNumber: varchar("serial_number", { length: 100 }),
+    firmwareVersion: varchar("firmware_version", { length: 50 }),
+    
+    apiKey: text("api_key"),
+    apiEndpoint: text("api_endpoint"),
+    
+    lastPingAt: timestamp("last_ping_at"),
+    lastSyncAt: timestamp("last_sync_at"),
+    isOnline: boolean("is_online").default(false),
+    isActive: boolean("is_active").default(true),
+    
+    settings: jsonb("settings"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_time_clock_devices_tenant").on(table.tenantId),
+    deviceIdIdx: index("idx_time_clock_devices_device_id").on(table.deviceId),
+    activeIdx: index("idx_time_clock_devices_active").on(table.isActive),
+    onlineIdx: index("idx_time_clock_devices_online").on(table.isOnline),
+  })
+);
+
+export const insertTimeClockDeviceSchema = createInsertSchema(timeClockDevices).omit({
+  id: true,
+  lastPingAt: true,
+  lastSyncAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTimeClockDevice = z.infer<typeof insertTimeClockDeviceSchema>;
+export type TimeClockDevice = typeof timeClockDevices.$inferSelect;
+
+// ========================
+// Time Clock Punches - Raw punches from devices
+// ========================
+export const PUNCH_TYPES = ['in', 'out', 'break_start', 'break_end'] as const;
+export type PunchType = typeof PUNCH_TYPES[number];
+
+export const PUNCH_SOURCES = ['device', 'manual', 'mobile', 'web', 'import'] as const;
+export type PunchSource = typeof PUNCH_SOURCES[number];
+
+export const timeClockPunches = pgTable(
+  "time_clock_punches",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    deviceId: varchar("device_id").references(() => timeClockDevices.id),
+    workerId: varchar("worker_id").references(() => workers.id),
+    
+    punchType: varchar("punch_type", { length: 20 }).notNull(),
+    punchTime: timestamp("punch_time").notNull(),
+    source: varchar("source", { length: 20 }).default("device"),
+    
+    workerIdentifier: varchar("worker_identifier", { length: 255 }),
+    
+    latitude: decimal("latitude", { precision: 10, scale: 7 }),
+    longitude: decimal("longitude", { precision: 10, scale: 7 }),
+    
+    rawData: jsonb("raw_data"),
+    
+    processedAt: timestamp("processed_at"),
+    timesheetId: varchar("timesheet_id").references(() => timesheets.id),
+    
+    isValid: boolean("is_valid").default(true),
+    validationErrors: jsonb("validation_errors"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_time_clock_punches_tenant").on(table.tenantId),
+    deviceIdx: index("idx_time_clock_punches_device").on(table.deviceId),
+    workerIdx: index("idx_time_clock_punches_worker").on(table.workerId),
+    punchTimeIdx: index("idx_time_clock_punches_time").on(table.punchTime),
+    processedIdx: index("idx_time_clock_punches_processed").on(table.processedAt),
+  })
+);
+
+export const insertTimeClockPunchSchema = createInsertSchema(timeClockPunches).omit({
+  id: true,
+  processedAt: true,
+  createdAt: true,
+});
+
+export type InsertTimeClockPunch = z.infer<typeof insertTimeClockPunchSchema>;
+export type TimeClockPunch = typeof timeClockPunches.$inferSelect;
+
+// ========================
+// Marketplace Apps - Available third-party integrations
+// ========================
+export const MARKETPLACE_CATEGORIES = ['accounting', 'hr', 'payroll', 'communication', 'compliance', 'payments'] as const;
+export type MarketplaceCategory = typeof MARKETPLACE_CATEGORIES[number];
+
+export const PRICING_TYPES = ['free', 'paid', 'freemium'] as const;
+export type PricingType = typeof PRICING_TYPES[number];
+
+export const marketplaceApps = pgTable(
+  "marketplace_apps",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: varchar("name", { length: 100 }).notNull(),
+    slug: varchar("slug", { length: 100 }).notNull().unique(),
+    description: text("description"),
+    category: varchar("category", { length: 50 }).notNull(),
+    provider: varchar("provider", { length: 100 }),
+    iconUrl: text("icon_url"),
+    websiteUrl: text("website_url"),
+    docsUrl: text("docs_url"),
+    pricingType: varchar("pricing_type", { length: 20 }).default("free"),
+    monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }),
+    features: text("features").array(),
+    requiredScopes: text("required_scopes").array(),
+    isActive: boolean("is_active").default(true),
+    isFeatured: boolean("is_featured").default(false),
+    rating: decimal("rating", { precision: 2, scale: 1 }).default("0"),
+    installCount: integer("install_count").default(0),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    slugIdx: index("idx_marketplace_apps_slug").on(table.slug),
+    categoryIdx: index("idx_marketplace_apps_category").on(table.category),
+    activeIdx: index("idx_marketplace_apps_active").on(table.isActive),
+    featuredIdx: index("idx_marketplace_apps_featured").on(table.isFeatured),
+  })
+);
+
+export const insertMarketplaceAppSchema = createInsertSchema(marketplaceApps).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertMarketplaceApp = z.infer<typeof insertMarketplaceAppSchema>;
+export type MarketplaceApp = typeof marketplaceApps.$inferSelect;
+
+// ========================
+// Installed Apps - Tenant app installations
+// ========================
+export const INSTALL_STATUSES = ['active', 'inactive', 'pending'] as const;
+export type InstallStatus = typeof INSTALL_STATUSES[number];
+
+export const installedApps = pgTable(
+  "installed_apps",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    appId: varchar("app_id").notNull().references(() => marketplaceApps.id),
+    status: varchar("status", { length: 20 }).default("active"),
+    configData: jsonb("config_data"),
+    installedAt: timestamp("installed_at").default(sql`NOW()`),
+    lastUsedAt: timestamp("last_used_at"),
+  },
+  (table) => ({
+    tenantIdx: index("idx_installed_apps_tenant").on(table.tenantId),
+    appIdx: index("idx_installed_apps_app").on(table.appId),
+    statusIdx: index("idx_installed_apps_status").on(table.status),
+    tenantAppUnique: index("idx_installed_apps_tenant_app").on(table.tenantId, table.appId),
+  })
+);
+
+export const insertInstalledAppSchema = createInsertSchema(installedApps).omit({
+  id: true,
+  installedAt: true,
+  lastUsedAt: true,
+});
+
+export type InsertInstalledApp = z.infer<typeof insertInstalledAppSchema>;
+export type InstalledApp = typeof installedApps.$inferSelect;

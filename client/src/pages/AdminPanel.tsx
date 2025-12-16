@@ -42,6 +42,8 @@ import { SEOManager } from '@/components/SEOManager';
 import BackgroundCheckManager from '@/components/BackgroundCheckManager';
 import { JobBoardManager } from '@/components/JobBoardManager';
 import { EVerifyManager } from '@/components/EVerifyManager';
+import { TimeClockManager } from '@/components/TimeClockManager';
+import { IntegrationMarketplace } from '@/components/IntegrationMarketplace';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
 import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
@@ -606,6 +608,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         { id: 'background-checks', label: 'Background Checks', icon: <Shield className="w-4 h-4" /> },
         { id: 'everify', label: 'E-Verify', icon: <Shield className="w-4 h-4" /> },
         { id: 'job-boards', label: 'Job Board Integration', icon: <Briefcase className="w-4 h-4" /> },
+        { id: 'time-clocks', label: 'Time Clock Manager', icon: <Activity className="w-4 h-4" /> },
         { id: 'bulk-ops', label: 'Bulk Operations', icon: <Settings className="w-4 h-4" /> },
         { id: 'search', label: 'Advanced Search', icon: <Search className="w-4 h-4" /> },
         { id: 'invoices', label: 'Invoice Templates', icon: <FileText className="w-4 h-4" /> },
@@ -617,6 +620,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       icon: <Settings className="w-5 h-5" />,
       color: 'purple',
       items: [
+        { id: 'app-marketplace', label: 'App Marketplace', icon: <Briefcase className="w-4 h-4" /> },
         { id: 'blockchain', label: 'Blockchain & Version', icon: <Shield className="w-4 h-4" /> },
         { id: 'messaging', label: 'Secure Messaging', icon: <MessageCircle className="w-4 h-4" /> },
         { id: 'ocr', label: 'Document OCR', icon: <FileText className="w-4 h-4" /> },
@@ -689,11 +693,13 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       case 'background-checks': return <BackgroundCheckManager />;
       case 'everify': return <EVerifyManager />;
       case 'job-boards': return <JobBoardManager />;
+      case 'time-clocks': return <TimeClockManager />;
       case 'worker-performance': return <WorkerPerformanceDashboard />;
       case 'beta-testers': return <BetaTesterManagement />;
       case 'user-data-access': return <UserDataAccessSection />;
       case 'receipts': return <ReceiptScanner />;
       case 'blockchain': return <BlockchainDashboard />;
+      case 'app-marketplace': return <IntegrationMarketplace />;
       default: return null;
     }
   };
