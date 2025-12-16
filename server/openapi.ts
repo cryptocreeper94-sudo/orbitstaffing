@@ -64,6 +64,8 @@ For API support, contact: partners@orbitstaffing.io
     { name: "Analytics", description: "Platform analytics" },
     { name: "Billing", description: "Billing information" },
     { name: "Webhooks", description: "Webhook subscription management" },
+    { name: "Bulk Operations", description: "Bulk import operations for workers, timesheets, and locations" },
+    { name: "Exports", description: "Data export endpoints with CSV and JSON support" },
   ],
   paths: {
     "/health": {
@@ -551,6 +553,202 @@ For API support, contact: partners@orbitstaffing.io
         },
       },
     },
+    "/bulk/workers": {
+      post: {
+        tags: ["Bulk Operations"],
+        summary: "Bulk import workers",
+        description: "Import multiple workers at once. Supports up to 1000 workers per request. Use `transactional: true` for all-or-nothing mode.",
+        operationId: "bulkImportWorkers",
+        security: [{ ApiKeyAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/BulkWorkersRequest" },
+              example: {
+                workers: [
+                  { fullName: "John Smith", email: "john@example.com", phone: "555-0101", status: "approved" },
+                  { fullName: "Jane Doe", email: "jane@example.com", phone: "555-0102", status: "pending_review" },
+                ],
+                transactional: false,
+              },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Bulk import results",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BulkImportResponse" },
+              },
+            },
+          },
+          "400": { $ref: "#/components/responses/BadRequest" },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "429": { $ref: "#/components/responses/RateLimitExceeded" },
+        },
+      },
+    },
+    "/bulk/timesheets": {
+      post: {
+        tags: ["Bulk Operations"],
+        summary: "Bulk import timesheets",
+        description: "Import multiple timesheets at once. Supports up to 5000 timesheets per request.",
+        operationId: "bulkImportTimesheets",
+        security: [{ ApiKeyAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/BulkTimesheetsRequest" },
+              example: {
+                timesheets: [
+                  { workerId: "worker_123", clockInTime: "2024-12-16T08:00:00Z", clockOutTime: "2024-12-16T17:00:00Z", totalHoursWorked: "8.00" },
+                  { workerId: "worker_456", clockInTime: "2024-12-16T09:00:00Z", clockOutTime: "2024-12-16T18:00:00Z", totalHoursWorked: "8.00" },
+                ],
+                transactional: false,
+              },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Bulk import results",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BulkImportResponse" },
+              },
+            },
+          },
+          "400": { $ref: "#/components/responses/BadRequest" },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "429": { $ref: "#/components/responses/RateLimitExceeded" },
+        },
+      },
+    },
+    "/bulk/locations": {
+      post: {
+        tags: ["Bulk Operations"],
+        summary: "Bulk import locations",
+        description: "Import multiple locations at once. Supports up to 100 locations per request.",
+        operationId: "bulkImportLocations",
+        security: [{ ApiKeyAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/BulkLocationsRequest" },
+              example: {
+                locations: [
+                  { name: "Downtown Office", locationCode: "DT001", addressLine1: "123 Main St", city: "Austin", state: "TX", zipCode: "78701" },
+                  { name: "North Branch", locationCode: "NB001", addressLine1: "456 Oak Ave", city: "Austin", state: "TX", zipCode: "78758" },
+                ],
+                transactional: false,
+              },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Bulk import results",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BulkImportResponse" },
+              },
+            },
+          },
+          "400": { $ref: "#/components/responses/BadRequest" },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "429": { $ref: "#/components/responses/RateLimitExceeded" },
+        },
+      },
+    },
+    "/export/workers": {
+      get: {
+        tags: ["Exports"],
+        summary: "Export workers",
+        description: "Export workers as JSON or CSV. Supports pagination with limit/offset.",
+        operationId: "exportWorkers",
+        security: [{ ApiKeyAuth: [] }],
+        parameters: [
+          { name: "format", in: "query", description: "Export format (json or csv)", schema: { type: "string", enum: ["json", "csv"], default: "json" } },
+          { name: "limit", in: "query", description: "Maximum records to return (max 10000)", schema: { type: "integer", default: 1000, maximum: 10000 } },
+          { name: "offset", in: "query", description: "Number of records to skip", schema: { type: "integer", default: 0 } },
+        ],
+        responses: {
+          "200": {
+            description: "Exported workers data",
+            content: {
+              "application/json": { schema: { $ref: "#/components/schemas/ExportResponse" } },
+              "text/csv": { schema: { type: "string", description: "CSV formatted data" } },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "429": { $ref: "#/components/responses/RateLimitExceeded" },
+        },
+      },
+    },
+    "/export/timesheets": {
+      get: {
+        tags: ["Exports"],
+        summary: "Export timesheets",
+        description: "Export timesheets as JSON or CSV. Supports date range filtering.",
+        operationId: "exportTimesheets",
+        security: [{ ApiKeyAuth: [] }],
+        parameters: [
+          { name: "format", in: "query", description: "Export format (json or csv)", schema: { type: "string", enum: ["json", "csv"], default: "json" } },
+          { name: "limit", in: "query", description: "Maximum records to return (max 10000)", schema: { type: "integer", default: 1000, maximum: 10000 } },
+          { name: "offset", in: "query", description: "Number of records to skip", schema: { type: "integer", default: 0 } },
+          { name: "startDate", in: "query", description: "Start date (ISO 8601)", schema: { type: "string", format: "date-time" } },
+          { name: "endDate", in: "query", description: "End date (ISO 8601)", schema: { type: "string", format: "date-time" } },
+        ],
+        responses: {
+          "200": {
+            description: "Exported timesheets data",
+            content: {
+              "application/json": { schema: { $ref: "#/components/schemas/ExportResponse" } },
+              "text/csv": { schema: { type: "string", description: "CSV formatted data" } },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "429": { $ref: "#/components/responses/RateLimitExceeded" },
+        },
+      },
+    },
+    "/export/payroll": {
+      get: {
+        tags: ["Exports"],
+        summary: "Export payroll records",
+        description: "Export payroll records as JSON or CSV. Supports date range filtering.",
+        operationId: "exportPayroll",
+        security: [{ ApiKeyAuth: [] }],
+        parameters: [
+          { name: "format", in: "query", description: "Export format (json or csv)", schema: { type: "string", enum: ["json", "csv"], default: "json" } },
+          { name: "limit", in: "query", description: "Maximum records to return (max 10000)", schema: { type: "integer", default: 1000, maximum: 10000 } },
+          { name: "offset", in: "query", description: "Number of records to skip", schema: { type: "integer", default: 0 } },
+          { name: "startDate", in: "query", description: "Pay period start date (ISO 8601)", schema: { type: "string", format: "date" } },
+          { name: "endDate", in: "query", description: "Pay period end date (ISO 8601)", schema: { type: "string", format: "date" } },
+        ],
+        responses: {
+          "200": {
+            description: "Exported payroll data",
+            content: {
+              "application/json": { schema: { $ref: "#/components/schemas/ExportResponse" } },
+              "text/csv": { schema: { type: "string", description: "CSV formatted data" } },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "429": { $ref: "#/components/responses/RateLimitExceeded" },
+        },
+      },
+    },
   },
   components: {
     securitySchemes: {
@@ -930,6 +1128,139 @@ For API support, contact: partners@orbitstaffing.io
             properties: {
               total: { type: "integer" },
               subscriptionId: { type: "string", format: "uuid" },
+            },
+          },
+        },
+      },
+      BulkWorkersRequest: {
+        type: "object",
+        required: ["workers"],
+        properties: {
+          workers: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                fullName: { type: "string", description: "Worker full name (required)" },
+                email: { type: "string", format: "email" },
+                phone: { type: "string" },
+                status: { type: "string", enum: ["pending_review", "approved", "rejected"] },
+                hourlyWage: { type: "string" },
+                city: { type: "string" },
+                state: { type: "string" },
+                zipCode: { type: "string" },
+              },
+              required: ["fullName"],
+            },
+            maxItems: 1000,
+            description: "Array of worker objects to import (max 1000)",
+          },
+          transactional: {
+            type: "boolean",
+            default: false,
+            description: "If true, all records must validate or none are imported",
+          },
+        },
+      },
+      BulkTimesheetsRequest: {
+        type: "object",
+        required: ["timesheets"],
+        properties: {
+          timesheets: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                workerId: { type: "string", format: "uuid", description: "Worker ID (required)" },
+                assignmentId: { type: "string", format: "uuid" },
+                clockInTime: { type: "string", format: "date-time" },
+                clockOutTime: { type: "string", format: "date-time" },
+                totalHoursWorked: { type: "string" },
+                billableHours: { type: "string" },
+                status: { type: "string", enum: ["draft", "submitted", "approved", "rejected"] },
+              },
+              required: ["workerId"],
+            },
+            maxItems: 5000,
+            description: "Array of timesheet objects to import (max 5000)",
+          },
+          transactional: {
+            type: "boolean",
+            default: false,
+            description: "If true, all records must validate or none are imported",
+          },
+        },
+      },
+      BulkLocationsRequest: {
+        type: "object",
+        required: ["locations"],
+        properties: {
+          locations: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string", description: "Location name (required)" },
+                locationCode: { type: "string", description: "Unique location code (required)" },
+                addressLine1: { type: "string", description: "Street address (required)" },
+                addressLine2: { type: "string" },
+                city: { type: "string", description: "City (required)" },
+                state: { type: "string", description: "State (required)" },
+                zipCode: { type: "string", description: "ZIP code (required)" },
+                latitude: { type: "number", format: "double" },
+                longitude: { type: "number", format: "double" },
+              },
+              required: ["name", "locationCode", "addressLine1", "city", "state", "zipCode"],
+            },
+            maxItems: 100,
+            description: "Array of location objects to import (max 100)",
+          },
+          transactional: {
+            type: "boolean",
+            default: false,
+            description: "If true, all records must validate or none are imported",
+          },
+        },
+      },
+      BulkImportResponse: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", description: "True if all records imported successfully" },
+          mode: { type: "string", enum: ["partial", "transactional"], description: "Import mode used" },
+          totalSubmitted: { type: "integer", description: "Number of records submitted" },
+          totalSuccess: { type: "integer", description: "Number of records successfully imported" },
+          totalFailed: { type: "integer", description: "Number of records that failed" },
+          results: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                row: { type: "integer", description: "1-based row number" },
+                success: { type: "boolean" },
+                id: { type: "string", format: "uuid", description: "Created record ID (if successful)" },
+                error: { type: "string", description: "Error message (if failed)" },
+              },
+            },
+          },
+        },
+      },
+      ExportResponse: {
+        type: "object",
+        properties: {
+          data: {
+            type: "array",
+            items: { type: "object" },
+            description: "Array of exported records",
+          },
+          meta: {
+            type: "object",
+            properties: {
+              total: { type: "integer", description: "Number of records returned" },
+              limit: { type: "integer", description: "Limit used" },
+              offset: { type: "integer", description: "Offset used" },
+              format: { type: "string", enum: ["json", "csv"] },
+              startDate: { type: "string", format: "date-time", description: "Start date filter (if used)" },
+              endDate: { type: "string", format: "date-time", description: "End date filter (if used)" },
             },
           },
         },

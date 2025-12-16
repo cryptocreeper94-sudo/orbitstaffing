@@ -583,6 +583,87 @@ export function PartnerApiManager() {
                   </div>
                 </div>
               </div>
+
+              <div className="border-t border-gray-700 pt-6">
+                <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
+                  <Code2 className="h-4 w-4 text-cyan-400" />
+                  Official SDKs
+                </h4>
+                <p className="text-gray-400 text-sm mb-4">
+                  Download our official SDKs for easy integration with your applications.
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                          <span className="text-yellow-400 text-sm font-bold">JS</span>
+                        </div>
+                        <div>
+                          <h5 className="font-semibold text-white">JavaScript SDK</h5>
+                          <p className="text-xs text-gray-400">Browser & Node.js</p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open('/api/partner/sdk/javascript', '_blank')}
+                        className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/20"
+                        data-testid="btn-download-js-sdk"
+                      >
+                        Download
+                      </Button>
+                    </div>
+                    <pre className="p-2 rounded bg-gray-900 text-xs overflow-x-auto">
+                      <code className="text-gray-300">{`const api = new OrbitPartnerAPI(
+  'orbit_pk_...', 
+  'orbit_sk_...'
+);
+const workers = await api.getWorkers();`}</code>
+                    </pre>
+                  </div>
+
+                  <div className="p-4 rounded-lg bg-gray-800/50 border border-gray-700">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                          <span className="text-blue-400 text-sm font-bold">PY</span>
+                        </div>
+                        <div>
+                          <h5 className="font-semibold text-white">Python SDK</h5>
+                          <p className="text-xs text-gray-400">Python 3.7+</p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open('/api/partner/sdk/python', '_blank')}
+                        className="border-blue-500/30 text-blue-400 hover:bg-blue-500/20"
+                        data-testid="btn-download-python-sdk"
+                      >
+                        Download
+                      </Button>
+                    </div>
+                    <pre className="p-2 rounded bg-gray-900 text-xs overflow-x-auto">
+                      <code className="text-gray-300">{`api = OrbitPartnerAPI(
+    'orbit_pk_...', 
+    'orbit_sk_...'
+)
+workers = api.get_workers()`}</code>
+                    </pre>
+                  </div>
+                </div>
+
+                <div className="mt-4 p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+                  <h5 className="font-semibold text-cyan-400 mb-2">Quick Start</h5>
+                  <div className="space-y-2 text-sm text-gray-300">
+                    <p><span className="text-cyan-400">1.</span> Create an API credential above with the scopes you need</p>
+                    <p><span className="text-cyan-400">2.</span> Download the SDK for your language</p>
+                    <p><span className="text-cyan-400">3.</span> Initialize with your API key and secret</p>
+                    <p><span className="text-cyan-400">4.</span> Start making API calls!</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

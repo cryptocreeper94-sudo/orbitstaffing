@@ -2553,6 +2553,67 @@ export type InsertComplianceCheck = z.infer<typeof insertComplianceCheckSchema>;
 export type ComplianceCheck = typeof complianceChecks.$inferSelect;
 
 // ========================
+// E-Verify Cases (Employment Eligibility Verification)
+// ========================
+export const everifyCases = pgTable(
+  "everify_cases",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    workerId: varchar("worker_id").notNull().references(() => workers.id),
+    
+    // E-Verify Case Details
+    caseNumber: varchar("case_number", { length: 50 }), // E-Verify assigned case number
+    caseStatus: varchar("case_status", { length: 50 }).default("initial"), // initial, referred, authorized, final_nonconfirmation, closed
+    
+    // Verification Results
+    eligibilityStatement: varchar("eligibility_statement", { length: 255 }), // "Employment Authorized" etc.
+    photoMatchResult: varchar("photo_match_result", { length: 50 }), // match, no_match, photo_not_available
+    documentType: varchar("document_type", { length: 100 }), // List A, B, or C document type used
+    
+    // I-9 Reference
+    i9Id: varchar("i9_id", { length: 100 }), // Reference to I-9 form
+    
+    // E-Verify API Response Data
+    everifyResponse: jsonb("everify_response"), // Full API response for auditing
+    
+    // Tentative Non-Confirmation (TNC) Details
+    tncReasonCode: varchar("tnc_reason_code", { length: 50 }),
+    tncDetails: text("tnc_details"),
+    referralLetterSent: boolean("referral_letter_sent").default(false),
+    referralDeadline: timestamp("referral_deadline"),
+    
+    // Resolution
+    resolutionNotes: text("resolution_notes"),
+    resolvedBy: varchar("resolved_by").references(() => users.id),
+    
+    // Timestamps
+    submittedAt: timestamp("submitted_at"),
+    resolvedAt: timestamp("resolved_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_everify_tenant").on(table.tenantId),
+    workerIdx: index("idx_everify_worker").on(table.workerId),
+    caseNumberIdx: index("idx_everify_case_number").on(table.caseNumber),
+    caseStatusIdx: index("idx_everify_case_status").on(table.caseStatus),
+    submittedAtIdx: index("idx_everify_submitted_at").on(table.submittedAt),
+  })
+);
+
+export const insertEverifyCaseSchema = createInsertSchema(everifyCases).omit({
+  id: true,
+  submittedAt: true,
+  resolvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertEverifyCase = z.infer<typeof insertEverifyCaseSchema>;
+export type EverifyCase = typeof everifyCases.$inferSelect;
+
+// ========================
 // Customer Service Agreements (CSA)
 // ========================
 export const customerServiceAgreements = pgTable(

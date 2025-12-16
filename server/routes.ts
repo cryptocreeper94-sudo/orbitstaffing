@@ -19,6 +19,7 @@ import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import { jobBoardService } from "./jobBoardService";
+import { everifyService } from "./everifyService";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -147,6 +148,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Job Board routes (Indeed, LinkedIn, ZipRecruiter integration)
   registerJobBoardRoutes(app);
+  
+  // Register E-Verify routes (Employment eligibility verification)
+  registerEVerifyRoutes(app);
 
   // ========================
   // API DOCUMENTATION (OpenAPI/Swagger)
@@ -10790,6 +10794,32 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // ═══════════════════════════════════════════════════════════════════════════════
+  // Partner API SDK Downloads (no auth required)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Download JavaScript SDK
+  app.get("/api/partner/sdk/javascript", (req: Request, res: Response) => {
+    const sdkPath = path.join(process.cwd(), "public", "sdks", "orbit-partner-sdk.js");
+    if (!fs.existsSync(sdkPath)) {
+      return res.status(404).json({ error: "JavaScript SDK not found" });
+    }
+    res.setHeader("Content-Type", "application/javascript");
+    res.setHeader("Content-Disposition", "attachment; filename=orbit-partner-sdk.js");
+    res.sendFile(sdkPath);
+  });
+
+  // Download Python SDK
+  app.get("/api/partner/sdk/python", (req: Request, res: Response) => {
+    const sdkPath = path.join(process.cwd(), "public", "sdks", "orbit_partner_sdk.py");
+    if (!fs.existsSync(sdkPath)) {
+      return res.status(404).json({ error: "Python SDK not found" });
+    }
+    res.setHeader("Content-Type", "text/x-python");
+    res.setHeader("Content-Disposition", "attachment; filename=orbit_partner_sdk.py");
+    res.sendFile(sdkPath);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
   // Partner API v1 Authenticated Endpoints
   // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -11380,6 +11410,574 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Partner API all webhook logs error:", error);
       res.status(500).json({ error: "Failed to fetch webhook delivery logs" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Partner API v1 Bulk/Batch Operations
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Helper: Convert data to CSV format
+  function toCSV(data: any[], columns: string[]): string {
+    if (!data || data.length === 0) {
+      return columns.join(',') + '\n';
+    }
+    
+    const escapeCSV = (value: any): string => {
+      if (value === null || value === undefined) return '';
+      const str = String(value);
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+    
+    const header = columns.join(',');
+    const rows = data.map(row => 
+      columns.map(col => escapeCSV(row[col])).join(',')
+    );
+    
+    return header + '\n' + rows.join('\n');
+  }
+
+  // Bulk import workers (requires workers:write scope)
+  app.post("/api/partner/v1/bulk/workers", partnerApiAuth, requireScope("workers:write"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+      const { workers: workerList, transactional = false } = req.body;
+
+      if (!Array.isArray(workerList)) {
+        return res.status(400).json({ error: "Request body must contain 'workers' array" });
+      }
+
+      if (workerList.length === 0) {
+        return res.status(400).json({ error: "Workers array cannot be empty" });
+      }
+
+      if (workerList.length > 1000) {
+        return res.status(400).json({ 
+          error: "Maximum 1000 workers per request",
+          received: workerList.length,
+          limit: 1000
+        });
+      }
+
+      const results: Array<{ row: number; success: boolean; id?: string; error?: string }> = [];
+      const errors: Array<{ row: number; error: string }> = [];
+
+      // Validate all items first
+      for (let i = 0; i < workerList.length; i++) {
+        const worker = workerList[i];
+        if (!worker.fullName) {
+          errors.push({ row: i + 1, error: "fullName is required" });
+        }
+        if (!worker.tenantId && !credential.tenantId) {
+          errors.push({ row: i + 1, error: "tenantId is required (not set in worker or credential)" });
+        }
+      }
+
+      if (transactional && errors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          mode: "transactional",
+          message: "Validation failed - no records were imported",
+          totalSubmitted: workerList.length,
+          errors,
+        });
+      }
+
+      // Sandbox mode: simulate processing
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        for (let i = 0; i < workerList.length; i++) {
+          const hasError = errors.some(e => e.row === i + 1);
+          if (hasError) {
+            results.push({ row: i + 1, success: false, error: errors.find(e => e.row === i + 1)?.error });
+          } else {
+            const mockWorker = sandboxService.simulateCreateOperation("worker", workerList[i], prefix);
+            results.push({ row: i + 1, success: true, id: mockWorker.id });
+          }
+        }
+        console.log(`[Sandbox API] POST /bulk/workers - Simulated ${workerList.length} workers`);
+        return res.status(201).json({
+          success: errors.length === 0,
+          mode: transactional ? "transactional" : "partial",
+          totalSubmitted: workerList.length,
+          totalSuccess: results.filter(r => r.success).length,
+          totalFailed: results.filter(r => !r.success).length,
+          results,
+          _sandbox: true,
+          _note: "Bulk import simulated in sandbox mode - not persisted"
+        });
+      }
+
+      // Production mode: actually insert workers
+      const tenantId = credential.tenantId;
+      if (!tenantId) {
+        return res.status(400).json({ error: "No tenant associated with this credential" });
+      }
+
+      for (let i = 0; i < workerList.length; i++) {
+        const hasError = errors.some(e => e.row === i + 1);
+        if (hasError) {
+          results.push({ row: i + 1, success: false, error: errors.find(e => e.row === i + 1)?.error });
+          continue;
+        }
+
+        try {
+          const worker = await storage.createWorker({
+            ...workerList[i],
+            tenantId: workerList[i].tenantId || tenantId,
+            companyId: workerList[i].companyId || tenantId,
+          });
+          results.push({ row: i + 1, success: true, id: worker.id });
+        } catch (err: any) {
+          results.push({ row: i + 1, success: false, error: err.message || "Failed to create worker" });
+        }
+      }
+
+      res.status(201).json({
+        success: results.every(r => r.success),
+        mode: transactional ? "transactional" : "partial",
+        totalSubmitted: workerList.length,
+        totalSuccess: results.filter(r => r.success).length,
+        totalFailed: results.filter(r => !r.success).length,
+        results,
+      });
+    } catch (error) {
+      console.error("Partner API bulk workers error:", error);
+      res.status(500).json({ error: "Failed to process bulk workers import" });
+    }
+  });
+
+  // Bulk import timesheets (requires timesheets:write scope)
+  app.post("/api/partner/v1/bulk/timesheets", partnerApiAuth, requireScope("timesheets:write"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+      const { timesheets: timesheetList, transactional = false } = req.body;
+
+      if (!Array.isArray(timesheetList)) {
+        return res.status(400).json({ error: "Request body must contain 'timesheets' array" });
+      }
+
+      if (timesheetList.length === 0) {
+        return res.status(400).json({ error: "Timesheets array cannot be empty" });
+      }
+
+      if (timesheetList.length > 5000) {
+        return res.status(400).json({ 
+          error: "Maximum 5000 timesheets per request",
+          received: timesheetList.length,
+          limit: 5000
+        });
+      }
+
+      const results: Array<{ row: number; success: boolean; id?: string; error?: string }> = [];
+      const errors: Array<{ row: number; error: string }> = [];
+
+      // Validate all items first
+      for (let i = 0; i < timesheetList.length; i++) {
+        const ts = timesheetList[i];
+        if (!ts.workerId) {
+          errors.push({ row: i + 1, error: "workerId is required" });
+        }
+        if (!ts.tenantId && !credential.tenantId) {
+          errors.push({ row: i + 1, error: "tenantId is required" });
+        }
+      }
+
+      if (transactional && errors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          mode: "transactional",
+          message: "Validation failed - no records were imported",
+          totalSubmitted: timesheetList.length,
+          errors,
+        });
+      }
+
+      // Sandbox mode: simulate processing
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        for (let i = 0; i < timesheetList.length; i++) {
+          const hasError = errors.some(e => e.row === i + 1);
+          if (hasError) {
+            results.push({ row: i + 1, success: false, error: errors.find(e => e.row === i + 1)?.error });
+          } else {
+            const mockTs = { id: `sb_ts_${Date.now()}_${i}`, ...timesheetList[i] };
+            results.push({ row: i + 1, success: true, id: mockTs.id });
+          }
+        }
+        console.log(`[Sandbox API] POST /bulk/timesheets - Simulated ${timesheetList.length} timesheets`);
+        return res.status(201).json({
+          success: errors.length === 0,
+          mode: transactional ? "transactional" : "partial",
+          totalSubmitted: timesheetList.length,
+          totalSuccess: results.filter(r => r.success).length,
+          totalFailed: results.filter(r => !r.success).length,
+          results,
+          _sandbox: true,
+          _note: "Bulk import simulated in sandbox mode - not persisted"
+        });
+      }
+
+      // Production mode: insert timesheets
+      const tenantId = credential.tenantId;
+      if (!tenantId) {
+        return res.status(400).json({ error: "No tenant associated with this credential" });
+      }
+
+      for (let i = 0; i < timesheetList.length; i++) {
+        const hasError = errors.some(e => e.row === i + 1);
+        if (hasError) {
+          results.push({ row: i + 1, success: false, error: errors.find(e => e.row === i + 1)?.error });
+          continue;
+        }
+
+        try {
+          const ts = await storage.createTimesheet({
+            ...timesheetList[i],
+            tenantId: timesheetList[i].tenantId || tenantId,
+            companyId: timesheetList[i].companyId || tenantId,
+          });
+          results.push({ row: i + 1, success: true, id: ts.id });
+        } catch (err: any) {
+          results.push({ row: i + 1, success: false, error: err.message || "Failed to create timesheet" });
+        }
+      }
+
+      res.status(201).json({
+        success: results.every(r => r.success),
+        mode: transactional ? "transactional" : "partial",
+        totalSubmitted: timesheetList.length,
+        totalSuccess: results.filter(r => r.success).length,
+        totalFailed: results.filter(r => !r.success).length,
+        results,
+      });
+    } catch (error) {
+      console.error("Partner API bulk timesheets error:", error);
+      res.status(500).json({ error: "Failed to process bulk timesheets import" });
+    }
+  });
+
+  // Bulk import locations (requires locations:write scope)
+  app.post("/api/partner/v1/bulk/locations", partnerApiAuth, requireScope("locations:write"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+      const { locations: locationList, transactional = false } = req.body;
+
+      if (!Array.isArray(locationList)) {
+        return res.status(400).json({ error: "Request body must contain 'locations' array" });
+      }
+
+      if (locationList.length === 0) {
+        return res.status(400).json({ error: "Locations array cannot be empty" });
+      }
+
+      if (locationList.length > 100) {
+        return res.status(400).json({ 
+          error: "Maximum 100 locations per request",
+          received: locationList.length,
+          limit: 100
+        });
+      }
+
+      const results: Array<{ row: number; success: boolean; id?: string; error?: string }> = [];
+      const errors: Array<{ row: number; error: string }> = [];
+
+      // Validate all items first
+      for (let i = 0; i < locationList.length; i++) {
+        const loc = locationList[i];
+        if (!loc.name) {
+          errors.push({ row: i + 1, error: "name is required" });
+        }
+        if (!loc.addressLine1) {
+          errors.push({ row: i + 1, error: "addressLine1 is required" });
+        }
+        if (!loc.city) {
+          errors.push({ row: i + 1, error: "city is required" });
+        }
+        if (!loc.state) {
+          errors.push({ row: i + 1, error: "state is required" });
+        }
+        if (!loc.zipCode) {
+          errors.push({ row: i + 1, error: "zipCode is required" });
+        }
+        if (!loc.locationCode) {
+          errors.push({ row: i + 1, error: "locationCode is required" });
+        }
+      }
+
+      if (transactional && errors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          mode: "transactional",
+          message: "Validation failed - no records were imported",
+          totalSubmitted: locationList.length,
+          errors,
+        });
+      }
+
+      // Sandbox mode: simulate processing
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        for (let i = 0; i < locationList.length; i++) {
+          const hasError = errors.some(e => e.row === i + 1);
+          if (hasError) {
+            results.push({ row: i + 1, success: false, error: errors.find(e => e.row === i + 1)?.error });
+          } else {
+            const mockLoc = sandboxService.simulateCreateOperation("location", locationList[i], prefix);
+            results.push({ row: i + 1, success: true, id: mockLoc.id });
+          }
+        }
+        console.log(`[Sandbox API] POST /bulk/locations - Simulated ${locationList.length} locations`);
+        return res.status(201).json({
+          success: errors.length === 0,
+          mode: transactional ? "transactional" : "partial",
+          totalSubmitted: locationList.length,
+          totalSuccess: results.filter(r => r.success).length,
+          totalFailed: results.filter(r => !r.success).length,
+          results,
+          _sandbox: true,
+          _note: "Bulk import simulated in sandbox mode - not persisted"
+        });
+      }
+
+      // Production mode: insert locations
+      for (let i = 0; i < locationList.length; i++) {
+        const hasError = errors.some(e => e.row === i + 1);
+        if (hasError) {
+          results.push({ row: i + 1, success: false, error: errors.find(e => e.row === i + 1)?.error });
+          continue;
+        }
+
+        try {
+          const location = await storage.createFranchiseLocation({
+            ...locationList[i],
+            franchiseId: credential.franchiseId,
+            tenantId: credential.tenantId,
+          });
+          results.push({ row: i + 1, success: true, id: location.id });
+        } catch (err: any) {
+          results.push({ row: i + 1, success: false, error: err.message || "Failed to create location" });
+        }
+      }
+
+      res.status(201).json({
+        success: results.every(r => r.success),
+        mode: transactional ? "transactional" : "partial",
+        totalSubmitted: locationList.length,
+        totalSuccess: results.filter(r => r.success).length,
+        totalFailed: results.filter(r => !r.success).length,
+        results,
+      });
+    } catch (error) {
+      console.error("Partner API bulk locations error:", error);
+      res.status(500).json({ error: "Failed to process bulk locations import" });
+    }
+  });
+
+  // Export workers (requires workers:read scope)
+  app.get("/api/partner/v1/export/workers", partnerApiAuth, requireScope("workers:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+      const format = (req.query.format as string)?.toLowerCase() || "json";
+      const limit = Math.min(parseInt(req.query.limit as string) || 1000, 10000);
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      let workerList: any[] = [];
+
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        workerList = sandboxService.getWorkers(credential.id, prefix);
+        workerList = workerList.slice(offset, offset + limit);
+      } else {
+        const tenantId = credential.tenantId;
+        if (!tenantId) {
+          return res.status(400).json({ error: "No tenant associated with this credential" });
+        }
+
+        workerList = await db.select().from(workers)
+          .where(eq(workers.tenantId, tenantId))
+          .orderBy(desc(workers.createdAt))
+          .limit(limit)
+          .offset(offset);
+      }
+
+      if (format === "csv") {
+        const columns = ['id', 'fullName', 'email', 'phone', 'status', 'employeeNumber', 'hourlyWage', 'city', 'state', 'zipCode', 'createdAt'];
+        const csv = toCSV(workerList, columns);
+        
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader("Content-Disposition", `attachment; filename=workers_export_${Date.now()}.csv`);
+        return res.send(csv);
+      }
+
+      res.json({
+        data: workerList,
+        meta: { 
+          total: workerList.length, 
+          limit, 
+          offset,
+          format: "json",
+          ...(isSandbox && { _sandbox: true })
+        }
+      });
+    } catch (error) {
+      console.error("Partner API export workers error:", error);
+      res.status(500).json({ error: "Failed to export workers" });
+    }
+  });
+
+  // Export timesheets (requires timesheets:read scope)
+  app.get("/api/partner/v1/export/timesheets", partnerApiAuth, requireScope("timesheets:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+      const format = (req.query.format as string)?.toLowerCase() || "json";
+      const limit = Math.min(parseInt(req.query.limit as string) || 1000, 10000);
+      const offset = parseInt(req.query.offset as string) || 0;
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
+
+      let timesheetList: any[] = [];
+
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        timesheetList = sandboxService.getTimesheets(credential.id, prefix);
+        
+        // Filter by date range if provided
+        if (startDate) {
+          const start = new Date(startDate);
+          timesheetList = timesheetList.filter(ts => new Date(ts.clockInTime) >= start);
+        }
+        if (endDate) {
+          const end = new Date(endDate);
+          timesheetList = timesheetList.filter(ts => new Date(ts.clockInTime) <= end);
+        }
+        
+        timesheetList = timesheetList.slice(offset, offset + limit);
+      } else {
+        const tenantId = credential.tenantId;
+        if (!tenantId) {
+          return res.status(400).json({ error: "No tenant associated with this credential" });
+        }
+
+        const { timesheets } = await import("@shared/schema");
+        let query = db.select().from(timesheets).where(eq(timesheets.tenantId, tenantId));
+        
+        if (startDate) {
+          query = query.where(gte(timesheets.clockInTime, new Date(startDate))) as any;
+        }
+        if (endDate) {
+          query = query.where(lte(timesheets.clockInTime, new Date(endDate))) as any;
+        }
+
+        timesheetList = await query.orderBy(desc(timesheets.clockInTime)).limit(limit).offset(offset);
+      }
+
+      if (format === "csv") {
+        const columns = ['id', 'workerId', 'assignmentId', 'clockInTime', 'clockOutTime', 'totalHoursWorked', 'billableHours', 'status', 'approvedAt', 'createdAt'];
+        const csv = toCSV(timesheetList, columns);
+        
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader("Content-Disposition", `attachment; filename=timesheets_export_${Date.now()}.csv`);
+        return res.send(csv);
+      }
+
+      res.json({
+        data: timesheetList,
+        meta: { 
+          total: timesheetList.length, 
+          limit, 
+          offset,
+          format: "json",
+          ...(startDate && { startDate }),
+          ...(endDate && { endDate }),
+          ...(isSandbox && { _sandbox: true })
+        }
+      });
+    } catch (error) {
+      console.error("Partner API export timesheets error:", error);
+      res.status(500).json({ error: "Failed to export timesheets" });
+    }
+  });
+
+  // Export payroll (requires payroll:read scope)
+  app.get("/api/partner/v1/export/payroll", partnerApiAuth, requireScope("payroll:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+      const format = (req.query.format as string)?.toLowerCase() || "json";
+      const limit = Math.min(parseInt(req.query.limit as string) || 1000, 10000);
+      const offset = parseInt(req.query.offset as string) || 0;
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
+
+      let payrollList: any[] = [];
+
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        payrollList = sandboxService.getPayrollRecords(credential.id, prefix);
+        
+        // Filter by date range if provided
+        if (startDate) {
+          const start = new Date(startDate);
+          payrollList = payrollList.filter(p => new Date(p.payPeriodStart) >= start);
+        }
+        if (endDate) {
+          const end = new Date(endDate);
+          payrollList = payrollList.filter(p => new Date(p.payPeriodEnd) <= end);
+        }
+        
+        payrollList = payrollList.slice(offset, offset + limit);
+      } else {
+        const tenantId = credential.tenantId;
+        if (!tenantId) {
+          return res.status(400).json({ error: "No tenant associated with this credential" });
+        }
+
+        const { payroll } = await import("@shared/schema");
+        let query = db.select().from(payroll).where(eq(payroll.tenantId, tenantId));
+        
+        if (startDate) {
+          query = query.where(gte(payroll.payPeriodStart, startDate)) as any;
+        }
+        if (endDate) {
+          query = query.where(lte(payroll.payPeriodEnd, endDate)) as any;
+        }
+
+        payrollList = await query.orderBy(desc(payroll.payPeriodStart)).limit(limit).offset(offset);
+      }
+
+      if (format === "csv") {
+        const columns = ['id', 'workerId', 'payPeriodStart', 'payPeriodEnd', 'grossPay', 'federalTax', 'stateTax', 'ficaTax', 'otherDeductions', 'netPay', 'status', 'processedAt', 'paidAt', 'createdAt'];
+        const csv = toCSV(payrollList, columns);
+        
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader("Content-Disposition", `attachment; filename=payroll_export_${Date.now()}.csv`);
+        return res.send(csv);
+      }
+
+      res.json({
+        data: payrollList,
+        meta: { 
+          total: payrollList.length, 
+          limit, 
+          offset,
+          format: "json",
+          ...(startDate && { startDate }),
+          ...(endDate && { endDate }),
+          ...(isSandbox && { _sandbox: true })
+        }
+      });
+    } catch (error) {
+      console.error("Partner API export payroll error:", error);
+      res.status(500).json({ error: "Failed to export payroll records" });
     }
   });
 
@@ -12376,6 +12974,190 @@ export function registerJobBoardRoutes(app: Express) {
     } catch (error) {
       console.error("[Job Boards] Sync stats error:", error);
       res.status(500).json({ error: "Failed to sync stats" });
+    }
+  });
+}
+
+// ========================
+// E-VERIFY INTEGRATION ROUTES (Employment Eligibility Verification)
+// ========================
+export function registerEVerifyRoutes(app: Express) {
+  
+  // Get E-Verify API configuration status
+  app.get("/api/admin/everify/status", async (req: Request, res: Response) => {
+    try {
+      const status = everifyService.getStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("[E-Verify] Status error:", error);
+      res.status(500).json({ error: "Failed to get E-Verify status" });
+    }
+  });
+
+  // List all E-Verify cases
+  app.get("/api/admin/everify/cases", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req);
+      let cases;
+      
+      if (tenantId) {
+        cases = await everifyService.getCasesForTenant(tenantId);
+      } else {
+        cases = await everifyService.getAllCases();
+      }
+      
+      res.json(cases);
+    } catch (error) {
+      console.error("[E-Verify] List cases error:", error);
+      res.status(500).json({ error: "Failed to fetch E-Verify cases" });
+    }
+  });
+
+  // Get E-Verify cases for a specific worker
+  app.get("/api/admin/everify/cases/worker/:workerId", async (req: Request, res: Response) => {
+    try {
+      const { workerId } = req.params;
+      const cases = await everifyService.getCasesForWorker(workerId);
+      res.json(cases);
+    } catch (error) {
+      console.error("[E-Verify] Get worker cases error:", error);
+      res.status(500).json({ error: "Failed to fetch worker E-Verify cases" });
+    }
+  });
+
+  // Get case details
+  app.get("/api/admin/everify/cases/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const caseDetails = await everifyService.getCaseStatus(id);
+      
+      if (!caseDetails) {
+        return res.status(404).json({ error: "Case not found" });
+      }
+      
+      // Get worker info
+      const worker = await db
+        .select({ id: workers.id, fullName: workers.fullName, email: workers.email })
+        .from(workers)
+        .where(eq(workers.id, caseDetails.workerId))
+        .limit(1);
+      
+      res.json({
+        case: caseDetails,
+        worker: worker[0] || null,
+      });
+    } catch (error) {
+      console.error("[E-Verify] Get case error:", error);
+      res.status(500).json({ error: "Failed to fetch case details" });
+    }
+  });
+
+  // Submit new E-Verify verification
+  app.post("/api/admin/everify/cases/submit", async (req: Request, res: Response) => {
+    try {
+      const { 
+        workerId, 
+        tenantId: bodyTenantId,
+        i9Id,
+        firstName,
+        lastName,
+        dateOfBirth,
+        ssn,
+        documentType,
+        documentNumber,
+        documentExpiration,
+        citizenshipStatus,
+      } = req.body;
+      
+      const tenantId = bodyTenantId || getTenantIdFromRequest(req) || "default";
+      
+      if (!workerId) {
+        return res.status(400).json({ error: "Worker ID is required" });
+      }
+      
+      // Get worker details if not provided
+      let workerFirstName = firstName;
+      let workerLastName = lastName;
+      
+      if (!workerFirstName || !workerLastName) {
+        const worker = await db
+          .select({ fullName: workers.fullName })
+          .from(workers)
+          .where(eq(workers.id, workerId))
+          .limit(1);
+        
+        if (worker[0]?.fullName) {
+          const nameParts = worker[0].fullName.split(' ');
+          workerFirstName = workerFirstName || nameParts[0] || 'Unknown';
+          workerLastName = workerLastName || nameParts.slice(1).join(' ') || 'Unknown';
+        }
+      }
+      
+      const newCase = await everifyService.submitCase({
+        workerId,
+        tenantId,
+        i9Id,
+        firstName: workerFirstName || 'Unknown',
+        lastName: workerLastName || 'Unknown',
+        dateOfBirth: dateOfBirth || '1990-01-01',
+        ssn: ssn || '000-00-0000',
+        documentType: documentType || 'US Passport',
+        documentNumber: documentNumber || 'MOCK123456',
+        documentExpiration,
+        citizenshipStatus: citizenshipStatus || 'citizen',
+      });
+      
+      res.json(newCase);
+    } catch (error) {
+      console.error("[E-Verify] Submit case error:", error);
+      res.status(500).json({ error: "Failed to submit E-Verify case" });
+    }
+  });
+
+  // Close/resolve an E-Verify case
+  app.post("/api/admin/everify/cases/:id/resolve", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { resolutionNotes, resolvedById } = req.body;
+      
+      const closedCase = await everifyService.closeCase(
+        id,
+        resolutionNotes || 'Case closed by admin',
+        resolvedById || 'system'
+      );
+      
+      res.json(closedCase);
+    } catch (error) {
+      console.error("[E-Verify] Resolve case error:", error);
+      res.status(500).json({ error: "Failed to resolve case" });
+    }
+  });
+
+  // Refresh case status from E-Verify API
+  app.post("/api/admin/everify/cases/:id/refresh", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const refreshedCase = await everifyService.refreshCaseStatus(id);
+      
+      if (!refreshedCase) {
+        return res.status(404).json({ error: "Case not found" });
+      }
+      
+      res.json(refreshedCase);
+    } catch (error) {
+      console.error("[E-Verify] Refresh case error:", error);
+      res.status(500).json({ error: "Failed to refresh case status" });
+    }
+  });
+
+  // E-Verify callback/webhook handler
+  app.post("/api/webhooks/everify", async (req: Request, res: Response) => {
+    try {
+      await everifyService.handleCallback(req.body);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("[E-Verify] Webhook error:", error);
+      res.status(500).json({ error: "Failed to process webhook" });
     }
   });
 }

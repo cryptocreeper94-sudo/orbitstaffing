@@ -41,6 +41,7 @@ import { FullAnalyticsDashboard } from '@/components/FullAnalyticsDashboard';
 import { SEOManager } from '@/components/SEOManager';
 import BackgroundCheckManager from '@/components/BackgroundCheckManager';
 import { JobBoardManager } from '@/components/JobBoardManager';
+import { EVerifyManager } from '@/components/EVerifyManager';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
 import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
@@ -603,6 +604,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         { id: 'shift-marketplace', label: 'Shift Marketplace', icon: <Briefcase className="w-4 h-4" /> },
         { id: 'credentials', label: 'Credential Tracker', icon: <Shield className="w-4 h-4" /> },
         { id: 'background-checks', label: 'Background Checks', icon: <Shield className="w-4 h-4" /> },
+        { id: 'everify', label: 'E-Verify', icon: <Shield className="w-4 h-4" /> },
         { id: 'job-boards', label: 'Job Board Integration', icon: <Briefcase className="w-4 h-4" /> },
         { id: 'bulk-ops', label: 'Bulk Operations', icon: <Settings className="w-4 h-4" /> },
         { id: 'search', label: 'Advanced Search', icon: <Search className="w-4 h-4" /> },
@@ -685,6 +687,7 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
       case 'shift-marketplace': return <ShiftMarketplace />;
       case 'credentials': return <CredentialTracker />;
       case 'background-checks': return <BackgroundCheckManager />;
+      case 'everify': return <EVerifyManager />;
       case 'job-boards': return <JobBoardManager />;
       case 'worker-performance': return <WorkerPerformanceDashboard />;
       case 'beta-testers': return <BetaTesterManagement />;
