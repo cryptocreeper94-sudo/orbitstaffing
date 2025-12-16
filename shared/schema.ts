@@ -6108,6 +6108,7 @@ export const partnerApiCredentials = pgTable(
     
     // Environment & Scopes
     environment: varchar("environment", { length: 20 }).default("production"), // sandbox, production
+    sandboxDataPrefix: varchar("sandbox_data_prefix", { length: 20 }), // Unique prefix for sandbox data isolation
     scopes: text("scopes").array().default(sql`ARRAY['workers:read']::text[]`),
     
     // Rate Limiting
@@ -6497,3 +6498,127 @@ export const insertAccountingSyncLogSchema = createInsertSchema(accountingSyncLo
 
 export type InsertAccountingSyncLog = z.infer<typeof insertAccountingSyncLogSchema>;
 export type AccountingSyncLog = typeof accountingSyncLogs.$inferSelect;
+
+// ========================
+// Job Board Connections (Indeed, LinkedIn, ZipRecruiter)
+// ========================
+export const JOB_BOARD_PROVIDERS = ['indeed', 'linkedin', 'ziprecruiter'] as const;
+export type JobBoardProvider = typeof JOB_BOARD_PROVIDERS[number];
+
+export const jobBoardConnections = pgTable(
+  "job_board_connections",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    provider: varchar("provider", { length: 50 }).notNull(), // indeed, linkedin, ziprecruiter
+    
+    // OAuth/API Credentials (encrypted in practice)
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at"),
+    
+    // Provider-specific identifiers
+    accountId: varchar("account_id", { length: 255 }), // Employer account ID on the platform
+    employerName: varchar("employer_name", { length: 255 }), // Company name on the platform
+    
+    // Connection status
+    isActive: boolean("is_active").default(true),
+    connectionStatus: varchar("connection_status", { length: 50 }).default("pending"), // pending, connected, error, expired
+    lastError: text("last_error"),
+    
+    // Sync tracking
+    lastSyncAt: timestamp("last_sync_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_job_board_conn_tenant").on(table.tenantId),
+    providerIdx: index("idx_job_board_conn_provider").on(table.provider),
+    tenantProviderIdx: index("idx_job_board_conn_tenant_provider").on(table.tenantId, table.provider),
+    activeIdx: index("idx_job_board_conn_active").on(table.isActive),
+  })
+);
+
+export const insertJobBoardConnectionSchema = createInsertSchema(jobBoardConnections).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertJobBoardConnection = z.infer<typeof insertJobBoardConnectionSchema>;
+export type JobBoardConnection = typeof jobBoardConnections.$inferSelect;
+
+// ========================
+// External Job Postings - Track jobs posted to external boards (Indeed, LinkedIn, ZipRecruiter)
+// ========================
+export const EXTERNAL_JOB_POSTING_STATUSES = ['draft', 'active', 'paused', 'expired', 'closed'] as const;
+export type ExternalJobPostingStatus = typeof EXTERNAL_JOB_POSTING_STATUSES[number];
+
+export const externalJobPostings = pgTable(
+  "external_job_postings",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").notNull().references(() => companies.id),
+    connectionId: varchar("connection_id").references(() => jobBoardConnections.id),
+    
+    // Internal job reference
+    jobId: varchar("job_id", { length: 255 }), // Internal job/requisition ID
+    jobTitle: varchar("job_title", { length: 255 }).notNull(),
+    jobDescription: text("job_description"),
+    
+    // Location
+    location: varchar("location", { length: 255 }),
+    city: varchar("city", { length: 100 }),
+    state: varchar("state", { length: 50 }),
+    zipCode: varchar("zip_code", { length: 10 }),
+    isRemote: boolean("is_remote").default(false),
+    
+    // Job Details
+    jobType: varchar("job_type", { length: 50 }), // full-time, part-time, contract, temp
+    salaryMin: decimal("salary_min", { precision: 10, scale: 2 }),
+    salaryMax: decimal("salary_max", { precision: 10, scale: 2 }),
+    salaryType: varchar("salary_type", { length: 20 }), // hourly, salary, daily
+    
+    // External posting info
+    provider: varchar("provider", { length: 50 }).notNull(), // indeed, linkedin, ziprecruiter
+    externalPostingId: varchar("external_posting_id", { length: 255 }), // ID from the job board
+    postUrl: text("post_url"), // Public URL to the job posting
+    
+    // Status tracking
+    status: varchar("status", { length: 20 }).default("draft"), // draft, active, paused, expired, closed
+    
+    // Performance metrics
+    viewCount: integer("view_count").default(0),
+    applicantCount: integer("applicant_count").default(0),
+    clickCount: integer("click_count").default(0),
+    
+    // Dates
+    postedAt: timestamp("posted_at"),
+    expiresAt: timestamp("expires_at"),
+    lastSyncAt: timestamp("last_sync_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    tenantIdx: index("idx_ext_job_posting_tenant").on(table.tenantId),
+    connectionIdx: index("idx_ext_job_posting_connection").on(table.connectionId),
+    providerIdx: index("idx_ext_job_posting_provider").on(table.provider),
+    statusIdx: index("idx_ext_job_posting_status").on(table.status),
+    jobIdIdx: index("idx_ext_job_posting_job_id").on(table.jobId),
+    externalIdx: index("idx_ext_job_posting_external").on(table.externalPostingId),
+  })
+);
+
+export const insertExternalJobPostingSchema = createInsertSchema(externalJobPostings).omit({
+  id: true,
+  viewCount: true,
+  applicantCount: true,
+  clickCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertExternalJobPosting = z.infer<typeof insertExternalJobPostingSchema>;
+export type ExternalJobPosting = typeof externalJobPostings.$inferSelect;

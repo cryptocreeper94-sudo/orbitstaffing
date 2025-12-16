@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Key, Copy, Check, Eye, EyeOff, Plus, Trash2, RefreshCw,
   Shield, Clock, Activity, AlertTriangle, Settings, ChevronDown,
-  Zap, Lock, Globe, BarChart3, Code2, Webhook
+  Zap, Lock, Globe, BarChart3, Code2, Webhook, FlaskConical, RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -43,6 +43,7 @@ interface ApiCredential {
   description?: string;
   apiKey: string;
   environment: string;
+  sandboxDataPrefix?: string;
   scopes: string[];
   rateLimitPerMinute: number;
   rateLimitPerDay: number;
@@ -213,6 +214,28 @@ export function PartnerApiManager() {
     }
   };
 
+  const resetSandboxData = async (id: string) => {
+    if (!confirm("Reset sandbox data? This will restore all mock data to its initial state.")) return;
+    
+    try {
+      const res = await fetch(`/api/admin/partner-api/credentials/${id}/reset-sandbox`, {
+        method: "POST",
+      });
+      
+      if (res.ok) {
+        toast({ 
+          title: "Sandbox Data Reset", 
+          description: "All sandbox mock data has been restored to initial state"
+        });
+      } else {
+        const error = await res.json();
+        toast({ title: "Error", description: error.error, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to reset sandbox data", variant: "destructive" });
+    }
+  };
+
   const copyToClipboard = async (text: string, id: string) => {
     await navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -320,9 +343,17 @@ export function PartnerApiManager() {
                         <Badge variant={cred.isActive ? "default" : "secondary"} className={cred.isActive ? "bg-green-500/20 text-green-400" : ""}>
                           {cred.isActive ? "Active" : "Disabled"}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {cred.environment}
-                        </Badge>
+                        {cred.environment === "sandbox" ? (
+                          <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 flex items-center gap-1">
+                            <FlaskConical className="h-3 w-3" />
+                            Test Mode
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                            <Globe className="h-3 w-3 mr-1" />
+                            Production
+                          </Badge>
+                        )}
                       </div>
                       
                       {cred.description && (
@@ -366,6 +397,32 @@ export function PartnerApiManager() {
                           {cred.lastUsedAt ? new Date(cred.lastUsedAt).toLocaleDateString() : "Never used"}
                         </span>
                       </div>
+                      
+                      {cred.environment === "sandbox" && (
+                        <div className="mt-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-amber-400 text-sm font-medium flex items-center gap-2">
+                                <FlaskConical className="h-4 w-4" />
+                                Sandbox Environment
+                              </p>
+                              <p className="text-amber-300/70 text-xs mt-1">
+                                All API calls return mock data. No real data is affected.
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => resetSandboxData(cred.id)}
+                              className="border-amber-500/30 text-amber-400 hover:bg-amber-500/20"
+                              data-testid={`btn-reset-sandbox-${cred.id}`}
+                            >
+                              <RotateCcw className="h-3 w-3 mr-1" />
+                              Reset Data
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-2">

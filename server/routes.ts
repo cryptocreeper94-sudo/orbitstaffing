@@ -18,6 +18,7 @@ import { solanaService } from "./solanaService";
 import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
+import { jobBoardService } from "./jobBoardService";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -26,6 +27,7 @@ import { azureFaceService } from "./azureFaceService";
 import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
 import { versionManager } from "./versionManager";
 import { webhookService, emitWebhookEvent, sendTestWebhook, startWebhookRetryProcessor } from "./webhookService";
+import { sandboxService } from "./sandboxService";
 import swaggerUi from "swagger-ui-express";
 import { openApiSpec } from "./openapi";
 
@@ -142,6 +144,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Analytics routes (Page tracking and dashboard)
   registerAnalyticsRoutes(app);
+  
+  // Register Job Board routes (Indeed, LinkedIn, ZipRecruiter integration)
+  registerJobBoardRoutes(app);
 
   // ========================
   // API DOCUMENTATION (OpenAPI/Swagger)
@@ -10792,10 +10797,13 @@ export function registerPayCardRoutes(app: Express) {
   app.get("/api/partner/v1/me", partnerApiAuth, async (req: Request, res: Response) => {
     try {
       const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
       res.json({
         credentialId: credential.id,
         name: credential.name,
         environment: credential.environment,
+        isSandbox,
+        sandboxDataPrefix: isSandbox ? credential.sandboxDataPrefix : undefined,
         scopes: credential.scopes,
         rateLimits: {
           perMinute: credential.rateLimitPerMinute,
@@ -10804,6 +10812,7 @@ export function registerPayCardRoutes(app: Express) {
         },
         franchiseId: credential.franchiseId,
         tenantId: credential.tenantId,
+        ...(isSandbox && { _sandbox: true, _note: "You are using sandbox credentials. All data is mock/demo data." }),
       });
     } catch (error) {
       console.error("Partner API /me error:", error);
@@ -10815,8 +10824,20 @@ export function registerPayCardRoutes(app: Express) {
   app.get("/api/partner/v1/workers", partnerApiAuth, requireScope("workers:read"), async (req: Request, res: Response) => {
     try {
       const credential = (req as any).partnerCredential;
-      const tenantId = credential.tenantId;
+      const isSandbox = credential.environment === "sandbox";
       
+      // Return sandbox mock data for sandbox credentials
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const workerList = sandboxService.getWorkers(credential.id, prefix);
+        console.log(`[Sandbox API] GET /workers - Returning ${workerList.length} mock workers`);
+        return res.json({
+          data: workerList,
+          meta: { total: workerList.length, _sandbox: true, _note: "Mock sandbox data" }
+        });
+      }
+
+      const tenantId = credential.tenantId;
       if (!tenantId) {
         return res.status(400).json({ error: "No tenant associated with this credential" });
       }
@@ -10840,6 +10861,19 @@ export function registerPayCardRoutes(app: Express) {
   app.get("/api/partner/v1/locations", partnerApiAuth, requireScope("locations:read"), async (req: Request, res: Response) => {
     try {
       const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      // Return sandbox mock data for sandbox credentials
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const locations = sandboxService.getLocations(credential.id, prefix);
+        console.log(`[Sandbox API] GET /locations - Returning ${locations.length} mock locations`);
+        return res.json({
+          data: locations,
+          meta: { total: locations.length, _sandbox: true, _note: "Mock sandbox data" }
+        });
+      }
+
       const locations = await storage.getFranchiseLocations(credential.franchiseId, credential.tenantId);
       res.json({
         data: locations,
@@ -10855,6 +10889,19 @@ export function registerPayCardRoutes(app: Express) {
   app.post("/api/partner/v1/locations", partnerApiAuth, requireScope("locations:write"), async (req: Request, res: Response) => {
     try {
       const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      // Sandbox: simulate creation without persistence
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const mockLocation = sandboxService.simulateCreateOperation("location", req.body, prefix);
+        console.log(`[Sandbox API] POST /locations - Simulated creation (not persisted)`);
+        return res.status(201).json({ 
+          data: mockLocation,
+          meta: { _sandbox: true, _note: "Created in sandbox mode - not persisted to database" }
+        });
+      }
+
       const location = await storage.createFranchiseLocation({
         ...req.body,
         franchiseId: credential.franchiseId,
@@ -10871,6 +10918,19 @@ export function registerPayCardRoutes(app: Express) {
   app.get("/api/partner/v1/analytics", partnerApiAuth, requireScope("analytics:read"), async (req: Request, res: Response) => {
     try {
       const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      // Return sandbox mock analytics for sandbox credentials
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const analytics = sandboxService.getAnalytics(credential.id, prefix);
+        console.log(`[Sandbox API] GET /analytics - Returning mock analytics`);
+        return res.json({
+          data: analytics,
+          meta: { credentialId: credential.id, _sandbox: true }
+        });
+      }
+
       const stats = await storage.getPartnerApiStats(credential.id);
       const dashboard = await storage.getAnalyticsDashboard();
       
@@ -10895,6 +10955,18 @@ export function registerPayCardRoutes(app: Express) {
   app.get("/api/partner/v1/billing", partnerApiAuth, requireScope("billing:read"), async (req: Request, res: Response) => {
     try {
       const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      // Return sandbox mock billing for sandbox credentials
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const billingInfo = sandboxService.getBillingInfo(credential.id, prefix);
+        console.log(`[Sandbox API] GET /billing - Returning mock billing info`);
+        return res.json({ 
+          data: billingInfo,
+          meta: { _sandbox: true }
+        });
+      }
       
       // Get company billing info if tenantId exists
       let billingInfo: any = { credentialId: credential.id };
@@ -10916,6 +10988,115 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Partner API billing error:", error);
       res.status(500).json({ error: "Failed to fetch billing info" });
+    }
+  });
+
+  // Reset sandbox data (sandbox only)
+  app.post("/api/partner/v1/sandbox/reset", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      
+      if (credential.environment !== "sandbox") {
+        return res.status(400).json({ 
+          error: "This endpoint is only available for sandbox credentials",
+          code: "NOT_SANDBOX"
+        });
+      }
+
+      const prefix = credential.sandboxDataPrefix || "sb_default";
+      sandboxService.resetSandboxData(credential.id, prefix);
+      
+      console.log(`[Sandbox API] POST /sandbox/reset - Reset data for credential ${credential.id}`);
+      res.json({ 
+        success: true, 
+        message: "Sandbox data has been reset to initial state",
+        credentialId: credential.id,
+        prefix
+      });
+    } catch (error) {
+      console.error("Partner API sandbox reset error:", error);
+      res.status(500).json({ error: "Failed to reset sandbox data" });
+    }
+  });
+
+  // Get jobs (requires jobs:read scope) - NEW SANDBOX ENDPOINT
+  app.get("/api/partner/v1/jobs", partnerApiAuth, requireScope("jobs:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const jobs = sandboxService.getJobs(credential.id, prefix);
+        console.log(`[Sandbox API] GET /jobs - Returning ${jobs.length} mock jobs`);
+        return res.json({
+          data: jobs,
+          meta: { total: jobs.length, _sandbox: true, _note: "Mock sandbox data" }
+        });
+      }
+
+      // For production, return actual jobs (if implemented)
+      res.json({
+        data: [],
+        meta: { total: 0, _note: "Jobs endpoint - connect to your jobs system" }
+      });
+    } catch (error) {
+      console.error("Partner API jobs error:", error);
+      res.status(500).json({ error: "Failed to fetch jobs" });
+    }
+  });
+
+  // Get timesheets (requires timesheets:read scope) - NEW SANDBOX ENDPOINT
+  app.get("/api/partner/v1/timesheets", partnerApiAuth, requireScope("timesheets:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const timesheets = sandboxService.getTimesheets(credential.id, prefix);
+        console.log(`[Sandbox API] GET /timesheets - Returning ${timesheets.length} mock timesheets`);
+        return res.json({
+          data: timesheets,
+          meta: { total: timesheets.length, _sandbox: true, _note: "Mock sandbox data" }
+        });
+      }
+
+      // For production, return actual timesheets (if implemented)
+      res.json({
+        data: [],
+        meta: { total: 0, _note: "Timesheets endpoint - connect to your timesheets system" }
+      });
+    } catch (error) {
+      console.error("Partner API timesheets error:", error);
+      res.status(500).json({ error: "Failed to fetch timesheets" });
+    }
+  });
+
+  // Get payroll records (requires payroll:read scope) - NEW SANDBOX ENDPOINT
+  app.get("/api/partner/v1/payroll", partnerApiAuth, requireScope("payroll:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const isSandbox = credential.environment === "sandbox";
+
+      if (isSandbox) {
+        const prefix = credential.sandboxDataPrefix || "sb_default";
+        const payrollRecords = sandboxService.getPayrollRecords(credential.id, prefix);
+        console.log(`[Sandbox API] GET /payroll - Returning ${payrollRecords.length} mock payroll records`);
+        return res.json({
+          data: payrollRecords,
+          meta: { total: payrollRecords.length, _sandbox: true, _note: "Mock sandbox data" }
+        });
+      }
+
+      // For production, return actual payroll (if implemented)
+      res.json({
+        data: [],
+        meta: { total: 0, _note: "Payroll endpoint - connect to your payroll system" }
+      });
+    } catch (error) {
+      console.error("Partner API payroll error:", error);
+      res.status(500).json({ error: "Failed to fetch payroll records" });
     }
   });
 
@@ -11240,6 +11421,10 @@ export function registerPayCardRoutes(app: Express) {
       const apiKey = generatePartnerApiKey();
       const apiSecret = generatePartnerApiSecret();
       const apiSecretHash = hashApiSecret(apiSecret);
+      
+      // Generate sandbox prefix for sandbox credentials
+      const isSandbox = environment === "sandbox";
+      const sandboxDataPrefix = isSandbox ? sandboxService.generateNewPrefix() : null;
 
       const credential = await storage.createPartnerApiCredential({
         name,
@@ -11249,17 +11434,21 @@ export function registerPayCardRoutes(app: Express) {
         apiKey,
         apiSecretHash,
         environment: environment || "production",
+        sandboxDataPrefix,
         scopes: scopes || ["workers:read"],
-        rateLimitPerMinute: rateLimitPerMinute || 60,
-        rateLimitPerDay: rateLimitPerDay || 10000,
+        rateLimitPerMinute: isSandbox ? Math.min(rateLimitPerMinute || 30, 30) : (rateLimitPerMinute || 60),
+        rateLimitPerDay: isSandbox ? Math.min(rateLimitPerDay || 1000, 1000) : (rateLimitPerDay || 10000),
         expiresAt: expiresAt ? new Date(expiresAt) : null,
         createdBy: req.session?.adminName || "admin",
       });
+
+      console.log(`[Partner API] Created ${isSandbox ? "sandbox" : "production"} credential: ${credential.id}`);
 
       res.status(201).json({
         ...credential,
         apiSecret, // Only shown once!
         warning: "Save this API secret now. It will not be shown again!",
+        ...(isSandbox && { sandboxNote: "This is a sandbox credential. All data will be mock/demo data." }),
       });
     } catch (error) {
       console.error("Create partner credential error:", error);
@@ -11333,6 +11522,41 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Delete partner credential error:", error);
       res.status(500).json({ error: "Failed to delete credential" });
+    }
+  });
+
+  // Reset sandbox data for a credential (admin only)
+  app.post("/api/admin/partner-api/credentials/:id/reset-sandbox", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const credentials = await storage.getPartnerApiCredentials();
+      const credential = credentials.find((c: any) => c.id === id);
+      
+      if (!credential) {
+        return res.status(404).json({ error: "Credential not found" });
+      }
+      
+      if (credential.environment !== "sandbox") {
+        return res.status(400).json({ 
+          error: "Only sandbox credentials can have their data reset",
+          code: "NOT_SANDBOX"
+        });
+      }
+
+      const prefix = credential.sandboxDataPrefix || "sb_default";
+      sandboxService.resetSandboxData(id, prefix);
+      
+      console.log(`[Admin] Reset sandbox data for credential ${id}`);
+      res.json({ 
+        success: true, 
+        message: "Sandbox data has been reset to initial state",
+        credentialId: id,
+        prefix
+      });
+    } catch (error) {
+      console.error("Reset sandbox data error:", error);
+      res.status(500).json({ error: "Failed to reset sandbox data" });
     }
   });
 
@@ -11909,6 +12133,249 @@ export function registerBackgroundCheckRoutes(app: Express) {
     } catch (error) {
       console.error("[Background Checks] Status error:", error);
       res.status(500).json({ error: "Failed to get status" });
+    }
+  });
+}
+
+// ========================
+// JOB BOARD INTEGRATION ROUTES (Indeed, LinkedIn, ZipRecruiter)
+// ========================
+export function registerJobBoardRoutes(app: Express) {
+  
+  // Get provider configurations (available job boards)
+  app.get("/api/admin/job-boards/providers", async (req: Request, res: Response) => {
+    try {
+      const providers = await jobBoardService.getProviderConfigs();
+      res.json(providers);
+    } catch (error) {
+      console.error("[Job Boards] Providers error:", error);
+      res.status(500).json({ error: "Failed to fetch providers" });
+    }
+  });
+
+  // List all connections for tenant
+  app.get("/api/admin/job-boards/connections", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || "default";
+      const connections = await jobBoardService.getConnections(tenantId);
+      res.json(connections);
+    } catch (error) {
+      console.error("[Job Boards] List connections error:", error);
+      res.status(500).json({ error: "Failed to fetch connections" });
+    }
+  });
+
+  // Connect to a job board (initiate OAuth or save API key)
+  app.post("/api/admin/job-boards/connect/:provider", async (req: Request, res: Response) => {
+    try {
+      const { provider } = req.params;
+      const { accessToken, accountId, employerName } = req.body;
+      const tenantId = getTenantIdFromRequest(req) || "default";
+
+      if (!['indeed', 'linkedin', 'ziprecruiter'].includes(provider)) {
+        return res.status(400).json({ error: "Invalid provider" });
+      }
+
+      // Check if connection already exists
+      const existing = await jobBoardService.getConnectionByProvider(tenantId, provider as any);
+      if (existing) {
+        // Update existing connection
+        const updated = await jobBoardService.updateConnection(existing.id, {
+          accessToken: accessToken || existing.accessToken,
+          accountId: accountId || existing.accountId,
+          employerName: employerName || existing.employerName,
+          connectionStatus: accessToken ? 'connected' : 'pending',
+          isActive: true,
+        });
+        return res.json(updated);
+      }
+
+      // Create new connection
+      const connection = await jobBoardService.createConnection({
+        tenantId,
+        provider,
+        accessToken,
+        accountId,
+        employerName,
+        connectionStatus: accessToken ? 'connected' : 'pending',
+        isActive: true,
+      });
+
+      res.json(connection);
+    } catch (error) {
+      console.error("[Job Boards] Connect error:", error);
+      res.status(500).json({ error: "Failed to connect to job board" });
+    }
+  });
+
+  // Disconnect from a job board
+  app.delete("/api/admin/job-boards/disconnect/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await jobBoardService.deleteConnection(id);
+      res.json({ success: true, message: "Disconnected successfully" });
+    } catch (error) {
+      console.error("[Job Boards] Disconnect error:", error);
+      res.status(500).json({ error: "Failed to disconnect" });
+    }
+  });
+
+  // Post a job to selected boards
+  app.post("/api/admin/job-boards/post", async (req: Request, res: Response) => {
+    try {
+      const { providers, jobData } = req.body;
+      const tenantId = getTenantIdFromRequest(req) || "default";
+
+      if (!providers || !Array.isArray(providers) || providers.length === 0) {
+        return res.status(400).json({ error: "At least one provider is required" });
+      }
+
+      if (!jobData || !jobData.title) {
+        return res.status(400).json({ error: "Job title is required" });
+      }
+
+      const results = [];
+
+      for (const provider of providers) {
+        const connection = await jobBoardService.getConnectionByProvider(tenantId, provider);
+        
+        if (!connection || !connection.isActive) {
+          results.push({
+            provider,
+            success: false,
+            error: `Not connected to ${provider}`,
+          });
+          continue;
+        }
+
+        // Attempt to post to the provider
+        const postResult = await jobBoardService.postToProvider(connection, jobData);
+
+        // Save posting record
+        const posting = await jobBoardService.createPosting({
+          tenantId,
+          connectionId: connection.id,
+          jobId: jobData.jobId,
+          jobTitle: jobData.title,
+          jobDescription: jobData.description,
+          location: jobData.location,
+          city: jobData.city,
+          state: jobData.state,
+          zipCode: jobData.zipCode,
+          isRemote: jobData.isRemote,
+          jobType: jobData.jobType,
+          salaryMin: jobData.salaryMin?.toString(),
+          salaryMax: jobData.salaryMax?.toString(),
+          salaryType: jobData.salaryType,
+          provider,
+          externalPostingId: postResult.externalPostingId,
+          postUrl: postResult.postUrl,
+          status: postResult.success ? 'active' : 'draft',
+          postedAt: postResult.success ? new Date() : undefined,
+          expiresAt: postResult.success 
+            ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+            : undefined,
+        });
+
+        results.push({
+          provider,
+          success: postResult.success,
+          posting,
+          error: postResult.error,
+        });
+      }
+
+      res.json({ results });
+    } catch (error) {
+      console.error("[Job Boards] Post error:", error);
+      res.status(500).json({ error: "Failed to post job" });
+    }
+  });
+
+  // List all postings for tenant
+  app.get("/api/admin/job-boards/postings", async (req: Request, res: Response) => {
+    try {
+      const tenantId = getTenantIdFromRequest(req) || "default";
+      const { provider, status } = req.query;
+      const postings = await jobBoardService.getPostings(tenantId, {
+        provider: provider as string,
+        status: status as string,
+      });
+      res.json(postings);
+    } catch (error) {
+      console.error("[Job Boards] List postings error:", error);
+      res.status(500).json({ error: "Failed to fetch postings" });
+    }
+  });
+
+  // Update posting status (pause, resume, close)
+  app.patch("/api/admin/job-boards/postings/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+
+      if (!status || !['draft', 'active', 'paused', 'expired', 'closed'].includes(status)) {
+        return res.status(400).json({ error: "Invalid status" });
+      }
+
+      const posting = await jobBoardService.getPosting(id);
+      if (!posting) {
+        return res.status(404).json({ error: "Posting not found" });
+      }
+
+      // Call provider API based on status change
+      let result = { success: true };
+      if (status === 'paused') {
+        result = await jobBoardService.pausePosting(posting);
+      } else if (status === 'active' && posting.status === 'paused') {
+        result = await jobBoardService.resumePosting(posting);
+      } else if (status === 'closed') {
+        result = await jobBoardService.closePosting(posting);
+      }
+
+      const updated = await jobBoardService.updatePosting(id, { status });
+      res.json(updated);
+    } catch (error) {
+      console.error("[Job Boards] Update posting error:", error);
+      res.status(500).json({ error: "Failed to update posting" });
+    }
+  });
+
+  // Delete/remove a posting
+  app.delete("/api/admin/job-boards/postings/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const posting = await jobBoardService.getPosting(id);
+      if (posting && posting.status === 'active') {
+        // Close on provider first
+        await jobBoardService.closePosting(posting);
+      }
+
+      await jobBoardService.deletePosting(id);
+      res.json({ success: true, message: "Posting removed successfully" });
+    } catch (error) {
+      console.error("[Job Boards] Delete posting error:", error);
+      res.status(500).json({ error: "Failed to delete posting" });
+    }
+  });
+
+  // Sync posting stats from providers
+  app.post("/api/admin/job-boards/postings/:id/sync", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const posting = await jobBoardService.getPosting(id);
+      if (!posting) {
+        return res.status(404).json({ error: "Posting not found" });
+      }
+
+      const stats = await jobBoardService.syncPostingStats(posting);
+      const updated = await jobBoardService.updatePosting(id, stats);
+      res.json(updated);
+    } catch (error) {
+      console.error("[Job Boards] Sync stats error:", error);
+      res.status(500).json({ error: "Failed to sync stats" });
     }
   });
 }
