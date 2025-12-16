@@ -23,6 +23,7 @@ import express from "express";
 import { azureFaceService } from "./azureFaceService";
 import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
 import { versionManager } from "./versionManager";
+import { webhookService, emitWebhookEvent, sendTestWebhook, startWebhookRetryProcessor } from "./webhookService";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -72,6 +73,7 @@ import {
   releasePackages,
   PARTNER_API_SCOPES,
   PARTNER_API_ERROR_CODES,
+  WEBHOOK_EVENT_TYPES,
 } from "@shared/schema";
 import crypto from "crypto";
 
@@ -10886,6 +10888,289 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // ═══════════════════════════════════════════════════════════════════════════════
+  // Partner API v1 Webhook Management
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // List webhook subscriptions
+  app.get("/api/partner/v1/webhooks", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const subscriptions = await storage.getWebhookSubscriptions(credential.id);
+      res.json({
+        data: subscriptions.map((sub: any) => ({
+          id: sub.id,
+          url: sub.url,
+          events: sub.events,
+          isActive: sub.isActive,
+          description: sub.description,
+          totalDeliveries: sub.totalDeliveries,
+          successfulDeliveries: sub.successfulDeliveries,
+          failedDeliveries: sub.failedDeliveries,
+          lastDeliveryAt: sub.lastDeliveryAt,
+          lastSuccessAt: sub.lastSuccessAt,
+          lastFailureAt: sub.lastFailureAt,
+          createdAt: sub.createdAt,
+          updatedAt: sub.updatedAt,
+        })),
+        meta: { 
+          total: subscriptions.length,
+          availableEvents: WEBHOOK_EVENT_TYPES,
+        }
+      });
+    } catch (error) {
+      console.error("Partner API list webhooks error:", error);
+      res.status(500).json({ error: "Failed to list webhook subscriptions" });
+    }
+  });
+
+  // Create webhook subscription
+  app.post("/api/partner/v1/webhooks", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const { url, events, description } = req.body;
+
+      if (!url || typeof url !== 'string') {
+        return res.status(400).json({ error: "URL is required" });
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        return res.status(400).json({ error: "Invalid URL format" });
+      }
+
+      if (!url.startsWith('https://')) {
+        return res.status(400).json({ error: "URL must use HTTPS" });
+      }
+
+      if (!events || !Array.isArray(events) || events.length === 0) {
+        return res.status(400).json({ error: "At least one event type is required" });
+      }
+
+      const invalidEvents = events.filter((e: string) => !WEBHOOK_EVENT_TYPES.includes(e as any));
+      if (invalidEvents.length > 0) {
+        return res.status(400).json({ 
+          error: "Invalid event types", 
+          invalidEvents,
+          validEvents: WEBHOOK_EVENT_TYPES 
+        });
+      }
+
+      const secret = crypto.randomBytes(32).toString('hex');
+
+      const subscription = await storage.createWebhookSubscription({
+        credentialId: credential.id,
+        url,
+        secret,
+        events,
+        description,
+        isActive: true,
+      });
+
+      res.status(201).json({
+        data: {
+          id: subscription.id,
+          url: subscription.url,
+          secret,
+          events: subscription.events,
+          isActive: subscription.isActive,
+          description: subscription.description,
+          createdAt: subscription.createdAt,
+        },
+        message: "Webhook subscription created. Save the secret - it won't be shown again!"
+      });
+    } catch (error) {
+      console.error("Partner API create webhook error:", error);
+      res.status(500).json({ error: "Failed to create webhook subscription" });
+    }
+  });
+
+  // Update webhook subscription
+  app.patch("/api/partner/v1/webhooks/:id", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const { id } = req.params;
+      const { url, events, description, isActive } = req.body;
+
+      const subscription = await storage.getWebhookSubscriptionById(id);
+      if (!subscription || subscription.credentialId !== credential.id) {
+        return res.status(404).json({ error: "Webhook subscription not found" });
+      }
+
+      const updates: any = {};
+
+      if (url !== undefined) {
+        if (typeof url !== 'string') {
+          return res.status(400).json({ error: "Invalid URL" });
+        }
+        try {
+          new URL(url);
+        } catch {
+          return res.status(400).json({ error: "Invalid URL format" });
+        }
+        if (!url.startsWith('https://')) {
+          return res.status(400).json({ error: "URL must use HTTPS" });
+        }
+        updates.url = url;
+      }
+
+      if (events !== undefined) {
+        if (!Array.isArray(events) || events.length === 0) {
+          return res.status(400).json({ error: "At least one event type is required" });
+        }
+        const invalidEvents = events.filter((e: string) => !WEBHOOK_EVENT_TYPES.includes(e as any));
+        if (invalidEvents.length > 0) {
+          return res.status(400).json({ error: "Invalid event types", invalidEvents });
+        }
+        updates.events = events;
+      }
+
+      if (description !== undefined) {
+        updates.description = description;
+      }
+
+      if (isActive !== undefined) {
+        updates.isActive = Boolean(isActive);
+      }
+
+      const updated = await storage.updateWebhookSubscription(id, updates);
+
+      res.json({
+        data: {
+          id: updated!.id,
+          url: updated!.url,
+          events: updated!.events,
+          isActive: updated!.isActive,
+          description: updated!.description,
+          updatedAt: updated!.updatedAt,
+        }
+      });
+    } catch (error) {
+      console.error("Partner API update webhook error:", error);
+      res.status(500).json({ error: "Failed to update webhook subscription" });
+    }
+  });
+
+  // Delete webhook subscription
+  app.delete("/api/partner/v1/webhooks/:id", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const { id } = req.params;
+
+      const subscription = await storage.getWebhookSubscriptionById(id);
+      if (!subscription || subscription.credentialId !== credential.id) {
+        return res.status(404).json({ error: "Webhook subscription not found" });
+      }
+
+      await storage.deleteWebhookSubscription(id);
+      res.json({ success: true, message: "Webhook subscription deleted" });
+    } catch (error) {
+      console.error("Partner API delete webhook error:", error);
+      res.status(500).json({ error: "Failed to delete webhook subscription" });
+    }
+  });
+
+  // Send test webhook
+  app.post("/api/partner/v1/webhooks/:id/test", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const { id } = req.params;
+
+      const subscription = await storage.getWebhookSubscriptionById(id);
+      if (!subscription || subscription.credentialId !== credential.id) {
+        return res.status(404).json({ error: "Webhook subscription not found" });
+      }
+
+      if (!subscription.isActive) {
+        return res.status(400).json({ error: "Cannot test an inactive webhook subscription" });
+      }
+
+      const result = await sendTestWebhook(id);
+
+      if (result.success) {
+        res.json({
+          success: true,
+          statusCode: result.statusCode,
+          message: "Test webhook delivered successfully"
+        });
+      } else {
+        res.status(502).json({
+          success: false,
+          statusCode: result.statusCode,
+          error: result.error,
+          message: "Test webhook delivery failed"
+        });
+      }
+    } catch (error) {
+      console.error("Partner API test webhook error:", error);
+      res.status(500).json({ error: "Failed to send test webhook" });
+    }
+  });
+
+  // Get webhook delivery logs
+  app.get("/api/partner/v1/webhooks/:id/logs", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const { id } = req.params;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+
+      const subscription = await storage.getWebhookSubscriptionById(id);
+      if (!subscription || subscription.credentialId !== credential.id) {
+        return res.status(404).json({ error: "Webhook subscription not found" });
+      }
+
+      const logs = await storage.getWebhookDeliveryLogs(id, limit);
+
+      res.json({
+        data: logs.map((log: any) => ({
+          id: log.id,
+          event: log.event,
+          status: log.status,
+          statusCode: log.statusCode,
+          attemptCount: log.attemptCount,
+          errorMessage: log.errorMessage,
+          deliveredAt: log.deliveredAt,
+          nextRetryAt: log.nextRetryAt,
+          createdAt: log.createdAt,
+        })),
+        meta: { total: logs.length, subscriptionId: id }
+      });
+    } catch (error) {
+      console.error("Partner API webhook logs error:", error);
+      res.status(500).json({ error: "Failed to fetch webhook delivery logs" });
+    }
+  });
+
+  // List all delivery logs for a credential
+  app.get("/api/partner/v1/webhook-logs", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+
+      const logs = await storage.getRecentWebhookDeliveryLogsForCredential(credential.id, limit);
+
+      res.json({
+        data: logs.map((log: any) => ({
+          id: log.id,
+          subscriptionId: log.subscriptionId,
+          event: log.event,
+          status: log.status,
+          statusCode: log.statusCode,
+          attemptCount: log.attemptCount,
+          errorMessage: log.errorMessage,
+          deliveredAt: log.deliveredAt,
+          nextRetryAt: log.nextRetryAt,
+          createdAt: log.createdAt,
+        })),
+        meta: { total: logs.length }
+      });
+    } catch (error) {
+      console.error("Partner API all webhook logs error:", error);
+      res.status(500).json({ error: "Failed to fetch webhook delivery logs" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
   // Partner API Credential Management (Admin)
   // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -11031,6 +11316,168 @@ export function registerPayCardRoutes(app: Express) {
       res.json(logs);
     } catch (error) {
       console.error("Get partner API logs error:", error);
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Admin Webhook Management Routes
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // List all webhooks (admin)
+  app.get("/api/admin/webhooks", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { credentialId } = req.query;
+      if (!credentialId) {
+        const allCredentials = await storage.getPartnerApiCredentials();
+        let allSubs: any[] = [];
+        for (const cred of allCredentials) {
+          const subs = await storage.getWebhookSubscriptions(cred.id);
+          allSubs = allSubs.concat(subs);
+        }
+        return res.json({ data: allSubs });
+      }
+      const subs = await storage.getWebhookSubscriptions(credentialId as string);
+      res.json({ data: subs });
+    } catch (error) {
+      console.error("Get webhooks error:", error);
+      res.status(500).json({ error: "Failed to fetch webhooks" });
+    }
+  });
+
+  // Create webhook (admin)
+  app.post("/api/admin/webhooks", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { credentialId, url, events, description } = req.body;
+
+      if (!url || typeof url !== 'string') {
+        return res.status(400).json({ error: "URL is required" });
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        return res.status(400).json({ error: "Invalid URL format" });
+      }
+
+      if (!events || !Array.isArray(events) || events.length === 0) {
+        return res.status(400).json({ error: "At least one event type is required" });
+      }
+
+      const secret = crypto.randomBytes(32).toString('hex');
+      
+      let targetCredentialId = credentialId;
+      if (!targetCredentialId) {
+        const allCredentials = await storage.getPartnerApiCredentials();
+        if (allCredentials.length > 0) {
+          targetCredentialId = allCredentials[0].id;
+        } else {
+          return res.status(400).json({ error: "No API credentials found. Create one first." });
+        }
+      }
+
+      const subscription = await storage.createWebhookSubscription({
+        credentialId: targetCredentialId,
+        url,
+        secret,
+        events,
+        description,
+        isActive: true,
+      });
+
+      res.status(201).json({
+        data: { ...subscription, secret },
+        message: "Webhook created. Save the secret!"
+      });
+    } catch (error) {
+      console.error("Create webhook error:", error);
+      res.status(500).json({ error: "Failed to create webhook" });
+    }
+  });
+
+  // Update webhook (admin)
+  app.patch("/api/admin/webhooks/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { url, events, description, isActive } = req.body;
+
+      const subscription = await storage.getWebhookSubscriptionById(id);
+      if (!subscription) {
+        return res.status(404).json({ error: "Webhook not found" });
+      }
+
+      const updates: any = {};
+      if (url !== undefined) updates.url = url;
+      if (events !== undefined) updates.events = events;
+      if (description !== undefined) updates.description = description;
+      if (isActive !== undefined) updates.isActive = Boolean(isActive);
+
+      const updated = await storage.updateWebhookSubscription(id, updates);
+      res.json({ data: updated });
+    } catch (error) {
+      console.error("Update webhook error:", error);
+      res.status(500).json({ error: "Failed to update webhook" });
+    }
+  });
+
+  // Delete webhook (admin)
+  app.delete("/api/admin/webhooks/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteWebhookSubscription(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete webhook error:", error);
+      res.status(500).json({ error: "Failed to delete webhook" });
+    }
+  });
+
+  // Test webhook (admin)
+  app.post("/api/admin/webhooks/:id/test", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = await sendTestWebhook(id);
+      res.json(result);
+    } catch (error) {
+      console.error("Test webhook error:", error);
+      res.status(500).json({ error: "Failed to test webhook" });
+    }
+  });
+
+  // Get webhook logs (admin)
+  app.get("/api/admin/webhooks/:id/logs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+      const logs = await storage.getWebhookDeliveryLogs(id, limit);
+      res.json({ data: logs });
+    } catch (error) {
+      console.error("Get webhook logs error:", error);
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
+
+  // Get all webhook logs (admin)
+  app.get("/api/admin/webhook-logs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { credentialId } = req.query;
+      const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+      
+      if (credentialId) {
+        const logs = await storage.getRecentWebhookDeliveryLogsForCredential(credentialId as string, limit);
+        return res.json({ data: logs });
+      }
+      
+      const allCredentials = await storage.getPartnerApiCredentials();
+      let allLogs: any[] = [];
+      for (const cred of allCredentials) {
+        const logs = await storage.getRecentWebhookDeliveryLogsForCredential(cred.id, 20);
+        allLogs = allLogs.concat(logs);
+      }
+      allLogs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      res.json({ data: allLogs.slice(0, limit) });
+    } catch (error) {
+      console.error("Get all webhook logs error:", error);
       res.status(500).json({ error: "Failed to fetch logs" });
     }
   });

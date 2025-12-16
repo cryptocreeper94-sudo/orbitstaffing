@@ -6260,3 +6260,123 @@ export const PARTNER_API_ERROR_CODES = {
   RATE_LIMIT_MINUTE: { status: 429, message: 'Rate limit exceeded (per minute)' },
   RATE_LIMIT_DAY: { status: 429, message: 'Rate limit exceeded (per day)' },
 } as const;
+
+// ========================
+// Webhook Event Types
+// ========================
+export const WEBHOOK_EVENT_TYPES = [
+  'worker.created',
+  'worker.updated',
+  'worker.deleted',
+  'job.created',
+  'job.filled',
+  'job.cancelled',
+  'timesheet.submitted',
+  'timesheet.approved',
+  'payroll.processed',
+  'payroll.failed',
+  'invoice.created',
+  'invoice.paid',
+] as const;
+
+export type WebhookEventType = typeof WEBHOOK_EVENT_TYPES[number];
+
+// ========================
+// Webhook Subscriptions - Partner webhook endpoints
+// ========================
+export const webhookSubscriptions = pgTable(
+  "webhook_subscriptions",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    credentialId: varchar("credential_id").references(() => partnerApiCredentials.id).notNull(),
+    
+    // Endpoint Configuration
+    url: text("url").notNull(),
+    secret: varchar("secret", { length: 64 }).notNull(),
+    
+    // Event Types (array of event types this subscription receives)
+    events: text("events").array().default(sql`ARRAY[]::text[]`),
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    
+    // Metadata
+    description: text("description"),
+    
+    // Stats
+    totalDeliveries: integer("total_deliveries").default(0),
+    successfulDeliveries: integer("successful_deliveries").default(0),
+    failedDeliveries: integer("failed_deliveries").default(0),
+    lastDeliveryAt: timestamp("last_delivery_at"),
+    lastSuccessAt: timestamp("last_success_at"),
+    lastFailureAt: timestamp("last_failure_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    credentialIdx: index("idx_webhook_sub_credential").on(table.credentialId),
+    activeIdx: index("idx_webhook_sub_active").on(table.isActive),
+    createdAtIdx: index("idx_webhook_sub_created").on(table.createdAt),
+  })
+);
+
+export const insertWebhookSubscriptionSchema = createInsertSchema(webhookSubscriptions).omit({
+  id: true,
+  totalDeliveries: true,
+  successfulDeliveries: true,
+  failedDeliveries: true,
+  lastDeliveryAt: true,
+  lastSuccessAt: true,
+  lastFailureAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertWebhookSubscription = z.infer<typeof insertWebhookSubscriptionSchema>;
+export type WebhookSubscription = typeof webhookSubscriptions.$inferSelect;
+
+// ========================
+// Webhook Delivery Logs - Track delivery attempts
+// ========================
+export const webhookDeliveryLogs = pgTable(
+  "webhook_delivery_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    subscriptionId: varchar("subscription_id").references(() => webhookSubscriptions.id).notNull(),
+    
+    // Event Details
+    event: varchar("event", { length: 100 }).notNull(),
+    payload: jsonb("payload").notNull(),
+    
+    // Delivery Status
+    status: varchar("status", { length: 20 }).default("pending"), // pending, delivered, failed, retrying
+    statusCode: integer("status_code"),
+    responseBody: text("response_body"),
+    errorMessage: text("error_message"),
+    
+    // Retry Tracking
+    attemptCount: integer("attempt_count").default(0),
+    maxAttempts: integer("max_attempts").default(4),
+    nextRetryAt: timestamp("next_retry_at"),
+    
+    // Timestamps
+    deliveredAt: timestamp("delivered_at"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    subscriptionIdx: index("idx_webhook_log_subscription").on(table.subscriptionId),
+    statusIdx: index("idx_webhook_log_status").on(table.status),
+    eventIdx: index("idx_webhook_log_event").on(table.event),
+    createdAtIdx: index("idx_webhook_log_created").on(table.createdAt),
+    retryIdx: index("idx_webhook_log_retry").on(table.nextRetryAt),
+  })
+);
+
+export const insertWebhookDeliveryLogSchema = createInsertSchema(webhookDeliveryLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertWebhookDeliveryLog = z.infer<typeof insertWebhookDeliveryLogSchema>;
+export type WebhookDeliveryLog = typeof webhookDeliveryLogs.$inferSelect;

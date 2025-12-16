@@ -126,6 +126,8 @@ import {
   partnerApiCredentials,
   partnerApiLogs,
   franchiseLocations,
+  webhookSubscriptions,
+  webhookDeliveryLogs,
   type PartnerApiCredential,
   type InsertPartnerApiCredential,
   type PartnerApiLog,
@@ -133,6 +135,10 @@ import {
   type FranchiseLocation,
   type InsertFranchiseLocation,
   type InsertPageView,
+  type WebhookSubscription,
+  type InsertWebhookSubscription,
+  type WebhookDeliveryLog,
+  type InsertWebhookDeliveryLog,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -3413,6 +3419,132 @@ export const storage: IStorage = {
 
   async deleteFranchiseLocation(id: string): Promise<void> {
     await db.delete(franchiseLocations).where(eq(franchiseLocations.id, id));
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // WEBHOOK SUBSCRIPTIONS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getWebhookSubscriptions(credentialId: string): Promise<WebhookSubscription[]> {
+    return db.select().from(webhookSubscriptions)
+      .where(eq(webhookSubscriptions.credentialId, credentialId))
+      .orderBy(desc(webhookSubscriptions.createdAt));
+  },
+
+  async getWebhookSubscriptionById(id: string): Promise<WebhookSubscription | undefined> {
+    const [subscription] = await db.select().from(webhookSubscriptions)
+      .where(eq(webhookSubscriptions.id, id));
+    return subscription;
+  },
+
+  async getActiveWebhookSubscriptionsForEvent(tenantId: string, eventType: string): Promise<WebhookSubscription[]> {
+    const allSubs = await db.select({
+      subscription: webhookSubscriptions,
+      credential: partnerApiCredentials,
+    })
+      .from(webhookSubscriptions)
+      .innerJoin(partnerApiCredentials, eq(webhookSubscriptions.credentialId, partnerApiCredentials.id))
+      .where(and(
+        eq(webhookSubscriptions.isActive, true),
+        eq(partnerApiCredentials.tenantId, tenantId),
+        eq(partnerApiCredentials.isActive, true)
+      ));
+    
+    return allSubs
+      .filter(({ subscription }) => 
+        subscription.events && subscription.events.includes(eventType)
+      )
+      .map(({ subscription }) => subscription);
+  },
+
+  async createWebhookSubscription(subscription: InsertWebhookSubscription): Promise<WebhookSubscription> {
+    const [created] = await db.insert(webhookSubscriptions).values(subscription).returning();
+    return created;
+  },
+
+  async updateWebhookSubscription(id: string, updates: Partial<InsertWebhookSubscription>): Promise<WebhookSubscription | undefined> {
+    const [updated] = await db.update(webhookSubscriptions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(webhookSubscriptions.id, id))
+      .returning();
+    return updated;
+  },
+
+  async deleteWebhookSubscription(id: string): Promise<void> {
+    await db.delete(webhookDeliveryLogs).where(eq(webhookDeliveryLogs.subscriptionId, id));
+    await db.delete(webhookSubscriptions).where(eq(webhookSubscriptions.id, id));
+  },
+
+  async incrementWebhookDeliveryStats(id: string, success: boolean): Promise<void> {
+    const now = new Date();
+    if (success) {
+      await db.update(webhookSubscriptions).set({
+        totalDeliveries: sql`${webhookSubscriptions.totalDeliveries} + 1`,
+        successfulDeliveries: sql`${webhookSubscriptions.successfulDeliveries} + 1`,
+        lastDeliveryAt: now,
+        lastSuccessAt: now,
+      }).where(eq(webhookSubscriptions.id, id));
+    } else {
+      await db.update(webhookSubscriptions).set({
+        totalDeliveries: sql`${webhookSubscriptions.totalDeliveries} + 1`,
+        failedDeliveries: sql`${webhookSubscriptions.failedDeliveries} + 1`,
+        lastDeliveryAt: now,
+        lastFailureAt: now,
+      }).where(eq(webhookSubscriptions.id, id));
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // WEBHOOK DELIVERY LOGS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getWebhookDeliveryLogs(subscriptionId: string, limit: number = 50): Promise<WebhookDeliveryLog[]> {
+    return db.select().from(webhookDeliveryLogs)
+      .where(eq(webhookDeliveryLogs.subscriptionId, subscriptionId))
+      .orderBy(desc(webhookDeliveryLogs.createdAt))
+      .limit(limit);
+  },
+
+  async getWebhookDeliveryLogById(id: string): Promise<WebhookDeliveryLog | undefined> {
+    const [log] = await db.select().from(webhookDeliveryLogs)
+      .where(eq(webhookDeliveryLogs.id, id));
+    return log;
+  },
+
+  async getPendingWebhookDeliveries(): Promise<WebhookDeliveryLog[]> {
+    const now = new Date();
+    return db.select().from(webhookDeliveryLogs)
+      .where(and(
+        inArray(webhookDeliveryLogs.status, ['pending', 'retrying']),
+        sql`(${webhookDeliveryLogs.nextRetryAt} IS NULL OR ${webhookDeliveryLogs.nextRetryAt} <= ${now})`
+      ))
+      .orderBy(webhookDeliveryLogs.createdAt)
+      .limit(100);
+  },
+
+  async createWebhookDeliveryLog(log: InsertWebhookDeliveryLog): Promise<WebhookDeliveryLog> {
+    const [created] = await db.insert(webhookDeliveryLogs).values(log).returning();
+    return created;
+  },
+
+  async updateWebhookDeliveryLog(id: string, updates: Partial<InsertWebhookDeliveryLog>): Promise<WebhookDeliveryLog | undefined> {
+    const [updated] = await db.update(webhookDeliveryLogs)
+      .set(updates)
+      .where(eq(webhookDeliveryLogs.id, id))
+      .returning();
+    return updated;
+  },
+
+  async getRecentWebhookDeliveryLogsForCredential(credentialId: string, limit: number = 100): Promise<WebhookDeliveryLog[]> {
+    return db.select({
+      log: webhookDeliveryLogs,
+    })
+      .from(webhookDeliveryLogs)
+      .innerJoin(webhookSubscriptions, eq(webhookDeliveryLogs.subscriptionId, webhookSubscriptions.id))
+      .where(eq(webhookSubscriptions.credentialId, credentialId))
+      .orderBy(desc(webhookDeliveryLogs.createdAt))
+      .limit(limit)
+      .then(rows => rows.map(r => r.log));
   },
 
 };

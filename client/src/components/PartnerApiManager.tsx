@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Key, Copy, Check, Eye, EyeOff, Plus, Trash2, RefreshCw,
   Shield, Clock, Activity, AlertTriangle, Settings, ChevronDown,
-  Zap, Lock, Globe, BarChart3, Code2
+  Zap, Lock, Globe, BarChart3, Code2, Webhook
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { WebhookManager } from "./WebhookManager";
 
 interface ApiCredential {
   id: string;
@@ -277,6 +278,10 @@ export function PartnerApiManager() {
             <Activity className="h-4 w-4 mr-2" />
             API Logs
           </TabsTrigger>
+          <TabsTrigger value="webhooks" className="data-[state=active]:bg-cyan-500/20">
+            <Webhook className="h-4 w-4 mr-2" />
+            Webhooks
+          </TabsTrigger>
           <TabsTrigger value="docs" className="data-[state=active]:bg-cyan-500/20">
             <Code2 className="h-4 w-4 mr-2" />
             Documentation
@@ -432,6 +437,10 @@ export function PartnerApiManager() {
               </ScrollArea>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="webhooks" className="mt-4">
+          <WebhookManager />
         </TabsContent>
 
         <TabsContent value="docs" className="mt-4">
