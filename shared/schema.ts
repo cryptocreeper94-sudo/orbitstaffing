@@ -6048,3 +6048,215 @@ export const insertPageViewSchema = createInsertSchema(pageViews).omit({
 
 export type InsertPageView = z.infer<typeof insertPageViewSchema>;
 export type PageView = typeof pageViews.$inferSelect;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PARTNER API SYSTEM - B2B API Access with Scoped Credentials
+// Enables franchises to programmatically access their data via REST API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Partner API Scopes - Granular permissions for API access
+export const PARTNER_API_SCOPES = [
+  'workers:read', 'workers:write',
+  'jobs:read', 'jobs:write',
+  'timesheets:read', 'timesheets:write',
+  'payroll:read', 'payroll:write',
+  'invoices:read', 'invoices:write',
+  'clients:read', 'clients:write',
+  'locations:read', 'locations:write',
+  'billing:read', 'analytics:read',
+  'compliance:read', 'compliance:write',
+] as const;
+
+export type PartnerApiScope = typeof PARTNER_API_SCOPES[number];
+
+// Partner API Credentials - Scoped API keys for franchise access
+export const partnerApiCredentials = pgTable(
+  "partner_api_credentials",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    franchiseId: varchar("franchise_id").references(() => franchises.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Credential Details
+    name: varchar("name", { length: 100 }).notNull(),
+    description: text("description"),
+    apiKey: varchar("api_key", { length: 64 }).notNull().unique(),
+    apiSecretHash: text("api_secret_hash").notNull(),
+    
+    // Environment & Scopes
+    environment: varchar("environment", { length: 20 }).default("production"), // sandbox, production
+    scopes: text("scopes").array().default(sql`ARRAY['workers:read']::text[]`),
+    
+    // Rate Limiting
+    rateLimitPerMinute: integer("rate_limit_per_minute").default(60),
+    rateLimitPerDay: integer("rate_limit_per_day").default(10000),
+    
+    // Usage Tracking
+    requestCount: integer("request_count").default(0),
+    requestCountDaily: integer("request_count_daily").default(0),
+    lastUsedAt: timestamp("last_used_at"),
+    lastResetAt: timestamp("last_reset_at").default(sql`NOW()`),
+    
+    // Status
+    isActive: boolean("is_active").default(true),
+    expiresAt: timestamp("expires_at"),
+    
+    // Audit
+    createdBy: varchar("created_by", { length: 100 }),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    apiKeyIdx: index("idx_partner_api_key").on(table.apiKey),
+    franchiseIdx: index("idx_partner_api_franchise").on(table.franchiseId),
+    tenantIdx: index("idx_partner_api_tenant").on(table.tenantId),
+    activeIdx: index("idx_partner_api_active").on(table.isActive),
+  })
+);
+
+export const insertPartnerApiCredentialSchema = createInsertSchema(partnerApiCredentials).omit({
+  id: true,
+  requestCount: true,
+  requestCountDaily: true,
+  lastUsedAt: true,
+  lastResetAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPartnerApiCredential = z.infer<typeof insertPartnerApiCredentialSchema>;
+export type PartnerApiCredential = typeof partnerApiCredentials.$inferSelect;
+
+// Partner API Logs - Detailed request/response logging
+export const partnerApiLogs = pgTable(
+  "partner_api_logs",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    credentialId: varchar("credential_id").references(() => partnerApiCredentials.id),
+    franchiseId: varchar("franchise_id").references(() => franchises.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Request Details
+    method: varchar("method", { length: 10 }).notNull(),
+    endpoint: varchar("endpoint", { length: 255 }).notNull(),
+    queryParams: jsonb("query_params"),
+    requestBody: jsonb("request_body"),
+    
+    // Response Details
+    statusCode: integer("status_code"),
+    responseTimeMs: integer("response_time_ms"),
+    responseSize: integer("response_size"),
+    
+    // Error Tracking
+    errorCode: varchar("error_code", { length: 50 }),
+    errorMessage: text("error_message"),
+    
+    // Client Info
+    ipAddress: varchar("ip_address", { length: 45 }),
+    userAgent: text("user_agent"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    credentialIdx: index("idx_partner_log_credential").on(table.credentialId),
+    franchiseIdx: index("idx_partner_log_franchise").on(table.franchiseId),
+    tenantIdx: index("idx_partner_log_tenant").on(table.tenantId),
+    endpointIdx: index("idx_partner_log_endpoint").on(table.endpoint),
+    statusIdx: index("idx_partner_log_status").on(table.statusCode),
+    createdAtIdx: index("idx_partner_log_created").on(table.createdAt),
+  })
+);
+
+export const insertPartnerApiLogSchema = createInsertSchema(partnerApiLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPartnerApiLog = z.infer<typeof insertPartnerApiLogSchema>;
+export type PartnerApiLog = typeof partnerApiLogs.$inferSelect;
+
+// Franchise Locations - Multiple physical locations per franchise
+export const franchiseLocations = pgTable(
+  "franchise_locations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    franchiseId: varchar("franchise_id").references(() => franchises.id),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    // Location Details
+    name: varchar("name", { length: 100 }).notNull(),
+    locationCode: varchar("location_code", { length: 20 }).notNull(),
+    locationType: varchar("location_type", { length: 50 }).default("branch"), // headquarters, branch, jobsite, warehouse
+    
+    // Address
+    addressLine1: varchar("address_line1", { length: 255 }).notNull(),
+    addressLine2: varchar("address_line2", { length: 255 }),
+    city: varchar("city", { length: 100 }).notNull(),
+    state: varchar("state", { length: 50 }).notNull(),
+    zipCode: varchar("zip_code", { length: 10 }).notNull(),
+    country: varchar("country", { length: 50 }).default("USA"),
+    
+    // Coordinates (for worker dispatch)
+    latitude: decimal("latitude", { precision: 10, scale: 7 }),
+    longitude: decimal("longitude", { precision: 10, scale: 7 }),
+    
+    // Contact
+    phone: varchar("phone", { length: 20 }),
+    email: varchar("email", { length: 255 }),
+    managerName: varchar("manager_name", { length: 100 }),
+    managerId: varchar("manager_id").references(() => users.id),
+    
+    // Operations
+    isActive: boolean("is_active").default(true),
+    operatingHours: jsonb("operating_hours"),
+    serviceRadius: integer("service_radius").default(25), // miles for worker dispatch
+    maxWorkers: integer("max_workers").default(50),
+    
+    // Stats
+    totalWorkers: integer("total_workers").default(0),
+    totalJobs: integer("total_jobs").default(0),
+    totalRevenue: decimal("total_revenue", { precision: 12, scale: 2 }).default("0"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    franchiseIdx: index("idx_franchise_loc_franchise").on(table.franchiseId),
+    tenantIdx: index("idx_franchise_loc_tenant").on(table.tenantId),
+    locationCodeIdx: index("idx_franchise_loc_code").on(table.locationCode),
+    activeIdx: index("idx_franchise_loc_active").on(table.isActive),
+    cityStateIdx: index("idx_franchise_loc_city_state").on(table.city, table.state),
+  })
+);
+
+export const insertFranchiseLocationSchema = createInsertSchema(franchiseLocations).omit({
+  id: true,
+  totalWorkers: true,
+  totalJobs: true,
+  totalRevenue: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFranchiseLocation = z.infer<typeof insertFranchiseLocationSchema>;
+export type FranchiseLocation = typeof franchiseLocations.$inferSelect;
+
+// Partner API Rate Limit Tiers
+export const PARTNER_API_RATE_LIMITS = {
+  sandbox: { perMinute: 30, perDay: 1000 },
+  standard: { perMinute: 60, perDay: 10000 },
+  premium: { perMinute: 120, perDay: 50000 },
+  enterprise: { perMinute: 300, perDay: 100000 },
+} as const;
+
+// Partner API Error Codes
+export const PARTNER_API_ERROR_CODES = {
+  MISSING_API_KEY: { status: 401, message: 'Missing X-API-Key header' },
+  INVALID_API_KEY: { status: 401, message: 'Invalid API key' },
+  KEY_DISABLED: { status: 403, message: 'API key is disabled' },
+  KEY_EXPIRED: { status: 403, message: 'API key has expired' },
+  FRANCHISE_INACTIVE: { status: 403, message: 'Franchise is not active' },
+  INSUFFICIENT_SCOPE: { status: 403, message: 'Missing required permission' },
+  RATE_LIMIT_MINUTE: { status: 429, message: 'Rate limit exceeded (per minute)' },
+  RATE_LIMIT_DAY: { status: 429, message: 'Rate limit exceeded (per day)' },
+} as const;
