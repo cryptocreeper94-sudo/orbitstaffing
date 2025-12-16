@@ -123,6 +123,15 @@ import {
   type InsertMeetingPresentation,
   pageViews,
   type PageView,
+  partnerApiCredentials,
+  partnerApiLogs,
+  franchiseLocations,
+  type PartnerApiCredential,
+  type InsertPartnerApiCredential,
+  type PartnerApiLog,
+  type InsertPartnerApiLog,
+  type FranchiseLocation,
+  type InsertFranchiseLocation,
   type InsertPageView,
 } from "@shared/schema";
 
@@ -3261,6 +3270,149 @@ export const storage: IStorage = {
       deviceTotal: total,
       hourlyTraffic,
     };
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PARTNER API CREDENTIALS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getPartnerApiCredentials(franchiseId?: string, tenantId?: string): Promise<PartnerApiCredential[]> {
+    const conditions = [];
+    if (franchiseId) conditions.push(eq(partnerApiCredentials.franchiseId, franchiseId));
+    if (tenantId) conditions.push(eq(partnerApiCredentials.tenantId, tenantId));
+    
+    if (conditions.length === 0) {
+      return db.select().from(partnerApiCredentials).orderBy(desc(partnerApiCredentials.createdAt));
+    }
+    return db.select().from(partnerApiCredentials)
+      .where(conditions.length === 1 ? conditions[0] : and(...conditions))
+      .orderBy(desc(partnerApiCredentials.createdAt));
+  },
+
+  async getPartnerApiCredentialById(id: string): Promise<PartnerApiCredential | undefined> {
+    const [credential] = await db.select().from(partnerApiCredentials)
+      .where(eq(partnerApiCredentials.id, id));
+    return credential;
+  },
+
+  async getPartnerApiCredentialByApiKey(apiKey: string): Promise<PartnerApiCredential | undefined> {
+    const [credential] = await db.select().from(partnerApiCredentials)
+      .where(eq(partnerApiCredentials.apiKey, apiKey));
+    return credential;
+  },
+
+  async createPartnerApiCredential(credential: InsertPartnerApiCredential): Promise<PartnerApiCredential> {
+    const [created] = await db.insert(partnerApiCredentials).values(credential).returning();
+    return created;
+  },
+
+  async updatePartnerApiCredential(id: string, updates: Partial<InsertPartnerApiCredential>): Promise<PartnerApiCredential | undefined> {
+    const [updated] = await db.update(partnerApiCredentials)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(partnerApiCredentials.id, id))
+      .returning();
+    return updated;
+  },
+
+  async deletePartnerApiCredential(id: string): Promise<void> {
+    await db.delete(partnerApiCredentials).where(eq(partnerApiCredentials.id, id));
+  },
+
+  async incrementPartnerApiRequestCount(id: string): Promise<void> {
+    await db.update(partnerApiCredentials).set({
+      requestCount: sql`${partnerApiCredentials.requestCount} + 1`,
+      requestCountDaily: sql`${partnerApiCredentials.requestCountDaily} + 1`,
+      lastUsedAt: new Date(),
+    }).where(eq(partnerApiCredentials.id, id));
+  },
+
+  async resetDailyPartnerApiCounts(): Promise<void> {
+    await db.update(partnerApiCredentials).set({
+      requestCountDaily: 0,
+      lastResetAt: new Date(),
+    });
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PARTNER API LOGS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async createPartnerApiLog(log: InsertPartnerApiLog): Promise<PartnerApiLog> {
+    const [created] = await db.insert(partnerApiLogs).values(log).returning();
+    return created;
+  },
+
+  async getPartnerApiLogs(credentialId?: string, franchiseId?: string, limit: number = 50): Promise<PartnerApiLog[]> {
+    const conditions = [];
+    if (credentialId) conditions.push(eq(partnerApiLogs.credentialId, credentialId));
+    if (franchiseId) conditions.push(eq(partnerApiLogs.franchiseId, franchiseId));
+    
+    if (conditions.length === 0) {
+      return db.select().from(partnerApiLogs)
+        .orderBy(desc(partnerApiLogs.createdAt))
+        .limit(limit);
+    }
+    return db.select().from(partnerApiLogs)
+      .where(conditions.length === 1 ? conditions[0] : and(...conditions))
+      .orderBy(desc(partnerApiLogs.createdAt))
+      .limit(limit);
+  },
+
+  async getPartnerApiStats(credentialId: string): Promise<any> {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
+    const [stats] = await db.select({
+      totalRequests: sql<number>`count(*)::int`,
+      successfulRequests: sql<number>`count(*) filter (where ${partnerApiLogs.statusCode} < 400)::int`,
+      failedRequests: sql<number>`count(*) filter (where ${partnerApiLogs.statusCode} >= 400)::int`,
+      avgResponseTime: sql<number>`avg(${partnerApiLogs.responseTimeMs})::int`,
+    }).from(partnerApiLogs)
+      .where(and(
+        eq(partnerApiLogs.credentialId, credentialId),
+        gte(partnerApiLogs.createdAt, oneDayAgo)
+      ));
+    
+    return stats || { totalRequests: 0, successfulRequests: 0, failedRequests: 0, avgResponseTime: 0 };
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FRANCHISE LOCATIONS
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async getFranchiseLocations(franchiseId?: string, tenantId?: string): Promise<FranchiseLocation[]> {
+    const conditions = [];
+    if (franchiseId) conditions.push(eq(franchiseLocations.franchiseId, franchiseId));
+    if (tenantId) conditions.push(eq(franchiseLocations.tenantId, tenantId));
+    
+    if (conditions.length === 0) {
+      return db.select().from(franchiseLocations).orderBy(desc(franchiseLocations.createdAt));
+    }
+    return db.select().from(franchiseLocations)
+      .where(conditions.length === 1 ? conditions[0] : and(...conditions))
+      .orderBy(desc(franchiseLocations.createdAt));
+  },
+
+  async getFranchiseLocationById(id: string): Promise<FranchiseLocation | undefined> {
+    const [location] = await db.select().from(franchiseLocations)
+      .where(eq(franchiseLocations.id, id));
+    return location;
+  },
+
+  async createFranchiseLocation(location: InsertFranchiseLocation): Promise<FranchiseLocation> {
+    const [created] = await db.insert(franchiseLocations).values(location).returning();
+    return created;
+  },
+
+  async updateFranchiseLocation(id: string, updates: Partial<InsertFranchiseLocation>): Promise<FranchiseLocation | undefined> {
+    const [updated] = await db.update(franchiseLocations)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(franchiseLocations.id, id))
+      .returning();
+    return updated;
+  },
+
+  async deleteFranchiseLocation(id: string): Promise<void> {
+    await db.delete(franchiseLocations).where(eq(franchiseLocations.id, id));
   },
 
 };
