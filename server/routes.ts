@@ -70,7 +70,10 @@ import {
   type Timesheet,
   type IntegrationToken,
   releasePackages,
+  PARTNER_API_SCOPES,
+  PARTNER_API_ERROR_CODES,
 } from "@shared/schema";
+import crypto from "crypto";
 
 // ========================
 // MIDDLEWARE
@@ -79,9 +82,10 @@ function parseJSON(req: Request, res: Response, next: () => void): void {
   next();
 }
 
-// Admin authentication middleware - requires valid admin session
+// Admin authentication middleware - requires valid admin session (master or developer role)
 function requireMasterAdmin(req: Request, res: Response, next: NextFunction): void {
-  if (!req.session?.adminAuthenticated || req.session?.adminRole !== 'master') {
+  const allowedRoles = ['master', 'developer'];
+  if (!req.session?.adminAuthenticated || !allowedRoles.includes(req.session?.adminRole || '')) {
     res.status(403).json({ error: "Master admin authentication required" });
     return;
   }
@@ -10568,6 +10572,535 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Delete software license error:", error);
       res.status(500).json({ error: "Failed to delete software license" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // PARTNER API v1 - B2B API Access with Scoped Credentials
+  // Franchises can use API keys to programmatically access their data
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // In-memory per-minute rate limiting tracker
+  const partnerApiMinuteTracker: Map<string, { count: number; resetAt: number }> = new Map();
+
+  // Generate API key with prefix
+  const generatePartnerApiKey = (): string => {
+    return `orbit_live_${crypto.randomBytes(24).toString("hex")}`;
+  };
+
+  // Generate API secret
+  const generatePartnerApiSecret = (): string => {
+    return crypto.randomBytes(32).toString("hex");
+  };
+
+  // Hash API secret for storage (using SHA-256)
+  const hashApiSecret = (secret: string): string => {
+    return crypto.createHash("sha256").update(secret).digest("hex");
+  };
+
+  // Verify API secret by comparing hashed values
+  const verifyApiSecret = (providedSecret: string, storedHash: string): boolean => {
+    const providedHash = hashApiSecret(providedSecret);
+    return crypto.timingSafeEqual(Buffer.from(providedHash), Buffer.from(storedHash));
+  };
+
+  // Partner API authentication middleware (requires both API Key + API Secret)
+  async function partnerApiAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const startTime = Date.now();
+    const apiKey = req.headers["x-api-key"] as string;
+    const apiSecret = req.headers["x-api-secret"] as string;
+
+    // Validate required headers
+    if (!apiKey) {
+      res.status(401).json({ error: PARTNER_API_ERROR_CODES.MISSING_API_KEY.message, code: "MISSING_API_KEY" });
+      return;
+    }
+
+    if (!apiSecret) {
+      res.status(401).json({ error: "API Secret is required", code: "MISSING_API_SECRET" });
+      return;
+    }
+
+    // Find credential by API key
+    const credential = await storage.getPartnerApiCredentialByApiKey(apiKey);
+    if (!credential) {
+      res.status(401).json({ error: PARTNER_API_ERROR_CODES.INVALID_API_KEY.message, code: "INVALID_API_KEY" });
+      return;
+    }
+
+    // Verify API secret using timing-safe comparison
+    if (!verifyApiSecret(apiSecret, credential.apiSecretHash)) {
+      res.status(401).json({ error: "Invalid API Secret", code: "INVALID_API_SECRET" });
+      return;
+    }
+
+    if (!credential.isActive) {
+      res.status(403).json({ error: PARTNER_API_ERROR_CODES.KEY_DISABLED.message, code: "KEY_DISABLED" });
+      return;
+    }
+
+    if (credential.expiresAt && new Date(credential.expiresAt) < new Date()) {
+      res.status(403).json({ error: PARTNER_API_ERROR_CODES.KEY_EXPIRED.message, code: "KEY_EXPIRED" });
+      return;
+    }
+
+    const now = Date.now();
+
+    // Per-minute rate limiting (in-memory)
+    const minuteKey = credential.id;
+    const minuteData = partnerApiMinuteTracker.get(minuteKey);
+    const rateLimitPerMinute = credential.rateLimitPerMinute || 60;
+
+    if (minuteData) {
+      if (now < minuteData.resetAt) {
+        if (minuteData.count >= rateLimitPerMinute) {
+          res.status(429).json({ 
+            error: "Rate limit exceeded (per minute)", 
+            code: "RATE_LIMIT_MINUTE",
+            retryAfter: Math.ceil((minuteData.resetAt - now) / 1000)
+          });
+          return;
+        }
+        minuteData.count++;
+      } else {
+        partnerApiMinuteTracker.set(minuteKey, { count: 1, resetAt: now + 60000 });
+      }
+    } else {
+      partnerApiMinuteTracker.set(minuteKey, { count: 1, resetAt: now + 60000 });
+    }
+
+    // Per-day rate limiting (database-backed)
+    const lastReset = credential.lastResetAt ? new Date(credential.lastResetAt) : new Date();
+    const hoursSinceReset = (now - lastReset.getTime()) / (1000 * 60 * 60);
+    
+    if (hoursSinceReset >= 24) {
+      await storage.resetDailyPartnerApiCounts();
+    }
+
+    if ((credential.requestCountDaily || 0) >= (credential.rateLimitPerDay || 10000)) {
+      res.status(429).json({ error: PARTNER_API_ERROR_CODES.RATE_LIMIT_DAY.message, code: "RATE_LIMIT_DAY" });
+      return;
+    }
+
+    // Increment request count
+    await storage.incrementPartnerApiRequestCount(credential.id);
+
+    // Attach credential info to request
+    (req as any).partnerCredential = credential;
+    (req as any).partnerStartTime = startTime;
+
+    // Log request on response finish
+    res.on("finish", async () => {
+      try {
+        await storage.createPartnerApiLog({
+          credentialId: credential.id,
+          franchiseId: credential.franchiseId || undefined,
+          tenantId: credential.tenantId || undefined,
+          method: req.method,
+          endpoint: req.originalUrl,
+          queryParams: Object.keys(req.query).length > 0 ? req.query : undefined,
+          statusCode: res.statusCode,
+          responseTimeMs: Date.now() - startTime,
+          ipAddress: req.ip || req.socket.remoteAddress || undefined,
+          userAgent: req.headers["user-agent"] || undefined,
+        });
+      } catch (logError) {
+        console.error("Partner API log error:", logError);
+      }
+    });
+
+    next();
+  }
+
+  // Scope check middleware factory
+  function requireScope(scope: string) {
+    return (req: Request, res: Response, next: NextFunction): void => {
+      const credential = (req as any).partnerCredential;
+      if (!credential?.scopes?.includes(scope)) {
+        res.status(403).json({ 
+          error: `${PARTNER_API_ERROR_CODES.INSUFFICIENT_SCOPE.message}: ${scope}`, 
+          code: "INSUFFICIENT_SCOPE",
+          requiredScope: scope
+        });
+        return;
+      }
+      next();
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Partner API v1 Public Endpoints
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Health check (no auth required)
+  app.get("/api/partner/v1/health", (req: Request, res: Response) => {
+    res.json({ 
+      status: "healthy", 
+      version: "1.0.0", 
+      timestamp: new Date().toISOString(),
+      service: "ORBIT Partner API"
+    });
+  });
+
+  // List available scopes (no auth required)
+  app.get("/api/partner/v1/scopes", (req: Request, res: Response) => {
+    res.json({ 
+      scopes: PARTNER_API_SCOPES,
+      description: "Available permission scopes for Partner API access"
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Partner API v1 Authenticated Endpoints
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Get current credential info
+  app.get("/api/partner/v1/me", partnerApiAuth, async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      res.json({
+        credentialId: credential.id,
+        name: credential.name,
+        environment: credential.environment,
+        scopes: credential.scopes,
+        rateLimits: {
+          perMinute: credential.rateLimitPerMinute,
+          perDay: credential.rateLimitPerDay,
+          usedToday: credential.requestCountDaily,
+        },
+        franchiseId: credential.franchiseId,
+        tenantId: credential.tenantId,
+      });
+    } catch (error) {
+      console.error("Partner API /me error:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Get workers (requires workers:read scope)
+  app.get("/api/partner/v1/workers", partnerApiAuth, requireScope("workers:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const tenantId = credential.tenantId;
+      
+      if (!tenantId) {
+        return res.status(400).json({ error: "No tenant associated with this credential" });
+      }
+
+      const workerList = await db.select().from(workers)
+        .where(eq(workers.tenantId, tenantId))
+        .orderBy(desc(workers.createdAt))
+        .limit(100);
+
+      res.json({
+        data: workerList,
+        meta: { total: workerList.length, tenantId }
+      });
+    } catch (error) {
+      console.error("Partner API workers error:", error);
+      res.status(500).json({ error: "Failed to fetch workers" });
+    }
+  });
+
+  // Get locations (requires locations:read scope)
+  app.get("/api/partner/v1/locations", partnerApiAuth, requireScope("locations:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const locations = await storage.getFranchiseLocations(credential.franchiseId, credential.tenantId);
+      res.json({
+        data: locations,
+        meta: { total: locations.length }
+      });
+    } catch (error) {
+      console.error("Partner API locations error:", error);
+      res.status(500).json({ error: "Failed to fetch locations" });
+    }
+  });
+
+  // Create location (requires locations:write scope)
+  app.post("/api/partner/v1/locations", partnerApiAuth, requireScope("locations:write"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const location = await storage.createFranchiseLocation({
+        ...req.body,
+        franchiseId: credential.franchiseId,
+        tenantId: credential.tenantId,
+      });
+      res.status(201).json({ data: location });
+    } catch (error) {
+      console.error("Partner API create location error:", error);
+      res.status(500).json({ error: "Failed to create location" });
+    }
+  });
+
+  // Get analytics (requires analytics:read scope)
+  app.get("/api/partner/v1/analytics", partnerApiAuth, requireScope("analytics:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      const stats = await storage.getPartnerApiStats(credential.id);
+      const dashboard = await storage.getAnalyticsDashboard();
+      
+      res.json({
+        data: {
+          apiUsage: stats,
+          platform: {
+            todayViews: dashboard.today.views,
+            todayVisitors: dashboard.today.visitors,
+            weekViews: dashboard.week.views,
+          }
+        },
+        meta: { credentialId: credential.id }
+      });
+    } catch (error) {
+      console.error("Partner API analytics error:", error);
+      res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+  });
+
+  // Get billing info (requires billing:read scope)
+  app.get("/api/partner/v1/billing", partnerApiAuth, requireScope("billing:read"), async (req: Request, res: Response) => {
+    try {
+      const credential = (req as any).partnerCredential;
+      
+      // Get company billing info if tenantId exists
+      let billingInfo: any = { credentialId: credential.id };
+      
+      if (credential.tenantId) {
+        const company = await storage.getCompany(credential.tenantId);
+        if (company) {
+          billingInfo = {
+            ...billingInfo,
+            billingModel: company.billingModel,
+            billingTier: company.billingTier,
+            monthlyFlatFee: company.monthlyFlatFee,
+            revenueSharePercentage: company.revenueSharePercentage,
+          };
+        }
+      }
+
+      res.json({ data: billingInfo });
+    } catch (error) {
+      console.error("Partner API billing error:", error);
+      res.status(500).json({ error: "Failed to fetch billing info" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Partner API Credential Management (Admin)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // List all credentials (admin only)
+  app.get("/api/admin/partner-api/credentials", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { franchiseId, tenantId } = req.query;
+      const credentials = await storage.getPartnerApiCredentials(
+        franchiseId as string | undefined,
+        tenantId as string | undefined
+      );
+      
+      // Mask API secrets
+      const safeCredentials = credentials.map(c => ({
+        ...c,
+        apiSecretHash: "••••••••",
+      }));
+      
+      res.json(safeCredentials);
+    } catch (error) {
+      console.error("Get partner credentials error:", error);
+      res.status(500).json({ error: "Failed to fetch credentials" });
+    }
+  });
+
+  // Create new credential (admin only)
+  app.post("/api/admin/partner-api/credentials", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { name, description, franchiseId, tenantId, environment, scopes, rateLimitPerMinute, rateLimitPerDay, expiresAt } = req.body;
+
+      if (!name) {
+        return res.status(400).json({ error: "Name is required" });
+      }
+
+      const apiKey = generatePartnerApiKey();
+      const apiSecret = generatePartnerApiSecret();
+      const apiSecretHash = hashApiSecret(apiSecret);
+
+      const credential = await storage.createPartnerApiCredential({
+        name,
+        description,
+        franchiseId: franchiseId || null,
+        tenantId: tenantId || null,
+        apiKey,
+        apiSecretHash,
+        environment: environment || "production",
+        scopes: scopes || ["workers:read"],
+        rateLimitPerMinute: rateLimitPerMinute || 60,
+        rateLimitPerDay: rateLimitPerDay || 10000,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        createdBy: req.session?.adminName || "admin",
+      });
+
+      res.status(201).json({
+        ...credential,
+        apiSecret, // Only shown once!
+        warning: "Save this API secret now. It will not be shown again!",
+      });
+    } catch (error) {
+      console.error("Create partner credential error:", error);
+      res.status(500).json({ error: "Failed to create credential" });
+    }
+  });
+
+  // Update credential (admin only)
+  app.patch("/api/admin/partner-api/credentials/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { name, description, scopes, rateLimitPerMinute, rateLimitPerDay, isActive, expiresAt } = req.body;
+
+      const updates: any = {};
+      if (name !== undefined) updates.name = name;
+      if (description !== undefined) updates.description = description;
+      if (scopes !== undefined) updates.scopes = scopes;
+      if (rateLimitPerMinute !== undefined) updates.rateLimitPerMinute = rateLimitPerMinute;
+      if (rateLimitPerDay !== undefined) updates.rateLimitPerDay = rateLimitPerDay;
+      if (isActive !== undefined) updates.isActive = isActive;
+      if (expiresAt !== undefined) updates.expiresAt = expiresAt ? new Date(expiresAt) : null;
+
+      const credential = await storage.updatePartnerApiCredential(id, updates);
+      if (!credential) {
+        return res.status(404).json({ error: "Credential not found" });
+      }
+
+      res.json({ ...credential, apiSecretHash: "••••••••" });
+    } catch (error) {
+      console.error("Update partner credential error:", error);
+      res.status(500).json({ error: "Failed to update credential" });
+    }
+  });
+
+  // Regenerate API key (admin only)
+  app.post("/api/admin/partner-api/credentials/:id/regenerate", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      const apiKey = generatePartnerApiKey();
+      const apiSecret = generatePartnerApiSecret();
+      const apiSecretHash = hashApiSecret(apiSecret);
+
+      const credential = await storage.updatePartnerApiCredential(id, {
+        apiKey,
+        apiSecretHash,
+      });
+
+      if (!credential) {
+        return res.status(404).json({ error: "Credential not found" });
+      }
+
+      res.json({
+        ...credential,
+        apiKey,
+        apiSecret,
+        warning: "Save these new credentials now. The API secret will not be shown again!",
+      });
+    } catch (error) {
+      console.error("Regenerate partner credential error:", error);
+      res.status(500).json({ error: "Failed to regenerate credentials" });
+    }
+  });
+
+  // Delete credential (admin only)
+  app.delete("/api/admin/partner-api/credentials/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePartnerApiCredential(id);
+      res.json({ success: true, message: "Credential deleted" });
+    } catch (error) {
+      console.error("Delete partner credential error:", error);
+      res.status(500).json({ error: "Failed to delete credential" });
+    }
+  });
+
+  // Get API logs (admin only)
+  app.get("/api/admin/partner-api/logs", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { credentialId, franchiseId, limit } = req.query;
+      const logs = await storage.getPartnerApiLogs(
+        credentialId as string | undefined,
+        franchiseId as string | undefined,
+        limit ? parseInt(limit as string) : 50
+      );
+      res.json(logs);
+    } catch (error) {
+      console.error("Get partner API logs error:", error);
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
+
+  // Get credential stats (admin only)
+  app.get("/api/admin/partner-api/credentials/:id/stats", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const stats = await storage.getPartnerApiStats(id);
+      res.json(stats);
+    } catch (error) {
+      console.error("Get partner credential stats error:", error);
+      res.status(500).json({ error: "Failed to fetch stats" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // Franchise Location Management (Admin)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // List franchise locations
+  app.get("/api/admin/franchise-locations", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { franchiseId, tenantId } = req.query;
+      const locations = await storage.getFranchiseLocations(
+        franchiseId as string | undefined,
+        tenantId as string | undefined
+      );
+      res.json(locations);
+    } catch (error) {
+      console.error("Get franchise locations error:", error);
+      res.status(500).json({ error: "Failed to fetch locations" });
+    }
+  });
+
+  // Create franchise location
+  app.post("/api/admin/franchise-locations", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const location = await storage.createFranchiseLocation(req.body);
+      res.status(201).json(location);
+    } catch (error) {
+      console.error("Create franchise location error:", error);
+      res.status(500).json({ error: "Failed to create location" });
+    }
+  });
+
+  // Update franchise location
+  app.patch("/api/admin/franchise-locations/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const location = await storage.updateFranchiseLocation(id, req.body);
+      if (!location) {
+        return res.status(404).json({ error: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      console.error("Update franchise location error:", error);
+      res.status(500).json({ error: "Failed to update location" });
+    }
+  });
+
+  // Delete franchise location
+  app.delete("/api/admin/franchise-locations/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteFranchiseLocation(id);
+      res.json({ success: true, message: "Location deleted" });
+    } catch (error) {
+      console.error("Delete franchise location error:", error);
+      res.status(500).json({ error: "Failed to delete location" });
     }
   });
 }

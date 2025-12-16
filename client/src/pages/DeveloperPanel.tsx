@@ -28,6 +28,7 @@ import { FloatingHelpButton } from '@/components/HelpCenter';
 import { FullAnalyticsDashboard } from '@/components/FullAnalyticsDashboard';
 import { SEOManager } from '@/components/SEOManager';
 import { ReceiptScanner } from '@/components/ReceiptScanner';
+import { PartnerApiManager } from '@/components/PartnerApiManager';
 import { BentoGrid, BentoTile } from '@/components/ui/bento-grid';
 import { CarouselRail, CarouselRailItem } from '@/components/ui/carousel-rail';
 import { SectionHeader, PageHeader } from '@/components/ui/section-header';
@@ -2878,7 +2879,7 @@ export default function DeveloperPanel() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="intelligence" className="border-b-0">
+            <AccordionItem value="intelligence" className="border-b border-slate-700">
               <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-purple-900/20 to-cyan-900/20" data-testid="accordion-dev-intelligence">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-5 h-5 text-cyan-400" />
@@ -2893,6 +2894,29 @@ export default function DeveloperPanel() {
                   ].map(item => (
                     <button key={item.id} onClick={() => setActiveTab(item.id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
+                      data-testid={`btn-dev-${item.id}`}>
+                      {item.icon}<span className="text-sm font-medium">{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="partner-api" className="border-b-0">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-green-900/20 to-emerald-900/20" data-testid="accordion-dev-partner-api">
+                <div className="flex items-center gap-3">
+                  <Key className="w-5 h-5 text-emerald-400" />
+                  <span className="font-bold text-white">Partner API</span>
+                  <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full ml-2">B2B</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="bg-slate-900/50 px-2 py-2">
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { id: 'partner-api', label: 'API Credentials & Logs', icon: <Key className="w-4 h-4" /> },
+                  ].map(item => (
+                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
                       data-testid={`btn-dev-${item.id}`}>
                       {item.icon}<span className="text-sm font-medium">{item.label}</span>
                     </button>
@@ -3381,6 +3405,11 @@ export default function DeveloperPanel() {
         {/* SEO MANAGER */}
         {activeTab === 'seo' && (
           <SEOManager />
+        )}
+
+        {/* PARTNER API MANAGER */}
+        {activeTab === 'partner-api' && (
+          <PartnerApiManager />
         )}
 
         {/* BUSINESS CONTROL PANEL - SOFTWARE LICENSES */}
