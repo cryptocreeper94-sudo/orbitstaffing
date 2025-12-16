@@ -664,6 +664,100 @@ workers = api.get_workers()`}</code>
                   </div>
                 </div>
               </div>
+
+              <div className="border-t border-gray-700 pt-6">
+                <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-purple-400" />
+                  Mobile App Template
+                </h4>
+                <p className="text-gray-400 text-sm mb-4">
+                  Download our white-label React Native mobile app template. 
+                  Customize branding, colors, and connect to your ORBIT tenant API.
+                </p>
+                
+                <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/30">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                        <Zap className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-white">ORBIT Worker App</h5>
+                        <p className="text-xs text-gray-400">React Native + Expo Template</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => window.open('/api/partner/mobile-template', '_blank')}
+                      className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600"
+                      data-testid="btn-download-mobile-template"
+                    >
+                      Download Template
+                    </Button>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-2">
+                      <h6 className="text-sm font-medium text-white">Features Included</h6>
+                      <ul className="text-xs text-gray-400 space-y-1">
+                        <li className="flex items-center gap-2">
+                          <Lock className="h-3 w-3 text-cyan-400" />
+                          Worker login with phone + PIN
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <BarChart3 className="h-3 w-3 text-cyan-400" />
+                          Dashboard with shifts & earnings
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Clock className="h-3 w-3 text-cyan-400" />
+                          GPS-verified clock in/out
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Activity className="h-3 w-3 text-cyan-400" />
+                          Pay history & paystubs
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <h6 className="text-sm font-medium text-white">Easy Customization</h6>
+                      <ul className="text-xs text-gray-400 space-y-1">
+                        <li className="flex items-center gap-2">
+                          <Settings className="h-3 w-3 text-purple-400" />
+                          Customize app name & colors
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Globe className="h-3 w-3 text-purple-400" />
+                          Set your tenant API URL
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Code2 className="h-3 w-3 text-purple-400" />
+                          Replace logos & branding
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Shield className="h-3 w-3 text-purple-400" />
+                          Ready for App Store/Play Store
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded bg-gray-800/50">
+                    <h6 className="text-xs font-medium text-cyan-400 mb-2">Quick Setup</h6>
+                    <pre className="text-xs text-gray-300 overflow-x-auto">
+                      <code>{`# 1. Download and extract template
+# 2. Edit src/config/branding.ts:
+
+export const BRANDING = {
+  appName: 'Your Company Worker',
+  primaryColor: '#00CED1',
+  apiBaseUrl: 'https://your-tenant.orbitstaffing.io/api'
+};
+
+# 3. Install dependencies and run
+npm install && npm start`}</code>
+                    </pre>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

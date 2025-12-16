@@ -32,6 +32,8 @@ import { webhookService, emitWebhookEvent, sendTestWebhook, startWebhookRetryPro
 import { sandboxService } from "./sandboxService";
 import swaggerUi from "swagger-ui-express";
 import { openApiSpec } from "./openapi";
+import { oauthService } from "./oauthService";
+import archiver from "archiver";
 
 // Session type extension for admin authentication
 declare module 'express-session' {
@@ -161,6 +163,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Integration Marketplace routes
   registerMarketplaceRoutes(app);
+  
+  // Register OAuth 2.0 routes
+  registerOAuthRoutes(app);
 
   // ========================
   // API DOCUMENTATION (OpenAPI/Swagger)
@@ -10830,6 +10835,40 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // ═══════════════════════════════════════════════════════════════════════════════
+  // Mobile App Template Download (no auth required - for franchisees)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Download white-label mobile app template as ZIP
+  app.get("/api/partner/mobile-template", async (req: Request, res: Response) => {
+    try {
+      const templateDir = path.join(process.cwd(), "public", "mobile-app-template");
+      
+      if (!fs.existsSync(templateDir)) {
+        return res.status(404).json({ error: "Mobile app template not found" });
+      }
+
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader("Content-Disposition", "attachment; filename=orbit-worker-app-template.zip");
+
+      const archive = archiver("zip", { zlib: { level: 9 } });
+      
+      archive.on("error", (err: Error) => {
+        console.error("[Mobile Template] Archive error:", err);
+        res.status(500).json({ error: "Failed to create archive" });
+      });
+
+      archive.pipe(res);
+      archive.directory(templateDir, "orbit-worker-app");
+      await archive.finalize();
+      
+      console.log("[Mobile Template] Template downloaded successfully");
+    } catch (error) {
+      console.error("[Mobile Template] Error:", error);
+      res.status(500).json({ error: "Failed to download mobile template" });
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
   // Partner API v1 Authenticated Endpoints
   // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -13856,6 +13895,503 @@ export function registerMarketplaceRoutes(app: Express) {
     } catch (error) {
       console.error("[Marketplace] Update config error:", error);
       res.status(500).json({ error: "Failed to update app config" });
+    }
+  });
+}
+
+// ========================
+// OAuth 2.0 Routes
+// ========================
+export function registerOAuthRoutes(app: Express) {
+  // GET /oauth/authorize - Authorization endpoint (show consent screen)
+  app.get("/oauth/authorize", async (req: Request, res: Response) => {
+    try {
+      const {
+        client_id,
+        redirect_uri,
+        response_type,
+        scope,
+        state,
+        code_challenge,
+        code_challenge_method,
+      } = req.query;
+
+      if (!client_id || !redirect_uri || response_type !== "code") {
+        return res.status(400).json({
+          error: "invalid_request",
+          error_description: "Missing required parameters: client_id, redirect_uri, response_type=code",
+        });
+      }
+
+      const client = await oauthService.getClientByClientId(client_id as string);
+      if (!client || !client.isActive) {
+        return res.status(400).json({
+          error: "invalid_client",
+          error_description: "Unknown or inactive client",
+        });
+      }
+
+      if (!client.redirectUris.includes(redirect_uri as string)) {
+        return res.status(400).json({
+          error: "invalid_redirect_uri",
+          error_description: "Redirect URI not registered for this client",
+        });
+      }
+
+      const requestedScopes = ((scope as string) || "").split(" ").filter(Boolean);
+      const validScopes = oauthService.validateScopes(requestedScopes, client.scopes);
+
+      res.json({
+        client: {
+          name: client.name,
+          description: client.description,
+          logoUrl: client.logoUrl,
+          homepageUrl: client.homepageUrl,
+        },
+        scopes: validScopes.length > 0 ? validScopes : client.scopes,
+        redirect_uri,
+        state,
+        code_challenge: code_challenge || undefined,
+        code_challenge_method: code_challenge_method || "S256",
+      });
+    } catch (error) {
+      console.error("[OAuth] Authorize error:", error);
+      res.status(500).json({ error: "server_error", error_description: "Internal server error" });
+    }
+  });
+
+  // POST /oauth/authorize - User grants access
+  app.post("/oauth/authorize", async (req: Request, res: Response) => {
+    try {
+      const {
+        client_id,
+        redirect_uri,
+        scope,
+        state,
+        code_challenge,
+        code_challenge_method,
+        user_id,
+        grant,
+      } = req.body;
+
+      if (!grant) {
+        const redirectUrl = new URL(redirect_uri);
+        redirectUrl.searchParams.set("error", "access_denied");
+        redirectUrl.searchParams.set("error_description", "User denied access");
+        if (state) redirectUrl.searchParams.set("state", state);
+        return res.json({ redirect: redirectUrl.toString() });
+      }
+
+      const { code, expiresAt } = await oauthService.generateAuthorizationCode({
+        clientId: client_id,
+        userId: user_id,
+        redirectUri: redirect_uri,
+        scope,
+        state,
+        codeChallenge: code_challenge,
+        codeChallengeMethod: code_challenge_method || "S256",
+      });
+
+      const redirectUrl = new URL(redirect_uri);
+      redirectUrl.searchParams.set("code", code);
+      if (state) redirectUrl.searchParams.set("state", state);
+
+      console.log(`[OAuth] Authorization code generated for client ${client_id}`);
+      res.json({ redirect: redirectUrl.toString(), code, expires_at: expiresAt });
+    } catch (error: any) {
+      console.error("[OAuth] Authorize POST error:", error);
+      res.status(400).json({
+        error: "invalid_request",
+        error_description: error.message || "Failed to generate authorization code",
+      });
+    }
+  });
+
+  // POST /oauth/token - Token endpoint
+  app.post("/oauth/token", async (req: Request, res: Response) => {
+    try {
+      const { grant_type, code, redirect_uri, client_id, client_secret, code_verifier, scope } = req.body;
+
+      if (grant_type === "authorization_code") {
+        if (!code || !redirect_uri || !client_id) {
+          return res.status(400).json({
+            error: "invalid_request",
+            error_description: "Missing required parameters for authorization_code grant",
+          });
+        }
+
+        const tokens = await oauthService.exchangeCodeForTokens({
+          code,
+          clientId: client_id,
+          clientSecret: client_secret,
+          redirectUri: redirect_uri,
+          codeVerifier: code_verifier,
+        });
+
+        console.log(`[OAuth] Tokens issued for client ${client_id}`);
+        return res.json(tokens);
+      }
+
+      if (grant_type === "client_credentials") {
+        if (!client_id || !client_secret) {
+          return res.status(400).json({
+            error: "invalid_request",
+            error_description: "Missing client_id or client_secret for client_credentials grant",
+          });
+        }
+
+        const tokens = await oauthService.clientCredentialsGrant({
+          clientId: client_id,
+          clientSecret: client_secret,
+          scope,
+        });
+
+        console.log(`[OAuth] Client credentials token issued for ${client_id}`);
+        return res.json(tokens);
+      }
+
+      if (grant_type === "refresh_token") {
+        const { refresh_token } = req.body;
+        if (!refresh_token || !client_id) {
+          return res.status(400).json({
+            error: "invalid_request",
+            error_description: "Missing refresh_token or client_id",
+          });
+        }
+
+        const tokens = await oauthService.refreshAccessToken(refresh_token, client_id, client_secret);
+        console.log(`[OAuth] Token refreshed for client ${client_id}`);
+        return res.json(tokens);
+      }
+
+      res.status(400).json({
+        error: "unsupported_grant_type",
+        error_description: "Supported grant types: authorization_code, client_credentials, refresh_token",
+      });
+    } catch (error: any) {
+      console.error("[OAuth] Token error:", error);
+      res.status(400).json({
+        error: "invalid_grant",
+        error_description: error.message || "Token request failed",
+      });
+    }
+  });
+
+  // POST /oauth/token/refresh - Refresh access token (alias)
+  app.post("/oauth/token/refresh", async (req: Request, res: Response) => {
+    try {
+      const { refresh_token, client_id, client_secret } = req.body;
+
+      if (!refresh_token || !client_id) {
+        return res.status(400).json({
+          error: "invalid_request",
+          error_description: "Missing refresh_token or client_id",
+        });
+      }
+
+      const tokens = await oauthService.refreshAccessToken(refresh_token, client_id, client_secret);
+      console.log(`[OAuth] Token refreshed for client ${client_id}`);
+      res.json(tokens);
+    } catch (error: any) {
+      console.error("[OAuth] Refresh error:", error);
+      res.status(400).json({
+        error: "invalid_grant",
+        error_description: error.message || "Refresh failed",
+      });
+    }
+  });
+
+  // POST /oauth/revoke - Revoke token
+  app.post("/oauth/revoke", async (req: Request, res: Response) => {
+    try {
+      const { token, token_type_hint } = req.body;
+
+      if (!token) {
+        return res.status(400).json({
+          error: "invalid_request",
+          error_description: "Missing token parameter",
+        });
+      }
+
+      const revoked = await oauthService.revokeToken(token);
+      console.log(`[OAuth] Token revoked: ${revoked}`);
+      res.json({ revoked });
+    } catch (error: any) {
+      console.error("[OAuth] Revoke error:", error);
+      res.status(400).json({
+        error: "invalid_request",
+        error_description: error.message || "Revoke failed",
+      });
+    }
+  });
+
+  // POST /oauth/introspect - Token introspection (RFC 7662)
+  app.post("/oauth/introspect", async (req: Request, res: Response) => {
+    try {
+      const { token } = req.body;
+
+      if (!token) {
+        return res.status(400).json({
+          error: "invalid_request",
+          error_description: "Missing token parameter",
+        });
+      }
+
+      const introspection = await oauthService.introspectToken(token);
+      res.json(introspection);
+    } catch (error: any) {
+      console.error("[OAuth] Introspect error:", error);
+      res.json({ active: false });
+    }
+  });
+
+  // GET /oauth/userinfo - Get authenticated user info
+  app.get("/oauth/userinfo", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({
+          error: "invalid_token",
+          error_description: "Missing or invalid Authorization header",
+        });
+      }
+
+      const accessToken = authHeader.substring(7);
+      const result = await oauthService.validateAccessToken(accessToken);
+
+      if (!result) {
+        return res.status(401).json({
+          error: "invalid_token",
+          error_description: "Token is invalid or expired",
+        });
+      }
+
+      const userInfo: any = {
+        sub: result.user?.id || result.client.id,
+        client_id: result.client.clientId,
+        scope: result.token.scope,
+      };
+
+      if (result.user) {
+        userInfo.email = result.user.email;
+        userInfo.name = result.user.fullName;
+        userInfo.role = result.user.role;
+      }
+
+      res.json(userInfo);
+    } catch (error: any) {
+      console.error("[OAuth] Userinfo error:", error);
+      res.status(500).json({
+        error: "server_error",
+        error_description: "Failed to retrieve user info",
+      });
+    }
+  });
+
+  // ========================
+  // Admin OAuth Client Management
+  // ========================
+
+  // GET /api/admin/oauth/clients - List OAuth clients
+  app.get("/api/admin/oauth/clients", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const tenantId = req.query.tenantId as string | undefined;
+      const clients = await oauthService.listClients(tenantId);
+      
+      const safeClients = clients.map((c) => ({
+        id: c.id,
+        clientId: c.clientId,
+        name: c.name,
+        description: c.description,
+        redirectUris: c.redirectUris,
+        scopes: c.scopes,
+        grantTypes: c.grantTypes,
+        isConfidential: c.isConfidential,
+        isActive: c.isActive,
+        logoUrl: c.logoUrl,
+        homepageUrl: c.homepageUrl,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      }));
+
+      res.json({ clients: safeClients });
+    } catch (error) {
+      console.error("[OAuth Admin] List clients error:", error);
+      res.status(500).json({ error: "Failed to list OAuth clients" });
+    }
+  });
+
+  // POST /api/admin/oauth/clients - Create OAuth client
+  app.post("/api/admin/oauth/clients", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const {
+        name,
+        description,
+        redirectUris,
+        scopes,
+        grantTypes,
+        isConfidential,
+        tenantId,
+        logoUrl,
+        homepageUrl,
+        privacyPolicyUrl,
+        termsOfServiceUrl,
+      } = req.body;
+
+      if (!name || !redirectUris || !Array.isArray(redirectUris) || redirectUris.length === 0) {
+        return res.status(400).json({ error: "Name and at least one redirect URI required" });
+      }
+
+      for (const uri of redirectUris) {
+        if (!oauthService.validateRedirectUri(uri)) {
+          return res.status(400).json({ error: `Invalid redirect URI: ${uri}` });
+        }
+      }
+
+      const { client, clientSecret } = await oauthService.createClient({
+        tenantId,
+        name,
+        description,
+        redirectUris,
+        scopes: scopes || ["read"],
+        grantTypes: grantTypes || ["authorization_code"],
+        isConfidential: isConfidential ?? true,
+        logoUrl,
+        homepageUrl,
+        privacyPolicyUrl,
+        termsOfServiceUrl,
+      });
+
+      console.log(`[OAuth Admin] Created client: ${client.clientId}`);
+      res.json({
+        client: {
+          id: client.id,
+          clientId: client.clientId,
+          name: client.name,
+          description: client.description,
+          redirectUris: client.redirectUris,
+          scopes: client.scopes,
+          grantTypes: client.grantTypes,
+          isActive: client.isActive,
+          createdAt: client.createdAt,
+        },
+        clientSecret,
+        warning: "Store the client secret securely. It cannot be retrieved again.",
+      });
+    } catch (error: any) {
+      console.error("[OAuth Admin] Create client error:", error);
+      res.status(500).json({ error: error.message || "Failed to create OAuth client" });
+    }
+  });
+
+  // PATCH /api/admin/oauth/clients/:id - Update OAuth client
+  app.patch("/api/admin/oauth/clients/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+
+      if (updates.redirectUris) {
+        for (const uri of updates.redirectUris) {
+          if (!oauthService.validateRedirectUri(uri)) {
+            return res.status(400).json({ error: `Invalid redirect URI: ${uri}` });
+          }
+        }
+      }
+
+      const updated = await oauthService.updateClient(id, updates);
+      if (!updated) {
+        return res.status(404).json({ error: "OAuth client not found" });
+      }
+
+      console.log(`[OAuth Admin] Updated client: ${updated.clientId}`);
+      res.json({
+        client: {
+          id: updated.id,
+          clientId: updated.clientId,
+          name: updated.name,
+          description: updated.description,
+          redirectUris: updated.redirectUris,
+          scopes: updated.scopes,
+          grantTypes: updated.grantTypes,
+          isActive: updated.isActive,
+          updatedAt: updated.updatedAt,
+        },
+      });
+    } catch (error: any) {
+      console.error("[OAuth Admin] Update client error:", error);
+      res.status(500).json({ error: error.message || "Failed to update OAuth client" });
+    }
+  });
+
+  // DELETE /api/admin/oauth/clients/:id - Delete OAuth client
+  app.delete("/api/admin/oauth/clients/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const deleted = await oauthService.deleteClient(id);
+
+      if (!deleted) {
+        return res.status(404).json({ error: "OAuth client not found" });
+      }
+
+      console.log(`[OAuth Admin] Deleted client: ${id}`);
+      res.json({ success: true, deleted: id });
+    } catch (error: any) {
+      console.error("[OAuth Admin] Delete client error:", error);
+      res.status(500).json({ error: error.message || "Failed to delete OAuth client" });
+    }
+  });
+
+  // POST /api/admin/oauth/clients/:id/rotate-secret - Rotate client secret
+  app.post("/api/admin/oauth/clients/:id/rotate-secret", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+
+      const client = await oauthService.getClientById(id);
+      if (!client) {
+        return res.status(404).json({ error: "OAuth client not found" });
+      }
+
+      await oauthService.deleteClient(id);
+
+      const { client: newClient, clientSecret } = await oauthService.createClient({
+        tenantId: client.tenantId || undefined,
+        name: client.name,
+        description: client.description || undefined,
+        redirectUris: client.redirectUris,
+        scopes: client.scopes,
+        grantTypes: client.grantTypes,
+        isConfidential: client.isConfidential ?? true,
+        logoUrl: client.logoUrl || undefined,
+        homepageUrl: client.homepageUrl || undefined,
+        privacyPolicyUrl: client.privacyPolicyUrl || undefined,
+        termsOfServiceUrl: client.termsOfServiceUrl || undefined,
+      });
+
+      console.log(`[OAuth Admin] Rotated secret for client: ${newClient.clientId}`);
+      res.json({
+        client: {
+          id: newClient.id,
+          clientId: newClient.clientId,
+          name: newClient.name,
+        },
+        clientSecret,
+        warning: "Store the new client secret securely. The old secret is now invalid.",
+      });
+    } catch (error: any) {
+      console.error("[OAuth Admin] Rotate secret error:", error);
+      res.status(500).json({ error: error.message || "Failed to rotate client secret" });
+    }
+  });
+
+  // GET /api/admin/oauth/cleanup - Cleanup expired tokens
+  app.post("/api/admin/oauth/cleanup", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const cleaned = await oauthService.cleanupExpiredTokens();
+      console.log(`[OAuth Admin] Cleaned up ${cleaned} expired tokens/codes`);
+      res.json({ cleaned, message: `Cleaned up ${cleaned} expired tokens and authorization codes` });
+    } catch (error: any) {
+      console.error("[OAuth Admin] Cleanup error:", error);
+      res.status(500).json({ error: error.message || "Failed to cleanup expired tokens" });
     }
   });
 }

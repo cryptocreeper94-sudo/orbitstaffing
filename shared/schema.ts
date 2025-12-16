@@ -6945,3 +6945,139 @@ export const insertInstalledAppSchema = createInsertSchema(installedApps).omit({
 
 export type InsertInstalledApp = z.infer<typeof insertInstalledAppSchema>;
 export type InstalledApp = typeof installedApps.$inferSelect;
+
+// ========================
+// OAuth 2.0 System - Client Applications
+// ========================
+export const OAUTH_GRANT_TYPES = ['authorization_code', 'client_credentials', 'refresh_token'] as const;
+export type OAuthGrantType = typeof OAUTH_GRANT_TYPES[number];
+
+export const oauthClients = pgTable(
+  "oauth_clients",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    tenantId: varchar("tenant_id").references(() => companies.id),
+    
+    clientId: varchar("client_id", { length: 64 }).notNull().unique(),
+    clientSecretHash: text("client_secret_hash").notNull(),
+    
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    
+    redirectUris: text("redirect_uris").array().notNull(),
+    scopes: text("scopes").array().notNull(),
+    grantTypes: text("grant_types").array().notNull(),
+    
+    isConfidential: boolean("is_confidential").default(true),
+    isActive: boolean("is_active").default(true),
+    
+    logoUrl: text("logo_url"),
+    homepageUrl: text("homepage_url"),
+    privacyPolicyUrl: text("privacy_policy_url"),
+    termsOfServiceUrl: text("terms_of_service_url"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    clientIdIdx: index("idx_oauth_clients_client_id").on(table.clientId),
+    tenantIdx: index("idx_oauth_clients_tenant").on(table.tenantId),
+    activeIdx: index("idx_oauth_clients_active").on(table.isActive),
+  })
+);
+
+export const insertOAuthClientSchema = createInsertSchema(oauthClients).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertOAuthClient = z.infer<typeof insertOAuthClientSchema>;
+export type OAuthClient = typeof oauthClients.$inferSelect;
+
+// ========================
+// OAuth 2.0 Authorization Codes (Temporary)
+// ========================
+export const oauthAuthorizationCodes = pgTable(
+  "oauth_authorization_codes",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    clientId: varchar("client_id").notNull().references(() => oauthClients.id),
+    userId: varchar("user_id").references(() => users.id),
+    
+    code: varchar("code", { length: 128 }).notNull().unique(),
+    redirectUri: text("redirect_uri").notNull(),
+    scope: text("scope"),
+    state: text("state"),
+    
+    codeChallenge: text("code_challenge"),
+    codeChallengeMethod: varchar("code_challenge_method", { length: 10 }),
+    
+    expiresAt: timestamp("expires_at").notNull(),
+    usedAt: timestamp("used_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    codeIdx: index("idx_oauth_auth_codes_code").on(table.code),
+    clientIdx: index("idx_oauth_auth_codes_client").on(table.clientId),
+    userIdx: index("idx_oauth_auth_codes_user").on(table.userId),
+    expiresIdx: index("idx_oauth_auth_codes_expires").on(table.expiresAt),
+  })
+);
+
+export const insertOAuthAuthorizationCodeSchema = createInsertSchema(oauthAuthorizationCodes).omit({
+  id: true,
+  usedAt: true,
+  createdAt: true,
+});
+
+export type InsertOAuthAuthorizationCode = z.infer<typeof insertOAuthAuthorizationCodeSchema>;
+export type OAuthAuthorizationCode = typeof oauthAuthorizationCodes.$inferSelect;
+
+// ========================
+// OAuth 2.0 Access Tokens
+// ========================
+export const oauthAccessTokens = pgTable(
+  "oauth_access_tokens",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    clientId: varchar("client_id").notNull().references(() => oauthClients.id),
+    userId: varchar("user_id").references(() => users.id),
+    
+    accessToken: varchar("access_token", { length: 512 }).notNull().unique(),
+    refreshToken: varchar("refresh_token", { length: 512 }).unique(),
+    
+    scope: text("scope"),
+    tokenType: varchar("token_type", { length: 20 }).default("Bearer"),
+    
+    expiresAt: timestamp("expires_at").notNull(),
+    refreshExpiresAt: timestamp("refresh_expires_at"),
+    
+    revokedAt: timestamp("revoked_at"),
+    lastUsedAt: timestamp("last_used_at"),
+    
+    ipAddress: varchar("ip_address", { length: 45 }),
+    userAgent: text("user_agent"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    accessTokenIdx: index("idx_oauth_tokens_access").on(table.accessToken),
+    refreshTokenIdx: index("idx_oauth_tokens_refresh").on(table.refreshToken),
+    clientIdx: index("idx_oauth_tokens_client").on(table.clientId),
+    userIdx: index("idx_oauth_tokens_user").on(table.userId),
+    expiresIdx: index("idx_oauth_tokens_expires").on(table.expiresAt),
+    revokedIdx: index("idx_oauth_tokens_revoked").on(table.revokedAt),
+  })
+);
+
+export const insertOAuthAccessTokenSchema = createInsertSchema(oauthAccessTokens).omit({
+  id: true,
+  revokedAt: true,
+  lastUsedAt: true,
+  createdAt: true,
+});
+
+export type InsertOAuthAccessToken = z.infer<typeof insertOAuthAccessTokenSchema>;
+export type OAuthAccessToken = typeof oauthAccessTokens.$inferSelect;
