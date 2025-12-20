@@ -145,6 +145,9 @@ import {
   type InsertWebhookSubscription,
   type WebhookDeliveryLog,
   type InsertWebhookDeliveryLog,
+  developers,
+  type Developer,
+  type InsertDeveloper,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -3677,6 +3680,55 @@ export const storage: IStorage = {
       .where(and(eq(installedApps.tenantId, tenantId), eq(installedApps.appId, appId)))
       .returning();
     return updated;
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // DEVELOPERS (API Partner Registration)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  async createDeveloper(data: InsertDeveloper): Promise<Developer> {
+    const [developer] = await db.insert(developers).values(data).returning();
+    return developer;
+  },
+
+  async getDeveloperById(id: string): Promise<Developer | undefined> {
+    const [developer] = await db.select().from(developers).where(eq(developers.id, id));
+    return developer;
+  },
+
+  async getDeveloperByEmail(email: string): Promise<Developer | undefined> {
+    const [developer] = await db.select().from(developers).where(eq(developers.email, email));
+    return developer;
+  },
+
+  async getDeveloperByApiKey(apiKey: string): Promise<Developer | undefined> {
+    const [developer] = await db.select().from(developers).where(eq(developers.apiKey, apiKey));
+    return developer;
+  },
+
+  async updateDeveloper(id: string, data: Partial<InsertDeveloper>): Promise<Developer | undefined> {
+    const [developer] = await db.update(developers)
+      .set(data)
+      .where(eq(developers.id, id))
+      .returning();
+    return developer;
+  },
+
+  async incrementDeveloperApiCalls(id: string): Promise<void> {
+    await db.update(developers)
+      .set({ 
+        apiCallsThisMonth: sql`${developers.apiCallsThisMonth} + 1`,
+        lastActiveAt: new Date()
+      })
+      .where(eq(developers.id, id));
+  },
+
+  async resetMonthlyApiCalls(): Promise<void> {
+    await db.update(developers).set({ apiCallsThisMonth: 0 });
+  },
+
+  async getAllDevelopers(): Promise<Developer[]> {
+    return db.select().from(developers).orderBy(desc(developers.createdAt));
   },
 
 };

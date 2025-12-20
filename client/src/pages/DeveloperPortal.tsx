@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import DeveloperRegistration from "@/components/DeveloperRegistration";
 import {
   Code,
   Zap,
@@ -145,38 +144,12 @@ console.log('Assignment created:', assignment.id);`;
 
 export default function DeveloperPortal() {
   const [, setLocation] = useLocation();
-  const [email, setEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
 
   const handleCopyCode = async () => {
     await navigator.clipboard.writeText(CODE_EXAMPLE);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleWaitlistSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsSubmitting(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast({
-        title: "You're on the list!",
-        description: "We'll notify you when developer access is available.",
-      });
-      setEmail("");
-    } catch (error) {
-      toast({
-        title: "Something went wrong",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (
@@ -573,42 +546,35 @@ export default function DeveloperPortal() {
                 Join the Orbit Ecosystem
               </h2>
               <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
-                Get early access to the Partner API and start building powerful
+                Register as a developer to get your API keys and start building powerful
                 integrations with our ecosystem.
               </p>
 
-              <form
-                onSubmit={handleWaitlistSubmit}
-                className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6"
-              >
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-slate-800/80 border-slate-600 text-white placeholder:text-gray-500"
-                  data-testid="input-waitlist-email"
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <DeveloperRegistration
+                  trigger={
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold px-8 py-6 text-lg"
+                      data-testid="button-register-developer"
+                    >
+                      <Rocket className="w-5 h-5 mr-2" />
+                      Register as Developer
+                    </Button>
+                  }
                 />
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 font-bold px-8"
-                  data-testid="button-join-waitlist"
-                >
-                  {isSubmitting ? "Joining..." : "Join Waitlist"}
-                </Button>
-              </form>
 
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 font-bold"
-                onClick={() => setLocation("/apply")}
-                data-testid="button-apply-access"
-              >
-                Apply for Developer Access
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-slate-600 text-white hover:bg-slate-800 font-bold px-8 py-6 text-lg"
+                  onClick={() => setLocation("/api/docs")}
+                  data-testid="button-browse-docs"
+                >
+                  <ExternalLink className="w-5 h-5 mr-2" />
+                  Browse API Docs
+                </Button>
+              </div>
             </div>
           </div>
         </div>

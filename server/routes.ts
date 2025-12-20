@@ -86,6 +86,8 @@ import {
   PARTNER_API_SCOPES,
   PARTNER_API_ERROR_CODES,
   WEBHOOK_EVENT_TYPES,
+  developers,
+  insertDeveloperSchema,
 } from "@shared/schema";
 import crypto from "crypto";
 
@@ -138,6 +140,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register CRM routes (Activity Timeline, Notes, Deals, Meetings, etc.)
   registerCrmRoutes(app);
+  
+  // Register Developer Registration routes (API Partner onboarding)
+  registerDeveloperRoutes(app);
   
   // Register Pay Card routes (ORBIT Pay Card waitlist and preferences)
   registerPayCardRoutes(app);
@@ -8255,6 +8260,220 @@ export function registerAnalyticsRoutes(app: Express) {
     } catch (error) {
       console.error("Analytics live error:", error);
       res.status(500).json({ error: "Failed to get live count" });
+    }
+  });
+}
+
+// ========================
+// Developer Registration API Routes
+// ========================
+
+export function registerDeveloperRoutes(app: Express) {
+  // Register new developer
+  app.post("/api/developers/register", async (req: Request, res: Response) => {
+    try {
+      const { email, name, company } = req.body;
+
+      if (!email || !name) {
+        return res.status(400).json({ error: "Email and name are required" });
+      }
+
+      // Check if developer already exists
+      const existing = await storage.getDeveloperByEmail(email);
+      if (existing && existing.status === "active") {
+        return res.status(409).json({ error: "Developer with this email already exists" });
+      }
+
+      // Generate 6-digit verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const verificationExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+      let developer;
+      if (existing) {
+        // Update existing pending developer with new verification code
+        developer = await storage.updateDeveloper(existing.id, {
+          name,
+          company,
+          verificationCode,
+          verificationExpires,
+        });
+      } else {
+        // Create new developer
+        developer = await storage.createDeveloper({
+          email,
+          name,
+          company,
+          verificationCode,
+          verificationExpires,
+          status: "pending",
+          tier: "starter",
+          apiCallLimit: 1000,
+        });
+      }
+
+      // Send verification email
+      try {
+        await emailService.sendEmail({
+          to: email,
+          subject: "Verify Your Orbit Developer Account",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a2e; color: #fff; padding: 40px; border-radius: 16px;">
+              <img src="https://orbit-staffing.replit.app/orbit-logo.png" alt="Orbit" style="height: 40px; margin-bottom: 24px;" />
+              <h1 style="color: #22d3ee; margin-bottom: 16px;">Welcome to Orbit Developer Portal</h1>
+              <p style="color: #94a3b8; margin-bottom: 24px;">Hi ${name},</p>
+              <p style="color: #94a3b8; margin-bottom: 24px;">Use the verification code below to complete your registration:</p>
+              <div style="background: #0f172a; border: 2px solid #22d3ee; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+                <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #22d3ee;">${verificationCode}</span>
+              </div>
+              <p style="color: #64748b; font-size: 14px;">This code expires in 15 minutes.</p>
+              <hr style="border: none; border-top: 1px solid #334155; margin: 24px 0;" />
+              <p style="color: #64748b; font-size: 12px;">© ${new Date().getFullYear()} Orbit Ecosystem. All rights reserved.</p>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error("[Developer Register] Email send failed:", emailError);
+        // Continue anyway for demo purposes - log the code
+        console.log(`[Developer Register] Verification code for ${email}: ${verificationCode}`);
+      }
+
+      res.json({
+        success: true,
+        developerId: developer?.id,
+        message: "Verification code sent to your email",
+      });
+    } catch (error) {
+      console.error("[Developer Register] Error:", error);
+      res.status(500).json({ error: "Failed to register developer" });
+    }
+  });
+
+  // Verify email and generate API keys
+  app.post("/api/developers/verify", async (req: Request, res: Response) => {
+    try {
+      const { developerId, verificationCode } = req.body;
+
+      if (!developerId || !verificationCode) {
+        return res.status(400).json({ error: "Developer ID and verification code are required" });
+      }
+
+      const developer = await storage.getDeveloperById(developerId);
+      if (!developer) {
+        return res.status(404).json({ error: "Developer not found" });
+      }
+
+      if (developer.status === "active") {
+        return res.status(400).json({ error: "Developer already verified" });
+      }
+
+      if (developer.verificationCode !== verificationCode) {
+        return res.status(400).json({ error: "Invalid verification code" });
+      }
+
+      if (developer.verificationExpires && new Date() > new Date(developer.verificationExpires)) {
+        return res.status(400).json({ error: "Verification code has expired" });
+      }
+
+      // Generate API key and secret
+      const apiKey = `orbit_${crypto.randomBytes(16).toString("hex")}`;
+      const apiSecret = `sk_${crypto.randomBytes(32).toString("hex")}`;
+      const apiSecretHash = await bcrypt.hash(apiSecret, 10);
+
+      await storage.updateDeveloper(developerId, {
+        apiKey,
+        apiSecretHash,
+        status: "active",
+        verificationCode: null,
+        verificationExpires: null,
+      });
+
+      res.json({
+        success: true,
+        apiKey,
+        apiSecret,
+        message: "API credentials generated successfully. Save your secret - it won't be shown again!",
+      });
+    } catch (error) {
+      console.error("[Developer Verify] Error:", error);
+      res.status(500).json({ error: "Failed to verify developer" });
+    }
+  });
+
+  // Get current developer profile by API key
+  app.get("/api/developers/me", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "API key required in Authorization header" });
+      }
+
+      const apiKey = authHeader.substring(7);
+      const developer = await storage.getDeveloperByApiKey(apiKey);
+
+      if (!developer) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      if (developer.status !== "active") {
+        return res.status(403).json({ error: "Developer account is not active" });
+      }
+
+      // Update last active timestamp
+      await storage.incrementDeveloperApiCalls(developer.id);
+
+      res.json({
+        id: developer.id,
+        email: developer.email,
+        name: developer.name,
+        company: developer.company,
+        tier: developer.tier,
+        apiCallsThisMonth: developer.apiCallsThisMonth,
+        apiCallLimit: developer.apiCallLimit,
+        status: developer.status,
+        createdAt: developer.createdAt,
+        lastActiveAt: developer.lastActiveAt,
+      });
+    } catch (error) {
+      console.error("[Developer Me] Error:", error);
+      res.status(500).json({ error: "Failed to get developer profile" });
+    }
+  });
+
+  // Regenerate API secret
+  app.post("/api/developers/regenerate-key", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "API key required in Authorization header" });
+      }
+
+      const apiKey = authHeader.substring(7);
+      const developer = await storage.getDeveloperByApiKey(apiKey);
+
+      if (!developer) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      if (developer.status !== "active") {
+        return res.status(403).json({ error: "Developer account is not active" });
+      }
+
+      // Generate new API secret
+      const newApiSecret = `sk_${crypto.randomBytes(32).toString("hex")}`;
+      const newApiSecretHash = await bcrypt.hash(newApiSecret, 10);
+
+      await storage.updateDeveloper(developer.id, {
+        apiSecretHash: newApiSecretHash,
+      });
+
+      res.json({
+        success: true,
+        apiSecret: newApiSecret,
+        message: "API secret regenerated successfully. Save your new secret - it won't be shown again!",
+      });
+    } catch (error) {
+      console.error("[Developer Regenerate Key] Error:", error);
+      res.status(500).json({ error: "Failed to regenerate API secret" });
     }
   });
 }

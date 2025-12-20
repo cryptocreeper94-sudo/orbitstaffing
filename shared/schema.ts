@@ -7081,3 +7081,46 @@ export const insertOAuthAccessTokenSchema = createInsertSchema(oauthAccessTokens
 
 export type InsertOAuthAccessToken = z.infer<typeof insertOAuthAccessTokenSchema>;
 export type OAuthAccessToken = typeof oauthAccessTokens.$inferSelect;
+
+// ========================
+// Developers - API Partner Registration
+// ========================
+export const DEVELOPER_TIERS = ['starter', 'pro', 'enterprise'] as const;
+export type DeveloperTier = typeof DEVELOPER_TIERS[number];
+
+export const DEVELOPER_STATUSES = ['pending', 'active', 'suspended'] as const;
+export type DeveloperStatus = typeof DEVELOPER_STATUSES[number];
+
+export const developers = pgTable(
+  "developers",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    name: varchar("name", { length: 255 }),
+    company: varchar("company", { length: 255 }),
+    tier: varchar("tier", { length: 50 }).default("starter"),
+    apiKey: varchar("api_key", { length: 64 }).unique(),
+    apiSecretHash: text("api_secret_hash"),
+    apiCallsThisMonth: integer("api_calls_this_month").default(0),
+    apiCallLimit: integer("api_call_limit").default(1000),
+    status: varchar("status", { length: 50 }).default("pending"),
+    verificationCode: varchar("verification_code", { length: 6 }),
+    verificationExpires: timestamp("verification_expires"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    lastActiveAt: timestamp("last_active_at"),
+  },
+  (table) => ({
+    emailIdx: index("idx_developers_email").on(table.email),
+    apiKeyIdx: index("idx_developers_api_key").on(table.apiKey),
+    statusIdx: index("idx_developers_status").on(table.status),
+  })
+);
+
+export const insertDeveloperSchema = createInsertSchema(developers).omit({
+  id: true,
+  createdAt: true,
+  lastActiveAt: true,
+});
+
+export type InsertDeveloper = z.infer<typeof insertDeveloperSchema>;
+export type Developer = typeof developers.$inferSelect;
