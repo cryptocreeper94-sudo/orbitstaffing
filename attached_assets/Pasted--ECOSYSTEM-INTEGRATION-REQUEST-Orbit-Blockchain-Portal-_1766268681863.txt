@@ -1,0 +1,61 @@
+🚀 ECOSYSTEM INTEGRATION REQUEST: Orbit Blockchain Portal
+
+TO: [Agent Name]
+FROM: Orbit Portal (Central Hub)
+
+We are integrating your application into the central Orbit Ecosystem Portal. To ensure accurate representation as a "Complete Turnkey Business System," please provide the following:
+
+═══════════════════════════════════════════════════════════════
+PART 1: APP METADATA (Required)
+═══════════════════════════════════════════════════════════════
+
+1. App Name: (Official Product Name)
+2. Category: (e.g., Enterprise, DeFi, Automation, Gaming, AI)
+3. One-Liner Hook: (5-10 word tagline)
+4. Full Description: (1-2 sentences explaining how this app functions as a complete turnkey business system)
+5. Key Tags: (3-4 keywords, e.g., "Supply Chain", "Auto-Trading", "Franchise Mgmt")
+
+═══════════════════════════════════════════════════════════════
+PART 2: API CONNECTION (Required for Live Data)
+═══════════════════════════════════════════════════════════════
+
+The Orbit Portal needs these endpoints to pull your data automatically:
+
+1. DARKWAVE_HUB_API_URL: The base URL for the Dark Wave Developer Hub API
+   - Expected endpoint: GET /apps (returns list of all ecosystem apps)
+   
+2. BLOCKCHAIN_API_URL: (If applicable) Endpoint for blockchain stats
+   - Expected endpoint: GET /stats (returns TPS, block height, network hash)
+
+3. API Authentication: (API key, token, or open access?)
+
+═══════════════════════════════════════════════════════════════
+PART 3: VISUAL ASSETS (Optional but Recommended)
+═══════════════════════════════════════════════════════════════
+
+The Orbit Portal uses a "Dark/Glassmorphic" aesthetic. Please provide:
+
+1. Text-to-Image Prompt for your app's hero visual:
+   Example format: "Futuristic [App Type] dashboard, data visualization of [Key Metric], neon cyan/purple accents, glassmorphic panels, showing [Specific Feature], dark mode, 8k resolution"
+
+2. Color Gradient: (e.g., "from-cyan-600 to-blue-700")
+
+═══════════════════════════════════════════════════════════════
+DELIVERY INSTRUCTIONS
+═══════════════════════════════════════════════════════════════
+
+Push this information to the Dark Wave Dev Hub in JSON format:
+
+{
+  "id": "your-app-slug",
+  "name": "App Name",
+  "category": "Category",
+  "description": "Full description here",
+  "hook": "One-liner tagline",
+  "tags": ["Tag1", "Tag2", "Tag3"],
+  "gradient": "from-color-500 to-color-700",
+  "verified": true,
+  "imagePrompt": "Your text-to-image prompt here"
+}
+
+The Orbit Portal will automatically fetch and display this data once the API connection is established.
