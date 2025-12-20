@@ -10334,6 +10334,81 @@ export function registerPayCardRoutes(app: Express) {
     }
   });
 
+  // App metadata endpoint for Orbit Portal integration (public)
+  app.get("/api/ecosystem/app-metadata", async (req: Request, res: Response) => {
+    try {
+      // Get blockchain stats for live data
+      const blockchainStats = await getBlockchainStats();
+      
+      // Get connected apps count
+      const apps = await ecosystemHub.getConnectedApps();
+      const activeApps = apps.filter(a => a.isActive).length;
+      
+      res.json({
+        id: "orbit-staffing-os",
+        name: "ORBIT Staffing OS",
+        category: "Enterprise",
+        description: "Complete turnkey staffing agency automation platform handling recruitment, onboarding, scheduling, time tracking, payroll, invoicing, and compliance - ready to deploy as a white-label franchise or SaaS subscription with full Partner API access.",
+        hook: "Automated White-Label Staffing Agency Platform",
+        tags: ["Staffing", "Franchise", "Payroll", "Compliance"],
+        gradient: "from-cyan-500 to-blue-700",
+        verified: true,
+        status: "live",
+        version: "2.7.1",
+        imagePrompt: "Futuristic staffing operations command center, holographic worker profiles floating in 3D space with real-time availability status, GPS location pins on dark world map, payroll data streams and timesheet grids, neon cyan and electric blue accents, glassmorphic dashboard panels with depth blur, friendly 3D Saturn mascot Orby with glowing rings, franchise network nodes connected by light beams, dark industrial aesthetic, 8k resolution",
+        apiEndpoints: {
+          base: "https://orbitstaffing.io/api",
+          ecosystem: "/ecosystem",
+          partner: "/partner/v1",
+          blockchain: "/blockchain/stats",
+          docs: "/docs"
+        },
+        authentication: {
+          type: "HMAC-SHA256",
+          headers: ["X-API-Key", "X-API-Secret"],
+          oauth: true,
+          pkce: true
+        },
+        features: [
+          "Partner API v1 with OAuth 2.0 + PKCE",
+          "15+ Third-Party Integrations",
+          "Franchise White-Label System",
+          "Solana Blockchain Anchoring",
+          "Real-time Webhook Events (12 types)",
+          "Bulk Import/Export (10k+ records)",
+          "Compliance Automation (I-9, E-Verify)",
+          "Time Clock Hardware Integration (6 vendors)",
+          "JavaScript & Python SDKs",
+          "Integration Marketplace (9 apps)"
+        ],
+        developerTiers: {
+          starter: { price: 0, calls: 1000, label: "Free" },
+          pro: { price: 49, calls: 50000, label: "$49/mo" },
+          enterprise: { price: 299, calls: -1, label: "Custom" }
+        },
+        liveStats: {
+          connectedApps: activeApps,
+          blockchainAnchors: blockchainStats.totalAnchored || 0,
+          networkStatus: blockchainStats.mode === "live" ? "connected" : "sandbox"
+        },
+        links: {
+          portal: "/developers",
+          docs: "/api/docs",
+          dashboard: "/dev-dashboard",
+          github: "https://github.com/darkwavestudios"
+        },
+        contact: {
+          sales: "enterprise@orbit.build",
+          support: "developers@orbit.build"
+        },
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("App metadata error:", error);
+      res.status(500).json({ error: "Failed to fetch app metadata" });
+    }
+  });
+
   // Status check (public endpoint for connection testing)
   app.get("/api/ecosystem/status", ecosystemAuth, async (req: Request, res: Response) => {
     const app = (req as any).ecosystemApp;
