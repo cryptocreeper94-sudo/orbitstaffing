@@ -80,6 +80,7 @@ import PresentationViewer from "@/pages/PresentationViewer";
 import SolanaVerification from "@/pages/SolanaVerification";
 import Changelog from "@/pages/Changelog";
 import EcosystemHub from "@/pages/EcosystemHub";
+import DevDashboard from "@/pages/DevDashboard";
 import DarkWaveHQ from "@/pages/DarkWaveHQ";
 import HelpCenterPage from "@/pages/HelpCenter";
 import AIAssistant from "@/pages/AIAssistant";
@@ -93,6 +94,7 @@ import Sales from "@/pages/Sales";
 import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import AdminLicenseManager from "@/pages/AdminLicenseManager";
 import AdminLanding from "@/pages/AdminLanding";
+import DeveloperPortal from "@/pages/DeveloperPortal";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { WeatherRadarModal } from "@/components/WeatherRadarModal";
@@ -213,6 +215,7 @@ function Router() {
       <Route path="/crypto" component={CryptoWallet} />
       <Route path="/feature-inventory" component={FeatureInventoryPage} />
       <Route path="/features" component={Features} />
+      <Route path="/developers" component={DeveloperPortal} />
       <Route path="/franchise" component={FranchiseOffer} />
       <Route path="/franchise-offer" component={FranchiseOffer} />
       <Route path="/my-hallmark" component={CustomerHallmarkManager} />
@@ -228,6 +231,7 @@ function Router() {
       <Route path="/solana-verification" component={SolanaVerification} />
       <Route path="/changelog" component={Changelog} />
       <Route path="/ecosystem-hub" component={EcosystemHub} />
+      <Route path="/dev-dashboard" component={DevDashboard} />
       <Route path="/developer-hq" component={DarkWaveHQ} />
       <Route path="/studio/developer" component={DarkWaveHQ} />
       

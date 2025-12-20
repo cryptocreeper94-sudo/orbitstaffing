@@ -4,7 +4,7 @@
  * Everything non-business-sensitive for developers and tech partners
  */
 import React, { useState, useEffect, useRef } from 'react';
-import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone, TrendingUp, Search, PieChart, Activity, DollarSign } from 'lucide-react';
+import { Code, Lock, LogOut, AlertCircle, CheckCircle2, Key, Database, Zap, Shield, Eye, Copy, BarChart3, MessageCircle, ExternalLink, AlertTriangle, Camera, Calendar, ArrowRight, Scale, FileText, Edit, Clock, Target, Trophy, Building2, Users, Briefcase, Bot, Megaphone, TrendingUp, Search, PieChart, Activity, DollarSign, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocation } from 'wouter';
 import { HallmarkWatermark, HallmarkBadge } from '@/components/HallmarkWatermark';
@@ -2571,6 +2571,16 @@ export default function DeveloperPanel() {
             >
               <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-emerald-400 group-hover:text-emerald-300 transition-colors" />
               <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Talent Exchange</span>
+            </button>
+
+            {/* Dev Dashboard Button - Ecosystem Command Center */}
+            <button
+              onClick={() => navigateTo('/dev-dashboard')}
+              className="relative h-20 md:h-24 bg-gradient-to-br from-cyan-900/50 to-slate-800 border border-cyan-600/50 hover:border-cyan-400 rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-105 hover:-translate-y-1 group"
+              data-testid="button-dev-dashboard"
+            >
+              <Network className="w-5 h-5 md:w-6 md:h-6 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+              <span className="text-[10px] md:text-xs font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Command Center</span>
             </button>
 
             {/* Job Board Button */}

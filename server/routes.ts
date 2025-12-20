@@ -81,6 +81,8 @@ import {
   type Timesheet,
   type IntegrationToken,
   releasePackages,
+  partnerApiLogs,
+  partnerApiCredentials,
   PARTNER_API_SCOPES,
   PARTNER_API_ERROR_CODES,
   WEBHOOK_EVENT_TYPES,
@@ -10206,6 +10208,215 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error: any) {
       console.error("Push to external hub error:", error);
       res.status(500).json({ error: error.message || "Failed to push data" });
+    }
+  });
+
+  // ========================
+  // DEV DASHBOARD API (Ecosystem Command Center for Jason)
+  // Protected by developer PIN validation on frontend
+  // ========================
+
+  // Get comprehensive dashboard statistics
+  app.get("/api/dev/dashboard/stats", async (req: Request, res: Response) => {
+    try {
+      // Get ecosystem stats
+      const ecosystemStats = await ecosystemHub.getHubStats();
+      
+      // Get blockchain stats
+      const blockchainStats = await getBlockchainStats();
+      
+      // Get API call stats for today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const [apiCallsToday] = await db.select({
+        count: sql<number>`count(*)`
+      }).from(partnerApiLogs)
+        .where(gte(partnerApiLogs.createdAt, today));
+      
+      // Get active developers (partner API credentials count)
+      const [activeDevelopers] = await db.select({
+        count: sql<number>`count(*) filter (where ${partnerApiCredentials.isActive} = true)`
+      }).from(partnerApiCredentials);
+      
+      // Get error rate for today
+      const [errorStats] = await db.select({
+        total: sql<number>`count(*)`,
+        errors: sql<number>`count(*) filter (where ${partnerApiLogs.statusCode} >= 400)`
+      }).from(partnerApiLogs)
+        .where(gte(partnerApiLogs.createdAt, today));
+      
+      const errorRate = errorStats?.total > 0 
+        ? ((errorStats?.errors || 0) / errorStats.total * 100).toFixed(1)
+        : '0.0';
+      
+      res.json({
+        connectedApps: ecosystemStats.activeApps,
+        totalApps: ecosystemStats.totalApps,
+        apiCallsToday: Number(apiCallsToday?.count) || 0,
+        activeDevelopers: Number(activeDevelopers?.count) || 0,
+        blockchainAnchors: blockchainStats?.totalAnchored || 0,
+        pendingAnchors: blockchainStats?.pendingCount || 0,
+        codeSnippets: ecosystemStats.totalSnippets,
+        dataSyncs: ecosystemStats.totalSyncs,
+        errorRate: parseFloat(errorRate),
+        solanaNetwork: blockchainStats?.solanaConnected ? 'connected' : 'disconnected',
+        lastUpdated: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[Dev Dashboard] Stats error:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Get recent activity feed
+  app.get("/api/dev/dashboard/activity", async (req: Request, res: Response) => {
+    try {
+      const { appId, eventType, limit = '50' } = req.query;
+      
+      // Get ecosystem activity logs
+      const activityLogs = await ecosystemHub.getActivityLogs(
+        appId as string, 
+        parseInt(limit as string)
+      );
+      
+      // Get recent partner API logs with credential info
+      const apiLogs = await db.select({
+        id: partnerApiLogs.id,
+        method: partnerApiLogs.method,
+        endpoint: partnerApiLogs.endpoint,
+        statusCode: partnerApiLogs.statusCode,
+        createdAt: partnerApiLogs.createdAt,
+        credentialId: partnerApiLogs.credentialId,
+      }).from(partnerApiLogs)
+        .orderBy(desc(partnerApiLogs.createdAt))
+        .limit(parseInt(limit as string));
+      
+      // Combine and format activity
+      const combinedActivity = [
+        ...activityLogs.map(log => ({
+          id: log.id,
+          type: 'ecosystem',
+          action: log.action,
+          appName: log.appName,
+          resource: log.resource,
+          details: log.details,
+          timestamp: log.createdAt,
+        })),
+        ...apiLogs.map(log => ({
+          id: log.id,
+          type: 'api_call',
+          action: `${log.method} ${log.endpoint}`,
+          appName: log.credentialId || 'Partner API',
+          resource: 'api',
+          details: { statusCode: log.statusCode },
+          timestamp: log.createdAt,
+        })),
+      ].sort((a, b) => new Date(b.timestamp!).getTime() - new Date(a.timestamp!).getTime())
+       .slice(0, parseInt(limit as string));
+      
+      res.json(combinedActivity);
+    } catch (error) {
+      console.error("[Dev Dashboard] Activity error:", error);
+      res.status(500).json({ error: "Failed to fetch activity feed" });
+    }
+  });
+
+  // Get connected apps with details
+  app.get("/api/dev/dashboard/apps", async (req: Request, res: Response) => {
+    try {
+      const apps = await ecosystemHub.getConnectedApps();
+      
+      // Mask API keys for display
+      const maskedApps = apps.map(app => ({
+        ...app,
+        apiKey: app.apiKey ? `${app.apiKey.substring(0, 12)}...${app.apiKey.slice(-4)}` : null,
+        apiSecretHash: undefined, // Remove secret hash from response
+      }));
+      
+      res.json(maskedApps);
+    } catch (error) {
+      console.error("[Dev Dashboard] Apps error:", error);
+      res.status(500).json({ error: "Failed to fetch connected apps" });
+    }
+  });
+
+  // Get API usage chart data
+  app.get("/api/dev/dashboard/usage", async (req: Request, res: Response) => {
+    try {
+      const { days = '7' } = req.query;
+      const daysAgo = new Date();
+      daysAgo.setDate(daysAgo.getDate() - parseInt(days as string));
+      
+      // Get daily API call counts
+      const dailyUsage = await db.select({
+        date: sql<string>`date(${partnerApiLogs.createdAt})`,
+        count: sql<number>`count(*)`,
+        errors: sql<number>`count(*) filter (where ${partnerApiLogs.statusCode} >= 400)`,
+      }).from(partnerApiLogs)
+        .where(gte(partnerApiLogs.createdAt, daysAgo))
+        .groupBy(sql`date(${partnerApiLogs.createdAt})`)
+        .orderBy(sql`date(${partnerApiLogs.createdAt})`);
+      
+      // Get calls by endpoint (since appName doesn't exist in this table)
+      const callsByApp = await db.select({
+        appName: partnerApiLogs.endpoint,
+        count: sql<number>`count(*)`,
+      }).from(partnerApiLogs)
+        .where(gte(partnerApiLogs.createdAt, daysAgo))
+        .groupBy(partnerApiLogs.endpoint)
+        .orderBy(desc(sql`count(*)`))
+        .limit(10);
+      
+      res.json({
+        dailyUsage,
+        callsByApp: callsByApp.map(c => ({ appName: c.appName?.split('/').pop() || 'Unknown', count: c.count })),
+      });
+    } catch (error) {
+      console.error("[Dev Dashboard] Usage error:", error);
+      res.status(500).json({ error: "Failed to fetch usage data" });
+    }
+  });
+
+  // Get developer applications (beta testers)
+  app.get("/api/dev/dashboard/applications", async (req: Request, res: Response) => {
+    try {
+      const applications = await db.select()
+        .from(betaTesters)
+        .orderBy(desc(betaTesters.createdAt))
+        .limit(50);
+      
+      res.json(applications);
+    } catch (error) {
+      console.error("[Dev Dashboard] Applications error:", error);
+      res.status(500).json({ error: "Failed to fetch applications" });
+    }
+  });
+
+  // Approve/reject developer application
+  app.patch("/api/dev/dashboard/applications/:id", async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { status, notes } = req.body;
+      
+      const [updated] = await db.update(betaTesters)
+        .set({ 
+          status, 
+          notes: notes || null,
+          updatedAt: new Date(),
+          ...(status === 'approved' ? { approvedAt: new Date() } : {}),
+        })
+        .where(eq(betaTesters.id, parseInt(id)))
+        .returning();
+      
+      if (!updated) {
+        return res.status(404).json({ error: "Application not found" });
+      }
+      
+      res.json(updated);
+    } catch (error) {
+      console.error("[Dev Dashboard] Update application error:", error);
+      res.status(500).json({ error: "Failed to update application" });
     }
   });
 
