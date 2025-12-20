@@ -7106,6 +7106,9 @@ export const developers = pgTable(
     status: varchar("status", { length: 50 }).default("pending"),
     verificationCode: varchar("verification_code", { length: 6 }),
     verificationExpires: timestamp("verification_expires"),
+    stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
+    stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
+    subscriptionStatus: varchar("subscription_status", { length: 50 }).default("none"),
     createdAt: timestamp("created_at").default(sql`NOW()`),
     lastActiveAt: timestamp("last_active_at"),
   },
@@ -7113,6 +7116,7 @@ export const developers = pgTable(
     emailIdx: index("idx_developers_email").on(table.email),
     apiKeyIdx: index("idx_developers_api_key").on(table.apiKey),
     statusIdx: index("idx_developers_status").on(table.status),
+    stripeCustomerIdx: index("idx_developers_stripe_customer").on(table.stripeCustomerId),
   })
 );
 

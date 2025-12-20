@@ -95,6 +95,7 @@ import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import AdminLicenseManager from "@/pages/AdminLicenseManager";
 import AdminLanding from "@/pages/AdminLanding";
 import DeveloperPortal from "@/pages/DeveloperPortal";
+import DeveloperAccount from "@/pages/DeveloperAccount";
 import { TutorialProvider } from "@/components/PageTutorial";
 import { FloatingHomeButton } from "@/components/FloatingHomeButton";
 import { WeatherRadarModal } from "@/components/WeatherRadarModal";
@@ -216,6 +217,7 @@ function Router() {
       <Route path="/feature-inventory" component={FeatureInventoryPage} />
       <Route path="/features" component={Features} />
       <Route path="/developers" component={DeveloperPortal} />
+      <Route path="/developer-account" component={DeveloperAccount} />
       <Route path="/franchise" component={FranchiseOffer} />
       <Route path="/franchise-offer" component={FranchiseOffer} />
       <Route path="/my-hallmark" component={CustomerHallmarkManager} />

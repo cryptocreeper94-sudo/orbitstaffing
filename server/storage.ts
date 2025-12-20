@@ -3731,6 +3731,25 @@ export const storage: IStorage = {
     return db.select().from(developers).orderBy(desc(developers.createdAt));
   },
 
+  async getDeveloperByStripeCustomerId(stripeCustomerId: string): Promise<Developer | undefined> {
+    const [developer] = await db.select().from(developers).where(eq(developers.stripeCustomerId, stripeCustomerId));
+    return developer;
+  },
+
+  async updateDeveloperSubscription(developerId: string, data: {
+    stripeCustomerId?: string | null;
+    stripeSubscriptionId?: string | null;
+    subscriptionStatus?: string;
+    tier?: string;
+    apiCallLimit?: number;
+  }): Promise<Developer | undefined> {
+    const [developer] = await db.update(developers)
+      .set(data)
+      .where(eq(developers.id, developerId))
+      .returning();
+    return developer;
+  },
+
 };
 
 export default storage;

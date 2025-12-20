@@ -8476,6 +8476,362 @@ export function registerDeveloperRoutes(app: Express) {
       res.status(500).json({ error: "Failed to regenerate API secret" });
     }
   });
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // DEVELOPER SUBSCRIPTION ROUTES (Stripe Integration)
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Setup Stripe developer tier products/prices
+  app.post("/api/stripe/setup-developer-tiers", async (req: Request, res: Response) => {
+    try {
+      const stripe = await getUncachableStripeClient();
+      
+      const tiers = [
+        {
+          id: "developer_pro",
+          name: "ORBIT Developer Pro",
+          description: "50,000 API calls/month, production access, priority support",
+          price: 4900,
+          interval: "month" as const,
+        },
+        {
+          id: "developer_enterprise",
+          name: "ORBIT Developer Enterprise",
+          description: "Unlimited API calls, white-label solutions, dedicated support, SLA guarantee",
+          price: 29900,
+          interval: "month" as const,
+        },
+      ];
+
+      const results = [];
+
+      for (const tier of tiers) {
+        let product;
+        try {
+          product = await stripe.products.retrieve(tier.id);
+        } catch (e) {
+          product = await stripe.products.create({
+            id: tier.id,
+            name: tier.name,
+            description: tier.description,
+            metadata: { type: "developer_tier" },
+          });
+        }
+
+        const priceId = `${tier.id}_monthly`;
+        let price;
+        try {
+          price = await stripe.prices.retrieve(priceId);
+        } catch (e) {
+          price = await stripe.prices.create({
+            product: product.id,
+            unit_amount: tier.price,
+            currency: "usd",
+            recurring: { interval: tier.interval },
+            metadata: { tier: tier.id },
+          });
+        }
+
+        results.push({
+          productId: product.id,
+          priceId: price.id,
+          name: tier.name,
+          amount: tier.price,
+        });
+      }
+
+      res.json({ success: true, tiers: results });
+    } catch (error) {
+      console.error("[Setup Developer Tiers] Error:", error);
+      res.status(500).json({ error: "Failed to setup developer tiers" });
+    }
+  });
+
+  // Create Stripe checkout session for subscription upgrade
+  app.post("/api/developers/subscribe", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "API key required in Authorization header" });
+      }
+
+      const apiKey = authHeader.substring(7);
+      const developer = await storage.getDeveloperByApiKey(apiKey);
+
+      if (!developer) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      if (developer.status !== "active") {
+        return res.status(403).json({ error: "Developer account is not active" });
+      }
+
+      const { tier } = req.body;
+      if (!tier || !["pro", "enterprise"].includes(tier)) {
+        return res.status(400).json({ error: "Invalid tier. Must be 'pro' or 'enterprise'" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      
+      let customerId = developer.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: developer.email,
+          name: developer.name || undefined,
+          metadata: {
+            developerId: developer.id,
+            type: "developer",
+          },
+        });
+        customerId = customer.id;
+        await storage.updateDeveloperSubscription(developer.id, { stripeCustomerId: customerId });
+      }
+
+      const priceId = tier === "pro" ? "developer_pro_monthly" : "developer_enterprise_monthly";
+      
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : "http://localhost:5000";
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "subscription",
+        success_url: `${baseUrl}/developer-account?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/developers`,
+        metadata: {
+          developerId: developer.id,
+          tier: tier,
+        },
+      });
+
+      res.json({ sessionId: session.id, sessionUrl: session.url });
+    } catch (error) {
+      console.error("[Developer Subscribe] Error:", error);
+      res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  // Get current subscription status
+  app.get("/api/developers/subscription", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "API key required in Authorization header" });
+      }
+
+      const apiKey = authHeader.substring(7);
+      const developer = await storage.getDeveloperByApiKey(apiKey);
+
+      if (!developer) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      let subscription = null;
+      if (developer.stripeSubscriptionId) {
+        try {
+          const stripe = await getUncachableStripeClient();
+          subscription = await stripe.subscriptions.retrieve(developer.stripeSubscriptionId);
+        } catch (e) {
+          console.error("[Developer Subscription] Failed to retrieve subscription:", e);
+        }
+      }
+
+      res.json({
+        tier: developer.tier || "starter",
+        subscriptionStatus: developer.subscriptionStatus || "none",
+        apiCallsThisMonth: developer.apiCallsThisMonth || 0,
+        apiCallLimit: developer.apiCallLimit || 1000,
+        stripeSubscriptionId: developer.stripeSubscriptionId,
+        subscription: subscription ? {
+          status: subscription.status,
+          currentPeriodEnd: subscription.current_period_end,
+          cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        } : null,
+      });
+    } catch (error) {
+      console.error("[Developer Subscription] Error:", error);
+      res.status(500).json({ error: "Failed to get subscription status" });
+    }
+  });
+
+  // Cancel subscription
+  app.post("/api/developers/cancel-subscription", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "API key required in Authorization header" });
+      }
+
+      const apiKey = authHeader.substring(7);
+      const developer = await storage.getDeveloperByApiKey(apiKey);
+
+      if (!developer) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      if (!developer.stripeSubscriptionId) {
+        return res.status(400).json({ error: "No active subscription to cancel" });
+      }
+
+      const stripe = await getUncachableStripeClient();
+      const subscription = await stripe.subscriptions.update(developer.stripeSubscriptionId, {
+        cancel_at_period_end: true,
+      });
+
+      await storage.updateDeveloperSubscription(developer.id, {
+        subscriptionStatus: "canceled",
+      });
+
+      res.json({
+        success: true,
+        message: "Subscription will be canceled at the end of the billing period",
+        cancelAt: subscription.cancel_at,
+      });
+    } catch (error) {
+      console.error("[Developer Cancel Subscription] Error:", error);
+      res.status(500).json({ error: "Failed to cancel subscription" });
+    }
+  });
+
+  // Create Stripe billing portal session
+  app.post("/api/developers/billing-portal", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "API key required in Authorization header" });
+      }
+
+      const apiKey = authHeader.substring(7);
+      const developer = await storage.getDeveloperByApiKey(apiKey);
+
+      if (!developer) {
+        return res.status(401).json({ error: "Invalid API key" });
+      }
+
+      if (!developer.stripeCustomerId) {
+        return res.status(400).json({ error: "No Stripe customer found" });
+      }
+
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+        : "http://localhost:5000";
+
+      const stripe = await getUncachableStripeClient();
+      const session = await stripe.billingPortal.sessions.create({
+        customer: developer.stripeCustomerId,
+        return_url: `${baseUrl}/developer-account`,
+      });
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error("[Developer Billing Portal] Error:", error);
+      res.status(500).json({ error: "Failed to create billing portal session" });
+    }
+  });
+
+  // Stripe webhook for developer subscriptions
+  app.post("/api/stripe/developer-webhook", express.raw({ type: "application/json" }), async (req: Request, res: Response) => {
+    try {
+      const stripe = await getUncachableStripeClient();
+      const sig = req.headers["stripe-signature"];
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+      if (!webhookSecret) {
+        console.error("[Stripe Webhook] No webhook secret configured");
+        return res.status(500).json({ error: "Webhook secret not configured" });
+      }
+
+      let event;
+      try {
+        event = stripe.webhooks.constructEvent(req.body, sig as string, webhookSecret);
+      } catch (err: any) {
+        console.error("[Stripe Webhook] Signature verification failed:", err.message);
+        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      }
+
+      console.log(`[Stripe Webhook] Received event: ${event.type}`);
+
+      switch (event.type) {
+        case "customer.subscription.created":
+        case "customer.subscription.updated": {
+          const subscription = event.data.object as any;
+          const customerId = subscription.customer;
+          
+          const developer = await storage.getDeveloperByStripeCustomerId(customerId);
+          if (developer) {
+            const tier = subscription.items.data[0]?.price?.product?.includes("enterprise") 
+              ? "enterprise" 
+              : subscription.items.data[0]?.price?.product?.includes("pro") 
+                ? "pro" 
+                : "starter";
+            
+            const apiCallLimit = tier === "enterprise" ? 999999999 : tier === "pro" ? 50000 : 1000;
+            
+            await storage.updateDeveloperSubscription(developer.id, {
+              stripeSubscriptionId: subscription.id,
+              subscriptionStatus: subscription.status,
+              tier,
+              apiCallLimit,
+            });
+            console.log(`[Stripe Webhook] Updated developer ${developer.id} to ${tier} tier`);
+          }
+          break;
+        }
+
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object as any;
+          const customerId = subscription.customer;
+          
+          const developer = await storage.getDeveloperByStripeCustomerId(customerId);
+          if (developer) {
+            await storage.updateDeveloperSubscription(developer.id, {
+              stripeSubscriptionId: null,
+              subscriptionStatus: "canceled",
+              tier: "starter",
+              apiCallLimit: 1000,
+            });
+            console.log(`[Stripe Webhook] Downgraded developer ${developer.id} to starter tier`);
+          }
+          break;
+        }
+
+        case "invoice.payment_failed": {
+          const invoice = event.data.object as any;
+          const customerId = invoice.customer;
+          
+          const developer = await storage.getDeveloperByStripeCustomerId(customerId);
+          if (developer) {
+            await storage.updateDeveloperSubscription(developer.id, {
+              subscriptionStatus: "past_due",
+            });
+            console.log(`[Stripe Webhook] Developer ${developer.id} payment failed`);
+          }
+          break;
+        }
+
+        case "invoice.payment_succeeded": {
+          const invoice = event.data.object as any;
+          const customerId = invoice.customer;
+          
+          const developer = await storage.getDeveloperByStripeCustomerId(customerId);
+          if (developer && developer.subscriptionStatus === "past_due") {
+            await storage.updateDeveloperSubscription(developer.id, {
+              subscriptionStatus: "active",
+            });
+            console.log(`[Stripe Webhook] Developer ${developer.id} payment succeeded`);
+          }
+          break;
+        }
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error("[Stripe Webhook] Error:", error);
+      res.status(500).json({ error: "Webhook processing failed" });
+    }
+  });
 }
 
 // ========================

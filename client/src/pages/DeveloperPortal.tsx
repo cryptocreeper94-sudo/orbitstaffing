@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import DeveloperRegistration from "@/components/DeveloperRegistration";
+import { useToast } from "@/hooks/use-toast";
 import {
   Code,
   Zap,
@@ -23,6 +24,8 @@ import {
   ParkingCircle,
   BarChart3,
   ChevronLeft,
+  Crown,
+  Mail,
 } from "lucide-react";
 
 const CONNECTED_PRODUCTS = [
@@ -145,11 +148,82 @@ console.log('Assignment created:', assignment.id);`;
 export default function DeveloperPortal() {
   const [, setLocation] = useLocation();
   const [copied, setCopied] = useState(false);
+  const [currentTier, setCurrentTier] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const apiKey = localStorage.getItem("orbit_developer_api_key");
+    if (apiKey) {
+      setIsLoggedIn(true);
+      fetch("/api/developers/subscription", {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.tier) setCurrentTier(data.tier);
+        })
+        .catch(console.error);
+    }
+  }, []);
 
   const handleCopyCode = async () => {
     await navigator.clipboard.writeText(CODE_EXAMPLE);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTierAction = async (tierId: string) => {
+    if (tierId === "starter") {
+      document.getElementById("cta-section")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    if (tierId === "enterprise") {
+      window.location.href = "mailto:enterprise@orbit.build?subject=Enterprise Developer Plan Inquiry";
+      return;
+    }
+
+    if (!isLoggedIn) {
+      toast({
+        title: "Registration Required",
+        description: "Please register as a developer first to upgrade your plan.",
+        variant: "destructive",
+      });
+      document.getElementById("cta-section")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
+    const apiKey = localStorage.getItem("orbit_developer_api_key");
+    if (!apiKey) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/developers/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({ tier: tierId }),
+      });
+
+      const data = await response.json();
+      if (data.sessionUrl) {
+        window.location.href = data.sessionUrl;
+      } else {
+        throw new Error(data.error || "Failed to create checkout session");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Upgrade Failed",
+        description: error.message || "Could not initiate checkout. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -480,60 +554,98 @@ export default function DeveloperPortal() {
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Choose the plan that fits your needs
             </p>
+            {isLoggedIn && (
+              <Button
+                variant="outline"
+                className="mt-4 border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+                onClick={() => setLocation("/developer-account")}
+                data-testid="button-manage-account"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Manage Your Account
+              </Button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {PRICING_TIERS.map((tier) => (
-              <div
-                key={tier.id}
-                className={`relative p-8 rounded-2xl border backdrop-blur-sm transition-all duration-300 ${
-                  tier.highlighted
-                    ? "bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border-cyan-500/50 scale-105"
-                    : "bg-gradient-to-br from-slate-800/60 to-slate-900/60 border-slate-700/50 hover:border-slate-600"
-                }`}
-                data-testid={`card-tier-${tier.id}`}
-              >
-                {tier.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0">
-                    Most Popular
-                  </Badge>
-                )}
-
-                <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
-                <div className="flex items-baseline gap-1 mb-4">
-                  <span className="text-4xl font-bold">{tier.price}</span>
-                  {tier.period && (
-                    <span className="text-gray-400">{tier.period}</span>
-                  )}
-                </div>
-                <p className="text-gray-400 mb-6">{tier.description}</p>
-
-                <ul className="space-y-3 mb-8">
-                  {tier.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <Check className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                      <span className="text-gray-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  className={`w-full font-bold py-6 ${
+            {PRICING_TIERS.map((tier) => {
+              const isCurrentTier = currentTier === tier.id;
+              return (
+                <div
+                  key={tier.id}
+                  className={`relative p-8 rounded-2xl border backdrop-blur-sm transition-all duration-300 ${
                     tier.highlighted
-                      ? "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
-                      : "bg-slate-700 hover:bg-slate-600 text-white"
-                  }`}
-                  data-testid={`button-tier-${tier.id}`}
+                      ? "bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border-cyan-500/50 scale-105"
+                      : "bg-gradient-to-br from-slate-800/60 to-slate-900/60 border-slate-700/50 hover:border-slate-600"
+                  } ${isCurrentTier ? "ring-2 ring-green-500" : ""}`}
+                  data-testid={`card-tier-${tier.id}`}
                 >
-                  {tier.cta}
-                </Button>
-              </div>
-            ))}
+                  {tier.highlighted && !isCurrentTier && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0">
+                      Most Popular
+                    </Badge>
+                  )}
+                  {isCurrentTier && (
+                    <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0">
+                      <Crown className="w-3 h-3 mr-1" />
+                      Current Plan
+                    </Badge>
+                  )}
+
+                  <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-4xl font-bold">{tier.price}</span>
+                    {tier.period && (
+                      <span className="text-gray-400">{tier.period}</span>
+                    )}
+                  </div>
+                  <p className="text-gray-400 mb-6">{tier.description}</p>
+
+                  <ul className="space-y-3 mb-8">
+                    {tier.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <Check className="w-5 h-5 text-cyan-400 flex-shrink-0" />
+                        <span className="text-gray-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    className={`w-full font-bold py-6 ${
+                      isCurrentTier
+                        ? "bg-green-600 hover:bg-green-700 text-white cursor-default"
+                        : tier.highlighted
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+                          : "bg-slate-700 hover:bg-slate-600 text-white"
+                    }`}
+                    onClick={() => !isCurrentTier && handleTierAction(tier.id)}
+                    disabled={isCurrentTier || isLoading}
+                    data-testid={`button-tier-${tier.id}`}
+                  >
+                    {isLoading && tier.id === "pro" ? (
+                      "Redirecting..."
+                    ) : isCurrentTier ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        Your Current Plan
+                      </>
+                    ) : tier.id === "enterprise" ? (
+                      <>
+                        <Mail className="w-4 h-4 mr-2" />
+                        Contact Sales
+                      </>
+                    ) : (
+                      tier.cta
+                    )}
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="py-24 bg-gradient-to-b from-slate-900/50 to-slate-950">
+      <section id="cta-section" className="py-24 bg-gradient-to-b from-slate-900/50 to-slate-950">
         <div className="max-w-4xl mx-auto px-6">
           <div className="relative p-12 rounded-3xl bg-gradient-to-br from-cyan-500/10 to-blue-600/10 border border-cyan-500/30 backdrop-blur-sm text-center">
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-600/5 rounded-3xl" />
