@@ -10352,6 +10352,41 @@ export function registerPayCardRoutes(app: Express) {
     }
   });
 
+  // Public endpoint: Get all connected ecosystem apps (for Orbit Portal and other hubs)
+  app.get("/api/ecosystem/apps", async (req: Request, res: Response) => {
+    try {
+      const apps = await ecosystemHub.getConnectedApps();
+      const activeApps = apps.filter(a => a.isActive);
+      
+      res.json({
+        success: true,
+        hubName: "DarkWave Ecosystem Hub",
+        hubVersion: "2.7.1",
+        appCount: activeApps.length,
+        apps: activeApps.map(a => ({
+          id: a.id,
+          name: a.appName,
+          slug: a.appSlug,
+          url: a.appUrl,
+          description: a.description,
+          category: a.category || "General",
+          hook: a.hook,
+          tags: a.tags || [],
+          gradient: a.gradient || "from-gray-500 to-gray-700",
+          imagePrompt: a.imagePrompt,
+          status: a.isActive ? "active" : "inactive",
+          lastSync: a.lastSyncAt,
+          syncCount: a.syncCount,
+          createdAt: a.createdAt,
+        })),
+        updatedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Ecosystem apps error:", error);
+      res.status(500).json({ error: "Failed to fetch apps" });
+    }
+  });
+
   // App metadata endpoint for Orbit Portal integration (public)
   app.get("/api/ecosystem/app-metadata", async (req: Request, res: Response) => {
     try {
