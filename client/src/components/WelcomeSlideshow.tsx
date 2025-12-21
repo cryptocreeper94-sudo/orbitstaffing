@@ -309,11 +309,17 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
               ))}
             </div>
             <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-white p-1"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700/80 hover:bg-red-500/80 text-slate-300 hover:text-white transition-all"
               data-testid="button-close-welcome"
+              type="button"
+              aria-label="Close welcome popup"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
           </div>
 

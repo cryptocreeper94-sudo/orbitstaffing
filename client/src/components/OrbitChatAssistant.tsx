@@ -394,6 +394,12 @@ export function OrbitChatAssistant() {
             {/* Close button */}
             <button
               onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleClose();
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 handleClose();
               }}
@@ -401,20 +407,23 @@ export function OrbitChatAssistant() {
                 position: 'absolute',
                 top: '8px',
                 right: '8px',
-                width: '28px',
-                height: '28px',
+                width: '36px',
+                height: '36px',
                 borderRadius: '50%',
                 border: 'none',
-                background: 'rgba(0,0,0,0.15)',
+                background: 'rgba(239, 68, 68, 0.9)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 100
+                zIndex: 100,
+                touchAction: 'manipulation'
               }}
               data-testid="button-close-orby"
+              type="button"
+              aria-label="Close Orby chat"
             >
-              <X size={16} color="#64748b" />
+              <X size={20} color="white" />
             </button>
 
             {/* Messages area */}
