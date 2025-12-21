@@ -293,9 +293,30 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <Card className="max-w-2xl w-full bg-gradient-to-br from-slate-900 to-slate-950 border border-cyan-500/30 shadow-2xl max-h-[90vh] overflow-y-auto">
+      {/* Close button - positioned outside card for guaranteed clickability */}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onClose();
+        }}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onClose();
+        }}
+        className="absolute top-4 right-4 z-[100] w-12 h-12 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg transition-all"
+        style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
+        data-testid="button-close-welcome"
+        type="button"
+        aria-label="Close welcome popup"
+      >
+        <X className="w-7 h-7" />
+      </button>
+      
+      <Card className="max-w-2xl w-full bg-gradient-to-br from-slate-900 to-slate-950 border border-cyan-500/30 shadow-2xl max-h-[90vh] overflow-y-auto relative">
         <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-start items-center mb-6">
             <div className="flex gap-1">
               {[...Array(totalSlides)].map((_, idx) => (
                 <button
@@ -308,19 +329,6 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                 />
               ))}
             </div>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onClose();
-              }}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-700/80 hover:bg-red-500/80 text-slate-300 hover:text-white transition-all"
-              data-testid="button-close-welcome"
-              type="button"
-              aria-label="Close welcome popup"
-            >
-              <X className="w-6 h-6" />
-            </button>
           </div>
 
           {renderSlide()}
