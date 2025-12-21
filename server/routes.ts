@@ -10352,6 +10352,59 @@ export function registerPayCardRoutes(app: Express) {
     }
   });
 
+  // Public endpoint: Get documentation/whitepapers
+  app.get("/api/ecosystem/docs", async (req: Request, res: Response) => {
+    try {
+      const docsPath = path.join(process.cwd(), 'public', 'docs');
+      if (!fs.existsSync(docsPath)) {
+        return res.json({ success: true, count: 0, docs: [] });
+      }
+      
+      const files = fs.readdirSync(docsPath).filter(f => f.endsWith('.json'));
+      
+      const docs = files.map(file => {
+        const content = JSON.parse(fs.readFileSync(path.join(docsPath, file), 'utf-8'));
+        return {
+          file: file,
+          title: content.title,
+          version: content.version,
+          date: content.date,
+          abstract: content.abstract,
+          sections: content.sections?.length || 0,
+          url: `/docs/${file}`
+        };
+      });
+      
+      res.json({
+        success: true,
+        count: docs.length,
+        docs,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Ecosystem docs error:", error);
+      res.status(500).json({ error: "Failed to fetch docs" });
+    }
+  });
+
+  // Public endpoint: Get specific document by name
+  app.get("/api/ecosystem/docs/:name", async (req: Request, res: Response) => {
+    try {
+      const { name } = req.params;
+      const docPath = path.join(process.cwd(), 'public', 'docs', `${name}.json`);
+      
+      if (!fs.existsSync(docPath)) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+      
+      const doc = JSON.parse(fs.readFileSync(docPath, 'utf-8'));
+      res.json(doc);
+    } catch (error) {
+      console.error("Ecosystem doc error:", error);
+      res.status(500).json({ error: "Failed to fetch document" });
+    }
+  });
+
   // Public endpoint: Get smart contracts (for Orbit Chain and other blockchain apps)
   app.get("/api/ecosystem/contracts", async (req: Request, res: Response) => {
     try {
