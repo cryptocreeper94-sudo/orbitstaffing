@@ -10352,6 +10352,56 @@ export function registerPayCardRoutes(app: Express) {
     }
   });
 
+  // Public endpoint: Get smart contracts (for Orbit Chain and other blockchain apps)
+  app.get("/api/ecosystem/contracts", async (req: Request, res: Response) => {
+    try {
+      const contractsPath = path.join(process.cwd(), 'public', 'contracts');
+      const files = fs.readdirSync(contractsPath).filter(f => f.endsWith('.json'));
+      
+      const contracts = files.map(file => {
+        const content = JSON.parse(fs.readFileSync(path.join(contractsPath, file), 'utf-8'));
+        return {
+          file: file,
+          name: content.name,
+          symbol: content.symbol,
+          standard: content.standard,
+          network: content.network,
+          address: content.contract?.address,
+          description: content.metadata?.description,
+          url: `/contracts/${file}`
+        };
+      });
+      
+      res.json({
+        success: true,
+        count: contracts.length,
+        contracts,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Ecosystem contracts error:", error);
+      res.status(500).json({ error: "Failed to fetch contracts" });
+    }
+  });
+
+  // Public endpoint: Get specific contract by name
+  app.get("/api/ecosystem/contracts/:name", async (req: Request, res: Response) => {
+    try {
+      const { name } = req.params;
+      const contractPath = path.join(process.cwd(), 'public', 'contracts', `${name}.json`);
+      
+      if (!fs.existsSync(contractPath)) {
+        return res.status(404).json({ error: "Contract not found" });
+      }
+      
+      const contract = JSON.parse(fs.readFileSync(contractPath, 'utf-8'));
+      res.json(contract);
+    } catch (error) {
+      console.error("Ecosystem contract error:", error);
+      res.status(500).json({ error: "Failed to fetch contract" });
+    }
+  });
+
   // Public endpoint: Get all connected ecosystem apps (for Orbit Portal and other hubs)
   app.get("/api/ecosystem/apps", async (req: Request, res: Response) => {
     try {

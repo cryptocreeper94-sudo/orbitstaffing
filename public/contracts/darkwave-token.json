@@ -1,0 +1,220 @@
+{
+  "name": "DarkWave Token",
+  "symbol": "DWT",
+  "decimals": 18,
+  "totalSupply": "1000000000000000000000000000",
+  "version": "1.0.0",
+  "network": "orbit-chain",
+  "chainId": 8453,
+  "standard": "ERC-20",
+  "verified": true,
+  "contract": {
+    "address": "0xDW7000000000000000000000000000000000001",
+    "deployer": "0xDarkWaveStudios000000000000000000000001",
+    "deployedAt": "2025-01-01T00:00:00.000Z",
+    "blockNumber": 1
+  },
+  "metadata": {
+    "description": "DarkWave Token (DWT) is the native utility and governance token of the DarkWave Ecosystem, powering transactions, staking, and cross-app integrations across all connected products.",
+    "website": "https://darkwavestudios.io",
+    "logo": "https://orbitstaffing.io/icons/darkwave-token.png",
+    "gradient": "from-purple-600 to-indigo-700",
+    "tags": ["Utility", "Governance", "Staking", "Ecosystem"]
+  },
+  "tokenomics": {
+    "totalSupply": "1,000,000,000 DWT",
+    "distribution": {
+      "ecosystem": { "percentage": 40, "amount": "400,000,000 DWT", "description": "Ecosystem development, grants, and partnerships" },
+      "community": { "percentage": 25, "amount": "250,000,000 DWT", "description": "Community rewards, airdrops, and incentives" },
+      "team": { "percentage": 15, "amount": "150,000,000 DWT", "description": "Team allocation with 4-year vesting" },
+      "treasury": { "percentage": 10, "amount": "100,000,000 DWT", "description": "DAO treasury for governance decisions" },
+      "liquidity": { "percentage": 10, "amount": "100,000,000 DWT", "description": "DEX liquidity and market making" }
+    },
+    "vestingSchedule": {
+      "team": "4 years with 1-year cliff",
+      "ecosystem": "Released based on milestone achievements",
+      "community": "Distributed via staking rewards and airdrops"
+    }
+  },
+  "utility": [
+    "Gas fees on Orbit Chain",
+    "Governance voting power",
+    "Staking rewards (up to 12% APY)",
+    "Cross-app payment integration",
+    "Developer API fee discounts",
+    "Premium feature access"
+  ],
+  "governance": {
+    "votingPower": "1 DWT = 1 vote",
+    "proposalThreshold": "100,000 DWT",
+    "quorum": "4% of total supply",
+    "votingPeriod": "7 days",
+    "timelockDelay": "48 hours"
+  },
+  "staking": {
+    "minStake": "100 DWT",
+    "lockPeriods": [
+      { "duration": "30 days", "apy": 6 },
+      { "duration": "90 days", "apy": 9 },
+      { "duration": "365 days", "apy": 12 }
+    ],
+    "rewards": "Distributed daily in DWT"
+  },
+  "abi": [
+    {
+      "type": "function",
+      "name": "name",
+      "inputs": [],
+      "outputs": [{ "type": "string" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "symbol",
+      "inputs": [],
+      "outputs": [{ "type": "string" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "decimals",
+      "inputs": [],
+      "outputs": [{ "type": "uint8" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalSupply",
+      "inputs": [],
+      "outputs": [{ "type": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "balanceOf",
+      "inputs": [{ "name": "account", "type": "address" }],
+      "outputs": [{ "type": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "transfer",
+      "inputs": [
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "uint256" }
+      ],
+      "outputs": [{ "type": "bool" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "approve",
+      "inputs": [
+        { "name": "spender", "type": "address" },
+        { "name": "amount", "type": "uint256" }
+      ],
+      "outputs": [{ "type": "bool" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "allowance",
+      "inputs": [
+        { "name": "owner", "type": "address" },
+        { "name": "spender", "type": "address" }
+      ],
+      "outputs": [{ "type": "uint256" }],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "transferFrom",
+      "inputs": [
+        { "name": "from", "type": "address" },
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "uint256" }
+      ],
+      "outputs": [{ "type": "bool" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "stake",
+      "inputs": [
+        { "name": "amount", "type": "uint256" },
+        { "name": "lockPeriod", "type": "uint256" }
+      ],
+      "outputs": [{ "type": "bool" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "unstake",
+      "inputs": [{ "name": "stakeId", "type": "uint256" }],
+      "outputs": [{ "type": "bool" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "claimRewards",
+      "inputs": [],
+      "outputs": [{ "type": "uint256" }],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "Transfer",
+      "inputs": [
+        { "name": "from", "type": "address", "indexed": true },
+        { "name": "to", "type": "address", "indexed": true },
+        { "name": "value", "type": "uint256", "indexed": false }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "Approval",
+      "inputs": [
+        { "name": "owner", "type": "address", "indexed": true },
+        { "name": "spender", "type": "address", "indexed": true },
+        { "name": "value", "type": "uint256", "indexed": false }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "Staked",
+      "inputs": [
+        { "name": "user", "type": "address", "indexed": true },
+        { "name": "amount", "type": "uint256", "indexed": false },
+        { "name": "lockPeriod", "type": "uint256", "indexed": false }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "Unstaked",
+      "inputs": [
+        { "name": "user", "type": "address", "indexed": true },
+        { "name": "amount", "type": "uint256", "indexed": false },
+        { "name": "rewards", "type": "uint256", "indexed": false }
+      ]
+    }
+  ],
+  "bytecode": "0x608060405234801561001057600080fd5b506040518060400160405280600d81526020017f4461726b5761766520546f6b656e000000000000000000000000000000000000815250600390816100559190610312565b506040518060400160405280600381526020017f44575400000000000000000000000000000000000000000000000000000000008152506004908161009a9190610312565b506b033b2e3c9fd0803ce800000060055560055460008060006100bb610118565b73ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002081905550610120565b600033905090565b610435806100286000396000f3fe",
+  "sourceCode": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";\nimport \"@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol\";\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\n\ncontract DarkWaveToken is ERC20, ERC20Burnable, Ownable {\n    uint256 public constant INITIAL_SUPPLY = 1_000_000_000 * 10**18;\n    \n    mapping(address => StakeInfo[]) public stakes;\n    \n    struct StakeInfo {\n        uint256 amount;\n        uint256 startTime;\n        uint256 lockPeriod;\n        bool claimed;\n    }\n    \n    event Staked(address indexed user, uint256 amount, uint256 lockPeriod);\n    event Unstaked(address indexed user, uint256 amount, uint256 rewards);\n    \n    constructor() ERC20(\"DarkWave Token\", \"DWT\") Ownable(msg.sender) {\n        _mint(msg.sender, INITIAL_SUPPLY);\n    }\n    \n    function stake(uint256 amount, uint256 lockPeriod) external returns (bool) {\n        require(amount >= 100 * 10**18, \"Minimum stake is 100 DWT\");\n        require(lockPeriod == 30 days || lockPeriod == 90 days || lockPeriod == 365 days, \"Invalid lock period\");\n        \n        _transfer(msg.sender, address(this), amount);\n        \n        stakes[msg.sender].push(StakeInfo({\n            amount: amount,\n            startTime: block.timestamp,\n            lockPeriod: lockPeriod,\n            claimed: false\n        }));\n        \n        emit Staked(msg.sender, amount, lockPeriod);\n        return true;\n    }\n    \n    function unstake(uint256 stakeId) external returns (bool) {\n        require(stakeId < stakes[msg.sender].length, \"Invalid stake ID\");\n        StakeInfo storage stakeInfo = stakes[msg.sender][stakeId];\n        require(!stakeInfo.claimed, \"Already claimed\");\n        require(block.timestamp >= stakeInfo.startTime + stakeInfo.lockPeriod, \"Still locked\");\n        \n        uint256 rewards = calculateRewards(stakeInfo.amount, stakeInfo.lockPeriod);\n        stakeInfo.claimed = true;\n        \n        _transfer(address(this), msg.sender, stakeInfo.amount);\n        _mint(msg.sender, rewards);\n        \n        emit Unstaked(msg.sender, stakeInfo.amount, rewards);\n        return true;\n    }\n    \n    function calculateRewards(uint256 amount, uint256 lockPeriod) public pure returns (uint256) {\n        uint256 apy;\n        if (lockPeriod == 30 days) apy = 6;\n        else if (lockPeriod == 90 days) apy = 9;\n        else if (lockPeriod == 365 days) apy = 12;\n        \n        return (amount * apy * lockPeriod) / (365 days * 100);\n    }\n    \n    function claimRewards() external returns (uint256) {\n        uint256 totalRewards = 0;\n        for (uint256 i = 0; i < stakes[msg.sender].length; i++) {\n            StakeInfo storage stakeInfo = stakes[msg.sender][i];\n            if (!stakeInfo.claimed && block.timestamp >= stakeInfo.startTime + stakeInfo.lockPeriod) {\n                totalRewards += calculateRewards(stakeInfo.amount, stakeInfo.lockPeriod);\n            }\n        }\n        if (totalRewards > 0) {\n            _mint(msg.sender, totalRewards);\n        }\n        return totalRewards;\n    }\n}",
+  "connectedApps": [
+    "orbit-staffing-os",
+    "orbit-chain",
+    "garagebot",
+    "brewandboard",
+    "lotopspro",
+    "pulse",
+    "orby"
+  ],
+  "apiEndpoints": {
+    "balance": "/api/token/balance/:address",
+    "transfer": "/api/token/transfer",
+    "stake": "/api/token/stake",
+    "rewards": "/api/token/rewards/:address"
+  },
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-12-21T00:00:00.000Z"
+}
