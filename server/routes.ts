@@ -10273,28 +10273,37 @@ export function registerPayCardRoutes(app: Express) {
   // Register a new app with the ecosystem hub (public endpoint - no auth required)
   app.post("/api/admin/ecosystem/register-app", async (req: Request, res: Response) => {
     try {
-      const { appName, appSlug, description } = req.body;
+      const { appName, appSlug, description, category, metadata } = req.body;
       
       if (!appName || !appSlug) {
         return res.status(400).json({ error: 'appName and appSlug are required' });
       }
+      
+      // Extract metadata fields (supports both flat and nested formats)
+      const hook = metadata?.hook || req.body.hook;
+      const tags = metadata?.tags || req.body.tags || [];
+      const gradient = metadata?.gradient || req.body.gradient;
+      const imagePrompt = metadata?.imagePrompt || req.body.imagePrompt;
       
       const result = await ecosystemHub.registerApp({
         appName,
         appSlug,
         appUrl: req.body.appUrl,
         description,
+        category,
+        hook,
+        tags,
+        gradient,
+        imagePrompt,
         permissions: req.body.permissions || [
+          'read:ecosystem',
+          'write:ecosystem',
           'read:workers',
           'write:workers',
           'read:contractors',
           'write:contractors',
-          'read:1099',
-          'write:1099',
           'read:timesheets',
           'write:timesheets',
-          'read:certifications',
-          'write:certifications',
           'read:code',
           'write:code',
         ],
@@ -10304,10 +10313,19 @@ export function registerPayCardRoutes(app: Express) {
         success: true,
         id: result.app.id,
         appName: result.app.appName,
+        appSlug: result.app.appSlug,
+        category: result.app.category,
         apiKey: result.apiKey,
         apiSecret: result.apiSecret,
         permissions: result.app.permissions,
+        metadata: {
+          hook: result.app.hook,
+          tags: result.app.tags,
+          gradient: result.app.gradient,
+          imagePrompt: result.app.imagePrompt,
+        },
         createdAt: result.app.createdAt,
+        message: "App registered successfully. Save your API credentials - the secret is shown only once.",
       });
     } catch (error) {
       console.error("Ecosystem register app error:", error);

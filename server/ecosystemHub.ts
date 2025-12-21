@@ -31,6 +31,12 @@ export interface EcosystemAppRegistration {
   description?: string;
   logoUrl?: string;
   permissions: string[];
+  // Enhanced metadata for Orbit Portal display
+  category?: string;
+  hook?: string;
+  tags?: string[];
+  gradient?: string;
+  imagePrompt?: string;
 }
 
 export interface CodeSnippetInput {
@@ -138,9 +144,19 @@ export class DarkWaveEcosystemHub {
       apiSecretHash,
       permissions: registration.permissions,
       isActive: true,
+      // Enhanced metadata for Orbit Portal
+      category: registration.category,
+      hook: registration.hook,
+      tags: registration.tags || [],
+      gradient: registration.gradient,
+      imagePrompt: registration.imagePrompt,
     }).returning();
     
-    await this.logActivity(app.id, app.appName, 'app.registered', 'app', app.id, { permissions: registration.permissions });
+    await this.logActivity(app.id, app.appName, 'app.registered', 'app', app.id, { 
+      permissions: registration.permissions,
+      category: registration.category,
+      metadata: { hook: registration.hook, tags: registration.tags, gradient: registration.gradient }
+    });
     
     return { app, apiKey, apiSecret };
   }

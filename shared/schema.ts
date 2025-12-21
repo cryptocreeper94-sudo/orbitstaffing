@@ -5762,6 +5762,12 @@ export const ecosystemConnectedApps = pgTable(
     isActive: boolean("is_active").default(true),
     lastSyncAt: timestamp("last_sync_at"),
     syncCount: integer("sync_count").default(0),
+    // Enhanced metadata for Orbit Portal display
+    category: varchar("category", { length: 100 }),
+    hook: varchar("hook", { length: 255 }),
+    tags: text("tags").array().default([]),
+    gradient: varchar("gradient", { length: 100 }),
+    imagePrompt: text("image_prompt"),
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
   },
