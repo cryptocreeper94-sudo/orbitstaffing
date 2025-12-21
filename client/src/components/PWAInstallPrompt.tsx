@@ -72,11 +72,23 @@ export function PWAInstallPrompt() {
     <div className="fixed bottom-4 left-4 right-4 z-[9999] animate-in slide-in-from-bottom-4 duration-300">
       <div className="relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl p-4 shadow-2xl shadow-cyan-500/20">
         <button
-          onClick={handleDismiss}
-          className="absolute top-3 right-3 p-2 text-gray-400 hover:text-white bg-slate-700/50 hover:bg-slate-600 rounded-full transition-colors z-10"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDismiss();
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDismiss();
+          }}
+          className="absolute -top-2 -right-2 w-10 h-10 flex items-center justify-center text-white bg-red-500 hover:bg-red-600 rounded-full transition-colors z-50 shadow-lg"
+          style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
           data-testid="button-dismiss-pwa"
+          type="button"
+          aria-label="Close install prompt"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6" />
         </button>
         
         <div className="flex items-start gap-4">
