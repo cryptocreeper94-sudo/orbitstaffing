@@ -232,7 +232,20 @@ export class DarkWaveEcosystemHub {
   
   hasPermission(app: EcosystemConnectedApp, permission: string): boolean {
     if (app.permissions?.includes('sync:all')) return true;
-    return app.permissions?.includes(permission) || false;
+    if (app.permissions?.includes(permission)) return true;
+    
+    // Map alternative permission formats for flexibility
+    const permissionAliases: Record<string, string[]> = {
+      'read:code': ['snippets:read', 'code:read'],
+      'write:code': ['snippets:write', 'code:write'],
+      'read:workers': ['workers:read'],
+      'write:workers': ['workers:write'],
+      'read:logs': ['logs:read'],
+      'write:logs': ['logs:write'],
+    };
+    
+    const aliases = permissionAliases[permission] || [];
+    return aliases.some(alias => app.permissions?.includes(alias)) || false;
   }
   
   // ─────────────────────────────────────────────────────────────────────────────
