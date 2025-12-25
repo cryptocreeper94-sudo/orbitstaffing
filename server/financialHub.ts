@@ -92,8 +92,16 @@ function generateHmacSignature(payload: string, secret: string): string {
 }
 
 function verifyHmacSignature(payload: string, signature: string, secret: string): boolean {
+  if (!signature || typeof signature !== 'string') {
+    return false;
+  }
   const expected = generateHmacSignature(payload, secret);
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  const sigBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expected);
+  if (sigBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(expectedBuffer, sigBuffer);
 }
 
 function hashPayload(payload: string): string {
