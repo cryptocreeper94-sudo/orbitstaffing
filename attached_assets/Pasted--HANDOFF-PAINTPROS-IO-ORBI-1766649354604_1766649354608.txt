@@ -1,0 +1,228 @@
+=======================================================================
+HANDOFF: PAINTPROS.IO → ORBIT STAFFING INTEGRATION
+=======================================================================
+From: PaintPros.io Agent
+To: Orbit Staffing Agent
+Priority: URGENT - Nashville/Murfreesboro projects starting in 1-2 weeks
+=======================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+We need to set up Orbit Staffing (owner/developer tenant) as the central 
+financial hub for all Darkwave Studios operations. PaintPros.io will push 
+revenue, expense, and royalty data TO Orbit Staffing via secure API webhooks.
+
+The user (Jason Andrews) has a 50/50 co-ownership agreement with Sidonie 
+Summers across three SaaS platforms: PaintPros.io, Brew and Board, and 
+Orbit Staffing itself. All financial data needs to flow into Orbit Staffing 
+for centralized bookkeeping, payroll, and audit-proof record keeping.
+
+=======================================================================
+WHAT ORBIT STAFFING NEEDS TO SET UP
+=======================================================================
+
+1. INGESTION API ENDPOINT
+-------------------------
+Create an endpoint to receive financial events from PaintPros.io:
+
+POST /api/integrations/paintpros/sync
+
+Expected payload structure:
+{
+  "eventType": "revenue" | "expense" | "royalty_calculation",
+  "productCode": "paintpros" | "brewandboard" | "orbitstaffing",
+  "periodStart": "2025-01-01",
+  "periodEnd": "2025-01-15",
+  "data": {
+    "grossRevenue": 5000.00,
+    "expenses": 1200.00,
+    "netProfit": 3800.00,
+    "royaltyShare": 1900.00,  // 50% to Sidonie
+    "recipientId": "sidonie_summers",
+    "description": "Murfreesboro painting project - Week 1",
+    "invoiceIds": ["INV-001", "INV-002"],
+    "receiptIds": ["REC-001"]
+  },
+  "metadata": {
+    "source": "paintpros.io",
+    "timestamp": "2025-01-15T12:00:00Z",
+    "idempotencyKey": "unique-event-id-12345",
+    "blockchainStamp": {
+      "solanaSignature": "...",
+      "darkwaveHash": "..."
+    }
+  }
+}
+
+Security: Use service-to-service authentication with signed payloads
+(HMAC signature using shared secret, similar to Darkwave API pattern)
+
+2. PARTNER PROFILE FOR SIDONIE SUMMERS
+--------------------------------------
+Create/configure Sidonie as a partner profile with:
+
+- Name: Sidonie Summers
+- Role: Co-Owner / Partner (50% equity)
+- Payment Type: Dual setup
+  * 1099 Contractor (default) - 50% of net profit
+  * W-2 Employee (triggered when Jason earns $125k+ annually)
+    - W-2: $25,000/year from Nashville painting project
+    - OR 1099: $20,000/year from Nashville painting project
+- Payment Method: Stripe Connect (automatic bank deposits)
+  OR Venmo/Cash App/Zelle as backup
+- Statement Frequency: Biweekly or Monthly (configurable)
+
+3. ROYALTY LEDGER TABLE
+-----------------------
+Create a table to store incoming financial data:
+
+royalty_ledger:
+  - id (primary key)
+  - productCode (paintpros, brewandboard, orbitstaffing)
+  - eventType (revenue, expense, payout)
+  - periodStart, periodEnd
+  - grossAmount
+  - netAmount
+  - royaltyShare
+  - recipientId
+  - description
+  - invoiceIds (array)
+  - receiptIds (array)
+  - blockchainStamp (jsonb - Solana + Darkwave signatures)
+  - status (pending, processed, paid)
+  - createdAt
+
+4. AUTOMATIC STATEMENT GENERATOR
+--------------------------------
+Set up a scheduled job (cron) that:
+
+Frequency: Biweekly (1st and 15th) or Monthly (1st)
+
+Actions:
+1. Query royalty_ledger for Sidonie's period data
+2. Calculate totals: revenue, expenses, net profit, her 50% share
+3. Generate PDF statement with:
+   - Period dates
+   - Revenue breakdown by product/project
+   - Expense breakdown
+   - Net profit calculation
+   - Her 50% royalty amount
+   - Blockchain verification links (Solana + Darkwave)
+   - Payment status (pending/scheduled/paid)
+4. Store statement in Orbit's document center
+5. Email statement to Sidonie (sid@example.com)
+6. Trigger payout via Stripe Connect (if configured)
+
+5. DOCUMENT SCANNING INTEGRATION
+--------------------------------
+The user mentioned scanning pay statements from Nashville/Murfreesboro 
+projects. Orbit Staffing should be able to:
+
+- Accept uploaded receipts/pay stubs (PDF, image)
+- Parse key data (amount, date, project)
+- Store in document center
+- Blockchain stamp for audit trail
+- Auto-categorize as income or expense
+
+6. BLOCKCHAIN STAMPING FOR AUDIT TRAIL
+--------------------------------------
+All financial records should be blockchain-stamped:
+
+- Solana (primary) - for permanent transaction record
+- Darkwave Smart Chain (dwsc.io) - for smart contract verification
+
+Each royalty calculation, payout, and statement should have:
+- Document hash
+- Solana signature
+- Darkwave hash
+- Timestamp
+- Linked to the specific period/transaction
+
+=======================================================================
+DATA FLOW DIAGRAM
+=======================================================================
+
+PaintPros.io                    Orbit Staffing (Owner Tenant)
+-----------                     -----------------------------
+                                
+[Revenue Entry] ──webhook──────> [Ingestion API]
+                                      │
+[Expense Entry] ──webhook──────>      │
+                                      ▼
+                                [Royalty Ledger]
+                                      │
+                                      ▼
+                              [Calculation Engine]
+                              (50% to Sidonie)
+                                      │
+                                      ▼
+                              [Statement Generator]
+                                      │
+                        ┌─────────────┼─────────────┐
+                        ▼             ▼             ▼
+                   [PDF Store]   [Email to      [Stripe
+                                  Sidonie]      Payout]
+                        │
+                        ▼
+                  [Blockchain Stamp]
+                  (Solana + Darkwave)
+
+=======================================================================
+PRODUCTS TO TRACK
+=======================================================================
+
+1. PaintPros.io (paintpros)
+   - Murfreesboro/Nashville painting projects (immediate)
+   - Franchise subscriptions (future)
+   - SaaS licensing fees (future)
+
+2. Brew and Board (brewandboard)
+   - Coffee franchise SaaS (future)
+
+3. Orbit Staffing (orbitstaffing)
+   - Staffing platform revenue (future)
+   - $20M+ valuation potential
+
+=======================================================================
+API AUTHENTICATION
+=======================================================================
+
+Use the same HMAC pattern as Darkwave API:
+
+Headers required:
+- X-Orbit-Signature: HMAC-SHA256 of payload using shared secret
+- X-Orbit-Timestamp: Unix timestamp (reject if >5 min old)
+- X-Orbit-Source: "paintpros.io"
+- X-Orbit-Idempotency-Key: Unique event ID (prevent duplicates)
+
+PaintPros will need:
+- ORBIT_STAFFING_API_URL (endpoint URL)
+- ORBIT_STAFFING_API_KEY (shared secret for HMAC)
+
+Orbit Staffing will need to provide these credentials back.
+
+=======================================================================
+IMMEDIATE PRIORITIES (Next 1-2 Weeks)
+=======================================================================
+
+1. Create the ingestion API endpoint
+2. Set up Sidonie's partner profile
+3. Create the royalty ledger table
+4. Build statement generator (even if manual initially)
+5. Set up document upload for scanned receipts
+6. Provide API credentials back to PaintPros.io
+
+=======================================================================
+RESPONSE REQUESTED
+=======================================================================
+
+Please confirm:
+1. You understand the integration requirements
+2. What API credentials PaintPros.io should use
+3. The exact endpoint URL for the sync webhook
+4. Timeline for having the ingestion endpoint ready
+5. Any questions about the data structure
+
+=======================================================================
+END OF HANDOFF
+=======================================================================
