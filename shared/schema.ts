@@ -7134,3 +7134,340 @@ export const insertDeveloperSchema = createInsertSchema(developers).omit({
 
 export type InsertDeveloper = z.infer<typeof insertDeveloperSchema>;
 export type Developer = typeof developers.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Partner Profiles
+// ========================
+export const PARTNER_TAX_TYPES = ['1099', 'w2', 'dual'] as const;
+export type PartnerTaxType = typeof PARTNER_TAX_TYPES[number];
+
+export const PARTNER_STATUSES = ['active', 'inactive', 'pending'] as const;
+export type PartnerStatus = typeof PARTNER_STATUSES[number];
+
+export const partnerProfiles = pgTable(
+  "partner_profiles",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    fullName: varchar("full_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 20 }),
+    
+    taxType: varchar("tax_type", { length: 20 }).default("1099"),
+    taxId: varchar("tax_id", { length: 50 }),
+    w9OnFile: boolean("w9_on_file").default(false),
+    w9SignedDate: timestamp("w9_signed_date"),
+    
+    defaultSplitPercentage: decimal("default_split_percentage", { precision: 5, scale: 2 }).default("50.00"),
+    
+    paymentMethod: varchar("payment_method", { length: 50 }).default("stripe"),
+    stripeAccountId: varchar("stripe_account_id", { length: 255 }),
+    bankAccountLast4: varchar("bank_account_last4", { length: 4 }),
+    venmoHandle: varchar("venmo_handle", { length: 100 }),
+    cashAppHandle: varchar("cashapp_handle", { length: 100 }),
+    
+    statementFrequency: varchar("statement_frequency", { length: 20 }).default("monthly"),
+    
+    blockchainWallet: varchar("blockchain_wallet", { length: 255 }),
+    
+    status: varchar("status", { length: 20 }).default("active"),
+    notes: text("notes"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    emailIdx: index("idx_partner_profiles_email").on(table.email),
+    statusIdx: index("idx_partner_profiles_status").on(table.status),
+  })
+);
+
+export const insertPartnerProfileSchema = createInsertSchema(partnerProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPartnerProfile = z.infer<typeof insertPartnerProfileSchema>;
+export type PartnerProfile = typeof partnerProfiles.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Financial Events (Incoming from Connected Apps)
+// ========================
+export const FINANCIAL_EVENT_TYPES = ['revenue', 'expense', 'payout', 'royalty_calculation', 'adjustment'] as const;
+export type FinancialEventType = typeof FINANCIAL_EVENT_TYPES[number];
+
+export const FINANCIAL_EVENT_STATUSES = ['pending', 'processed', 'failed', 'duplicate'] as const;
+export type FinancialEventStatus = typeof FINANCIAL_EVENT_STATUSES[number];
+
+export const financialEvents = pgTable(
+  "financial_events",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    sourceSystem: varchar("source_system", { length: 100 }).notNull(),
+    sourceAppId: varchar("source_app_id", { length: 255 }),
+    externalRef: varchar("external_ref", { length: 255 }),
+    idempotencyKey: varchar("idempotency_key", { length: 255 }).unique(),
+    
+    eventType: varchar("event_type", { length: 50 }).notNull(),
+    productCode: varchar("product_code", { length: 100 }),
+    
+    periodStart: date("period_start"),
+    periodEnd: date("period_end"),
+    eventDate: timestamp("event_date").default(sql`NOW()`),
+    
+    grossAmount: decimal("gross_amount", { precision: 12, scale: 2 }).default("0"),
+    netAmount: decimal("net_amount", { precision: 12, scale: 2 }).default("0"),
+    currency: varchar("currency", { length: 3 }).default("USD"),
+    
+    description: text("description"),
+    invoiceIds: text("invoice_ids").array(),
+    receiptIds: text("receipt_ids").array(),
+    
+    metadata: jsonb("metadata"),
+    
+    blockchainStamp: jsonb("blockchain_stamp"),
+    
+    hmacSignature: varchar("hmac_signature", { length: 255 }),
+    rawPayloadHash: varchar("raw_payload_hash", { length: 64 }),
+    
+    status: varchar("status", { length: 20 }).default("pending"),
+    processedAt: timestamp("processed_at"),
+    errorMessage: text("error_message"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    sourceSystemIdx: index("idx_financial_events_source").on(table.sourceSystem),
+    productCodeIdx: index("idx_financial_events_product").on(table.productCode),
+    eventTypeIdx: index("idx_financial_events_type").on(table.eventType),
+    statusIdx: index("idx_financial_events_status").on(table.status),
+    idempotencyIdx: index("idx_financial_events_idempotency").on(table.idempotencyKey),
+    periodIdx: index("idx_financial_events_period").on(table.periodStart, table.periodEnd),
+  })
+);
+
+export const insertFinancialEventSchema = createInsertSchema(financialEvents).omit({
+  id: true,
+  processedAt: true,
+  createdAt: true,
+});
+
+export type InsertFinancialEvent = z.infer<typeof insertFinancialEventSchema>;
+export type FinancialEvent = typeof financialEvents.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Royalty Ledger (Calculated Splits)
+// ========================
+export const LEDGER_STATUSES = ['pending', 'approved', 'paid', 'disputed', 'cancelled'] as const;
+export type LedgerStatus = typeof LEDGER_STATUSES[number];
+
+export const royaltyLedger = pgTable(
+  "royalty_ledger",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    partnerId: varchar("partner_id").notNull().references(() => partnerProfiles.id),
+    counterpartyId: varchar("counterparty_id").references(() => partnerProfiles.id),
+    
+    financialEventId: varchar("financial_event_id").references(() => financialEvents.id),
+    
+    productCode: varchar("product_code", { length: 100 }),
+    description: text("description"),
+    
+    periodStart: date("period_start"),
+    periodEnd: date("period_end"),
+    
+    grossAmount: decimal("gross_amount", { precision: 12, scale: 2 }).default("0"),
+    splitPercentage: decimal("split_percentage", { precision: 5, scale: 2 }),
+    netAmount: decimal("net_amount", { precision: 12, scale: 2 }).default("0"),
+    
+    taxWithholding: decimal("tax_withholding", { precision: 12, scale: 2 }).default("0"),
+    taxType: varchar("tax_type", { length: 20 }),
+    
+    auditTrail: jsonb("audit_trail"),
+    
+    solanaSignature: varchar("solana_signature", { length: 255 }),
+    darkwaveHash: varchar("darkwave_hash", { length: 255 }),
+    
+    status: varchar("status", { length: 20 }).default("pending"),
+    approvedAt: timestamp("approved_at"),
+    approvedBy: varchar("approved_by", { length: 255 }),
+    
+    statementId: varchar("statement_id"),
+    payoutId: varchar("payout_id"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    partnerIdx: index("idx_royalty_ledger_partner").on(table.partnerId),
+    productIdx: index("idx_royalty_ledger_product").on(table.productCode),
+    statusIdx: index("idx_royalty_ledger_status").on(table.status),
+    periodIdx: index("idx_royalty_ledger_period").on(table.periodStart, table.periodEnd),
+    eventIdx: index("idx_royalty_ledger_event").on(table.financialEventId),
+  })
+);
+
+export const insertRoyaltyLedgerSchema = createInsertSchema(royaltyLedger).omit({
+  id: true,
+  approvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertRoyaltyLedger = z.infer<typeof insertRoyaltyLedgerSchema>;
+export type RoyaltyLedger = typeof royaltyLedger.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Statements (Generated Reports)
+// ========================
+export const STATEMENT_STATUSES = ['draft', 'generated', 'sent', 'acknowledged'] as const;
+export type StatementStatus = typeof STATEMENT_STATUSES[number];
+
+export const financialStatements = pgTable(
+  "financial_statements",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    partnerId: varchar("partner_id").notNull().references(() => partnerProfiles.id),
+    
+    statementNumber: varchar("statement_number", { length: 50 }).unique(),
+    
+    periodStart: date("period_start").notNull(),
+    periodEnd: date("period_end").notNull(),
+    
+    totalGrossRevenue: decimal("total_gross_revenue", { precision: 12, scale: 2 }).default("0"),
+    totalExpenses: decimal("total_expenses", { precision: 12, scale: 2 }).default("0"),
+    totalNetProfit: decimal("total_net_profit", { precision: 12, scale: 2 }).default("0"),
+    partnerShare: decimal("partner_share", { precision: 12, scale: 2 }).default("0"),
+    taxWithholding: decimal("tax_withholding", { precision: 12, scale: 2 }).default("0"),
+    amountDue: decimal("amount_due", { precision: 12, scale: 2 }).default("0"),
+    
+    lineItems: jsonb("line_items"),
+    
+    pdfUrl: varchar("pdf_url", { length: 500 }),
+    pdfHash: varchar("pdf_hash", { length: 64 }),
+    
+    solanaSignature: varchar("solana_signature", { length: 255 }),
+    darkwaveHash: varchar("darkwave_hash", { length: 255 }),
+    
+    status: varchar("status", { length: 20 }).default("draft"),
+    generatedAt: timestamp("generated_at"),
+    sentAt: timestamp("sent_at"),
+    acknowledgedAt: timestamp("acknowledged_at"),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    partnerIdx: index("idx_financial_statements_partner").on(table.partnerId),
+    periodIdx: index("idx_financial_statements_period").on(table.periodStart, table.periodEnd),
+    statusIdx: index("idx_financial_statements_status").on(table.status),
+    numberIdx: index("idx_financial_statements_number").on(table.statementNumber),
+  })
+);
+
+export const insertFinancialStatementSchema = createInsertSchema(financialStatements).omit({
+  id: true,
+  generatedAt: true,
+  sentAt: true,
+  acknowledgedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFinancialStatement = z.infer<typeof insertFinancialStatementSchema>;
+export type FinancialStatement = typeof financialStatements.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Payouts
+// ========================
+export const PAYOUT_STATUSES = ['pending', 'scheduled', 'processing', 'completed', 'failed', 'cancelled'] as const;
+export type PayoutStatus = typeof PAYOUT_STATUSES[number];
+
+export const payouts = pgTable(
+  "payouts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    partnerId: varchar("partner_id").notNull().references(() => partnerProfiles.id),
+    statementId: varchar("statement_id").references(() => financialStatements.id),
+    
+    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+    currency: varchar("currency", { length: 3 }).default("USD"),
+    
+    paymentMethod: varchar("payment_method", { length: 50 }),
+    
+    stripeTransferId: varchar("stripe_transfer_id", { length: 255 }),
+    transactionRef: varchar("transaction_ref", { length: 255 }),
+    
+    scheduledDate: date("scheduled_date"),
+    processedAt: timestamp("processed_at"),
+    
+    status: varchar("status", { length: 20 }).default("pending"),
+    errorMessage: text("error_message"),
+    
+    solanaSignature: varchar("solana_signature", { length: 255 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+    updatedAt: timestamp("updated_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    partnerIdx: index("idx_payouts_partner").on(table.partnerId),
+    statementIdx: index("idx_payouts_statement").on(table.statementId),
+    statusIdx: index("idx_payouts_status").on(table.status),
+    scheduledIdx: index("idx_payouts_scheduled").on(table.scheduledDate),
+  })
+);
+
+export const insertPayoutSchema = createInsertSchema(payouts).omit({
+  id: true,
+  processedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertPayout = z.infer<typeof insertPayoutSchema>;
+export type Payout = typeof payouts.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Document Receipts (Scanned Documents)
+// ========================
+export const documentReceipts = pgTable(
+  "document_receipts",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    financialEventId: varchar("financial_event_id").references(() => financialEvents.id),
+    statementId: varchar("statement_id").references(() => financialStatements.id),
+    partnerId: varchar("partner_id").references(() => partnerProfiles.id),
+    
+    documentType: varchar("document_type", { length: 50 }),
+    filename: varchar("filename", { length: 255 }),
+    storagePath: varchar("storage_path", { length: 500 }),
+    mimeType: varchar("mime_type", { length: 100 }),
+    fileSize: integer("file_size"),
+    
+    ocrText: text("ocr_text"),
+    ocrExtractedData: jsonb("ocr_extracted_data"),
+    
+    documentHash: varchar("document_hash", { length: 64 }),
+    solanaSignature: varchar("solana_signature", { length: 255 }),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    eventIdx: index("idx_document_receipts_event").on(table.financialEventId),
+    partnerIdx: index("idx_document_receipts_partner").on(table.partnerId),
+    hashIdx: index("idx_document_receipts_hash").on(table.documentHash),
+  })
+);
+
+export const insertDocumentReceiptSchema = createInsertSchema(documentReceipts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertDocumentReceipt = z.infer<typeof insertDocumentReceiptSchema>;
+export type DocumentReceipt = typeof documentReceipts.$inferSelect;
