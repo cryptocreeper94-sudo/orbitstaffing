@@ -27,6 +27,7 @@ import fs from "fs";
 import express from "express";
 import { azureFaceService } from "./azureFaceService";
 import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
+import { financialHub, type FinancialEventInput } from "./financialHub";
 import { versionManager } from "./versionManager";
 import { webhookService, emitWebhookEvent, sendTestWebhook, startWebhookRetryProcessor } from "./webhookService";
 import { sandboxService } from "./sandboxService";
@@ -11436,6 +11437,226 @@ export function registerPayCardRoutes(app: Express) {
       res.type('text/markdown').send(spec);
     } catch (error) {
       res.status(500).json({ error: "Spec file not found" });
+    }
+  });
+
+  // ========================
+  // FINANCIAL HUB - Partner & Revenue Tracking
+  // ========================
+
+  // Financial Hub HMAC authentication middleware
+  const financialHubAuth = async (req: Request, res: Response, next: NextFunction) => {
+    const apiKey = req.headers['x-orbit-api-key'] as string;
+    const signature = req.headers['x-orbit-signature'] as string;
+    
+    if (!apiKey || !signature) {
+      res.status(401).json({ error: 'Missing API credentials' });
+      return;
+    }
+
+    const rawBody = JSON.stringify(req.body);
+    if (!financialHub.verifyApiCredentials(apiKey, signature, rawBody)) {
+      res.status(403).json({ error: 'Invalid API credentials or signature' });
+      return;
+    }
+
+    next();
+  };
+
+  // Public: Get Financial Hub status
+  app.get("/api/financial-hub/status", async (req: Request, res: Response) => {
+    try {
+      const summary = await financialHub.getFinancialSummary();
+      res.json({
+        hub: 'ORBIT Financial Hub',
+        version: '1.0.0',
+        status: 'operational',
+        summary,
+      });
+    } catch (error) {
+      console.error("Financial hub status error:", error);
+      res.status(500).json({ error: "Failed to get hub status" });
+    }
+  });
+
+  // Authenticated: Ingest financial event from connected app
+  app.post("/api/financial-hub/ingest", financialHubAuth, async (req: Request, res: Response) => {
+    try {
+      const input = req.body as FinancialEventInput;
+      const rawPayload = JSON.stringify(req.body);
+      const hmacSignature = req.headers['x-orbit-signature'] as string;
+
+      if (!input.sourceSystem || !input.eventType || input.grossAmount === undefined) {
+        res.status(400).json({ error: 'Missing required fields: sourceSystem, eventType, grossAmount' });
+        return;
+      }
+
+      const result = await financialHub.ingestFinancialEvent(input, rawPayload, hmacSignature);
+
+      res.json({
+        success: true,
+        eventId: result.event.id,
+        status: result.event.status,
+        royaltySplits: result.royaltySplits,
+        message: `Financial event ingested and ${result.royaltySplits.length} royalty splits calculated`,
+      });
+    } catch (error: any) {
+      console.error("Financial hub ingest error:", error);
+      res.status(500).json({ error: error.message || "Failed to ingest financial event" });
+    }
+  });
+
+  // Admin: Get all partners
+  app.get("/api/admin/financial-hub/partners", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const partners = await financialHub.getPartners();
+      res.json(partners);
+    } catch (error) {
+      console.error("Get partners error:", error);
+      res.status(500).json({ error: "Failed to fetch partners" });
+    }
+  });
+
+  // Admin: Create new partner
+  app.post("/api/admin/financial-hub/partners", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const partner = await financialHub.createPartner(req.body);
+      res.json(partner);
+    } catch (error: any) {
+      console.error("Create partner error:", error);
+      res.status(500).json({ error: error.message || "Failed to create partner" });
+    }
+  });
+
+  // Admin: Update partner
+  app.patch("/api/admin/financial-hub/partners/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const partner = await financialHub.updatePartner(req.params.id, req.body);
+      if (!partner) {
+        res.status(404).json({ error: "Partner not found" });
+        return;
+      }
+      res.json(partner);
+    } catch (error: any) {
+      console.error("Update partner error:", error);
+      res.status(500).json({ error: error.message || "Failed to update partner" });
+    }
+  });
+
+  // Admin: Get financial events
+  app.get("/api/admin/financial-hub/events", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { sourceSystem, eventType, status, productCode, limit } = req.query;
+      const events = await financialHub.getFinancialEvents({
+        sourceSystem: sourceSystem as string,
+        eventType: eventType as string,
+        status: status as string,
+        productCode: productCode as string,
+        limit: limit ? parseInt(limit as string) : 100,
+      });
+      res.json(events);
+    } catch (error) {
+      console.error("Get events error:", error);
+      res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
+  // Admin: Get royalty ledger entries
+  app.get("/api/admin/financial-hub/ledger", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { partnerId, productCode, status, limit } = req.query;
+      const entries = await financialHub.getLedgerEntries({
+        partnerId: partnerId as string,
+        productCode: productCode as string,
+        status: status as string,
+        limit: limit ? parseInt(limit as string) : 100,
+      });
+      res.json(entries);
+    } catch (error) {
+      console.error("Get ledger error:", error);
+      res.status(500).json({ error: "Failed to fetch ledger entries" });
+    }
+  });
+
+  // Admin: Generate statement for partner
+  app.post("/api/admin/financial-hub/statements/generate", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { partnerId, periodStart, periodEnd } = req.body;
+      if (!partnerId || !periodStart || !periodEnd) {
+        res.status(400).json({ error: "Missing required fields: partnerId, periodStart, periodEnd" });
+        return;
+      }
+      const statement = await financialHub.generateStatement(partnerId, periodStart, periodEnd);
+      res.json(statement);
+    } catch (error: any) {
+      console.error("Generate statement error:", error);
+      res.status(500).json({ error: error.message || "Failed to generate statement" });
+    }
+  });
+
+  // Admin: Get all statements
+  app.get("/api/admin/financial-hub/statements", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { partnerId } = req.query;
+      const statements = await financialHub.getStatements(partnerId as string);
+      res.json(statements);
+    } catch (error) {
+      console.error("Get statements error:", error);
+      res.status(500).json({ error: "Failed to fetch statements" });
+    }
+  });
+
+  // Admin: Get single statement
+  app.get("/api/admin/financial-hub/statements/:id", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const statement = await financialHub.getStatementById(req.params.id);
+      if (!statement) {
+        res.status(404).json({ error: "Statement not found" });
+        return;
+      }
+      res.json(statement);
+    } catch (error) {
+      console.error("Get statement error:", error);
+      res.status(500).json({ error: "Failed to fetch statement" });
+    }
+  });
+
+  // Admin: Get payouts
+  app.get("/api/admin/financial-hub/payouts", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { partnerId } = req.query;
+      const payoutsList = await financialHub.getPayouts(partnerId as string);
+      res.json(payoutsList);
+    } catch (error) {
+      console.error("Get payouts error:", error);
+      res.status(500).json({ error: "Failed to fetch payouts" });
+    }
+  });
+
+  // Admin: Create payout
+  app.post("/api/admin/financial-hub/payouts", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { partnerId, statementId, amount, paymentMethod } = req.body;
+      if (!partnerId || !statementId || !amount) {
+        res.status(400).json({ error: "Missing required fields: partnerId, statementId, amount" });
+        return;
+      }
+      const payout = await financialHub.createPayout(partnerId, statementId, amount, paymentMethod || 'stripe');
+      res.json(payout);
+    } catch (error: any) {
+      console.error("Create payout error:", error);
+      res.status(500).json({ error: error.message || "Failed to create payout" });
+    }
+  });
+
+  // Admin: Get financial hub summary dashboard
+  app.get("/api/admin/financial-hub/summary", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const summary = await financialHub.getFinancialSummary();
+      res.json(summary);
+    } catch (error) {
+      console.error("Get summary error:", error);
+      res.status(500).json({ error: "Failed to fetch summary" });
     }
   });
 
