@@ -7471,3 +7471,96 @@ export const insertDocumentReceiptSchema = createInsertSchema(documentReceipts).
 
 export type InsertDocumentReceipt = z.infer<typeof insertDocumentReceiptSchema>;
 export type DocumentReceipt = typeof documentReceipts.$inferSelect;
+
+// ========================
+// FINANCIAL HUB - Treasury Sync (DarkWave Smart Chain Integration)
+// ========================
+export const treasurySnapshots = pgTable(
+  "treasury_snapshots",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    sourceSystem: varchar("source_system", { length: 100 }).notNull(),
+    treasuryAddress: varchar("treasury_address", { length: 255 }),
+    treasuryBalanceDwc: decimal("treasury_balance_dwc", { precision: 20, scale: 2 }),
+    
+    snapshotAsOf: timestamp("snapshot_as_of").notNull(),
+    
+    dexSwapFee: varchar("dex_swap_fee", { length: 20 }),
+    nftMarketplaceFee: varchar("nft_marketplace_fee", { length: 20 }),
+    bridgeFee: varchar("bridge_fee", { length: 20 }),
+    
+    rawResponse: jsonb("raw_response"),
+    
+    syncedAt: timestamp("synced_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    sourceIdx: index("idx_treasury_snapshots_source").on(table.sourceSystem),
+    syncedIdx: index("idx_treasury_snapshots_synced").on(table.syncedAt),
+  })
+);
+
+export const insertTreasurySnapshotSchema = createInsertSchema(treasurySnapshots).omit({
+  id: true,
+  syncedAt: true,
+});
+
+export type InsertTreasurySnapshot = z.infer<typeof insertTreasurySnapshotSchema>;
+export type TreasurySnapshot = typeof treasurySnapshots.$inferSelect;
+
+export const treasuryAllocations = pgTable(
+  "treasury_allocations",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    snapshotId: varchar("snapshot_id").notNull().references(() => treasurySnapshots.id),
+    
+    category: varchar("category", { length: 50 }).notNull(),
+    label: varchar("label", { length: 100 }).notNull(),
+    percentage: decimal("percentage", { precision: 5, scale: 2 }).notNull(),
+    
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    snapshotIdx: index("idx_treasury_allocations_snapshot").on(table.snapshotId),
+    categoryIdx: index("idx_treasury_allocations_category").on(table.category),
+  })
+);
+
+export const insertTreasuryAllocationSchema = createInsertSchema(treasuryAllocations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTreasuryAllocation = z.infer<typeof insertTreasuryAllocationSchema>;
+export type TreasuryAllocation = typeof treasuryAllocations.$inferSelect;
+
+export const treasuryLedgerEntries = pgTable(
+  "treasury_ledger_entries",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    
+    snapshotId: varchar("snapshot_id").notNull().references(() => treasurySnapshots.id),
+    externalId: varchar("external_id", { length: 255 }),
+    
+    category: varchar("category", { length: 50 }).notNull(),
+    amountDwc: decimal("amount_dwc", { precision: 20, scale: 2 }).notNull(),
+    transactionType: varchar("transaction_type", { length: 50 }).notNull(),
+    
+    externalCreatedAt: timestamp("external_created_at"),
+    syncedAt: timestamp("synced_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    snapshotIdx: index("idx_treasury_ledger_snapshot").on(table.snapshotId),
+    categoryIdx: index("idx_treasury_ledger_category").on(table.category),
+    externalIdx: index("idx_treasury_ledger_external").on(table.externalId),
+  })
+);
+
+export const insertTreasuryLedgerEntrySchema = createInsertSchema(treasuryLedgerEntries).omit({
+  id: true,
+  syncedAt: true,
+});
+
+export type InsertTreasuryLedgerEntry = z.infer<typeof insertTreasuryLedgerEntrySchema>;
+export type TreasuryLedgerEntry = typeof treasuryLedgerEntries.$inferSelect;
