@@ -26,7 +26,10 @@ import {
   ArrowLeft,
   Wallet,
   Receipt,
-  BarChart3
+  BarChart3,
+  Landmark,
+  Loader2,
+  Link2
 } from "lucide-react";
 
 interface Partner {
@@ -75,6 +78,32 @@ interface Summary {
   expensesThisMonth: number;
 }
 
+interface TreasuryAllocation {
+  id: string;
+  category: string;
+  label: string;
+  percentage: string;
+}
+
+interface TreasurySummary {
+  latestBalance: string | null;
+  latestAsOf: string | null;
+  allocations: TreasuryAllocation[];
+  protocolFees: {
+    dexSwapFee: string | null;
+    nftMarketplaceFee: string | null;
+    bridgeFee: string | null;
+  };
+}
+
+interface TreasuryStatus {
+  service: string;
+  configured: boolean;
+  lastSync: string | null;
+  totalSnapshots: number;
+  dwscUrl: string | null;
+}
+
 export default function AdminFinancialHub() {
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
@@ -82,6 +111,9 @@ export default function AdminFinancialHub() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [events, setEvents] = useState<FinancialEvent[]>([]);
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
+  const [treasuryStatus, setTreasuryStatus] = useState<TreasuryStatus | null>(null);
+  const [treasurySummary, setTreasurySummary] = useState<TreasurySummary | null>(null);
+  const [syncingTreasury, setSyncingTreasury] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -90,21 +122,39 @@ export default function AdminFinancialHub() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [summaryRes, partnersRes, eventsRes, ledgerRes] = await Promise.all([
+      const [summaryRes, partnersRes, eventsRes, ledgerRes, treasuryStatusRes, treasurySummaryRes] = await Promise.all([
         fetch("/api/admin/financial-hub/summary"),
         fetch("/api/admin/financial-hub/partners"),
         fetch("/api/admin/financial-hub/events?limit=20"),
         fetch("/api/admin/financial-hub/ledger?limit=20"),
+        fetch("/api/financial-hub/treasury/status"),
+        fetch("/api/admin/financial-hub/treasury/summary"),
       ]);
 
       if (summaryRes.ok) setSummary(await summaryRes.json());
       if (partnersRes.ok) setPartners(await partnersRes.json());
       if (eventsRes.ok) setEvents(await eventsRes.json());
       if (ledgerRes.ok) setLedger(await ledgerRes.json());
+      if (treasuryStatusRes.ok) setTreasuryStatus(await treasuryStatusRes.json());
+      if (treasurySummaryRes.ok) setTreasurySummary(await treasurySummaryRes.json());
     } catch (error) {
       console.error("Failed to fetch financial hub data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const triggerTreasurySync = async () => {
+    setSyncingTreasury(true);
+    try {
+      const res = await fetch("/api/admin/financial-hub/treasury/sync", { method: "POST" });
+      if (res.ok) {
+        await fetchData();
+      }
+    } catch (error) {
+      console.error("Failed to sync treasury:", error);
+    } finally {
+      setSyncingTreasury(false);
     }
   };
 
@@ -207,7 +257,7 @@ export default function AdminFinancialHub() {
       </BentoGrid>
 
       <Tabs defaultValue="partners" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-slate-700">
+        <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-slate-700">
           <TabsTrigger value="partners" className="data-[state=active]:bg-cyan-500/20" data-testid="tab-partners">
             <Users className="w-4 h-4 mr-2" />
             Partners
@@ -223,6 +273,10 @@ export default function AdminFinancialHub() {
           <TabsTrigger value="payouts" className="data-[state=active]:bg-cyan-500/20" data-testid="tab-payouts">
             <Wallet className="w-4 h-4 mr-2" />
             Payouts
+          </TabsTrigger>
+          <TabsTrigger value="treasury" className="data-[state=active]:bg-purple-500/20" data-testid="tab-treasury">
+            <Landmark className="w-4 h-4 mr-2" />
+            Treasury
           </TabsTrigger>
         </TabsList>
 
@@ -380,6 +434,122 @@ export default function AdminFinancialHub() {
               </div>
             </OrbitCardContent>
           </OrbitCard>
+        </TabsContent>
+
+        <TabsContent value="treasury" className="mt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <OrbitCard className="lg:col-span-2">
+              <OrbitCardHeader className="flex flex-row items-center justify-between">
+                <OrbitCardTitle>DarkWave Smart Chain Treasury</OrbitCardTitle>
+                <Button
+                  onClick={triggerTreasurySync}
+                  disabled={syncingTreasury || !treasuryStatus?.configured}
+                  size="sm"
+                  className="bg-purple-600 hover:bg-purple-700"
+                  data-testid="button-sync-treasury"
+                >
+                  {syncingTreasury ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                  )}
+                  Sync Now
+                </Button>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                <div className="mb-6 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${treasuryStatus?.configured ? 'bg-emerald-500 animate-pulse' : 'bg-yellow-500'}`} />
+                      <span className="text-white font-medium">Connection Status</span>
+                    </div>
+                    <Badge className={treasuryStatus?.configured ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}>
+                      {treasuryStatus?.configured ? 'Connected' : 'Not Configured'}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-slate-400">Last Sync:</span>
+                      <span className="text-white ml-2">
+                        {treasuryStatus?.lastSync ? formatDate(treasuryStatus.lastSync) : 'Never'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400">Snapshots:</span>
+                      <span className="text-cyan-400 ml-2 font-mono">{treasuryStatus?.totalSnapshots ?? 0}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {treasurySummary?.latestBalance && (
+                  <div className="p-6 bg-gradient-to-br from-purple-900/30 to-slate-800/50 rounded-lg border border-purple-500/30">
+                    <div className="text-center mb-4">
+                      <p className="text-slate-400 text-sm">Treasury Balance (DWC)</p>
+                      <p className="text-3xl font-bold text-purple-400 font-mono">
+                        {parseFloat(treasurySummary.latestBalance).toLocaleString()}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        As of {treasurySummary.latestAsOf ? formatDate(treasurySummary.latestAsOf) : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {!treasuryStatus?.configured && (
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                    <Link2 className="w-12 h-12 mb-4 text-slate-600" />
+                    <p className="text-lg">Treasury Sync Not Configured</p>
+                    <p className="text-sm text-slate-500 mt-2 text-center max-w-md">
+                      Set DWSC_TREASURY_URL environment variable to connect to DarkWave Smart Chain treasury.
+                    </p>
+                  </div>
+                )}
+              </OrbitCardContent>
+            </OrbitCard>
+
+            <OrbitCard>
+              <OrbitCardHeader>
+                <OrbitCardTitle>Allocations</OrbitCardTitle>
+              </OrbitCardHeader>
+              <OrbitCardContent>
+                {treasurySummary?.allocations && treasurySummary.allocations.length > 0 ? (
+                  <div className="space-y-3">
+                    {treasurySummary.allocations.map((alloc) => (
+                      <div key={alloc.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg" data-testid={`allocation-${alloc.category}`}>
+                        <span className="text-white">{alloc.label}</span>
+                        <span className="text-purple-400 font-mono font-bold">{alloc.percentage}%</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-slate-500">
+                    <p>No allocation data yet</p>
+                    <p className="text-xs mt-2">Sync treasury to fetch allocations</p>
+                  </div>
+                )}
+
+                {treasurySummary?.protocolFees?.dexSwapFee && (
+                  <div className="mt-6 pt-4 border-t border-slate-700">
+                    <p className="text-sm text-slate-400 mb-3">Protocol Fees</p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">DEX Swap</span>
+                        <span className="text-cyan-400">{treasurySummary.protocolFees.dexSwapFee}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">NFT Marketplace</span>
+                        <span className="text-cyan-400">{treasurySummary.protocolFees.nftMarketplaceFee}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Bridge</span>
+                        <span className="text-cyan-400">{treasurySummary.protocolFees.bridgeFee}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </OrbitCardContent>
+            </OrbitCard>
+          </div>
         </TabsContent>
       </Tabs>
 
