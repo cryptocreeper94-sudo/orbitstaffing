@@ -48,9 +48,13 @@ interface TreasurySyncResponse {
   };
 }
 
-function generateHmacSignature(key: string, timestamp: string, path: string, secret: string): string {
-  const payload = `${key}${timestamp}${path}`;
+function generateHmacSignature(method: string, path: string, timestamp: string, nonce: string, secret: string): string {
+  const payload = `${method}:${path}:${timestamp}:${nonce}`;
   return crypto.createHmac('sha256', secret).update(payload).digest('hex');
+}
+
+function generateNonce(): string {
+  return crypto.randomBytes(16).toString('hex');
 }
 
 export class TreasurySyncClient {
@@ -102,7 +106,8 @@ export class TreasurySyncClient {
     try {
       const timestamp = Date.now().toString();
       const path = "/api/treasury/sync";
-      const signature = generateHmacSignature(ORBIT_API_KEY, timestamp, path, ORBIT_API_SECRET);
+      const nonce = generateNonce();
+      const signature = generateHmacSignature("GET", path, timestamp, nonce, ORBIT_API_SECRET);
 
       const response = await fetch(`${DWSC_TREASURY_URL}${path}`, {
         method: "GET",
@@ -110,6 +115,7 @@ export class TreasurySyncClient {
           "X-Orbit-Key": ORBIT_API_KEY,
           "X-Orbit-Timestamp": timestamp,
           "X-Orbit-Signature": signature,
+          "X-Orbit-Nonce": nonce,
         },
       });
 
