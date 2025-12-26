@@ -306,6 +306,10 @@ export class FinancialHub {
     return splits;
   }
 
+  async getPartnerLedger(partnerId: string, limit: number = 20): Promise<RoyaltyLedger[]> {
+    return await this.getLedgerEntries({ partnerId, limit });
+  }
+
   async getLedgerEntries(filters?: {
     partnerId?: string;
     productCode?: string;

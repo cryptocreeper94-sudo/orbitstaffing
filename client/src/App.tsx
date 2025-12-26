@@ -95,6 +95,7 @@ import WorkersCompAdmin from "@/pages/WorkersCompAdmin";
 import AdminLicenseManager from "@/pages/AdminLicenseManager";
 import AdminLanding from "@/pages/AdminLanding";
 import AdminFinancialHub from "@/pages/AdminFinancialHub";
+import PartnerDashboard from "@/pages/PartnerDashboard";
 import DeveloperPortal from "@/pages/DeveloperPortal";
 import DeveloperAccount from "@/pages/DeveloperAccount";
 import { TutorialProvider } from "@/components/PageTutorial";
@@ -228,6 +229,7 @@ function Router() {
       <Route path="/admin/licenses" component={AdminLicenseManager} />
       <Route path="/admin/license-manager" component={AdminLicenseManager} />
       <Route path="/admin/financial-hub" component={AdminFinancialHub} />
+      <Route path="/partner" component={PartnerDashboard} />
       <Route path="/franchise-success" component={FranchiseSuccess} />
       <Route path="/franchise/success" component={FranchiseSuccess} />
       <Route path="/about" component={AboutUs} />

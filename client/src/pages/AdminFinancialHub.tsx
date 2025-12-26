@@ -114,10 +114,26 @@ export default function AdminFinancialHub() {
   const [treasuryStatus, setTreasuryStatus] = useState<TreasuryStatus | null>(null);
   const [treasurySummary, setTreasurySummary] = useState<TreasurySummary | null>(null);
   const [syncingTreasury, setSyncingTreasury] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    const fetchAuthInfo = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          setIsOwner(data.isOwner === true);
+        }
+      } catch (error) {
+        console.error('Failed to fetch auth info:', error);
+      }
+    };
+    fetchAuthInfo();
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [isOwner]);
 
   useEffect(() => {
     const autoSyncTreasury = async () => {
@@ -140,21 +156,33 @@ export default function AdminFinancialHub() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [summaryRes, partnersRes, eventsRes, ledgerRes, treasuryStatusRes, treasurySummaryRes] = await Promise.all([
+      const basePromises = [
         fetch("/api/admin/financial-hub/summary"),
         fetch("/api/admin/financial-hub/partners"),
         fetch("/api/admin/financial-hub/events?limit=20"),
         fetch("/api/admin/financial-hub/ledger?limit=20"),
-        fetch("/api/financial-hub/treasury/status"),
-        fetch("/api/admin/financial-hub/treasury/summary"),
-      ]);
+      ];
+      
+      const [summaryRes, partnersRes, eventsRes, ledgerRes] = await Promise.all(basePromises);
 
       if (summaryRes.ok) setSummary(await summaryRes.json());
       if (partnersRes.ok) setPartners(await partnersRes.json());
       if (eventsRes.ok) setEvents(await eventsRes.json());
       if (ledgerRes.ok) setLedger(await ledgerRes.json());
-      if (treasuryStatusRes.ok) setTreasuryStatus(await treasuryStatusRes.json());
-      if (treasurySummaryRes.ok) setTreasurySummary(await treasurySummaryRes.json());
+      
+      // Only fetch treasury data if owner (all treasury endpoints require owner access)
+      if (isOwner) {
+        try {
+          const [treasuryStatusRes, treasurySummaryRes] = await Promise.all([
+            fetch("/api/financial-hub/treasury/status"),
+            fetch("/api/admin/financial-hub/treasury/summary"),
+          ]);
+          if (treasuryStatusRes.ok) setTreasuryStatus(await treasuryStatusRes.json());
+          if (treasurySummaryRes.ok) setTreasurySummary(await treasurySummaryRes.json());
+        } catch (e) {
+          // Ignore treasury errors for non-owners
+        }
+      }
     } catch (error) {
       console.error("Failed to fetch financial hub data:", error);
     } finally {
@@ -275,7 +303,7 @@ export default function AdminFinancialHub() {
       </BentoGrid>
 
       <Tabs defaultValue="partners" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-slate-700">
+        <TabsList className={`grid w-full ${isOwner ? 'grid-cols-5' : 'grid-cols-4'} bg-slate-800/50 border border-slate-700`}>
           <TabsTrigger value="partners" className="data-[state=active]:bg-cyan-500/20" data-testid="tab-partners">
             <Users className="w-4 h-4 mr-2" />
             Partners
@@ -292,10 +320,12 @@ export default function AdminFinancialHub() {
             <Wallet className="w-4 h-4 mr-2" />
             Payouts
           </TabsTrigger>
-          <TabsTrigger value="treasury" className="data-[state=active]:bg-purple-500/20" data-testid="tab-treasury">
-            <Landmark className="w-4 h-4 mr-2" />
-            Treasury
-          </TabsTrigger>
+          {isOwner && (
+            <TabsTrigger value="treasury" className="data-[state=active]:bg-purple-500/20" data-testid="tab-treasury">
+              <Landmark className="w-4 h-4 mr-2" />
+              Treasury
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="partners" className="mt-4">
@@ -454,6 +484,7 @@ export default function AdminFinancialHub() {
           </OrbitCard>
         </TabsContent>
 
+        {isOwner && (
         <TabsContent value="treasury" className="mt-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <OrbitCard className="lg:col-span-2">
@@ -569,6 +600,7 @@ export default function AdminFinancialHub() {
             </OrbitCard>
           </div>
         </TabsContent>
+        )}
       </Tabs>
 
       <OrbitCard className="mt-6">

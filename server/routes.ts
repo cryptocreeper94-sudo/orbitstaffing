@@ -110,6 +110,23 @@ function requireMasterAdmin(req: Request, res: Response, next: NextFunction): vo
   next();
 }
 
+// Owner-only middleware - ONLY Developer role (Jason) can access DWSC Treasury
+// This is the most restrictive check - no master admins, no partners, only developer
+function requireOwner(req: Request, res: Response, next: NextFunction): void {
+  if (!req.session?.adminAuthenticated) {
+    res.status(403).json({ error: "Authentication required" });
+    return;
+  }
+  const adminRole = req.session?.adminRole || '';
+  // ONLY developer role has DWSC Treasury access - this is Jason's exclusive domain
+  // All other roles (master, admin, partner) are blocked
+  if (adminRole === 'developer') {
+    next();
+    return;
+  }
+  res.status(403).json({ error: "Owner access required - DWSC Treasury is restricted" });
+}
+
 // ========================
 // HELPERS
 // ========================
@@ -621,7 +638,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       
-      // Check for Sid's PIN (4444) - Partner with full sandbox access
+      // Check for Sidonie's PIN (4444) - Partner with full admin access (not sandbox)
+      // Sidonie is 50/50 partner on: ORBIT Staffing OS, PaintPros.io, Brew & Board Coffee
+      // She does NOT have access to DWSC Treasury or Developer tools
       if (pin === '4444') {
         // Regenerate session to prevent session fixation
         req.session.regenerate(async (err) => {
@@ -630,23 +649,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(500).json({ error: "Session error" });
           }
           
-          // Set session for Sid - full sandbox access (can interact, nothing saves to production)
+          // Set session for Sidonie - full admin access (real actions, not sandbox)
           req.session.adminAuthenticated = true;
-          req.session.adminName = 'Sid';
-          req.session.adminRole = 'partner';
+          req.session.adminName = 'Sidonie';
+          req.session.adminRole = 'master'; // Full admin access
           
-          // Log successful Sid login
+          // Log successful Sidonie login
           await db.insert(adminLoginLogs).values({
-            adminName: 'Sid',
-            adminRole: 'partner',
+            adminName: 'Sidonie',
+            adminRole: 'master',
             loginTime: new Date(),
             ipAddress: ipAddress as string,
             userAgent: userAgent || 'Unknown',
           });
           
-          console.log(`[Sid Login] ✅ Sid logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          console.log(`[Sidonie Login] ✅ Sidonie logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
           
-          return res.json({ verified: true, role: 'partner', name: 'Sid', sandboxMode: true });
+          // Return full admin access - no sandbox mode, but flag as partner for UI filtering
+          return res.json({ verified: true, role: 'master', name: 'Sidonie', isPartner: true, sandboxMode: false });
         });
         return;
       }
@@ -709,6 +729,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.clearCookie('orbit.sid');
       console.log(`[Admin Logout] ✅ ${adminName} logged out at ${new Date().toLocaleString()}`);
       res.json({ success: true, message: "Logged out successfully" });
+    });
+  });
+
+  // Get current session info (for frontend access control)
+  app.get("/api/auth/me", (req: Request, res: Response) => {
+    if (!req.session?.adminAuthenticated) {
+      return res.json({ authenticated: false });
+    }
+    
+    const adminName = req.session.adminName || '';
+    const adminRole = req.session.adminRole || '';
+    
+    // Determine if this user is the owner (has DWSC Treasury access)
+    // ONLY developer role has owner status - this is Jason's exclusive domain
+    const isOwner = adminRole === 'developer';
+    const isPartner = adminName === 'Sidonie';
+    
+    res.json({
+      authenticated: true,
+      name: adminName,
+      role: adminRole,
+      isOwner,
+      isPartner,
     });
   });
 
@@ -11662,11 +11705,159 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // ========================
+  // PARTNER DASHBOARD - Sidonie's 50/50 profit share view
+  // ========================
+
+  // Partner: Get partner earnings summary (filtered to session user)
+  app.get("/api/partner/earnings", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const adminName = req.session?.adminName || '';
+      const isPartner = adminName === 'Sidonie';
+      
+      // Get Sidonie's partner profile
+      const partner = await financialHub.getPartnerByEmail('sidonie@darkwavestudios.io');
+      
+      if (!partner && isPartner) {
+        // Return empty earnings for new partners
+        res.json({
+          earnings: {
+            partnerId: null,
+            fullName: 'Sidonie Summers',
+            totalGrossRevenue: 0,
+            totalExpenses: 0,
+            netProfit: 0,
+            partnerShare: 0,
+            splitPercentage: 50,
+            pendingPayouts: 0,
+            paidToDate: 0,
+            taxWithheld: 0,
+          },
+          productBreakdown: [],
+        });
+        return;
+      }
+
+      // Get summary data from financial hub
+      const summary = await financialHub.getFinancialSummary();
+      
+      // Calculate partner share (50% after expenses)
+      const netProfit = summary.revenueThisMonth - summary.expensesThisMonth;
+      const partnerShare = netProfit * 0.5;
+      
+      // Get partner ledger entries
+      const ledgerEntries = partner ? await financialHub.getPartnerLedger(partner.id) : [];
+      const pendingPayouts = ledgerEntries
+        .filter(e => e.status === 'pending')
+        .reduce((sum, e) => sum + parseFloat(e.netAmount || '0'), 0);
+      
+      const paidToDate = ledgerEntries
+        .filter(e => e.status === 'paid')
+        .reduce((sum, e) => sum + parseFloat(e.netAmount || '0'), 0);
+      
+      const taxWithheld = ledgerEntries
+        .reduce((sum, e) => sum + parseFloat(e.taxWithholding || '0'), 0);
+
+      // Aggregate ledger entries by product code for real product breakdown
+      const productAggregates: Record<string, { gross: number; net: number; tax: number }> = {};
+      for (const entry of ledgerEntries) {
+        const code = entry.productCode || 'orbit_staffing';
+        if (!productAggregates[code]) {
+          productAggregates[code] = { gross: 0, net: 0, tax: 0 };
+        }
+        productAggregates[code].gross += parseFloat(entry.grossAmount || '0');
+        productAggregates[code].net += parseFloat(entry.netAmount || '0');
+        productAggregates[code].tax += parseFloat(entry.taxWithholding || '0');
+      }
+      
+      const productNames: Record<string, string> = {
+        'orbit_staffing': 'ORBIT Staffing OS',
+        'paintpros': 'PaintPros.io',
+        'brew_board': 'Brew & Board Coffee',
+      };
+      
+      // Build product breakdown from actual ledger data
+      const productBreakdown = ['orbit_staffing', 'paintpros', 'brew_board'].map(code => {
+        const agg = productAggregates[code] || { gross: 0, net: 0, tax: 0 };
+        return {
+          productCode: code,
+          productName: productNames[code] || code,
+          totalRevenue: agg.gross,
+          expenses: 0, // Expenses tracked separately
+          netProfit: agg.gross, // Before partner split
+          partnerShare: agg.net, // After 50% split
+        };
+      });
+
+      res.json({
+        earnings: {
+          partnerId: partner?.id || null,
+          fullName: partner?.fullName || 'Sidonie Summers',
+          totalGrossRevenue: summary.revenueThisMonth,
+          totalExpenses: summary.expensesThisMonth,
+          netProfit,
+          partnerShare,
+          splitPercentage: 50,
+          pendingPayouts,
+          paidToDate,
+          taxWithheld,
+        },
+        productBreakdown,
+      });
+    } catch (error) {
+      console.error("Get partner earnings error:", error);
+      res.status(500).json({ error: "Failed to fetch partner earnings" });
+    }
+  });
+
+  // Partner: Get ledger entries for the current partner
+  app.get("/api/partner/ledger", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const adminName = req.session?.adminName || '';
+      
+      // Get Sidonie's partner profile
+      const partner = await financialHub.getPartnerByEmail('sidonie@darkwavestudios.io');
+      
+      if (!partner) {
+        res.json([]);
+        return;
+      }
+
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+      const ledger = await financialHub.getPartnerLedger(partner.id, limit);
+      res.json(ledger);
+    } catch (error) {
+      console.error("Get partner ledger error:", error);
+      res.status(500).json({ error: "Failed to fetch partner ledger" });
+    }
+  });
+
+  // Partner: Get payout history for the current partner
+  app.get("/api/partner/payouts", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const adminName = req.session?.adminName || '';
+      
+      // Get Sidonie's partner profile
+      const partner = await financialHub.getPartnerByEmail('sidonie@darkwavestudios.io');
+      
+      if (!partner) {
+        res.json([]);
+        return;
+      }
+
+      const payoutsList = await financialHub.getPayouts(partner.id);
+      res.json(payoutsList);
+    } catch (error) {
+      console.error("Get partner payouts error:", error);
+      res.status(500).json({ error: "Failed to fetch partner payouts" });
+    }
+  });
+
+  // ========================
   // TREASURY SYNC - DarkWave Smart Chain Integration
   // ========================
 
-  // Public: Get treasury sync status
-  app.get("/api/financial-hub/treasury/status", async (req: Request, res: Response) => {
+  // Owner-only: Get treasury sync status (DWSC is Jason's exclusive domain)
+  app.get("/api/financial-hub/treasury/status", requireOwner, async (req: Request, res: Response) => {
     try {
       const status = await treasurySyncClient.getSyncStatus();
       res.json({
@@ -11680,7 +11871,7 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // Admin: Trigger manual treasury sync
-  app.post("/api/admin/financial-hub/treasury/sync", requireMasterAdmin, async (req: Request, res: Response) => {
+  app.post("/api/admin/financial-hub/treasury/sync", requireOwner, async (req: Request, res: Response) => {
     try {
       const result = await treasurySyncClient.syncFromDWSC();
       if (result.success) {
@@ -11699,7 +11890,7 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // Admin: Get treasury summary (latest snapshot + allocations)
-  app.get("/api/admin/financial-hub/treasury/summary", requireMasterAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/financial-hub/treasury/summary", requireOwner, async (req: Request, res: Response) => {
     try {
       const summary = await treasurySyncClient.getTreasurySummary();
       res.json(summary);
@@ -11710,7 +11901,7 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // Admin: Get all treasury snapshots
-  app.get("/api/admin/financial-hub/treasury/snapshots", requireMasterAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/financial-hub/treasury/snapshots", requireOwner, async (req: Request, res: Response) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
       const snapshots = await treasurySyncClient.getAllSnapshots(limit);
@@ -11722,7 +11913,7 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // Admin: Get allocations for a specific snapshot
-  app.get("/api/admin/financial-hub/treasury/snapshots/:id/allocations", requireMasterAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/financial-hub/treasury/snapshots/:id/allocations", requireOwner, async (req: Request, res: Response) => {
     try {
       const allocations = await treasurySyncClient.getSnapshotAllocations(req.params.id);
       res.json(allocations);
@@ -11733,7 +11924,7 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // Admin: Get ledger entries for a specific snapshot
-  app.get("/api/admin/financial-hub/treasury/snapshots/:id/ledger", requireMasterAdmin, async (req: Request, res: Response) => {
+  app.get("/api/admin/financial-hub/treasury/snapshots/:id/ledger", requireOwner, async (req: Request, res: Response) => {
     try {
       const ledger = await treasurySyncClient.getSnapshotLedger(req.params.id);
       res.json(ledger);
