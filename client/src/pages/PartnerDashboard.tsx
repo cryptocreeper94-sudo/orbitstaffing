@@ -27,7 +27,11 @@ import {
   BarChart3,
   PieChart,
   Building2,
-  Calendar
+  Calendar,
+  CreditCard,
+  Link2,
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 
 interface PartnerEarnings {
@@ -72,6 +76,14 @@ interface ProductSummary {
   partnerShare: number;
 }
 
+interface StripeConnectStatus {
+  connected: boolean;
+  onboardingComplete: boolean;
+  payoutsEnabled: boolean;
+  accountId: string | null;
+  status: string;
+}
+
 export default function PartnerDashboard() {
   const [, setLocation] = useLocation();
   const [loading, setLoading] = useState(true);
@@ -79,9 +91,19 @@ export default function PartnerDashboard() {
   const [ledger, setLedger] = useState<LedgerEntry[]>([]);
   const [payouts, setPayouts] = useState<PayoutRecord[]>([]);
   const [productSummary, setProductSummary] = useState<ProductSummary[]>([]);
+  const [stripeStatus, setStripeStatus] = useState<StripeConnectStatus | null>(null);
+  const [connectingStripe, setConnectingStripe] = useState(false);
 
   useEffect(() => {
     fetchPartnerData();
+    fetchStripeStatus();
+    
+    // Check for Stripe return params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('stripe_success') === 'true') {
+      refreshStripeStatus();
+      window.history.replaceState({}, '', '/partner');
+    }
   }, []);
 
   const fetchPartnerData = async () => {
@@ -141,6 +163,45 @@ export default function PartnerDashboard() {
     { code: 'brew_board', name: 'Brew & Board Coffee', icon: '☕' },
   ];
 
+  const fetchStripeStatus = async () => {
+    try {
+      const res = await fetch("/api/partner/stripe/status");
+      if (res.ok) {
+        setStripeStatus(await res.json());
+      }
+    } catch (error) {
+      console.error("Failed to fetch Stripe status:", error);
+    }
+  };
+
+  const refreshStripeStatus = async () => {
+    try {
+      const res = await fetch("/api/partner/stripe/refresh-status", { method: 'POST' });
+      if (res.ok) {
+        setStripeStatus(await res.json());
+      }
+    } catch (error) {
+      console.error("Failed to refresh Stripe status:", error);
+    }
+  };
+
+  const connectStripe = async () => {
+    setConnectingStripe(true);
+    try {
+      const res = await fetch("/api/partner/stripe/onboard", { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to connect Stripe:", error);
+    } finally {
+      setConnectingStripe(false);
+    }
+  };
+
   return (
     <div className="space-y-6 p-6 min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <PageHeader
@@ -171,6 +232,69 @@ export default function PartnerDashboard() {
           </div>
         }
       />
+
+      {/* Stripe Connect Card - Show if not fully set up */}
+      {(!stripeStatus?.payoutsEnabled) && (
+        <OrbitCard className="border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-900/20 to-slate-900">
+          <OrbitCardContent className="p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-emerald-500/20 rounded-xl">
+                  <CreditCard className="w-8 h-8 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-1">
+                    {stripeStatus?.connected ? 'Complete Your Stripe Setup' : 'Connect Your Bank Account'}
+                  </h3>
+                  <p className="text-slate-400 text-sm mb-3">
+                    {stripeStatus?.connected 
+                      ? 'Finish setting up your Stripe account to receive automatic payouts.'
+                      : 'Connect your bank account through Stripe to receive automatic 50% profit share payouts.'}
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>Secure • Instant transfers • No fees</span>
+                  </div>
+                </div>
+              </div>
+              <Button
+                onClick={connectStripe}
+                disabled={connectingStripe}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-6"
+                data-testid="button-connect-stripe"
+              >
+                {connectingStripe ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <Link2 className="w-4 h-4 mr-2" />
+                    {stripeStatus?.connected ? 'Complete Setup' : 'Connect Stripe'}
+                  </>
+                )}
+              </Button>
+            </div>
+            {stripeStatus?.status === 'pending_verification' && (
+              <div className="mt-4 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/30">
+                <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Your account is pending verification. This usually takes 1-2 business days.</span>
+                </div>
+              </div>
+            )}
+          </OrbitCardContent>
+        </OrbitCard>
+      )}
+
+      {/* Stripe Connected Badge */}
+      {stripeStatus?.payoutsEnabled && (
+        <div className="flex items-center gap-3 p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+          <span className="text-emerald-300 font-medium">Stripe Connected - Automatic payouts enabled</span>
+        </div>
+      )}
 
       <BentoGrid cols={4} gap="md">
         <BentoTile>

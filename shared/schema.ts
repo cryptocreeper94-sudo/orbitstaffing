@@ -7161,6 +7161,9 @@ export const partnerProfiles = pgTable(
     
     paymentMethod: varchar("payment_method", { length: 50 }).default("stripe"),
     stripeAccountId: varchar("stripe_account_id", { length: 255 }),
+    stripeConnectStatus: varchar("stripe_connect_status", { length: 50 }).default("not_started"),
+    stripeConnectOnboardingComplete: boolean("stripe_connect_onboarding_complete").default(false),
+    stripePayoutsEnabled: boolean("stripe_payouts_enabled").default(false),
     bankAccountLast4: varchar("bank_account_last4", { length: 4 }),
     venmoHandle: varchar("venmo_handle", { length: 100 }),
     cashAppHandle: varchar("cashapp_handle", { length: 100 }),

@@ -382,10 +382,7 @@ export default function AdminPanel() {
     );
   }
 
-  const isPartner = adminName === 'Sidonie' || adminName === 'Sid';
-  
   const quickActions = [
-    ...(isPartner ? [{ title: 'My Earnings', icon: <Receipt className="w-4 h-4" />, onClick: () => setLocation('/partner'), className: 'bg-emerald-600 hover:bg-emerald-700' }] : []),
     { title: 'Incidents', icon: <AlertTriangle className="w-4 h-4" />, onClick: () => setLocation('/incident-reporting'), className: 'bg-red-600 hover:bg-red-700' },
     { title: 'Workers Comp', icon: <Shield className="w-4 h-4" />, onClick: () => setLocation('/workers-comp-admin'), className: 'bg-orange-600 hover:bg-orange-700' },
     { title: 'Developer', icon: <Code className="w-4 h-4" />, onClick: () => setLocation('/'), className: 'bg-purple-600 hover:bg-purple-700' },

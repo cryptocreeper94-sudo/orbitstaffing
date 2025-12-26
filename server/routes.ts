@@ -90,6 +90,7 @@ import {
   WEBHOOK_EVENT_TYPES,
   developers,
   insertDeveloperSchema,
+  partnerProfiles,
 } from "@shared/schema";
 import crypto from "crypto";
 
@@ -741,10 +742,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const adminName = req.session.adminName || '';
     const adminRole = req.session.adminRole || '';
     
-    // Determine if this user is the owner (has DWSC Treasury access)
-    // ONLY developer role has owner status - this is Jason's exclusive domain
-    const isOwner = adminRole === 'developer';
-    const isPartner = adminName === 'Sidonie';
+    // Access control model:
+    // Jason (developer): Full access to everything including dev tools, DWSC treasury, pricing
+    // Sidonie (master): Full access EXCEPT dev tools, DWSC treasury; pricing needs approval
+    const isDeveloper = adminRole === 'developer';
+    const isOwner = isDeveloper; // DWSC Treasury access - Jason only
+    const isPartner = adminRole === 'master' && adminName === 'Sidonie';
+    
+    // Capability flags
+    const capabilities = {
+      canAccessDevTools: isDeveloper,
+      canAccessDWSCTreasury: isDeveloper,
+      canChangePricing: isDeveloper, // Sidonie needs approval for pricing changes
+      canViewAllFeatures: isDeveloper || isPartner, // Both see everything else
+      canManageWorkers: true,
+      canManageJobs: true,
+      canManageTimesheets: true,
+      canManagePayroll: true,
+      canManageCompliance: true,
+      canViewFinancials: true,
+      canReceivePayouts: isPartner, // Sidonie can connect Stripe for payouts
+    };
     
     res.json({
       authenticated: true,
@@ -752,6 +770,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       role: adminRole,
       isOwner,
       isPartner,
+      isDeveloper,
+      capabilities,
     });
   });
 
@@ -11849,6 +11869,155 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Get partner payouts error:", error);
       res.status(500).json({ error: "Failed to fetch partner payouts" });
+    }
+  });
+
+  // ========================
+  // STRIPE CONNECT - Partner Payout Onboarding
+  // ========================
+
+  // Partner: Get Stripe Connect status
+  app.get("/api/partner/stripe/status", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const partner = await financialHub.getPartnerByEmail('sidonie@darkwavestudios.io');
+      
+      if (!partner) {
+        return res.json({
+          connected: false,
+          onboardingComplete: false,
+          payoutsEnabled: false,
+          accountId: null,
+        });
+      }
+
+      res.json({
+        connected: !!partner.stripeAccountId,
+        onboardingComplete: partner.stripeConnectOnboardingComplete || false,
+        payoutsEnabled: partner.stripePayoutsEnabled || false,
+        accountId: partner.stripeAccountId,
+        status: partner.stripeConnectStatus || 'not_started',
+      });
+    } catch (error) {
+      console.error("Get Stripe Connect status error:", error);
+      res.status(500).json({ error: "Failed to get Stripe Connect status" });
+    }
+  });
+
+  // Partner: Create Stripe Connect onboarding link
+  app.post("/api/partner/stripe/onboard", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      let partner = await financialHub.getPartnerByEmail('sidonie@darkwavestudios.io');
+      
+      // Create partner profile if doesn't exist
+      if (!partner) {
+        partner = await financialHub.createPartner({
+          fullName: 'Sidonie Summers',
+          email: 'sidonie@darkwavestudios.io',
+          taxType: 'dual',
+          defaultSplitPercentage: 50,
+        });
+      }
+
+      let accountId = partner.stripeAccountId;
+
+      // Create Stripe Connect account if doesn't exist
+      if (!accountId) {
+        const account = await stripe.accounts.create({
+          type: 'express',
+          country: 'US',
+          email: 'sidonie@darkwavestudios.io',
+          capabilities: {
+            transfers: { requested: true },
+          },
+          business_type: 'individual',
+          metadata: {
+            partnerId: partner.id,
+            partnerName: 'Sidonie Summers',
+            source: 'orbit_staffing_os',
+          },
+        });
+        accountId = account.id;
+
+        // Update partner with Stripe account ID
+        await db.update(partnerProfiles)
+          .set({ 
+            stripeAccountId: accountId,
+            stripeConnectStatus: 'pending',
+          })
+          .where(eq(partnerProfiles.id, partner.id));
+      }
+
+      // Create account link for onboarding
+      const host = req.get('host') || process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000';
+      const protocol = host.includes('localhost') ? 'http' : 'https';
+      const baseUrl = `${protocol}://${host}`;
+      const accountLink = await stripe.accountLinks.create({
+        account: accountId!,
+        refresh_url: `${baseUrl}/partner?stripe_refresh=true`,
+        return_url: `${baseUrl}/partner?stripe_success=true`,
+        type: 'account_onboarding',
+      });
+
+      res.json({
+        url: accountLink.url,
+        accountId,
+      });
+    } catch (error: any) {
+      console.error("Stripe Connect onboard error:", error);
+      res.status(500).json({ error: error.message || "Failed to create onboarding link" });
+    }
+  });
+
+  // Partner: Check and update Stripe Connect account status
+  app.post("/api/partner/stripe/refresh-status", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const { getUncachableStripeClient } = await import('./stripeClient');
+      const stripe = await getUncachableStripeClient();
+      
+      const partner = await financialHub.getPartnerByEmail('sidonie@darkwavestudios.io');
+      
+      if (!partner?.stripeAccountId) {
+        return res.json({ 
+          connected: false,
+          message: "No Stripe account connected" 
+        });
+      }
+
+      // Get account details from Stripe
+      const account = await stripe.accounts.retrieve(partner.stripeAccountId);
+      
+      const payoutsEnabled = account.payouts_enabled || false;
+      const detailsSubmitted = account.details_submitted || false;
+      
+      let status = 'pending';
+      if (payoutsEnabled && detailsSubmitted) {
+        status = 'active';
+      } else if (detailsSubmitted) {
+        status = 'pending_verification';
+      }
+
+      // Update partner profile
+      await db.update(partnerProfiles)
+        .set({
+          stripeConnectStatus: status,
+          stripeConnectOnboardingComplete: detailsSubmitted,
+          stripePayoutsEnabled: payoutsEnabled,
+        })
+        .where(eq(partnerProfiles.id, partner.id));
+
+      res.json({
+        connected: true,
+        onboardingComplete: detailsSubmitted,
+        payoutsEnabled,
+        status,
+        accountId: partner.stripeAccountId,
+      });
+    } catch (error: any) {
+      console.error("Stripe Connect refresh error:", error);
+      res.status(500).json({ error: error.message || "Failed to refresh status" });
     }
   });
 
