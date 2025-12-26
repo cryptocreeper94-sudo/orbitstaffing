@@ -28,6 +28,7 @@ import express from "express";
 import { azureFaceService } from "./azureFaceService";
 import { ecosystemHub, externalHubManager, EcosystemClient } from "./ecosystemHub";
 import { financialHub, type FinancialEventInput } from "./financialHub";
+import { treasurySyncClient } from "./treasurySync";
 import { versionManager } from "./versionManager";
 import { webhookService, emitWebhookEvent, sendTestWebhook, startWebhookRetryProcessor } from "./webhookService";
 import { sandboxService } from "./sandboxService";
@@ -11657,6 +11658,88 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Get summary error:", error);
       res.status(500).json({ error: "Failed to fetch summary" });
+    }
+  });
+
+  // ========================
+  // TREASURY SYNC - DarkWave Smart Chain Integration
+  // ========================
+
+  // Public: Get treasury sync status
+  app.get("/api/financial-hub/treasury/status", async (req: Request, res: Response) => {
+    try {
+      const status = await treasurySyncClient.getSyncStatus();
+      res.json({
+        service: "DarkWave Smart Chain Treasury Sync",
+        ...status,
+      });
+    } catch (error) {
+      console.error("Treasury status error:", error);
+      res.status(500).json({ error: "Failed to get treasury status" });
+    }
+  });
+
+  // Admin: Trigger manual treasury sync
+  app.post("/api/admin/financial-hub/treasury/sync", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const result = await treasurySyncClient.syncFromDWSC();
+      if (result.success) {
+        res.json({
+          success: true,
+          snapshotId: result.snapshotId,
+          message: `Synced ${result.allocationsCount} allocations and ${result.ledgerEntriesCount} ledger entries`,
+        });
+      } else {
+        res.status(400).json({ success: false, error: result.error });
+      }
+    } catch (error: any) {
+      console.error("Treasury sync error:", error);
+      res.status(500).json({ error: error.message || "Failed to sync treasury" });
+    }
+  });
+
+  // Admin: Get treasury summary (latest snapshot + allocations)
+  app.get("/api/admin/financial-hub/treasury/summary", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const summary = await treasurySyncClient.getTreasurySummary();
+      res.json(summary);
+    } catch (error) {
+      console.error("Treasury summary error:", error);
+      res.status(500).json({ error: "Failed to get treasury summary" });
+    }
+  });
+
+  // Admin: Get all treasury snapshots
+  app.get("/api/admin/financial-hub/treasury/snapshots", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const snapshots = await treasurySyncClient.getAllSnapshots(limit);
+      res.json(snapshots);
+    } catch (error) {
+      console.error("Treasury snapshots error:", error);
+      res.status(500).json({ error: "Failed to get treasury snapshots" });
+    }
+  });
+
+  // Admin: Get allocations for a specific snapshot
+  app.get("/api/admin/financial-hub/treasury/snapshots/:id/allocations", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const allocations = await treasurySyncClient.getSnapshotAllocations(req.params.id);
+      res.json(allocations);
+    } catch (error) {
+      console.error("Treasury allocations error:", error);
+      res.status(500).json({ error: "Failed to get allocations" });
+    }
+  });
+
+  // Admin: Get ledger entries for a specific snapshot
+  app.get("/api/admin/financial-hub/treasury/snapshots/:id/ledger", requireMasterAdmin, async (req: Request, res: Response) => {
+    try {
+      const ledger = await treasurySyncClient.getSnapshotLedger(req.params.id);
+      res.json(ledger);
+    } catch (error) {
+      console.error("Treasury ledger error:", error);
+      res.status(500).json({ error: "Failed to get ledger entries" });
     }
   });
 
