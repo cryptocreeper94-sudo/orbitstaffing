@@ -14,6 +14,14 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { 
   TrendingUp, 
   DollarSign, 
@@ -31,7 +39,10 @@ import {
   CreditCard,
   Link2,
   ExternalLink,
-  Loader2
+  Loader2,
+  Sparkles,
+  Shield,
+  Zap
 } from "lucide-react";
 
 interface PartnerEarnings {
@@ -93,6 +104,7 @@ export default function PartnerDashboard() {
   const [productSummary, setProductSummary] = useState<ProductSummary[]>([]);
   const [stripeStatus, setStripeStatus] = useState<StripeConnectStatus | null>(null);
   const [connectingStripe, setConnectingStripe] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
     fetchPartnerData();
@@ -103,6 +115,12 @@ export default function PartnerDashboard() {
     if (params.get('stripe_success') === 'true') {
       refreshStripeStatus();
       window.history.replaceState({}, '', '/partner');
+    }
+    
+    // Show welcome modal for first-time partner login (if Stripe not yet connected)
+    const hasSeenWelcome = localStorage.getItem('partner_welcome_seen');
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true);
     }
   }, []);
 
@@ -544,6 +562,85 @@ export default function PartnerDashboard() {
           </div>
         </OrbitCardContent>
       </OrbitCard>
+
+      {/* Welcome Modal for First-Time Partner Login */}
+      <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+        <DialogContent className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-cyan-500/30 max-w-lg">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-3 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-xl">
+                <Sparkles className="w-8 h-8 text-cyan-400" />
+              </div>
+              <div>
+                <DialogTitle className="text-2xl text-white">Welcome to Partner Hub!</DialogTitle>
+                <DialogDescription className="text-slate-400">
+                  Hey Sid! Let's get you set up to receive payouts.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+              <h4 className="text-white font-semibold mb-2 flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-emerald-400" />
+                Connect Your Bank Account
+              </h4>
+              <p className="text-slate-400 text-sm">
+                To receive your 50% profit share automatically, you'll need to connect your bank account through Stripe. 
+                This is a one-time setup that takes about 2 minutes.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 bg-slate-800/30 rounded-lg text-center">
+                <Shield className="w-6 h-6 text-cyan-400 mx-auto mb-2" />
+                <p className="text-xs text-slate-400">Bank-level security</p>
+              </div>
+              <div className="p-3 bg-slate-800/30 rounded-lg text-center">
+                <Zap className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
+                <p className="text-xs text-slate-400">Instant transfers</p>
+              </div>
+              <div className="p-3 bg-slate-800/30 rounded-lg text-center">
+                <CheckCircle2 className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                <p className="text-xs text-slate-400">Zero fees</p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
+              <p className="text-cyan-300 text-sm">
+                <strong>Your 50/50 split covers:</strong> ORBIT Staffing OS, PaintPros.io, and Brew & Board Coffee (after expenses).
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                localStorage.setItem('partner_welcome_seen', 'true');
+                setShowWelcomeModal(false);
+              }}
+              className="border-slate-600 hover:border-slate-500"
+              data-testid="button-skip-welcome"
+            >
+              I'll do this later
+            </Button>
+            <Button
+              onClick={() => {
+                localStorage.setItem('partner_welcome_seen', 'true');
+                setShowWelcomeModal(false);
+                connectStripe();
+              }}
+              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white"
+              data-testid="button-connect-stripe-welcome"
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              Connect Stripe Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
