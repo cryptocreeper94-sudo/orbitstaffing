@@ -119,6 +119,24 @@ export default function AdminFinancialHub() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const autoSyncTreasury = async () => {
+      if (!treasuryStatus?.configured) return;
+      
+      const lastSync = treasuryStatus.lastSync ? new Date(treasuryStatus.lastSync).getTime() : 0;
+      const oneHourAgo = Date.now() - (60 * 60 * 1000);
+      
+      if (lastSync < oneHourAgo && !syncingTreasury) {
+        console.log('[Treasury] Auto-syncing (last sync > 1 hour ago)');
+        await triggerTreasurySync();
+      }
+    };
+    
+    if (treasuryStatus) {
+      autoSyncTreasury();
+    }
+  }, [treasuryStatus?.configured]);
+
   const fetchData = async () => {
     setLoading(true);
     try {

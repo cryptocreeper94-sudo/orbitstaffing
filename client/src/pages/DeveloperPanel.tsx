@@ -2850,13 +2850,14 @@ export default function DeveloperPanel() {
                 </div>
               </AccordionTrigger>
               <AccordionContent className="bg-slate-900/50 px-2 py-2">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
                     { id: 'licenses', label: 'Software Licenses', icon: <FileText className="w-4 h-4" /> },
                     { id: 'franchises', label: 'Franchise Agreements', icon: <Building2 className="w-4 h-4" /> },
                     { id: 'invoices', label: 'License Invoices', icon: <Scale className="w-4 h-4" /> },
+                    { id: 'financial-hub', label: 'Financial Hub', icon: <DollarSign className="w-4 h-4" /> },
                   ].map(item => (
-                    <button key={item.id} onClick={() => setActiveTab(item.id)}
+                    <button key={item.id} onClick={() => item.id === 'financial-hub' ? setLocation('/admin/financial-hub') : setActiveTab(item.id)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all ${activeTab === item.id ? 'bg-amber-600 text-white' : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'}`}
                       data-testid={`btn-dev-${item.id}`}>
                       {item.icon}<span className="text-sm font-medium">{item.label}</span>
