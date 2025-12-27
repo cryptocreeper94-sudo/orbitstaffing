@@ -22,8 +22,10 @@ import {
 import { eq, desc, and, sql, between, gte, lte } from "drizzle-orm";
 import crypto from "crypto";
 
-// Financial Hub uses ecosystem API credentials from environment
-// DO NOT hardcode fallback values - credentials must be set in environment
+// Financial Hub API authentication
+// Supports both ecosystem credentials and external app integrations (PaintPros, etc.)
+const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot'];
+
 function getApiKey(): string {
   const key = process.env.ORBIT_ECOSYSTEM_API_KEY;
   if (!key) {
@@ -38,6 +40,18 @@ function getApiSecret(): string {
     throw new Error('ORBIT_ECOSYSTEM_API_SECRET environment variable not set');
   }
   return secret;
+}
+
+function getFinancialHubSecret(): string {
+  const secret = process.env.ORBIT_FINANCIAL_HUB_SECRET || process.env.ORBIT_ECOSYSTEM_API_SECRET;
+  if (!secret) {
+    throw new Error('ORBIT_FINANCIAL_HUB_SECRET or ORBIT_ECOSYSTEM_API_SECRET must be set');
+  }
+  return secret;
+}
+
+function isValidAppId(apiKey: string): boolean {
+  return VALID_APP_IDS.includes(apiKey) || apiKey === getApiKey();
 }
 
 export interface FinancialEventInput {
@@ -562,10 +576,16 @@ export class FinancialHub {
 
   verifyApiCredentials(apiKey: string, signature: string, payload: string): boolean {
     try {
-      if (apiKey !== getApiKey()) {
+      if (!isValidAppId(apiKey)) {
+        console.log(`[Financial Hub] Invalid API key: ${apiKey}`);
         return false;
       }
-      return verifyHmacSignature(payload, signature, getApiSecret());
+      const secret = getFinancialHubSecret();
+      const isValid = verifyHmacSignature(payload, signature, secret);
+      if (!isValid) {
+        console.log(`[Financial Hub] Invalid HMAC signature from ${apiKey}`);
+      }
+      return isValid;
     } catch (e) {
       console.error('Financial Hub credential verification failed:', e);
       return false;
