@@ -42,10 +42,19 @@ function getApiSecret(): string {
   return secret;
 }
 
-function getFinancialHubSecret(): string {
-  const secret = process.env.ORBIT_FINANCIAL_HUB_SECRET || process.env.ORBIT_ECOSYSTEM_API_SECRET;
+function getFinancialHubSecret(appId: string): string {
+  // Each connected app can have its own webhook secret for isolation
+  const appSecrets: Record<string, string | undefined> = {
+    'dw_app_paintpros': process.env.PAINTPROS_WEBHOOK_SECRET,
+    'dw_app_brewandboard': process.env.BREWANDBOARD_ECOSYSTEM_API_SECRET,
+    'dw_app_garagebot': process.env.GARAGEBOT_WEBHOOK_SECRET,
+    'dw_app_orbit': process.env.ORBIT_ECOSYSTEM_API_SECRET,
+  };
+  
+  // Try app-specific secret first, fall back to ecosystem secret
+  const secret = appSecrets[appId] || process.env.ORBIT_ECOSYSTEM_API_SECRET;
   if (!secret) {
-    throw new Error('ORBIT_FINANCIAL_HUB_SECRET or ORBIT_ECOSYSTEM_API_SECRET must be set');
+    throw new Error(`No webhook secret configured for ${appId}`);
   }
   return secret;
 }
@@ -580,7 +589,7 @@ export class FinancialHub {
         console.log(`[Financial Hub] Invalid API key: ${apiKey}`);
         return false;
       }
-      const secret = getFinancialHubSecret();
+      const secret = getFinancialHubSecret(apiKey);
       const isValid = verifyHmacSignature(payload, signature, secret);
       if (!isValid) {
         console.log(`[Financial Hub] Invalid HMAC signature from ${apiKey}`);
