@@ -24,7 +24,7 @@ import crypto from "crypto";
 
 // Financial Hub API authentication
 // Supports both ecosystem credentials and external app integrations (PaintPros, etc.)
-const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot'];
+const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot', 'dw_app_darkwavehealth'];
 
 function getApiKey(): string {
   const key = process.env.ORBIT_ECOSYSTEM_API_KEY;
@@ -49,6 +49,7 @@ function getFinancialHubSecret(appId: string): string {
     'dw_app_brewandboard': process.env.BREWANDBOARD_ECOSYSTEM_API_SECRET,
     'dw_app_garagebot': process.env.GARAGEBOT_WEBHOOK_SECRET,
     'dw_app_orbit': process.env.ORBIT_ECOSYSTEM_API_SECRET,
+    'dw_app_darkwavehealth': process.env.DARKWAVEHEALTH_WEBHOOK_SECRET,
   };
   
   // Try app-specific secret first, fall back to ecosystem secret
