@@ -379,6 +379,96 @@ class EmailService {
       `,
     };
   }
+
+  async sendPasswordResetEmail(email: string, name: string, resetUrl: string): Promise<{ success: boolean }> {
+    const emailOptions: EmailOptions = {
+      to: email,
+      subject: "Reset Your ORBIT Password",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #000000 0%, #1f2937 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">🪐 ORBIT Staffing</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Password Reset Request</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #000; margin-top: 0;">Hello ${name},</h2>
+            
+            <p style="color: #333; line-height: 1.6;">
+              We received a request to reset your password. Click the button below to create a new password:
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                Reset Password
+              </a>
+            </div>
+            
+            <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>Important:</strong> This link will expire in 30 minutes for security reasons.
+              </p>
+            </div>
+            
+            <p style="color: #666; line-height: 1.6; font-size: 14px;">
+              If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.
+            </p>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              ORBIT Staffing Platform | Secure Password Reset
+            </p>
+          </div>
+        </div>
+      `,
+    };
+    return this.send(emailOptions);
+  }
+
+  async sendPasswordChangedEmail(email: string, name: string): Promise<{ success: boolean }> {
+    const emailOptions: EmailOptions = {
+      to: email,
+      subject: "Your ORBIT Password Has Been Changed",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #000000 0%, #1f2937 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">🪐 ORBIT Staffing</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px;">Security Notice</p>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #000; margin-top: 0;">Hello ${name},</h2>
+            
+            <p style="color: #333; line-height: 1.6;">
+              Your ORBIT account password was successfully changed.
+            </p>
+            
+            <div style="background: #dcfce7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #22c55e;">
+              <p style="margin: 0; color: #166534; font-size: 14px;">
+                <strong>Password Updated Successfully</strong><br>
+                Your account is now secured with your new password.
+              </p>
+            </div>
+            
+            <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
+              <p style="margin: 0; color: #991b1b; font-size: 14px;">
+                <strong>Didn't make this change?</strong><br>
+                If you didn't reset your password, please contact us immediately at support@orbitstaffing.io
+              </p>
+            </div>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #999; font-size: 12px; margin: 0;">
+              ORBIT Staffing Platform | Account Security
+            </p>
+          </div>
+        </div>
+      `,
+    };
+    return this.send(emailOptions);
+  }
 }
 
 // Singleton instance

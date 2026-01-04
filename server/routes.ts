@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import { storage } from "./storage";
 import { db } from "./db";
+import { rateLimitMiddleware, recordLoginAttempt, logSecurityEvent, hashPassword, verifyPassword, generateSecureToken, hashToken, getTokenExpiry, validatePasswordStrength } from "./auth";
 import { emailService } from "./email";
 import { oauthClients } from "./oauthClients";
 import { syncEngine } from "./syncEngine";
@@ -91,6 +92,7 @@ import {
   developers,
   insertDeveloperSchema,
   partnerProfiles,
+  passwordResetTokens,
 } from "@shared/schema";
 import crypto from "crypto";
 
@@ -571,7 +573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/login", async (req: Request, res: Response) => {
+  app.post("/api/auth/login", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -579,12 +581,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const user = await storage.getUserByEmail(email);
       if (!user) {
+        recordLoginAttempt(req, false);
+        logSecurityEvent('LOGIN_FAILED', { email, reason: 'user_not_found', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      const passwordValid = await bcrypt.compare(password, user.passwordHash);
+      const passwordValid = await verifyPassword(password, user.passwordHash);
       if (!passwordValid) {
+        recordLoginAttempt(req, false);
+        logSecurityEvent('LOGIN_FAILED', { email, reason: 'invalid_password', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
+      recordLoginAttempt(req, true);
+      logSecurityEvent('LOGIN_SUCCESS', { email, userId: user.id, ip: req.ip });
+      
+      // Set session
+      req.session.user = {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenantId || undefined,
+      };
+      req.session.isAuthenticated = true;
+      
       res.json({
         id: user.id,
         email: user.email,
@@ -597,7 +615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/verify-admin-pin", async (req: Request, res: Response) => {
+  app.post("/api/auth/verify-admin-pin", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
       const { userId, pin } = req.body;
       
@@ -829,21 +847,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
+  // Secure forgot password - sends email with reset link
+  app.post("/api/auth/forgot-password", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
-      const { email, newPassword } = req.body;
-      if (!email || !newPassword) {
-        return res.status(400).json({ error: "Email and new password required" });
+      const { email } = req.body;
+      
+      // Always return 202 to prevent email enumeration attacks
+      if (!email) {
+        return res.status(202).json({ message: "If an account exists, a reset link will be sent" });
       }
+      
+      const user = await storage.getUserByEmail(email);
+      
+      if (user) {
+        // Invalidate any existing tokens for this user
+        await db.execute(sql`
+          DELETE FROM password_reset_tokens WHERE user_id = ${user.id}
+        `);
+        
+        // Generate secure token
+        const plainToken = generateSecureToken();
+        const tokenHash = hashToken(plainToken);
+        const expiresAt = getTokenExpiry(30); // 30 minutes
+        
+        // Store hashed token
+        await db.insert(passwordResetTokens).values({
+          userId: user.id,
+          tokenHash,
+          expiresAt,
+          requestIp: req.ip || null,
+          userAgent: req.headers['user-agent'] || null,
+        });
+        
+        // Send reset email via Resend
+        const resetUrl = `${req.protocol}://${req.get('host')}/reset-password?token=${plainToken}&email=${encodeURIComponent(email)}`;
+        
+        try {
+          await emailService.sendPasswordResetEmail(email, user.fullName || 'User', resetUrl);
+          logSecurityEvent('PASSWORD_RESET_REQUESTED', { email, ip: req.ip });
+        } catch (emailError) {
+          console.error('[Auth] Failed to send reset email:', emailError);
+        }
+      } else {
+        logSecurityEvent('PASSWORD_RESET_UNKNOWN_EMAIL', { email, ip: req.ip });
+      }
+      
+      // Always return success to prevent enumeration
+      res.status(202).json({ message: "If an account exists, a reset link will be sent" });
+    } catch (error) {
+      console.error('[Auth] Forgot password error:', error);
+      res.status(500).json({ error: "Request failed" });
+    }
+  });
+
+  // Verify reset token (frontend calls this when user clicks link)
+  app.post("/api/auth/reset-password/verify", async (req: Request, res: Response) => {
+    try {
+      const { token, email } = req.body;
+      
+      if (!token || !email) {
+        return res.status(400).json({ valid: false, error: "Token and email required" });
+      }
+      
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        return res.status(400).json({ valid: false, error: "Invalid token" });
       }
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      const tokenHash = hashToken(token);
+      const result = await db.execute(sql`
+        SELECT * FROM password_reset_tokens 
+        WHERE user_id = ${user.id} 
+          AND token_hash = ${tokenHash}
+          AND consumed_at IS NULL
+          AND expires_at > NOW()
+        LIMIT 1
+      `);
+      
+      if (result.rows.length === 0) {
+        logSecurityEvent('PASSWORD_RESET_INVALID_TOKEN', { email, ip: req.ip });
+        return res.status(400).json({ valid: false, error: "Invalid or expired token" });
+      }
+      
+      res.json({ valid: true });
+    } catch (error) {
+      console.error('[Auth] Token verification error:', error);
+      res.status(500).json({ valid: false, error: "Verification failed" });
+    }
+  });
+
+  // Confirm password reset with new password
+  app.post("/api/auth/reset-password/confirm", rateLimitMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { token, email, newPassword } = req.body;
+      
+      if (!token || !email || !newPassword) {
+        return res.status(400).json({ error: "Token, email, and new password required" });
+      }
+      
+      // Validate password strength
+      const passwordCheck = validatePasswordStrength(newPassword);
+      if (!passwordCheck.valid) {
+        return res.status(400).json({ error: "Password too weak", details: passwordCheck.errors });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(400).json({ error: "Invalid request" });
+      }
+      
+      const tokenHash = hashToken(token);
+      const result = await db.execute(sql`
+        SELECT id FROM password_reset_tokens 
+        WHERE user_id = ${user.id} 
+          AND token_hash = ${tokenHash}
+          AND consumed_at IS NULL
+          AND expires_at > NOW()
+        LIMIT 1
+      `);
+      
+      if (result.rows.length === 0) {
+        logSecurityEvent('PASSWORD_RESET_CONFIRM_INVALID', { email, ip: req.ip });
+        return res.status(400).json({ error: "Invalid or expired token" });
+      }
+      
+      const tokenRecord = result.rows[0] as any;
+      
+      // Hash new password and update user
+      const hashedPassword = await hashPassword(newPassword);
       await storage.updateUser(user.id, { passwordHash: hashedPassword });
+      
+      // Mark token as consumed
+      await db.execute(sql`
+        UPDATE password_reset_tokens SET consumed_at = NOW() WHERE id = ${tokenRecord.id}
+      `);
+      
+      // Delete all other tokens for this user
+      await db.execute(sql`
+        DELETE FROM password_reset_tokens WHERE user_id = ${user.id} AND id != ${tokenRecord.id}
+      `);
+      
+      logSecurityEvent('PASSWORD_RESET_SUCCESS', { email, userId: user.id, ip: req.ip });
+      
+      // Send confirmation email
+      try {
+        await emailService.sendPasswordChangedEmail(email, user.fullName || 'User');
+      } catch (emailError) {
+        console.error('[Auth] Failed to send password changed email:', emailError);
+      }
+      
       res.json({ success: true, message: "Password reset successfully" });
     } catch (error) {
-      res.status(500).json({ error: "Failed to reset password" });
+      console.error('[Auth] Password reset confirm error:', error);
+      res.status(500).json({ error: "Password reset failed" });
     }
   });
 
@@ -5039,7 +5195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Employer Login
-  app.post("/api/talent-exchange/employers/login", async (req: Request, res: Response) => {
+  app.post("/api/talent-exchange/employers/login", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
       
@@ -5052,15 +5208,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       
       if (result.rows.length === 0) {
+        recordLoginAttempt(req, false);
+        logSecurityEvent('EMPLOYER_LOGIN_FAILED', { email, reason: 'not_found', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
       const employer = result.rows[0] as any;
       
-      const passwordValid = await bcrypt.compare(password, employer.password_hash);
+      const passwordValid = await verifyPassword(password, employer.password_hash);
       if (!passwordValid) {
+        recordLoginAttempt(req, false);
+        logSecurityEvent('EMPLOYER_LOGIN_FAILED', { email, reason: 'invalid_password', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
+      
+      recordLoginAttempt(req, true);
+      logSecurityEvent('EMPLOYER_LOGIN_SUCCESS', { email, employerId: employer.id, ip: req.ip });
       
       if (employer.verification_status !== 'approved' && employer.verification_status !== 'pending') {
         return res.status(403).json({ error: "Account not approved" });
@@ -5795,7 +5958,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Candidate Login
-  app.post("/api/talent-exchange/candidates/login", async (req: Request, res: Response) => {
+  app.post("/api/talent-exchange/candidates/login", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
       const { email, password } = req.body;
       
@@ -5808,15 +5971,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       
       if (result.rows.length === 0) {
+        recordLoginAttempt(req, false);
+        logSecurityEvent('CANDIDATE_LOGIN_FAILED', { email, reason: 'not_found', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
       const candidate = result.rows[0] as any;
       
-      const passwordValid = await bcrypt.compare(password, candidate.password_hash);
+      const passwordValid = await verifyPassword(password, candidate.password_hash);
       if (!passwordValid) {
+        recordLoginAttempt(req, false);
+        logSecurityEvent('CANDIDATE_LOGIN_FAILED', { email, reason: 'invalid_password', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
+      
+      recordLoginAttempt(req, true);
+      logSecurityEvent('CANDIDATE_LOGIN_SUCCESS', { email, candidateId: candidate.id, ip: req.ip });
       
       // Update last active
       await db.execute(sql`

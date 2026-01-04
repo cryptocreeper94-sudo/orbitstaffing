@@ -62,6 +62,36 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // ========================
+// Password Reset Tokens
+// ========================
+export const passwordResetTokens = pgTable(
+  "password_reset_tokens",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    consumedAt: timestamp("consumed_at"),
+    requestIp: varchar("request_ip", { length: 45 }),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    userIdx: index("idx_password_reset_tokens_user").on(table.userId),
+    expiresIdx: index("idx_password_reset_tokens_expires").on(table.expiresAt),
+  })
+);
+
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
+  id: true,
+  consumedAt: true,
+  createdAt: true,
+});
+
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
+// ========================
 // Companies (Business Accounts)
 // ========================
 export const companies = pgTable(
