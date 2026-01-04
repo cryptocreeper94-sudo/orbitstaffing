@@ -26,6 +26,26 @@ import crypto from "crypto";
 // Supports both ecosystem credentials and external app integrations (PaintPros, etc.)
 const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot', 'dw_app_darkwavehealth', 'dw_app_dwsc'];
 
+// Product-specific royalty splits
+// 50/50 (Jason/Sidonie): orbit, brewandboard, paintpros
+// 100% Jason: Everything else (dwsc, garagebot, darkwavehealth, orby, lotopspro, pulse, etc.)
+const PRODUCT_SPLITS: Record<string, { jason: number; sidonie: number }> = {
+  'orbit': { jason: 50, sidonie: 50 },
+  'orbit-staffing': { jason: 50, sidonie: 50 },
+  'orbit-staffing-os': { jason: 50, sidonie: 50 },
+  'brewandboard': { jason: 50, sidonie: 50 },
+  'brew-and-board': { jason: 50, sidonie: 50 },
+  'paintpros': { jason: 50, sidonie: 50 },
+  'paint-pros': { jason: 50, sidonie: 50 },
+  // Everything else defaults to 100% Jason
+};
+
+function getProductSplit(productCode: string | null | undefined): { jason: number; sidonie: number } {
+  if (!productCode) return { jason: 100, sidonie: 0 }; // Default to 100% Jason
+  const normalizedCode = productCode.toLowerCase().replace(/[^a-z0-9-]/g, '');
+  return PRODUCT_SPLITS[normalizedCode] || { jason: 100, sidonie: 0 };
+}
+
 function getApiKey(): string {
   const key = process.env.ORBIT_ECOSYSTEM_API_KEY;
   if (!key) {
@@ -284,9 +304,32 @@ export class FinancialHub {
 
     const grossAmount = parseFloat(event.grossAmount || '0');
     const splits: RoyaltySplitResult[] = [];
+    
+    // Get product-specific split (50/50 for orbit/brewandboard/paintpros, 100% Jason for everything else)
+    const productSplit = getProductSplit(event.productCode);
 
     for (const partner of partners) {
-      const splitPercentage = parseFloat(partner.defaultSplitPercentage || '50');
+      // Determine split based on partner and product
+      const isJason = partner.email?.toLowerCase().includes('jason') || 
+                      partner.fullName.toLowerCase().includes('jason');
+      const isSidonie = partner.email?.toLowerCase().includes('sidonie') || 
+                        partner.fullName.toLowerCase().includes('sidonie');
+      
+      let splitPercentage: number;
+      if (isJason) {
+        splitPercentage = productSplit.jason;
+      } else if (isSidonie) {
+        splitPercentage = productSplit.sidonie;
+      } else {
+        // For other partners, use their default split percentage
+        splitPercentage = parseFloat(partner.defaultSplitPercentage || '0');
+      }
+      
+      // Skip partners with 0% split for this product
+      if (splitPercentage === 0) {
+        continue;
+      }
+      
       const partnerGross = grossAmount * (splitPercentage / 100);
       
       let taxWithholding = 0;
@@ -312,7 +355,8 @@ export class FinancialHub {
           createdAt: new Date().toISOString(),
           sourceEvent: event.id,
           sourceSystem: event.sourceSystem,
-          calculationMethod: 'percentage_split',
+          calculationMethod: 'product_specific_split',
+          productSplit: productSplit,
         },
         status: 'pending',
       }).returning();
