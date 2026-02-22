@@ -1,0 +1,70 @@
+ORBIT Staffing OS — Agent Handoff Brief
+
+Project: ORBIT Staffing OS (v2.7.1+)
+Owner: Jason (PIN 0424, full developer access) | Sid (PIN 4444, partner/sandbox)
+Stack: React 18 + Wouter (frontend), Express.js + TypeScript (backend), PostgreSQL/Neon + Drizzle ORM, Tailwind CSS + Radix UI
+Theme: Dark industrial with cyan accents ("aqua Saturn" aesthetic)
+
+WHAT JUST HAPPENED (This Session)
+
+Video Hero Section — Built a rotating cinematic video hero on the Explore page (/explore, which IS the landing page). Six 6-second flyover videos auto-rotate every 8 seconds with crossfade transitions:
+
+Video 1: ORBIT Staffing OS (industrial warehouse) → links to /products
+Video 2: TrustHome (suburban neighborhood) → links to https://trusthome.io
+Video 3: Trust Vault (financial district) → links to https://trustvault.io
+Video 4: THE VOID (dark futuristic cityscape) → links to https://enterthevoid.io
+Video 5: GarageBot (auto repair shop) → links to https://garagebot.io
+Video 6: Brew & Board (coffee shop district) → links to https://brewandboard.coffee
+Explore Page Improvements — Filter buttons (All, Workers, Employers, Owners, Resources) resized to consistent pill shapes with gradient backgrounds on both ExploreHub and AdminExploreHub.
+
+Key Files Modified:
+
+client/src/components/VideoHero.tsx — New component (video hero with parallax, animated counters, glassmorphism stats card, navigation dots)
+client/src/pages/ExploreHub.tsx — Added VideoHero + DemoRequestForm, updated filter buttons
+client/src/pages/AdminExploreHub.tsx — Updated filter buttons
+client/src/pages/Landing.tsx — Removed VideoHero (it lives on ExploreHub now), old static hero replaced with "Why ORBIT?" benefit cards section
+client/src/assets/videos/hero-flyover-1.mp4 through hero-flyover-6.mp4 — Generated video assets
+WHAT WE'RE BUILDING — DarkWave Ecosystem
+
+ORBIT is the hub of the DarkWave Studios ecosystem. The goal is cross-app connectivity where these products talk to each other:
+
+Connected Apps (Ecosystem Hub is LIVE):
+
+TrustHome — Home service professionals platform. Registered in ecosystem with API key dw_app_7337d537e2f31786b35c21a391efab3976076b6cb1678726
+Trust Vault — Digital asset/financial security platform. API key dw_app_9ac69f5a55537842b5d7913f2c917c92c5186c42f26e77a5
+THE VOID — Immersive creative/entertainment platform. API key dw_app_52a405533ca1cbcda26adbcbff7fa1c96a5e291cb0bdb9a1
+GarageBot — AI-powered auto shop management. API key dw_app_3c88bda688e781b58b2b46144bf6006a49add5c28eed327e
+Brew & Board Coffee — Café/venue management. Already connected.
+Ecosystem Hub endpoints (server/ecosystemHub.ts):
+
+POST /api/admin/ecosystem/register-app — Register new apps
+GET /api/ecosystem/status — Connection status
+POST /api/ecosystem/sync/* — Sync workers, contractors, W-2, 1099, timesheets, certifications
+GET /api/ecosystem/shops/* — Query worker and payroll data
+All endpoints use HMAC-SHA256 authentication
+Trust Layer SSO (IN PROGRESS):
+
+Goal: Single sign-on across all DarkWave apps so a user logged into TrustHome is also authenticated in ORBIT, Trust Vault, etc.
+Test ecosystem users already created: Kathy (PIN 7724), Marcus (PIN 8832), Devon (PIN 6619)
+Database migration for Trust Layer columns is still pending
+WHAT NEEDS TO HAPPEN NEXT
+
+Database setup — New project needs PostgreSQL + schema migration (npm run db:push or Drizzle migration)
+Secrets — Re-add all API keys (OpenAI, Resend, Stripe, database URL, etc.)
+Trust Layer SSO implementation — Complete the cross-app authentication flow
+Verdara integration — There's a Verdara app that needs to be added to the ecosystem (was mentioned in handoff specs)
+Premium UI polish — Glassmorphism effects, bento grids, and animation patterns should follow ORBIT's cyan/dark industrial theme (NOT Verdara's emerald palette)
+IMPORTANT RULES
+
+Always confirm before implementing major changes — user must approve with "go"
+Every multi-card section must be horizontal scroll carousel on mobile
+Desktop layouts must fill full width with zero white space
+No excessive vertical stacking on mobile or desktop
+Root route / renders ExploreHub (the landing page)
+"Powered by ORBIT" hallmark is non-removable on all outputs
+That should give the new agent everything it needs to pick up where we left off. Anything you'd like me to add or change in this handoff?
+
+
+Scroll to latest
+
+Make, test, iterate…
