@@ -10,6 +10,7 @@ packages = ["oneDNN", "re2"]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 run = ["node", "./dist/index.cjs"]
+publicDir = "dist/public"
 
 [[ports]]
 localPort = 5000
