@@ -8,10 +8,11 @@ import runApp from "./app";
 import { setupWebSocket } from "./websocket";
 import { versionManager } from "./versionManager";
 
+declare var __dirname: string;
+
 export async function serveStatic(app: Express, server: Server) {
-  // Setup WebSocket for real-time updates
   setupWebSocket(server);
-  const distPath = path.resolve(import.meta.dirname, "public");
+  const distPath = path.resolve(__dirname, "public");
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
@@ -21,8 +22,7 @@ export async function serveStatic(app: Express, server: Server) {
 
   app.use(express.static(distPath));
 
-  // Serve attached_assets folder for images, emblems, hallmarks
-  const attachedAssetsPath = path.resolve(import.meta.dirname, "..", "attached_assets");
+  const attachedAssetsPath = path.resolve(__dirname, "..", "attached_assets");
   app.use('/attached_assets', express.static(attachedAssetsPath));
 
   // Serve React app for /studio path - ProductsGallery component handles the UI
