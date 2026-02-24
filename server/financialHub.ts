@@ -24,7 +24,7 @@ import crypto from "crypto";
 
 // Financial Hub API authentication
 // Supports both ecosystem credentials and external app integrations (PaintPros, etc.)
-const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot', 'dw_app_darkwavehealth', 'dw_app_dwsc', 'dw_app_verdara', 'dw_app_tldriverconnect', 'dw_app_happyeats', 'dw_app_thevoid', 'dw_app_lotopspro'];
+const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot', 'dw_app_darkwavehealth', 'dw_app_dwsc', 'dw_app_verdara', 'dw_app_tldriverconnect', 'dw_app_happyeats', 'dw_app_thevoid', 'dw_app_trustvault', 'dw_app_trusthome'];
 
 // Product-specific royalty splits
 // 50/50 (Jason/Sidonie): orbit, brewandboard, paintpros
@@ -78,7 +78,8 @@ function getFinancialHubSecret(appId: string): string {
     'dw_app_tldriverconnect': process.env.TLDRIVERCONNECT_WEBHOOK_SECRET,
     'dw_app_happyeats': process.env.HAPPYEATS_WEBHOOK_SECRET,
     'dw_app_thevoid': process.env.THEVOID_WEBHOOK_SECRET,
-    'dw_app_lotopspro': process.env.LOTOPSPRO_WEBHOOK_SECRET,
+    'dw_app_trustvault': process.env.TRUSTVAULT_WEBHOOK_SECRET,
+    'dw_app_trusthome': process.env.TRUSTHOME_WEBHOOK_SECRET,
   };
   
   // Try app-specific secret first, fall back to ecosystem secret
