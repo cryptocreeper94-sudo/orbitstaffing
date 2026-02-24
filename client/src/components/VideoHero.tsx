@@ -406,15 +406,6 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
             {currentSlide.subtitle}
           </p>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={`inline-flex items-center text-[11px] px-2.5 py-1 rounded-full border ${accent.badge}`}>
-              {currentSlide.split}
-            </span>
-            <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-full border border-white/10 bg-white/5 text-white/50">
-              {currentSlide.fee}
-            </span>
-          </div>
-
           <div className="flex items-center gap-3 pt-2 flex-wrap">
             <Button
               onClick={onDemoClick}
