@@ -82,7 +82,7 @@ import Settings from "@/pages/Settings";
 import MeetingPresentations from "@/pages/MeetingPresentations";
 import PresentationViewer from "@/pages/PresentationViewer";
 import TrustVaultVerification from "@/pages/TrustVaultVerification";
-import SignalChat from "@/pages/SignalChat";
+import SignalChatPanel from "@/components/SignalChatPanel";
 import Changelog from "@/pages/Changelog";
 import EcosystemHub from "@/pages/EcosystemHub";
 import DevDashboard from "@/pages/DevDashboard";
@@ -243,7 +243,6 @@ function Router() {
       <Route path="/about" component={AboutUs} />
       <Route path="/settings" component={Settings} />
       <Route path="/trustvault-verification" component={TrustVaultVerification} />
-      <Route path="/signal-chat" component={SignalChat} />
       <Route path="/changelog" component={Changelog} />
       <Route path="/ecosystem-hub" component={EcosystemHub} />
       <Route path="/dev-dashboard" component={DevDashboard} />
@@ -341,6 +340,7 @@ export default function App() {
               <Toaster />
               <PWAInstallPrompt />
               <PWASplashScreen />
+              <SignalChatPanel />
               </TutorialProvider>
             </OrbitExperienceProvider>
           </ModeProvider>
