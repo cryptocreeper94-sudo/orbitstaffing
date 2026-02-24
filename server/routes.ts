@@ -694,6 +694,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       
+      // Check for Kathy Grater's PIN (1497) - Partner with read-only Happy Eats financials
+      // Kathy is 60% equity owner of Happy Eats Nashville franchise
+      const kathyPin = process.env.KATHY_ADMIN_PIN || '1497';
+      if (pin === kathyPin) {
+        req.session.regenerate(async (err) => {
+          if (err) {
+            console.error('[Session] Failed to regenerate session:', err);
+            return res.status(500).json({ error: "Session error" });
+          }
+          
+          req.session.adminAuthenticated = true;
+          req.session.adminName = 'Kathy Grater';
+          req.session.adminRole = 'partner_readonly';
+          req.session.partnerProduct = 'happyeats';
+          
+          const hasChangedPin = process.env.KATHY_PIN_CHANGED === 'true';
+          req.session.requirePinChange = !hasChangedPin;
+          
+          await db.insert(adminLoginLogs).values({
+            adminName: 'Kathy Grater',
+            adminRole: 'partner_readonly',
+            loginTime: new Date(),
+            ipAddress: ipAddress as string,
+            userAgent: userAgent || 'Unknown',
+          });
+          
+          console.log(`[Kathy Login] ✅ Kathy Grater logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          
+          return res.json({ 
+            verified: true, 
+            role: 'partner_readonly', 
+            name: 'Kathy Grater', 
+            isPartner: true,
+            requirePinChange: !hasChangedPin,
+            redirectTo: '/partner/happyeats',
+          });
+        });
+        return;
+      }
+      
       // Check for user-specific admin PIN
       if (userId) {
         const user = await storage.getUser(userId);
@@ -767,23 +807,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Access control model:
     // Jason (developer): Full access to everything including dev tools, DWSC treasury, pricing
     // Sidonie (master): Full access EXCEPT dev tools, DWSC treasury; pricing needs approval
+    // Kathy (partner_readonly): Read-only Happy Eats financials only
     const isDeveloper = adminRole === 'developer';
     const isOwner = isDeveloper; // DWSC Treasury access - Jason only
-    const isPartner = adminRole === 'master' && adminName === 'Sidonie';
+    const isPartner = (adminRole === 'master' && adminName === 'Sidonie') || adminRole === 'partner_readonly';
+    const isReadOnlyPartner = adminRole === 'partner_readonly';
     
     // Capability flags
     const capabilities = {
       canAccessDevTools: isDeveloper,
       canAccessDWSCTreasury: isDeveloper,
-      canChangePricing: isDeveloper, // Sidonie needs approval for pricing changes
-      canViewAllFeatures: isDeveloper || isPartner, // Both see everything else
-      canManageWorkers: true,
-      canManageJobs: true,
-      canManageTimesheets: true,
-      canManagePayroll: true,
-      canManageCompliance: true,
-      canViewFinancials: true,
-      canReceivePayouts: isPartner, // Sidonie can connect Stripe for payouts
+      canChangePricing: isDeveloper,
+      canViewAllFeatures: isDeveloper || (isPartner && !isReadOnlyPartner),
+      canManageWorkers: !isReadOnlyPartner,
+      canManageJobs: !isReadOnlyPartner,
+      canManageTimesheets: !isReadOnlyPartner,
+      canManagePayroll: !isReadOnlyPartner,
+      canManageCompliance: !isReadOnlyPartner,
+      canViewFinancials: !isReadOnlyPartner,
+      canReceivePayouts: isPartner && !isReadOnlyPartner,
+      canViewPartnerFinancials: isReadOnlyPartner,
+      partnerProduct: isReadOnlyPartner ? req.session.partnerProduct : null,
     };
     
     res.json({
@@ -793,6 +837,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       isOwner,
       isPartner,
       isDeveloper,
+      isReadOnlyPartner,
+      requirePinChange: req.session.requirePinChange || false,
       capabilities,
     });
   });
@@ -815,32 +861,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // For Master Admin (Sidonie), update the ADMIN_PIN environment variable concept
-      // In production, this would update a secure storage. For now, we log it.
-      // The PIN is stored in the session for the current login
       if (adminName === 'Sidonie') {
-        // Store the new PIN in the database for persistence
-        // We'll use a system settings table or similar
         console.log(`[PIN Change] ✅ Master Admin PIN changed by ${adminName} at ${new Date().toLocaleString()}`);
         
-        // Update session with new context
         if (req.session) {
           req.session.pinChanged = true;
           req.session.pinChangedAt = new Date().toISOString();
         }
         
-        // In a production environment, you would:
-        // 1. Hash the new PIN
-        // 2. Store it securely in a database table
-        // 3. Update the authentication logic to use the new PIN
-        
-        // For now, we acknowledge the change request
-        // The actual PIN update would require environment variable management
-        // which should be done through Replit's secrets management
-        
         return res.json({ 
           success: true, 
           message: "PIN change request received. For security, please update ADMIN_PIN in your environment secrets.",
           note: "Your new PIN will be active after updating the ADMIN_PIN secret."
+        });
+      }
+      
+      // For Kathy Grater - partner PIN change
+      if (adminName === 'Kathy Grater') {
+        console.log(`[PIN Change] ✅ Partner PIN changed by ${adminName} at ${new Date().toLocaleString()}`);
+        
+        if (req.session) {
+          req.session.pinChanged = true;
+          req.session.pinChangedAt = new Date().toISOString();
+          req.session.requirePinChange = false;
+        }
+        
+        return res.json({ 
+          success: true, 
+          message: "PIN changed successfully. Please update KATHY_ADMIN_PIN in environment secrets and set KATHY_PIN_CHANGED=true.",
+          note: "Use your new PIN to log in next time."
         });
       }
       
@@ -12043,6 +12092,79 @@ export function registerPayCardRoutes(app: Express) {
     } catch (error) {
       console.error("Get partner payouts error:", error);
       res.status(500).json({ error: "Failed to fetch partner payouts" });
+    }
+  });
+
+  // ========================
+  // PARTNER READ-ONLY DASHBOARD - Kathy Grater's Happy Eats view
+  // ========================
+
+  const requirePartnerAuth = (req: Request, res: Response, next: Function) => {
+    if (!req.session?.adminAuthenticated) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+    if (req.session.adminRole !== 'partner_readonly' && req.session.adminRole !== 'developer' && req.session.adminRole !== 'master') {
+      return res.status(403).json({ error: "Partner access required" });
+    }
+    next();
+  };
+
+  app.get("/api/partner/product/earnings", requirePartnerAuth, async (req: Request, res: Response) => {
+    try {
+      const adminRole = req.session?.adminRole;
+      const partnerProduct = req.session?.partnerProduct;
+      
+      if (adminRole === 'partner_readonly' && !partnerProduct) {
+        return res.status(403).json({ error: "No product assigned" });
+      }
+      
+      const productFilter = adminRole === 'partner_readonly' ? partnerProduct : (req.query.product as string || null);
+      
+      const events = await financialHub.getFinancialEvents({ 
+        productCode: productFilter || undefined,
+        limit: 100 
+      });
+      
+      const revenueEvents = events.filter(e => e.eventType === 'revenue');
+      const expenseEvents = events.filter(e => e.eventType === 'expense');
+      
+      const totalRevenue = revenueEvents.reduce((sum, e) => sum + parseFloat(e.amount || '0'), 0);
+      const totalExpenses = expenseEvents.reduce((sum, e) => sum + parseFloat(e.amount || '0'), 0);
+      const netProfit = totalRevenue - totalExpenses;
+      
+      const splitConfig: Record<string, { partnerName: string; partnerPct: number; jasonPct: number }> = {
+        'happyeats': { partnerName: 'Kathy Grater', partnerPct: 60, jasonPct: 40 },
+      };
+      
+      const split = splitConfig[productFilter || ''] || { partnerName: 'Partner', partnerPct: 0, jasonPct: 100 };
+      const partnerShare = netProfit * (split.partnerPct / 100);
+      
+      const recentTransactions = events
+        .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+        .slice(0, 20)
+        .map(e => ({
+          id: e.id,
+          date: e.createdAt,
+          type: e.eventType,
+          description: e.description || e.sourceSystem,
+          amount: parseFloat(e.amount || '0'),
+          status: e.status,
+        }));
+
+      res.json({
+        product: productFilter,
+        partnerName: split.partnerName,
+        splitPercentage: split.partnerPct,
+        totalRevenue,
+        totalExpenses,
+        netProfit,
+        partnerShare,
+        transactionCount: events.length,
+        recentTransactions,
+      });
+    } catch (error) {
+      console.error("Get partner product earnings error:", error);
+      res.status(500).json({ error: "Failed to fetch partner earnings" });
     }
   });
 

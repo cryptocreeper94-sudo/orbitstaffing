@@ -43,7 +43,7 @@ export function PinChangeModal({ isOpen, onClose, onSkip, adminName }: PinChange
       return;
     }
 
-    if (newPin === '4444') {
+    if (newPin === '4444' || newPin === '1497') {
       setError('Please choose a different PIN than the default');
       return;
     }
@@ -59,7 +59,7 @@ export function PinChangeModal({ isOpen, onClose, onSkip, adminName }: PinChange
 
       if (res.ok) {
         setSuccess(true);
-        localStorage.setItem('sidonieChangedPin', 'true');
+        localStorage.setItem(`${adminName.replace(/\s/g, '_')}_changedPin`, 'true');
         setTimeout(() => {
           onClose();
         }, 2000);
@@ -75,7 +75,7 @@ export function PinChangeModal({ isOpen, onClose, onSkip, adminName }: PinChange
   };
 
   const handleSkip = () => {
-    localStorage.setItem('sidonieSkippedPinChange', 'true');
+    localStorage.setItem(`${adminName.replace(/\s/g, '_')}_skippedPinChange`, 'true');
     onSkip();
   };
 
@@ -117,7 +117,7 @@ export function PinChangeModal({ isOpen, onClose, onSkip, adminName }: PinChange
               <div>
                 <p className="text-amber-200 font-semibold text-sm">First-Time Login</p>
                 <p className="text-slate-400 text-xs mt-1">
-                  Your current PIN (4444) is the default. Please choose a unique PIN that only you know.
+                  Your current PIN is the default. Please choose a unique PIN that only you know.
                 </p>
               </div>
             </div>

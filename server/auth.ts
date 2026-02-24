@@ -24,6 +24,13 @@ declare module 'express-session' {
     adminName?: string;
     tenantId?: number;
     isAuthenticated?: boolean;
+    adminAuthenticated?: boolean;
+    pinChanged?: boolean;
+    pinChangedAt?: string;
+    stripeCustomerId?: string;
+    hallmarkId?: number;
+    requirePinChange?: boolean;
+    partnerProduct?: string;
   }
 }
 

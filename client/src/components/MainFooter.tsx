@@ -19,28 +19,49 @@ interface MainFooterProps {
 function TeamLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
 
   useEffect(() => {
     if (isOpen) {
       setPin('');
       setError('');
+      setIsLoading(false);
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin === '0424') {
-      onClose();
-      setLocation('/admin-explore');
-    } else if (pin === '4444') {
-      onClose();
-      setLocation('/admin-explore');
-    } else {
-      setError('Invalid PIN');
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const res = await fetch('/api/auth/verify-admin-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.verified) {
+        onClose();
+        if (data.redirectTo) {
+          setLocation(data.redirectTo);
+        } else {
+          setLocation('/admin-explore');
+        }
+      } else {
+        setError(data.error || 'Invalid PIN');
+        setPin('');
+      }
+    } catch {
+      setError('Connection error. Try again.');
       setPin('');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -84,10 +105,11 @@ function TeamLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           )}
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium py-2 rounded-lg text-sm hover:from-cyan-400 hover:to-blue-500 transition"
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium py-2 rounded-lg text-sm hover:from-cyan-400 hover:to-blue-500 transition disabled:opacity-50"
             data-testid="button-submit-pin"
           >
-            Access Portal
+            {isLoading ? 'Verifying...' : 'Access Portal'}
           </button>
         </form>
       </div>

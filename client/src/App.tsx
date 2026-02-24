@@ -11,6 +11,7 @@ import WorkerPortal from "@/pages/WorkerPortal";
 import Landing from "@/pages/Landing";
 import ExploreHub from "@/pages/ExploreHub";
 import AdminExploreHub from "@/pages/AdminExploreHub";
+import PartnerDashboardHappyEats from "@/pages/PartnerDashboardHappyEats";
 import DeveloperPanel from "@/pages/DeveloperPanel";
 import { shouldBypassDeveloperLogin } from "@/lib/deviceFingerprint";
 import DeveloperLanding from "@/pages/DeveloperLanding";
@@ -148,6 +149,7 @@ function Router() {
       <Route path="/home" component={ExploreHub} />
       <Route path="/explore" component={ExploreHub} />
       <Route path="/admin-explore" component={AdminExploreHub} />
+      <Route path="/partner/happyeats" component={PartnerDashboardHappyEats} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/integrations" component={Integrations} />
       <Route path="/equipment-tracking" component={EquipmentTrackingAdmin} />
