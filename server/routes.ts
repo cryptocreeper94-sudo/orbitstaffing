@@ -957,6 +957,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Partner account setup - replaces temporary PIN with permanent email + password
+  app.post("/api/auth/setup-partner-account", async (req: Request, res: Response) => {
+    try {
+      const { email, password, adminName } = req.body;
+      
+      if (!email || !password || !adminName) {
+        return res.status(400).json({ error: "Email, password, and name are required" });
+      }
+
+      // Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email address" });
+      }
+
+      // Validate password: 8+ chars, 1 capital, 1 special char
+      if (password.length < 8) {
+        return res.status(400).json({ error: "Password must be at least 8 characters" });
+      }
+      if (!/[A-Z]/.test(password)) {
+        return res.status(400).json({ error: "Password must contain at least 1 capital letter" });
+      }
+      if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        return res.status(400).json({ error: "Password must contain at least 1 special character" });
+      }
+
+      // Only allow known partners
+      const allowedPartners = ['Kathy Grater', 'Jennifer Lambert', 'Sidonie'];
+      if (!allowedPartners.includes(adminName)) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      // Hash the password
+      const bcrypt = await import('bcrypt');
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      // Store the partner account in the database
+      await db.execute(
+        `INSERT INTO partner_accounts (admin_name, email, password_hash, created_at)
+         VALUES ($1, $2, $3, NOW())
+         ON CONFLICT (admin_name) DO UPDATE SET email = $2, password_hash = $3, updated_at = NOW()`,
+        [adminName, email, hashedPassword]
+      );
+
+      // Mark PIN change as complete in session
+      if (req.session) {
+        req.session.requirePinChange = false;
+        req.session.accountSetup = true;
+      }
+
+      console.log(`[Account Setup] ✅ ${adminName} created permanent account with ${email} at ${new Date().toLocaleString()}`);
+      
+      return res.json({ 
+        success: true, 
+        message: "Account created successfully. Use your email and password to log in next time."
+      });
+    } catch (error) {
+      console.error('[Account Setup] Error:', error);
+      res.status(500).json({ error: "Failed to create account" });
+    }
+  });
+
+  // Partner email/password login - for partners who have set up their permanent account
+  app.post("/api/auth/partner-login", rateLimitMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      const ipAddress = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+
+      // Look up partner account by email
+      const result = await db.execute(
+        `SELECT * FROM partner_accounts WHERE email = $1 LIMIT 1`,
+        [email]
+      );
+
+      const account = result.rows?.[0];
+      if (!account) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      // Verify password
+      const bcrypt = await import('bcrypt');
+      const validPassword = await bcrypt.compare(password, account.password_hash as string);
+      if (!validPassword) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+
+      const adminName = account.admin_name as string;
+
+      // Determine redirect and role based on partner name
+      const partnerConfig: Record<string, { role: string; product: string; redirectTo: string }> = {
+        'Kathy Grater': { role: 'partner_readonly', product: 'happyeats', redirectTo: '/partner/happyeats' },
+        'Jennifer Lambert': { role: 'partner_readonly', product: 'trusthome', redirectTo: '/partner/trusthome' },
+        'Sidonie': { role: 'master', product: '', redirectTo: '/admin-explore' },
+      };
+
+      const config = partnerConfig[adminName];
+      if (!config) {
+        return res.status(403).json({ error: "Account not configured" });
+      }
+
+      // Regenerate session
+      req.session.regenerate(async (err) => {
+        if (err) {
+          console.error('[Session] Failed to regenerate session:', err);
+          return res.status(500).json({ error: "Session error" });
+        }
+
+        req.session.adminAuthenticated = true;
+        req.session.adminName = adminName;
+        req.session.adminRole = config.role;
+        if (config.product) {
+          req.session.partnerProduct = config.product;
+        }
+        req.session.requirePinChange = false;
+
+        await db.insert(adminLoginLogs).values({
+          adminName,
+          adminRole: config.role,
+          loginTime: new Date(),
+          ipAddress: ipAddress as string,
+          userAgent: userAgent || 'Unknown',
+        });
+
+        console.log(`[Partner Login] ✅ ${adminName} logged in via email from ${ipAddress} at ${new Date().toLocaleString()}`);
+
+        return res.json({
+          verified: true,
+          role: config.role,
+          name: adminName,
+          isPartner: true,
+          redirectTo: config.redirectTo,
+        });
+      });
+    } catch (error) {
+      console.error('[Partner Login] Error:', error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
   // Secure forgot password - sends email with reset link
   app.post("/api/auth/forgot-password", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {

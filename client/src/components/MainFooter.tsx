@@ -17,7 +17,10 @@ interface MainFooterProps {
 }
 
 function TeamLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [mode, setMode] = useState<'pin' | 'email'>('pin');
   const [pin, setPin] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
@@ -25,14 +28,17 @@ function TeamLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
   useEffect(() => {
     if (isOpen) {
       setPin('');
+      setEmail('');
+      setPassword('');
       setError('');
       setIsLoading(false);
+      setMode('pin');
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
@@ -65,10 +71,41 @@ function TeamLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
     }
   };
 
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const res = await fetch('/api/auth/partner-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await res.json();
+      
+      if (data.verified) {
+        onClose();
+        if (data.redirectTo) {
+          setLocation(data.redirectTo);
+        } else {
+          setLocation('/admin-explore');
+        }
+      } else {
+        setError(data.error || 'Invalid credentials');
+      }
+    } catch {
+      setError('Connection error. Try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="relative bg-slate-900 border border-slate-700 rounded-xl p-6 w-[320px] shadow-2xl"
+        className="relative bg-slate-900 border border-slate-700 rounded-xl p-6 w-[340px] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -85,33 +122,78 @@ function TeamLoginModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => v
           </div>
           <div>
             <h3 className="text-white font-bold text-sm">Team Login</h3>
-            <p className="text-slate-400 text-xs">Enter your access PIN</p>
+            <p className="text-slate-400 text-xs">
+              {mode === 'pin' ? 'Enter your access PIN' : 'Sign in with your account'}
+            </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={pin}
-            onChange={(e) => { setPin(e.target.value); setError(''); }}
-            placeholder="Enter PIN"
-            maxLength={4}
-            autoFocus
-            className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white text-center text-lg tracking-[0.3em] placeholder:text-slate-500 placeholder:tracking-normal placeholder:text-sm focus:outline-none focus:border-cyan-500 transition mb-3"
-            data-testid="input-team-pin"
-          />
-          {error && (
-            <p className="text-red-400 text-xs text-center mb-3" data-testid="text-pin-error">{error}</p>
-          )}
+        {mode === 'pin' ? (
+          <form onSubmit={handlePinSubmit}>
+            <input
+              type="password"
+              value={pin}
+              onChange={(e) => { setPin(e.target.value); setError(''); }}
+              placeholder="Enter PIN"
+              maxLength={8}
+              autoFocus
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white text-center text-lg tracking-[0.3em] placeholder:text-slate-500 placeholder:tracking-normal placeholder:text-sm focus:outline-none focus:border-cyan-500 transition mb-3"
+              data-testid="input-team-pin"
+            />
+            {error && (
+              <p className="text-red-400 text-xs text-center mb-3" data-testid="text-pin-error">{error}</p>
+            )}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium py-2 rounded-lg text-sm hover:from-cyan-400 hover:to-blue-500 transition disabled:opacity-50"
+              data-testid="button-submit-pin"
+            >
+              {isLoading ? 'Verifying...' : 'Access Portal'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleEmailSubmit} className="space-y-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(''); }}
+              placeholder="Email address"
+              autoFocus
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 transition"
+              data-testid="input-team-email"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
+              placeholder="Password"
+              className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 transition"
+              data-testid="input-team-password"
+            />
+            {error && (
+              <p className="text-red-400 text-xs text-center" data-testid="text-login-error">{error}</p>
+            )}
+            <button
+              type="submit"
+              disabled={isLoading || !email || !password}
+              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium py-2 rounded-lg text-sm hover:from-cyan-400 hover:to-blue-500 transition disabled:opacity-50"
+              data-testid="button-submit-login"
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+        )}
+
+        <div className="mt-4 pt-3 border-t border-slate-700/50 text-center">
           <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium py-2 rounded-lg text-sm hover:from-cyan-400 hover:to-blue-500 transition disabled:opacity-50"
-            data-testid="button-submit-pin"
+            onClick={() => { setMode(mode === 'pin' ? 'email' : 'pin'); setError(''); }}
+            className="text-xs text-slate-400 hover:text-cyan-400 transition"
+            data-testid="button-toggle-login-mode"
           >
-            {isLoading ? 'Verifying...' : 'Access Portal'}
+            {mode === 'pin' ? 'Sign in with email instead' : 'Sign in with PIN instead'}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
