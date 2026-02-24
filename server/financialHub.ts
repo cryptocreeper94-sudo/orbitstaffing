@@ -24,7 +24,7 @@ import crypto from "crypto";
 
 // Financial Hub API authentication
 // Supports both ecosystem credentials and external app integrations (PaintPros, etc.)
-const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot', 'dw_app_darkwavehealth', 'dw_app_dwsc'];
+const VALID_APP_IDS = ['dw_app_orbit', 'dw_app_paintpros', 'dw_app_brewandboard', 'dw_app_garagebot', 'dw_app_darkwavehealth', 'dw_app_dwsc', 'dw_app_verdara', 'dw_app_tldriverconnect', 'dw_app_happyeats'];
 
 // Product-specific royalty splits
 // 50/50 (Jason/Sidonie): orbit, brewandboard, paintpros
@@ -37,7 +37,10 @@ const PRODUCT_SPLITS: Record<string, { jason: number; sidonie: number }> = {
   'brew-and-board': { jason: 50, sidonie: 50 },
   'paintpros': { jason: 50, sidonie: 50 },
   'paint-pros': { jason: 50, sidonie: 50 },
-  // Everything else defaults to 100% Jason
+  'trusthome': { jason: 49, sidonie: 0 },
+  'trust-home': { jason: 49, sidonie: 0 },
+  'happyeats': { jason: 40, sidonie: 0 },
+  'happy-eats': { jason: 40, sidonie: 0 },
 };
 
 function getProductSplit(productCode: string | null | undefined): { jason: number; sidonie: number } {
@@ -71,6 +74,9 @@ function getFinancialHubSecret(appId: string): string {
     'dw_app_orbit': process.env.ORBIT_ECOSYSTEM_API_SECRET,
     'dw_app_darkwavehealth': process.env.DARKWAVEHEALTH_WEBHOOK_SECRET,
     'dw_app_dwsc': process.env.DWSC_WEBHOOK_SECRET,
+    'dw_app_verdara': process.env.VERDARA_WEBHOOK_SECRET,
+    'dw_app_tldriverconnect': process.env.TLDRIVERCONNECT_WEBHOOK_SECRET,
+    'dw_app_happyeats': process.env.HAPPYEATS_WEBHOOK_SECRET,
   };
   
   // Try app-specific secret first, fall back to ecosystem secret

@@ -11,6 +11,9 @@ import paintProsVideo from "@assets/generated_videos/paintpros_hero.mp4";
 import trustHomeVideo from "@assets/generated_videos/trusthome_hero.mp4";
 import trustVaultVideo from "@assets/generated_videos/trustvault_hero.mp4";
 import theVoidVideo from "@assets/generated_videos/the_void_hero.mp4";
+import verdaraVideo from "@assets/generated_videos/verdara_hero.mp4";
+import tlDriverVideo from "@assets/generated_videos/tl_driver_connect_hero.mp4";
+import happyEatsVideo from "@assets/generated_videos/happyeats_hero.mp4";
 
 interface VideoHeroProps {
   onDemoClick: () => void;
@@ -19,7 +22,7 @@ interface VideoHeroProps {
 interface AppSlide {
   title: string;
   subtitle: string;
-  accent: "cyan" | "emerald" | "amber" | "orange" | "rose" | "blue" | "purple";
+  accent: "cyan" | "emerald" | "amber" | "orange" | "rose" | "blue" | "purple" | "teal" | "lime" | "pink";
   link: string;
   external: boolean;
   video: string;
@@ -67,6 +70,36 @@ const slides: AppSlide[] = [
     video: theVoidVideo,
     split: "100% Jason",
     fee: "Creative platform",
+  },
+  {
+    title: "Verdara",
+    subtitle: "Outdoor lifestyle super-app — trail discovery, gear tracking, adventure planning, and community for outdoor enthusiasts",
+    accent: "lime",
+    link: "https://verdara.replit.app",
+    external: true,
+    video: verdaraVideo,
+    split: "100% Jason",
+    fee: "Outdoor lifestyle platform",
+  },
+  {
+    title: "TL Driver Connect",
+    subtitle: "Driver dispatch and fleet coordination — route optimization, real-time GPS tracking, and automated scheduling for commercial fleets",
+    accent: "teal",
+    link: "https://tldriverconnect.com",
+    external: true,
+    video: tlDriverVideo,
+    split: "100% Jason",
+    fee: "Fleet management platform",
+  },
+  {
+    title: "HappyEats",
+    subtitle: "Food ordering and delivery platform — restaurant discovery, menu management, and seamless ordering for happy dining experiences",
+    accent: "pink",
+    link: "https://happyeats.app",
+    external: true,
+    video: happyEatsVideo,
+    split: "60% Kathy / 40% Jason",
+    fee: "Food & dining platform",
   },
   {
     title: "Brew & Board Coffee",
@@ -174,12 +207,39 @@ const accentClasses: Record<string, { text: string; border: string; bg: string; 
     buttonBg: "bg-purple-500/20 border-purple-500/40 text-purple-300",
     badge: "bg-purple-500/20 text-purple-300 border-purple-500/30",
   },
+  teal: {
+    text: "text-teal-400",
+    border: "border-teal-500/40",
+    bg: "bg-teal-500/20",
+    dot: "bg-teal-400",
+    glow: "shadow-teal-500/20",
+    buttonBg: "bg-teal-500/20 border-teal-500/40 text-teal-300",
+    badge: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  },
+  lime: {
+    text: "text-lime-400",
+    border: "border-lime-500/40",
+    bg: "bg-lime-500/20",
+    dot: "bg-lime-400",
+    glow: "shadow-lime-500/20",
+    buttonBg: "bg-lime-500/20 border-lime-500/40 text-lime-300",
+    badge: "bg-lime-500/20 text-lime-300 border-lime-500/30",
+  },
+  pink: {
+    text: "text-pink-400",
+    border: "border-pink-500/40",
+    bg: "bg-pink-500/20",
+    dot: "bg-pink-400",
+    glow: "shadow-pink-500/20",
+    buttonBg: "bg-pink-500/20 border-pink-500/40 text-pink-300",
+    badge: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+  },
 };
 
 const stats = [
   { label: "Cost Savings", value: 35, suffix: "%" },
   { label: "Onboarding", value: 2, suffix: "hr" },
-  { label: "Connected Apps", value: 8, suffix: "" },
+  { label: "Connected Apps", value: 11, suffix: "" },
   { label: "Support", value: 24, suffix: "/7" },
 ];
 
