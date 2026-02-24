@@ -11961,12 +11961,12 @@ export function registerPayCardRoutes(app: Express) {
       
       const appConfigs: Record<string, { name: string; url: string; ownership: string; color: string; status: string }> = {
         'orbit': { name: 'ORBIT Staffing OS', url: 'orbitstaffing.io', ownership: '50/50 Jason & Sidonie', color: 'cyan', status: 'live' },
-        'trusthome': { name: 'TrustHome', url: 'trusthome.io', ownership: '51% Jennifer / 49% Jason', color: 'emerald', status: 'pre-launch' },
-        'trustvault': { name: 'Trust Vault', url: 'trustvault.replit.app', ownership: '100% Jason', color: 'blue', status: 'pre-launch' },
-        'thevoid': { name: 'THE VOID', url: 'enterthevoid.io', ownership: '100% Jason', color: 'purple', status: 'pre-launch' },
-        'verdara': { name: 'Verdara', url: 'verdara.replit.app', ownership: '100% Jason', color: 'lime', status: 'pre-launch' },
-        'tldriverconnect': { name: 'TL Driver Connect', url: 'tldriverconnect.com', ownership: '100% Jason', color: 'teal', status: 'pre-launch' },
-        'happyeats': { name: 'Happy Eats', url: 'happyeats.app', ownership: '60% Kathy / 40% Jason', color: 'pink', status: 'pre-launch' },
+        'trusthome': { name: 'TrustHome', url: 'trusthome.io', ownership: '51% Jennifer / 49% Jason', color: 'emerald', status: 'connected' },
+        'trustvault': { name: 'Trust Vault', url: 'trustvault.replit.app', ownership: '100% Jason', color: 'blue', status: 'connected' },
+        'thevoid': { name: 'THE VOID', url: 'enterthevoid.io', ownership: '100% Jason', color: 'purple', status: 'connected' },
+        'verdara': { name: 'Verdara', url: 'verdara.replit.app', ownership: '100% Jason', color: 'lime', status: 'connected' },
+        'tldriverconnect': { name: 'TL Driver Connect', url: 'tldriverconnect.com', ownership: '100% Jason', color: 'teal', status: 'connected' },
+        'happyeats': { name: 'Happy Eats', url: 'happyeats.app', ownership: '60% Kathy / 40% Jason', color: 'pink', status: 'connected' },
         'brewandboard': { name: 'Brew & Board Coffee', url: 'brewandboard.coffee', ownership: '50/50 Jason & Sidonie', color: 'amber', status: 'connected' },
         'garagebot': { name: 'GarageBot', url: 'garagebot.io', ownership: '100% Jason', color: 'amber', status: 'connected' },
         'paintpros': { name: 'PaintPros.io', url: 'paintpros.io', ownership: '50/50 Jason & Sidonie', color: 'rose', status: 'connected' },
