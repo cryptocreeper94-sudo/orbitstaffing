@@ -1,0 +1,73 @@
+Happy Eats (Food Delivery Platform)
+
+Kathy Grater: 60% equity (managing partner)
+Jason (Platform Developer): 40% equity
+Transition: Moves to 70% Kathy / 30% Jason at the appointed time
+Kathy holds operational control of Happy Eats Nashville franchise
+TL Driver Connect (Driver Services Platform)
+
+Jason (Platform Developer): 100% equity
+Full ownership of all driver tools, subscriptions, and partnerships
+PLATFORM STATUS: Pre-Launch (Coming Soon)
+
+120+ API endpoints live
+35+ database tables
+53+ pages and views
+2 brands (Happy Eats + TL Driver Connect)
+2 WebSocket servers (Trucker Talk + Signal Chat)
+Stripe payments integrated
+Nashville / Middle TN launch market
+Technology Stack: React 19, TypeScript, Tailwind CSS v4, Vite 7, Express 5, Node.js, PostgreSQL (Neon-backed), Drizzle ORM, Stripe, OpenAI API, ElevenLabs API, Replit Object Storage
+
+24 Built & Working Features: Batch ordering, zone-based delivery, vendor self-service portal, Signal Chat (encrypted), bilingual EN/ES, interactive zone map, operations manual, marketing hub, AI content generation, Trucker Talk community, business suite, CDL directory, franchise onboarding, admin command center, blog platform, flyer builder, customer accounts, rewards & referrals, Media Studio Pro, vendor marketing toolkit, fuel finder, food truck map, order sandbox, invite code system
+
+REVENUE MODEL
+
+Active Streams:
+
+Transaction fees: 15% service fee on all food orders
+Delivery fees: $3.99 per delivery
+Subscriptions: $5/mo ad-free, $15/mo Media Studio Pro
+Add-ons: TLI d.io automated social media posting for vendors
+Future Revenue:
+
+Franchise licensing (monthly fees per market/territory)
+Premium vendor placement (featured listings)
+Fleet management (enterprise tools)
+Advertising (sponsored listings, in-app promotions)
+NASHVILLE LAUNCH OPERATIONS
+
+Launch Market: Nashville / Middle Tennessee
+Primary Corridor: Hwy 109 & I-840 (Lebanon, Mt. Juliet, Wilson County)
+Food Truck Hub: Zone-based batch ordering centered on Hwy 109 & I-840
+Franchise Operator: Kathy Grater (Happy Eats Nashville)
+11 delivery zones configured
+Vendor onboarding portal live and ready for recruitment
+Launch Status: Coming Soon — no specific date set
+PLATFORM VALUATION
+
+Pre-launch valuation: $1.5M–$3.5M
+Rebuild cost (US team): $750K–$1.4M
+Rebuild cost (offshore): $300K–$600K
+Team size needed: 6–8 members
+Build timeline: 10–14 months
+Monthly burn rate (US team): $70K–$100K/month
+KEY CONTACTS & ROLES
+
+Kathy Grater — Managing Partner, Happy Eats
+
+Equity: 60% (current) → 70% (future)
+Responsibilities: Nashville operations, vendor recruitment, local partnerships, franchise management
+Jason — Platform Developer & Owner
+
+Equity: 40% Happy Eats + 100% TL Driver Connect (current) → 30% Happy Eats + 100% TL Driver Connect (future)
+Responsibilities: Platform development, technical architecture, system admin, all technology decisions
+SUBSCRIPTION TIERS
+
+Free: Basic access, ads shown
+$5/month Ad-Free: Removes all platform ads
+$15/month Media Studio Pro: Advanced marketing tools, AI content, flyer builder
+TLI d.io Add-On: Automated social media posting (Facebook, Instagram, X)
+EXTERNAL DEPENDENCIES
+
+PostgreSQL (Neon), Drizzle ORM, Stripe, OpenAI API, ElevenLabs, Replit Object Storage, Solana blockchain, Facebook/Instagram/Twitter APIs, TLI d.io, Trust Layer Hub API, Orbit Financial Hub, DarkWave Trust Layer Widget, WebSockets

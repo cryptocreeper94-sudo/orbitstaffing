@@ -26,6 +26,7 @@ interface AppSlide {
   link: string;
   external: boolean;
   video: string;
+  gradient: string;
   split: string;
   fee: string;
 }
@@ -38,8 +39,9 @@ const slides: AppSlide[] = [
     link: "/products",
     external: false,
     video: orbitVideo,
+    gradient: "from-cyan-900/80 via-slate-900/60 to-slate-950/90",
     split: "50/50 Jason & Sidonie",
-    fee: "Bundles $99–249/mo · Franchise $7.5k–35k",
+    fee: "Bundles $99-249/mo",
   },
   {
     title: "TrustHome",
@@ -48,6 +50,7 @@ const slides: AppSlide[] = [
     link: "https://trusthome.io",
     external: true,
     video: trustHomeVideo,
+    gradient: "from-emerald-900/80 via-slate-900/60 to-slate-950/90",
     split: "51% Jennifer / 49% Jason",
     fee: "Woman-owned business",
   },
@@ -58,6 +61,7 @@ const slides: AppSlide[] = [
     link: "https://trustvault.io",
     external: true,
     video: trustVaultVideo,
+    gradient: "from-blue-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
     fee: "Enterprise security platform",
   },
@@ -68,6 +72,7 @@ const slides: AppSlide[] = [
     link: "https://enterthevoid.io",
     external: true,
     video: theVoidVideo,
+    gradient: "from-purple-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
     fee: "Creative platform",
   },
@@ -78,16 +83,18 @@ const slides: AppSlide[] = [
     link: "https://verdara.replit.app",
     external: true,
     video: verdaraVideo,
+    gradient: "from-lime-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
     fee: "Outdoor lifestyle platform",
   },
   {
     title: "TL Driver Connect",
-    subtitle: "Driver dispatch and fleet coordination — route optimization, real-time GPS tracking, and automated scheduling for commercial fleets",
+    subtitle: "All-in-one driver app — GPS navigation, receipt scanning, food truck locator, gas services, vendor signup, Signal chat, games, and tools for commercial and everyday drivers",
     accent: "teal",
     link: "https://tldriverconnect.com",
     external: true,
     video: tlDriverVideo,
+    gradient: "from-teal-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
     fee: "Fleet management platform",
   },
@@ -98,6 +105,7 @@ const slides: AppSlide[] = [
     link: "https://happyeats.app",
     external: true,
     video: happyEatsVideo,
+    gradient: "from-pink-900/80 via-slate-900/60 to-slate-950/90",
     split: "60% Kathy / 40% Jason",
     fee: "Food & dining platform",
   },
@@ -108,8 +116,9 @@ const slides: AppSlide[] = [
     link: "https://brewandboard.coffee",
     external: true,
     video: brewBoardVideo,
+    gradient: "from-amber-900/80 via-slate-900/60 to-slate-950/90",
     split: "50/50 Jason & Sidonie",
-    fee: "Franchise $299–999/mo + 4–6% royalty",
+    fee: "Franchise $299-999/mo + 4-6% royalty",
   },
   {
     title: "GarageBot",
@@ -118,8 +127,9 @@ const slides: AppSlide[] = [
     link: "https://garagebot.io",
     external: true,
     video: garageBotVideo,
+    gradient: "from-amber-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
-    fee: "SaaS · GarageBot Pro $2.99/mo",
+    fee: "SaaS - GarageBot Pro $2.99/mo",
   },
   {
     title: "Lot Ops Pro",
@@ -128,8 +138,9 @@ const slides: AppSlide[] = [
     link: "https://lotopspro.io",
     external: true,
     video: lotOpsVideo,
+    gradient: "from-orange-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
-    fee: "Franchise $5k–25k + 3–5% royalty",
+    fee: "Franchise $5k-25k + 3-5% royalty",
   },
   {
     title: "PaintPros.io",
@@ -138,8 +149,9 @@ const slides: AppSlide[] = [
     link: "https://paintpros.io",
     external: true,
     video: paintProsVideo,
+    gradient: "from-rose-900/80 via-slate-900/60 to-slate-950/90",
     split: "50/50 Jason & Sidonie",
-    fee: "Project-based · 50/50 net profit",
+    fee: "Project-based - 50/50 net profit",
   },
 ];
 
@@ -272,6 +284,49 @@ function AnimatedCounter({ value, suffix, inView }: { value: number; suffix: str
   );
 }
 
+function SlideVideo({ slide, isActive, onReady }: { slide: AppSlide; isActive: boolean; onReady: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleCanPlay = () => {
+      setLoaded(true);
+      onReady();
+    };
+    video.addEventListener("canplay", handleCanPlay);
+
+    if (isActive) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    } else {
+      video.pause();
+    }
+
+    return () => {
+      video.removeEventListener("canplay", handleCanPlay);
+    };
+  }, [isActive]);
+
+  return (
+    <>
+      <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} transition-opacity duration-500 ${loaded ? 'opacity-0' : 'opacity-100'}`} />
+      <video
+        ref={videoRef}
+        src={slide.video}
+        muted
+        loop
+        playsInline
+        preload={isActive ? "auto" : "metadata"}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+      />
+      <div className="absolute inset-0 bg-slate-950/15" />
+    </>
+  );
+}
+
 export function VideoHero({ onDemoClick }: VideoHeroProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState(0);
@@ -279,7 +334,6 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
   const [scrollY, setScrollY] = useState(0);
   const [statsInView, setStatsInView] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [, setLocation] = useLocation();
 
   const goToSlide = useCallback((index: number) => {
@@ -299,18 +353,6 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
   }, [activeIndex, goToSlide]);
 
   useEffect(() => {
-    videoRefs.current.forEach((video, i) => {
-      if (!video) return;
-      if (i === activeIndex) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
-    });
-  }, [activeIndex]);
-
-  useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -325,6 +367,9 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
     observer.observe(statsRef.current);
     return () => observer.disconnect();
   }, []);
+
+  const nextIndex = (activeIndex + 1) % slides.length;
+  const visibleIndices = new Set([activeIndex, prevIndex, nextIndex]);
 
   const currentSlide = slides[activeIndex];
   const accent = accentClasses[currentSlide.accent];
@@ -345,28 +390,26 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
       {slides.map((slide, i) => {
         const isActive = i === activeIndex;
         const isPrev = i === prevIndex && transitioning;
+        const shouldMount = visibleIndices.has(i);
+
         return (
           <div
             key={i}
             className="absolute inset-0 transition-opacity"
             style={{
-              opacity: isActive ? 1 : isPrev ? 0 : 0,
+              opacity: isActive ? 1 : isPrev ? 1 : 0,
               transitionDuration: "1200ms",
               transitionTimingFunction: "ease-in-out",
               zIndex: isActive ? 2 : isPrev ? 1 : 0,
               transform: `translateY(${scrollY * 0.3}px) scale(${1 + scrollY * 0.0003})`,
+              visibility: shouldMount ? "visible" : "hidden",
             }}
           >
-            <video
-              ref={(el) => { videoRefs.current[i] = el; }}
-              src={slide.video}
-              muted
-              loop
-              playsInline
-              preload={i <= 1 ? "auto" : "metadata"}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-slate-950/15" />
+            {shouldMount ? (
+              <SlideVideo slide={slide} isActive={isActive} onReady={() => {}} />
+            ) : (
+              <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
+            )}
           </div>
         );
       })}
