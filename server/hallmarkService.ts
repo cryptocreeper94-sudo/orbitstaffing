@@ -1,12 +1,12 @@
 import crypto from 'crypto';
-import { solanaService } from './solanaService';
+import { trustLayerBlockchain } from './trustLayerBlockchain';
 import { db } from './db';
 import { sql } from 'drizzle-orm';
 
 /**
  * ORBIT Hallmark Service - Automatic stamping & tracking
  * Every asset gets a unique, permanent identifier
- * Now with optional Solana blockchain anchoring for immutable verification
+ * Now with optional TrustVault blockchain anchoring for immutable verification
  * 
  * ASSET NUMBER FORMAT: #XXXXXXXXX-YY
  * - 9 digits for master asset (1 billion capacity)
@@ -390,7 +390,7 @@ export function createHallmarkData(
 
 export function formatHallmarkForCert(hallmark: any): string {
   const blockchainStatus = hallmark.blockchainTxSignature 
-    ? `║ Blockchain: Verified on Solana            ║\n║ TX: ${hallmark.blockchainTxSignature.substring(0, 38)}... ║\n`
+    ? `║ Blockchain: Verified on TrustVault        ║\n║ TX: ${hallmark.blockchainTxSignature.substring(0, 38)}... ║\n`
     : `║ Blockchain: Pending anchoring             ║\n`;
     
   return `
@@ -417,7 +417,7 @@ export async function queueForBlockchain(
   contentHash: string,
   assetType: string
 ): Promise<{ queued: boolean; message: string }> {
-  if (!solanaService.shouldAnchor(assetType)) {
+  if (!trustLayerBlockchain.shouldAnchor(assetType)) {
     return { 
       queued: false, 
       message: `Asset type '${assetType}' not configured for blockchain anchoring` 
@@ -425,10 +425,10 @@ export async function queueForBlockchain(
   }
 
   try {
-    await solanaService.queueForAnchoring(hallmarkId, contentHash, assetType);
+    await trustLayerBlockchain.queueForAnchoring(hallmarkId, contentHash, assetType);
     return { 
       queued: true, 
-      message: `Queued for blockchain anchoring (${solanaService.isSimulationMode() ? 'simulation' : 'live'} mode)` 
+      message: `Queued for blockchain anchoring (${trustLayerBlockchain.isSimulationMode() ? 'simulation' : 'live'} mode)` 
     };
   } catch (error) {
     console.error('[Hallmark] Failed to queue for blockchain:', error);
@@ -443,5 +443,5 @@ export async function queueForBlockchain(
  * Get blockchain anchoring statistics
  */
 export async function getBlockchainStats() {
-  return await solanaService.getStats();
+  return await trustLayerBlockchain.getStats();
 }

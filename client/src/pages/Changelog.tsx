@@ -14,9 +14,9 @@ const changelogEntries = [
     changes: [
       { type: "new", text: "Full analytics tracking system with page views, live visitors, device detection" },
       { type: "new", text: "Bento-grid analytics dashboard at /analytics with real-time stats" },
-      { type: "new", text: "OrbyHallmark component with QR code on Solana Verification page" },
+      { type: "new", text: "OrbyHallmark component with QR code on TrustVault Verification page" },
       { type: "fix", text: "Footer alignment - all links and version on same baseline" },
-      { type: "fix", text: "Solana verification page scrolls to top on load" },
+      { type: "fix", text: "TrustVault verification page scrolls to top on load" },
       { type: "fix", text: "Back button navigation fixed throughout app" },
     ]
   },
@@ -31,7 +31,7 @@ const changelogEntries = [
       { type: "new", text: "Email presentations directly to attendees via Resend integration" },
       { type: "new", text: "Fullscreen slideshow viewer with keyboard navigation" },
       { type: "new", text: "CRM integration with quick-access Presentations button" },
-      { type: "security", text: "New Solana blockchain stamp for v2.7.0" },
+      { type: "security", text: "New TrustVault blockchain stamp for v2.7.0" },
     ]
   },
   {
@@ -42,7 +42,7 @@ const changelogEntries = [
       { type: "fix", text: "Version number moved to footer with proper baseline alignment" },
       { type: "fix", text: "Header cleaned up - just ORBIT title and hamburger menu" },
       { type: "fix", text: "Footer simplified to minimal strip: DarkWave Studios, LLC | © 2025 | version" },
-      { type: "security", text: "New Solana blockchain stamp generated" },
+      { type: "security", text: "New TrustVault blockchain stamp generated" },
     ]
   },
   {
@@ -56,7 +56,7 @@ const changelogEntries = [
       { type: "fix", text: "Pricing cards now have consistent height on mobile" },
       { type: "new", text: "Added hamburger menu to landing page header" },
       { type: "new", text: "Added About Us page" },
-      { type: "new", text: "Added Solana Verification page showing all blockchain stamps" },
+      { type: "new", text: "Added TrustVault Verification page showing all blockchain stamps" },
       { type: "new", text: "Version number in header links to changelog" },
     ]
   },
@@ -68,7 +68,7 @@ const changelogEntries = [
       { type: "fix", text: "Fixed all product card emblems and hallmarks by importing images properly" },
       { type: "fix", text: "Standardized card width to ensure navigation arrows remain on-screen" },
       { type: "fix", text: "Wave AI button made larger with enhanced glow effects" },
-      { type: "security", text: "New Solana blockchain stamps generated" },
+      { type: "security", text: "New TrustVault blockchain stamps generated" },
     ]
   },
   {
@@ -91,7 +91,7 @@ const changelogEntries = [
       { type: "new", text: "Splash screen with Orby presenting pose" },
       { type: "new", text: "Automatic install prompt with 7-day cooldown" },
       { type: "new", text: "Service worker for offline caching" },
-      { type: "security", text: "Solana blockchain stamps for ORBIT v2.6.1" },
+      { type: "security", text: "TrustVault blockchain stamps for ORBIT v2.6.1" },
     ]
   },
   {
@@ -186,8 +186,8 @@ export default function Changelog() {
 
         <section className="text-center py-8 border-t border-slate-800/50">
           <p className="text-xs text-slate-500">
-            All versions are blockchain-verified on Solana.{" "}
-            <Link href="/solana-verification" className="text-cyan-400 hover:text-cyan-300">
+            All versions are blockchain-verified on TrustVault.{" "}
+            <Link href="/trustvault-verification" className="text-cyan-400 hover:text-cyan-300">
               View verification stamps
             </Link>
           </p>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ExternalLink, Wallet, Coins, Globe, Loader2, Sparkles } from "lucide-react";
 
 interface SearchResult {
-  type: 'url' | 'solana_address' | 'solana_token' | 'solana_wallet' | 'token_symbol' | 'search' | 'web_search';
+  type: 'url' | 'trustvault_address' | 'trustvault_token' | 'trustvault_wallet' | 'token_symbol' | 'search' | 'web_search';
   query: string;
   result: {
     url?: string;
@@ -38,7 +38,7 @@ export function Web3SearchBar() {
     return /^(https?:\/\/|www\.)/i.test(text.trim());
   };
 
-  const isSolanaAddress = (text: string): boolean => {
+  const isTrustVaultAddress = (text: string): boolean => {
     return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(text.trim());
   };
 
@@ -82,7 +82,7 @@ export function Web3SearchBar() {
       clearTimeout(debounceRef.current);
     }
 
-    if (value.trim().length >= 3 || isSolanaAddress(value)) {
+    if (value.trim().length >= 3 || isTrustVaultAddress(value)) {
       debounceRef.current = setTimeout(() => {
         handleSearch(value);
       }, 300);
@@ -137,9 +137,9 @@ export function Web3SearchBar() {
     switch (type) {
       case 'url':
         return <Globe className="w-4 h-4 text-cyan-400" />;
-      case 'solana_wallet':
+      case 'trustvault_wallet':
         return <Wallet className="w-4 h-4 text-purple-400" />;
-      case 'solana_token':
+      case 'trustvault_token':
       case 'token_symbol':
         return <Coins className="w-4 h-4 text-amber-400" />;
       default:
@@ -174,7 +174,7 @@ export function Web3SearchBar() {
             onChange={handleInputChange}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="Search anything, Solana, or enter URL..."
+            placeholder="Search anything, TrustVault, or enter URL..."
             className="w-full py-2.5 pl-10 pr-20 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none"
             data-testid="input-web3-search"
           />
@@ -275,7 +275,7 @@ export function Web3SearchBar() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-white font-medium text-sm truncate">
-                        {result.result.name || result.result.symbol || 'Solana Address'}
+                        {result.result.name || result.result.symbol || 'TrustVault Address'}
                       </span>
                       {result.result.symbol && result.result.name && (
                         <span className="px-1.5 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs rounded">
@@ -316,7 +316,7 @@ export function Web3SearchBar() {
                     className="mt-3 w-full flex items-center justify-center gap-2 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm text-cyan-400 transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    View on Solana Explorer
+                    View on TrustVault Explorer
                   </button>
                 )}
               </div>

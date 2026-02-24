@@ -760,7 +760,7 @@ interface IntegrationStatus {
     sendgrid: { configured: boolean };
     openai: { configured: boolean };
     checkr: { configured: boolean };
-    solana: { configured: boolean };
+    trustvault: { configured: boolean };
     helius: { configured: boolean };
     database: { configured: boolean };
     github: { configured: boolean };

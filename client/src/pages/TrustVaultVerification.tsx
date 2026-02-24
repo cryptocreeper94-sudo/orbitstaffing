@@ -104,7 +104,7 @@ const blockchainStamps = [
   }
 ];
 
-export default function SolanaVerification() {
+export default function TrustVaultVerification() {
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const [, navigate] = useLocation();
 
@@ -131,7 +131,7 @@ export default function SolanaVerification() {
       <header className="border-b border-purple-500/30 backdrop-blur-sm sticky top-0 z-50 bg-slate-950/80">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <PageHeader
-            title="Solana Blockchain Verification"
+            title="TrustVault Blockchain Verification"
             subtitle="Immutable cryptographic verification for all platform versions"
             breadcrumb={
               <Button 
@@ -147,7 +147,7 @@ export default function SolanaVerification() {
             }
             actions={
               <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
-                Powered by Solana Mainnet
+                Powered by TrustVault
               </Badge>
             }
           />
@@ -162,7 +162,7 @@ export default function SolanaVerification() {
             </span>
           </h1>
           <p className="text-slate-400 max-w-xl mx-auto text-sm">
-            Every version of ORBIT Staffing OS is cryptographically stamped on the Solana blockchain 
+            Every version of ORBIT Staffing OS is cryptographically stamped on the TrustVault blockchain 
             for immutable verification and transparency.
           </p>
           
@@ -276,15 +276,15 @@ export default function SolanaVerification() {
 
         <section className="text-center py-8 border-t border-slate-800/50 space-y-4">
           <p className="text-xs text-slate-500">
-            Hashes are SHA-256 signatures of version metadata. Verify on any Solana explorer.
+            Hashes are SHA-256 signatures of version metadata. Verify on the TrustVault explorer.
           </p>
           <a 
-            href="https://explorer.solana.com" 
+            href="https://darkwave-trust-layer.replit.app" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-xs text-cyan-400 hover:text-cyan-300 transition"
           >
-            Open Solana Explorer <ExternalLink className="w-3 h-3" />
+            Open TrustVault Explorer <ExternalLink className="w-3 h-3" />
           </a>
         </section>
       </main>

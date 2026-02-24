@@ -434,7 +434,7 @@ export const slideContent: ProductSlides = {
     },
     {
       title: "Blockchain Verification",
-      content: "Every order and document can be verified with our Solana-based hallmark system. Tamper-proof receipts and invoices for your business records.",
+      content: "Every order and document can be verified with our TrustVault-based hallmark system. Tamper-proof receipts and invoices for your business records.",
       category: "SECURITY"
     },
     {

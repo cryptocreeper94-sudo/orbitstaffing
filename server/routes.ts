@@ -15,7 +15,7 @@ import type { PayrollCalculationInput } from "./payrollCalculator";
 import { autoMatchWorkers, autoReassignWorkerRequest } from "./matchingService";
 import { registerCrmRoutes } from "./crmRoutes";
 import { coinbaseService } from "./coinbaseService";
-import { solanaService } from "./solanaService";
+import { trustLayerBlockchain } from "./trustLayerBlockchain";
 import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
 import { registerUser, loginUser, getUserFromToken, ecosystemLogin } from "./trustlayer-sso";
@@ -94,6 +94,7 @@ import {
   insertDeveloperSchema,
   partnerProfiles,
   passwordResetTokens,
+  chatChannels,
 } from "@shared/schema";
 import crypto from "crypto";
 
@@ -173,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Crypto Payment routes (Coinbase Commerce for invoice payments)
   registerCryptoPaymentRoutes(app);
   
-  // Register Blockchain routes (Solana hash anchoring for Hallmarks)
+  // Register Blockchain routes (TrustVault hash anchoring for Hallmarks)
   registerBlockchainRoutes(app);
   
   // Register Analytics routes (Page tracking and dashboard)
@@ -254,11 +255,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         checkr: {
           configured: !!process.env.CHECKR_API_KEY,
         },
-        solana: {
-          configured: !!process.env.SOLANA_WALLET_PRIVATE_KEY,
-        },
-        helius: {
-          configured: !!process.env.HELIUS_API_KEY,
+        trustvault: {
+          configured: !!process.env.TRUSTLAYER_API_KEY,
         },
         database: {
           configured: !!process.env.DATABASE_URL,
@@ -8146,21 +8144,21 @@ async function recalculateWorkerPerformance(workerId: string, tenantId: string) 
 // Worker matching is handled by ./matchingService - see autoMatchWorkers and autoReassignWorkerRequest exports
 
 // ========================
-// Blockchain Hash Anchoring (Solana)
+// Blockchain Hash Anchoring (TrustVault)
 // ========================
 
 export function registerBlockchainRoutes(app: Express) {
   // Get blockchain anchoring status and stats
   app.get("/api/blockchain/status", async (req: Request, res: Response) => {
     try {
-      const stats = await solanaService.getStats();
+      const stats = await trustLayerBlockchain.getStats();
       res.json({
         ...stats,
-        configured: solanaService.isConfigured(),
-        simulationMode: solanaService.isSimulationMode(),
-        message: solanaService.isSimulationMode() 
-          ? "Running in simulation mode - add HELIUS_API_KEY to enable live mode"
-          : "Connected to Solana mainnet via Helius"
+        configured: trustLayerBlockchain.isConfigured(),
+        simulationMode: trustLayerBlockchain.isSimulationMode(),
+        message: trustLayerBlockchain.isSimulationMode() 
+          ? "Running in simulation mode - add TRUSTLAYER_API_KEY to enable live mode"
+          : "Connected to TrustVault blockchain via DarkWave Trust Layer"
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to get blockchain status" });
@@ -8170,7 +8168,7 @@ export function registerBlockchainRoutes(app: Express) {
   // View current hash queue
   app.get("/api/blockchain/queue", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
-      const queue = await solanaService.getQueuedHashes();
+      const queue = await trustLayerBlockchain.getQueuedHashes();
       res.json({ 
         queueSize: queue.length,
         hashes: queue,
@@ -8184,16 +8182,16 @@ export function registerBlockchainRoutes(app: Express) {
   // Manually trigger batch anchoring
   app.post("/api/blockchain/anchor-batch", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
-      const result = await solanaService.anchorBatch();
+      const result = await trustLayerBlockchain.anchorBatch();
       if (!result) {
         return res.json({ success: false, message: "No hashes in queue to anchor" });
       }
       res.json({ 
         success: true, 
         batch: result,
-        message: solanaService.isSimulationMode() 
+        message: trustLayerBlockchain.isSimulationMode() 
           ? "Batch anchored (simulation mode)" 
-          : "Batch anchored to Solana mainnet"
+          : "Batch anchored to TrustVault blockchain"
       });
     } catch (error) {
       console.error("Batch anchoring error:", error);
@@ -8204,10 +8202,10 @@ export function registerBlockchainRoutes(app: Express) {
   // View anchored batches history
   app.get("/api/blockchain/batches", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
-      const batches = await solanaService.getAnchoredBatches();
+      const batches = await trustLayerBlockchain.getAnchoredBatches();
       res.json({ 
         totalBatches: batches.length,
-        batches: batches.slice(0, 20) // Already sorted DESC in the query
+        batches: batches.slice(0, 20)
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to get batches" });
@@ -8233,7 +8231,7 @@ export function registerBlockchainRoutes(app: Express) {
   // Get anchorable document types
   app.get("/api/blockchain/anchorable-types", async (req: Request, res: Response) => {
     res.json({ 
-      types: solanaService.getAnchorableTypes(),
+      types: trustLayerBlockchain.getAnchorableTypes(),
       description: "Document types that are automatically queued for blockchain anchoring"
     });
   });
@@ -8262,133 +8260,16 @@ export function registerBlockchainRoutes(app: Express) {
         });
       }
       
-      // Check if it's a Solana address (base58, 32-44 characters)
+      // Check if it's a blockchain address (base58, 32-44 characters)
       const base58Pattern = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
       if (base58Pattern.test(query)) {
-        // Use Helius API if configured
-        const heliusKey = process.env.HELIUS_API_KEY;
-        
-        if (!heliusKey) {
-          return res.json({
-            type: 'solana_address',
-            query,
-            result: {
-              address: query,
-              explorerUrl: `https://explorer.solana.com/address/${query}`,
-              note: 'Helius API not configured - showing explorer link only'
-            }
-          });
-        }
-        
-        try {
-          // Try to get asset info from Helius DAS API
-          const heliusResponse = await fetch(`https://mainnet.helius-rpc.com/?api-key=${heliusKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              id: 'orbit-web3-search',
-              method: 'getAsset',
-              params: { id: query }
-            })
-          });
-          
-          const heliusData = await heliusResponse.json();
-          
-          if (heliusData.result) {
-            const asset = heliusData.result;
-            return res.json({
-              type: 'solana_token',
-              query,
-              result: {
-                address: query,
-                name: asset.content?.metadata?.name || 'Unknown Token',
-                symbol: asset.content?.metadata?.symbol || '',
-                image: asset.content?.links?.image || asset.content?.files?.[0]?.uri || null,
-                description: asset.content?.metadata?.description || null,
-                tokenStandard: asset.interface || 'Unknown',
-                owner: asset.ownership?.owner || null,
-                explorerUrl: `https://explorer.solana.com/address/${query}`
-              }
-            });
-          }
-          
-          // If not a token, check if it's a wallet/account
-          const balanceResponse = await fetch(`https://mainnet.helius-rpc.com/?api-key=${heliusKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              jsonrpc: '2.0',
-              id: 'orbit-balance-check',
-              method: 'getBalance',
-              params: [query]
-            })
-          });
-          
-          const balanceData = await balanceResponse.json();
-          
-          if (balanceData.result !== undefined) {
-            const lamports = balanceData.result?.value || balanceData.result || 0;
-            const sol = lamports / 1e9;
-            
-            return res.json({
-              type: 'solana_wallet',
-              query,
-              result: {
-                address: query,
-                balance: sol,
-                balanceFormatted: `${sol.toFixed(4)} SOL`,
-                explorerUrl: `https://explorer.solana.com/address/${query}`
-              }
-            });
-          }
-          
-          // Fallback - address exists but no specific info
-          return res.json({
-            type: 'solana_address',
-            query,
-            result: {
-              address: query,
-              explorerUrl: `https://explorer.solana.com/address/${query}`
-            }
-          });
-          
-        } catch (heliusError) {
-          console.error('[Web3 Search] Helius API error:', heliusError);
-          return res.json({
-            type: 'solana_address',
-            query,
-            result: {
-              address: query,
-              explorerUrl: `https://explorer.solana.com/address/${query}`,
-              note: 'Could not fetch details from Helius'
-            }
-          });
-        }
-      }
-      
-      // Check for common token symbols (basic matching)
-      const tokenSymbols: Record<string, { name: string; address: string }> = {
-        'SOL': { name: 'Solana', address: 'So11111111111111111111111111111111111111112' },
-        'USDC': { name: 'USD Coin', address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' },
-        'USDT': { name: 'Tether', address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB' },
-        'BONK': { name: 'Bonk', address: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263' },
-        'JUP': { name: 'Jupiter', address: 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN' },
-        'RAY': { name: 'Raydium', address: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R' },
-        'ORCA': { name: 'Orca', address: 'orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE' },
-      };
-      
-      const upperQuery = query.toUpperCase();
-      if (tokenSymbols[upperQuery]) {
-        const token = tokenSymbols[upperQuery];
         return res.json({
-          type: 'token_symbol',
+          type: 'blockchain_address',
           query,
           result: {
-            symbol: upperQuery,
-            name: token.name,
-            address: token.address,
-            explorerUrl: `https://explorer.solana.com/address/${token.address}`
+            address: query,
+            explorerUrl: `${process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.replit.app'}/api/provenance/verify/${query}`,
+            note: 'TrustVault blockchain address'
           }
         });
       }
@@ -8402,8 +8283,8 @@ export function registerBlockchainRoutes(app: Express) {
             type: 'search',
             query,
             result: {
-              suggestion: 'Enter a Solana address, token symbol, or URL to search',
-              examples: ['So11111111111111111111111111111111111111112', 'SOL', 'USDC', 'https://solana.com']
+              suggestion: 'Enter a blockchain address or URL to search',
+              examples: ['https://example.com']
             }
           });
         }
@@ -8440,8 +8321,8 @@ export function registerBlockchainRoutes(app: Express) {
             type: 'search',
             query,
             result: {
-              suggestion: 'Web search is currently unavailable. Try a URL or Solana address.',
-              examples: ['https://solana.com', 'SOL', 'USDC', 'www.google.com']
+              suggestion: 'Web search is currently unavailable. Try a URL or blockchain address.',
+              examples: ['https://example.com', 'www.google.com']
             }
           });
         }
@@ -8463,8 +8344,8 @@ export function registerBlockchainRoutes(app: Express) {
           type: 'search',
           query,
           result: {
-            suggestion: 'Search temporarily unavailable. Try a URL or Solana address.',
-            examples: ['https://solana.com', 'SOL', 'USDC']
+            suggestion: 'Search temporarily unavailable. Try a URL or blockchain address.',
+            examples: ['https://example.com']
           }
         });
       }
@@ -11019,7 +10900,7 @@ export function registerPayCardRoutes(app: Express) {
           "Partner API v1 with OAuth 2.0 + PKCE",
           "15+ Third-Party Integrations",
           "Franchise White-Label System",
-          "Solana Blockchain Anchoring",
+          "TrustVault Blockchain Anchoring",
           "Real-time Webhook Events (12 types)",
           "Bulk Import/Export (10k+ records)",
           "Compliance Automation (I-9, E-Verify)",
@@ -11556,7 +11437,7 @@ export function registerPayCardRoutes(app: Express) {
         codeSnippets: ecosystemStats.totalSnippets,
         dataSyncs: ecosystemStats.totalSyncs,
         errorRate: parseFloat(errorRate),
-        solanaNetwork: blockchainStats?.solanaConnected ? 'connected' : 'disconnected',
+        trustVaultNetwork: blockchainStats?.mode === 'live' ? 'connected' : 'disconnected',
         lastUpdated: new Date().toISOString(),
       });
     } catch (error) {
@@ -11765,22 +11646,22 @@ export function registerPayCardRoutes(app: Express) {
       });
       const releaseHash = crypto.createHash('sha256').update(releasePayload).digest('hex');
       
-      // Anchor to Solana blockchain via queue
-      let solanaResult = null;
+      // Anchor to TrustVault blockchain via queue
+      let blockchainResult = null;
       try {
-        // Queue the release hash for blockchain anchoring
-        await solanaService.queueForAnchoring(
+        await trustLayerBlockchain.queueForAnchoring(
           `release-${ecosystemApp.appSlug}-${version}`,
           releaseHash,
           'release'
         );
-        solanaResult = {
+        const trustLayerBaseUrl = process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.replit.app';
+        blockchainResult = {
           transactionSignature: `pending-${releaseHash.substring(0, 16)}`,
-          explorerUrl: `https://explorer.solana.com/search?q=${releaseHash}`
+          explorerUrl: `${trustLayerBaseUrl}/api/provenance/verify/${releaseHash}`
         };
-        console.log(`[Release Manager] Queued for Solana anchoring: ${releaseHash.substring(0, 16)}...`);
-      } catch (solanaError) {
-        console.warn(`[Release Manager] Solana anchoring failed (non-blocking):`, solanaError);
+        console.log(`[Release Manager] Queued for TrustVault anchoring: ${releaseHash.substring(0, 16)}...`);
+      } catch (blockchainError) {
+        console.warn(`[Release Manager] TrustVault anchoring failed (non-blocking):`, blockchainError);
       }
       
       // Insert release with explicit timestamp
@@ -11795,8 +11676,8 @@ export function registerPayCardRoutes(app: Express) {
         breakingChanges: breakingChanges || false,
         dependencies: dependencies || null,
         releaseHash,
-        solanaTx: solanaResult?.transactionSignature || null,
-        solanaExplorerUrl: solanaResult?.explorerUrl || null,
+        solanaTx: blockchainResult?.transactionSignature || null,
+        solanaExplorerUrl: blockchainResult?.explorerUrl || null,
         publishedAt: registeredAt,
         createdAt: registeredAt,
       }).returning();
@@ -11814,10 +11695,10 @@ export function registerPayCardRoutes(app: Express) {
         registeredAt: registeredAt.toISOString(),
         registeredAtCST: cstTimestamp,
         releaseHash,
-        solanaAnchor: solanaResult ? {
+        blockchainAnchor: blockchainResult ? {
           hash: releaseHash,
-          transactionSignature: solanaResult.transactionSignature,
-          explorerUrl: solanaResult.explorerUrl,
+          transactionSignature: blockchainResult.transactionSignature,
+          explorerUrl: blockchainResult.explorerUrl,
         } : null,
       });
     } catch (error) {
@@ -12680,7 +12561,7 @@ export function registerPayCardRoutes(app: Express) {
     }
   });
 
-  // Trigger a publish with version bump and Solana hash (admin only)
+  // Trigger a publish with version bump and TrustVault hash (admin only)
   app.post("/api/admin/publish", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
       const bumpType = (req.body.bumpType as 'major' | 'minor' | 'patch') || 'patch';
@@ -12694,10 +12575,10 @@ export function registerPayCardRoutes(app: Express) {
         version: result.version,
         buildNumber: result.buildNumber,
         hash: result.hash,
-        solana: result.solanaResult ? {
-          transactionSignature: result.solanaResult.transactionSignature,
-          explorerUrl: result.solanaResult.explorerUrl,
-          merkleRoot: result.solanaResult.merkleRoot,
+        blockchain: result.blockchainResult ? {
+          transactionSignature: result.blockchainResult.transactionSignature,
+          explorerUrl: result.blockchainResult.explorerUrl,
+          merkleRoot: result.blockchainResult.merkleRoot,
         } : null,
         publishedAt: new Date().toISOString(),
       });
@@ -16197,6 +16078,16 @@ export function registerTrustLayerRoutes(app: Express) {
     } catch (error: any) {
       console.error("[Trust Layer] Auth me error:", error);
       res.status(500).json({ error: "Failed to verify token" });
+    }
+  });
+
+  app.get("/api/chat/channels", async (_req: Request, res: Response) => {
+    try {
+      const channels = await db.select().from(chatChannels).orderBy(chatChannels.name);
+      res.json(channels);
+    } catch (error: any) {
+      console.error("[Signal Chat] Failed to fetch channels:", error);
+      res.status(500).json({ error: "Failed to fetch channels" });
     }
   });
 

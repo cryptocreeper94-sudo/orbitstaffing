@@ -1,9 +1,9 @@
-// Automatic Version Management & Solana Hashing on Publish
+// Automatic Version Management & TrustVault Hashing on Publish
 // This module handles version bumping and blockchain stamping for releases
 
 import { createHash } from 'crypto';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { solanaService } from './solanaService';
+import { trustLayerBlockchain } from './trustLayerBlockchain';
 import { db } from './db';
 import { sql } from 'drizzle-orm';
 
@@ -11,7 +11,7 @@ interface VersionInfo {
   version: string;
   buildNumber: number;
   lastPublished: string;
-  solanaHash: string | null;
+  blockchainHash: string | null;
   transactionSignature: string | null;
 }
 
@@ -39,7 +39,7 @@ export class VersionManager {
       version: '2.7.0',
       buildNumber: 1,
       lastPublished: new Date().toISOString(),
-      solanaHash: null,
+      blockchainHash: null,
       transactionSignature: null,
     };
   }
@@ -95,7 +95,7 @@ export class VersionManager {
     version: string;
     buildNumber: number;
     hash: string;
-    solanaResult: any;
+    blockchainResult: any;
   }> {
     console.log('[Version] Starting publish process...');
 
@@ -105,18 +105,18 @@ export class VersionManager {
 
     // 2. Generate release hash
     const releaseHash = this.generateReleaseHash();
-    this.versionInfo.solanaHash = releaseHash;
+    this.versionInfo.blockchainHash = releaseHash;
 
-    // 3. Queue for Solana anchoring
+    // 3. Queue for TrustVault anchoring
     const hallmarkId = `orbit-release-v${newVersion}`;
-    await solanaService.queueForAnchoring(hallmarkId, releaseHash, 'release');
+    await trustLayerBlockchain.queueForAnchoring(hallmarkId, releaseHash, 'release');
 
     // 4. Anchor the batch immediately
-    const solanaResult = await solanaService.anchorBatch();
+    const blockchainResult = await trustLayerBlockchain.anchorBatch();
 
-    if (solanaResult) {
-      this.versionInfo.transactionSignature = solanaResult.transactionSignature;
-      console.log(`[Version] Solana anchor: ${solanaResult.transactionSignature}`);
+    if (blockchainResult) {
+      this.versionInfo.transactionSignature = blockchainResult.transactionSignature;
+      console.log(`[Version] TrustVault anchor: ${blockchainResult.transactionSignature}`);
     }
 
     // 5. Update last published timestamp
@@ -129,7 +129,7 @@ export class VersionManager {
     try {
       await db.execute(sql`
         INSERT INTO release_history (version, build_number, release_hash, transaction_signature, published_at)
-        VALUES (${newVersion}, ${this.versionInfo.buildNumber}, ${releaseHash}, ${solanaResult?.transactionSignature || null}, NOW())
+        VALUES (${newVersion}, ${this.versionInfo.buildNumber}, ${releaseHash}, ${blockchainResult?.transactionSignature || null}, NOW())
       `);
     } catch (error) {
       console.log('[Version] Note: release_history table not created yet, skipping DB log');
@@ -139,9 +139,9 @@ export class VersionManager {
     console.log(`[Version] ORBIT Staffing OS v${newVersion} PUBLISHED`);
     console.log(`[Version] Build: ${this.versionInfo.buildNumber}`);
     console.log(`[Version] Hash: ${releaseHash}`);
-    if (solanaResult) {
-      console.log(`[Version] Solana TX: ${solanaResult.transactionSignature}`);
-      console.log(`[Version] Explorer: ${solanaResult.explorerUrl}`);
+    if (blockchainResult) {
+      console.log(`[Version] TrustVault TX: ${blockchainResult.transactionSignature}`);
+      console.log(`[Version] Explorer: ${blockchainResult.explorerUrl}`);
     }
     console.log('[Version] ═══════════════════════════════════════════════════');
 
@@ -149,7 +149,7 @@ export class VersionManager {
       version: newVersion,
       buildNumber: this.versionInfo.buildNumber,
       hash: releaseHash,
-      solanaResult,
+      blockchainResult,
     };
   }
 

@@ -983,7 +983,7 @@ export const brewAndBoardSlides: Slide[] = [
       type: 'feature',
       headline: 'Verified with Blockchain',
       subheadline: 'Tamper-proof document verification',
-      description: 'Every receipt and invoice can be permanently verified on Solana blockchain.',
+      description: 'Every receipt and invoice can be permanently verified on TrustVault blockchain.',
       bullets: [
         'Unique hallmark codes for each document',
         'QR code verification for instant validation',

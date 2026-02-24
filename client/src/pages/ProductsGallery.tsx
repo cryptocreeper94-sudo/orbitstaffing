@@ -298,7 +298,7 @@ export default function ProductsGallery() {
                 />
               </div>
               <div className="hidden sm:flex flex-col">
-                <span className="text-[9px] text-cyan-400 font-semibold leading-tight">SOLANA</span>
+                <span className="text-[9px] text-cyan-400 font-semibold leading-tight">TRUSTVAULT</span>
                 <span className="text-[8px] text-slate-400 leading-tight">VERIFIED</span>
               </div>
             </div>
@@ -345,7 +345,7 @@ export default function ProductsGallery() {
                 </a>
                 <div className="border-t border-slate-700 my-2"></div>
                 <div className="px-4 py-2 text-xs text-slate-500">
-                  Version v2.7.0 • Solana Verified
+                  Version v2.7.0 • TrustVault Verified
                 </div>
               </div>
             </motion.div>

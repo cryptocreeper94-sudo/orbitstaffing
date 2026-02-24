@@ -342,7 +342,7 @@ export default function DeveloperPortal() {
               </div>
               <h3 className="text-xl font-bold mb-2">Blockchain-Verified</h3>
               <p className="text-gray-400">
-                All records secured on Solana blockchain for tamper-proof
+                All records secured on TrustVault blockchain for tamper-proof
                 verification and compliance.
               </p>
             </div>

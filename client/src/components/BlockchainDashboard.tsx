@@ -6,7 +6,7 @@ interface VersionInfo {
   version: string;
   buildNumber: number;
   lastPublished: string;
-  solanaHash: string | null;
+  trustvaultHash: string | null;
   transactionSignature: string | null;
 }
 
@@ -164,7 +164,7 @@ export function BlockchainDashboard() {
         </div>
       </div>
 
-      {version?.solanaHash && (
+      {version?.trustvaultHash && (
         <div className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 border border-cyan-700/50 rounded-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -174,11 +174,11 @@ export function BlockchainDashboard() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => copyToClipboard(version.solanaHash!)}
+              onClick={() => copyToClipboard(version.trustvaultHash!)}
               className="text-slate-400 hover:text-white"
               data-testid="button-copy-hash"
             >
-              {copiedHash === version.solanaHash ? (
+              {copiedHash === version.trustvaultHash ? (
                 <Check className="w-4 h-4 text-green-400" />
               ) : (
                 <Copy className="w-4 h-4" />
@@ -186,7 +186,7 @@ export function BlockchainDashboard() {
             </Button>
           </div>
           <div className="font-mono text-sm text-white bg-slate-900/50 p-3 rounded break-all" data-testid="text-release-hash">
-            {version.solanaHash}
+            {version.trustvaultHash}
           </div>
           {version.lastPublished && (
             <div className="flex items-center gap-2 mt-3 text-slate-400 text-sm">
@@ -196,14 +196,14 @@ export function BlockchainDashboard() {
           )}
           {version.transactionSignature && (
             <a
-              href={`https://explorer.solana.com/tx/${version.transactionSignature}?cluster=mainnet-beta`}
+              href={`https://darkwave-trust-layer.replit.app/api/provenance/verify/${version.transactionSignature}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-2 text-cyan-400 hover:text-cyan-300 text-sm"
-              data-testid="link-solana-explorer"
+              data-testid="link-trustvault-explorer"
             >
               <ExternalLink className="w-4 h-4" />
-              View on Solana Explorer
+              View on TrustVault Explorer
             </a>
           )}
         </div>
@@ -241,7 +241,7 @@ export function BlockchainDashboard() {
           </Button>
         </div>
         <p className="text-slate-500 text-sm mt-3">
-          Publishing bumps the version, generates a SHA-256 hash, and anchors it to Solana blockchain.
+          Publishing bumps the version, generates a SHA-256 hash, and anchors it to TrustVault blockchain.
         </p>
       </div>
 

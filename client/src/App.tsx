@@ -81,7 +81,8 @@ import AboutUs from "@/pages/AboutUs";
 import Settings from "@/pages/Settings";
 import MeetingPresentations from "@/pages/MeetingPresentations";
 import PresentationViewer from "@/pages/PresentationViewer";
-import SolanaVerification from "@/pages/SolanaVerification";
+import TrustVaultVerification from "@/pages/TrustVaultVerification";
+import SignalChat from "@/pages/SignalChat";
 import Changelog from "@/pages/Changelog";
 import EcosystemHub from "@/pages/EcosystemHub";
 import DevDashboard from "@/pages/DevDashboard";
@@ -241,7 +242,8 @@ function Router() {
       <Route path="/franchise/success" component={FranchiseSuccess} />
       <Route path="/about" component={AboutUs} />
       <Route path="/settings" component={Settings} />
-      <Route path="/solana-verification" component={SolanaVerification} />
+      <Route path="/trustvault-verification" component={TrustVaultVerification} />
+      <Route path="/signal-chat" component={SignalChat} />
       <Route path="/changelog" component={Changelog} />
       <Route path="/ecosystem-hub" component={EcosystemHub} />
       <Route path="/dev-dashboard" component={DevDashboard} />

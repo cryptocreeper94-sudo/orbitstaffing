@@ -330,7 +330,7 @@ export default function Landing() {
                 <FileText className="w-4 h-4" />
                 What's New
               </Link>
-              <Link href="/solana-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-purple-400 hover:bg-slate-800 rounded-lg transition">
+              <Link href="/trustvault-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-purple-400 hover:bg-slate-800 rounded-lg transition">
                 <Coins className="w-4 h-4" />
                 Blockchain
               </Link>

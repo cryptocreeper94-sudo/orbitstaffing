@@ -332,7 +332,7 @@ export default function AdminLanding() {
               <div className="bg-slate-700/30 rounded-lg p-3">
                 <p className="font-bold text-purple-300 mb-2">🪙 ORBIT Loyalty Token</p>
                 <ul className="text-xs text-gray-400 space-y-1 ml-3">
-                  <li>✓ Workers earn for assignments (Solana/Polygon)</li>
+                  <li>✓ Workers earn for assignments (TrustVault/Polygon)</li>
                   <li>✓ Redeem for pay, features, training</li>
                   <li>⚠️ Requires legal review (NOT a security)</li>
                 </ul>

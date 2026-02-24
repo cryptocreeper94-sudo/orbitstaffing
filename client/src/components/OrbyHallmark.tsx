@@ -278,7 +278,7 @@ export function OrbyHallmark({
                 <span className="text-gray-400">Network:</span>
                 <span className="text-purple-300 flex items-center gap-1">
                   <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
-                  Solana Mainnet
+                  TrustVault Network
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm mt-2">
@@ -312,7 +312,7 @@ export function OrbyHallmark({
             </div>
 
             <div className="mt-4 text-center text-xs text-gray-500 relative z-10">
-              Hallmark permanently recorded on Solana blockchain
+              Hallmark permanently recorded on TrustVault blockchain
             </div>
           </div>
         </div>

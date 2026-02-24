@@ -1,16 +1,16 @@
-// Solana Blockchain Service for On-Chain Hash Anchoring
-// Supports simulation mode (no blockchain) and live mode (mainnet via Helius)
+// TrustVault Blockchain Service for On-Chain Hash Anchoring
+// Supports simulation mode (no blockchain) and live mode (TrustVault via DarkWave Trust Layer)
 // Uses database persistence for queue and batch history
 
-import { createHash } from 'crypto';
+import { createHash, createHmac } from 'crypto';
 import { db } from './db';
 import { sql } from 'drizzle-orm';
 
 // Configuration
-const SIMULATION_MODE = !process.env.HELIUS_API_KEY;
-const HELIUS_RPC_URL = process.env.HELIUS_API_KEY 
-  ? `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`
-  : null;
+const TRUSTLAYER_API_KEY = process.env.TRUSTLAYER_API_KEY || process.env.TRUST_LAYER_API_KEY;
+const TRUSTLAYER_API_SECRET = process.env.TRUSTLAYER_API_SECRET || process.env.TRUST_LAYER_SECRET_KEY;
+const TRUSTLAYER_BASE_URL = process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.replit.app';
+const SIMULATION_MODE = !TRUSTLAYER_API_KEY;
 
 // Types
 interface HashAnchor {
@@ -56,16 +56,24 @@ const ANCHORABLE_TYPES = [
   'audit',         // Audit logs & compliance records
 ];
 
-export class SolanaService {
+function generateHmacSignature(method: string, path: string, timestamp: number, bodyHash: string): string {
+  if (!TRUSTLAYER_API_KEY || !TRUSTLAYER_API_SECRET) {
+    return '';
+  }
+  const payload = `${method}:${path}:${TRUSTLAYER_API_KEY}:${timestamp}:${bodyHash}`;
+  return createHmac('sha256', TRUSTLAYER_API_SECRET).update(payload).digest('hex');
+}
+
+export class TrustLayerBlockchainService {
   private simulationMode: boolean;
 
   constructor() {
     this.simulationMode = SIMULATION_MODE;
     if (this.simulationMode) {
-      console.log('[Solana] Running in SIMULATION MODE - no blockchain transactions');
-      console.log('[Solana] Add HELIUS_API_KEY to enable live mode');
+      console.log('[TrustVault] Running in SIMULATION MODE - no blockchain transactions');
+      console.log('[TrustVault] Add TRUSTLAYER_API_KEY to enable live mode');
     } else {
-      console.log('[Solana] Connected to mainnet via Helius RPC');
+      console.log('[TrustVault] Connected to TrustVault blockchain via DarkWave Trust Layer');
     }
   }
 
@@ -91,7 +99,6 @@ export class SolanaService {
     assetType: string
   ): Promise<HashAnchor> {
     try {
-      // Insert into database
       const result = await db.execute(sql`
         INSERT INTO blockchain_hash_queue (hallmark_id, content_hash, asset_type, status)
         VALUES (${hallmarkId}, ${contentHash}, ${assetType}, 'queued')
@@ -108,18 +115,17 @@ export class SolanaService {
         status: 'queued',
       };
 
-      console.log(`[Solana] Queued hash for anchoring: ${hallmarkId} (${assetType})`);
+      console.log(`[TrustVault] Queued hash for anchoring: ${hallmarkId} (${assetType})`);
       
-      // Get current queue size
       const countResult = await db.execute(sql`
         SELECT COUNT(*) as count FROM blockchain_hash_queue WHERE status = 'queued'
       `);
       const queueSize = parseInt((countResult.rows[0] as any).count || '0');
-      console.log(`[Solana] Queue size: ${queueSize}`);
+      console.log(`[TrustVault] Queue size: ${queueSize}`);
 
       return anchor;
     } catch (error) {
-      console.error('[Solana] Failed to queue hash:', error);
+      console.error('[TrustVault] Failed to queue hash:', error);
       throw error;
     }
   }
@@ -142,7 +148,7 @@ export class SolanaService {
         status: row.status as 'queued',
       }));
     } catch (error) {
-      console.error('[Solana] Failed to get queued hashes:', error);
+      console.error('[TrustVault] Failed to get queued hashes:', error);
       return [];
     }
   }
@@ -154,7 +160,7 @@ export class SolanaService {
       `);
       return parseInt((result.rows[0] as any).count || '0');
     } catch (error) {
-      console.error('[Solana] Failed to get queue size:', error);
+      console.error('[TrustVault] Failed to get queue size:', error);
       return 0;
     }
   }
@@ -164,16 +170,14 @@ export class SolanaService {
       throw new Error('Cannot build Merkle tree from empty hash list');
     }
 
-    // Create leaf nodes
     let nodes: MerkleNode[] = hashes.map(hash => ({ hash }));
 
-    // Build tree bottom-up
     while (nodes.length > 1) {
       const newLevel: MerkleNode[] = [];
       
       for (let i = 0; i < nodes.length; i += 2) {
         const left = nodes[i];
-        const right = nodes[i + 1] || left; // Duplicate last node if odd
+        const right = nodes[i + 1] || left;
         
         const combinedHash = createHash('sha256')
           .update(left.hash + right.hash)
@@ -221,43 +225,39 @@ export class SolanaService {
   }
 
   async anchorBatch(): Promise<BatchResult | null> {
-    // Get queued hashes from database
     const queuedHashes = await this.getQueuedHashes();
     
     if (queuedHashes.length === 0) {
-      console.log('[Solana] No hashes in queue to anchor');
+      console.log('[TrustVault] No hashes in queue to anchor');
       return null;
     }
 
     const batchHashes = queuedHashes.map(h => h.contentHash);
     const { root: merkleRoot } = this.buildMerkleTree(batchHashes);
     
-    console.log(`[Solana] Batching ${batchHashes.length} hashes into Merkle root: ${merkleRoot.substring(0, 16)}...`);
+    console.log(`[TrustVault] Batching ${batchHashes.length} hashes into Merkle root: ${merkleRoot.substring(0, 16)}...`);
 
     let transactionSignature: string;
     let explorerUrl: string;
     const mode = this.simulationMode ? 'simulation' : 'live';
 
     if (this.simulationMode) {
-      // Simulation mode - generate fake but realistic-looking signature
       transactionSignature = `SIM_${Date.now()}_${createHash('sha256').update(merkleRoot).digest('hex').substring(0, 44)}`;
-      explorerUrl = `https://explorer.solana.com/tx/${transactionSignature}?cluster=mainnet-beta`;
-      console.log(`[Solana] SIMULATION: Would anchor Merkle root to Solana`);
-      console.log(`[Solana] SIMULATION: Transaction signature: ${transactionSignature}`);
+      explorerUrl = `${TRUSTLAYER_BASE_URL}/api/provenance/verify/${transactionSignature}`;
+      console.log(`[TrustVault] SIMULATION: Would anchor Merkle root to TrustVault`);
+      console.log(`[TrustVault] SIMULATION: Transaction signature: ${transactionSignature}`);
     } else {
-      // Live mode - submit to Solana via Helius
       try {
-        transactionSignature = await this.submitToSolana(merkleRoot);
-        explorerUrl = `https://explorer.solana.com/tx/${transactionSignature}?cluster=mainnet-beta`;
-        console.log(`[Solana] LIVE: Anchored to Solana: ${transactionSignature}`);
+        transactionSignature = await this.submitToTrustVault(merkleRoot);
+        explorerUrl = `${TRUSTLAYER_BASE_URL}/api/provenance/verify/${transactionSignature}`;
+        console.log(`[TrustVault] LIVE: Anchored to TrustVault: ${transactionSignature}`);
       } catch (error) {
-        console.error('[Solana] Failed to submit to Solana:', error);
+        console.error('[TrustVault] Failed to submit to TrustVault:', error);
         throw error;
       }
     }
 
     try {
-      // Create batch record in database
       const batchResult = await db.execute(sql`
         INSERT INTO blockchain_anchor_batches 
           (merkle_root, transaction_signature, hash_count, mode, explorer_url)
@@ -267,7 +267,6 @@ export class SolanaService {
       
       const batchId = (batchResult.rows[0] as any).id;
       
-      // Update all queued hashes with batch info
       const hashIds = queuedHashes.map(h => h.id);
       await db.execute(sql`
         UPDATE blockchain_hash_queue 
@@ -284,42 +283,58 @@ export class SolanaService {
         explorerUrl,
       };
 
-      console.log(`[Solana] Batch anchored successfully. ${result.hashCount} documents now on-chain.`);
+      console.log(`[TrustVault] Batch anchored successfully. ${result.hashCount} documents now on-chain.`);
       
       return result;
     } catch (error) {
-      console.error('[Solana] Failed to save batch to database:', error);
+      console.error('[TrustVault] Failed to save batch to database:', error);
       throw error;
     }
   }
 
-  private async submitToSolana(merkleRoot: string): Promise<string> {
-    if (!HELIUS_RPC_URL) {
-      console.warn('[Solana] HELIUS_API_KEY not configured - using simulation');
+  private async submitToTrustVault(merkleRoot: string): Promise<string> {
+    if (!TRUSTLAYER_API_KEY || !TRUSTLAYER_API_SECRET) {
+      console.warn('[TrustVault] TRUSTLAYER_API_KEY not configured - using simulation');
       return `SIM_${Date.now()}_${merkleRoot.substring(0, 32)}`;
     }
 
-    const walletKey = process.env.SOLANA_WALLET_PRIVATE_KEY;
-    if (!walletKey) {
-      console.warn('[Solana] SOLANA_WALLET_PRIVATE_KEY not configured');
-      console.log('[Solana] Using simulation mode until wallet is configured');
-      return `PENDING_${Date.now()}_${merkleRoot.substring(0, 32)}`;
-    }
+    try {
+      const path = '/api/provenance/register';
+      const method = 'POST';
+      const body = JSON.stringify({
+        merkleRoot,
+        source: 'orbit-staffing-os',
+        timestamp: new Date().toISOString(),
+      });
+      const bodyHash = createHash('sha256').update(body).digest('hex');
+      const timestamp = Date.now();
+      const signature = generateHmacSignature(method, path, timestamp, bodyHash);
 
-    // Production implementation steps (when ready):
-    // 1. Create Connection to Helius RPC
-    // 2. Load wallet keypair from SOLANA_WALLET_PRIVATE_KEY
-    // 3. Build Memo Program transaction with merkleRoot
-    // 4. Sign and submit transaction
-    // 5. Wait for confirmation
-    // 6. Return signature
-    
-    // For now, log the intent and return a pending signature
-    // This allows the full flow to work without spending SOL
-    console.log('[Solana] Helius configured but wallet signing not yet implemented');
-    console.log('[Solana] Merkle root ready for anchoring:', merkleRoot);
-    
-    return `READY_${Date.now()}_${merkleRoot.substring(0, 32)}`;
+      const response = await fetch(`${TRUSTLAYER_BASE_URL}${path}`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-blockchain-key': TRUSTLAYER_API_KEY,
+          'x-blockchain-signature': signature,
+          'x-blockchain-timestamp': String(timestamp),
+        },
+        body,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.warn(`[TrustVault] API returned ${response.status}: ${errorText}`);
+        return `PENDING_${Date.now()}_${merkleRoot.substring(0, 32)}`;
+      }
+
+      const data = await response.json() as any;
+      console.log('[TrustVault] Successfully anchored to TrustVault blockchain');
+      return data.transactionId || data.id || `TV_${Date.now()}_${merkleRoot.substring(0, 32)}`;
+    } catch (error) {
+      console.error('[TrustVault] TrustVault API call failed:', error);
+      console.log('[TrustVault] Merkle root ready for anchoring:', merkleRoot);
+      return `READY_${Date.now()}_${merkleRoot.substring(0, 32)}`;
+    }
   }
 
   async getAnchoredBatches(): Promise<BatchResult[]> {
@@ -340,7 +355,7 @@ export class SolanaService {
         explorerUrl: row.explorer_url,
       }));
     } catch (error) {
-      console.error('[Solana] Failed to get anchored batches:', error);
+      console.error('[TrustVault] Failed to get anchored batches:', error);
       return [];
     }
   }
@@ -374,7 +389,7 @@ export class SolanaService {
         anchorableTypes: ANCHORABLE_TYPES,
       };
     } catch (error) {
-      console.error('[Solana] Failed to get stats:', error);
+      console.error('[TrustVault] Failed to get stats:', error);
       return {
         mode: this.simulationMode ? 'simulation' : 'live',
         queueSize: 0,
@@ -409,16 +424,16 @@ export class SolanaService {
             transactionSignature: row.transaction_signature,
             hashCount: parseInt(row.hash_count),
             anchoredAt: new Date(row.anchored_at),
-            explorerUrl: `https://solscan.io/tx/${row.transaction_signature}`,
+            explorerUrl: `${TRUSTLAYER_BASE_URL}/api/provenance/verify/${row.transaction_signature}`,
           },
         };
       }
     } catch (error) {
-      console.error('[Solana] Error verifying hash:', error);
+      console.error('[TrustVault] Error verifying hash:', error);
     }
     
     return { found: false };
   }
 }
 
-export const solanaService = new SolanaService();
+export const trustLayerBlockchain = new TrustLayerBlockchainService();

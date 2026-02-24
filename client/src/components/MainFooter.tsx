@@ -8,7 +8,7 @@ interface VersionInfo {
   version: string;
   buildNumber: number;
   lastPublished: string;
-  solanaHash: string | null;
+  trustvaultHash: string | null;
   transactionSignature: string | null;
 }
 
@@ -204,7 +204,7 @@ export function MainFooter({ onOpenRadar }: MainFooterProps) {
     version: '2.7.1',
     buildNumber: 1,
     lastPublished: '',
-    solanaHash: null,
+    trustvaultHash: null,
     transactionSignature: null
   });
   const [showLogin, setShowLogin] = useState(false);
@@ -235,7 +235,7 @@ export function MainFooter({ onOpenRadar }: MainFooterProps) {
           </div>
           
           <div className="flex items-center gap-2 sm:gap-3 text-slate-500">
-            <Link href="/solana-verification">
+            <Link href="/trustvault-verification">
               <div className="flex items-center text-emerald-400 hover:text-emerald-300 transition cursor-pointer" data-testid="link-footer-verified">
                 <Shield className="w-3 h-3" />
               </div>

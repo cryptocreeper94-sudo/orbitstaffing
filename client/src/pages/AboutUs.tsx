@@ -12,7 +12,7 @@ export default function AboutUs() {
     { icon: Zap, title: "Zero Manual Entry", desc: "Automated matching, scheduling, and payroll processing" },
     { icon: Globe, title: "GPS Verification", desc: "Real-time location tracking for clock-in/out verification" },
     { icon: Users, title: "Talent Exchange", desc: "Two-way marketplace connecting workers and employers" },
-    { icon: Shield, title: "Blockchain Stamps", desc: "Solana-verified credentials and audit trails" },
+    { icon: Shield, title: "Blockchain Stamps", desc: "TrustVault-verified credentials and audit trails" },
     { icon: Award, title: "White Label Ready", desc: "Full customization for franchise and enterprise clients" },
     { icon: Building2, title: "Multi-Tenant", desc: "Complete data isolation with scalable architecture" },
   ];

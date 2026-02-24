@@ -327,10 +327,10 @@ export default function HallmarkSeal() {
                           </button>
                         </div>
                         
-                        <Link href="/solana-verification">
+                        <Link href="/trustvault-verification">
                           <button className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1" data-testid="link-view-on-chain">
                             <ExternalLink className="w-3 h-3" />
-                            View on Solana Explorer
+                            View on TrustVault Explorer
                           </button>
                         </Link>
                       </OrbitCardContent>

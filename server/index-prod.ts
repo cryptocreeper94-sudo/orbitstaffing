@@ -46,10 +46,10 @@ export async function serveStatic(app: Express, server: Server) {
     console.log('[Startup] Running background auto-publish...');
     try {
       const result = await versionManager.publishRelease('patch');
-      console.log(`[Startup] ✅ Published ORBIT Staffing OS v${result.version}`);
-      console.log(`[Startup] ✅ Solana Hash: ${result.hash.substring(0, 16)}...`);
-      if (result.solanaResult) {
-        console.log(`[Startup] ✅ TX: ${result.solanaResult.transactionSignature}`);
+      console.log(`[Startup] Published ORBIT Staffing OS v${result.version}`);
+      console.log(`[Startup] TrustVault Hash: ${result.hash.substring(0, 16)}...`);
+      if (result.blockchainResult) {
+        console.log(`[Startup] TX: ${result.blockchainResult.transactionSignature}`);
       }
     } catch (error) {
       console.log('[Startup] Auto-publish skipped (non-critical)');

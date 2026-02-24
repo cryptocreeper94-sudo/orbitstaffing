@@ -69,8 +69,8 @@ export function MainHeader({ showNav = true }: MainHeaderProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link href="/solana-verification">
-              <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10" data-testid="link-solana-verified">
+            <Link href="/trustvault-verification">
+              <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10" data-testid="link-trustvault-verified">
                 <Shield className="w-3.5 h-3.5" />
                 <span className="text-xs">Verified</span>
               </Button>
@@ -115,9 +115,9 @@ export function MainHeader({ showNav = true }: MainHeaderProps) {
                 </Link>
               ))}
               <div className="border-t border-slate-800 my-2" />
-              <Link href="/solana-verification">
+              <Link href="/trustvault-verification">
                 <Button variant="ghost" className="w-full justify-start text-emerald-400" onClick={() => setMobileMenuOpen(false)}>
-                  <Shield className="w-4 h-4 mr-2" /> Solana Verified
+                  <Shield className="w-4 h-4 mr-2" /> TrustVault Verified
                 </Button>
               </Link>
               <Link href="/investors">

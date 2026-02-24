@@ -19,7 +19,7 @@ const darkwaveResponses: Record<string, string> = {
   fleet: "Lot Ops Pro tracks every vehicle with GPS/RFID, automates maintenance schedules based on mileage/time, and provides comprehensive utilization dashboards.",
   brew: "Brew & Board Coffee is our B2B coffee delivery platform for Nashville businesses. Schedule pre-meeting deliveries from 20+ local and national vendors with transparent distance-based pricing.",
   coffee: "Brew & Board connects businesses with Nashville's finest coffee shops - Crema, Barista Parlor, Starbucks, and more. Features calendar scheduling, blockchain-verified receipts, and flexible subscriptions.",
-  blockchain: "All DarkWave Studios products feature Solana blockchain verification. Every document gets an unforgeable hallmark that can be verified instantly via QR code.",
+  blockchain: "All DarkWave Studios products feature TrustVault blockchain verification. Every document gets an unforgeable hallmark that can be verified instantly via QR code.",
   pricing: "We offer flexible à la carte pricing! Choose individual modules or bundle packages. Contact us for custom enterprise pricing tailored to your needs.",
   contact: "Ready to transform your business? Visit any product page to learn more, or reach out to our sales team for a personalized demo!",
   default: "I'm Wave, your DarkWave Studios guide! I can tell you about ORBIT (staffing), DarkWave Pulse (safety), Lot Ops Pro (fleet), or Brew & Board (coffee delivery). What interests you?"

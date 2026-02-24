@@ -794,7 +794,7 @@ export default function SecureSandbox() {
                 <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
               </div>
               <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Crypto</h3>
-              <p className="text-[10px] sm:text-xs text-gray-500">Solana</p>
+              <p className="text-[10px] sm:text-xs text-gray-500">TrustVault</p>
             </div>
 
             {/* Notifications */}
@@ -1002,7 +1002,7 @@ export default function SecureSandbox() {
               <p className="text-xs text-gray-400">The origin of all hallmarks</p>
               <div className="mt-3 flex items-center gap-2">
                 <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
-                <span className="px-2 py-0.5 text-[10px] bg-cyan-600/20 text-cyan-300 rounded">Solana Verified</span>
+                <span className="px-2 py-0.5 text-[10px] bg-cyan-600/20 text-cyan-300 rounded">TrustVault Verified</span>
               </div>
             </div>
 

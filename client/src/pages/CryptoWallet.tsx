@@ -36,7 +36,7 @@ export default function CryptoWallet() {
           }
           actions={
             <Badge className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white border-0">
-              <Zap className="w-3 h-3 mr-1" /> Solana Powered
+              <Zap className="w-3 h-3 mr-1" /> TrustVault Powered
             </Badge>
           }
         />
@@ -138,17 +138,17 @@ export default function CryptoWallet() {
             <OrbitCard variant="default" className="bg-gradient-to-br from-purple-900/30 to-cyan-900/20 border-purple-500/30">
               <OrbitCardContent className="text-center">
                 <div className="text-3xl mb-3">⛓️</div>
-                <h3 className="text-lg font-bold text-white mb-2">Solana Network</h3>
+                <h3 className="text-lg font-bold text-white mb-2">TrustVault Network</h3>
                 <p className="text-sm text-gray-400 mb-4">
-                  ORBIT uses Solana for lightning-fast, low-cost transactions with enterprise-grade security.
+                  ORBIT uses TrustVault for lightning-fast, low-cost transactions with enterprise-grade security.
                 </p>
                 <a 
-                  href="https://solana.com" 
+                  href="https://darkwave-trust-layer.replit.app" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300"
                 >
-                  Learn about Solana <ExternalLink className="w-3 h-3" />
+                  Learn about TrustVault <ExternalLink className="w-3 h-3" />
                 </a>
               </OrbitCardContent>
             </OrbitCard>

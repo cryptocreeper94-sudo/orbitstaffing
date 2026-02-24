@@ -157,6 +157,6 @@ export const ORBIT_DEFINITIONS: Record<string, string> = {
   "White-Label": "The ability to rebrand ORBIT with your own company's logo, colors, and domain while using all of ORBIT's technology.",
   "Franchise": "A licensed business model where agencies purchase the right to operate under the ORBIT brand with dedicated support and territory rights.",
   "Multi-Tenant": "Architecture that allows multiple separate companies to use the same platform while keeping their data completely isolated and secure.",
-  "Blockchain Anchoring": "The process of recording document hashes on the Solana blockchain to create permanent, tamper-proof verification of authenticity.",
+  "Blockchain Anchoring": "The process of recording document hashes on the TrustVault blockchain to create permanent, tamper-proof verification of authenticity.",
   "Merkle Tree": "A data structure used to efficiently batch multiple document hashes into a single blockchain transaction, reducing costs.",
 };

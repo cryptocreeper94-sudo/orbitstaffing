@@ -52,7 +52,7 @@ interface DashboardStats {
   codeSnippets: number;
   dataSyncs: number;
   errorRate: number;
-  solanaNetwork: 'connected' | 'disconnected';
+  trustvaultNetwork: 'connected' | 'disconnected';
   lastUpdated: string;
 }
 
@@ -263,7 +263,7 @@ export default function DevDashboard() {
           actions={
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                {stats?.solanaNetwork === 'connected' ? (
+                {stats?.trustvaultNetwork === 'connected' ? (
                   <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-600/30" data-testid="status-connected">
                     <Wifi className="h-3 w-3 mr-1" />
                     Connected
@@ -646,7 +646,7 @@ export default function DevDashboard() {
           </TabsContent>
 
           <TabsContent value="blockchain" className="space-y-4 mt-4">
-            <SectionHeader title="Blockchain Stats" subtitle="Solana network anchoring statistics" />
+            <SectionHeader title="Blockchain Stats" subtitle="TrustVault network anchoring statistics" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <OrbitCard>
                 <OrbitCardContent className="text-center py-6">
@@ -668,7 +668,7 @@ export default function DevDashboard() {
               </OrbitCard>
               <OrbitCard>
                 <OrbitCardContent className="text-center py-6">
-                  {stats?.solanaNetwork === 'connected' ? (
+                  {stats?.trustvaultNetwork === 'connected' ? (
                     <>
                       <Wifi className="h-10 w-10 text-emerald-400 mx-auto mb-3" />
                       <div className="text-xl font-bold text-emerald-400">Connected</div>
@@ -679,7 +679,7 @@ export default function DevDashboard() {
                       <div className="text-xl font-bold text-red-400">Disconnected</div>
                     </>
                   )}
-                  <p className="text-slate-400 mt-1">Solana Network</p>
+                  <p className="text-slate-400 mt-1">TrustVault Network</p>
                 </OrbitCardContent>
               </OrbitCard>
               <OrbitCard>

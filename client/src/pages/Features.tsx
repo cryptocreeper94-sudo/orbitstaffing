@@ -59,7 +59,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
       { id: "pay-3", name: "Invoice Generation", description: "Generate client invoices automatically", status: "complete", route: "/invoices" },
       { id: "pay-4", name: "ORBIT Pay Card", description: "Branded Visa debit card for instant pay", status: "partial", route: "/pay-card" },
       { id: "pay-5", name: "Stripe Integration", description: "Credit card and ACH payments", status: "complete" },
-      { id: "pay-6", name: "Crypto Wallet", description: "Solana-based cryptocurrency payments", status: "complete", route: "/crypto-wallet" },
+      { id: "pay-6", name: "Crypto Wallet", description: "TrustVault-based cryptocurrency payments", status: "complete", route: "/crypto-wallet" },
       { id: "pay-7", name: "Creditor Routing", description: "Auto-split payments to creditors", status: "complete", route: "/creditor-routing" },
     ]
   },
@@ -83,7 +83,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
       { id: "comp-1", name: "Compliance Dashboard", description: "Track I-9, certifications, background checks", status: "complete", route: "/compliance" },
       { id: "comp-2", name: "Background Check Integration", description: "Checkr API for background screening", status: "partial" },
       { id: "comp-3", name: "Drug Testing", description: "Quest Diagnostics integration", status: "partial" },
-      { id: "comp-4", name: "Document Verification", description: "Solana blockchain-verified documents", status: "complete" },
+      { id: "comp-4", name: "Document Verification", description: "TrustVault blockchain-verified documents", status: "complete" },
       { id: "comp-5", name: "State-Specific Rules", description: "TN/KY compliance configurations", status: "complete" },
       { id: "comp-6", name: "Prevailing Wage", description: "Davis-Bacon prevailing wage tracking", status: "complete" },
     ]
@@ -169,7 +169,7 @@ const FEATURE_CATEGORIES: FeatureCategory[] = [
       { id: "int-1", name: "QuickBooks", description: "Accounting sync", status: "planned" },
       { id: "int-2", name: "Indeed/LinkedIn", description: "Job board posting", status: "planned" },
       { id: "int-3", name: "Stripe", description: "Payment processing", status: "complete" },
-      { id: "int-4", name: "Solana Blockchain", description: "Document verification", status: "complete" },
+      { id: "int-4", name: "TrustVault Blockchain", description: "Document verification", status: "complete" },
       { id: "int-5", name: "Twilio", description: "SMS messaging", status: "partial" },
       { id: "int-6", name: "OpenAI", description: "AI assistant", status: "complete" },
     ]

@@ -293,7 +293,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
               <div>
                 <p className="text-sm text-gray-400">Blockchain Records</p>
                 <p className="text-2xl font-bold text-white">{metrics.blocksAnchored}</p>
-                <p className="text-xs text-cyan-400">Solana anchored</p>
+                <p className="text-xs text-cyan-400">TrustVault anchored</p>
               </div>
               <Shield className="w-8 h-8 text-cyan-400" />
             </div>
@@ -579,7 +579,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-cyan-400" />
             <span className="text-gray-400">Blockchain:</span>
-            <span className="text-white font-medium">Solana Mainnet</span>
+            <span className="text-white font-medium">TrustVault Network</span>
           </div>
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-purple-400" />
