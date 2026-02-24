@@ -45,14 +45,14 @@ const slides: AppSlide[] = [
   },
   {
     title: "TrustHome",
-    subtitle: "Trusted home service professionals on demand — vetted contractors, smart scheduling, and secure payment processing",
+    subtitle: "Real estate agent platform — AI-powered video walkthroughs, full business suite, listing management, client CRM, and smart tools built for agents",
     accent: "emerald",
     link: "https://trusthome.io",
     external: true,
     video: trustHomeVideo,
     gradient: "from-emerald-900/80 via-slate-900/60 to-slate-950/90",
     split: "51% Jennifer / 49% Jason",
-    fee: "Woman-owned business",
+    fee: "Real estate tech platform",
   },
   {
     title: "Trust Vault",
@@ -100,14 +100,14 @@ const slides: AppSlide[] = [
   },
   {
     title: "HappyEats",
-    subtitle: "Food ordering and delivery platform — restaurant discovery, menu management, and seamless ordering for happy dining experiences",
+    subtitle: "Nashville food delivery platform — zone-based batch ordering, vendor self-service portal, food truck locator, rewards & referrals, AI content tools, and 11 delivery zones across Middle TN",
     accent: "pink",
     link: "https://happyeats.app",
     external: true,
     video: happyEatsVideo,
     gradient: "from-pink-900/80 via-slate-900/60 to-slate-950/90",
     split: "60% Kathy / 40% Jason",
-    fee: "Food & dining platform",
+    fee: "Food delivery platform",
   },
   {
     title: "Brew & Board Coffee",
