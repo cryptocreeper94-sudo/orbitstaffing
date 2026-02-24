@@ -8,6 +8,9 @@ import brewBoardVideo from "@assets/generated_videos/brew_board_hero.mp4";
 import garageBotVideo from "@assets/generated_videos/garagebot_hero.mp4";
 import lotOpsVideo from "@assets/generated_videos/lotops_pro_hero.mp4";
 import paintProsVideo from "@assets/generated_videos/paintpros_hero.mp4";
+import trustHomeVideo from "@assets/generated_videos/trusthome_hero.mp4";
+import trustVaultVideo from "@assets/generated_videos/trustvault_hero.mp4";
+import theVoidVideo from "@assets/generated_videos/the_void_hero.mp4";
 
 interface VideoHeroProps {
   onDemoClick: () => void;
@@ -16,7 +19,7 @@ interface VideoHeroProps {
 interface AppSlide {
   title: string;
   subtitle: string;
-  accent: "cyan" | "emerald" | "amber" | "orange" | "rose";
+  accent: "cyan" | "emerald" | "amber" | "orange" | "rose" | "blue" | "purple";
   link: string;
   external: boolean;
   video: string;
@@ -27,53 +30,83 @@ interface AppSlide {
 const slides: AppSlide[] = [
   {
     title: "ORBIT Staffing OS",
-    subtitle: "GPS-verified workforce management with blockchain compliance — full payroll, onboarding, and CRM automation",
+    subtitle: "100% automated flexible labor marketplace — GPS check-ins, smart matching, payroll, CRM, and blockchain-verified compliance",
     accent: "cyan",
     link: "/products",
     external: false,
     video: orbitVideo,
-    split: "50/50 Partnership",
-    fee: "SaaS $199–599/mo or 2% revenue",
+    split: "50/50 Jason & Sidonie",
+    fee: "Bundles $99–249/mo · Franchise $7.5k–35k",
+  },
+  {
+    title: "TrustHome",
+    subtitle: "Trusted home service professionals on demand — vetted contractors, smart scheduling, and secure payment processing",
+    accent: "emerald",
+    link: "https://trusthome.io",
+    external: true,
+    video: trustHomeVideo,
+    split: "51% Jennifer / 49% Jason",
+    fee: "Woman-owned business",
+  },
+  {
+    title: "Trust Vault",
+    subtitle: "Enterprise-grade digital asset protection — biometric security, encrypted storage, and blockchain-verified custody",
+    accent: "blue",
+    link: "https://trustvault.io",
+    external: true,
+    video: trustVaultVideo,
+    split: "100% Jason",
+    fee: "Enterprise security platform",
+  },
+  {
+    title: "THE VOID",
+    subtitle: "Step into the unknown — immersive creative experiences, interactive art installations, and next-gen entertainment",
+    accent: "purple",
+    link: "https://enterthevoid.io",
+    external: true,
+    video: theVoidVideo,
+    split: "100% Jason",
+    fee: "Creative platform",
   },
   {
     title: "Brew & Board Coffee",
-    subtitle: "B2B craft coffee delivery for Nashville — 20+ vendors, calendar scheduling, blockchain-verified receipts",
+    subtitle: "B2B coffee delivery for Nashville — 20+ vendors, calendar scheduling, and blockchain-verified receipts",
     accent: "amber",
     link: "https://brewandboard.coffee",
     external: true,
     video: brewBoardVideo,
-    split: "50/50 Partnership",
+    split: "50/50 Jason & Sidonie",
     fee: "Franchise $299–999/mo + 4–6% royalty",
   },
   {
     title: "GarageBot",
-    subtitle: "AI-powered automotive diagnostics, fleet management, and smart workshop operations with IoT integration",
+    subtitle: "Smart garage and workshop management — IoT integration, tool inventory, work orders, and automated maintenance tracking",
     accent: "amber",
     link: "https://garagebot.io",
     external: true,
     video: garageBotVideo,
-    split: "100% Sole Owner",
-    fee: "SaaS $2.99/mo Pro tier",
+    split: "100% Jason",
+    fee: "SaaS · GarageBot Pro $2.99/mo",
   },
   {
     title: "Lot Ops Pro",
-    subtitle: "Smart inventory and fleet operations — real-time vehicle tracking, condition reports, and predictive maintenance",
+    subtitle: "Smart inventory and fleet operations — real-time vehicle tracking, condition reporting, and predictive maintenance for dealerships",
     accent: "orange",
     link: "https://lotopspro.io",
     external: true,
     video: lotOpsVideo,
-    split: "100% Sole Owner",
+    split: "100% Jason",
     fee: "Franchise $5k–25k + 3–5% royalty",
   },
   {
     title: "PaintPros.io",
-    subtitle: "Professional painting contractor platform — job scheduling, crew management, and automated invoicing powered by ORBIT",
+    subtitle: "Professional painting contractor management — job scheduling, crew management, and automated invoicing powered by ORBIT",
     accent: "rose",
     link: "https://paintpros.io",
     external: true,
     video: paintProsVideo,
-    split: "50/50 Partnership",
-    fee: "Project-based revenue split",
+    split: "50/50 Jason & Sidonie",
+    fee: "Project-based · 50/50 net profit",
   },
 ];
 
@@ -123,12 +156,30 @@ const accentClasses: Record<string, { text: string; border: string; bg: string; 
     buttonBg: "bg-rose-500/20 border-rose-500/40 text-rose-300",
     badge: "bg-rose-500/20 text-rose-300 border-rose-500/30",
   },
+  blue: {
+    text: "text-blue-400",
+    border: "border-blue-500/40",
+    bg: "bg-blue-500/20",
+    dot: "bg-blue-400",
+    glow: "shadow-blue-500/20",
+    buttonBg: "bg-blue-500/20 border-blue-500/40 text-blue-300",
+    badge: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  },
+  purple: {
+    text: "text-purple-400",
+    border: "border-purple-500/40",
+    bg: "bg-purple-500/20",
+    dot: "bg-purple-400",
+    glow: "shadow-purple-500/20",
+    buttonBg: "bg-purple-500/20 border-purple-500/40 text-purple-300",
+    badge: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  },
 };
 
 const stats = [
   { label: "Cost Savings", value: 35, suffix: "%" },
   { label: "Onboarding", value: 2, suffix: "hr" },
-  { label: "Connected Apps", value: 5, suffix: "" },
+  { label: "Connected Apps", value: 8, suffix: "" },
   { label: "Support", value: 24, suffix: "/7" },
 ];
 
@@ -255,7 +306,7 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
               preload={i <= 1 ? "auto" : "metadata"}
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-slate-950/40" />
+            <div className="absolute inset-0 bg-slate-950/15" />
           </div>
         );
       })}
@@ -263,11 +314,11 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: "linear-gradient(to bottom, rgba(2,6,23,0.4) 0%, rgba(2,6,23,0.2) 30%, rgba(2,6,23,0.5) 70%, rgba(2,6,23,0.95) 100%)",
+          background: "linear-gradient(to bottom, rgba(2,6,23,0.15) 0%, rgba(2,6,23,0.05) 30%, rgba(2,6,23,0.25) 60%, rgba(2,6,23,0.85) 100%)",
         }}
       />
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-950/60 via-transparent to-slate-950/60" />
-      <div className="absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-[#070b16] to-transparent" />
+      <div className="absolute inset-0 z-10 bg-gradient-to-r from-slate-950/30 via-transparent to-slate-950/30" />
+      <div className="absolute bottom-0 left-0 right-0 z-10 h-20 bg-gradient-to-t from-[#070b16] to-transparent" />
 
       <div className="relative z-20 h-full flex flex-col justify-end pb-20 sm:pb-24 px-4 sm:px-8 max-w-7xl mx-auto">
         <div className="space-y-4">

@@ -1,0 +1,191 @@
+ORBIT STAFFING OS — COMPLETE PRICING & BOOKKEEPING HANDOFF
+1. STANDALONE MODULES (À la carte tools)
+Module ID	Name	Price/mo	Competitor	Competitor Price	Savings
+crm	ORBIT CRM	$19	HubSpot	$50/user/mo	62% less
+talent	ORBIT Talent Exchange	$29	Indeed	$400/mo	93% less
+payroll	ORBIT Payroll	$39	ADP	$39 + $5/employee	60-80% less
+time	ORBIT Time & GPS	$15	Deputy	$4/user/mo	Flat rate!
+compliance	ORBIT Compliance	$25	Checkr	$35+ per check	Unlimited tracking
+Module features in detail:
+
+CRM: Deal pipeline drag-and-drop, activity timeline, meeting scheduler, email open/click tracking, duplicate detection, notes & tasks, unlimited contacts
+Talent Exchange: Unlimited job postings, talent pool database, smart job matching, application tracking, candidate messaging, skills verification, Indeed-style search
+Payroll: Unlimited employees, multi-state tax compliance, garnishment processing, direct deposit, paystub generation, prevailing wage support, automated calculations
+Time & GPS: GPS geofencing (200-300ft), mobile clock-in/out, timesheet management, overtime calculations, break tracking, photo verification, real-time location
+Compliance: I-9 verification tracking, certification management, expiration alerts, document storage, background check integration, drug testing tracking, audit-ready reports
+2. PLATFORM BUNDLES (Stripe-backed subscriptions)
+Bundle ID	Name	Price/mo	Workers	Savings	Stripe Price ID	Included Tools
+starter	Starter Bundle	$99	1-25	Save $28/mo	price_1SYoQkPQpkkF93FKsLEssZzb	CRM, Time & GPS, Compliance
+growth	Growth Bundle	$149	25-100	Save $48/mo	price_1SYoQlPQpkkF93FKh9pRxrdL	All Starter + Talent Exchange, Payroll
+professional	Professional Bundle	$249	100-500	Save $78/mo	price_1SYoQlPQpkkF93FKaNLqc6T6	All Growth + Multi-location, Full API, White-label, Weather, Dedicated support
+enterprise	Enterprise	Custom	500+	—	None (contact sales)	All Pro + Unlimited workers, Custom integrations, SLA, 24/7 phone, Dedicated AM
+3. SIMPLE PAYMENT PLANS (PaymentPlans.tsx — alternative view)
+Plan	Price	Period	Workers	Key Features
+Starter	$0	Forever	Up to 50	Basic GPS, manual scheduling, email support
+Professional	$299/mo	Monthly	Up to 500	Advanced GPS + geofencing, smart scheduling, payroll + invoicing, custom branding, SMS (Q2 2026)
+Enterprise	Custom	Custom	Unlimited	Multi-location, advanced analytics, dedicated AM, AI job matching (Q3 2026), instant/daily pay (Q2 2026)
+Payment methods accepted: Credit/Debit Card (Stripe), Bank Transfer, ACH Direct Debit, Invoice (30-day terms for Enterprise)
+
+Instant Pay (Q2 2026): 2.5% processing fee, integrated with Stripe Connect
+
+4. ADD-ON SERVICES
+Service	Price
+Background Checks	$25-50 per worker (depending on check level)
+Drug Testing	$30-150 (depending on test type: 5-panel to hair)
+I-9 Verification	Included with all plans + eVerify integration
+5. AFFILIATE / PARTNER COMMISSIONS
+Partner Type	Commission	Details
+Referral Partner	20% recurring	Unique referral link, monthly payouts, performance dashboard
+Agency Partner	30% recurring	White-label options, co-marketing support, priority onboarding, dedicated partner manager
+Customer Referral	$50 credit + 10% recurring	For each successful referral of another business
+6. FRANCHISE TIERS (Two-Tier Ownership Model)
+Ownership modes:
+
+subscriber_managed — ORBIT retains hallmark custody, customer pays monthly SaaS fees, no upfront costs
+franchise_owned — Full hallmark custody transfers to customer, one-time franchise fee + reduced royalties + sub-franchise rights available
+Franchise tier pricing range shown on Pricing page: $7,500 – $35,000 one-time fee
+
+Franchise Tiers Schema (DB-driven, configurable):
+
+Field	Type	Description
+tierCode	varchar	e.g., "standard", "premium", "enterprise"
+tierName	varchar	Display name
+franchiseFee	integer	One-time fee (in cents)
+royaltyPercent	varchar	e.g., "8%", "6%", "4%"
+royaltyType	varchar	"percentage" or "per_unit"
+supportMonthlyFee	integer	Monthly support fee (in cents)
+transferFee	integer	Fee to transfer franchise (in cents)
+maxLocations	integer	1, 5, or -1 (unlimited)
+territoryExclusive	boolean	Exclusive territory rights
+territoryLevel	varchar	"city", "regional", or "state"
+supportResponseHours	integer	48, 24, or 4
+nftRevenueSharePercent	integer	70%, 80%, or 90% (franchise owner keeps this)
+whitelabelApp	boolean	White-label mobile app included
+dedicatedAccountManager	boolean	Dedicated AM assigned
+subFranchiseRights	boolean	Can create sub-franchises
+customApiAccess	boolean	Custom API access
+priorityFeatureRequests	boolean	Priority feature queue
+allModulesIncluded	boolean	All platform modules included (true for all franchise tiers)
+Franchise tier display features (from FranchiseOffer.tsx):
+
+Each tier shows: franchise fee, royalty %, monthly support fee, NFT revenue share %, territory level
+Feature checklist: Exclusive Territory, White-Label App, Dedicated AM, Sub-Franchise Rights, Custom API, Priority Features, Location limits, Support response time
+"Premium" tier gets a "Best Value" badge
+Territory availability checking via /api/franchise-territory-availability
+Stripe integration: Each tier has stripeSupportPriceIdMonthly and stripeFranchiseFeeProductId for automated billing
+
+7. DEVELOPER API PRICING
+Tier	Name	Price/mo	API Calls	Stripe Product ID
+Free	Developer Free	$0	1,000/month	—
+Pro	ORBIT Developer Pro	$49 ($4,900 in cents)	50,000/month	developer_pro
+Enterprise	ORBIT Developer Enterprise	$299 ($29,900 in cents)	Unlimited	developer_enterprise
+Stripe Price IDs: developer_pro_monthly, developer_enterprise_monthly
+Developer Pro features: Production access, priority support
+Developer Enterprise features: White-label solutions, dedicated support, SLA guarantee
+
+8. FINANCIAL HUB (Cross-App Bookkeeping System)
+Database tables for financial tracking:
+
+Table	Purpose
+financial_events	Incoming revenue/expense events from connected apps
+royalty_ledger	Calculated royalty splits between partners
+financial_statements	Generated periodic statements (draft → sent → acknowledged)
+payouts	Actual money transfers to partners
+partner_profiles	Partner/counterparty records
+ecosystem_financial_transactions	Cross-app payment sync records
+Financial event types: revenue, expense, payout, royalty_calculation, adjustment
+Ledger statuses: pending, approved, paid, disputed, cancelled
+Statement statuses: draft, generated, sent, acknowledged
+Payout statuses: pending, scheduled, processing, completed, failed, cancelled
+
+Royalty ledger tracks:
+
+Partner ID, counterparty ID
+Gross amount, split percentage, net amount
+Tax withholding (amount + type)
+Solana blockchain signature + DarkWave hash for verification
+Audit trail (JSON)
+Linked to financial events via financialEventId
+Financial statements track:
+
+Period (start/end dates)
+Total gross revenue, expenses, net profit
+Partner share, tax withholding, amount due
+Line items (JSON)
+PDF generation + hash
+Blockchain stamps (Solana signature + DarkWave hash)
+9. ECOSYSTEM CROSS-APP FINANCIAL TRANSACTIONS
+Table: ecosystem_financial_transactions
+
+Tracks payments flowing between DarkWave apps
+Fields: source app, external transaction ID, type (payment/subscription/refund), amount, currency
+Customer info: email, name
+Payment method: stripe, coinbase, etc.
+Owner/partner revenue split: ownerShare + partnerShare (default: owner=Jason)
+Linked Stripe payment intent IDs and Coinbase charge IDs
+10. CUSTOMER HALLMARK FINANCIAL FIELDS
+Each white-label customer (customer_hallmarks table) stores:
+
+ownershipMode: "subscriber_managed" or "franchise_owned"
+franchiseFee: amount paid
+royaltyPercent: ongoing royalty rate
+royaltyType: "percentage" or "per_unit"
+royaltyAmount: calculated royalty
+supportMonthlyFee: monthly support charge
+nftRevenueSharePercent: NFT certification revenue share
+franchiseAgreementUrl: signed agreement document
+serialPrefix + nextSerialNumber: serial number issuance system
+That's everything — from the $0 starter plan through the $35K franchise tiers, developer API pricing, affiliate commissions, add-on services, and the full financial hub bookkeeping system. You can pass this directly to the other agent.
+
+does this have the trusthome, trustvault, and the void info as well
+
+Good question — the pricing handoff above covers the ORBIT platform's own pricing structure, but doesn't include the individual product details for TrustHome, Trust Vault, or THE VOID. Let me pull what we have stored for those apps.
+
+Now I have the full picture. Here's what's actually stored:
+
+TrustHome, Trust Vault, and THE VOID are NOT fully built out as products in this project. They exist only in two places:
+
+What exists for TrustHome, Trust Vault, and THE VOID:
+1. Video Hero slides only (in VideoHero.tsx):
+
+TrustHome — Label: "TrustHome", Category: "Home Services", Tagline: "Trusted home service professionals on demand", Accent: emerald, URL: https://trusthome.io
+Trust Vault — Label: "Trust Vault", Category: "Financial Security", Tagline: "Enterprise-grade digital asset protection", Accent: blue, URL: https://trustvault.io
+THE VOID — Label: "THE VOID", Category: "Creative Platform", Tagline: "Step into the unknown — immersive experiences", Accent: purple, URL: https://enterthevoid.io
+2. Ecosystem Hub registrations (database credentials):
+
+TrustHome: API key dw_app_7337d537e2f31786b35c21a391efab3976076b6cb1678726
+Trust Vault: API key dw_app_9ac69f5a55537842b5d7913f2c917c92c5186c42f26e77a5
+THE VOID: API key dw_app_52a405533ca1cbcda26adbcbff7fa1c96a5e291cb0bdb9a1
+3. Financial Hub revenue splits (in server/financialHub.ts):
+
+TrustHome: 51% Jennifer Lambert / 49% Jason (woman-owned business)
+Trust Vault: 100% Jason
+THE VOID: Not explicitly listed → defaults to 100% Jason
+4. CORS origin (in server/app.ts):
+
+https://trusthome.replit.app is whitelisted
+What does NOT exist for these three:
+No product cards in ProductsGallery.tsx (only ORBIT, Orby, Pulse, Lot Ops Pro, Brew & Board, GarageBot, and PaintPros are listed there)
+No slideshow data in slidesData.ts
+No dedicated pricing pages
+No emblem/hallmark images imported
+No individual routes or pages
+Complete DarkWave Product Gallery (what IS in ProductsGallery.tsx):
+#	Product ID	Name	Tagline	Gradient	URL	Revenue Split
+1	ORBIT	ORBIT Staffing OS	100% Automated Flexible Labor Marketplace	cyan→blue	orbitstaffing.io	50/50 Jason/Sidonie
+2	Orby	Orby	Operations Command Software	emerald→teal	getorby.io	100% Jason
+3	Pulse	Pulse	Predictive AI Market Intelligence	purple→pink	darkwavepulse.com	100% Jason
+4	Lot Ops Pro	Lot Ops Pro	Smart Inventory & Fleet Operations	amber→orange	lotopspro.io	100% Jason
+5	BrewAndBoard	Brew & Board Coffee	B2B Coffee Delivery for Nashville	stone→amber	brewandboard.coffee	50/50 Jason/Sidonie
+6	GarageBot	GarageBot	Smart Garage & Workshop Management	sky→blue	garagebot.io	100% Jason
+7	PaintPros	Paint Pros	Professional Painting Contractor Management	rose→red	paintpros.io	50/50 Jason/Sidonie
+Complete Revenue Split Table (from Financial Hub):
+Product	Jason	Sidonie	Jennifer Lambert	Notes
+ORBIT Staffing OS	50%	50%	—	
+Brew & Board	50%	50%	—	
+PaintPros	50%	50%	—	
+TrustHome	49%	0%	51%	Woman-owned business
+Trust Vault	100%	0%	—	
+GarageBot	100%	0%	—	
+Everything else	100%	0%	—	Default for unlisted products
+So to directly answer your question — TrustHome, Trust Vault, and THE VOID don't have full product pages, pricing, or slideshow data built out in this project. They only have hero video references, ecosystem API keys, and revenue split rules. If the other agent needs to build those out as full products, they'll need descriptions and pricing from you.
