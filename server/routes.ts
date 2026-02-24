@@ -11750,6 +11750,68 @@ export function registerPayCardRoutes(app: Express) {
     next();
   };
 
+  // Developer: Get ecosystem app performance dashboard
+  app.get("/api/admin/ecosystem/performance", requireOwner, async (req: Request, res: Response) => {
+    try {
+      const apps = await ecosystemHub.getConnectedApps();
+      const summary = await financialHub.getFinancialSummary();
+      const events = await financialHub.getFinancialEvents({ limit: 500 });
+      
+      const appConfigs: Record<string, { name: string; url: string; ownership: string; color: string; status: string }> = {
+        'orbit': { name: 'ORBIT Staffing OS', url: 'orbitstaffing.io', ownership: '50/50 Jason & Sidonie', color: 'cyan', status: 'live' },
+        'trusthome': { name: 'TrustHome', url: 'trusthome.io', ownership: '51% Jennifer / 49% Jason', color: 'emerald', status: 'pre-launch' },
+        'trustvault': { name: 'Trust Vault', url: 'trustvault.replit.app', ownership: '100% Jason', color: 'blue', status: 'pre-launch' },
+        'thevoid': { name: 'THE VOID', url: 'enterthevoid.io', ownership: '100% Jason', color: 'purple', status: 'pre-launch' },
+        'verdara': { name: 'Verdara', url: 'verdara.replit.app', ownership: '100% Jason', color: 'lime', status: 'pre-launch' },
+        'tldriverconnect': { name: 'TL Driver Connect', url: 'tldriverconnect.com', ownership: '100% Jason', color: 'teal', status: 'pre-launch' },
+        'happyeats': { name: 'Happy Eats', url: 'happyeats.app', ownership: '60% Kathy / 40% Jason', color: 'pink', status: 'pre-launch' },
+        'brewandboard': { name: 'Brew & Board Coffee', url: 'brewandboard.coffee', ownership: '50/50 Jason & Sidonie', color: 'amber', status: 'connected' },
+        'garagebot': { name: 'GarageBot', url: 'garagebot.io', ownership: '100% Jason', color: 'amber', status: 'connected' },
+        'paintpros': { name: 'PaintPros.io', url: 'paintpros.io', ownership: '50/50 Jason & Sidonie', color: 'rose', status: 'connected' },
+      };
+
+      const revenueByApp: Record<string, number> = {};
+      const eventCountByApp: Record<string, number> = {};
+      for (const event of events) {
+        const code = (event.productCode || 'orbit').toLowerCase().replace(/[^a-z0-9]/g, '');
+        revenueByApp[code] = (revenueByApp[code] || 0) + (event.eventType === 'revenue' ? parseFloat(event.amount || '0') : 0);
+        eventCountByApp[code] = (eventCountByApp[code] || 0) + 1;
+      }
+
+      const connectedApps = apps.filter(a => a.isActive);
+      
+      const appPerformance = Object.entries(appConfigs).map(([key, config]) => {
+        const dbApp = connectedApps.find(a => a.appSlug?.includes(key) || a.appName?.toLowerCase().includes(key));
+        return {
+          id: key,
+          name: config.name,
+          url: config.url,
+          ownership: config.ownership,
+          color: config.color,
+          status: config.status,
+          connected: !!dbApp,
+          lastSync: dbApp?.lastSyncAt || null,
+          syncCount: dbApp?.syncCount || 0,
+          revenue: revenueByApp[key] || 0,
+          eventCount: eventCountByApp[key] || 0,
+          registeredAt: dbApp?.createdAt || null,
+        };
+      });
+
+      res.json({
+        totalApps: Object.keys(appConfigs).length,
+        connectedApps: connectedApps.length,
+        totalRevenue: summary.revenueThisMonth,
+        totalExpenses: summary.expensesThisMonth,
+        totalEvents: summary.totalEvents,
+        apps: appPerformance,
+      });
+    } catch (error) {
+      console.error("Ecosystem performance error:", error);
+      res.status(500).json({ error: "Failed to fetch ecosystem performance" });
+    }
+  });
+
   // Public: Get Financial Hub status
   app.get("/api/financial-hub/status", async (req: Request, res: Response) => {
     try {

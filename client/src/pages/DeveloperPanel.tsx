@@ -2095,6 +2095,185 @@ function PayrollAutomationSettings() {
   );
 }
 
+interface EcoApp {
+  id: string;
+  name: string;
+  url: string;
+  ownership: string;
+  color: string;
+  status: string;
+  connected: boolean;
+  lastSync: string | null;
+  syncCount: number;
+  revenue: number;
+  eventCount: number;
+  registeredAt: string | null;
+}
+
+interface EcoPerformance {
+  totalApps: number;
+  connectedApps: number;
+  totalRevenue: number;
+  totalExpenses: number;
+  totalEvents: number;
+  apps: EcoApp[];
+}
+
+function EcosystemPerformanceDashboard() {
+  const [data, setData] = useState<EcoPerformance | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/admin/ecosystem/performance', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => { setError('Failed to load'); setLoading(false); });
+  }, []);
+
+  const fmt = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
+
+  const colorMap: Record<string, string> = {
+    cyan: 'border-cyan-500/40 bg-cyan-500/10',
+    emerald: 'border-emerald-500/40 bg-emerald-500/10',
+    blue: 'border-blue-500/40 bg-blue-500/10',
+    purple: 'border-purple-500/40 bg-purple-500/10',
+    lime: 'border-lime-500/40 bg-lime-500/10',
+    teal: 'border-teal-500/40 bg-teal-500/10',
+    pink: 'border-pink-500/40 bg-pink-500/10',
+    amber: 'border-amber-500/40 bg-amber-500/10',
+    rose: 'border-rose-500/40 bg-rose-500/10',
+  };
+
+  const dotColorMap: Record<string, string> = {
+    cyan: 'bg-cyan-400',
+    emerald: 'bg-emerald-400',
+    blue: 'bg-blue-400',
+    purple: 'bg-purple-400',
+    lime: 'bg-lime-400',
+    teal: 'bg-teal-400',
+    pink: 'bg-pink-400',
+    amber: 'bg-amber-400',
+    rose: 'bg-rose-400',
+  };
+
+  const statusBadge = (status: string) => {
+    const map: Record<string, string> = {
+      live: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      connected: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+      'pre-launch': 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    };
+    return map[status] || map['pre-launch'];
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="h-24 rounded-xl bg-slate-800/50 animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="text-center py-12 text-red-400">
+        <AlertTriangle className="w-8 h-8 mx-auto mb-3" />
+        <p>{error || 'No data'}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Network className="w-5 h-5 text-cyan-400" />
+            Ecosystem Performance
+          </h2>
+          <p className="text-sm text-slate-400 mt-1">All connected DarkWave apps at a glance</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-slate-800/60 border border-cyan-500/30 rounded-xl p-4" data-testid="card-stat-total-apps">
+          <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Total Apps</p>
+          <p className="text-2xl font-bold text-cyan-300">{data.totalApps}</p>
+        </div>
+        <div className="bg-slate-800/60 border border-emerald-500/30 rounded-xl p-4" data-testid="card-stat-connected">
+          <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Connected</p>
+          <p className="text-2xl font-bold text-emerald-300">{data.connectedApps}</p>
+        </div>
+        <div className="bg-slate-800/60 border border-amber-500/30 rounded-xl p-4" data-testid="card-stat-revenue">
+          <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Revenue (Month)</p>
+          <p className="text-2xl font-bold text-amber-300">{fmt(data.totalRevenue)}</p>
+        </div>
+        <div className="bg-slate-800/60 border border-purple-500/30 rounded-xl p-4" data-testid="card-stat-events">
+          <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Total Events</p>
+          <p className="text-2xl font-bold text-purple-300">{data.totalEvents}</p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        {data.apps.map((app) => (
+          <div
+            key={app.id}
+            className={`border rounded-xl p-4 transition-all hover:bg-slate-800/40 ${colorMap[app.color] || 'border-slate-700 bg-slate-800/30'}`}
+            data-testid={`card-app-${app.id}`}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className={`w-2.5 h-2.5 rounded-full ${dotColorMap[app.color] || 'bg-slate-400'} ${app.connected ? 'animate-pulse' : 'opacity-40'}`} />
+                <div>
+                  <h3 className="text-sm font-bold text-white">{app.name}</h3>
+                  <p className="text-xs text-slate-400">{app.url}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusBadge(app.status)}`}>
+                  {app.status}
+                </span>
+                {app.connected && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    ● linked
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div>
+                <p className="text-[10px] text-slate-500 uppercase">Revenue</p>
+                <p className="text-sm font-semibold text-white">{fmt(app.revenue)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500 uppercase">Events</p>
+                <p className="text-sm font-semibold text-white">{app.eventCount}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500 uppercase">Syncs</p>
+                <p className="text-sm font-semibold text-white">{app.syncCount}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-slate-500 uppercase">Ownership</p>
+                <p className="text-sm font-semibold text-white">{app.ownership}</p>
+              </div>
+            </div>
+
+            {app.lastSync && (
+              <p className="text-[10px] text-slate-500 mt-2">
+                Last sync: {new Date(app.lastSync).toLocaleString()}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DeveloperPanel() {
   const [, setLocation] = useLocation();
   const [showBypassOption, setShowBypassOption] = useState(false);
@@ -2846,12 +3025,14 @@ export default function DeveloperPanel() {
                 <div className="flex items-center gap-3">
                   <Briefcase className="w-5 h-5 text-amber-400" />
                   <span className="font-bold text-white">Business Control Panel</span>
-                  <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full ml-2">OWNER</span>
+                  <span className="text-xs text-gray-500 ml-2">(5)</span>
+                  <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full ml-1">OWNER</span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="bg-slate-900/50 px-2 py-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {[
+                    { id: 'ecosystem-performance', label: 'Ecosystem Performance', icon: <Network className="w-4 h-4" /> },
                     { id: 'licenses', label: 'Software Licenses', icon: <FileText className="w-4 h-4" /> },
                     { id: 'franchises', label: 'Franchise Agreements', icon: <Building2 className="w-4 h-4" /> },
                     { id: 'invoices', label: 'License Invoices', icon: <Scale className="w-4 h-4" /> },
@@ -3488,6 +3669,11 @@ export default function DeveloperPanel() {
               </OrbitCardContent>
             </OrbitCard>
           </div>
+        )}
+
+        {/* ECOSYSTEM PERFORMANCE DASHBOARD */}
+        {activeTab === 'ecosystem-performance' && (
+          <EcosystemPerformanceDashboard />
         )}
 
         {/* BUSINESS CONTROL PANEL - LICENSE INVOICES */}
