@@ -43,7 +43,7 @@ export function PinChangeModal({ isOpen, onClose, onSkip, adminName }: PinChange
       return;
     }
 
-    if (newPin === '4444' || newPin === '1497') {
+    if (newPin === '4444' || newPin === '1497' || newPin === '5700') {
       setError('Please choose a different PIN than the default');
       return;
     }

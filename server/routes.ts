@@ -734,6 +734,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
       
+      // Check for Jennifer Lambert's PIN (5700) - Partner with TrustHome financials + Stripe
+      // Jennifer is 51% equity owner of TrustHome
+      const jenniferPin = process.env.JENNIFER_ADMIN_PIN || '5700';
+      if (pin === jenniferPin) {
+        req.session.regenerate(async (err) => {
+          if (err) {
+            console.error('[Session] Failed to regenerate session:', err);
+            return res.status(500).json({ error: "Session error" });
+          }
+          
+          req.session.adminAuthenticated = true;
+          req.session.adminName = 'Jennifer Lambert';
+          req.session.adminRole = 'partner_readonly';
+          req.session.partnerProduct = 'trusthome';
+          
+          const hasChangedPin = process.env.JENNIFER_PIN_CHANGED === 'true';
+          req.session.requirePinChange = !hasChangedPin;
+          
+          await db.insert(adminLoginLogs).values({
+            adminName: 'Jennifer Lambert',
+            adminRole: 'partner_readonly',
+            loginTime: new Date(),
+            ipAddress: ipAddress as string,
+            userAgent: userAgent || 'Unknown',
+          });
+          
+          console.log(`[Jennifer Login] ✅ Jennifer Lambert logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
+          
+          return res.json({ 
+            verified: true, 
+            role: 'partner_readonly', 
+            name: 'Jennifer Lambert', 
+            isPartner: true,
+            requirePinChange: !hasChangedPin,
+            redirectTo: '/partner/trusthome',
+          });
+        });
+        return;
+      }
+      
       // Check for user-specific admin PIN
       if (userId) {
         const user = await storage.getUser(userId);
@@ -889,6 +929,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ 
           success: true, 
           message: "PIN changed successfully. Please update KATHY_ADMIN_PIN in environment secrets and set KATHY_PIN_CHANGED=true.",
+          note: "Use your new PIN to log in next time."
+        });
+      }
+      
+      // For Jennifer Lambert - partner PIN change
+      if (adminName === 'Jennifer Lambert') {
+        console.log(`[PIN Change] ✅ Partner PIN changed by ${adminName} at ${new Date().toLocaleString()}`);
+        
+        if (req.session) {
+          req.session.pinChanged = true;
+          req.session.pinChangedAt = new Date().toISOString();
+          req.session.requirePinChange = false;
+        }
+        
+        return res.json({ 
+          success: true, 
+          message: "PIN changed successfully. Please update JENNIFER_ADMIN_PIN in environment secrets and set JENNIFER_PIN_CHANGED=true.",
           note: "Use your new PIN to log in next time."
         });
       }
@@ -11750,8 +11807,8 @@ export function registerPayCardRoutes(app: Express) {
     next();
   };
 
-  // Developer: Get ecosystem app performance dashboard
-  app.get("/api/admin/ecosystem/performance", requireOwner, async (req: Request, res: Response) => {
+  // Ecosystem performance dashboard - accessible to developer, master, and admin roles
+  app.get("/api/admin/ecosystem/performance", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
       const apps = await ecosystemHub.getConnectedApps();
       const summary = await financialHub.getFinancialSummary();
@@ -12158,7 +12215,9 @@ export function registerPayCardRoutes(app: Express) {
   });
 
   // ========================
-  // PARTNER READ-ONLY DASHBOARD - Kathy Grater's Happy Eats view
+  // PARTNER DASHBOARDS - Product-specific partner views
+  // Kathy Grater: Happy Eats (60% equity, read-only)
+  // Jennifer Lambert: TrustHome (51% equity, Stripe Connect enabled)
   // ========================
 
   const requirePartnerAuth = (req: Request, res: Response, next: Function) => {
@@ -12196,6 +12255,7 @@ export function registerPayCardRoutes(app: Express) {
       
       const splitConfig: Record<string, { partnerName: string; partnerPct: number; jasonPct: number }> = {
         'happyeats': { partnerName: 'Kathy Grater', partnerPct: 60, jasonPct: 40 },
+        'trusthome': { partnerName: 'Jennifer Lambert', partnerPct: 51, jasonPct: 49 },
       };
       
       const split = splitConfig[productFilter || ''] || { partnerName: 'Partner', partnerPct: 0, jasonPct: 100 };

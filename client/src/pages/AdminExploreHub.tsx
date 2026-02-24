@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { MainHeader } from '@/components/MainHeader';
+import { EcosystemPerformanceDashboard } from '@/components/EcosystemPerformanceDashboard';
 import {
   Carousel,
   CarouselContent,
@@ -347,6 +348,10 @@ export default function AdminExploreHub() {
             </Carousel>
           </section>
         ))}
+
+        <section className="mt-12 bg-slate-900/40 border border-slate-700/30 rounded-2xl p-6 backdrop-blur-sm" data-testid="section-ecosystem-performance">
+          <EcosystemPerformanceDashboard compact />
+        </section>
       </div>
     </div>
   );
