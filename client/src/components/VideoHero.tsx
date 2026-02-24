@@ -66,14 +66,14 @@ const slides: AppSlide[] = [
   },
   {
     title: "THE VOID",
-    subtitle: "Step into the unknown — immersive creative experiences, interactive art installations, and next-gen entertainment",
+    subtitle: "Voice-first mental wellness platform — AI-powered venting with 5 personality modes, guided breathing, mood analytics, rage room, journaling, and 20+ wellness tools",
     accent: "purple",
     link: "https://enterthevoid.io",
     external: true,
     video: theVoidVideo,
     gradient: "from-purple-900/80 via-slate-900/60 to-slate-950/90",
     split: "100% Jason",
-    fee: "Creative platform",
+    fee: "Founders $9.99/mo, Standard $14.99/mo",
   },
   {
     title: "Verdara",

@@ -1,0 +1,74 @@
+THE VOID by DarkWave Studios
+
+THE VOID is a voice-first mental wellness platform where users record their frustrations — called "venting" — and receive AI-generated responses tailored by five distinct personality modes: Smart-ass, Calming, Therapist, Hype Man, and Roast Master. It's designed to be a cathartic, safe, and engaging space for people to process emotions through voice, text, and guided wellness tools.
+
+Core Experience
+
+Users speak their frustrations into the app. The audio is transcribed in real time using OpenAI's transcription model, then processed by GPT-5.2, which generates a response in the selected personality's voice. Responses can be read as text or played back as speech using OpenAI's text-to-speech with personality-specific voices. Conversations support multi-turn threads, so users can go back and forth with their chosen AI personality. Premium users can fine-tune personality traits like sarcasm and empathy using sliders.
+
+Subscription Model
+
+THE VOID runs on a Stripe-powered subscription with a Founders Pricing model:
+
+First 1,000 subscribers lock in $9.99/month forever (Founders Rate)
+After that, new subscribers pay $14.99/month
+Credit packs are available for purchasing additional vents beyond the subscription allowance
+Founders receive a permanent badge and their rate is preserved for life
+Void ID & Blockchain Hallmark
+
+Premium subscribers receive a unique Void ID (format: V-XXXXXXXX) that serves as both a membership hallmark and an affiliate referral code. Each Void ID gets a SHA-256 hash-chained stamp minted on the Trust Layer v1 network — a blockchain-style verification of membership.
+
+Affiliate Program
+
+Premium users share their Void ID as a referral code. When a referred user converts to Premium, the referrer earns 5 bonus credits.
+
+Wellness Tools (20+)
+
+Beyond venting, the app includes a full suite of mental wellness features:
+
+Zen Zone — Guided breathing exercises (Box Breathing, 4-7-8, Calming Breath), ambient sounds (Rain, Ocean, Forest, Fire), and customizable meditation timer
+Written Journal — Mood-tagged journaling with optional AI personality responses
+Mood Analytics — Data visualization dashboard with before/after mood tracking, stat cards, and check-in history
+Vent Library — Searchable archive of past venting sessions with personality filter, audio playback, and full transcript/response view
+Daily Affirmations — AI-generated personalized affirmations displayed as premium quote cards
+Crisis Toolkit — Panic breathing animation, 5-4-3-2-1 grounding exercise, crisis hotlines (988, 741741, SAMHSA, 911), and an editable personal safety plan
+Virtual Rage Room — Interactive stress-relief page with destructible objects and smash animations
+Sleep Sounds — Ambient soundscape mixer with sleep timer and breathing guide
+Gamification — Streak tracking, 10 unlockable achievement badges, daily prompts, and mood check-ins
+AI Blog — SEO-optimized blog with mental wellness articles
+Security & Authentication
+
+Access is secured through a PIN-based whitelist system with master key access, first-login PIN change flow, and Replit Auth (OIDC). The app includes robust rate limiting across all API endpoints and integrates TrustShield.tech for additional security.
+
+Signal Chat
+
+A real-time global chat system with crisis hotline integration, powered by Trust Layer SSO and WebSockets. Includes ecosystem login — members from any DarkWave app (Happy Eats, TrustHome, Signal, Orbit Staffing, etc.) can sign in using their Trust Layer ID or ecosystem email with their password or short numeric PIN.
+
+Trust Layer SSO & Ecosystem
+
+THE VOID is part of the DarkWave Studios ecosystem. All DarkWave apps share a common identity system called Trust Layer SSO. Members get a Trust Layer ID (format: tl-xxxx-xxxx) that works across every app in the ecosystem. This enables cross-app member recognition, shared identity, and ecosystem-wide login.
+
+TrustVault Integration
+
+Premium users' vent audio, voice journals, void echoes, and mood portraits are automatically archived to TrustVault (trustvault.replit.app) with encrypted storage. Non-blocking uploads ensure the core app experience is never interrupted. Free users have their audio transcribed then discarded.
+
+Technical Stack
+
+Frontend: React + Vite, Tailwind CSS, Framer Motion, shadcn/ui
+Backend: Express.js, Drizzle ORM, PostgreSQL
+AI: OpenAI GPT-5.2 (responses), gpt-4o-mini-transcribe (transcription), OpenAI TTS (voice)
+Payments: Stripe
+Email: Resend
+Real-time: WebSockets
+Design: Premium dark glassmorphism aesthetic with Bento grid layout
+Mobile: PWA-ready, Capacitor-wrapped for Android/iOS distribution
+Current Ecosystem Apps
+
+App	Purpose
+THE VOID	Voice-first mental wellness
+Happy Eats	Food/dining
+TrustHome	Home services
+Signal	Real-time chat with crisis support
+TrustVault	Encrypted media storage
+Orbit Staffing	Staffing & bookkeeping
+That covers everything Orbit Staffing would need to understand the full scope of the app. Want me to save this as a separate document in the project, or is this good to copy from here?
