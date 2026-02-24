@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import orbitVideo from "@assets/generated_videos/orbit_staffing_hero.mp4";
 import brewBoardVideo from "@assets/generated_videos/brew_board_hero.mp4";
 import garageBotVideo from "@assets/generated_videos/garagebot_hero.mp4";
-import lotOpsVideo from "@assets/generated_videos/lotops_pro_hero.mp4";
 import paintProsVideo from "@assets/generated_videos/paintpros_hero.mp4";
 import trustHomeVideo from "@assets/generated_videos/trusthome_hero.mp4";
 import trustVaultVideo from "@assets/generated_videos/trustvault_hero.mp4";
@@ -132,17 +131,6 @@ const slides: AppSlide[] = [
     fee: "SaaS - GarageBot Pro $2.99/mo",
   },
   {
-    title: "Lot Ops Pro",
-    subtitle: "Smart inventory and fleet operations — real-time vehicle tracking, condition reporting, and predictive maintenance for dealerships",
-    accent: "orange",
-    link: "https://lotopspro.io",
-    external: true,
-    video: lotOpsVideo,
-    gradient: "from-orange-900/80 via-slate-900/60 to-slate-950/90",
-    split: "100% Jason",
-    fee: "Franchise $5k-25k + 3-5% royalty",
-  },
-  {
     title: "PaintPros.io",
     subtitle: "Professional painting contractor management — job scheduling, crew management, and automated invoicing powered by ORBIT",
     accent: "rose",
@@ -251,7 +239,7 @@ const accentClasses: Record<string, { text: string; border: string; bg: string; 
 const stats = [
   { label: "Cost Savings", value: 35, suffix: "%" },
   { label: "Onboarding", value: 2, suffix: "hr" },
-  { label: "Connected Apps", value: 11, suffix: "" },
+  { label: "Connected Apps", value: 10, suffix: "" },
   { label: "Support", value: 24, suffix: "/7" },
 ];
 
