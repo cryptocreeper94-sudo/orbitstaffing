@@ -18,7 +18,7 @@ import { coinbaseService } from "./coinbaseService";
 import { solanaService } from "./solanaService";
 import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
-import { registerUser, loginUser, getUserFromToken } from "./trustlayer-sso";
+import { registerUser, loginUser, getUserFromToken, ecosystemLogin } from "./trustlayer-sso";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import { jobBoardService } from "./jobBoardService";
 import { everifyService } from "./everifyService";
@@ -15808,6 +15808,23 @@ export function registerTrustLayerRoutes(app: Express) {
     } catch (error: any) {
       console.error("[Trust Layer] Auth me error:", error);
       res.status(500).json({ error: "Failed to verify token" });
+    }
+  });
+
+  app.post("/api/auth/ecosystem-login", async (req: Request, res: Response) => {
+    try {
+      const { identifier, credential } = req.body;
+      if (!identifier || !credential) {
+        return res.status(400).json({ success: false, error: "identifier and credential are required" });
+      }
+      const result = await ecosystemLogin(identifier, credential);
+      if (result.error) {
+        return res.status(result.status || 401).json({ success: false, error: result.error });
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Trust Layer] Ecosystem login error:", error);
+      res.status(500).json({ success: false, error: "Failed to process ecosystem login" });
     }
   });
 }

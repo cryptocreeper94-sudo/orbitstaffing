@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { db } from "./db";
 import { chatUsers } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 const SALT_ROUNDS = 12;
 const JWT_EXPIRY = "7d";
@@ -175,4 +175,133 @@ export async function getUserFromToken(token: string) {
       trustLayerId: user.trustLayerId,
     },
   };
+}
+
+export async function ecosystemLogin(identifier: string, credential: string) {
+  if (!identifier || !credential) {
+    return { error: "Identifier and credential are required", status: 400 };
+  }
+
+  const trimmedId = identifier.trim();
+  const trimmedCred = credential.trim();
+
+  let user;
+  if (trimmedId.startsWith("tl-")) {
+    const [found] = await db.select().from(chatUsers)
+      .where(eq(chatUsers.trustLayerId, trimmedId))
+      .limit(1);
+    user = found;
+  }
+  if (!user) {
+    const [found] = await db.select().from(chatUsers)
+      .where(eq(chatUsers.email, trimmedId.toLowerCase()))
+      .limit(1);
+    user = found;
+  }
+
+  if (!user) {
+    return { error: "No ecosystem account found. Check your Trust Layer ID or email.", status: 401 };
+  }
+
+  if (!user.trustLayerId) {
+    return { error: "Account not linked to Trust Layer.", status: 401 };
+  }
+
+  let authenticated = false;
+
+  if (user.ecosystemPinHash && /^\d{4,8}$/.test(trimmedCred)) {
+    authenticated = await bcrypt.compare(trimmedCred, user.ecosystemPinHash);
+  }
+
+  if (!authenticated) {
+    authenticated = await bcrypt.compare(trimmedCred, user.passwordHash);
+  }
+
+  if (!authenticated) {
+    return { error: "Invalid credential.", status: 401 };
+  }
+
+  await db.update(chatUsers)
+    .set({ isOnline: true, lastSeen: new Date() })
+    .where(eq(chatUsers.id, user.id));
+
+  const token = generateToken(user.id, user.trustLayerId);
+
+  return {
+    success: true,
+    user: {
+      id: user.id,
+      username: user.username,
+      displayName: user.displayName,
+      email: user.email,
+      avatarColor: user.avatarColor,
+      role: user.role,
+      trustLayerId: user.trustLayerId,
+      ecosystemApp: user.ecosystemApp,
+    },
+    token,
+  };
+}
+
+export async function seedEcosystemTestAccounts() {
+  const testAccounts = [
+    {
+      username: "kathy.nguyen",
+      email: "kathy@happyeats.io",
+      password: "HappyEats@2025",
+      pin: "7724",
+      displayName: "Kathy Nguyen",
+      trustLayerId: "tl-kathy-he01",
+      ecosystemApp: "Happy Eats",
+    },
+    {
+      username: "marcus.chen",
+      email: "marcus@trusthome.io",
+      password: "TrustHome@2025",
+      pin: "8832",
+      displayName: "Marcus Chen",
+      trustLayerId: "tl-marcus-th01",
+      ecosystemApp: "TrustHome",
+    },
+    {
+      username: "devon.blackwell",
+      email: "devon@signal.dw",
+      password: "Signal@2025",
+      pin: "6619",
+      displayName: "Devon Blackwell",
+      trustLayerId: "tl-devon-sig01",
+      ecosystemApp: "Signal",
+    },
+  ];
+
+  for (const acct of testAccounts) {
+    const [existing] = await db.select().from(chatUsers)
+      .where(eq(chatUsers.trustLayerId, acct.trustLayerId))
+      .limit(1);
+
+    if (existing) continue;
+
+    const [byEmail] = await db.select().from(chatUsers)
+      .where(eq(chatUsers.email, acct.email))
+      .limit(1);
+
+    if (byEmail) continue;
+
+    const passwordHash = await bcrypt.hash(acct.password, SALT_ROUNDS);
+    const ecosystemPinHash = await bcrypt.hash(acct.pin, SALT_ROUNDS);
+
+    await db.insert(chatUsers).values({
+      username: acct.username,
+      email: acct.email,
+      passwordHash,
+      displayName: acct.displayName,
+      avatarColor: randomAvatarColor(),
+      trustLayerId: acct.trustLayerId,
+      ecosystemPinHash,
+      ecosystemApp: acct.ecosystemApp,
+      role: "member",
+    });
+
+    console.log(`[Trust Layer] Seeded ecosystem account: ${acct.displayName} (${acct.ecosystemApp})`);
+  }
 }

@@ -7612,6 +7612,8 @@ export const chatUsers = pgTable(
     avatarColor: text("avatar_color").notNull().default("#06b6d4"),
     role: text("role").notNull().default("member"),
     trustLayerId: text("trust_layer_id").unique(),
+    ecosystemPinHash: text("ecosystem_pin_hash"),
+    ecosystemApp: text("ecosystem_app"),
     isOnline: boolean("is_online").default(false),
     lastSeen: timestamp("last_seen").default(sql`NOW()`),
     createdAt: timestamp("created_at").default(sql`NOW()`),

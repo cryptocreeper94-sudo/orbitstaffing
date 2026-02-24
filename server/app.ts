@@ -5,6 +5,7 @@ import session from "express-session";
 import { registerRoutes } from "./routes";
 import { seedComplianceData } from "./seedComplianceData";
 import { seedChatChannels } from "./seedChat";
+import { seedEcosystemTestAccounts } from "./trustlayer-sso";
 import "./scheduler"; // Auto-starts sync scheduler on module load
 import { startBackgroundJobs, stopBackgroundJobs } from "./backgroundJobs"; // Onboarding deadline enforcement
 
@@ -89,6 +90,7 @@ export default async function runApp(
 
   await seedComplianceData();
   await seedChatChannels().catch((err: any) => log(`Chat seed: ${err.message}`));
+  await seedEcosystemTestAccounts().catch((err: any) => log(`Ecosystem seed: ${err.message}`));
   
   // Start background jobs for onboarding deadline enforcement
   startBackgroundJobs();
