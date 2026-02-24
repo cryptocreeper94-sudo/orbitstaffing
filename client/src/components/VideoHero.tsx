@@ -3,6 +3,12 @@ import { useLocation } from "wouter";
 import { ExternalLink, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import orbitVideo from "@assets/generated_videos/orbit_staffing_hero.mp4";
+import brewBoardVideo from "@assets/generated_videos/brew_board_hero.mp4";
+import garageBotVideo from "@assets/generated_videos/garagebot_hero.mp4";
+import lotOpsVideo from "@assets/generated_videos/lotops_pro_hero.mp4";
+import paintProsVideo from "@assets/generated_videos/paintpros_hero.mp4";
+
 interface VideoHeroProps {
   onDemoClick: () => void;
 }
@@ -10,71 +16,68 @@ interface VideoHeroProps {
 interface AppSlide {
   title: string;
   subtitle: string;
-  accent: "cyan" | "emerald" | "blue" | "purple" | "amber" | "orange";
+  accent: "cyan" | "emerald" | "amber" | "orange" | "rose";
   link: string;
   external: boolean;
-  gradient: string;
-  animatedGradient: string;
+  video: string;
+  split: string;
+  fee: string;
 }
 
 const slides: AppSlide[] = [
   {
     title: "ORBIT Staffing OS",
-    subtitle: "GPS-verified workforce management with blockchain compliance",
+    subtitle: "GPS-verified workforce management with blockchain compliance — full payroll, onboarding, and CRM automation",
     accent: "cyan",
     link: "/products",
     external: false,
-    gradient: "from-cyan-900/80 via-slate-900/90 to-slate-950",
-    animatedGradient: "from-cyan-600/30 via-blue-700/20 to-slate-950/90",
+    video: orbitVideo,
+    split: "50/50 Partnership",
+    fee: "SaaS $199–599/mo or 2% revenue",
   },
   {
-    title: "TrustHome",
-    subtitle: "Smart home security and automation platform",
-    accent: "emerald",
-    link: "https://trusthome.io",
+    title: "Brew & Board Coffee",
+    subtitle: "B2B craft coffee delivery for Nashville — 20+ vendors, calendar scheduling, blockchain-verified receipts",
+    accent: "amber",
+    link: "https://brewandboard.coffee",
     external: true,
-    gradient: "from-emerald-900/80 via-slate-900/90 to-slate-950",
-    animatedGradient: "from-emerald-600/30 via-teal-700/20 to-slate-950/90",
-  },
-  {
-    title: "Trust Vault",
-    subtitle: "Enterprise-grade digital asset protection",
-    accent: "blue",
-    link: "https://trustvault.io",
-    external: true,
-    gradient: "from-blue-900/80 via-slate-900/90 to-slate-950",
-    animatedGradient: "from-blue-600/30 via-indigo-700/20 to-slate-950/90",
-  },
-  {
-    title: "THE VOID",
-    subtitle: "Next-generation immersive entertainment",
-    accent: "purple",
-    link: "https://enterthevoid.io",
-    external: true,
-    gradient: "from-purple-900/80 via-slate-900/90 to-slate-950",
-    animatedGradient: "from-purple-600/30 via-violet-700/20 to-slate-950/90",
+    video: brewBoardVideo,
+    split: "50/50 Partnership",
+    fee: "Franchise $299–999/mo + 4–6% royalty",
   },
   {
     title: "GarageBot",
-    subtitle: "AI-powered automotive diagnostics and fleet management",
+    subtitle: "AI-powered automotive diagnostics, fleet management, and smart workshop operations with IoT integration",
     accent: "amber",
     link: "https://garagebot.io",
     external: true,
-    gradient: "from-amber-900/80 via-slate-900/90 to-slate-950",
-    animatedGradient: "from-amber-600/30 via-yellow-700/20 to-slate-950/90",
+    video: garageBotVideo,
+    split: "100% Sole Owner",
+    fee: "SaaS $2.99/mo Pro tier",
   },
   {
-    title: "Brew & Board",
-    subtitle: "Craft brewery and cafe operations suite",
+    title: "Lot Ops Pro",
+    subtitle: "Smart inventory and fleet operations — real-time vehicle tracking, condition reports, and predictive maintenance",
     accent: "orange",
-    link: "https://brewandboard.coffee",
+    link: "https://lotopspro.io",
     external: true,
-    gradient: "from-orange-900/80 via-slate-900/90 to-slate-950",
-    animatedGradient: "from-orange-600/30 via-red-700/20 to-slate-950/90",
+    video: lotOpsVideo,
+    split: "100% Sole Owner",
+    fee: "Franchise $5k–25k + 3–5% royalty",
+  },
+  {
+    title: "PaintPros.io",
+    subtitle: "Professional painting contractor platform — job scheduling, crew management, and automated invoicing powered by ORBIT",
+    accent: "rose",
+    link: "https://paintpros.io",
+    external: true,
+    video: paintProsVideo,
+    split: "50/50 Partnership",
+    fee: "Project-based revenue split",
   },
 ];
 
-const accentClasses = {
+const accentClasses: Record<string, { text: string; border: string; bg: string; dot: string; glow: string; buttonBg: string; badge: string }> = {
   cyan: {
     text: "text-cyan-400",
     border: "border-cyan-500/40",
@@ -82,6 +85,7 @@ const accentClasses = {
     dot: "bg-cyan-400",
     glow: "shadow-cyan-500/20",
     buttonBg: "bg-cyan-500/20 border-cyan-500/40 text-cyan-300",
+    badge: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
   },
   emerald: {
     text: "text-emerald-400",
@@ -90,22 +94,7 @@ const accentClasses = {
     dot: "bg-emerald-400",
     glow: "shadow-emerald-500/20",
     buttonBg: "bg-emerald-500/20 border-emerald-500/40 text-emerald-300",
-  },
-  blue: {
-    text: "text-blue-400",
-    border: "border-blue-500/40",
-    bg: "bg-blue-500/20",
-    dot: "bg-blue-400",
-    glow: "shadow-blue-500/20",
-    buttonBg: "bg-blue-500/20 border-blue-500/40 text-blue-300",
-  },
-  purple: {
-    text: "text-purple-400",
-    border: "border-purple-500/40",
-    bg: "bg-purple-500/20",
-    dot: "bg-purple-400",
-    glow: "shadow-purple-500/20",
-    buttonBg: "bg-purple-500/20 border-purple-500/40 text-purple-300",
+    badge: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
   },
   amber: {
     text: "text-amber-400",
@@ -114,6 +103,7 @@ const accentClasses = {
     dot: "bg-amber-400",
     glow: "shadow-amber-500/20",
     buttonBg: "bg-amber-500/20 border-amber-500/40 text-amber-300",
+    badge: "bg-amber-500/20 text-amber-300 border-amber-500/30",
   },
   orange: {
     text: "text-orange-400",
@@ -122,13 +112,23 @@ const accentClasses = {
     dot: "bg-orange-400",
     glow: "shadow-orange-500/20",
     buttonBg: "bg-orange-500/20 border-orange-500/40 text-orange-300",
+    badge: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+  },
+  rose: {
+    text: "text-rose-400",
+    border: "border-rose-500/40",
+    bg: "bg-rose-500/20",
+    dot: "bg-rose-400",
+    glow: "shadow-rose-500/20",
+    buttonBg: "bg-rose-500/20 border-rose-500/40 text-rose-300",
+    badge: "bg-rose-500/20 text-rose-300 border-rose-500/30",
   },
 };
 
 const stats = [
   { label: "Cost Savings", value: 35, suffix: "%" },
   { label: "Onboarding", value: 2, suffix: "hr" },
-  { label: "Connected Apps", value: 6, suffix: "+" },
+  { label: "Connected Apps", value: 5, suffix: "" },
   { label: "Support", value: 24, suffix: "/7" },
 ];
 
@@ -168,6 +168,7 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
   const [scrollY, setScrollY] = useState(0);
   const [statsInView, setStatsInView] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const [, setLocation] = useLocation();
 
   const goToSlide = useCallback((index: number) => {
@@ -185,6 +186,18 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
     }, 8000);
     return () => clearInterval(interval);
   }, [activeIndex, goToSlide]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, i) => {
+      if (!video) return;
+      if (i === activeIndex) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
+  }, [activeIndex]);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -233,19 +246,16 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
               transform: `translateY(${scrollY * 0.3}px) scale(${1 + scrollY * 0.0003})`,
             }}
           >
-            <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
-            <div
-              className={`absolute inset-0 bg-gradient-to-tr ${slide.animatedGradient}`}
-              style={{
-                animation: isActive ? "pulse 4s ease-in-out infinite" : "none",
-              }}
+            <video
+              ref={(el) => { videoRefs.current[i] = el; }}
+              src={slide.video}
+              muted
+              loop
+              playsInline
+              preload={i <= 1 ? "auto" : "metadata"}
+              className="absolute inset-0 w-full h-full object-cover"
             />
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.03) 0%, transparent 50%), radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.02) 0%, transparent 40%)`,
-              }}
-            />
+            <div className="absolute inset-0 bg-slate-950/40" />
           </div>
         );
       })}
@@ -264,7 +274,7 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
           <div className="flex items-center gap-3">
             <div className={`w-2 h-2 rounded-full ${accent.dot} animate-pulse`} />
             <span className={`text-xs font-semibold uppercase tracking-widest ${accent.text}`}>
-              DarkWave Studios
+              DarkWave Studios Ecosystem
             </span>
           </div>
 
@@ -284,6 +294,15 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
           >
             {currentSlide.subtitle}
           </p>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`inline-flex items-center text-[11px] px-2.5 py-1 rounded-full border ${accent.badge}`}>
+              {currentSlide.split}
+            </span>
+            <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-full border border-white/10 bg-white/5 text-white/50">
+              {currentSlide.fee}
+            </span>
+          </div>
 
           <div className="flex items-center gap-3 pt-2 flex-wrap">
             <Button
@@ -339,7 +358,7 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
           data-testid="card-platform-stats"
         >
           <h3 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3">
-            Platform Stats
+            Ecosystem Stats
           </h3>
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
@@ -349,13 +368,6 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
           ))}
         </div>
       </div>
-
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
-        }
-      `}</style>
     </section>
   );
 }
