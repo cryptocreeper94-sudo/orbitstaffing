@@ -18,6 +18,7 @@ import { coinbaseService } from "./coinbaseService";
 import { solanaService } from "./solanaService";
 import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
+import { registerUser, loginUser, getUserFromToken } from "./trustlayer-sso";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import { jobBoardService } from "./jobBoardService";
 import { everifyService } from "./everifyService";
@@ -195,6 +196,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register OAuth 2.0 routes
   registerOAuthRoutes(app);
+  
+  // Register Trust Layer SSO routes (Signal Chat auth)
+  registerTrustLayerRoutes(app);
 
   // ========================
   // API DOCUMENTATION (OpenAPI/Swagger)
@@ -15746,6 +15750,64 @@ export function registerMarketplaceRoutes(app: Express) {
     } catch (error) {
       console.error("[Marketplace] Update config error:", error);
       res.status(500).json({ error: "Failed to update app config" });
+    }
+  });
+}
+
+// ========================
+// Trust Layer SSO Routes (Signal Chat Auth)
+// ========================
+export function registerTrustLayerRoutes(app: Express) {
+
+  app.post("/api/chat/auth/register", async (req: Request, res: Response) => {
+    try {
+      const { username, email, password, displayName } = req.body;
+      if (!username || !email || !password || !displayName) {
+        return res.status(400).json({ error: "username, email, password, and displayName are required" });
+      }
+      const result = await registerUser(username, email, password, displayName);
+      if (result.error) {
+        return res.status(result.status || 400).json({ error: result.error });
+      }
+      res.status(201).json(result);
+    } catch (error: any) {
+      console.error("[Trust Layer] Register error:", error);
+      res.status(500).json({ error: "Failed to register user" });
+    }
+  });
+
+  app.post("/api/chat/auth/login", async (req: Request, res: Response) => {
+    try {
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ error: "username and password are required" });
+      }
+      const result = await loginUser(username, password);
+      if (result.error) {
+        return res.status(result.status || 401).json({ error: result.error });
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Trust Layer] Login error:", error);
+      res.status(500).json({ error: "Failed to login" });
+    }
+  });
+
+  app.get("/api/chat/auth/me", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "Authorization header required" });
+      }
+      const token = authHeader.substring(7);
+      const result = await getUserFromToken(token);
+      if (result.error) {
+        return res.status(result.status || 401).json({ error: result.error });
+      }
+      res.json(result);
+    } catch (error: any) {
+      console.error("[Trust Layer] Auth me error:", error);
+      res.status(500).json({ error: "Failed to verify token" });
     }
   });
 }

@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'wouter';
 import { useState } from 'react';
-import { Menu, X, Shield, Users, Code, LogIn } from 'lucide-react';
+import { Menu, X, Shield, Users, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface MainHeaderProps {
@@ -10,6 +10,9 @@ interface MainHeaderProps {
 export function MainHeader({ showNav = true }: MainHeaderProps) {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isAdminPage = location.startsWith('/admin') || location.startsWith('/developer') || location.startsWith('/dev-') || location === '/admin-explore';
+  const isExplorePage = location === '/' || location === '/explore' || location === '/home';
 
   const navLinks = [
     { href: '/pricing', label: 'Pricing' },
@@ -36,6 +39,19 @@ export function MainHeader({ showNav = true }: MainHeaderProps) {
 
             {showNav && (
               <nav className="hidden md:flex items-center gap-1">
+                {!isExplorePage && (
+                  <Link href="/">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-sm text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10"
+                      data-testid="nav-link-explore"
+                    >
+                      <Home className="w-3.5 h-3.5 mr-1" />
+                      Explore
+                    </Button>
+                  </Link>
+                )}
                 {navLinks.map((link) => (
                   <Link key={link.href} href={link.href}>
                     <Button
@@ -67,20 +83,6 @@ export function MainHeader({ showNav = true }: MainHeaderProps) {
               </Button>
             </Link>
 
-            <Link href="/admin-landing">
-              <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800" data-testid="link-admin-login">
-                <LogIn className="w-3.5 h-3.5" />
-                <span className="text-xs">Admin</span>
-              </Button>
-            </Link>
-
-            <Link href="/developer">
-              <Button variant="ghost" size="sm" className="hidden sm:flex items-center gap-1.5 text-slate-400 hover:text-white hover:bg-slate-800" data-testid="link-dev-login">
-                <Code className="w-3.5 h-3.5" />
-                <span className="text-xs">Dev</span>
-              </Button>
-            </Link>
-
             <button
               className="md:hidden p-2 text-slate-400 hover:text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -94,6 +96,13 @@ export function MainHeader({ showNav = true }: MainHeaderProps) {
         {mobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-slate-800">
             <nav className="flex flex-col gap-1">
+              {!isExplorePage && (
+                <Link href="/">
+                  <Button variant="ghost" className="w-full justify-start text-cyan-400" onClick={() => setMobileMenuOpen(false)}>
+                    <Home className="w-4 h-4 mr-2" /> Explore Hub
+                  </Button>
+                </Link>
+              )}
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
                   <Button
@@ -114,16 +123,6 @@ export function MainHeader({ showNav = true }: MainHeaderProps) {
               <Link href="/investors">
                 <Button variant="ghost" className="w-full justify-start text-slate-400" onClick={() => setMobileMenuOpen(false)}>
                   <Users className="w-4 h-4 mr-2" /> Investors
-                </Button>
-              </Link>
-              <Link href="/admin-landing">
-                <Button variant="ghost" className="w-full justify-start text-slate-400" onClick={() => setMobileMenuOpen(false)}>
-                  <LogIn className="w-4 h-4 mr-2" /> Admin Login
-                </Button>
-              </Link>
-              <Link href="/developer">
-                <Button variant="ghost" className="w-full justify-start text-slate-400" onClick={() => setMobileMenuOpen(false)}>
-                  <Code className="w-4 h-4 mr-2" /> Developer
                 </Button>
               </Link>
             </nav>

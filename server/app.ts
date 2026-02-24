@@ -4,6 +4,7 @@ import express, { type Express, type Request, Response, NextFunction } from "exp
 import session from "express-session";
 import { registerRoutes } from "./routes";
 import { seedComplianceData } from "./seedComplianceData";
+import { seedChatChannels } from "./seedChat";
 import "./scheduler"; // Auto-starts sync scheduler on module load
 import { startBackgroundJobs, stopBackgroundJobs } from "./backgroundJobs"; // Onboarding deadline enforcement
 
@@ -86,8 +87,8 @@ export default async function runApp(
 ) {
   const server = await registerRoutes(app);
 
-  // Seed compliance data on startup
   await seedComplianceData();
+  await seedChatChannels().catch((err: any) => log(`Chat seed: ${err.message}`));
   
   // Start background jobs for onboarding deadline enforcement
   startBackgroundJobs();

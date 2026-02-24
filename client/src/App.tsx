@@ -9,6 +9,8 @@ import NotFound from "@/pages/not-found";
 import AdminPanel from "@/pages/AdminPanel";
 import WorkerPortal from "@/pages/WorkerPortal";
 import Landing from "@/pages/Landing";
+import ExploreHub from "@/pages/ExploreHub";
+import AdminExploreHub from "@/pages/AdminExploreHub";
 import DeveloperPanel from "@/pages/DeveloperPanel";
 import { shouldBypassDeveloperLogin } from "@/lib/deviceFingerprint";
 import DeveloperLanding from "@/pages/DeveloperLanding";
@@ -130,8 +132,7 @@ function RootPage() {
   }, [setLocation, hostname]);
 
   if (loading) return null;
-  // Main landing page for everyone - devs can go to /dev-landing to skip
-  return <Landing />;
+  return <ExploreHub />;
 }
 
 function Router() {
@@ -144,7 +145,9 @@ function Router() {
       <Route path="/admin-landing" component={AdminLanding} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/worker" component={WorkerPortal} />
-      <Route path="/home" component={Landing} />
+      <Route path="/home" component={ExploreHub} />
+      <Route path="/explore" component={ExploreHub} />
+      <Route path="/admin-explore" component={AdminExploreHub} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/integrations" component={Integrations} />
       <Route path="/equipment-tracking" component={EquipmentTrackingAdmin} />

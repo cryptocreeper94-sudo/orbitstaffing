@@ -7597,3 +7597,93 @@ export const insertTreasuryLedgerEntrySchema = createInsertSchema(treasuryLedger
 
 export type InsertTreasuryLedgerEntry = z.infer<typeof insertTreasuryLedgerEntrySchema>;
 export type TreasuryLedgerEntry = typeof treasuryLedgerEntries.$inferSelect;
+
+// ========================
+// Chat Users (Trust Layer SSO - shared identity across ecosystem)
+// ========================
+export const chatUsers = pgTable(
+  "chat_users",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    username: text("username").notNull().unique(),
+    email: text("email").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
+    displayName: text("display_name").notNull(),
+    avatarColor: text("avatar_color").notNull().default("#06b6d4"),
+    role: text("role").notNull().default("member"),
+    trustLayerId: text("trust_layer_id").unique(),
+    isOnline: boolean("is_online").default(false),
+    lastSeen: timestamp("last_seen").default(sql`NOW()`),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    usernameIdx: index("idx_chat_users_username").on(table.username),
+    emailIdx: index("idx_chat_users_email").on(table.email),
+    trustLayerIdx: index("idx_chat_users_trust_layer_id").on(table.trustLayerId),
+  })
+);
+
+export const insertChatUserSchema = createInsertSchema(chatUsers).omit({
+  id: true,
+  isOnline: true,
+  lastSeen: true,
+  createdAt: true,
+});
+
+export type InsertChatUser = z.infer<typeof insertChatUserSchema>;
+export type ChatUser = typeof chatUsers.$inferSelect;
+
+// ========================
+// Chat Channels
+// ========================
+export const chatChannels = pgTable(
+  "chat_channels",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    name: text("name").notNull().unique(),
+    description: text("description"),
+    category: text("category").notNull().default("ecosystem"),
+    isDefault: boolean("is_default").default(false),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    nameIdx: index("idx_chat_channels_name").on(table.name),
+    categoryIdx: index("idx_chat_channels_category").on(table.category),
+  })
+);
+
+export const insertChatChannelSchema = createInsertSchema(chatChannels).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertChatChannel = z.infer<typeof insertChatChannelSchema>;
+export type ChatChannel = typeof chatChannels.$inferSelect;
+
+// ========================
+// Chat Messages
+// ========================
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+    channelId: varchar("channel_id").notNull(),
+    userId: varchar("user_id").notNull(),
+    content: text("content").notNull(),
+    replyToId: varchar("reply_to_id"),
+    createdAt: timestamp("created_at").default(sql`NOW()`),
+  },
+  (table) => ({
+    channelIdx: index("idx_chat_messages_channel").on(table.channelId),
+    userIdx: index("idx_chat_messages_user").on(table.userId),
+    createdAtIdx: index("idx_chat_messages_created_at").on(table.createdAt),
+  })
+);
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;

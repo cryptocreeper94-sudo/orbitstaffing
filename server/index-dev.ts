@@ -8,14 +8,15 @@ import { createServer as createViteServer, createLogger } from "vite";
 
 import runApp from "./app";
 import { setupWebSocket } from "./websocket";
+import { setupChatWebSocket } from "./chat-ws";
 
 import viteConfig from "../vite.config";
 
 const viteLogger = createLogger();
 
 export async function setupVite(app: Express, server: Server) {
-  // Setup WebSocket for real-time updates
   setupWebSocket(server);
+  setupChatWebSocket(server);
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
