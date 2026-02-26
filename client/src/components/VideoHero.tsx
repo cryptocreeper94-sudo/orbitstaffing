@@ -466,16 +466,17 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
         </div>
       </div>
 
-      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
+      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5">
         {slides.map((slide, i) => (
           <button
             key={i}
             onClick={() => goToSlide(i)}
-            className={`rounded-full transition-all duration-300 ${
+            className={`p-0 border-0 rounded-full transition-all duration-300 block ${
               i === activeIndex
-                ? `w-5 h-[5px] ${accentClasses[slide.accent].dot}`
-                : `w-[3px] h-[3px] bg-white/30 hover:bg-white/50`
+                ? `${accentClasses[slide.accent].dot}`
+                : `bg-white/30 hover:bg-white/50`
             }`}
+            style={i === activeIndex ? { width: 16, height: 4 } : { width: 4, height: 4 }}
             aria-label={`Go to slide ${i + 1}`}
             data-testid={`button-hero-dot-${i}`}
           />
