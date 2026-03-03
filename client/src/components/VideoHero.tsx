@@ -466,30 +466,38 @@ export function VideoHero({ onDemoClick }: VideoHeroProps) {
         </div>
       </div>
 
-      <div className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-30 flex items-center gap-[6px]">
-        {slides.map((slide, i) => (
-          <span
-            key={i}
-            role="button"
-            onClick={() => goToSlide(i)}
-            className={`block rounded-full cursor-pointer transition-all duration-300 ${
-              i === activeIndex
-                ? accentClasses[slide.accent].dot
-                : 'bg-white/30'
-            }`}
-            style={{
-              width: i === activeIndex ? 14 : 4,
-              height: 4,
-              minWidth: 0,
-              minHeight: 0,
-              padding: 0,
-              margin: 0,
-              lineHeight: 0,
-              fontSize: 0,
-            }}
-            data-testid={`button-hero-dot-${i}`}
-          />
-        ))}
+      <div
+        className="absolute bottom-28 sm:bottom-32 left-1/2 -translate-x-1/2 z-30"
+        style={{ display: 'flex', alignItems: 'center', gap: 6, height: 8, lineHeight: 0 }}
+      >
+        {slides.map((slide, i) => {
+          const isActive = i === activeIndex;
+          return (
+            <div
+              key={i}
+              onClick={() => goToSlide(i)}
+              className={`cursor-pointer ${isActive ? accentClasses[slide.accent].dot : 'bg-white/30'}`}
+              style={{
+                width: isActive ? 14 : 4,
+                height: 4,
+                borderRadius: 9999,
+                display: 'block',
+                boxSizing: 'border-box',
+                padding: 0,
+                margin: 0,
+                border: 'none',
+                outline: 'none',
+                minWidth: 0,
+                minHeight: 0,
+                maxWidth: isActive ? 14 : 4,
+                maxHeight: 4,
+                flexShrink: 0,
+                transition: 'all 300ms',
+              }}
+              data-testid={`button-hero-dot-${i}`}
+            />
+          );
+        })}
       </div>
 
       <div

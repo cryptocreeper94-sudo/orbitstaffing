@@ -18,6 +18,8 @@ import { coinbaseService } from "./coinbaseService";
 import { trustLayerBlockchain } from "./trustLayerBlockchain";
 import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
+import * as ecosystemHallmarkService from "./ecosystemHallmark";
+import * as affiliateService from "./affiliate";
 import { registerUser, loginUser, getUserFromToken, ecosystemLogin } from "./trustlayer-sso";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import { jobBoardService } from "./jobBoardService";
@@ -654,6 +656,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log(`[Developer Login] ✅ Developer logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
           
+          ecosystemHallmarkService.createTrustStamp({
+            category: 'auth-login',
+            data: { ip: ipAddress, device: userAgent, role: 'developer', appContext: 'orbit' },
+          }).catch(() => {});
+
           return res.json({ verified: true, role: 'developer', name: 'Developer', redirectTo: '/developer' });
         });
         return;
@@ -686,7 +693,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log(`[Sidonie Login] ✅ Sidonie logged in from ${ipAddress} at ${new Date().toLocaleString()}`);
           
-          // Return full admin access - no sandbox mode, but flag as partner for UI filtering
+          ecosystemHallmarkService.createTrustStamp({
+            category: 'auth-login',
+            data: { ip: ipAddress, device: userAgent, role: 'master', name: 'Sidonie', appContext: 'orbit' },
+          }).catch(() => {});
+
           return res.json({ verified: true, role: 'master', name: 'Sidonie', isPartner: true, sandboxMode: false });
         });
         return;
@@ -8058,6 +8069,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Schedule post error:", error);
       res.status(500).json({ error: "Failed to schedule post" });
+    }
+  });
+
+  // ========================
+  // Ecosystem Hallmark Routes (Trust Layer OR-prefix system)
+  // ========================
+  
+  app.get("/api/hallmark/genesis", async (_req: Request, res: Response) => {
+    try {
+      const genesis = await ecosystemHallmarkService.getGenesisHallmark();
+      if (!genesis) {
+        return res.status(404).json({ error: "Genesis hallmark not yet created" });
+      }
+      res.json(genesis);
+    } catch (error) {
+      console.error("[Hallmark] Genesis fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch genesis hallmark" });
+    }
+  });
+
+  app.get("/api/hallmark/:hallmarkId/verify", async (req: Request, res: Response) => {
+    try {
+      const result = await ecosystemHallmarkService.verifyHallmark(req.params.hallmarkId);
+      if (!result.verified) {
+        return res.status(404).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      console.error("[Hallmark] Verify error:", error);
+      res.status(500).json({ error: "Verification failed" });
+    }
+  });
+
+  app.get("/api/ecosystem-hallmarks", async (_req: Request, res: Response) => {
+    try {
+      const hallmarks = await ecosystemHallmarkService.getAllHallmarks();
+      res.json(hallmarks);
+    } catch (error) {
+      console.error("[Hallmark] List error:", error);
+      res.status(500).json({ error: "Failed to fetch hallmarks" });
+    }
+  });
+
+  app.get("/api/trust-stamps/:userId", async (req: Request, res: Response) => {
+    try {
+      const stamps = await ecosystemHallmarkService.getUserTrustStamps(req.params.userId);
+      res.json(stamps);
+    } catch (error) {
+      console.error("[TrustStamp] Fetch error:", error);
+      res.status(500).json({ error: "Failed to fetch trust stamps" });
+    }
+  });
+
+  // ========================
+  // Affiliate Routes
+  // ========================
+
+  app.get("/api/affiliate/dashboard", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId || req.query.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const dashboard = await affiliateService.getAffiliateDashboard(userId as string);
+      res.json(dashboard);
+    } catch (error) {
+      console.error("[Affiliate] Dashboard error:", error);
+      res.status(500).json({ error: "Failed to fetch affiliate dashboard" });
+    }
+  });
+
+  app.get("/api/affiliate/link", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId || req.query.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const link = await affiliateService.getAffiliateLink(userId as string);
+      res.json(link);
+    } catch (error) {
+      console.error("[Affiliate] Link error:", error);
+      res.status(500).json({ error: "Failed to fetch affiliate link" });
+    }
+  });
+
+  app.post("/api/affiliate/track", rateLimitMiddleware, async (req: Request, res: Response) => {
+    try {
+      const { referralHash, platform } = req.body;
+      if (!referralHash || typeof referralHash !== 'string' || referralHash.length > 64) {
+        return res.status(400).json({ error: "Valid referralHash is required" });
+      }
+      const validPlatforms = ['orbit', 'trusthub', 'trustvault', 'thevoid', 'happyeats', 'brewandboard', 'garagebot', 'paintpros', 'trusthome', 'verdara', 'tldriverconnect'];
+      const safePlatform = validPlatforms.includes(platform) ? platform : 'orbit';
+      const result = await affiliateService.trackReferral(referralHash, safePlatform);
+      if (!result.success) {
+        return res.status(404).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      console.error("[Affiliate] Track error:", error);
+      res.status(500).json({ error: "Failed to track referral" });
+    }
+  });
+
+  app.post("/api/affiliate/request-payout", async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId || req.body.userId;
+      if (!userId) {
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      const result = await affiliateService.requestPayout(userId as string);
+      if (!result.success) {
+        return res.status(400).json(result);
+      }
+      res.json(result);
+    } catch (error) {
+      console.error("[Affiliate] Payout error:", error);
+      res.status(500).json({ error: "Failed to process payout request" });
     }
   });
 
