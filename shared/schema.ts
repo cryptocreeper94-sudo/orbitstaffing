@@ -7200,6 +7200,12 @@ export const partnerProfiles = pgTable(
     venmoHandle: varchar("venmo_handle", { length: 100 }),
     cashAppHandle: varchar("cashapp_handle", { length: 100 }),
     
+    bankName: varchar("bank_name", { length: 100 }),
+    bankRoutingNumber: varchar("bank_routing_number", { length: 20 }),
+    bankAccountNumber: varchar("bank_account_number", { length: 30 }),
+    partnerApp: varchar("partner_app", { length: 50 }),
+    splitPercentage: decimal("split_percentage", { precision: 5, scale: 2 }),
+    
     statementFrequency: varchar("statement_frequency", { length: 20 }).default("monthly"),
     
     blockchainWallet: varchar("blockchain_wallet", { length: 255 }),
