@@ -20,6 +20,7 @@ import { accountingService } from "./accountingService";
 import { queueForBlockchain, getBlockchainStats } from "./hallmarkService";
 import * as ecosystemHallmarkService from "./ecosystemHallmark";
 import * as affiliateService from "./affiliate";
+import * as partnerPayouts from "./partnerPayouts";
 import { registerUser, loginUser, getUserFromToken, ecosystemLogin } from "./trustlayer-sso";
 import { checkrService, CHECKR_PACKAGES } from "./checkrService";
 import { jobBoardService } from "./jobBoardService";
@@ -8069,6 +8070,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Schedule post error:", error);
       res.status(500).json({ error: "Failed to schedule post" });
+    }
+  });
+
+  // ========================
+  // Partner Payout Routes (Automated bank transfers via Stripe)
+  // ========================
+
+  app.post("/api/admin/partner-payouts/setup", async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.adminAuthenticated || !['developer', 'master'].includes(req.session?.adminRole || '')) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      const { partnerId } = req.body;
+      if (!partnerId) {
+        return res.status(400).json({ error: "partnerId is required" });
+      }
+      const result = await partnerPayouts.createPartnerConnectedAccount(partnerId);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[PartnerPayouts] Setup error:", error);
+      res.status(500).json({ error: error.message || "Failed to set up partner payout account" });
+    }
+  });
+
+  app.post("/api/admin/partner-payouts/transfer", async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.adminAuthenticated || req.session?.adminRole !== 'developer') {
+        return res.status(403).json({ error: "Developer access required" });
+      }
+      const { partnerId, amount, description, productCode } = req.body;
+      if (!partnerId || !amount || !productCode) {
+        return res.status(400).json({ error: "partnerId, amount, and productCode are required" });
+      }
+      const result = await partnerPayouts.processPartnerPayout(partnerId, parseFloat(amount), description || 'Revenue split', productCode);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[PartnerPayouts] Transfer error:", error);
+      res.status(500).json({ error: error.message || "Failed to process transfer" });
+    }
+  });
+
+  app.get("/api/admin/partner-payouts/status/:partnerId", async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.adminAuthenticated) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      const status = await partnerPayouts.getPartnerPayoutStatus(req.params.partnerId);
+      res.json(status);
+    } catch (error: any) {
+      console.error("[PartnerPayouts] Status error:", error);
+      res.status(500).json({ error: error.message || "Failed to get payout status" });
+    }
+  });
+
+  app.get("/api/admin/partner-payouts/partners/:appCode", async (req: Request, res: Response) => {
+    try {
+      if (!req.session?.adminAuthenticated) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      const partners = await partnerPayouts.listPartnersByApp(req.params.appCode);
+      res.json(partners);
+    } catch (error: any) {
+      console.error("[PartnerPayouts] List error:", error);
+      res.status(500).json({ error: error.message || "Failed to list partners" });
     }
   });
 
