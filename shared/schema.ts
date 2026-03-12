@@ -38,8 +38,10 @@ export const users = pgTable(
     verifiedAt: timestamp("verified_at"),
 
     // NDA Tracking (for internal staff)
-    ndaSignedDate: timestamp("nda_signed_date"), // When staff signed NDA
-    ndaVersion: varchar("nda_version", { length: 10 }), // Version of NDA signed (e.g., "1.0")
+    ndaSignedDate: timestamp("nda_signed_date"),
+    ndaVersion: varchar("nda_version", { length: 10 }),
+
+    uniqueHash: varchar("unique_hash", { length: 64 }).unique(),
 
     createdAt: timestamp("created_at").default(sql`NOW()`),
     updatedAt: timestamp("updated_at").default(sql`NOW()`),
@@ -7198,6 +7200,12 @@ export const partnerProfiles = pgTable(
     venmoHandle: varchar("venmo_handle", { length: 100 }),
     cashAppHandle: varchar("cashapp_handle", { length: 100 }),
     
+    bankName: varchar("bank_name", { length: 100 }),
+    bankRoutingNumber: varchar("bank_routing_number", { length: 20 }),
+    bankAccountNumber: varchar("bank_account_number", { length: 30 }),
+    partnerApp: varchar("partner_app", { length: 50 }),
+    splitPercentage: decimal("split_percentage", { precision: 5, scale: 2 }),
+    
     statementFrequency: varchar("statement_frequency", { length: 20 }).default("monthly"),
     
     blockchainWallet: varchar("blockchain_wallet", { length: 255 }),
@@ -7689,3 +7697,142 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
 
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
+
+// ========================
+// Trust Layer Ecosystem Hallmarks (OR-prefix system)
+// ========================
+export const ecosystemHallmarks = pgTable(
+  "ecosystem_hallmarks",
+  {
+    id: serial("id").primaryKey(),
+    thId: text("th_id").notNull().unique(),
+    userId: varchar("user_id").references(() => users.id),
+    appId: text("app_id").notNull(),
+    appName: text("app_name").notNull(),
+    productName: text("product_name").notNull(),
+    releaseType: text("release_type").notNull(),
+    metadata: jsonb("metadata"),
+    dataHash: text("data_hash").notNull(),
+    txHash: text("tx_hash"),
+    blockHeight: text("block_height"),
+    qrCodeSvg: text("qr_code_svg"),
+    verificationUrl: text("verification_url"),
+    hallmarkId: integer("hallmark_id").notNull(),
+    createdAt: timestamp("created_at").notNull().default(sql`NOW()`),
+  },
+  (table) => ({
+    thIdIdx: index("idx_eco_hallmarks_th_id").on(table.thId),
+    userIdIdx: index("idx_eco_hallmarks_user_id").on(table.userId),
+    appIdIdx: index("idx_eco_hallmarks_app_id").on(table.appId),
+    releaseTypeIdx: index("idx_eco_hallmarks_release_type").on(table.releaseType),
+    createdAtIdx: index("idx_eco_hallmarks_created_at").on(table.createdAt),
+  })
+);
+
+export const insertEcosystemHallmarkSchema = createInsertSchema(ecosystemHallmarks).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertEcosystemHallmark = z.infer<typeof insertEcosystemHallmarkSchema>;
+export type EcosystemHallmark = typeof ecosystemHallmarks.$inferSelect;
+
+// ========================
+// Trust Stamps (Tier 2 audit trail)
+// ========================
+export const trustStamps = pgTable(
+  "trust_stamps",
+  {
+    id: serial("id").primaryKey(),
+    userId: varchar("user_id").references(() => users.id),
+    category: text("category").notNull(),
+    data: jsonb("data"),
+    dataHash: text("data_hash").notNull(),
+    txHash: text("tx_hash"),
+    blockHeight: text("block_height"),
+    createdAt: timestamp("created_at").notNull().default(sql`NOW()`),
+  },
+  (table) => ({
+    userIdIdx: index("idx_trust_stamps_user_id").on(table.userId),
+    categoryIdx: index("idx_trust_stamps_category").on(table.category),
+    createdAtIdx: index("idx_trust_stamps_created_at").on(table.createdAt),
+  })
+);
+
+export const insertTrustStampSchema = createInsertSchema(trustStamps).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertTrustStamp = z.infer<typeof insertTrustStampSchema>;
+export type TrustStamp = typeof trustStamps.$inferSelect;
+
+// ========================
+// Hallmark Counter (per-app sequence)
+// ========================
+export const hallmarkCounter = pgTable("hallmark_counter", {
+  id: text("id").primaryKey(),
+  currentSequence: text("current_sequence").notNull().default("0"),
+});
+
+// ========================
+// Affiliate Referrals
+// ========================
+export const affiliateReferrals = pgTable(
+  "affiliate_referrals",
+  {
+    id: serial("id").primaryKey(),
+    referrerId: varchar("referrer_id").notNull().references(() => users.id),
+    referredUserId: varchar("referred_user_id").references(() => users.id),
+    referralHash: text("referral_hash").notNull(),
+    platform: text("platform").notNull().default("orbit"),
+    status: text("status").notNull().default("pending"),
+    convertedAt: timestamp("converted_at"),
+    createdAt: timestamp("created_at").notNull().default(sql`NOW()`),
+  },
+  (table) => ({
+    referrerIdx: index("idx_affiliate_referrals_referrer").on(table.referrerId),
+    hashIdx: index("idx_affiliate_referrals_hash").on(table.referralHash),
+    statusIdx: index("idx_affiliate_referrals_status").on(table.status),
+  })
+);
+
+export const insertAffiliateReferralSchema = createInsertSchema(affiliateReferrals).omit({
+  id: true,
+  convertedAt: true,
+  createdAt: true,
+});
+
+export type InsertAffiliateReferral = z.infer<typeof insertAffiliateReferralSchema>;
+export type AffiliateReferral = typeof affiliateReferrals.$inferSelect;
+
+// ========================
+// Affiliate Commissions
+// ========================
+export const affiliateCommissions = pgTable(
+  "affiliate_commissions",
+  {
+    id: serial("id").primaryKey(),
+    referrerId: varchar("referrer_id").notNull().references(() => users.id),
+    referralId: integer("referral_id").references(() => affiliateReferrals.id),
+    amount: text("amount").notNull(),
+    currency: text("currency").default("SIG"),
+    tier: text("tier").default("base"),
+    status: text("status").default("pending"),
+    paidAt: timestamp("paid_at"),
+    createdAt: timestamp("created_at").notNull().default(sql`NOW()`),
+  },
+  (table) => ({
+    referrerIdx: index("idx_affiliate_commissions_referrer").on(table.referrerId),
+    statusIdx: index("idx_affiliate_commissions_status").on(table.status),
+  })
+);
+
+export const insertAffiliateCommissionSchema = createInsertSchema(affiliateCommissions).omit({
+  id: true,
+  paidAt: true,
+  createdAt: true,
+});
+
+export type InsertAffiliateCommission = z.infer<typeof insertAffiliateCommissionSchema>;
+export type AffiliateCommission = typeof affiliateCommissions.$inferSelect;

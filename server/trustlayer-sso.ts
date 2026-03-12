@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { db } from "./db";
 import { chatUsers } from "@shared/schema";
 import { eq, or } from "drizzle-orm";
+import { createTrustStamp } from "./ecosystemHallmark";
 
 const SALT_ROUNDS = 12;
 const JWT_EXPIRY = "7d";
@@ -98,6 +99,11 @@ export async function registerUser(username: string, email: string, password: st
   }).returning();
 
   const token = generateToken(user.id, trustLayerId);
+
+  createTrustStamp({
+    category: 'auth-register',
+    data: { email: email.toLowerCase(), username: username.toLowerCase(), appContext: 'orbit' },
+  }).catch(() => {});
 
   return {
     success: true,
@@ -226,6 +232,11 @@ export async function ecosystemLogin(identifier: string, credential: string) {
     .where(eq(chatUsers.id, user.id));
 
   const token = generateToken(user.id, user.trustLayerId);
+
+  createTrustStamp({
+    category: 'auth-login',
+    data: { username: user.username, ecosystemApp: user.ecosystemApp, appContext: 'orbit' },
+  }).catch(() => {});
 
   return {
     success: true,

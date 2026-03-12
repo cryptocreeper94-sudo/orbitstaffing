@@ -54,29 +54,53 @@ Branded Visa debit card for workers to receive instant pay, powered by Stripe Is
 
 ---
 
-## Last Session Summary (December 15, 2025)
+## Last Session Summary (March 3, 2026)
 
-### Current Version: v2.7.1 (Ready for Publishing)
+### What Was Accomplished
+1. **Trust Layer Ecosystem Hallmark System - COMPLETE ✅**
+   - Prefix `OR` for ORBIT Staffing OS (per 33-app ecosystem registry)
+   - Genesis hallmark `OR-00000001` auto-created on server boot (idempotent)
+   - SHA-256 hashing of full payload, simulated txHash & blockHeight (pre-mainnet)
+   - `parentGenesis: "TH-00000001"` linking to Trust Layer Hub genesis
+   - Database: `ecosystem_hallmarks`, `trust_stamps`, `hallmark_counter` tables
+   - API: `GET /api/hallmark/genesis`, `GET /api/hallmark/:id/verify`, `GET /api/ecosystem-hallmarks`
+   - Service: `server/ecosystemHallmark.ts` — `generateHallmark()`, `createTrustStamp()`, `seedGenesisHallmark()`, `verifyHallmark()`
+
+2. **Trust Stamps Audit Trail - COMPLETE ✅**
+   - Tier 2 lightweight stamps for auth events (login, register)
+   - Standardized categories: `auth-login`, `auth-register`, `hallmark-generated`, `affiliate-payout-request`, `affiliate-referral-converted`
+   - Stamps on PIN login (developer, partner), SSO login, SSO registration
+   - `appContext: "orbit"` on all stamps
+   - API: `GET /api/trust-stamps/:userId`
+
+3. **Affiliate & Referral System - COMPLETE ✅**
+   - `uniqueHash` field added to users table (ecosystem-wide affiliate ID)
+   - 5 commission tiers: Base(10%), Silver(12.5%), Gold(15%), Platinum(17.5%), Diamond(20%)
+   - Referral link format: `https://orbit.tlid.io/ref/[uniqueHash]`
+   - Cross-platform links for all ecosystem apps
+   - Database: `affiliate_referrals`, `affiliate_commissions` tables
+   - API: `GET /api/affiliate/dashboard`, `GET /api/affiliate/link`, `POST /api/affiliate/track` (public, rate-limited), `POST /api/affiliate/request-payout`
+   - Platform whitelist validation, input sanitization, minimum 10 SIG payout threshold
+   - Service: `server/affiliate.ts`
+
+4. **VideoHero Navigation Dots - FIXED ✅**
+   - Bulletproof inline styles with explicit max-width/max-height, flexShrink:0
+   - Active: 14x4px pill, Inactive: 4x4px circle
+
+### Key New Files
+- `server/ecosystemHallmark.ts` — Ecosystem hallmark generation, trust stamps, genesis seeding
+- `server/affiliate.ts` — Full affiliate system (dashboard, tracking, payouts)
+
+---
+
+## Previous Session Summary (December 15, 2025)
+
+### Version: v2.7.1
 
 ### What Was Accomplished
 1. **Weather Radar Modal - FIXED ✅**
-   - Fixed modal sizing to fit on screen (max-height 600px)
-   - Added body scroll lock when modal is open
-   - Side-by-side layout (weather info + radar map) works in landscape mobile
-   - Reduced typography sizes and padding for compact display
-   - Weather panel scrolls independently within modal
-
 2. **Footer Weather Widget - CONNECTED ✅**
-   - Clicking temperature in footer opens Weather Radar Modal
-   - Prop chain: FooterWeatherWidget → MainFooter → App.tsx
-
 3. **Pre-Publish Sweep - COMPLETE ✅**
-   - LSP/TypeScript: No errors
-   - Database: Healthy
-   - API Endpoints: Working
-   - Authentication flows verified (PINs 0424, 4444, 777, 5555)
-   - Mobile responsiveness verified
-   - Version v2.7.1 confirmed
 
 ---
 
