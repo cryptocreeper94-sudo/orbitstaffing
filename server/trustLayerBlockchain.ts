@@ -9,7 +9,7 @@ import { sql } from 'drizzle-orm';
 // Configuration
 const TRUSTLAYER_API_KEY = process.env.TRUSTLAYER_API_KEY || process.env.TRUST_LAYER_API_KEY;
 const TRUSTLAYER_API_SECRET = process.env.TRUSTLAYER_API_SECRET || process.env.TRUST_LAYER_SECRET_KEY;
-const TRUSTLAYER_BASE_URL = process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.replit.app';
+const TRUSTLAYER_BASE_URL = process.env.TRUSTLAYER_BASE_URL || 'https://dwtl.io';
 const SIMULATION_MODE = !TRUSTLAYER_API_KEY;
 
 // Types
@@ -104,7 +104,7 @@ export class TrustLayerBlockchainService {
         VALUES (${hallmarkId}, ${contentHash}, ${assetType}, 'queued')
         RETURNING id, hallmark_id, content_hash, asset_type, status, queued_at
       `);
-      
+
       const row = result.rows[0] as any;
       const anchor: HashAnchor = {
         id: row.id,
@@ -116,7 +116,7 @@ export class TrustLayerBlockchainService {
       };
 
       console.log(`[TrustVault] Queued hash for anchoring: ${hallmarkId} (${assetType})`);
-      
+
       const countResult = await db.execute(sql`
         SELECT COUNT(*) as count FROM blockchain_hash_queue WHERE status = 'queued'
       `);
@@ -138,7 +138,7 @@ export class TrustLayerBlockchainService {
         WHERE status = 'queued'
         ORDER BY queued_at ASC
       `);
-      
+
       return result.rows.map((row: any) => ({
         id: row.id,
         hallmarkId: row.hallmark_id,
@@ -174,22 +174,22 @@ export class TrustLayerBlockchainService {
 
     while (nodes.length > 1) {
       const newLevel: MerkleNode[] = [];
-      
+
       for (let i = 0; i < nodes.length; i += 2) {
         const left = nodes[i];
         const right = nodes[i + 1] || left;
-        
+
         const combinedHash = createHash('sha256')
           .update(left.hash + right.hash)
           .digest('hex');
-        
+
         newLevel.push({
           hash: combinedHash,
           left,
           right: nodes[i + 1] ? right : undefined,
         });
       }
-      
+
       nodes = newLevel;
     }
 
@@ -201,32 +201,32 @@ export class TrustLayerBlockchainService {
 
   generateMerkleProof(hash: string, tree: MerkleNode): string[] {
     const proof: string[] = [];
-    
+
     function findPath(node: MerkleNode, target: string, path: string[]): boolean {
       if (!node.left && !node.right) {
         return node.hash === target;
       }
-      
+
       if (node.left && findPath(node.left, target, path)) {
         if (node.right) path.push(node.right.hash);
         return true;
       }
-      
+
       if (node.right && findPath(node.right, target, path)) {
         if (node.left) path.push(node.left.hash);
         return true;
       }
-      
+
       return false;
     }
-    
+
     findPath(tree, hash, proof);
     return proof;
   }
 
   async anchorBatch(): Promise<BatchResult | null> {
     const queuedHashes = await this.getQueuedHashes();
-    
+
     if (queuedHashes.length === 0) {
       console.log('[TrustVault] No hashes in queue to anchor');
       return null;
@@ -234,7 +234,7 @@ export class TrustLayerBlockchainService {
 
     const batchHashes = queuedHashes.map(h => h.contentHash);
     const { root: merkleRoot } = this.buildMerkleTree(batchHashes);
-    
+
     console.log(`[TrustVault] Batching ${batchHashes.length} hashes into Merkle root: ${merkleRoot.substring(0, 16)}...`);
 
     let transactionSignature: string;
@@ -264,9 +264,9 @@ export class TrustLayerBlockchainService {
         VALUES (${merkleRoot}, ${transactionSignature}, ${batchHashes.length}, ${mode}, ${explorerUrl})
         RETURNING id
       `);
-      
+
       const batchId = (batchResult.rows[0] as any).id;
-      
+
       const hashIds = queuedHashes.map(h => h.id);
       await db.execute(sql`
         UPDATE blockchain_hash_queue 
@@ -284,7 +284,7 @@ export class TrustLayerBlockchainService {
       };
 
       console.log(`[TrustVault] Batch anchored successfully. ${result.hashCount} documents now on-chain.`);
-      
+
       return result;
     } catch (error) {
       console.error('[TrustVault] Failed to save batch to database:', error);
@@ -345,7 +345,7 @@ export class TrustLayerBlockchainService {
         ORDER BY anchored_at DESC
         LIMIT 50
       `);
-      
+
       return result.rows.map((row: any) => ({
         id: row.id,
         merkleRoot: row.merkle_root,
@@ -372,7 +372,7 @@ export class TrustLayerBlockchainService {
         SELECT COUNT(*) as count FROM blockchain_hash_queue WHERE status = 'queued'
       `);
       const queueSize = parseInt((queueResult.rows[0] as any).count || '0');
-      
+
       const batchResult = await db.execute(sql`
         SELECT COUNT(*) as count, COALESCE(SUM(hash_count), 0) as total_hashes 
         FROM blockchain_anchor_batches
@@ -380,7 +380,7 @@ export class TrustLayerBlockchainService {
       const row = batchResult.rows[0] as any;
       const totalBatches = parseInt(row.count || '0');
       const totalAnchored = parseInt(row.total_hashes || '0');
-      
+
       return {
         mode: this.simulationMode ? 'simulation' : 'live',
         queueSize,
@@ -413,7 +413,7 @@ export class TrustLayerBlockchainService {
         WHERE q.content_hash = ${contentHash}
         LIMIT 1
       `);
-      
+
       if (result.rows.length > 0) {
         const row = result.rows[0] as any;
         return {
@@ -431,7 +431,7 @@ export class TrustLayerBlockchainService {
     } catch (error) {
       console.error('[TrustVault] Error verifying hash:', error);
     }
-    
+
     return { found: false };
   }
 }

@@ -1,35 +1,13 @@
 import { Resend } from 'resend';
 
-let connectionSettings: any;
-
 async function getCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
-
-  if (!xReplitToken) {
-    throw new Error('X_REPLIT_TOKEN not found for repl/depl');
-  }
-
-  connectionSettings = await fetch(
-    'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=resend',
-    {
-      headers: {
-        'Accept': 'application/json',
-        'X_REPLIT_TOKEN': xReplitToken
-      }
-    }
-  ).then(res => res.json()).then(data => data.items?.[0]);
-
-  if (!connectionSettings || (!connectionSettings.settings.api_key)) {
-    throw new Error('Resend not connected');
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY not configured');
   }
   return {
-    apiKey: connectionSettings.settings.api_key, 
-    fromEmail: connectionSettings.settings.from_email
+    apiKey,
+    fromEmail: process.env.RESEND_FROM_EMAIL || 'ORBIT Staffing <noreply@orbitstaffing.io>'
   };
 }
 
@@ -52,7 +30,7 @@ export interface EmailOptions {
 export async function sendEmail(options: EmailOptions) {
   try {
     const { client, fromEmail } = await getResendClient();
-    
+
     const emailPayload: any = {
       from: fromEmail || 'ORBIT Staffing <noreply@orbitstaffing.io>',
       to: Array.isArray(options.to) ? options.to : [options.to],
@@ -68,7 +46,7 @@ export async function sendEmail(options: EmailOptions) {
     if (options.replyTo) {
       emailPayload.replyTo = options.replyTo;
     }
-    
+
     const result = await client.emails.send(emailPayload);
 
     console.log('[Resend] Email sent:', result);
@@ -126,8 +104,8 @@ export async function sendWelcomeEmail(workerName: string, workerEmail: string) 
 }
 
 export async function sendAssignmentNotification(
-  workerName: string, 
-  workerEmail: string, 
+  workerName: string,
+  workerEmail: string,
   jobTitle: string,
   clientName: string,
   startDate: string,
@@ -253,7 +231,7 @@ export async function sendComplianceReminder(
   daysRemaining: number
 ) {
   const urgencyColor = daysRemaining <= 7 ? '#ef4444' : daysRemaining <= 14 ? '#f59e0b' : '#22d3ee';
-  
+
   return sendEmail({
     to: workerEmail,
     subject: `Action Required: ${documentType} Expires in ${daysRemaining} Days`,

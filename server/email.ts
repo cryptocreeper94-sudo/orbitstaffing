@@ -13,43 +13,13 @@ interface EmailOptions {
   from?: string;
 }
 
-// Resend integration credentials cache
-let connectionSettings: any;
-
 async function getResendCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY 
-    ? 'repl ' + process.env.REPL_IDENTITY 
-    : process.env.WEB_REPL_RENEWAL 
-    ? 'depl ' + process.env.WEB_REPL_RENEWAL 
-    : null;
-
-  if (!hostname || !xReplitToken) {
-    return null;
-  }
-
-  try {
-    connectionSettings = await fetch(
-      'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=resend',
-      {
-        headers: {
-          'Accept': 'application/json',
-          'X_REPLIT_TOKEN': xReplitToken
-        }
-      }
-    ).then(res => res.json()).then(data => data.items?.[0]);
-
-    if (!connectionSettings || !connectionSettings.settings?.api_key) {
-      return null;
-    }
-    return {
-      apiKey: connectionSettings.settings.api_key,
-      fromEmail: connectionSettings.settings.from_email
-    };
-  } catch (error) {
-    console.error('[Email] Failed to get Resend credentials:', error);
-    return null;
-  }
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  return {
+    apiKey,
+    fromEmail: process.env.RESEND_FROM_EMAIL || null
+  };
 }
 
 class EmailService {
@@ -61,12 +31,12 @@ class EmailService {
   async send(options: EmailOptions): Promise<{ success: boolean; messageId?: string }> {
     // Try Resend integration first
     const credentials = await getResendCredentials();
-    
+
     if (credentials) {
       try {
         const resend = new Resend(credentials.apiKey);
         const fromEmail = options.from || credentials.fromEmail || this.defaultFrom;
-        
+
         const result = await resend.emails.send({
           from: fromEmail,
           to: options.to,

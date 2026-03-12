@@ -26,9 +26,7 @@ const XERO_TOKEN_URL = "https://identity.xero.com/connect/token";
 const XERO_API_BASE = "https://api.xero.com/api.xro/2.0";
 
 function getBaseUrl(): string {
-  return process.env.REPLIT_DOMAINS?.split(',')[0]
-    ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
-    : "http://localhost:5000";
+  return process.env.SITE_BASE_URL || "http://localhost:5000";
 }
 
 export const accountingService = {
@@ -44,7 +42,7 @@ export const accountingService = {
 
       const scopes = "com.intuit.quickbooks.accounting";
       const url = `${QUICKBOOKS_AUTH_URL}?client_id=${QUICKBOOKS_CLIENT_ID}&response_type=code&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
-      
+
       return { url, state };
     }
 
@@ -56,7 +54,7 @@ export const accountingService = {
 
       const scopes = "openid profile email accounting.transactions accounting.contacts accounting.settings offline_access";
       const url = `${XERO_AUTH_URL}?response_type=code&client_id=${XERO_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}&state=${state}`;
-      
+
       return { url, state };
     }
 
@@ -84,7 +82,7 @@ export const accountingService = {
         }
 
         const authHeader = Buffer.from(`${QUICKBOOKS_CLIENT_ID}:${QUICKBOOKS_CLIENT_SECRET}`).toString('base64');
-        
+
         const tokenResponse = await fetch(QUICKBOOKS_TOKEN_URL, {
           method: "POST",
           headers: {
@@ -132,7 +130,7 @@ export const accountingService = {
         }
 
         const authHeader = Buffer.from(`${XERO_CLIENT_ID}:${XERO_CLIENT_SECRET}`).toString('base64');
-        
+
         const tokenResponse = await fetch(XERO_TOKEN_URL, {
           method: "POST",
           headers: {
@@ -272,7 +270,7 @@ export const accountingService = {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("[Accounting] Token refresh failed:", errorText);
-        
+
         await db
           .update(accountingConnections)
           .set({
@@ -281,7 +279,7 @@ export const accountingService = {
             updatedAt: new Date(),
           })
           .where(eq(accountingConnections.id, connectionId));
-        
+
         return false;
       }
 
