@@ -1,9 +1,3 @@
-databases:
-  - name: orbitstaffing-db
-    plan: free
-    databaseName: orbitstaffing
-    user: orbitstaffing
-
 services:
   - type: web
     name: orbitstaffing
@@ -21,9 +15,7 @@ services:
       - key: SITE_BASE_URL
         value: https://orbitstaffing.io
       - key: DATABASE_URL
-        fromDatabase:
-          name: orbitstaffing-db
-          property: connectionString
+        sync: false
       - key: SESSION_SECRET
         sync: false
       - key: JWT_SECRET
