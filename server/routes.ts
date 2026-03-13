@@ -5569,9 +5569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? plan.stripe_price_id_annual 
         : plan.stripe_price_id_monthly;
       
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : 'http://localhost:5000';
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000';
       
       // Create checkout session
       const session = await stripeService.createCheckoutSession(
@@ -5640,9 +5638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No active subscription" });
       }
       
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : 'http://localhost:5000';
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000';
       
       const session = await stripeService.createCustomerPortalSession(
         employer.stripe_customer_id,
@@ -5761,9 +5757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         `);
       }
       
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : 'http://localhost:5000';
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000';
       
       // Create one-time payment session for $19
       const session = await stripeService.createCheckoutSession(
@@ -9154,9 +9148,7 @@ export function registerDeveloperRoutes(app: Express) {
 
       const priceId = tier === "pro" ? "developer_pro_monthly" : "developer_enterprise_monthly";
       
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : "http://localhost:5000";
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : "http://localhost:5000";
 
       const session = await stripe.checkout.sessions.create({
         customer: customerId,
@@ -9279,9 +9271,7 @@ export function registerDeveloperRoutes(app: Express) {
         return res.status(400).json({ error: "No Stripe customer found" });
       }
 
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : "http://localhost:5000";
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : "http://localhost:5000";
 
       const stripe = await getUncachableStripeClient();
       const session = await stripe.billingPortal.sessions.create({
@@ -10404,9 +10394,7 @@ export function registerPayCardRoutes(app: Express) {
         return res.status(404).json({ error: "Franchise tier not found" });
       }
       
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : 'http://localhost:5000';
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000';
       
       const checkoutResult = await stripeService.createFranchiseCheckout({
         franchiseFee: tier.franchiseFee,
@@ -10524,9 +10512,7 @@ export function registerPayCardRoutes(app: Express) {
         return res.status(404).json({ error: "Franchise tier not found" });
       }
       
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : 'http://localhost:5000';
+      const baseUrl = process.env.APP_DOMAIN ? `https://${process.env.APP_DOMAIN}` : 'http://localhost:5000';
       
       const subscriptionResult = await stripeService.createFranchiseSupportSubscription({
         supportMonthlyFee: tier.supportMonthlyFee,
@@ -12589,7 +12575,7 @@ export function registerPayCardRoutes(app: Express) {
       }
 
       // Create account link for onboarding
-      const host = req.get('host') || process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000';
+      const host = req.get('host') || process.env.APP_DOMAIN || 'localhost:5000';
       const protocol = host.includes('localhost') ? 'http' : 'https';
       const baseUrl = `${protocol}://${host}`;
       const accountLink = await stripe.accountLinks.create({
