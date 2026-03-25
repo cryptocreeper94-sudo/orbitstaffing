@@ -319,6 +319,9 @@ function ConditionalMainFooter({ onOpenRadar }: { onOpenRadar?: () => void }) {
   return <MainFooter onOpenRadar={onOpenRadar} />;
 }
 
+import { PresaleBanner } from "@/components/PresaleBanner";
+import { EcosystemAccountHub } from "@/components/EcosystemAccountHub";
+
 export default function App() {
   const [isRadarOpen, setIsRadarOpen] = useState(false);
   
@@ -330,6 +333,8 @@ export default function App() {
             <OrbitExperienceProvider>
               <TutorialProvider>
               <AnalyticsTracker />
+              <PresaleBanner />
+              <EcosystemAccountHub />
               <SandboxBanner />
               <SandboxWelcome />
               <div className="sandbox-banner-spacer" />
