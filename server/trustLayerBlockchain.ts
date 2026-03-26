@@ -319,6 +319,7 @@ export class TrustLayerBlockchainService {
           'x-blockchain-timestamp': String(timestamp),
         },
         body,
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!response.ok) {
