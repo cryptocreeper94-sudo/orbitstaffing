@@ -1,7 +1,9 @@
+process.on('unhandledRejection', (err) => { console.error('[FATAL] Unhandled rejection:', err); });
+process.on('uncaughtException', (err) => { console.error('[FATAL] Uncaught exception:', err); process.exit(1); });
+
 import fs from "node:fs";
 import { type Server } from "node:http";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import express, { type Express } from "express";
 import { nanoid } from "nanoid";
@@ -11,12 +13,8 @@ import runApp from "./app";
 import { setupWebSocket } from "./websocket";
 import { setupChatWebSocket } from "./chat-ws";
 import { versionManager } from "./versionManager";
-import viteConfig from "../vite.config";
 
 const viteLogger = createLogger();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export async function setupServer(app: Express, server: Server) {
   setupWebSocket(server);
@@ -50,8 +48,9 @@ export async function setupServer(app: Express, server: Server) {
       allowedHosts: true as const,
     };
 
+    const viteConfig = await import("../vite.config");
     const vite = await createViteServer({
-      ...viteConfig,
+      ...viteConfig.default,
       configFile: false,
       customLogger: {
         ...viteLogger,
