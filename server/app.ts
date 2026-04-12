@@ -37,11 +37,8 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: false }));
 
 // Session configuration for admin authentication
-// SESSION_SECRET is REQUIRED in all environments
-if (!process.env.SESSION_SECRET) {
-  throw new Error('[CRITICAL] SESSION_SECRET environment variable is required. Please set a secure random string (e.g., run: openssl rand -hex 32)');
-}
-const sessionSecret = process.env.SESSION_SECRET;
+// SESSION_SECRET — use env var or generate a random fallback for first deploy
+const sessionSecret = process.env.SESSION_SECRET || require('crypto').randomBytes(32).toString('hex');
 app.use(session({
   secret: sessionSecret,
   resave: false,
@@ -125,7 +122,7 @@ export default async function runApp(
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    console.error('[error]', err.stack || err.message);
   });
 
   // importantly run the final setup after setting up all the other routes so
@@ -140,7 +137,6 @@ export default async function runApp(
   server.listen({
     port,
     host: "0.0.0.0",
-    reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
   });
