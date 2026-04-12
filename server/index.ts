@@ -38,7 +38,7 @@ export async function setupServer(app: Express, server: Server) {
       res.sendFile(path.resolve(distPath, "index.html"));
     });
 
-    app.use("/:path(*)", (req, res) => {
+    app.use("/{*splat}", (req, res) => {
       res.sendFile(path.resolve(distPath, "index.html"));
     });
   } else {
@@ -64,7 +64,7 @@ export async function setupServer(app: Express, server: Server) {
     });
 
     app.use(vite.middlewares);
-    app.use("/:path(*)", async (req, res, next) => {
+    app.use("/{*splat}", async (req, res, next) => {
       const url = req.originalUrl;
       
       if (url.startsWith('/api/')) {
