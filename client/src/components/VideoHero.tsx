@@ -79,7 +79,7 @@ const slides: AppSlide[] = [
     title: "Verdara",
     subtitle: "Outdoor lifestyle super-app — trail discovery, gear tracking, adventure planning, and community for outdoor enthusiasts",
     accent: "lime",
-    link: "https://verdara.replit.app",
+    link: "https://verdara.onrender.com",
     external: true,
     video: verdaraVideo,
     gradient: "from-lime-900/80 via-slate-900/60 to-slate-950/90",

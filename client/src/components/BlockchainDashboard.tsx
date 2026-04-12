@@ -196,7 +196,7 @@ export function BlockchainDashboard() {
           )}
           {version.transactionSignature && (
             <a
-              href={`https://darkwave-trust-layer.replit.app/api/provenance/verify/${version.transactionSignature}`}
+              href={`https://darkwave-trust-layer.onrender.com/api/provenance/verify/${version.transactionSignature}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 mt-2 text-cyan-400 hover:text-cyan-300 text-sm"

@@ -298,7 +298,7 @@ const TODO_TASKS = [
       '   - Auth Token (click to reveal)',
       '4. Go to: Phone Numbers → Buy a Number',
       '5. Buy a local number ($1/month)',
-      '6. In Replit Secrets add:',
+      '6. In render Secrets add:',
       '   - TWILIO_ACCOUNT_SID = ACxxxxxxx',
       '   - TWILIO_AUTH_TOKEN = your_token',
       '   - TWILIO_PHONE_NUMBER = +1XXXXXXXXXX',
@@ -348,7 +348,7 @@ const TODO_TASKS = [
       '5. Name it "ORBIT Production"',
       '6. Select "Full Access"',
       '7. Copy the key (only shown once!)',
-      '8. In Replit Secrets: SENDGRID_API_KEY = SG.xxxxx',
+      '8. In render Secrets: SENDGRID_API_KEY = SG.xxxxx',
       '',
       '💰 COST: Free tier = 100/day, $19.95/mo = 50,000/mo',
     ],
@@ -360,19 +360,19 @@ const TODO_TASKS = [
     priorityBadge: '📌 WHEN READY',
     priorityColor: 'blue',
     why: 'Professional branding, better SEO, custom email addresses',
-    setupGuide: 'https://docs.replit.com/hosting/custom-domains',
-    action: 'Connect domain to Replit deployment',
+    setupGuide: 'https://docs.render.com/hosting/custom-domains',
+    action: 'Connect domain to render deployment',
     notes: [
       '✅ STATUS: Domain owned, needs connection',
       '',
       '📋 STEP-BY-STEP:',
-      '1. Deploy app on Replit first',
-      '2. In Replit: Go to Deployments → Settings',
+      '1. Deploy app on render first',
+      '2. In render: Go to Deployments → Settings',
       '3. Click "Link a domain"',
       '4. Enter: orbitstaffing.io',
       '5. Copy the CNAME record shown',
       '6. Go to your domain registrar (GoDaddy, Namecheap, etc.)',
-      '7. Add CNAME record pointing to Replit',
+      '7. Add CNAME record pointing to render',
       '8. Wait 15-30 min for DNS propagation',
       '9. SSL certificate auto-generated',
     ],
@@ -464,7 +464,7 @@ const TODO_TASKS = [
       '2. Contact sales for API access',
       '3. Complete account verification',
       '4. Get API key from dashboard',
-      '5. In Replit Secrets: CHECKR_API_KEY = xxx',
+      '5. In render Secrets: CHECKR_API_KEY = xxx',
       '',
       '💰 COST: $35-85 per background check',
     ],
@@ -490,7 +490,7 @@ const TODO_TASKS = [
       '6. Click "Create Credentials" → API Key',
       '7. (Optional) Restrict key to your domain for security',
       '8. Copy the API key',
-      '9. In Replit Secrets: GOOGLE_MAPS_API_KEY = AIzaXXXXX',
+      '9. In render Secrets: GOOGLE_MAPS_API_KEY = AIzaXXXXX',
       '',
       '💰 COST: $200/month free credit, then $7 per 1000 map loads',
       '🎯 VALUE: Street view, satellite imagery, job site visualization',
@@ -1248,7 +1248,7 @@ function SecretsManager() {
               <li>Go to the developer portal (link above)</li>
               <li>Create an OAuth app called "ORBIT Staffing OS"</li>
               <li>Copy the Client ID and Client Secret</li>
-              <li>Come back and add them as secrets in Replit</li>
+              <li>Come back and add them as secrets in render</li>
             </ol>
           </div>
 
@@ -1256,7 +1256,7 @@ function SecretsManager() {
           <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4">
             <h4 className="font-bold text-purple-300 mb-2">🔐 Add Secrets Manually:</h4>
             <p className="text-sm text-purple-100 mb-3">
-              Open Replit's Secrets pane (Tools → Secrets) and add these two secrets:
+              Open render's Secrets pane (Tools → Secrets) and add these two secrets:
             </p>
             <div className="bg-black/30 rounded p-3 font-mono text-xs text-green-400 space-y-1">
               <div className="flex items-center justify-between">
@@ -1316,7 +1316,7 @@ function SecretsManager() {
           <div>
             <h4 className="font-bold text-white mb-2">Security Notes</h4>
             <ul className="text-sm text-gray-300 space-y-1">
-              <li>• Credentials are stored as encrypted secrets in Replit</li>
+              <li>• Credentials are stored as encrypted secrets in render</li>
               <li>• They are never exposed in the frontend or logs</li>
               <li>• Each customer's OAuth connection is separate and tenant-isolated</li>
               <li>• You only need to set these up once per provider</li>
@@ -2447,13 +2447,13 @@ export default function DeveloperPanel() {
         {/* Navigation Buttons - Desktop Grid / Mobile Carousel */}
         <div className="hidden md:block mb-8">
           <BentoGrid cols={4} gap="md">
-            {/* REPLIT AGENT - Talk to Me Button (PRIORITY) */}
+            {/* render AGENT - Talk to Me Button (PRIORITY) */}
             <a
-              href="https://replit.com/@JasonDark/ORBIT-Staffing-OS"
+              href="https://render.com/@JasonDark/ORBIT-Staffing-OS"
               target="_blank"
               rel="noopener noreferrer"
               className="relative h-24 md:h-28 bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-400 hover:border-cyan-300 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/40 hover:scale-105 hover:-translate-y-1 group animate-pulse"
-              data-testid="button-replit-agent"
+              data-testid="button-render-agent"
             >
               <Bot className="w-7 h-7 md:w-8 md:h-8 text-white group-hover:text-cyan-100 transition-colors" />
               <span className="text-xs md:text-sm font-bold text-white group-hover:text-cyan-100 transition-colors text-center leading-tight">Talk to Agent</span>
@@ -2613,7 +2613,7 @@ export default function DeveloperPanel() {
             <ActionCard
               title="Talk to Agent"
               icon={<Bot className="w-5 h-5" />}
-              onClick={() => window.open('https://replit.com/@JasonDark/ORBIT-Staffing-OS', '_blank')}
+              onClick={() => window.open('https://render.com/@JasonDark/ORBIT-Staffing-OS', '_blank')}
               className="min-w-[140px]"
             />
             <ActionCard
@@ -2996,18 +2996,18 @@ export default function DeveloperPanel() {
           <div className="space-y-6 hidden">
             {/* Quick Links Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Replit IDE Link */}
+              {/* render IDE Link */}
               <a 
-                href="https://replit.com" 
+                href="https://render.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="bg-gradient-to-br from-purple-600 to-purple-800 border border-purple-500 rounded-lg p-6 hover:border-purple-400 transition-all flex items-start gap-4"
-                data-testid="link-replit-ide"
+                data-testid="link-render-ide"
               >
                 <div>
                   <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                     <Code className="w-5 h-5" />
-                    Replit IDE
+                    render IDE
                   </h3>
                   <p className="text-purple-100 text-sm">Open the development environment</p>
                 </div>

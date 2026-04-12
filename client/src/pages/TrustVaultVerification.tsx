@@ -279,7 +279,7 @@ export default function TrustVaultVerification() {
             Hashes are SHA-256 signatures of version metadata. Verify on the TrustVault explorer.
           </p>
           <a 
-            href="https://darkwave-trust-layer.replit.app" 
+            href="https://darkwave-trust-layer.onrender.com" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-xs text-cyan-400 hover:text-cyan-300 transition"

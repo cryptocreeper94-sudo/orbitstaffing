@@ -8457,7 +8457,7 @@ export function registerBlockchainRoutes(app: Express) {
           query,
           result: {
             address: query,
-            explorerUrl: `${process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.replit.app'}/api/provenance/verify/${query}`,
+            explorerUrl: `${process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.onrender.com'}/api/provenance/verify/${query}`,
             note: 'TrustVault blockchain address'
           }
         });
@@ -8878,7 +8878,7 @@ export function registerDeveloperRoutes(app: Express) {
           subject: "Verify Your Orbit Developer Account",
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a2e; color: #fff; padding: 40px; border-radius: 16px;">
-              <img src="https://orbit-staffing.replit.app/orbit-logo.png" alt="Orbit" style="height: 40px; margin-bottom: 24px;" />
+              <img src="https://orbit-staffing.onrender.com/orbit-logo.png" alt="Orbit" style="height: 40px; margin-bottom: 24px;" />
               <h1 style="color: #22d3ee; margin-bottom: 16px;">Welcome to Orbit Developer Portal</h1>
               <p style="color: #94a3b8; margin-bottom: 24px;">Hi ${name},</p>
               <p style="color: #94a3b8; margin-bottom: 24px;">Use the verification code below to complete your registration:</p>
@@ -11835,7 +11835,7 @@ export function registerPayCardRoutes(app: Express) {
           releaseHash,
           'release'
         );
-        const trustLayerBaseUrl = process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.replit.app';
+        const trustLayerBaseUrl = process.env.TRUSTLAYER_BASE_URL || 'https://darkwave-trust-layer.onrender.com';
         blockchainResult = {
           transactionSignature: `pending-${releaseHash.substring(0, 16)}`,
           explorerUrl: `${trustLayerBaseUrl}/api/provenance/verify/${releaseHash}`
@@ -12024,9 +12024,9 @@ export function registerPayCardRoutes(app: Express) {
       const appConfigs: Record<string, { name: string; url: string; ownership: string; color: string; status: string }> = {
         'orbit': { name: 'ORBIT Staffing OS', url: 'orbitstaffing.io', ownership: '50/50 Jason & Sidonie', color: 'cyan', status: 'live' },
         'trusthome': { name: 'TrustHome', url: 'trusthome.io', ownership: '51% Jennifer / 49% Jason', color: 'emerald', status: 'connected' },
-        'trustvault': { name: 'Trust Vault', url: 'trustvault.replit.app', ownership: '100% Jason', color: 'blue', status: 'connected' },
+        'trustvault': { name: 'Trust Vault', url: 'trustvault.onrender.com', ownership: '100% Jason', color: 'blue', status: 'connected' },
         'thevoid': { name: 'THE VOID', url: 'enterthevoid.io', ownership: '100% Jason', color: 'purple', status: 'connected' },
-        'verdara': { name: 'Verdara', url: 'verdara.replit.app', ownership: '100% Jason', color: 'lime', status: 'connected' },
+        'verdara': { name: 'Verdara', url: 'verdara.onrender.com', ownership: '100% Jason', color: 'lime', status: 'connected' },
         'tldriverconnect': { name: 'TL Driver Connect', url: 'tldriverconnect.com', ownership: '100% Jason', color: 'teal', status: 'connected' },
         'happyeats': { name: 'Happy Eats', url: 'happyeats.app', ownership: '60% Kathy / 40% Jason', color: 'pink', status: 'connected' },
         'brewandboard': { name: 'Brew & Board Coffee', url: 'brewandboard.coffee', ownership: '50/50 Jason & Sidonie', color: 'amber', status: 'connected' },
