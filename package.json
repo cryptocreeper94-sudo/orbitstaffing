@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev:client": "vite dev --port 5000",
-    "dev": "NODE_ENV=development tsx server/index-dev.ts",
-    "build": "vite build && esbuild server/index-prod.ts --platform=node --packages=external --bundle --format=cjs --outfile=dist/index.cjs",
+    "dev": "NODE_ENV=development tsx server/index.ts",
+    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=cjs --outfile=dist/index.cjs",
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push"
@@ -51,6 +51,7 @@
     "@types/multer": "^2.0.0",
     "@types/pg": "^8.16.0",
     "@types/swagger-ui-express": "^4.1.8",
+    "@upstash/redis": "^1.37.0",
     "archiver": "^7.0.1",
     "bcrypt": "^6.0.0",
     "canvas-confetti": "^1.9.4",
@@ -64,7 +65,7 @@
     "drizzle-orm": "^0.39.1",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",
-    "express": "^4.21.2",
+    "express": "^5.2.1",
     "express-session": "^1.18.1",
     "framer-motion": "^12.23.24",
     "html2canvas": "^1.4.1",
@@ -80,9 +81,9 @@
     "passport-local": "^1.0.0",
     "pg": "^8.18.0",
     "qrcode.react": "^4.2.0",
-    "react": "^19.2.0",
+    "react": "^19.2.5",
     "react-day-picker": "^9.11.1",
-    "react-dom": "^19.2.0",
+    "react-dom": "^19.2.5",
     "react-hook-form": "^7.66.0",
     "react-qr-code": "^2.0.18",
     "react-resizable-panels": "^2.1.9",
@@ -119,8 +120,9 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.20.5",
-    "typescript": "5.6.3",
-    "vite": "^7.1.9"
+    "typescript": "^6.0.2",
+    "vite": "^8.0.8",
+    "vitest": "^4.1.1"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

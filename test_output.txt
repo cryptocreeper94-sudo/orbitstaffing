@@ -1,0 +1,131 @@
+
+[1m[46m RUN [49m[22m [36mv4.1.1 [39m[90mD:/orbitstaffing[39m
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+[90mstdout[2m | server/tests/trustLayerBlockchain.test.ts
+[22m[39m[TrustVault] Running in SIMULATION MODE - no blockchain transactions
+[TrustVault] Add TRUSTLAYER_API_KEY to enable live mode
+
+[90mstdout[2m | server/tests/trustLayerBlockchain.test.ts[2m > [22m[2mTrustLayer Blockchain Engine[2m > [22m[2mgracefully throws on 5000ms timeout boundary when anchoring a batch
+[22m[39m[TrustVault] Batching 1 hashes into Merkle root: abc...
+
+stderr | server/tests/trustLayerBlockchain.test.ts > TrustLayer Blockchain Engine > gracefully throws on 5000ms timeout boundary when anchoring a batch
+[TrustVault] TRUSTLAYER_API_KEY not configured - using simulation
+
+[90mstdout[2m | server/tests/trustLayerBlockchain.test.ts[2m > [22m[2mTrustLayer Blockchain Engine[2m > [22m[2mgracefully throws on 5000ms timeout boundary when anchoring a batch
+[22m[39m[TrustVault] LIVE: Anchored to TrustVault: SIM_1774515870074_abc
+
+(node:10232) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | server/tests/trustLayerBlockchain.test.ts > TrustLayer Blockchain Engine > gracefully throws on 5000ms timeout boundary when anchoring a batch
+[TrustVault] Failed to save batch to database: error: relation "blockchain_anchor_batches" does not exist
+    at D:\orbitstaffing\node_modules\pg-pool\index.js:45:11
+    at processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at TrustLayerBlockchainService.anchorBatch (D:/orbitstaffing/server/trustLayerBlockchain.ts:261:27)
+    at D:/orbitstaffing/server/tests/trustLayerBlockchain.test.ts:27:5
+    at file:///D:/orbitstaffing/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:20 {
+  length: 124,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '22',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+
+ [31mΓ¥»[39m server/tests/trustLayerBlockchain.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 679[2mms[22m[39m
+[31m     [31m├ù[31m gracefully throws on 5000ms timeout boundary when anchoring a batch[39m[33m 676[2mms[22m[39m
+4:04:31 AM [vite] (ssr) warning: Duplicate key "getWorkerRequest" in object literal
+1530 |    },
+1531 |  
+1532 |    async getWorkerRequest(id: string, tenantId: string): Promise<WorkerRequest | undefined> {
+     |          ^
+1533 |      const result = await db.select().from(workerRequests).where(
+1534 |        and(
+
+  Plugin: vite:esbuild
+  File: D:/orbitstaffing/server/storage.ts
+4:04:31 AM [vite] (ssr) warning: Duplicate key "createPayrollRecord" in object literal
+2502 |    },
+2503 |  
+2504 |    async createPayrollRecord(data: InsertPayrollRecord): Promise<PayrollRecord> {
+     |          ^
+2505 |      const result = await db.insert(payrollRecords).values(data).returning();
+2506 |      return result[0];
+
+  Plugin: vite:esbuild
+  File: D:/orbitstaffing/server/storage.ts
+4:04:31 AM [vite] (ssr) warning: Duplicate key "getPayrollRecord" in object literal
+2507 |    },
+2508 |  
+2509 |    async getPayrollRecord(id: string): Promise<PayrollRecord | null> {
+     |          ^
+2510 |      const result = await db
+2511 |        .select()
+
+  Plugin: vite:esbuild
+  File: D:/orbitstaffing/server/storage.ts
+4:04:31 AM [vite] (ssr) warning: Duplicate key "updatePayrollRecord" in object literal
+2535 |    },
+2536 |  
+2537 |    async updatePayrollRecord(id: string, data: Partial<InsertPayrollRecord>): Promise<PayrollRecord> {
+     |          ^
+2538 |      const result = await db
+2539 |        .update(payrollRecords)
+
+  Plugin: vite:esbuild
+  File: D:/orbitstaffing/server/storage.ts
+ [32mΓ£ô[39m server/tests/aiMatchingEngine.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mΓ£ô[39m server/tests/payrollCalculator.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+stderr | server/tests/auth.test.ts
+[Auth Rate Limit] UPSTASH credentials missing. Falling back to in-memory store.
+
+[90mstdout[2m | server/tests/auth.test.ts[2m > [22m[2mAuth Rate Limiting[2m > [22m[2mlocks out after 5 max attempts
+[22m[39m[Auth] Account locked for 192.168.1.78 after failed attempts
+
+ [32mΓ£ô[39m server/tests/auth.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 1 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  server/tests/trustLayerBlockchain.test.ts > TrustLayer Blockchain Engine > gracefully throws on 5000ms timeout boundary when anchoring a batch
+AssertionError: expected [Function] to throw error matching /TrustVault API failed|timeout|aborted/i but got 'relation "blockchain_anchor_batches" ΓÇª'
+
+- Expected:
+/TrustVault API failed|timeout|aborted/i
+
++ Received:
+"relation \"blockchain_anchor_batches\" does not exist"
+
+ Γ¥» server/tests/trustLayerBlockchain.test.ts:27:52
+     25|
+     26|     // We expect anchorBatch to reject due to the AbortController
+     27|     await expect(trustLayerBlockchain.anchorBatch())
+       |                                                    ^
+     28|       .rejects.toThrow(/TrustVault API failed|timeout|aborted/i);
+     29|   });
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/1]ΓÄ»
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m7 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 04:04:27
+[2m   Duration [22m 6.49s[2m (transform 967ms, setup 0ms, import 3.31s, tests 714ms, environment 1ms)[22m
+

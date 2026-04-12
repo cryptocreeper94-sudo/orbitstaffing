@@ -100,7 +100,7 @@ async function generateI9AuditReport(tenantId: string, params: ReportParams): Pr
     onboardingStatus: workers.onboardingStatus,
   })
     .from(workers)
-    .where(eq(workers.companyId, tenantId))
+    .where(eq(workers.tenantId, tenantId))
     .orderBy(workers.fullName);
 
   let findings = 0;
@@ -162,7 +162,7 @@ async function generateTaxSummaryReport(tenantId: string, params: ReportParams):
 
   const workerNames = await db.select({ id: workers.id, fullName: workers.fullName })
     .from(workers)
-    .where(eq(workers.companyId, tenantId));
+    .where(eq(workers.tenantId, tenantId));
   const nameMap = new Map(workerNames.map(w => [w.id, w.fullName]));
 
   const data = Array.from(workerTotals.entries()).map(([workerId, totals]) => ({
@@ -189,7 +189,7 @@ async function generateCertificationTrackerReport(tenantId: string, params: Repo
     i9Verified: workers.i9Verified,
   })
     .from(workers)
-    .where(eq(workers.companyId, tenantId))
+    .where(eq(workers.tenantId, tenantId))
     .orderBy(workers.fullName);
 
   let findings = 0;
@@ -229,7 +229,7 @@ async function generateWorkerStatusReport(tenantId: string, params: ReportParams
     skills: workers.skills,
   })
     .from(workers)
-    .where(eq(workers.companyId, tenantId))
+    .where(eq(workers.tenantId, tenantId))
     .orderBy(workers.fullName);
 
   let findings = 0;
@@ -282,7 +282,7 @@ async function generatePayrollSummaryReport(tenantId: string, params: ReportPara
 
   const workerNames = await db.select({ id: workers.id, fullName: workers.fullName })
     .from(workers)
-    .where(eq(workers.companyId, tenantId));
+    .where(eq(workers.tenantId, tenantId));
   const nameMap = new Map(workerNames.map(w => [w.id, w.fullName]));
 
   const data = payrollRecords.map(p => ({
@@ -321,7 +321,7 @@ async function generateInsuranceComplianceReport(tenantId: string, params: Repor
 
   const workerNames = await db.select({ id: workers.id, fullName: workers.fullName })
     .from(workers)
-    .where(eq(workers.companyId, tenantId));
+    .where(eq(workers.tenantId, tenantId));
   const nameMap = new Map(workerNames.map(w => [w.id, w.fullName]));
 
   let findings = 0;

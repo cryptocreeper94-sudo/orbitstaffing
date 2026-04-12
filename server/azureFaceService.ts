@@ -56,7 +56,9 @@ class AzureFaceService {
   }
 
   isAvailable(): boolean {
-    return this.initialized;
+    // SECURITY/COMPLIANCE OVERRIDE: Biometric data collection is disabled
+    // pending explicit BIPA/CCPA consent frameworks in docs/LEGAL_CHECKLIST.md
+    return false;
   }
 
   /**
@@ -184,15 +186,14 @@ class AzureFaceService {
    * @returns Match result with confidence and status
    */
   async compareFaces(profilePhotoUrl: string, selfieBase64: string): Promise<FaceMatchResult> {
-    if (!this.initialized) {
-      return {
-        success: false,
-        isMatch: false,
-        confidence: 0,
-        status: 'error',
-        message: 'Facial recognition service not configured. Please add Azure Face API credentials.',
-      };
-    }
+    // SECURITY/COMPLIANCE OVERRIDE: Biometric data collection is disabled
+    return {
+      success: false,
+      isMatch: false,
+      confidence: 0,
+      status: 'error',
+      message: 'Biometric features disabled pending legal privacy review (BIPA/CCPA compliance).',
+    };
 
     if (!profilePhotoUrl) {
       return {

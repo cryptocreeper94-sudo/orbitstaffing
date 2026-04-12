@@ -143,9 +143,6 @@ function getTenantIdFromRequest(req: Request): string | null {
   if (user && user.tenantId) {
     return user.tenantId;
   }
-  if (user && user.companyId) {
-    return user.companyId;
-  }
   const tenantIdParam = req.query.tenantId as string;
   if (tenantIdParam) {
     return tenantIdParam;
@@ -586,17 +583,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const user = await storage.getUserByEmail(email);
       if (!user) {
-        recordLoginAttempt(req, false);
+        await recordLoginAttempt(req, false);
         logSecurityEvent('LOGIN_FAILED', { email, reason: 'user_not_found', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
       const passwordValid = await verifyPassword(password, user.passwordHash);
       if (!passwordValid) {
-        recordLoginAttempt(req, false);
+        await recordLoginAttempt(req, false);
         logSecurityEvent('LOGIN_FAILED', { email, reason: 'invalid_password', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
-      recordLoginAttempt(req, true);
+      await recordLoginAttempt(req, true);
       logSecurityEvent('LOGIN_SUCCESS', { email, userId: user.id, ip: req.ip });
       
       // Set session
@@ -787,7 +784,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check for user-specific admin PIN
       if (userId) {
         const user = await storage.getUser(userId);
-        if (!user || user.adminPin !== pin) {
+        let validPin = false;
+        if (user && user.adminPin) {
+          validPin = await verifyPassword(pin, user.adminPin);
+        }
+        
+        if (!user || !user.adminPin || !validPin) {
           console.log(`[Admin Login] ❌ Failed login attempt with PIN: ${pin.substring(0, 1)}***`);
           return res.status(401).json({ error: "Invalid PIN" });
         }
@@ -2847,12 +2849,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/company-insurance/:companyId/:type", async (req: Request, res: Response) => {
+  app.get("/api/company-insurance/:tenantId/:type", async (req: Request, res: Response) => {
     try {
       const tenantId = validateTenantAccess(req, res);
       if (!tenantId) return;
       const insuranceList = await storage.listCompanyInsuranceByType(
-        req.params.companyId,
+        req.params.tenantId,
         tenantId,
         req.params.type
       );
@@ -5473,7 +5475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       
       if (result.rows.length === 0) {
-        recordLoginAttempt(req, false);
+        await recordLoginAttempt(req, false);
         logSecurityEvent('EMPLOYER_LOGIN_FAILED', { email, reason: 'not_found', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
@@ -5482,12 +5484,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const passwordValid = await verifyPassword(password, employer.password_hash);
       if (!passwordValid) {
-        recordLoginAttempt(req, false);
+        await recordLoginAttempt(req, false);
         logSecurityEvent('EMPLOYER_LOGIN_FAILED', { email, reason: 'invalid_password', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
-      recordLoginAttempt(req, true);
+      await recordLoginAttempt(req, true);
       logSecurityEvent('EMPLOYER_LOGIN_SUCCESS', { email, employerId: employer.id, ip: req.ip });
       
       if (employer.verification_status !== 'approved' && employer.verification_status !== 'pending') {
@@ -5783,16 +5785,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Grant free access for ORBIT franchise clients
   app.post("/api/talent-exchange/billing/grant-franchise-access", requireMasterAdmin, async (req: Request, res: Response) => {
     try {
-      const { companyId } = req.body;
+      const { tenantId: requestTenantId } = req.body;
       
-      if (!companyId) {
-        return res.status(400).json({ error: "Company ID required" });
+      if (!requestTenantId) {
+        return res.status(400).json({ error: "Tenant ID is required" });
       }
       
-      // Check if company exists
-      const companyResult = await db.execute(sql`
-        SELECT id, name FROM companies WHERE id = ${companyId}
-      `);
+      const companyResult = await db.execute(
+        sql`SELECT id, name FROM companies WHERE id = ${requestTenantId}`
+      );
       
       if (companyResult.rows.length === 0) {
         return res.status(404).json({ error: "Company not found" });
@@ -5805,7 +5806,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         UPDATE companies 
         SET talent_exchange_enabled = true,
             updated_at = NOW()
-        WHERE id = ${companyId}
+        WHERE id = ${requestTenantId}
       `);
       
       console.log(`[Talent Exchange] Granted free access to ORBIT franchise: ${company.name}`);
@@ -6230,7 +6231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `);
       
       if (result.rows.length === 0) {
-        recordLoginAttempt(req, false);
+        await recordLoginAttempt(req, false);
         logSecurityEvent('CANDIDATE_LOGIN_FAILED', { email, reason: 'not_found', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
@@ -6239,12 +6240,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const passwordValid = await verifyPassword(password, candidate.password_hash);
       if (!passwordValid) {
-        recordLoginAttempt(req, false);
+        await recordLoginAttempt(req, false);
         logSecurityEvent('CANDIDATE_LOGIN_FAILED', { email, reason: 'invalid_password', ip: req.ip });
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
-      recordLoginAttempt(req, true);
+      await recordLoginAttempt(req, true);
       logSecurityEvent('CANDIDATE_LOGIN_SUCCESS', { email, candidateId: candidate.id, ip: req.ip });
       
       // Update last active
@@ -13883,7 +13884,7 @@ export function registerPayCardRoutes(app: Express) {
           const worker = await storage.createWorker({
             ...workerList[i],
             tenantId: workerList[i].tenantId || tenantId,
-            companyId: workerList[i].companyId || tenantId,
+            tenantId: workerList[i].tenantId || tenantId,
           });
           results.push({ row: i + 1, success: true, id: worker.id });
         } catch (err: any) {
@@ -13994,7 +13995,7 @@ export function registerPayCardRoutes(app: Express) {
           const ts = await storage.createTimesheet({
             ...timesheetList[i],
             tenantId: timesheetList[i].tenantId || tenantId,
-            companyId: timesheetList[i].companyId || tenantId,
+            tenantId: timesheetList[i].tenantId || tenantId,
           });
           results.push({ row: i + 1, success: true, id: ts.id });
         } catch (err: any) {

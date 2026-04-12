@@ -310,6 +310,9 @@ export class TrustLayerBlockchainService {
       const timestamp = Date.now();
       const signature = generateHmacSignature(method, path, timestamp, bodyHash);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const response = await fetch(`${TRUSTLAYER_BASE_URL}${path}`, {
         method,
         headers: {
@@ -319,22 +322,24 @@ export class TrustLayerBlockchainService {
           'x-blockchain-timestamp': String(timestamp),
         },
         body,
-        signal: AbortSignal.timeout(5000),
+        signal: controller.signal,
       });
+      
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorText = await response.text();
         console.warn(`[TrustVault] API returned ${response.status}: ${errorText}`);
-        return `PENDING_${Date.now()}_${merkleRoot.substring(0, 32)}`;
+        throw new Error(`TrustVault API failed with status ${response.status}`);
       }
 
       const data = await response.json() as any;
       console.log('[TrustVault] Successfully anchored to TrustVault blockchain');
       return data.transactionId || data.id || `TV_${Date.now()}_${merkleRoot.substring(0, 32)}`;
     } catch (error) {
-      console.error('[TrustVault] TrustVault API call failed:', error);
-      console.log('[TrustVault] Merkle root ready for anchoring:', merkleRoot);
-      return `READY_${Date.now()}_${merkleRoot.substring(0, 32)}`;
+      console.error('[TrustVault] TrustVault API call failed or timed out:', error);
+      // Hard throw ensures the batch fails and the items remain in the 'queued' status natively for cron retries
+      throw error;
     }
   }
 

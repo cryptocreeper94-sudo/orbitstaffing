@@ -6,9 +6,6 @@ export function getConfiguredProvider(): SMSProvider {
   if (process.env.PLIVO_AUTH_ID && process.env.PLIVO_AUTH_TOKEN && process.env.PLIVO_PHONE_NUMBER) {
     return 'plivo';
   }
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
-    return 'twilio';
-  }
   return 'none';
 }
 
@@ -24,14 +21,6 @@ export function getSMSProviderStatus(): {
       provider: 'plivo',
       configured: true,
       phoneNumber: process.env.PLIVO_PHONE_NUMBER
-    };
-  }
-  
-  if (provider === 'twilio') {
-    return {
-      provider: 'twilio',
-      configured: true,
-      phoneNumber: process.env.TWILIO_PHONE_NUMBER
     };
   }
   
@@ -58,17 +47,6 @@ export async function sendSMS(
     };
   }
   
-  if (provider === 'twilio') {
-    const twilio = await import('./twilioService');
-    const result = await twilio.sendSMS(phoneNumber, message, messageType);
-    return {
-      success: result.success,
-      messageId: result.messageSid,
-      error: result.error,
-      provider: 'twilio'
-    };
-  }
-  
   console.log(`[SMS QUEUED - No provider] Type: ${messageType}, Phone: ${phoneNumber}, Message: ${message}`);
   return {
     success: true,
@@ -91,17 +69,6 @@ export async function sendSMSFromTemplate(
       messageId: result.messageUuid,
       error: result.error,
       provider: 'plivo'
-    };
-  }
-  
-  if (provider === 'twilio') {
-    const twilio = await import('./twilioService');
-    const result = await twilio.sendSMSFromTemplate(phoneNumber, templateType as any, data);
-    return {
-      success: result.success,
-      messageId: result.messageSid,
-      error: result.error,
-      provider: 'twilio'
     };
   }
   
@@ -132,19 +99,6 @@ export async function sendBulkSMS(
       messageId: result.messageUuid,
       error: result.error,
       provider: 'plivo'
-    };
-  }
-  
-  if (provider === 'twilio') {
-    const results = await Promise.all(
-      phoneNumbers.map(phone => sendSMS(phone, message, messageType))
-    );
-    const failed = results.filter(r => !r.success);
-    return {
-      success: failed.length === 0,
-      messageId: results[0]?.messageId,
-      error: failed.length > 0 ? `${failed.length} messages failed` : undefined,
-      provider: 'twilio'
     };
   }
   

@@ -2,14 +2,31 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { Request, Response, NextFunction } from "express";
 
+import { Redis } from '@upstash/redis';
+
 const SALT_ROUNDS = 12;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-// In-memory rate limiting store (use Redis for production at scale)
-const loginAttempts = new Map<string, { count: number; lastAttempt: number; lockedUntil?: number }>();
+// Initialize Redis if credentials exist, otherwise gracefully fallback to memory Map
+let redis: Redis | null = null;
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+    console.log('[Auth Rate Limit] Connected to Upstash Redis');
+  } else {
+    console.warn('[Auth Rate Limit] UPSTASH credentials missing. Falling back to in-memory store.');
+  }
+} catch (error) {
+  console.error('[Auth Rate Limit] Redis initialization failed:', error);
+}
 
+// In-memory fallback
+const memoryStore = new Map<string, { count: number; lastAttempt: number; lockedUntil?: number }>();
 export interface AuthUser {
   id: number;
   email: string;
@@ -80,58 +97,95 @@ function getClientKey(req: Request): string {
 }
 
 // Check if client is rate limited
-export function isRateLimited(req: Request): { limited: boolean; retryAfterMs?: number } {
-  const key = getClientKey(req);
-  const record = loginAttempts.get(key);
-  
-  if (!record) {
-    return { limited: false };
-  }
-  
+export async function isRateLimited(req: Request): Promise<{ limited: boolean; retryAfterMs?: number }> {
+  const key = `ratelimit:login:${getClientKey(req)}`;
   const now = Date.now();
   
-  // Check if still locked out
+  if (redis) {
+    try {
+      const recordStr = await redis.get(key);
+      if (!recordStr) return { limited: false };
+      
+      const record = typeof recordStr === 'string' ? JSON.parse(recordStr) : recordStr;
+      
+      if (record.lockedUntil && now < record.lockedUntil) {
+        return { limited: true, retryAfterMs: record.lockedUntil - now };
+      }
+      
+      if (record.lockedUntil && now >= record.lockedUntil) {
+        await redis.del(key);
+      }
+      return { limited: false };
+    } catch (err) {
+      console.error('[Auth] Redis error checking rate limit:', err);
+      return { limited: false };
+    }
+  }
+
+  // Fallback memory logic
+  const record = memoryStore.get(key);
+  if (!record) return { limited: false };
+  
   if (record.lockedUntil && now < record.lockedUntil) {
-    return { 
-      limited: true, 
-      retryAfterMs: record.lockedUntil - now 
-    };
+    return { limited: true, retryAfterMs: record.lockedUntil - now };
   }
   
-  // Reset if lockout expired
   if (record.lockedUntil && now >= record.lockedUntil) {
-    loginAttempts.delete(key);
-    return { limited: false };
+    memoryStore.delete(key);
   }
-  
   return { limited: false };
 }
 
 // Record login attempt
-export function recordLoginAttempt(req: Request, success: boolean): void {
-  const key = getClientKey(req);
+export async function recordLoginAttempt(req: Request, success: boolean): Promise<void> {
+  const key = `ratelimit:login:${getClientKey(req)}`;
   const now = Date.now();
   
+  if (redis) {
+    try {
+      if (success) {
+        await redis.del(key);
+        return;
+      }
+      
+      const recordStr = await redis.get(key);
+      let record = recordStr ? (typeof recordStr === 'string' ? JSON.parse(recordStr) : recordStr) : { count: 0, lastAttempt: 0 };
+      
+      record.count++;
+      record.lastAttempt = now;
+      
+      if (record.count >= MAX_LOGIN_ATTEMPTS) {
+        record.lockedUntil = now + LOCKOUT_DURATION_MS;
+        console.log(`[Auth] Account locked for ${key.split(':')[2]} after ${MAX_LOGIN_ATTEMPTS} failed attempts`);
+      }
+      
+      await redis.set(key, JSON.stringify(record), { ex: Math.ceil(LOCKOUT_DURATION_MS / 1000) * 2 });
+      return;
+    } catch (err) {
+      console.error('[Auth] Redis error recording attempt:', err);
+    }
+  }
+
+  // Fallback memory logic
   if (success) {
-    loginAttempts.delete(key);
+    memoryStore.delete(key);
     return;
   }
   
-  const record = loginAttempts.get(key) || { count: 0, lastAttempt: 0 };
+  const record = memoryStore.get(key) || { count: 0, lastAttempt: 0 };
   record.count++;
   record.lastAttempt = now;
   
   if (record.count >= MAX_LOGIN_ATTEMPTS) {
     record.lockedUntil = now + LOCKOUT_DURATION_MS;
-    console.log(`[Auth] Account locked for ${key.split(':')[0]} after ${MAX_LOGIN_ATTEMPTS} failed attempts`);
+    console.log(`[Auth] Account locked for ${key.split(':')[2]} after failed attempts`);
   }
-  
-  loginAttempts.set(key, record);
+  memoryStore.set(key, record);
 }
 
 // Rate limiting middleware for login routes
-export function rateLimitMiddleware(req: Request, res: Response, next: NextFunction): void {
-  const { limited, retryAfterMs } = isRateLimited(req);
+export async function rateLimitMiddleware(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const { limited, retryAfterMs } = await isRateLimited(req);
   
   if (limited) {
     const retryAfterSeconds = Math.ceil((retryAfterMs || LOCKOUT_DURATION_MS) / 1000);
@@ -208,16 +262,14 @@ export function validatePasswordStrength(password: string): { valid: boolean; er
 // Clean up expired rate limit records periodically
 setInterval(() => {
   const now = Date.now();
-  const entries = Array.from(loginAttempts.entries());
+  const entries = Array.from(memoryStore.entries());
   for (let i = 0; i < entries.length; i++) {
     const [key, record] = entries[i];
-    // Remove records older than 1 hour with no lockout
     if (!record.lockedUntil && now - record.lastAttempt > 60 * 60 * 1000) {
-      loginAttempts.delete(key);
+      memoryStore.delete(key);
     }
-    // Remove records with expired lockouts
     if (record.lockedUntil && now >= record.lockedUntil) {
-      loginAttempts.delete(key);
+      memoryStore.delete(key);
     }
   }
 }, 60 * 1000); // Clean up every minute

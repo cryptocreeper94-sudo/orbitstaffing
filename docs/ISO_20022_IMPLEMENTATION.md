@@ -1,5 +1,7 @@
 # ISO 20022 Banking Integration - Implementation Roadmap
 
+> [!CAUTION]
+> **NOTICE**: This repository does not currently generate live ISO 20022 payment messages. This document is a **planned roadmap specification only**. Do not attempt to integrate or generate live money movement messages in production without a verified independent financial compliance audit.
 **Status:** Planned for Q3-Q4 2026  
 **Owner:** Product & Engineering  
 **Funding Model:** Revenue-funded (requires $13-22K from customer revenue)  
