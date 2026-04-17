@@ -1,4 +1,4 @@
-/**
+﻿/**
  * EcosystemAccountHub V2 — Standalone Portable (Inline Styles)
  * Premium + Mobile-Optimized + Rotating Affiliate Bonus
  * Zero external dependencies. Drop into any React repo.
@@ -25,11 +25,25 @@ function timeLeft(b:Bonus):string { const d=new Date(b.end).getTime()-Date.now()
 function refUrl(b:Bonus,u?:string):string { const s=b.url.includes('?')?'&':'?'; return `${b.url}${s}${b.refParam}=${u||'eco'}&bonus=${b.id}`; }
 
 const APPS = [
-  {n:'Trust Hub',u:'https://trusthub.tlid.io',i:'🛡️'},{n:'TrustGen 3D',u:'https://trustgen.tlid.io',i:'🎨'},{n:'TrustVault',u:'https://trustvault.tlid.io',i:'🔐'},
-  {n:'Chronicles',u:'https://yourlegacy.io',i:'📜'},{n:'ORBIT',u:'https://orbitstaffing.io',i:'🌐'},{n:'Lume',u:'https://lume-lang.org',i:'💡'},
-  {n:'Bomber 3D',u:'https://bomber.tlid.io',i:'⛳'},{n:'THE VOID',u:'https://intothevoid.app',i:'🕳️'},{n:'Lot Ops',u:'https://lotopspro.io',i:'🚗'},
-  {n:'SignalCast',u:'https://signalcast.tlid.io',i:'📡'},{n:'Studio',u:'https://studio.tlid.io',i:'🎛️'},
+  { n:'Trust Hub',   u:'https://trusthub.tlid.io',      i:'🛡️' },
+  { n:'TrustGen 3D', u:'https://trustgen.tlid.io',      i:'🎨' },
+  { n:'TrustVault',  u:'https://trustvault.tlid.io',    i:'🔐' },
+  { n:'Trust Layer', u:'https://dwtl.io',               i:'🌊' },
+  { n:'Chronicles',  u:'https://yourlegacy.io',         i:'📜' },
+  { n:'ORBIT',       u:'https://orbitstaffing.io',      i:'🌐' },
+  { n:'Bomber Golf', u:'https://bombergolf.tlid.io',    i:'⛳' },
+  { n:'Lume',        u:'https://lume-lang.org',         i:'💡' },
+  { n:'LumeLine',    u:'https://lumeline.app',          i:'📊' },
+  { n:'SignalCast',  u:'https://signalcast.tlid.io',    i:'📡' },
+  { n:'DWStudios',   u:'https://darkwavestudios.io',    i:'🎛️' },
+  { n:'THE VOID',    u:'https://intothevoid.app',       i:'🕳️' },
+  { n:'TrustGolf',   u:'https://trustgolf.app',         i:'🏌️' },
+  { n:'HappyEats',   u:'https://happyeats.tlid.io',    i:'🍔' },
+  { n:'DWSC',        u:'https://dwsc.io',              i:'◈'   },
+  { n:'Arcade',      u:'https://darkwavegames.io',     i:'🕹️' },
 ];
+const APPS_PER_PAGE = 8;
+const APP_TOTAL_PAGES = Math.ceil(APPS.length / APPS_PER_PAGE);
 
 function getUser():{name?:string;email?:string;avatar?:string}|null {
   for(const k of['tl_user','trustlayer_user','user','auth_user','dwtl_user','eco_user','vanops_user','orbit_user','trustgen_user','chronicles_user','bomber_user']){
@@ -85,6 +99,7 @@ const S: Record<string, CSSProperties> = {
 
 export function EcosystemAccountHub() {
   const [open, setOpen] = useState(false);
+  const [appPage, setAppPage] = useState(0);
   const [user, setUser] = useState<ReturnType<typeof getUser>>(null);
   const bonus = getBonus();
   const [tl, setTl] = useState(timeLeft(bonus));
@@ -144,7 +159,38 @@ export function EcosystemAccountHub() {
                 <a style={S.row} href={`${SSO}/rewards`} target="_blank" rel="noopener noreferrer"><div style={S.rIcon}>🎁</div><div style={S.rCont}><div style={S.rTitle}>Ecosystem Rewards</div><div style={S.rSub}>Points, referrals, bonuses</div></div></a>
                 <a style={S.row} href={`${SSO}/affiliate`} target="_blank" rel="noopener noreferrer"><div style={S.rIcon}>🤝</div><div style={S.rCont}><div style={S.rTitle}>Affiliate Program</div><div style={S.rSub}>Earn from referrals</div></div></a>
               </div>
-              <div style={S.sec}><div style={S.lbl}>Ecosystem Apps</div><div style={S.grid}>{APPS.map(a=><a key={a.n} style={S.appBadge} href={a.u} target="_blank" rel="noopener noreferrer"><span style={{fontSize:12}}>{a.i}</span>{a.n}</a>)}</div></div>
+              <div style={S.sec}><div style={S.lbl}>Ecosystem Apps</div><div style={S.grid}>{/* Ecosystem Apps Carousel */}
+{(() => {
+  const touchX = React.useRef(0);
+  return (
+    <div>
+      <div style={{overflow:'hidden',touchAction:'pan-y'}}
+        onTouchStart={(e:React.TouchEvent)=>{touchX.current=e.touches[0].clientX;}}
+        onTouchEnd={(e:React.TouchEvent)=>{const dx=e.changedTouches[0].clientX-touchX.current;if(dx<-40)setAppPage(p=>Math.min(APP_TOTAL_PAGES-1,p+1));else if(dx>40)setAppPage(p=>Math.max(0,p-1));}}>
+        <div style={{display:'flex',transform:	ranslate3d(-%,0,0),transition:'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)'}}>
+          {Array.from({length:APP_TOTAL_PAGES}).map((_,pi)=>(
+            <div key={pi} style={{minWidth:'100%',display:'flex',flexWrap:'wrap',gap:5,padding:'0 2px'}}>
+              {APPS.slice(pi*APPS_PER_PAGE,(pi+1)*APPS_PER_PAGE).map(a=>(
+                <a key={a.n} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'5px 9px',borderRadius:7,background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.05)',textDecoration:'none',color:'rgba(255,255,255,0.5)',fontSize:10,fontWeight:600,minHeight:30}} href={a.u} target="_blank" rel="noopener noreferrer">
+                  <span style={{fontSize:11}}>{a.i}</span>{a.n}
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginTop:10}}>
+        <button style={{background:'none',border:'1px solid rgba(6,182,212,0.2)',borderRadius:6,width:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',cursor:appPage===0?'default':'pointer',padding:0,outline:'none',color:appPage===0?'rgba(255,255,255,0.12)':'#67e8f9',fontSize:14,opacity:appPage===0?0.4:1}} onClick={()=>setAppPage(p=>Math.max(0,p-1))} disabled={appPage===0}>‹</button>
+        <div style={{display:'flex',gap:4,alignItems:'center'}}>
+          {Array.from({length:APP_TOTAL_PAGES}).map((_,i)=>(
+            <button key={i} style={{width:i===appPage?18:6,height:6,borderRadius:3,background:i===appPage?'#06b6d4':'rgba(255,255,255,0.15)',border:'none',cursor:'pointer',padding:0,outline:'none',transition:'all 0.25s'}} onClick={()=>setAppPage(i)} aria-label={`Page ${i+1}`} />
+          ))}
+        </div>
+        <button style={{background:'none',border:'1px solid rgba(6,182,212,0.2)',borderRadius:6,width:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',cursor:appPage===APP_TOTAL_PAGES-1?'default':'pointer',padding:0,outline:'none',color:appPage===APP_TOTAL_PAGES-1?'rgba(255,255,255,0.12)':'#67e8f9',fontSize:14,opacity:appPage===APP_TOTAL_PAGES-1?0.4:1}} onClick={()=>setAppPage(p=>Math.min(APP_TOTAL_PAGES-1,p+1))} disabled={appPage===APP_TOTAL_PAGES-1}>›</button>
+      </div>
+    </div>
+  );
+})()}</div></div>
               <div style={S.sec}><div style={S.lbl}>Settings</div>
                 <a style={S.row} href={`${SSO}/settings`} target="_blank" rel="noopener noreferrer"><div style={S.rIcon}>⚙️</div><div style={S.rCont}><div style={S.rTitle}>Account Settings</div><div style={S.rSub}>Preferences, security</div></div></a>
                 <a style={S.row} href="/settings"><div style={S.rIcon}>🎨</div><div style={S.rCont}><div style={S.rTitle}>App Settings</div><div style={S.rSub}>Theme, display, local</div></div></a>
@@ -154,7 +200,38 @@ export function EcosystemAccountHub() {
             <>
               <div style={S.conn}><div style={{fontSize:44,opacity:0.5}}>🛡️</div><div style={{fontSize:17,fontWeight:800,color:'rgba(255,255,255,0.88)'}}>Connect to Trust Layer</div><div style={{fontSize:12,color:'rgba(255,255,255,0.35)',lineHeight:1.55,maxWidth:260}}>Sign in with your Trust Layer ID to access your wallet, hallmark, rewards, and ecosystem apps.</div><a style={S.connBtn} href={`${SSO}/login?redirect=${redir}`} target="_blank" rel="noopener noreferrer">🔗 Connect Account</a></div>
               <div style={S.sec}><div style={S.lbl}>Signal Charging</div><a style={S.row} href={PRE} target="_blank" rel="noopener noreferrer"><div style={S.rIcon}>⚡</div><div style={S.rCont}><div style={S.rTitle}>Start Charging</div><div style={S.rSub}>SIG $0.001 → $0.01 at TGE</div></div><span style={{...S.badge,...S.badgeC}}>10×</span></a></div>
-              <div style={S.sec}><div style={S.lbl}>Explore the Ecosystem</div><div style={S.grid}>{APPS.map(a=><a key={a.n} style={S.appBadge} href={a.u} target="_blank" rel="noopener noreferrer"><span style={{fontSize:12}}>{a.i}</span>{a.n}</a>)}</div></div>
+              <div style={S.sec}><div style={S.lbl}>Explore the Ecosystem</div><div style={S.grid}>{/* Ecosystem Apps Carousel */}
+{(() => {
+  const touchX = React.useRef(0);
+  return (
+    <div>
+      <div style={{overflow:'hidden',touchAction:'pan-y'}}
+        onTouchStart={(e:React.TouchEvent)=>{touchX.current=e.touches[0].clientX;}}
+        onTouchEnd={(e:React.TouchEvent)=>{const dx=e.changedTouches[0].clientX-touchX.current;if(dx<-40)setAppPage(p=>Math.min(APP_TOTAL_PAGES-1,p+1));else if(dx>40)setAppPage(p=>Math.max(0,p-1));}}>
+        <div style={{display:'flex',transform:	ranslate3d(-%,0,0),transition:'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)'}}>
+          {Array.from({length:APP_TOTAL_PAGES}).map((_,pi)=>(
+            <div key={pi} style={{minWidth:'100%',display:'flex',flexWrap:'wrap',gap:5,padding:'0 2px'}}>
+              {APPS.slice(pi*APPS_PER_PAGE,(pi+1)*APPS_PER_PAGE).map(a=>(
+                <a key={a.n} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'5px 9px',borderRadius:7,background:'rgba(255,255,255,0.02)',border:'1px solid rgba(255,255,255,0.05)',textDecoration:'none',color:'rgba(255,255,255,0.5)',fontSize:10,fontWeight:600,minHeight:30}} href={a.u} target="_blank" rel="noopener noreferrer">
+                  <span style={{fontSize:11}}>{a.i}</span>{a.n}
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginTop:10}}>
+        <button style={{background:'none',border:'1px solid rgba(6,182,212,0.2)',borderRadius:6,width:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',cursor:appPage===0?'default':'pointer',padding:0,outline:'none',color:appPage===0?'rgba(255,255,255,0.12)':'#67e8f9',fontSize:14,opacity:appPage===0?0.4:1}} onClick={()=>setAppPage(p=>Math.max(0,p-1))} disabled={appPage===0}>‹</button>
+        <div style={{display:'flex',gap:4,alignItems:'center'}}>
+          {Array.from({length:APP_TOTAL_PAGES}).map((_,i)=>(
+            <button key={i} style={{width:i===appPage?18:6,height:6,borderRadius:3,background:i===appPage?'#06b6d4':'rgba(255,255,255,0.15)',border:'none',cursor:'pointer',padding:0,outline:'none',transition:'all 0.25s'}} onClick={()=>setAppPage(i)} aria-label={`Page ${i+1}`} />
+          ))}
+        </div>
+        <button style={{background:'none',border:'1px solid rgba(6,182,212,0.2)',borderRadius:6,width:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',cursor:appPage===APP_TOTAL_PAGES-1?'default':'pointer',padding:0,outline:'none',color:appPage===APP_TOTAL_PAGES-1?'rgba(255,255,255,0.12)':'#67e8f9',fontSize:14,opacity:appPage===APP_TOTAL_PAGES-1?0.4:1}} onClick={()=>setAppPage(p=>Math.min(APP_TOTAL_PAGES-1,p+1))} disabled={appPage===APP_TOTAL_PAGES-1}>›</button>
+      </div>
+    </div>
+  );
+})()}</div></div>
             </>
           )}
           <div style={S.ft}><a style={S.ftLink} href={SSO} target="_blank" rel="noopener noreferrer">Trust Layer</a> · Ecosystem Account Hub</div>
