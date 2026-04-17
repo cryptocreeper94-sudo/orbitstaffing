@@ -167,7 +167,7 @@ export function EcosystemAccountHub() {
       <div style={{overflow:'hidden',touchAction:'pan-y'}}
         onTouchStart={(e:React.TouchEvent)=>{touchX.current=e.touches[0].clientX;}}
         onTouchEnd={(e:React.TouchEvent)=>{const dx=e.changedTouches[0].clientX-touchX.current;if(dx<-40)setAppPage(p=>Math.min(APP_TOTAL_PAGES-1,p+1));else if(dx>40)setAppPage(p=>Math.max(0,p-1));}}>
-        <div style={{display:'flex',transform:	ranslate3d(-%,0,0),transition:'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)'}}>
+        <div style={{display:'flex',transform:`translate3d(-${appPage * 100}%,0,0)`,transition:'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)'}}>
           {Array.from({length:APP_TOTAL_PAGES}).map((_,pi)=>(
             <div key={pi} style={{minWidth:'100%',display:'flex',flexWrap:'wrap',gap:5,padding:'0 2px'}}>
               {APPS.slice(pi*APPS_PER_PAGE,(pi+1)*APPS_PER_PAGE).map(a=>(
@@ -208,7 +208,7 @@ export function EcosystemAccountHub() {
       <div style={{overflow:'hidden',touchAction:'pan-y'}}
         onTouchStart={(e:React.TouchEvent)=>{touchX.current=e.touches[0].clientX;}}
         onTouchEnd={(e:React.TouchEvent)=>{const dx=e.changedTouches[0].clientX-touchX.current;if(dx<-40)setAppPage(p=>Math.min(APP_TOTAL_PAGES-1,p+1));else if(dx>40)setAppPage(p=>Math.max(0,p-1));}}>
-        <div style={{display:'flex',transform:	ranslate3d(-%,0,0),transition:'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)'}}>
+        <div style={{display:'flex',transform:`translate3d(-${appPage * 100}%,0,0)`,transition:'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)'}}>
           {Array.from({length:APP_TOTAL_PAGES}).map((_,pi)=>(
             <div key={pi} style={{minWidth:'100%',display:'flex',flexWrap:'wrap',gap:5,padding:'0 2px'}}>
               {APPS.slice(pi*APPS_PER_PAGE,(pi+1)*APPS_PER_PAGE).map(a=>(
