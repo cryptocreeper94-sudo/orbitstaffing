@@ -377,7 +377,7 @@ export default function BusinessOwnerMarketing() {
           </div>
 
           {/* Integrity Message */}
-          <div className="mt-12 p-8 bg-gradient-to-r from-blue-900/40 to-purple-900/40 border border-blue-700 rounded-lg text-center">
+          <div className="mt-12 p-8 bg-gradient-to-r from-blue-900/40 to-sky-900/40 border border-blue-700 rounded-lg text-center">
             <h3 className="text-2xl font-bold mb-4">The Integrity Multiplier</h3>
             <p className="text-lg text-gray-300 mb-4">
               When you reward integrity (showing up, doing good work), you get more of it.

@@ -59,7 +59,7 @@ export default function WorkerPortal() {
   const earningsLinks = [
     { icon: <Zap className="w-4 h-4" />, label: "Bonuses", path: "/worker-bonuses", color: "text-amber-400" },
     { icon: <Calendar className="w-4 h-4" />, label: "Shifts", path: "/worker-shifts", color: "text-blue-400" },
-    { icon: <Calendar className="w-4 h-4" />, label: "Availability", path: "/worker-availability", color: "text-purple-400" },
+    { icon: <Calendar className="w-4 h-4" />, label: "Availability", path: "/worker-availability", color: "text-sky-400" },
     { icon: <Share2 className="w-4 h-4" />, label: "Referrals", path: "/worker-referrals", color: "text-emerald-400" },
   ];
 

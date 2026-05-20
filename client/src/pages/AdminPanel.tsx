@@ -310,7 +310,7 @@ export default function AdminPanel() {
 
               <button
                 onClick={() => setShowDeveloperPin(true)}
-                className="w-full mt-4 px-4 py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-600 rounded-lg text-purple-300 font-bold text-sm transition-all"
+                className="w-full mt-4 px-4 py-3 bg-sky-600/20 hover:bg-sky-600/30 border border-sky-600 rounded-lg text-sky-300 font-bold text-sm transition-all"
                 data-testid="button-developer-access"
               >
                 Developer Access
@@ -337,7 +337,7 @@ export default function AdminPanel() {
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <h2 className="text-sm font-bold text-purple-400">Developer Panel</h2>
+                  <h2 className="text-sm font-bold text-sky-400">Developer Panel</h2>
                 </div>
 
                 <div>
@@ -350,7 +350,7 @@ export default function AdminPanel() {
                     onChange={(e) => setDeveloperPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                     maxLength={4}
                     placeholder="•••••••"
-                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-sky-400"
                     autoFocus
                     data-testid="input-developer-pin"
                   />
@@ -365,7 +365,7 @@ export default function AdminPanel() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg"
+                  className="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 font-bold text-lg"
                   data-testid="button-developer-login"
                 >
                   Access Developer Panel
@@ -385,7 +385,7 @@ export default function AdminPanel() {
   const quickActions = [
     { title: 'Incidents', icon: <AlertTriangle className="w-4 h-4" />, onClick: () => setLocation('/incident-reporting'), className: 'bg-red-600 hover:bg-red-700' },
     { title: 'Workers Comp', icon: <Shield className="w-4 h-4" />, onClick: () => setLocation('/workers-comp-admin'), className: 'bg-orange-600 hover:bg-orange-700' },
-    { title: 'Developer', icon: <Code className="w-4 h-4" />, onClick: () => setLocation('/'), className: 'bg-purple-600 hover:bg-purple-700' },
+    { title: 'Developer', icon: <Code className="w-4 h-4" />, onClick: () => setLocation('/'), className: 'bg-sky-600 hover:bg-sky-700' },
     { title: 'Main App', icon: <Eye className="w-4 h-4" />, onClick: () => setLocation('/dashboard'), className: 'bg-green-600 hover:bg-green-700' },
     { title: 'Logout', icon: <LogOut className="w-4 h-4" />, onClick: handleLogout, className: 'bg-slate-600 hover:bg-slate-700' },
   ];
@@ -660,18 +660,18 @@ function MasterAdminDashboard({ adminName }: { adminName: string }) {
         </BentoTile>
       );
       case 'professional': return (
-        <BentoTile className="p-6 border-purple-600/50">
+        <BentoTile className="p-6 border-sky-600/50">
           <div className="flex items-center gap-3 mb-6">
-            <Lock className="w-6 h-6 text-purple-400" />
+            <Lock className="w-6 h-6 text-sky-400" />
             <div>
-              <h2 className="text-2xl font-bold text-purple-300">Professional Staffing Division</h2>
-              <p className="text-sm text-purple-300">Coming in Version 2 (Q3 2026)</p>
+              <h2 className="text-2xl font-bold text-sky-300">Professional Staffing Division</h2>
+              <p className="text-sm text-sky-300">Coming in Version 2 (Q3 2026)</p>
             </div>
           </div>
           <p className="text-gray-300 mb-6">
             Preview the Professional Staffing Division interface and features planned for Q3 2026.
           </p>
-          <Button onClick={() => window.location.href = '/professional-staffing'} className="bg-purple-600 hover:bg-purple-700">
+          <Button onClick={() => window.location.href = '/professional-staffing'} className="bg-sky-600 hover:bg-sky-700">
             View Professional Division Preview
           </Button>
         </BentoTile>
@@ -1074,7 +1074,7 @@ function UserDataAccessSection() {
           data-testid="button-toggle-owner-search"
         >
           <div className="flex items-center gap-3">
-            <Building2 className="w-5 h-5 text-purple-400" />
+            <Building2 className="w-5 h-5 text-sky-400" />
             <span className="font-bold text-lg">Company / Owner Search</span>
           </div>
           {ownerSearchOpen ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
@@ -1090,7 +1090,7 @@ function UserDataAccessSection() {
                   value={ownerSearch}
                   onChange={(e) => setOwnerSearch(e.target.value)}
                   placeholder="Search by company name or contact name..."
-                  className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-400"
+                  className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-400"
                   data-testid="input-owner-search"
                 />
               </div>
@@ -1115,7 +1115,7 @@ function UserDataAccessSection() {
                       </div>
                       <Button
                         size="sm"
-                        className="bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 border border-purple-600/50"
+                        className="bg-sky-600/20 hover:bg-sky-600/40 text-sky-300 border border-sky-600/50"
                         onClick={() => setLocation('/owner-hub')}
                         data-testid={`button-view-owner-${owner.id}`}
                       >
@@ -1239,7 +1239,7 @@ function UserDataAccessSection() {
 function FranchiseAdminDashboard() {
   return (
     <div className="space-y-8">
-      <BentoTile className="p-6 border-purple-700/50">
+      <BentoTile className="p-6 border-sky-700/50">
         <SectionHeader
           eyebrow="Franchise"
           title="Franchise Admin Dashboard"

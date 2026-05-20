@@ -69,7 +69,7 @@ const getPricingBadge = (pricingType: string, monthlyPrice: string | null) => {
     return <Badge className="bg-blue-600/20 text-blue-400 border-blue-600/30">Freemium</Badge>;
   }
   if (monthlyPrice && parseFloat(monthlyPrice) > 0) {
-    return <Badge className="bg-purple-600/20 text-purple-400 border-purple-600/30">${monthlyPrice}/mo</Badge>;
+    return <Badge className="bg-sky-600/20 text-sky-400 border-sky-600/30">${monthlyPrice}/mo</Badge>;
   }
   return <Badge className="bg-amber-600/20 text-amber-400 border-amber-600/30">Pay per use</Badge>;
 };

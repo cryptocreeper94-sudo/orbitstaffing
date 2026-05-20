@@ -90,7 +90,7 @@ export default function OrbitPayCard() {
       description: "Add to Apple Pay, Google Pay, or Samsung Pay instantly."
     },
     {
-      icon: <Shield className="w-6 h-6 text-purple-400" />,
+      icon: <Shield className="w-6 h-6 text-sky-400" />,
       title: "Bank-Level Security",
       description: "Chip technology, fraud protection, instant lock/unlock."
     },
@@ -147,7 +147,7 @@ export default function OrbitPayCard() {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-sky-400">
               ORBIT Pay Card
             </span>
           </h1>
@@ -156,7 +156,7 @@ export default function OrbitPayCard() {
           </p>
         </div>
 
-        <OrbitCard variant="glass" hover={false} className="mb-8 bg-gradient-to-r from-cyan-900/30 via-blue-900/30 to-purple-900/30 border-cyan-500/30 overflow-hidden relative">
+        <OrbitCard variant="glass" hover={false} className="mb-8 bg-gradient-to-r from-cyan-900/30 via-blue-900/30 to-sky-900/30 border-cyan-500/30 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 to-transparent rounded-full blur-3xl" />
           <OrbitCardContent className="p-2 md:p-4">
             <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -317,7 +317,7 @@ export default function OrbitPayCard() {
             </div>
           </BentoTile>
 
-          <BentoTile className="bg-gradient-to-br from-cyan-900/30 to-purple-900/30 border-cyan-500/30">
+          <BentoTile className="bg-gradient-to-br from-cyan-900/30 to-sky-900/30 border-cyan-500/30">
             <div className="p-6">
               <OrbitCardHeader icon={<Star className="w-5 h-5 text-yellow-400" />}>
                 <OrbitCardTitle>Join the Waitlist</OrbitCardTitle>
@@ -344,7 +344,7 @@ export default function OrbitPayCard() {
                     <Button
                       type="submit"
                       disabled={isSubmitting || !email}
-                      className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                      className="w-full bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500"
                       data-testid="button-join-waitlist"
                     >
                       {isSubmitting ? (

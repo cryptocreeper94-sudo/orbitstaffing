@@ -202,7 +202,7 @@ export function Sparkles({ count = 12, trigger = true }: SparkleProps) {
 export function ConfettiBurst({ trigger = false }: { trigger?: boolean }) {
   if (!trigger) return null;
 
-  const colors = ['#06b6d4', '#8b5cf6', '#22c55e', '#f59e0b', '#ef4444'];
+  const colors = ['#06b6d4', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444'];
 
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">

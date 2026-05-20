@@ -88,7 +88,7 @@ const badgeColors: Record<BadgeType, string> = {
   New: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   Hot: 'bg-red-500/20 text-red-400 border-red-500/30',
   Earn: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  AI: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  AI: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
 };
 
 const categories: CategorySection[] = [
@@ -138,8 +138,8 @@ const categories: CategorySection[] = [
   },
   {
     title: 'For Employers',
-    gradient: 'from-violet-500 to-purple-500',
-    iconGradient: 'from-violet-500/20 to-purple-500/20',
+    gradient: 'from-cyan-500 to-sky-500',
+    iconGradient: 'from-cyan-500/20 to-sky-500/20',
     filterGroup: ['All', 'Employers'],
     cards: [
       { id: 'fe-1', label: 'Request Workers', description: 'Submit staffing requests instantly', icon: Users, href: '/client/request-workers', image: imgRequestWorkers, badge: 'Live' },
@@ -286,7 +286,7 @@ export default function ExploreHub() {
               const gradients: Record<string, string> = {
                 All: 'from-cyan-500 to-blue-500',
                 Workers: 'from-emerald-500 to-teal-500',
-                Employers: 'from-violet-500 to-purple-500',
+                Employers: 'from-cyan-500 to-sky-500',
                 Owners: 'from-orange-500 to-red-500',
                 Resources: 'from-sky-500 to-indigo-500',
               };

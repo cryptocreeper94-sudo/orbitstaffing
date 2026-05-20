@@ -158,9 +158,9 @@ const categories: AdminCategory[] = [
   },
   {
     title: 'Operations',
-    gradient: 'from-violet-500 to-purple-600',
-    iconBg: 'bg-gradient-to-br from-violet-500 to-purple-600',
-    accentColor: 'bg-violet-400',
+    gradient: 'from-cyan-500 to-sky-600',
+    iconBg: 'bg-gradient-to-br from-cyan-500 to-sky-600',
+    accentColor: 'bg-cyan-400',
     filter: ['All', 'Operations'],
     cards: [
       { id: 'timesheet-approval', label: 'Timesheet Approval', description: 'Review and approve worker timesheets', href: '/admin/timesheet-approval', icon: Clock, image: imgTimesheets, badge: 'Live' },
@@ -213,7 +213,7 @@ const badgeStyles: Record<string, string> = {
   Live: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   New: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   Hot: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  AI: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+  AI: 'bg-sky-500/20 text-sky-400 border-sky-500/30',
   Earn: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
 };
 

@@ -59,7 +59,7 @@ const PIPELINE_STAGES = [
   { id: "lead", label: "Lead", color: "bg-slate-500", probability: 10 },
   { id: "qualified", label: "Qualified", color: "bg-blue-500", probability: 25 },
   { id: "proposal", label: "Proposal", color: "bg-amber-500", probability: 50 },
-  { id: "negotiation", label: "Negotiation", color: "bg-purple-500", probability: 75 },
+  { id: "negotiation", label: "Negotiation", color: "bg-sky-500", probability: 75 },
   { id: "closed_won", label: "Closed Won", color: "bg-green-500", probability: 100 },
   { id: "closed_lost", label: "Closed Lost", color: "bg-red-500", probability: 0 },
 ];
@@ -619,7 +619,7 @@ export default function CRMDashboard() {
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             activity.activityType === 'email' ? 'bg-blue-500/20 text-blue-400' :
                             activity.activityType === 'call' ? 'bg-green-500/20 text-green-400' :
-                            activity.activityType === 'meeting' ? 'bg-purple-500/20 text-purple-400' :
+                            activity.activityType === 'meeting' ? 'bg-sky-500/20 text-sky-400' :
                             activity.activityType === 'note' ? 'bg-amber-500/20 text-amber-400' :
                             'bg-slate-500/20 text-slate-400'
                           }`}>

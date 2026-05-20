@@ -357,7 +357,7 @@ export default function AdminTalentExchange() {
   const pendingRequestsCount = workerRequests?.filter(r => r.status === "pending")?.length || 0;
   const totalCandidates = analytics?.totalCandidates || 0;
 
-  const CHART_COLORS = ["#06b6d4", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+  const CHART_COLORS = ["#06b6d4", "#10b981", "#f59e0b", "#ef4444", "#0ea5e9", "#ec4899"];
 
   return (
     <div className="min-h-screen bg-slate-900" data-testid="admin-talent-exchange-page">
@@ -421,7 +421,7 @@ export default function AdminTalentExchange() {
             label="Worker Requests"
             value={pendingRequestsCount}
             subtext="Hire requests pending"
-            color="bg-purple-600"
+            color="bg-sky-600"
             testId="card-worker-requests"
           />
           <StatCard
@@ -831,7 +831,7 @@ export default function AdminTalentExchange() {
                 icon={Users}
                 label="Total Candidates"
                 value={analytics?.totalCandidates || 0}
-                color="bg-purple-600"
+                color="bg-sky-600"
                 testId="card-analytics-candidates"
               />
               <StatCard
@@ -1014,8 +1014,8 @@ export default function AdminTalentExchange() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg">
-                      <div className="p-2 bg-purple-600/20 rounded-full">
-                        <UserCheck className="w-4 h-4 text-purple-400" />
+                      <div className="p-2 bg-sky-600/20 rounded-full">
+                        <UserCheck className="w-4 h-4 text-sky-400" />
                       </div>
                       <div>
                         <p className="text-sm text-white">Worker hire approved</p>

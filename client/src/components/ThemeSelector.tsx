@@ -77,7 +77,7 @@ export function ThemeSelector() {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="rounded-lg border p-3 mb-3 bg-gradient-to-r from-cyan-900/30 to-violet-900/30 border-cyan-500/30">
+        <div className="rounded-lg border p-3 mb-3 bg-gradient-to-r from-cyan-900/30 to-cyan-900/30 border-cyan-500/30">
           <div className="flex items-center gap-3">
             <div
               className={`w-10 h-10 rounded-lg bg-gradient-to-br ${currentTheme.colors.primary} border-2 border-white/20`}

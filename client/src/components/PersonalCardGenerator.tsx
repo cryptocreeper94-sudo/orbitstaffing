@@ -302,7 +302,7 @@ export default function PersonalCardGenerator({ userId, userName, cardType, onSa
           </div>
 
           {/* Hallmark Generation */}
-          <Button onClick={handleGenerateHallmark} className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-generate-hallmark">
+          <Button onClick={handleGenerateHallmark} className="w-full bg-sky-600 hover:bg-sky-700" data-testid="button-generate-hallmark">
             <QrCode className="w-4 h-4 mr-2" />
             Generate Hallmark (UPC & Serial)
           </Button>

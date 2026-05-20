@@ -59,9 +59,9 @@ export const DarkwaveFooter: React.FC<DarkwaveFooterProps> = ({ product = "Lot O
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div className="flex flex-col items-center md:items-start">
-            <div className="w-16 h-16 mb-4 rounded-lg bg-gradient-to-br from-purple-900 to-slate-900 border border-purple-500/30 flex items-center justify-center">
-              <div className="w-14 h-14 rounded-lg bg-black/50 flex items-center justify-center border border-purple-500/50">
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <div className="w-16 h-16 mb-4 rounded-lg bg-gradient-to-br from-sky-900 to-slate-900 border border-sky-500/30 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-lg bg-black/50 flex items-center justify-center border border-sky-500/50">
+                <span className="text-2xl font-bold bg-gradient-to-r from-sky-400 to-pink-400 bg-clip-text text-transparent">
                   DW
                 </span>
               </div>

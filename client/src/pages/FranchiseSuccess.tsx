@@ -59,7 +59,7 @@ export default function FranchiseSuccess() {
             x: randomInRange(0.1, 0.3),
             y: Math.random() - 0.2
           },
-          colors: ['#06b6d4', '#8b5cf6', '#ec4899', '#10b981'],
+          colors: ['#06b6d4', '#0ea5e9', '#ec4899', '#10b981'],
           particleCount: Math.floor(particleCount)
         });
         confetti({
@@ -70,7 +70,7 @@ export default function FranchiseSuccess() {
             x: randomInRange(0.7, 0.9),
             y: Math.random() - 0.2
           },
-          colors: ['#06b6d4', '#8b5cf6', '#ec4899', '#10b981'],
+          colors: ['#06b6d4', '#0ea5e9', '#ec4899', '#10b981'],
           particleCount: Math.floor(particleCount)
         });
       }, 250);
@@ -82,9 +82,9 @@ export default function FranchiseSuccess() {
   }, [hasAnimated]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900/20 to-gray-900 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-sky-900/20 to-gray-900 overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
 
@@ -97,7 +97,7 @@ export default function FranchiseSuccess() {
             
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Welcome to the{' '}
-              <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-pink-400 bg-clip-text text-transparent">
                 ORBIT Family!
               </span>
             </h1>
@@ -108,10 +108,10 @@ export default function FranchiseSuccess() {
             </p>
           </div>
 
-          <Card className="bg-gradient-to-br from-purple-900/40 to-gray-800/40 border-purple-500/30 mb-8">
-            <CardHeader className="text-center border-b border-purple-500/20 pb-6">
+          <Card className="bg-gradient-to-br from-sky-900/40 to-gray-800/40 border-sky-500/30 mb-8">
+            <CardHeader className="text-center border-b border-sky-500/20 pb-6">
               <div className="flex items-center justify-center gap-3 mb-2">
-                <Crown className="h-8 w-8 text-purple-400" />
+                <Crown className="h-8 w-8 text-sky-400" />
                 <CardTitle className="text-2xl text-white">Your Franchise Details</CardTitle>
               </div>
               <CardDescription className="text-gray-400">
@@ -137,7 +137,7 @@ export default function FranchiseSuccess() {
                         Ownership Mode
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                        <Badge className="bg-sky-500/20 text-sky-300 border-sky-500/30">
                           {hallmark.ownershipMode === 'franchise_owned' ? 'Franchise Owner' : 'Subscriber'}
                         </Badge>
                       </div>
@@ -170,7 +170,7 @@ export default function FranchiseSuccess() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Sparkles className="h-12 w-12 mx-auto mb-4 text-purple-400" />
+                  <Sparkles className="h-12 w-12 mx-auto mb-4 text-sky-400" />
                   <p className="text-gray-400 mb-4">
                     Your franchise is being activated. This may take a few moments.
                   </p>
@@ -220,16 +220,16 @@ export default function FranchiseSuccess() {
                 </CardContent>
               </Card>
 
-              <Card className="flex-shrink-0 w-[280px] md:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-purple-500/50 transition-colors group">
+              <Card className="flex-shrink-0 w-[280px] md:w-auto snap-start bg-gray-800/50 border-gray-700 hover:border-sky-500/50 transition-colors group">
                 <CardContent className="pt-6 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                    <Mail className="h-7 w-7 text-purple-400" />
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <Mail className="h-7 w-7 text-sky-400" />
                   </div>
                   <h3 className="font-semibold text-white mb-2">Check Your Email</h3>
                   <p className="text-gray-400 text-sm mb-4">
                     A confirmation email with your franchise agreement has been sent.
                   </p>
-                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30">
                     Sent
                   </Badge>
                 </CardContent>
@@ -252,7 +252,7 @@ export default function FranchiseSuccess() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl p-8 border border-gray-700">
+          <div className="bg-gradient-to-r from-cyan-500/10 via-sky-500/10 to-pink-500/10 rounded-2xl p-8 border border-gray-700">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-white mb-2">What Happens Next?</h2>
               <p className="text-gray-400">Here's what to expect in the coming days</p>
@@ -284,7 +284,7 @@ export default function FranchiseSuccess() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
             <Link href="/my-hallmark">
               <Button 
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                className="bg-gradient-to-r from-sky-500 to-pink-500 hover:from-sky-600 hover:to-pink-600 text-white"
                 data-testid="button-manage-hallmark"
               >
                 <Crown className="h-4 w-4 mr-2" />

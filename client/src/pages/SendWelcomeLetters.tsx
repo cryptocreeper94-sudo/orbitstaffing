@@ -15,7 +15,7 @@ export default function SendWelcomeLetters() {
 
   const roles = [
     { id: 'employee', label: 'Employee', color: 'bg-cyan-600' },
-    { id: 'owner', label: 'Company Owner', color: 'bg-purple-600' },
+    { id: 'owner', label: 'Company Owner', color: 'bg-sky-600' },
     { id: 'admin', label: 'Administrator', color: 'bg-amber-600' },
   ];
 

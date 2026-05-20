@@ -50,7 +50,7 @@ export function EcosystemPerformanceDashboard({ compact = false }: Props) {
     cyan: { border: 'border-cyan-500/30', bg: 'from-cyan-500/10 to-cyan-600/5', text: 'text-cyan-300', glow: 'shadow-cyan-500/10', dot: 'bg-cyan-400' },
     emerald: { border: 'border-emerald-500/30', bg: 'from-emerald-500/10 to-emerald-600/5', text: 'text-emerald-300', glow: 'shadow-emerald-500/10', dot: 'bg-emerald-400' },
     blue: { border: 'border-blue-500/30', bg: 'from-blue-500/10 to-blue-600/5', text: 'text-blue-300', glow: 'shadow-blue-500/10', dot: 'bg-blue-400' },
-    purple: { border: 'border-purple-500/30', bg: 'from-purple-500/10 to-purple-600/5', text: 'text-purple-300', glow: 'shadow-purple-500/10', dot: 'bg-purple-400' },
+    purple: { border: 'border-sky-500/30', bg: 'from-sky-500/10 to-sky-600/5', text: 'text-sky-300', glow: 'shadow-sky-500/10', dot: 'bg-sky-400' },
     lime: { border: 'border-lime-500/30', bg: 'from-lime-500/10 to-lime-600/5', text: 'text-lime-300', glow: 'shadow-lime-500/10', dot: 'bg-lime-400' },
     teal: { border: 'border-teal-500/30', bg: 'from-teal-500/10 to-teal-600/5', text: 'text-teal-300', glow: 'shadow-teal-500/10', dot: 'bg-teal-400' },
     pink: { border: 'border-pink-500/30', bg: 'from-pink-500/10 to-pink-600/5', text: 'text-pink-300', glow: 'shadow-pink-500/10', dot: 'bg-pink-400' },
@@ -91,7 +91,7 @@ export function EcosystemPerformanceDashboard({ compact = false }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className={`${compact ? 'text-lg' : 'text-xl'} font-bold text-white flex items-center gap-2`}>
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-purple-500/30 border border-cyan-500/20 flex items-center justify-center backdrop-blur-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-sky-500/30 border border-cyan-500/20 flex items-center justify-center backdrop-blur-sm">
               <Network className="w-4 h-4 text-cyan-400" />
             </div>
             Ecosystem Performance
@@ -125,13 +125,13 @@ export function EcosystemPerformanceDashboard({ compact = false }: Props) {
           </div>
           <p className="text-2xl font-bold text-amber-300">{fmt(data.totalRevenue)}</p>
         </div>
-        <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-4 backdrop-blur-sm relative overflow-hidden group hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300" data-testid="card-stat-events">
-          <div className="absolute -top-4 -right-4 w-16 h-16 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all" />
+        <div className="bg-gradient-to-br from-sky-500/10 to-sky-600/5 border border-sky-500/20 rounded-xl p-4 backdrop-blur-sm relative overflow-hidden group hover:border-sky-500/40 hover:shadow-lg hover:shadow-sky-500/10 transition-all duration-300" data-testid="card-stat-events">
+          <div className="absolute -top-4 -right-4 w-16 h-16 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all" />
           <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-3.5 h-3.5 text-purple-400/60" />
+            <Zap className="w-3.5 h-3.5 text-sky-400/60" />
             <p className="text-[10px] uppercase tracking-wider text-slate-400">Total Events</p>
           </div>
-          <p className="text-2xl font-bold text-purple-300">{data.totalEvents}</p>
+          <p className="text-2xl font-bold text-sky-300">{data.totalEvents}</p>
         </div>
       </div>
 

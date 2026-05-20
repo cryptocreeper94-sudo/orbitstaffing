@@ -19,7 +19,7 @@ export default function AdminGarnishmentDashboard() {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<any[]>([]);
 
-  const COLORS = ["#ef4444", "#f59e0b", "#3b82f6", "#8b5cf6"];
+  const COLORS = ["#ef4444", "#f59e0b", "#3b82f6", "#0ea5e9"];
 
   const { connected } = useWebSocket("garnishments", (data) => {
     setStats((prev) => ({ ...prev, ...data }));
@@ -200,7 +200,7 @@ export default function AdminGarnishmentDashboard() {
               </div>
               <div className="w-full bg-gray-200 rounded h-2">
                 <div
-                  className="bg-purple-500 h-2 rounded"
+                  className="bg-sky-500 h-2 rounded"
                   style={{ width: `${(stats.creditor / stats.total) * 100}%` }}
                 ></div>
               </div>

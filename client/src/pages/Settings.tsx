@@ -54,7 +54,7 @@ function InlineThemeSelector() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border p-4 bg-gradient-to-r from-cyan-900/30 to-violet-900/30 border-cyan-500/30">
+      <div className="rounded-xl border p-4 bg-gradient-to-r from-cyan-900/30 to-cyan-900/30 border-cyan-500/30">
         <div className="flex items-center gap-4">
           <div
             className={`w-14 h-14 rounded-xl bg-gradient-to-br ${currentTheme.colors.primary} border-2 border-white/20 flex items-center justify-center`}
@@ -157,7 +157,7 @@ export default function Settings() {
     <Shell>
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-cyan-500/30">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/20 border border-cyan-500/30">
             <SettingsIcon className="w-6 h-6 text-cyan-400" />
           </div>
           <div>

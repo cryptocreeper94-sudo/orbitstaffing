@@ -18,9 +18,9 @@ export function SystemArchitectureInfo() {
       {/* Three-Tier Structure */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Tier 1 */}
-        <div className="bg-purple-900/30 border border-purple-600 rounded-lg p-6">
+        <div className="bg-sky-900/30 border border-sky-600 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Shield className="w-6 h-6 text-purple-400" />
+            <Shield className="w-6 h-6 text-sky-400" />
             <h3 className="font-bold text-lg">Tier 1: YOU</h3>
           </div>
           <p className="text-sm text-gray-400 mb-4">Master Admin</p>
@@ -32,8 +32,8 @@ export function SystemArchitectureInfo() {
             <li>✓ System health & config</li>
             <li>✓ View all analytics</li>
           </ul>
-          <div className="mt-4 p-3 bg-purple-900/50 rounded text-xs">
-            <p className="font-bold text-purple-300">Access:</p>
+          <div className="mt-4 p-3 bg-sky-900/50 rounded text-xs">
+            <p className="font-bold text-sky-300">Access:</p>
             <p>PIN → System Control Panel</p>
           </div>
         </div>

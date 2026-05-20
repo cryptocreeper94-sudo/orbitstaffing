@@ -473,7 +473,7 @@ export default function OAuthConnectionWizard() {
 
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
-                    <Users className="mr-2 h-5 w-5 text-purple-400" />
+                    <Users className="mr-2 h-5 w-5 text-sky-400" />
                     👥 HR & STAFFING
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -483,7 +483,7 @@ export default function OAuthConnectionWizard() {
                         onClick={() => toggleProvider(provider.id)}
                         className={`flex items-center space-x-3 p-4 rounded-lg border cursor-pointer transition-all ${
                           selectedProviders.includes(provider.id)
-                            ? 'border-purple-500 bg-purple-950/30'
+                            ? 'border-sky-500 bg-sky-950/30'
                             : 'border-slate-700 bg-slate-800/50 hover:border-slate-600'
                         }`}
                         data-testid={`checkbox-provider-${provider.id}`}

@@ -102,7 +102,7 @@ export function MainAppInfo() {
                 </div>
               </li>
               <li className="flex items-start gap-2">
-                <Lock className="w-4 h-4 text-purple-400 mt-1 flex-shrink-0" />
+                <Lock className="w-4 h-4 text-sky-400 mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-bold text-gray-300">Permission Control</p>
                   <p className="text-xs text-gray-500">Owner defines which features each admin can access</p>
@@ -154,7 +154,7 @@ export function MainAppInfo() {
                 </ul>
               </div>
               <div className="bg-slate-800 rounded p-4">
-                <p className="font-bold text-purple-300 mb-2">Custom</p>
+                <p className="font-bold text-sky-300 mb-2">Custom</p>
                 <ul className="text-xs text-gray-400 space-y-1">
                   <li>✓ Feature requests</li>
                   <li>✓ Custom workflows</li>

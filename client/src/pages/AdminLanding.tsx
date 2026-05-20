@@ -113,7 +113,7 @@ export default function AdminLanding() {
       {/* Investor Pitch Section */}
       <OrbitCard 
         variant="glass" 
-        className="mb-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-700/50"
+        className="mb-8 bg-gradient-to-r from-blue-900/20 to-sky-900/20 border-blue-700/50"
       >
         <OrbitCardHeader
           icon={<TrendingUp className="w-5 h-5 text-blue-400" />}
@@ -312,12 +312,12 @@ export default function AdminLanding() {
 
         {/* Blockchain */}
         <BentoTile
-          className="cursor-pointer p-4 border-purple-700/30 bg-purple-900/5"
+          className="cursor-pointer p-4 border-sky-700/30 bg-sky-900/5"
           onClick={() => toggleSection('blockchain')}
           data-testid="card-blockchain"
         >
           <OrbitCardHeader
-            icon={<Zap className="w-5 h-5 text-purple-400" />}
+            icon={<Zap className="w-5 h-5 text-sky-400" />}
             action={
               <ChevronDown
                 className={`w-5 h-5 transition-transform ${expandedSections.blockchain ? 'rotate-180' : ''}`}
@@ -330,7 +330,7 @@ export default function AdminLanding() {
           {expandedSections.blockchain && (
             <OrbitCardContent className="space-y-3 text-sm">
               <div className="bg-slate-700/30 rounded-lg p-3">
-                <p className="font-bold text-purple-300 mb-2">🪙 ORBIT Loyalty Token</p>
+                <p className="font-bold text-sky-300 mb-2">🪙 ORBIT Loyalty Token</p>
                 <ul className="text-xs text-gray-400 space-y-1 ml-3">
                   <li>✓ Workers earn for assignments (TrustVault/Polygon)</li>
                   <li>✓ Redeem for pay, features, training</li>
@@ -339,7 +339,7 @@ export default function AdminLanding() {
               </div>
 
               <div className="bg-slate-700/30 rounded-lg p-3">
-                <p className="font-bold text-purple-300 mb-2">📜 Blockchain Credentials</p>
+                <p className="font-bold text-sky-300 mb-2">📜 Blockchain Credentials</p>
                 <ul className="text-xs text-gray-400 space-y-1 ml-3">
                   <li>✓ Immutable proof of qualifications</li>
                   <li>✓ Workers own across platforms</li>

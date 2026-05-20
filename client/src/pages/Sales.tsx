@@ -246,7 +246,7 @@ export default function Sales() {
             </BentoTile>
 
             <BentoTile className="p-5">
-              <OrbitCardHeader icon={<Zap className="w-5 h-5 text-purple-400" />}>
+              <OrbitCardHeader icon={<Zap className="w-5 h-5 text-sky-400" />}>
                 <OrbitCardTitle>Slack Notifications</OrbitCardTitle>
                 <OrbitCardDescription>Get reminders in Slack</OrbitCardDescription>
               </OrbitCardHeader>
@@ -258,7 +258,7 @@ export default function Sales() {
                   <li>✓ Team mentions/tags</li>
                   <li>✓ Daily summary reports</li>
                 </ul>
-                <Button className="w-full bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 border border-purple-500/30">
+                <Button className="w-full bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 border border-sky-500/30">
                   <ExternalLink className="w-4 h-4 mr-2" /> Connect Slack
                 </Button>
               </OrbitCardContent>

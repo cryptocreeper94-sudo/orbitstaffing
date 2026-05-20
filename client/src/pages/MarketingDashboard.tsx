@@ -105,7 +105,7 @@ export default function MarketingDashboard() {
                           : lead.status === 'contacted'
                             ? '#f59e0b'
                             : lead.status === 'demo_scheduled'
-                              ? '#8b5cf6'
+                              ? '#0ea5e9'
                               : '#10b981',
                     }}
                     onClick={() => setSelectedLead(lead)}
@@ -122,7 +122,7 @@ export default function MarketingDashboard() {
                             : lead.status === 'contacted'
                               ? 'bg-yellow-100 text-yellow-800'
                               : lead.status === 'demo_scheduled'
-                                ? 'bg-purple-100 text-purple-800'
+                                ? 'bg-sky-100 text-sky-800'
                                 : 'bg-green-100 text-green-800'
                         }`}
                       >

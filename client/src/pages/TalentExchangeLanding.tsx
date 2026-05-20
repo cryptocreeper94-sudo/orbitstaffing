@@ -112,7 +112,7 @@ export default function TalentExchangeLanding() {
       description: "Get matched before regular users as we grow"
     },
     {
-      icon: <Zap className="w-10 h-10 text-purple-400" />,
+      icon: <Zap className="w-10 h-10 text-sky-400" />,
       title: "Shape the Platform",
       description: "Your feedback directly influences our features"
     }
@@ -219,10 +219,10 @@ export default function TalentExchangeLanding() {
             </BentoTile>
 
             {/* Employer Quick Signup */}
-            <BentoTile className="p-0 border-purple-500/30 hover:border-purple-500/50" data-testid="card-employer-signup">
+            <BentoTile className="p-0 border-sky-500/30 hover:border-sky-500/50" data-testid="card-employer-signup">
               <OrbitCard variant="default" hover={false} className="h-full border-0 bg-transparent">
                 <OrbitCardHeader className="flex-col items-center text-center mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-purple-500/25">
+                  <div className="w-16 h-16 bg-gradient-to-br from-sky-500 to-pink-600 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-sky-500/25">
                     <Building2 className="w-8 h-8 text-white" />
                   </div>
                   <OrbitCardTitle className="text-xl sm:text-2xl">Hire Talent</OrbitCardTitle>
@@ -250,12 +250,12 @@ export default function TalentExchangeLanding() {
                       placeholder="Enter your work email"
                       value={employerEmail}
                       onChange={(e) => setEmployerEmail(e.target.value)}
-                      className="bg-slate-900/50 border-slate-600 focus:border-purple-500 text-white"
+                      className="bg-slate-900/50 border-slate-600 focus:border-sky-500 text-white"
                       data-testid="input-employer-email"
                     />
                     <Button 
                       type="submit" 
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-3"
+                      className="w-full bg-gradient-to-r from-sky-500 to-pink-600 hover:from-sky-600 hover:to-pink-700 text-white font-semibold py-3"
                       disabled={isEmployerLoading}
                       data-testid="button-employer-signup"
                     >
@@ -275,7 +275,7 @@ export default function TalentExchangeLanding() {
 
                   <p className="text-xs text-slate-500 text-center">
                     Already registered?{" "}
-                    <Link href="/employer/login" className="text-purple-400 hover:underline">
+                    <Link href="/employer/login" className="text-sky-400 hover:underline">
                       Log in here
                     </Link>
                   </p>
@@ -355,7 +355,7 @@ export default function TalentExchangeLanding() {
 
       {/* Bottom CTA */}
       <div className="container mx-auto px-4 py-12 sm:py-16">
-        <OrbitCard variant="action" hover={false} className="p-6 sm:p-8 text-center max-w-2xl mx-auto bg-gradient-to-r from-cyan-900/30 to-purple-900/30 cursor-default">
+        <OrbitCard variant="action" hover={false} className="p-6 sm:p-8 text-center max-w-2xl mx-auto bg-gradient-to-r from-cyan-900/30 to-sky-900/30 cursor-default">
           <Sparkles className="w-12 h-12 text-amber-400 mx-auto mb-4" />
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">
             Help Us Build Something Great
@@ -372,7 +372,7 @@ export default function TalentExchangeLanding() {
               </Button>
             </Link>
             <Link href="/talent-pool">
-              <Button variant="outline" className="border-purple-500 text-purple-400 hover:bg-purple-500/10 w-full sm:w-auto">
+              <Button variant="outline" className="border-sky-500 text-sky-400 hover:bg-sky-500/10 w-full sm:w-auto">
                 <Users className="w-4 h-4 mr-2" />
                 View Talent Pool
               </Button>

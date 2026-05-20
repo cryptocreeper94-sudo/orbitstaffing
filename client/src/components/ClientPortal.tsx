@@ -274,7 +274,7 @@ export function ClientPortal() {
             </div>
             <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
               <div className="flex items-center justify-between mb-2">
-                <DollarSign className="w-8 h-8 text-purple-400" />
+                <DollarSign className="w-8 h-8 text-sky-400" />
                 <span className="text-2xl font-bold text-white">${stats.monthlySpend.toLocaleString()}</span>
               </div>
               <p className="text-gray-400 text-sm">Monthly Spend</p>

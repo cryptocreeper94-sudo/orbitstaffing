@@ -296,7 +296,7 @@ export function WorkerReferrals() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-500 font-semibold flex-shrink-0">3</div>
+                <div className="w-8 h-8 rounded-full bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-500 font-semibold flex-shrink-0">3</div>
                 <div>
                   <p className="font-semibold text-white">Earn $100 Bonus</p>
                   <p className="text-sm text-muted-foreground">After 30 days of employment, $100 is added to your next paycheck</p>

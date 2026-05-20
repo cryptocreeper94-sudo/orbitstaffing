@@ -140,7 +140,7 @@ interface Application {
 const SUBSCRIPTION_TIERS: Record<number, { name: string; color: string; icon: string }> = {
   1: { name: "Starter", color: "bg-slate-600", icon: "🌱" },
   2: { name: "Professional", color: "bg-blue-600", icon: "⚡" },
-  3: { name: "Enterprise", color: "bg-purple-600", icon: "🚀" },
+  3: { name: "Enterprise", color: "bg-sky-600", icon: "🚀" },
   4: { name: "Premium", color: "bg-amber-600", icon: "👑" },
 };
 
@@ -185,7 +185,7 @@ function getStatusBadgeColor(status: string): string {
     case "accepted":
       return "bg-cyan-600/20 text-cyan-300 border-cyan-500/30";
     case "interview":
-      return "bg-purple-600/20 text-purple-300 border-purple-500/30";
+      return "bg-sky-600/20 text-sky-300 border-sky-500/30";
     default:
       return "bg-slate-600/20 text-slate-300 border-slate-500/30";
   }
@@ -370,7 +370,7 @@ function ApplicationCard({
               <Button
                 size="sm"
                 onClick={() => onUpdateStatus(application.id, "interview")}
-                className="bg-purple-600 hover:bg-purple-500 text-white"
+                className="bg-sky-600 hover:bg-sky-500 text-white"
                 data-testid={`button-interview-${application.id}`}
               >
                 Schedule Interview
@@ -1239,7 +1239,7 @@ export default function EmployerPortal() {
               <BentoTile data-testid="plan-enterprise">
                 <div className="p-5 h-full flex flex-col">
                   <div className="text-center mb-4">
-                    <Badge className="bg-purple-600/50 text-purple-300 mb-2">Enterprise</Badge>
+                    <Badge className="bg-sky-600/50 text-sky-300 mb-2">Enterprise</Badge>
                     <h3 className="text-lg font-semibold text-white">High Volume</h3>
                     <div className="mt-2">
                       <span className="text-3xl font-bold text-white">$249</span>
@@ -1248,16 +1248,16 @@ export default function EmployerPortal() {
                     <p className="text-xs text-green-400 mt-1">Enterprise features at startup price</p>
                   </div>
                   <ul className="space-y-2 text-sm text-slate-300 mb-4 flex-1">
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Unlimited job posts</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Unlimited contacts</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> 10 featured listings/mo</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> API/ATS integration</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Dedicated manager</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Co-branded hiring page</li>
-                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-purple-400" /> Custom reporting</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Unlimited job posts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Unlimited contacts</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> 10 featured listings/mo</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> API/ATS integration</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Dedicated manager</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Co-branded hiring page</li>
+                    <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Custom reporting</li>
                   </ul>
                   <Button 
-                    className="w-full bg-purple-600 hover:bg-purple-500"
+                    className="w-full bg-sky-600 hover:bg-sky-500"
                     onClick={() => handleSubscribe('enterprise')}
                     data-testid="button-subscribe-enterprise"
                   >

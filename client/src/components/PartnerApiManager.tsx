@@ -667,7 +667,7 @@ workers = api.get_workers()`}</code>
 
               <div className="border-t border-gray-700 pt-6">
                 <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-purple-400" />
+                  <Zap className="h-4 w-4 text-sky-400" />
                   Mobile App Template
                 </h4>
                 <p className="text-gray-400 text-sm mb-4">
@@ -675,10 +675,10 @@ workers = api.get_workers()`}</code>
                   Customize branding, colors, and connect to your ORBIT tenant API.
                 </p>
                 
-                <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/10 to-cyan-500/10 border border-purple-500/30">
+                <div className="p-4 rounded-lg bg-gradient-to-br from-sky-500/10 to-cyan-500/10 border border-sky-500/30">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                      <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center">
                         <Zap className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -688,7 +688,7 @@ workers = api.get_workers()`}</code>
                     </div>
                     <Button
                       onClick={() => window.open('/api/partner/mobile-template', '_blank')}
-                      className="bg-gradient-to-r from-purple-500 to-cyan-500 hover:from-purple-600 hover:to-cyan-600"
+                      className="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600"
                       data-testid="btn-download-mobile-template"
                     >
                       Download Template
@@ -721,19 +721,19 @@ workers = api.get_workers()`}</code>
                       <h6 className="text-sm font-medium text-white">Easy Customization</h6>
                       <ul className="text-xs text-gray-400 space-y-1">
                         <li className="flex items-center gap-2">
-                          <Settings className="h-3 w-3 text-purple-400" />
+                          <Settings className="h-3 w-3 text-sky-400" />
                           Customize app name & colors
                         </li>
                         <li className="flex items-center gap-2">
-                          <Globe className="h-3 w-3 text-purple-400" />
+                          <Globe className="h-3 w-3 text-sky-400" />
                           Set your tenant API URL
                         </li>
                         <li className="flex items-center gap-2">
-                          <Code2 className="h-3 w-3 text-purple-400" />
+                          <Code2 className="h-3 w-3 text-sky-400" />
                           Replace logos & branding
                         </li>
                         <li className="flex items-center gap-2">
-                          <Shield className="h-3 w-3 text-purple-400" />
+                          <Shield className="h-3 w-3 text-sky-400" />
                           Ready for App Store/Play Store
                         </li>
                       </ul>

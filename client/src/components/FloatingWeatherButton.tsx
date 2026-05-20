@@ -120,8 +120,8 @@ const WEATHER_GLOWS: Record<string, { color: string; shadow: string; bg: string 
   },
   thunderstorm: { 
     color: 'rgba(234, 179, 8, 0.7)', 
-    shadow: '0 0 40px rgba(234, 179, 8, 0.6), 0 0 80px rgba(139, 92, 246, 0.4)',
-    bg: 'from-yellow-500/20 to-purple-600/15'
+    shadow: '0 0 40px rgba(234, 179, 8, 0.6), 0 0 80px rgba(14,165,233, 0.4)',
+    bg: 'from-yellow-500/20 to-sky-600/15'
   },
   snowy: { 
     color: 'rgba(226, 232, 240, 0.7)', 
@@ -134,9 +134,9 @@ const WEATHER_GLOWS: Record<string, { color: string; shadow: string; bg: string 
     bg: 'from-slate-400/15 to-slate-500/10'
   },
   night: { 
-    color: 'rgba(139, 92, 246, 0.6)', 
-    shadow: '0 0 35px rgba(139, 92, 246, 0.5), 0 0 70px rgba(99, 102, 241, 0.3)',
-    bg: 'from-purple-500/20 to-indigo-600/15'
+    color: 'rgba(14,165,233, 0.6)', 
+    shadow: '0 0 35px rgba(14,165,233, 0.5), 0 0 70px rgba(99, 102, 241, 0.3)',
+    bg: 'from-sky-500/20 to-indigo-600/15'
   },
   tornado: {
     color: 'rgba(220, 38, 38, 0.7)',
@@ -411,7 +411,7 @@ export function FloatingWeatherButton({ onOpenRadar }: FloatingWeatherButtonProp
                   onOpenRadar?.();
                 }}
                 size="sm"
-                className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white h-8 text-xs"
+                className="flex-1 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white h-8 text-xs"
                 data-testid="button-view-radar"
               >
                 <Radar className="w-3.5 h-3.5 mr-1.5" />

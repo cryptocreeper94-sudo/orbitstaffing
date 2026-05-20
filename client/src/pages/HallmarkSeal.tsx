@@ -263,7 +263,7 @@ export default function HallmarkSeal() {
 
           <div className="flex items-center gap-4 mb-4 text-sm text-gray-400">
             <span className="flex items-center gap-2">
-              <Blocks className="w-4 h-4 text-purple-400" />
+              <Blocks className="w-4 h-4 text-sky-400" />
               {filteredAssets} of {totalAssets} assets
             </span>
             {searchQuery && (
@@ -289,7 +289,7 @@ export default function HallmarkSeal() {
               filteredStamps.map((stamp) => (
                 <div key={stamp.version} className="space-y-2">
                   <div className="flex items-center gap-3 text-sm">
-                    <span className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded font-mono">{stamp.version}</span>
+                    <span className="px-2 py-1 bg-sky-500/20 text-sky-300 rounded font-mono">{stamp.version}</span>
                     <span className="flex items-center gap-1 text-gray-400">
                       <Calendar className="w-3 h-3" />
                       {stamp.date}
@@ -297,7 +297,7 @@ export default function HallmarkSeal() {
                   </div>
                   
                   {stamp.products.map((product) => (
-                    <OrbitCard key={product.hash} variant="glass" hover className="border-purple-500/20">
+                    <OrbitCard key={product.hash} variant="glass" hover className="border-sky-500/20">
                       <OrbitCardContent className="space-y-3">
                         <div className="flex items-start justify-between gap-4">
                           <div>
@@ -310,8 +310,8 @@ export default function HallmarkSeal() {
                         </div>
                         
                         <div className="flex items-center gap-2 bg-slate-950/50 rounded p-2">
-                          <Hash className="w-4 h-4 text-purple-400 shrink-0" />
-                          <code className="text-xs font-mono text-purple-300 break-all flex-1">
+                          <Hash className="w-4 h-4 text-sky-400 shrink-0" />
+                          <code className="text-xs font-mono text-sky-300 break-all flex-1">
                             {product.hash}
                           </code>
                           <button
@@ -328,7 +328,7 @@ export default function HallmarkSeal() {
                         </div>
                         
                         <Link href="/trustvault-verification">
-                          <button className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1" data-testid="link-view-on-chain">
+                          <button className="text-xs text-sky-400 hover:text-sky-300 flex items-center gap-1" data-testid="link-view-on-chain">
                             <ExternalLink className="w-3 h-3" />
                             View on TrustVault Explorer
                           </button>

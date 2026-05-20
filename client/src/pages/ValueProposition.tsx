@@ -77,7 +77,7 @@ const orbitAdvantages = [
 
 const colorClasses: Record<string, { border: string; icon: string; stat: string }> = {
   cyan: { border: 'border-cyan-600/50', icon: 'text-cyan-400', stat: 'text-cyan-400' },
-  purple: { border: 'border-purple-600/50', icon: 'text-purple-400', stat: 'text-purple-400' },
+  purple: { border: 'border-sky-600/50', icon: 'text-sky-400', stat: 'text-sky-400' },
   green: { border: 'border-green-600/50', icon: 'text-green-400', stat: 'text-green-400' },
   blue: { border: 'border-blue-600/50', icon: 'text-blue-400', stat: 'text-blue-400' },
   yellow: { border: 'border-yellow-600/50', icon: 'text-yellow-400', stat: 'text-yellow-400' },
@@ -114,14 +114,14 @@ export default function ValueProposition() {
 
       <div className="relative overflow-hidden px-3 sm:px-4 py-12 sm:py-20">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-transparent to-purple-600 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-transparent to-sky-600 blur-3xl" />
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
           <PageHeader
             title="Why ORBIT Staffing OS"
             subtitle="A production-ready staffing platform that outpaces competitors like HubSpot, Guidepoint, and legacy systems"
-            className="[&_h1]:text-3xl [&_h1]:sm:text-5xl [&_h1]:lg:text-6xl [&_h1]:bg-gradient-to-r [&_h1]:from-cyan-400 [&_h1]:to-purple-400 [&_h1]:bg-clip-text [&_h1]:text-transparent [&_p]:text-sm [&_p]:sm:text-lg [&_p]:lg:text-xl"
+            className="[&_h1]:text-3xl [&_h1]:sm:text-5xl [&_h1]:lg:text-6xl [&_h1]:bg-gradient-to-r [&_h1]:from-cyan-400 [&_h1]:to-sky-400 [&_h1]:bg-clip-text [&_h1]:text-transparent [&_p]:text-sm [&_p]:sm:text-lg [&_p]:lg:text-xl"
           />
         </div>
       </div>
@@ -238,7 +238,7 @@ export default function ValueProposition() {
           align="center"
           size="lg"
         />
-        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg" data-testid="button-schedule-demo">
+        <Button className="bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700 px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg" data-testid="button-schedule-demo">
           Schedule a Demo <ArrowRight className="w-5 h-5 ml-2" />
         </Button>
       </div>

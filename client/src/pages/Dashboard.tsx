@@ -140,11 +140,11 @@ const colorMap: Record<string, { bg: string; border: string; text: string; glow:
     hover: "hover:border-emerald-400/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.25)]"
   },
   violet: { 
-    bg: "from-violet-500/10 to-violet-600/5", 
-    border: "border-violet-500/30", 
-    text: "text-violet-400",
-    glow: "shadow-[0_0_20px_rgba(139,92,246,0.15)]",
-    hover: "hover:border-violet-400/50 hover:shadow-[0_0_30px_rgba(139,92,246,0.25)]"
+    bg: "from-cyan-500/10 to-cyan-600/5", 
+    border: "border-cyan-500/30", 
+    text: "text-cyan-400",
+    glow: "shadow-[0_0_20px_rgba(14,165,233,0.15)]",
+    hover: "hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(14,165,233,0.25)]"
   },
 };
 
@@ -319,7 +319,7 @@ function FloatingTutorialButton() {
       onClick={() => openTutorial(dashboardTutorialContent)}
       className={cn(
         "fixed bottom-24 right-6 z-40 p-3 rounded-full",
-        "bg-gradient-to-br from-cyan-500 to-violet-600",
+        "bg-gradient-to-br from-cyan-500 to-cyan-600",
         "text-white shadow-lg shadow-cyan-500/30",
         "hover:shadow-cyan-500/50 hover:scale-110 transition-all",
         pulse && "animate-pulse"
@@ -383,13 +383,13 @@ export default function Dashboard() {
                 Add Clients
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setLocation('/work-orders')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
-                <ClipboardList className="w-4 h-4 mr-2 text-violet-400" />
+                <ClipboardList className="w-4 h-4 mr-2 text-cyan-400" />
                 Create Work Order
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-slate-700" />
               <DropdownMenuLabel className="text-slate-400">Admin</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => setLocation('/admin')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
-                <Lock className="w-4 h-4 mr-2 text-violet-400" />
+                <Lock className="w-4 h-4 mr-2 text-cyan-400" />
                 Admin Panel
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setLocation('/settings')} className="text-slate-300 focus:bg-slate-800 focus:text-white">
@@ -435,7 +435,7 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-cyan-500/10 border border-cyan-500/30 rounded-xl p-6 text-center"
+            className="bg-gradient-to-r from-cyan-500/10 via-cyan-500/10 to-cyan-500/10 border border-cyan-500/30 rounded-xl p-6 text-center"
           >
             <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-cyan-500/20 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-cyan-400" />

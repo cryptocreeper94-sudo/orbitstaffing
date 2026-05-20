@@ -458,7 +458,7 @@ export default function HelpCenterPage() {
           </OrbitCard>
           <OrbitCard variant="glass" className="text-center">
             <div className="p-4">
-              <MessageCircle className="w-8 h-8 text-purple-400 mx-auto mb-3" />
+              <MessageCircle className="w-8 h-8 text-sky-400 mx-auto mb-3" />
               <h3 className="font-semibold text-white mb-1">Contact Support</h3>
               <p className="text-sm text-slate-400">Get help from our team</p>
             </div>

@@ -122,7 +122,7 @@ export function BetaTesterDashboard({ testerName, onLogout }: BetaTesterDashboar
         {activeSection === 'overview' && (
           <div className="space-y-6">
             {/* Welcome Card */}
-            <div className="bg-gradient-to-r from-cyan-900/50 to-purple-900/50 border border-cyan-700/50 rounded-lg p-6">
+            <div className="bg-gradient-to-r from-cyan-900/50 to-sky-900/50 border border-cyan-700/50 rounded-lg p-6">
               <h2 className="text-2xl font-bold text-white mb-2">Welcome to ORBIT Beta Testing!</h2>
               <p className="text-gray-300 mb-4">
                 You have full sandbox access to test all platform features. Explore the system, 

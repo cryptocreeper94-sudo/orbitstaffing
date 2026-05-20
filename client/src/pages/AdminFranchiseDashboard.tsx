@@ -187,7 +187,7 @@ export default function AdminFranchiseDashboard() {
       case 'rejected':
         return <Badge className="bg-red-500/20 text-red-400 border-red-500/30"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
       case 'completed':
-        return <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30"><Crown className="h-3 w-3 mr-1" />Completed</Badge>;
+        return <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30"><Crown className="h-3 w-3 mr-1" />Completed</Badge>;
       default:
         return <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">{status}</Badge>;
     }
@@ -211,7 +211,7 @@ export default function AdminFranchiseDashboard() {
   const statCards = [
     { label: "Pending Applications", value: pendingCount, icon: <Clock className="h-6 w-6" />, className: "border-yellow-500/30" },
     { label: "Approved", value: approvedCount, icon: <CheckCircle2 className="h-6 w-6" />, className: "border-green-500/30" },
-    { label: "Active Franchises", value: franchiseHallmarks.length, icon: <Crown className="h-6 w-6" />, className: "border-purple-500/30" },
+    { label: "Active Franchises", value: franchiseHallmarks.length, icon: <Crown className="h-6 w-6" />, className: "border-sky-500/30" },
     { label: "Total Hallmarks", value: hallmarks.length, icon: <Shield className="h-6 w-6" />, className: "border-cyan-500/30" },
   ];
 
@@ -502,7 +502,7 @@ export default function AdminFranchiseDashboard() {
                   <OrbitCard 
                     key={hallmark.id} 
                     className={hallmark.ownershipMode === 'franchise_owned' 
-                      ? 'border-purple-500/30' 
+                      ? 'border-sky-500/30' 
                       : ''
                     }
                   >
@@ -511,11 +511,11 @@ export default function AdminFranchiseDashboard() {
                         <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                             hallmark.ownershipMode === 'franchise_owned'
-                              ? 'bg-purple-500/20'
+                              ? 'bg-sky-500/20'
                               : 'bg-cyan-500/20'
                           }`}>
                             {hallmark.ownershipMode === 'franchise_owned' ? (
-                              <Crown className="h-6 w-6 text-purple-400" />
+                              <Crown className="h-6 w-6 text-sky-400" />
                             ) : (
                               <Shield className="h-6 w-6 text-cyan-400" />
                             )}
@@ -525,7 +525,7 @@ export default function AdminFranchiseDashboard() {
                             <div className="flex items-center gap-3 text-sm flex-wrap">
                               <Badge className={`${
                                 hallmark.ownershipMode === 'franchise_owned'
-                                  ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                                  ? 'bg-sky-500/20 text-sky-300 border-sky-500/30'
                                   : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
                               }`}>
                                 {hallmark.ownershipMode === 'franchise_owned' ? 'Franchise' : 'Subscriber'}
@@ -570,7 +570,7 @@ export default function AdminFranchiseDashboard() {
                 <BentoTile key={tier.id}>
                   <OrbitCard className="h-full border-0 bg-transparent" hover={false}>
                     <OrbitCardHeader 
-                      icon={<Crown className="h-5 w-5 text-purple-400" />}
+                      icon={<Crown className="h-5 w-5 text-sky-400" />}
                     >
                       <OrbitCardTitle>{tier.tierName}</OrbitCardTitle>
                       <p className="text-sm text-gray-400">{tier.tierCode}</p>

@@ -62,7 +62,7 @@ const CONNECTED_PRODUCTS = [
     name: "DarkWave Pulse",
     description: "Real-time analytics engine",
     icon: <BarChart3 className="h-6 w-6" />,
-    color: "from-purple-500 to-indigo-600",
+    color: "from-sky-500 to-indigo-600",
   },
   {
     id: "orby",
@@ -248,7 +248,7 @@ export default function DeveloperPortal() {
           </Badge>
 
           <h1
-            className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent"
+            className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-blue-400 to-sky-400 bg-clip-text text-transparent"
             data-testid="text-portal-headline"
           >
             Orbit Developer Portal
@@ -337,8 +337,8 @@ export default function DeveloperPortal() {
               className="p-6 rounded-2xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-slate-700/50 backdrop-blur-sm"
               data-testid="card-benefit-blockchain"
             >
-              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-sky-400" />
               </div>
               <h3 className="text-xl font-bold mb-2">Blockchain-Verified</h3>
               <p className="text-gray-400">

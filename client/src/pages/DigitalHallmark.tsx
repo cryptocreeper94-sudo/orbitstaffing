@@ -241,7 +241,7 @@ export default function DigitalHallmark() {
                 </BentoTile>
               </BentoGrid>
 
-              <OrbitCard variant="action" hover={false} className="mb-8 cursor-default bg-gradient-to-r from-cyan-900/20 to-purple-900/20">
+              <OrbitCard variant="action" hover={false} className="mb-8 cursor-default bg-gradient-to-r from-cyan-900/20 to-sky-900/20">
                 <OrbitCardHeader icon={<Briefcase className="w-5 h-5 text-cyan-400" />}>
                   <OrbitCardTitle>How Workers Use It</OrbitCardTitle>
                 </OrbitCardHeader>
@@ -257,9 +257,9 @@ export default function DigitalHallmark() {
                 </OrbitCardContent>
               </OrbitCard>
 
-              <OrbitCard variant="glass" className="border-purple-400/20">
-                <OrbitCardHeader icon={<Link2 className="w-5 h-5 text-purple-400" />}>
-                  <OrbitCardTitle className="text-purple-300">Ties Into HR File</OrbitCardTitle>
+              <OrbitCard variant="glass" className="border-sky-400/20">
+                <OrbitCardHeader icon={<Link2 className="w-5 h-5 text-sky-400" />}>
+                  <OrbitCardTitle className="text-sky-300">Ties Into HR File</OrbitCardTitle>
                 </OrbitCardHeader>
                 <OrbitCardContent>
                   <p className="text-sm text-gray-300 mb-4">
@@ -268,7 +268,7 @@ export default function DigitalHallmark() {
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-300">
                     {hrFileItems.map((item) => (
                       <li key={item} className="flex items-center gap-2">
-                        <span className="text-purple-400">•</span> {item}
+                        <span className="text-sky-400">•</span> {item}
                       </li>
                     ))}
                   </ul>
@@ -363,7 +363,7 @@ export default function DigitalHallmark() {
                 <p className="text-xs font-bold text-gray-300 mb-3">CERTIFICATIONS</p>
                 <div className="flex flex-wrap gap-2">
                   {worker.certifications.map((cert) => (
-                    <span key={cert} className="bg-purple-900/30 border border-purple-700 text-purple-300 text-xs px-3 py-1 rounded-full">
+                    <span key={cert} className="bg-sky-900/30 border border-sky-700 text-sky-300 text-xs px-3 py-1 rounded-full">
                       {cert}
                     </span>
                   ))}

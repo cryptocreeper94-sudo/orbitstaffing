@@ -408,10 +408,10 @@ export default function PartnerAgencyDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="border-l-4 border-l-purple-500 bg-card/50">
+            <Card className="border-l-4 border-l-sky-500 bg-card/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <DollarSign className="w-5 h-5 text-purple-400" />
+                  <DollarSign className="w-5 h-5 text-sky-400" />
                   Audit Trail
                 </CardTitle>
               </CardHeader>

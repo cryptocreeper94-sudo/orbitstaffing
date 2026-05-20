@@ -940,7 +940,7 @@ export default function OwnerHub() {
               </BentoTile>
             </BentoGrid>
 
-            <OrbitCard variant="glass" className="bg-gradient-to-r from-pink-900/30 to-purple-900/30 border-pink-500/30">
+            <OrbitCard variant="glass" className="bg-gradient-to-r from-pink-900/30 to-sky-900/30 border-pink-500/30">
               <OrbitCardContent className="flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-white mb-2">Open Enrollment Starting Soon</h3>

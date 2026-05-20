@@ -49,7 +49,7 @@ interface DeveloperProfile {
 const TIER_INFO: Record<string, { name: string; color: string; icon: React.ReactNode }> = {
   starter: { name: "Starter", color: "from-slate-500 to-slate-600", icon: <Zap className="w-5 h-5" /> },
   pro: { name: "Pro", color: "from-cyan-500 to-blue-600", icon: <Crown className="w-5 h-5" /> },
-  enterprise: { name: "Enterprise", color: "from-purple-500 to-indigo-600", icon: <Crown className="w-5 h-5" /> },
+  enterprise: { name: "Enterprise", color: "from-sky-500 to-indigo-600", icon: <Crown className="w-5 h-5" /> },
 };
 
 export default function DeveloperAccount() {
@@ -290,7 +290,7 @@ export default function DeveloperAccount() {
                     {canceling ? "Canceling..." : "Cancel Subscription"}
                   </Button>
                   <Button
-                    className="bg-gradient-to-r from-purple-500 to-indigo-600"
+                    className="bg-gradient-to-r from-sky-500 to-indigo-600"
                     onClick={() => handleUpgrade("enterprise")}
                     data-testid="button-upgrade-enterprise"
                   >

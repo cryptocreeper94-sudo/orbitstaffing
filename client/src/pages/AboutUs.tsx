@@ -44,7 +44,7 @@ export default function AboutUs() {
             subtitle="100% automated, white-label staffing platform designed to revolutionize temporary workforce management across skilled trades, hospitality, and general labor sectors."
             align="center"
             size="lg"
-            className="mb-0 [&_h2]:bg-gradient-to-r [&_h2]:from-cyan-400 [&_h2]:to-purple-400 [&_h2]:bg-clip-text [&_h2]:text-transparent"
+            className="mb-0 [&_h2]:bg-gradient-to-r [&_h2]:from-cyan-400 [&_h2]:to-sky-400 [&_h2]:bg-clip-text [&_h2]:text-transparent"
           />
         </section>
 
@@ -75,8 +75,8 @@ export default function AboutUs() {
             <OrbitCard variant="glass" hover={false} className="h-full border-0 bg-transparent p-6">
               <OrbitCardHeader
                 icon={
-                  <div className="p-2 bg-purple-500/20 rounded-lg">
-                    <Shield className="w-6 h-6 text-purple-400" />
+                  <div className="p-2 bg-sky-500/20 rounded-lg">
+                    <Shield className="w-6 h-6 text-sky-400" />
                   </div>
                 }
               >

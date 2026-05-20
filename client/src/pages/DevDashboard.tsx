@@ -319,8 +319,8 @@ export default function DevDashboard() {
             <StatCard
               label="Blockchain Anchors"
               value={stats?.blockchainAnchors || 0}
-              icon={<Hash className="h-8 w-8 text-purple-400" />}
-              className="[&_.text-cyan-400]:text-purple-400"
+              icon={<Hash className="h-8 w-8 text-sky-400" />}
+              className="[&_.text-cyan-400]:text-sky-400"
               data-testid="stat-blockchain"
             />
           </BentoTile>
@@ -650,8 +650,8 @@ export default function DevDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <OrbitCard>
                 <OrbitCardContent className="text-center py-6">
-                  <Hash className="h-10 w-10 text-purple-400 mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-purple-400" data-testid="stat-total-anchors">
+                  <Hash className="h-10 w-10 text-sky-400 mx-auto mb-3" />
+                  <div className="text-3xl font-bold text-sky-400" data-testid="stat-total-anchors">
                     {stats?.blockchainAnchors || 0}
                   </div>
                   <p className="text-slate-400 mt-1">Total Anchored</p>
@@ -731,7 +731,7 @@ export default function DevDashboard() {
           </Button>
           <Button
             variant="outline"
-            className="border-purple-600/30 text-purple-400 hover:bg-purple-950/30 h-auto py-4"
+            className="border-sky-600/30 text-sky-400 hover:bg-sky-950/30 h-auto py-4"
             onClick={() => toast({ title: 'Coming soon', description: 'Announcement feature is under development' })}
             data-testid="button-broadcast"
           >

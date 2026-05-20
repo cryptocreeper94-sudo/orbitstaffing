@@ -276,8 +276,8 @@ export function OrbyHallmark({
               </div>
               <div className="flex items-center justify-between text-sm mt-2">
                 <span className="text-gray-400">Network:</span>
-                <span className="text-purple-300 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                <span className="text-sky-300 flex items-center gap-1">
+                  <span className="w-2 h-2 bg-sky-400 rounded-full"></span>
                   TrustVault Network
                 </span>
               </div>
@@ -303,7 +303,7 @@ export function OrbyHallmark({
                 href={fullVerificationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 py-3 px-4 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+                className="flex-1 py-3 px-4 bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
                 data-testid="verify-on-chain"
               >
                 <ExternalLink className="w-4 h-4" />

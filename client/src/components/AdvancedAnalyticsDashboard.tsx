@@ -13,7 +13,7 @@ interface AnalyticsMetrics {
   topPerformers: Array<{ name: string; score: number; revenue: number }>;
 }
 
-const COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444'];
+const COLORS = ['#06b6d4', '#0ea5e9', '#f59e0b', '#10b981', '#ef4444'];
 
 export function AdvancedAnalyticsDashboard() {
   const [metrics, setMetrics] = useState<AnalyticsMetrics>({
@@ -49,7 +49,7 @@ export function AdvancedAnalyticsDashboard() {
     { range: '80-89', count: 112, fill: '#06b6d4' },
     { range: '70-79', count: 98, fill: '#f59e0b' },
     { range: '60-69', count: 52, fill: '#ef4444' },
-    { range: '<60', count: 35, fill: '#7c3aed' },
+    { range: '<60', count: 35, fill: '#0369a1' },
   ];
 
   // Industry breakdown
@@ -103,8 +103,8 @@ export function AdvancedAnalyticsDashboard() {
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <Award className="w-8 h-8 text-purple-400" />
-            <span className="text-sm font-bold text-purple-400">{metrics.avgWorkerPerformance}/100</span>
+            <Award className="w-8 h-8 text-sky-400" />
+            <span className="text-sm font-bold text-sky-400">{metrics.avgWorkerPerformance}/100</span>
           </div>
           <p className="text-2xl font-bold">{metrics.avgWorkerPerformance}%</p>
           <p className="text-xs text-gray-400 mt-1">Avg Performance Score</p>
@@ -153,7 +153,7 @@ export function AdvancedAnalyticsDashboard() {
         {/* Worker Performance Distribution */}
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-purple-400" />
+            <BarChart3 className="w-5 h-5 text-sky-400" />
             <h3 className="text-lg font-bold">Performance Distribution</h3>
           </div>
           <ResponsiveContainer width="100%" height={250}>
@@ -162,7 +162,7 @@ export function AdvancedAnalyticsDashboard() {
               <XAxis dataKey="range" stroke="#9ca3af" />
               <YAxis stroke="#9ca3af" />
               <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }} />
-              <Bar dataKey="count" fill="#8b5cf6" name="Workers" />
+              <Bar dataKey="count" fill="#0ea5e9" name="Workers" />
             </BarChart>
           </ResponsiveContainer>
         </div>

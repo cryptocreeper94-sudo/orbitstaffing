@@ -262,8 +262,8 @@ function SlideRenderer({ slide }: { slide: Slide }) {
       problem: "from-red-950/30 via-slate-900 to-slate-900",
       solution: "from-emerald-950/30 via-slate-900 to-cyan-950/30",
       feature: "from-slate-900 via-slate-800 to-slate-900",
-      comparison: "from-slate-900 via-purple-950/20 to-slate-900",
-      cta: "from-cyan-950/40 via-slate-900 to-purple-950/40",
+      comparison: "from-slate-900 via-sky-950/20 to-slate-900",
+      cta: "from-cyan-950/40 via-slate-900 to-sky-950/40",
       closing: "from-slate-900 via-slate-800 to-slate-900"
     };
     return gradients[content.type] || gradients.feature;
@@ -282,7 +282,7 @@ function SlideRenderer({ slide }: { slide: Slide }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-sky-400"
           >
             {content.headline}
           </motion.h1>

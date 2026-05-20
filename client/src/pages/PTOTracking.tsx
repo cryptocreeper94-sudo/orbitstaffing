@@ -92,7 +92,7 @@ export default function PTOTracking() {
     switch (type) {
       case "vacation": return <Sun className="w-4 h-4 text-yellow-400" />;
       case "sick": return <Heart className="w-4 h-4 text-red-400" />;
-      case "personal": return <Briefcase className="w-4 h-4 text-purple-400" />;
+      case "personal": return <Briefcase className="w-4 h-4 text-sky-400" />;
       case "unpaid": return <Clock className="w-4 h-4 text-slate-400" />;
       default: return <CalendarIcon className="w-4 h-4" />;
     }

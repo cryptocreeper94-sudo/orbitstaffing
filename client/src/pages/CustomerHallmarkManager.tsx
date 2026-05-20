@@ -194,7 +194,7 @@ export default function CustomerHallmarkManager() {
                   </Button>
                 </Link>
                 <Link href="/franchise">
-                  <Button variant="outline" className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10" data-testid="button-franchise-info">
+                  <Button variant="outline" className="border-sky-500/50 text-sky-400 hover:bg-sky-500/10" data-testid="button-franchise-info">
                     <Crown className="h-4 w-4 mr-2" />
                     Franchise Information
                   </Button>
@@ -223,9 +223,9 @@ export default function CustomerHallmarkManager() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-1/3">
-            <Card className={`bg-gradient-to-br ${isFranchise ? 'from-purple-900/50 to-pink-900/30 border-purple-500/30' : 'from-cyan-900/50 to-blue-900/30 border-cyan-500/30'}`}>
+            <Card className={`bg-gradient-to-br ${isFranchise ? 'from-sky-900/50 to-pink-900/30 border-sky-500/30' : 'from-cyan-900/50 to-blue-900/30 border-cyan-500/30'}`}>
               <CardHeader className="text-center pb-4">
-                <div className={`w-20 h-20 rounded-2xl ${isFranchise ? 'bg-gradient-to-br from-purple-500 to-pink-500' : 'bg-gradient-to-br from-cyan-500 to-blue-500'} flex items-center justify-center mx-auto mb-4`}>
+                <div className={`w-20 h-20 rounded-2xl ${isFranchise ? 'bg-gradient-to-br from-sky-500 to-pink-500' : 'bg-gradient-to-br from-cyan-500 to-blue-500'} flex items-center justify-center mx-auto mb-4`}>
                   {isFranchise ? (
                     <Crown className="h-10 w-10 text-white" />
                   ) : (
@@ -233,7 +233,7 @@ export default function CustomerHallmarkManager() {
                   )}
                 </div>
                 <CardTitle className="text-2xl text-white">{hallmark.hallmarkName}</CardTitle>
-                <Badge className={`${isFranchise ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'}`}>
+                <Badge className={`${isFranchise ? 'bg-sky-500/20 text-sky-300 border-sky-500/30' : 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'}`}>
                   {isFranchise ? 'Franchise Owner' : 'Subscriber Managed'}
                 </Badge>
               </CardHeader>
@@ -283,7 +283,7 @@ export default function CustomerHallmarkManager() {
                 
                 {isFranchise && !hallmark.franchiseAgreementUrl && (
                   <Button 
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    className="w-full bg-gradient-to-r from-sky-500 to-pink-500"
                     onClick={() => startSupportSubscription.mutate()}
                     disabled={startSupportSubscription.isPending}
                     data-testid="button-start-subscription"
@@ -340,7 +340,7 @@ export default function CustomerHallmarkManager() {
                   <Card className="bg-gray-800/50 border-gray-700">
                     <CardHeader>
                       <CardTitle className="text-white flex items-center gap-2">
-                        <Award className="h-5 w-5 text-purple-400" />
+                        <Award className="h-5 w-5 text-sky-400" />
                         Franchise Benefits
                       </CardTitle>
                     </CardHeader>
@@ -408,7 +408,7 @@ export default function CustomerHallmarkManager() {
                 </Card>
 
                 {!isFranchise && (
-                  <Card className="bg-gradient-to-r from-purple-900/30 to-pink-900/30 border-purple-500/30">
+                  <Card className="bg-gradient-to-r from-sky-900/30 to-pink-900/30 border-sky-500/30">
                     <CardContent className="py-6">
                       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div>
@@ -418,7 +418,7 @@ export default function CustomerHallmarkManager() {
                           </p>
                         </div>
                         <Link href="/franchise">
-                          <Button className="bg-gradient-to-r from-purple-500 to-pink-500 whitespace-nowrap" data-testid="button-upgrade-franchise">
+                          <Button className="bg-gradient-to-r from-sky-500 to-pink-500 whitespace-nowrap" data-testid="button-upgrade-franchise">
                             View Franchise Options
                             <ChevronRight className="h-4 w-4 ml-2" />
                           </Button>
@@ -453,13 +453,13 @@ export default function CustomerHallmarkManager() {
                             <div className="flex items-center gap-4">
                               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                                 payment.paymentType === 'franchise_fee' 
-                                  ? 'bg-purple-500/20' 
+                                  ? 'bg-sky-500/20' 
                                   : payment.paymentType === 'royalty'
                                   ? 'bg-amber-500/20'
                                   : 'bg-cyan-500/20'
                               }`}>
                                 {payment.paymentType === 'franchise_fee' ? (
-                                  <Crown className="h-5 w-5 text-purple-400" />
+                                  <Crown className="h-5 w-5 text-sky-400" />
                                 ) : payment.paymentType === 'royalty' ? (
                                   <TrendingUp className="h-5 w-5 text-amber-400" />
                                 ) : (
@@ -620,7 +620,7 @@ export default function CustomerHallmarkManager() {
                           />
                           <div 
                             className="w-8 h-8 rounded-lg border border-gray-600"
-                            style={{ backgroundColor: hallmark.secondaryColor || '#8b5cf6' }}
+                            style={{ backgroundColor: hallmark.secondaryColor || '#0ea5e9' }}
                           />
                           <span className="text-gray-500 text-sm ml-2">
                             {hallmark.primaryColor && hallmark.secondaryColor ? 'Custom' : 'Default ORBIT theme'}
@@ -687,9 +687,9 @@ export default function CustomerHallmarkManager() {
 
 function BenefitCard({ icon: Icon, label, value, active }: { icon: any; label: string; value: string; active: boolean }) {
   return (
-    <div className={`p-4 rounded-lg ${active ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-gray-700/50 border border-gray-600'}`}>
+    <div className={`p-4 rounded-lg ${active ? 'bg-sky-500/10 border border-sky-500/30' : 'bg-gray-700/50 border border-gray-600'}`}>
       <div className="flex items-center gap-2 mb-2">
-        <Icon className={`h-4 w-4 ${active ? 'text-purple-400' : 'text-gray-500'}`} />
+        <Icon className={`h-4 w-4 ${active ? 'text-sky-400' : 'text-gray-500'}`} />
         <span className="text-xs text-gray-400">{label}</span>
       </div>
       <div className={`font-semibold ${active ? 'text-white' : 'text-gray-500'}`}>{value}</div>

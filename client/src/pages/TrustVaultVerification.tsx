@@ -127,8 +127,8 @@ export default function TrustVaultVerification() {
   const uniqueHashes = new Set(blockchainStamps.flatMap(s => s.products.map(p => p.hash))).size;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950/20 to-slate-950 text-white">
-      <header className="border-b border-purple-500/30 backdrop-blur-sm sticky top-0 z-50 bg-slate-950/80">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-sky-950/20 to-slate-950 text-white">
+      <header className="border-b border-sky-500/30 backdrop-blur-sm sticky top-0 z-50 bg-slate-950/80">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <PageHeader
             title="TrustVault Blockchain Verification"
@@ -146,7 +146,7 @@ export default function TrustVaultVerification() {
               </Button>
             }
             actions={
-              <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <Badge className="bg-sky-500/20 text-sky-300 border-sky-500/30">
                 Powered by TrustVault
               </Badge>
             }
@@ -157,7 +157,7 @@ export default function TrustVaultVerification() {
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         <section className="text-center space-y-6">
           <h1 className="text-2xl sm:text-4xl font-bold">
-            <span className="bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-sky-400 to-cyan-400 bg-clip-text text-transparent">
               Blockchain Verified
             </span>
           </h1>
@@ -212,7 +212,7 @@ export default function TrustVaultVerification() {
 
           <div className="space-y-6">
             {blockchainStamps.map((stamp, i) => (
-              <OrbitCard key={i} variant="default" className="border-purple-500/30">
+              <OrbitCard key={i} variant="default" className="border-sky-500/30">
                 <OrbitCardHeader
                   icon={
                     <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30 font-mono">
@@ -239,7 +239,7 @@ export default function TrustVaultVerification() {
                             <h3 className="font-semibold text-sm text-white">{product.name}</h3>
                             <p className="text-xs text-slate-400 mb-2">{product.description}</p>
                             <div className="flex items-center gap-2">
-                              <code className="text-[10px] sm:text-xs font-mono text-purple-300 bg-purple-900/30 px-2 py-1 rounded truncate max-w-[200px] sm:max-w-none">
+                              <code className="text-[10px] sm:text-xs font-mono text-sky-300 bg-sky-900/30 px-2 py-1 rounded truncate max-w-[200px] sm:max-w-none">
                                 {product.hash.slice(0, 16)}...{product.hash.slice(-8)}
                               </code>
                               <button

@@ -130,7 +130,7 @@ export function AdminBusinessCardDisplay({
           <Button
             onClick={onCustomize}
             size="sm"
-            className="bg-purple-600 hover:bg-purple-700"
+            className="bg-sky-600 hover:bg-sky-700"
             data-testid="button-customize-card"
           >
             <Edit2 className="w-4 h-4 mr-2" />

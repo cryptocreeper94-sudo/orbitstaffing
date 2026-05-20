@@ -21,7 +21,7 @@ export default function CryptoWallet() {
   const transactions: { id: number; type: string; amount: string; date: string }[] = [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 p-4 sm:p-8">
       <div className="max-w-5xl mx-auto">
         <PageHeader
           title="ORBIT Crypto Wallet"
@@ -35,39 +35,39 @@ export default function CryptoWallet() {
             </Link>
           }
           actions={
-            <Badge className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white border-0">
+            <Badge className="bg-gradient-to-r from-sky-500 to-cyan-500 text-white border-0">
               <Zap className="w-3 h-3 mr-1" /> TrustVault Powered
             </Badge>
           }
         />
 
         <BentoGrid cols={2} gap="lg" className="mb-12">
-          <BentoTile className="border-2 border-purple-500/30">
+          <BentoTile className="border-2 border-sky-500/30">
             <OrbitCard variant="default" hover={false} className="h-full border-0 bg-transparent p-0">
               <OrbitCardHeader
-                icon={<Wallet className="w-5 h-5 text-purple-300" />}
+                icon={<Wallet className="w-5 h-5 text-sky-300" />}
                 action={
                   <Badge className="bg-green-500/20 text-green-400 border-green-500/40">
                     Connected
                   </Badge>
                 }
               >
-                <OrbitCardTitle className="text-purple-300">ORBIT Treasury</OrbitCardTitle>
+                <OrbitCardTitle className="text-sky-300">ORBIT Treasury</OrbitCardTitle>
               </OrbitCardHeader>
               
               <OrbitCardContent className="space-y-6">
-                <div className="bg-slate-950/50 rounded-xl p-4 border border-purple-500/20">
+                <div className="bg-slate-950/50 rounded-xl p-4 border border-sky-500/20">
                   <div className="text-xs text-gray-500 mb-1">Wallet Address</div>
                   <div className="flex items-center gap-2">
-                    <code className="text-xs text-purple-300 font-mono break-all flex-1">
+                    <code className="text-xs text-sky-300 font-mono break-all flex-1">
                       {walletAddress}
                     </code>
                     <button 
                       onClick={copyAddress}
-                      className="p-2 hover:bg-purple-500/20 rounded-lg transition-colors"
+                      className="p-2 hover:bg-sky-500/20 rounded-lg transition-colors"
                       data-testid="button-copy-address"
                     >
-                      <Copy className="w-4 h-4 text-purple-400" />
+                      <Copy className="w-4 h-4 text-sky-400" />
                     </button>
                   </div>
                   {copied && <div className="text-xs text-green-400 mt-2">Copied!</div>}
@@ -77,12 +77,12 @@ export default function CryptoWallet() {
                   label="Current Balance"
                   value="0.00 SOL"
                   icon={<Wallet className="w-6 h-6" />}
-                  className="bg-slate-950/30 border-purple-500/20"
+                  className="bg-slate-950/30 border-sky-500/20"
                 />
                 <div className="text-sm text-gray-500 text-center -mt-4">≈ $0.00 USD</div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <Button className="bg-purple-600 hover:bg-purple-500 flex-col h-auto py-4" data-testid="button-receive">
+                  <Button className="bg-sky-600 hover:bg-sky-500 flex-col h-auto py-4" data-testid="button-receive">
                     <ArrowDownLeft className="w-5 h-5 mb-1" />
                     <span className="text-xs">Receive</span>
                   </Button>
@@ -90,7 +90,7 @@ export default function CryptoWallet() {
                     <Send className="w-5 h-5 mb-1" />
                     <span className="text-xs">Send</span>
                   </Button>
-                  <Button variant="outline" className="border-purple-500/40 text-purple-300 flex-col h-auto py-4" data-testid="button-qr">
+                  <Button variant="outline" className="border-sky-500/40 text-sky-300 flex-col h-auto py-4" data-testid="button-qr">
                     <QrCode className="w-5 h-5 mb-1" />
                     <span className="text-xs">QR Code</span>
                   </Button>
@@ -106,8 +106,8 @@ export default function CryptoWallet() {
               </OrbitCardHeader>
               <OrbitCardContent className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-4 h-4 text-purple-400" />
+                  <div className="w-8 h-8 rounded-lg bg-sky-500/20 flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4 h-4 text-sky-400" />
                   </div>
                   <div>
                     <div className="font-semibold text-white text-sm">Instant Settlements</div>
@@ -135,7 +135,7 @@ export default function CryptoWallet() {
               </OrbitCardContent>
             </OrbitCard>
 
-            <OrbitCard variant="default" className="bg-gradient-to-br from-purple-900/30 to-cyan-900/20 border-purple-500/30">
+            <OrbitCard variant="default" className="bg-gradient-to-br from-sky-900/30 to-cyan-900/20 border-sky-500/30">
               <OrbitCardContent className="text-center">
                 <div className="text-3xl mb-3">⛓️</div>
                 <h3 className="text-lg font-bold text-white mb-2">TrustVault Network</h3>
@@ -146,7 +146,7 @@ export default function CryptoWallet() {
                   href="https://darkwave-trust-layer.onrender.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300"
+                  className="inline-flex items-center gap-2 text-sm text-sky-400 hover:text-sky-300"
                 >
                   Learn about TrustVault <ExternalLink className="w-3 h-3" />
                 </a>

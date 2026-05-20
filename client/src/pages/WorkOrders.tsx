@@ -78,7 +78,7 @@ export default function WorkOrders() {
       case "under_review":
         return "bg-orange-500/20 text-orange-400";
       case "completed":
-        return "bg-purple-500/20 text-purple-400";
+        return "bg-sky-500/20 text-sky-400";
       case "cancelled":
         return "bg-red-500/20 text-red-400";
       default:

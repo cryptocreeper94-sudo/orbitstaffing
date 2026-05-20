@@ -46,8 +46,8 @@ export default function WeatherNewsWidget({
     if (percent < 20) return 'from-green-500 to-green-600';
     if (percent < 40) return 'from-blue-400 to-blue-500';
     if (percent < 60) return 'from-blue-500 to-blue-600';
-    if (percent < 80) return 'from-purple-600 to-purple-700';
-    return 'from-purple-700 to-red-700';
+    if (percent < 80) return 'from-sky-600 to-sky-700';
+    return 'from-sky-700 to-red-700';
   };
 
   return (

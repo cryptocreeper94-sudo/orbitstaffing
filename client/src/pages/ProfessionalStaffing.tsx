@@ -46,14 +46,14 @@ export default function ProfessionalStaffing() {
           subtitle="ORBIT Professional Staffing handles high-value placements: nurses, accountants, engineers, consultants, and specialized professionals."
           breadcrumb={
             <Link href="/">
-              <Button variant="ghost" className="text-purple-400 hover:text-purple-300 hover:bg-purple-900/20 min-h-[44px] -ml-3" data-testid="button-back-home">
+              <Button variant="ghost" className="text-sky-400 hover:text-sky-300 hover:bg-sky-900/20 min-h-[44px] -ml-3" data-testid="button-back-home">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
             </Link>
           }
           actions={
-            <div className="flex items-center gap-2 text-purple-300">
+            <div className="flex items-center gap-2 text-sky-300">
               <Lock className="w-5 h-5" />
               <span className="text-xs sm:text-sm">Coming Q3 2026 - Preview Mode</span>
             </div>
@@ -62,14 +62,14 @@ export default function ProfessionalStaffing() {
 
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8 bg-slate-800 border border-slate-700 p-1 gap-0">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Overview</TabsTrigger>
-            <TabsTrigger value="workflow" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Workflow</TabsTrigger>
-            <TabsTrigger value="features" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Features</TabsTrigger>
-            <TabsTrigger value="specs" className="data-[state=active]:bg-purple-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Tech Specs</TabsTrigger>
+            <TabsTrigger value="overview" className="data-[state=active]:bg-sky-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Overview</TabsTrigger>
+            <TabsTrigger value="workflow" className="data-[state=active]:bg-sky-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Workflow</TabsTrigger>
+            <TabsTrigger value="features" className="data-[state=active]:bg-sky-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Features</TabsTrigger>
+            <TabsTrigger value="specs" className="data-[state=active]:bg-sky-600 text-[10px] sm:text-xs lg:text-sm min-h-[40px]">Tech Specs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            <OrbitCard variant="glass" className="border-purple-600/50 p-6 md:p-8">
+            <OrbitCard variant="glass" className="border-sky-600/50 p-6 md:p-8">
               <SectionHeader
                 title="Professional Placement Model"
                 size="md"
@@ -77,8 +77,8 @@ export default function ProfessionalStaffing() {
               />
               
               <BentoGrid cols={2} gap="lg">
-                <BentoTile className="p-6 border-purple-600/30">
-                  <OrbitCardHeader icon={<Briefcase className="w-5 h-5 text-purple-400" />}>
+                <BentoTile className="p-6 border-sky-600/30">
+                  <OrbitCardHeader icon={<Briefcase className="w-5 h-5 text-sky-400" />}>
                     <OrbitCardTitle>Supported Professions</OrbitCardTitle>
                   </OrbitCardHeader>
                   <OrbitCardContent>
@@ -95,8 +95,8 @@ export default function ProfessionalStaffing() {
                   </OrbitCardContent>
                 </BentoTile>
 
-                <BentoTile className="p-6 border-purple-600/30">
-                  <OrbitCardHeader icon={<DollarSign className="w-5 h-5 text-purple-400" />}>
+                <BentoTile className="p-6 border-sky-600/30">
+                  <OrbitCardHeader icon={<DollarSign className="w-5 h-5 text-sky-400" />}>
                     <OrbitCardTitle>Economic Model</OrbitCardTitle>
                   </OrbitCardHeader>
                   <OrbitCardContent>
@@ -124,7 +124,7 @@ export default function ProfessionalStaffing() {
           </TabsContent>
 
           <TabsContent value="workflow" className="space-y-6">
-            <OrbitCard variant="glass" className="border-purple-600/50 p-6 md:p-8">
+            <OrbitCard variant="glass" className="border-sky-600/50 p-6 md:p-8">
               <SectionHeader
                 title="Professional Placement Workflow"
                 size="md"
@@ -135,14 +135,14 @@ export default function ProfessionalStaffing() {
                 {workflowSteps.map(({ step, title, desc, icon: Icon }) => (
                   <div key={step} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white">
+                      <div className="w-10 h-10 rounded-full bg-sky-600 flex items-center justify-center font-bold text-white">
                         {step}
                       </div>
-                      {step < 6 && <div className="w-1 h-12 bg-purple-600/30 mt-2" />}
+                      {step < 6 && <div className="w-1 h-12 bg-sky-600/30 mt-2" />}
                     </div>
                     <div className="pb-6">
                       <h3 className="font-semibold text-white mb-1 flex items-center gap-2">
-                        <Icon className="w-4 h-4 text-purple-400" />
+                        <Icon className="w-4 h-4 text-sky-400" />
                         {title}
                       </h3>
                       <p className="text-gray-400">{desc}</p>
@@ -157,8 +157,8 @@ export default function ProfessionalStaffing() {
             <div className="hidden md:block">
               <BentoGrid cols={2} gap="md">
                 {features.map(({ title, desc, icon: Icon }) => (
-                  <BentoTile key={title} className="p-6 border-purple-600/30 hover:border-purple-600/60 transition-colors">
-                    <Icon className="w-6 h-6 text-purple-400 mb-3" />
+                  <BentoTile key={title} className="p-6 border-sky-600/30 hover:border-sky-600/60 transition-colors">
+                    <Icon className="w-6 h-6 text-sky-400 mb-3" />
                     <h3 className="font-semibold text-white mb-2">{title}</h3>
                     <p className="text-gray-400 text-sm">{desc}</p>
                   </BentoTile>
@@ -175,8 +175,8 @@ export default function ProfessionalStaffing() {
               >
                 {features.map(({ title, desc, icon: Icon }) => (
                   <CarouselRailItem key={title}>
-                    <OrbitCard className="h-full border-purple-600/30 min-h-[160px]">
-                      <Icon className="w-6 h-6 text-purple-400 mb-3" />
+                    <OrbitCard className="h-full border-sky-600/30 min-h-[160px]">
+                      <Icon className="w-6 h-6 text-sky-400 mb-3" />
                       <h3 className="font-semibold text-white mb-2">{title}</h3>
                       <p className="text-gray-400 text-sm">{desc}</p>
                     </OrbitCard>
@@ -187,7 +187,7 @@ export default function ProfessionalStaffing() {
           </TabsContent>
 
           <TabsContent value="specs" className="space-y-6">
-            <OrbitCard variant="glass" className="border-purple-600/50 p-6 md:p-8">
+            <OrbitCard variant="glass" className="border-sky-600/50 p-6 md:p-8">
               <SectionHeader
                 title="Backend Architecture (V2)"
                 size="md"
@@ -207,7 +207,7 @@ export default function ProfessionalStaffing() {
                       { name: 'professionalJobs', fields: 'title, certRequired, minExperience, contractLength, billRate' },
                     ].map(({ name, fields }) => (
                       <BentoTile key={name} className="bg-slate-900 p-3 border-slate-700">
-                        <p className="text-purple-300 font-mono text-sm">{name}</p>
+                        <p className="text-sky-300 font-mono text-sm">{name}</p>
                         <p className="text-xs text-gray-400">{fields}</p>
                       </BentoTile>
                     ))}
@@ -227,7 +227,7 @@ export default function ProfessionalStaffing() {
 
                 <div>
                   <h3 className="font-semibold text-white mb-3">API Endpoints (V2)</h3>
-                  <div className="space-y-2 text-sm font-mono text-purple-300">
+                  <div className="space-y-2 text-sm font-mono text-sky-300">
                     <p>POST /api/professional/worker/apply</p>
                     <p>GET /api/professional/certifications/:workerId</p>
                     <p>POST /api/professional/background-check/initiate</p>
@@ -242,7 +242,7 @@ export default function ProfessionalStaffing() {
         </Tabs>
 
         <div className="mt-12">
-          <OrbitCard variant="glass" className="border-purple-600/50 p-6 md:p-8">
+          <OrbitCard variant="glass" className="border-sky-600/50 p-6 md:p-8">
             <SectionHeader
               title="Feature Roadmap"
               size="md"
@@ -253,9 +253,9 @@ export default function ProfessionalStaffing() {
               {roadmapItems.map(({ month, tasks, active }) => (
                 <BentoTile 
                   key={month} 
-                  className={`p-4 ${active ? 'bg-gradient-to-br from-green-900/40 to-slate-900/30 border-green-600/50' : 'bg-gradient-to-br from-purple-900/30 to-slate-900/30 border-purple-600/30'}`}
+                  className={`p-4 ${active ? 'bg-gradient-to-br from-green-900/40 to-slate-900/30 border-green-600/50' : 'bg-gradient-to-br from-sky-900/30 to-slate-900/30 border-sky-600/30'}`}
                 >
-                  <p className={`font-semibold mb-2 ${active ? 'text-green-300' : 'text-purple-300'}`}>{month}</p>
+                  <p className={`font-semibold mb-2 ${active ? 'text-green-300' : 'text-sky-300'}`}>{month}</p>
                   <p className="text-sm text-gray-300">{tasks}</p>
                 </BentoTile>
               ))}

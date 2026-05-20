@@ -488,7 +488,7 @@ export default function PayrollSetupWizard() {
               </div>
               <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
                 <div className="flex items-center gap-3 mb-3">
-                  <Sparkles className="w-5 h-5 text-purple-400" />
+                  <Sparkles className="w-5 h-5 text-sky-400" />
                   <span className="font-medium">Auto-Collected via App</span>
                 </div>
                 <ul className="space-y-1 text-sm text-slate-400">
@@ -546,7 +546,7 @@ export default function PayrollSetupWizard() {
                   <p className="text-xs text-slate-400">Build your team</p>
                 </div>
                 <div className="p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
-                  <FileText className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                  <FileText className="w-6 h-6 text-sky-400 mx-auto mb-2" />
                   <p className="text-sm font-medium">Tax Documents</p>
                   <p className="text-xs text-slate-400">Review tax settings</p>
                 </div>

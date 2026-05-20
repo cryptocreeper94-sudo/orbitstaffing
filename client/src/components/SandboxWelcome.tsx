@@ -72,7 +72,7 @@ export function SandboxWelcome({ userName, userRole, onStartTour }: SandboxWelco
           </div>
           
           <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700">
-            <Compass className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+            <Compass className="w-5 h-5 text-sky-400 flex-shrink-0 mt-0.5" />
             <div>
               <div className="text-white font-medium text-sm">Safe to Explore</div>
               <div className="text-gray-400 text-xs">Try any feature - changes won't affect production</div>

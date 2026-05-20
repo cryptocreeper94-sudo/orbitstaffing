@@ -150,7 +150,7 @@ export default function PresentationViewer() {
     <div className={`min-h-screen bg-gradient-to-br ${theme.bg} flex flex-col`}>
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl" />
       </div>
 
       <header className="relative z-10 flex items-center justify-between p-4 border-b border-white/10">

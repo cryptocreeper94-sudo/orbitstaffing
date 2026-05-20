@@ -32,9 +32,9 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-cyan-500/30 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/20">
-        <div className="p-6 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-purple-900/30 to-cyan-900/30">
+        <div className="p-6 border-b border-slate-700 flex items-center justify-between bg-gradient-to-r from-sky-900/30 to-cyan-900/30">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
               <Star className="w-7 h-7 text-white" />
             </div>
             <div>
@@ -48,13 +48,13 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="p-6 space-y-6">
-          <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+          <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+              <Info className="w-5 h-5 text-sky-400 mt-0.5 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-purple-300">Your Access Level: Full Sandbox Access</h3>
+                <h3 className="font-semibold text-sky-300">Your Access Level: Full Sandbox Access</h3>
                 <p className="text-gray-400 text-sm mt-1">
-                  You have <span className="text-purple-300 font-medium">complete access to play in the sandbox</span> - click everything, fill out forms, test all features! 
+                  You have <span className="text-sky-300 font-medium">complete access to play in the sandbox</span> - click everything, fill out forms, test all features! 
                   Nothing saves to the live system yet, and you can't edit the actual site code. Perfect for exploring and giving feedback!
                 </p>
               </div>
@@ -124,7 +124,7 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-cyan-900/30 to-purple-900/30 rounded-lg p-4 border border-cyan-500/30">
+          <div className="bg-gradient-to-r from-cyan-900/30 to-sky-900/30 rounded-lg p-4 border border-cyan-500/30">
             <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
               <Globe className="w-5 h-5 text-cyan-400" />
               NEW: GetOrby.io - Orby Commander
@@ -163,8 +163,8 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
                 <span className="text-cyan-300 font-medium">Admin Dashboard</span>
                 <p className="text-gray-500 text-xs mt-1">Full system overview, real-time analytics, user management, and operational controls</p>
               </div>
-              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-purple-500/50 transition">
-                <span className="text-purple-300 font-medium">Owner Portal</span>
+              <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-sky-500/50 transition">
+                <span className="text-sky-300 font-medium">Owner Portal</span>
                 <p className="text-gray-500 text-xs mt-1">Company management, billing dashboard, worker assignments, job postings</p>
               </div>
               <div className="bg-slate-800/30 rounded-lg p-3 border border-slate-700 hover:border-green-500/50 transition">
@@ -223,7 +223,7 @@ function SidWelcomeModal({ onClose }: { onClose: () => void }) {
         <div className="p-6 border-t border-slate-700 bg-slate-800/30">
           <Button
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-bold py-3 text-lg"
+            className="w-full bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500 text-white font-bold py-3 text-lg"
           >
             <Sparkles className="w-5 h-5 mr-2" />
             Let's Explore ORBIT!
@@ -395,7 +395,7 @@ export default function SecureSandbox() {
           <div className="flex justify-between items-start mb-8">
             <div>
               <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
-                <Lock className="w-8 h-8 text-purple-400" />
+                <Lock className="w-8 h-8 text-sky-400" />
                 ORBIT Sandbox Portal
               </h1>
               <p className="text-gray-400">
@@ -479,9 +479,9 @@ export default function SecureSandbox() {
             {currentUser.role === 'worker' && (
               <div
                 onClick={() => setLocation('/employee-app')}
-                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-purple-500 transition-all group"
+                className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 cursor-pointer hover:border-sky-500 transition-all group"
               >
-                <Users className="w-8 h-8 text-purple-400 mb-4" />
+                <Users className="w-8 h-8 text-sky-400 mb-4" />
                 <h2 className="text-xl font-bold mb-2">Employee App</h2>
                 <p className="text-gray-400 text-sm mb-4">
                   Worker experience view
@@ -492,7 +492,7 @@ export default function SecureSandbox() {
                   <li>✓ Track earnings</li>
                   <li>✓ View bonuses</li>
                 </ul>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                <Button className="w-full bg-sky-600 hover:bg-sky-700">
                   Open Worker App →
                 </Button>
               </div>
@@ -502,7 +502,7 @@ export default function SecureSandbox() {
           {/* Business Intelligence & Valuation Dashboard for Partners */}
           <div className="mt-8">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-sky-500/20 flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
@@ -515,7 +515,7 @@ export default function SecureSandbox() {
 
           <div className="mt-8 bg-slate-800/30 border border-slate-700 rounded-lg p-6">
             <p className="text-gray-400 text-sm">
-              <Lock className="w-4 h-4 inline mr-2 text-purple-400" />
+              <Lock className="w-4 h-4 inline mr-2 text-sky-400" />
               You are in PIN 4444 sandbox mode. You can switch between Admin, Owner, and Employee views.
             </p>
           </div>
@@ -541,7 +541,7 @@ export default function SecureSandbox() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
-            <Lock className="w-10 h-10 text-purple-400 mr-3" />
+            <Lock className="w-10 h-10 text-sky-400 mr-3" />
             <h1 className="text-4xl font-bold text-white">Secure Sandbox</h1>
           </div>
           <p className="text-gray-300 text-lg">
@@ -665,9 +665,9 @@ export default function SecureSandbox() {
           </div>
 
           {/* Employee Sandbox */}
-          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-purple-500 transition-all flex flex-col h-full">
+          <div className="bg-slate-800 rounded-lg shadow-2xl p-8 border border-slate-700 hover:border-sky-500 transition-all flex flex-col h-full">
             <div className="flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-purple-400" />
+              <Users className="w-8 h-8 text-sky-400" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-3 text-center">
               Employee Sandbox
@@ -678,23 +678,23 @@ export default function SecureSandbox() {
 
             <div className="space-y-3 mb-6 bg-slate-700/30 p-4 rounded flex-grow">
               <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
+                <span className="text-sky-400">✓</span>
                 View assigned jobs
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
+                <span className="text-sky-400">✓</span>
                 GPS clock-in/out
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
+                <span className="text-sky-400">✓</span>
                 Real-time earnings
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
+                <span className="text-sky-400">✓</span>
                 Track bonuses
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-300">
-                <span className="text-purple-400">✓</span>
+                <span className="text-sky-400">✓</span>
                 Payment history
               </div>
             </div>
@@ -702,7 +702,7 @@ export default function SecureSandbox() {
             <Button
               onClick={() => handleJoinSandbox('employee')}
               disabled={loginMutation.isPending}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg mb-3"
+              className="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 font-bold text-lg mb-3"
               data-testid="button-employee-sandbox"
             >
               {loginMutation.isPending && selectedRole === 'employee'
@@ -764,10 +764,10 @@ export default function SecureSandbox() {
             {/* GPS Clock Demo */}
             <div 
               onClick={() => setLocation('/gps-clock-in')}
-              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-purple-500 transition-all cursor-pointer group"
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-sky-500 transition-all cursor-pointer group"
             >
-              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-purple-600/20 mb-2 sm:mb-3">
-                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-sky-600/20 mb-2 sm:mb-3">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400" />
               </div>
               <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">GPS Clock</h3>
               <p className="text-[10px] sm:text-xs text-gray-500">Geofence test</p>
@@ -848,10 +848,10 @@ export default function SecureSandbox() {
             {/* Marketing Hub */}
             <div 
               onClick={() => setLocation('/marketing-hub')}
-              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-fuchsia-500 transition-all cursor-pointer group"
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-teal-500 transition-all cursor-pointer group"
             >
-              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-fuchsia-600/20 mb-2 sm:mb-3">
-                <Megaphone className="w-4 h-4 sm:w-5 sm:h-5 text-fuchsia-400" />
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-teal-600/20 mb-2 sm:mb-3">
+                <Megaphone className="w-4 h-4 sm:w-5 sm:h-5 text-teal-400" />
               </div>
               <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Marketing</h3>
               <p className="text-[10px] sm:text-xs text-gray-500">Campaigns</p>
@@ -908,10 +908,10 @@ export default function SecureSandbox() {
             {/* Roadmap */}
             <div 
               onClick={() => setLocation('/roadmap')}
-              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-violet-500 transition-all cursor-pointer group"
+              className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 sm:p-4 hover:border-cyan-500 transition-all cursor-pointer group"
             >
-              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-violet-600/20 mb-2 sm:mb-3">
-                <Map className="w-4 h-4 sm:w-5 sm:h-5 text-violet-400" />
+              <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cyan-600/20 mb-2 sm:mb-3">
+                <Map className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
               </div>
               <h3 className="font-bold text-white text-xs sm:text-sm mb-0.5 sm:mb-1">Roadmap</h3>
               <p className="text-[10px] sm:text-xs text-gray-500">Features</p>
@@ -1039,7 +1039,7 @@ export default function SecureSandbox() {
               <p className="text-xs text-gray-400">Core team member</p>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <span className="px-2 py-0.5 text-[10px] bg-yellow-600/20 text-yellow-300 rounded">FE Edition</span>
-                <span className="px-2 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded">PIN: 4444</span>
+                <span className="px-2 py-0.5 text-[10px] bg-sky-600/20 text-sky-300 rounded">PIN: 4444</span>
                 <span className="px-2 py-0.5 text-[10px] bg-orange-600/20 text-orange-300 rounded">read-only</span>
               </div>
             </div>
@@ -1054,7 +1054,7 @@ export default function SecureSandbox() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <span className="px-2 py-1 text-xs bg-yellow-600/20 text-yellow-300 rounded border border-yellow-500/30">1-99: Founders</span>
-                <span className="px-2 py-1 text-xs bg-purple-600/20 text-purple-300 rounded border border-purple-500/30">100-999: Special</span>
+                <span className="px-2 py-1 text-xs bg-sky-600/20 text-sky-300 rounded border border-sky-500/30">100-999: Special</span>
                 <span className="px-2 py-1 text-xs bg-cyan-600/20 text-cyan-300 rounded border border-cyan-500/30">1000-1999: Genesis</span>
                 <span className="px-2 py-1 text-xs bg-green-600/20 text-green-300 rounded border border-green-500/30">3000+: General</span>
               </div>
@@ -1090,10 +1090,10 @@ export default function SecureSandbox() {
             <Button
               onClick={() => setLocation('/pricing')}
               variant="outline"
-              className="border-slate-600 hover:border-purple-500 text-gray-300"
+              className="border-slate-600 hover:border-sky-500 text-gray-300"
               data-testid="button-pricing-demo"
             >
-              <Settings className="w-4 h-4 mr-2 text-purple-400" />
+              <Settings className="w-4 h-4 mr-2 text-sky-400" />
               Pricing Config
             </Button>
             <Button
@@ -1110,7 +1110,7 @@ export default function SecureSandbox() {
 
         {/* Security Notice */}
         <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6 text-center">
-          <Lock className="w-5 h-5 inline text-purple-400 mr-2" />
+          <Lock className="w-5 h-5 inline text-sky-400 mr-2" />
           <p className="text-gray-400 text-sm">
             Restricted access sandbox. Authorized access only.
           </p>

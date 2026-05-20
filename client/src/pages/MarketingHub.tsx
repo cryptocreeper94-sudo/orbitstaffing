@@ -615,7 +615,7 @@ export default function MarketingHub() {
                 <Check className="w-3 h-3 mr-1" />
                 {completedTaskCount}/{postingTasks.length} Tasks Done
               </Badge>
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 px-3 py-1" data-testid="badge-template-count">
+              <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30 px-3 py-1" data-testid="badge-template-count">
                 <Zap className="w-3 h-3 mr-1" />
                 {postTemplates.length} Templates
               </Badge>
@@ -626,7 +626,7 @@ export default function MarketingHub() {
         <OrbitCard variant="glass" className="border-cyan-500/30 shadow-lg shadow-cyan-500/10">
           <OrbitCardHeader
             icon={
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-500 to-sky-600">
                 <Send className="w-4 h-4 text-white" />
               </div>
             }
@@ -890,7 +890,7 @@ export default function MarketingHub() {
           <BentoTile span={2} className="p-4 md:p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-purple-400" />
+                <MessageSquare className="w-5 h-5 text-sky-400" />
                 <h3 className="text-white font-semibold text-lg">Ready-to-Post Templates</h3>
               </div>
               <div className="flex gap-1">
@@ -898,7 +898,7 @@ export default function MarketingHub() {
                   size="sm"
                   variant={selectedPlatform === 'all' ? 'default' : 'outline'}
                   onClick={() => setSelectedPlatform('all')}
-                  className={selectedPlatform === 'all' ? 'bg-purple-600' : 'border-slate-600'}
+                  className={selectedPlatform === 'all' ? 'bg-sky-600' : 'border-slate-600'}
                   data-testid="button-filter-all"
                 >
                   All

@@ -490,7 +490,7 @@ export function TimeClockManager() {
                             <span className="text-xs bg-cyan-600/30 px-2 py-0.5 rounded text-cyan-300">
                               {DEVICE_TYPES.find(t => t.id === device.deviceType)?.name || device.deviceType}
                             </span>
-                            <span className="text-xs bg-purple-600/30 px-2 py-0.5 rounded text-purple-300">
+                            <span className="text-xs bg-sky-600/30 px-2 py-0.5 rounded text-sky-300">
                               {vendors.find(v => v.id === device.vendor)?.name || device.vendor}
                             </span>
                           </div>

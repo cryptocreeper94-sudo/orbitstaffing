@@ -319,8 +319,8 @@ export default function InteractiveWeatherRadar({
     if (percent < 20) return 'from-green-500 to-green-600';
     if (percent < 40) return 'from-blue-400 to-blue-500';
     if (percent < 60) return 'from-blue-500 to-blue-600';
-    if (percent < 80) return 'from-purple-600 to-purple-700';
-    return 'from-purple-700 to-red-700';
+    if (percent < 80) return 'from-sky-600 to-sky-700';
+    return 'from-sky-700 to-red-700';
   };
 
   const containerClasses = isFullscreen
@@ -384,7 +384,7 @@ export default function InteractiveWeatherRadar({
                 </button>
                 <button
                   onClick={() => setIsFullscreen(!isFullscreen)}
-                  className="p-1 sm:p-1.5 rounded-lg bg-slate-600/50 text-gray-300 hover:bg-purple-600 hover:text-white transition-all"
+                  className="p-1 sm:p-1.5 rounded-lg bg-slate-600/50 text-gray-300 hover:bg-sky-600 hover:text-white transition-all"
                   title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
                 >
                   {isFullscreen ? <Shrink className="w-3 h-3 sm:w-4 sm:h-4" /> : <Expand className="w-3 h-3 sm:w-4 sm:h-4" />}
@@ -481,7 +481,7 @@ export default function InteractiveWeatherRadar({
                         </div>
                       </div>
                       <div className="bg-slate-800 rounded-lg p-3 flex items-center gap-3">
-                        <CloudRain className="w-6 h-6 text-purple-400" />
+                        <CloudRain className="w-6 h-6 text-sky-400" />
                         <div>
                           <div className="text-lg font-bold text-white">{weather.precipitation}%</div>
                           <div className="text-xs text-gray-400">Precipitation</div>

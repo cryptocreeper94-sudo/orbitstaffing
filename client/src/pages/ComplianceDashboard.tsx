@@ -233,9 +233,9 @@ export function ComplianceDashboard() {
                                 {rate.riskLevel?.toUpperCase()}
                               </Badge>
                             </div>
-                            <div className="bg-slate-800/50 p-3 rounded border-l-4 border-purple-400">
+                            <div className="bg-slate-800/50 p-3 rounded border-l-4 border-sky-400">
                               <p className="text-xs text-slate-400 font-semibold">% of Payroll</p>
-                              <p className="text-2xl font-bold text-purple-300">{Number(rate.percentageOfPayroll || 0).toFixed(2)}%</p>
+                              <p className="text-2xl font-bold text-sky-300">{Number(rate.percentageOfPayroll || 0).toFixed(2)}%</p>
                             </div>
                             <div className="text-sm space-y-1">
                               <p className="text-slate-400">Min Premium: <span className="text-amber-300 font-semibold">${rate.minimumPremiumPerEmployee}</span></p>
@@ -268,9 +268,9 @@ export function ComplianceDashboard() {
                                 {rate.riskLevel?.toUpperCase()}
                               </Badge>
                             </div>
-                            <div className="bg-slate-800/50 p-3 rounded border-l-4 border-purple-400">
+                            <div className="bg-slate-800/50 p-3 rounded border-l-4 border-sky-400">
                               <p className="text-xs text-slate-400 font-semibold">% of Payroll</p>
-                              <p className="text-2xl font-bold text-purple-300">{Number(rate.percentageOfPayroll || 0).toFixed(2)}%</p>
+                              <p className="text-2xl font-bold text-sky-300">{Number(rate.percentageOfPayroll || 0).toFixed(2)}%</p>
                             </div>
                             <div className="text-sm space-y-1">
                               <p className="text-slate-400">Min Premium: <span className="text-amber-300 font-semibold">${rate.minimumPremiumPerEmployee}</span></p>

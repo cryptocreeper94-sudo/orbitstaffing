@@ -104,7 +104,7 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                   }`}
                   data-testid="button-role-owner"
                 >
-                  <Building2 className="w-8 h-8 text-purple-400 mb-2 mx-auto" />
+                  <Building2 className="w-8 h-8 text-sky-400 mb-2 mx-auto" />
                   <div className="font-bold text-white text-sm whitespace-nowrap">Business Owner</div>
                   <p className="text-xs text-slate-400 mt-1 whitespace-nowrap">Manage staff & payroll</p>
                 </button>
@@ -150,7 +150,7 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                 <p className="text-xs text-slate-400">Automated processing</p>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                <Clock className="w-6 h-6 text-purple-400 mb-2" />
+                <Clock className="w-6 h-6 text-sky-400 mb-2" />
                 <div className="font-semibold text-white text-sm">Time Tracking</div>
                 <p className="text-xs text-slate-400">Digital timesheets</p>
               </div>
@@ -203,7 +203,7 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
             <div className="text-center">
               <Button
                 onClick={() => handleNavigate('/orbit-pay-card')}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                className="bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-500 hover:to-sky-500"
                 data-testid="button-view-paycard"
               >
                 Learn More & Join Waitlist
@@ -250,7 +250,7 @@ export function WelcomeSlideshow({ isOpen, onClose }: WelcomeSlideshowProps) {
                 </div>
                 <div className="text-cyan-400 font-bold">$39/mo</div>
               </div>
-              <div className="p-3 bg-gradient-to-r from-cyan-900/30 to-purple-900/30 rounded-lg border border-cyan-500/30 flex justify-between items-center">
+              <div className="p-3 bg-gradient-to-r from-cyan-900/30 to-sky-900/30 rounded-lg border border-cyan-500/30 flex justify-between items-center">
                 <div>
                   <div className="font-semibold text-white">Growth Bundle</div>
                   <p className="text-xs text-slate-400">All 5 tools included</p>

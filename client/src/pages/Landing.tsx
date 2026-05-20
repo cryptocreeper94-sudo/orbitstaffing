@@ -330,7 +330,7 @@ export default function Landing() {
                 <FileText className="w-4 h-4" />
                 What's New
               </Link>
-              <Link href="/trustvault-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-purple-400 hover:bg-slate-800 rounded-lg transition">
+              <Link href="/trustvault-verification" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm text-sky-400 hover:bg-slate-800 rounded-lg transition">
                 <Coins className="w-4 h-4" />
                 Blockchain
               </Link>
@@ -381,7 +381,7 @@ export default function Landing() {
               </div>
             </Link>
 
-            <Link href="/employer/register" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-violet-500/40 hover:border-violet-400 transition-all shadow-lg" data-testid="link-employer-register">
+            <Link href="/employer/register" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-lg" data-testid="link-employer-register">
               <img src="/images/scenarios/professional_creating_invoices.png" alt="Post" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
               <div className="absolute bottom-3 left-3">
@@ -442,12 +442,12 @@ export default function Landing() {
               </div>
             </Link>
 
-            <Link href="/crm" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-violet-500/40 hover:border-violet-400 transition-all shadow-lg">
+            <Link href="/crm" className="col-span-1 row-span-1 group relative rounded-xl overflow-hidden border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-lg">
               <img src="/images/scenarios/coworkers_referral_handshake.png" alt="CRM" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
               <div className="absolute bottom-3 left-3">
                 <h3 className="text-lg font-bold text-white">CRM</h3>
-                <p className="text-violet-300 text-xs">Client relationships</p>
+                <p className="text-cyan-300 text-xs">Client relationships</p>
               </div>
             </Link>
           </div>
@@ -455,8 +455,8 @@ export default function Landing() {
       </section>
 
       {/* RECENTLY LAUNCHED - BENTO GRID */}
-      <section className="bg-gradient-to-br from-violet-950/40 via-purple-900/30 to-violet-950/40 border-b border-violet-500/30 py-6 sm:py-10 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-600/10 via-transparent to-transparent pointer-events-none"></div>
+      <section className="bg-gradient-to-br from-cyan-950/40 via-sky-900/30 to-cyan-950/40 border-b border-cyan-500/30 py-6 sm:py-10 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-600/10 via-transparent to-transparent pointer-events-none"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <SectionHeader 
@@ -526,7 +526,7 @@ export default function Landing() {
           </div>
           
           <div className="text-center mt-6">
-            <Link href="/roadmap" className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/40 text-violet-200 font-semibold text-sm transition-all" data-testid="link-view-roadmap">
+            <Link href="/roadmap" className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-200 font-semibold text-sm transition-all" data-testid="link-view-roadmap">
               View Roadmap <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -545,12 +545,12 @@ export default function Landing() {
 
           {/* Bento Grid - 2 cols mobile, 4 cols desktop */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <Link href="/admin" className="group relative rounded-xl overflow-hidden border border-violet-400/50 hover:border-violet-300 shadow-lg h-[140px] sm:h-[180px]">
+            <Link href="/admin" className="group relative rounded-xl overflow-hidden border border-cyan-400/50 hover:border-cyan-300 shadow-lg h-[140px] sm:h-[180px]">
               <img src="/images/scenarios/professional_creating_invoices.png" alt="Owner" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent" />
               <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 text-center">
-                <h3 className="text-sm sm:text-lg font-bold text-violet-300">Owner</h3>
-                <Button className="w-full mt-1.5 sm:mt-2 bg-violet-500/80 hover:bg-violet-600 text-white text-[10px] sm:text-xs h-7 sm:h-8" data-testid="button-owner-access">
+                <h3 className="text-sm sm:text-lg font-bold text-cyan-300">Owner</h3>
+                <Button className="w-full mt-1.5 sm:mt-2 bg-cyan-500/80 hover:bg-cyan-600 text-white text-[10px] sm:text-xs h-7 sm:h-8" data-testid="button-owner-access">
                   Login
                 </Button>
               </div>
@@ -786,10 +786,10 @@ export default function Landing() {
               { tier: "Pro", price: "$99", workers: "Up to 50 workers", features: ["Everything in Starter", "AI Worker Matching", "Priority Support", "Analytics Dashboard"], featured: true },
               { tier: "Enterprise", price: "Custom", workers: "Unlimited workers", features: ["Everything in Pro", "Dedicated Account Manager", "Custom Integrations", "SLA Guarantee"] },
             ].map((plan) => (
-              <div key={plan.tier} className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 ${plan.featured ? 'bg-gradient-to-br from-violet-900/40 to-purple-900/40 border-2 border-violet-500/50 shadow-[0_0_30px_rgba(139,92,246,0.2)]' : 'bg-slate-800/50 border border-slate-700/50'}`}>
+              <div key={plan.tier} className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 ${plan.featured ? 'bg-gradient-to-br from-cyan-900/40 to-sky-900/40 border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(14,165,233,0.2)]' : 'bg-slate-800/50 border border-slate-700/50'}`}>
                 <div className="flex items-center justify-between mb-2 sm:mb-3">
-                  <span className={`text-sm sm:text-lg font-bold ${plan.featured ? 'text-violet-300' : 'text-cyan-300'}`}>{plan.tier}</span>
-                  {plan.featured && <span className="text-[8px] sm:text-[10px] bg-violet-500 text-white px-2 py-0.5 sm:py-1 rounded-full font-medium">MOST POPULAR</span>}
+                  <span className={`text-sm sm:text-lg font-bold ${plan.featured ? 'text-cyan-300' : 'text-cyan-300'}`}>{plan.tier}</span>
+                  {plan.featured && <span className="text-[8px] sm:text-[10px] bg-cyan-500 text-white px-2 py-0.5 sm:py-1 rounded-full font-medium">MOST POPULAR</span>}
                 </div>
                 <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{plan.price}<span className="text-xs sm:text-sm text-slate-400">/mo</span></div>
                 <div className="text-[10px] sm:text-xs text-slate-400 mb-3 sm:mb-4">{plan.workers}</div>
@@ -800,7 +800,7 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/pricing" className={`block text-center py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${plan.featured ? 'bg-violet-500 hover:bg-violet-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
+                <Link href="/pricing" className={`block text-center py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${plan.featured ? 'bg-cyan-500 hover:bg-cyan-600 text-white' : 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300'}`}>
                   {plan.tier === "Enterprise" ? "Contact Sales" : "Start Free Trial"}
                 </Link>
               </div>
@@ -821,7 +821,7 @@ export default function Landing() {
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {[
                 { name: "CRM", price: "$19", Icon: BarChart3, color: "text-cyan-400" },
-                { name: "Time & GPS", price: "$15", Icon: MapPin, color: "text-violet-400" },
+                { name: "Time & GPS", price: "$15", Icon: MapPin, color: "text-cyan-400" },
                 { name: "Payroll", price: "$39", Icon: DollarSign, color: "text-emerald-400" },
                 { name: "Talent Pool", price: "$29", Icon: Users, color: "text-blue-400" },
                 { name: "Compliance", price: "$25", Icon: Shield, color: "text-amber-400" },

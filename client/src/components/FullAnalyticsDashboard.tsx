@@ -51,7 +51,7 @@ interface AnalyticsDashboardData {
   hourlyTraffic: { hour: number; views: number }[];
 }
 
-const CHART_COLORS = ["#06b6d4", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
+const CHART_COLORS = ["#06b6d4", "#0ea5e9", "#10b981", "#f59e0b", "#ef4444"];
 
 const GlassCard = ({
   children,
@@ -102,7 +102,7 @@ const GlassCard = ({
       {...props}
     >
       {glow && (
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-sky-500/5 pointer-events-none" />
       )}
       <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
       {children}
@@ -127,7 +127,7 @@ const StatValue = ({
 }) => {
   const colorClasses = {
     cyan: "from-cyan-500 to-blue-600 text-cyan-400",
-    purple: "from-purple-500 to-pink-600 text-purple-400",
+    purple: "from-sky-500 to-pink-600 text-sky-400",
     emerald: "from-emerald-500 to-teal-600 text-emerald-400",
     amber: "from-amber-500 to-orange-600 text-amber-400",
   };
@@ -253,7 +253,7 @@ export function FullAnalyticsDashboard() {
   const deviceData = [
     { name: "Desktop", value: dashboard?.deviceBreakdown?.desktop || 0, color: "#06b6d4" },
     { name: "Mobile", value: dashboard?.deviceBreakdown?.mobile || 0, color: "#10b981" },
-    { name: "Tablet", value: dashboard?.deviceBreakdown?.tablet || 0, color: "#8b5cf6" },
+    { name: "Tablet", value: dashboard?.deviceBreakdown?.tablet || 0, color: "#0ea5e9" },
   ].filter(d => d.value > 0);
 
   const weekTrend = dashboard
@@ -380,7 +380,7 @@ export function FullAnalyticsDashboard() {
 
         <GlassCard className="p-5" data-testid="chart-device-breakdown">
           <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-sky-500 to-pink-600">
               <PieChartIcon className="w-4 h-4 text-white" />
             </div>
             <h3 className="text-lg font-semibold text-white">Devices</h3>
@@ -518,7 +518,7 @@ export function FullAnalyticsDashboard() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Tablet className="w-4 h-4 text-purple-400" />
+                  <Tablet className="w-4 h-4 text-sky-400" />
                   <span className="text-slate-300">Tablet</span>
                 </div>
                 <span className="text-white font-semibold">{devicePercent("tablet")}%</span>
@@ -528,7 +528,7 @@ export function FullAnalyticsDashboard() {
                   initial={{ width: 0 }}
                   animate={{ width: `${devicePercent("tablet")}%` }}
                   transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                  className="h-full rounded-full bg-gradient-to-r from-sky-500 to-pink-500"
                 />
               </div>
             </div>
@@ -549,7 +549,7 @@ export function FullAnalyticsDashboard() {
                 <p className="text-xs text-slate-500">Mobile Views</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-purple-400">
+                <p className="text-2xl font-bold text-sky-400">
                   {dashboard?.deviceBreakdown?.tablet || 0}
                 </p>
                 <p className="text-xs text-slate-500">Tablet Views</p>
@@ -561,7 +561,7 @@ export function FullAnalyticsDashboard() {
 
       <GlassCard span={4} className="p-5" data-testid="quick-insights">
         <div className="flex items-center gap-2 mb-4">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-sky-600">
             <Zap className="w-4 h-4 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-white">Quick Insights</h3>

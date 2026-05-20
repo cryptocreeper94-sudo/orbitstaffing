@@ -39,7 +39,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
               <Rocket className="w-3 h-3 mr-1" />
               100% Automated
             </Badge>
-            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+            <Badge className="bg-sky-500/20 text-sky-400 border-sky-500/30">
               <BarChart3 className="w-3 h-3 mr-1" />
               CRM Added
             </Badge>
@@ -71,8 +71,8 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                     <p className="text-xs text-slate-400">ORBIT CRM</p>
                   </div>
                   <div className="bg-slate-900/50 rounded-lg p-3 text-center">
-                    <Users className="w-5 h-5 text-purple-400 mx-auto mb-1" />
-                    <p className="text-lg font-bold text-purple-300">$29</p>
+                    <Users className="w-5 h-5 text-sky-400 mx-auto mb-1" />
+                    <p className="text-lg font-bold text-sky-300">$29</p>
                     <p className="text-xs text-slate-400">Talent Exchange</p>
                   </div>
                   <div className="bg-slate-900/50 rounded-lg p-3 text-center">
@@ -186,9 +186,9 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-950/60 to-violet-950/60 border border-purple-500/50">
+            <Card className="bg-gradient-to-br from-sky-950/60 to-cyan-950/60 border border-sky-500/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-purple-300 flex items-center gap-2 text-lg">
+                <CardTitle className="text-sky-300 flex items-center gap-2 text-lg">
                   <Gift className="w-5 h-5" />
                   Affiliate/MLM Program
                 </CardTitle>
@@ -204,7 +204,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                     <p className="text-xs text-slate-400">Agency</p>
                   </div>
                   <div className="bg-slate-900/50 rounded-lg p-2">
-                    <p className="text-xl font-bold text-purple-400">40%+</p>
+                    <p className="text-xl font-bold text-sky-400">40%+</p>
                     <p className="text-xs text-slate-400">Franchise</p>
                   </div>
                 </div>
@@ -218,7 +218,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
               <Card className="bg-slate-900/50 border-slate-700/50">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-white flex items-center gap-2 text-sm">
-                    <Building2 className="w-4 h-4 text-purple-400" />
+                    <Building2 className="w-4 h-4 text-sky-400" />
                     Self-Service Portals
                   </CardTitle>
                 </CardHeader>
@@ -228,7 +228,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                     Employee Hub - Full data access
                   </div>
                   <div className="flex items-center gap-2 text-slate-300">
-                    <Building2 className="w-3 h-3 text-purple-400" />
+                    <Building2 className="w-3 h-3 text-sky-400" />
                     Owner Hub - Admin dashboard
                   </div>
                 </CardContent>
@@ -319,7 +319,7 @@ export function SidonieWelcomeModal({ isOpen, onClose }: SidonieWelcomeModalProp
                     </Button>
                   </Link>
                   <Link href="/jobs">
-                    <Button variant="outline" size="sm" className="w-full text-xs border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-sky-500/30 text-sky-400 hover:bg-sky-500/10">
                       <Briefcase className="w-3 h-3 mr-1" />
                       Jobs
                     </Button>

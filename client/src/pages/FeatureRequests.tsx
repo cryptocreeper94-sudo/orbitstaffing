@@ -22,7 +22,7 @@ interface FeatureRequest {
 
 const CATEGORIES = {
   automation: { label: "Automation", color: "bg-blue-500/20 text-blue-400" },
-  integration: { label: "Integration", color: "bg-purple-500/20 text-purple-400" },
+  integration: { label: "Integration", color: "bg-sky-500/20 text-sky-400" },
   reporting: { label: "Reporting", color: "bg-green-500/20 text-green-400" },
   ui: { label: "User Interface", color: "bg-orange-500/20 text-orange-400" },
   other: { label: "Other", color: "bg-gray-500/20 text-gray-400" },
@@ -38,7 +38,7 @@ const PRIORITIES = {
 const STATUS_ICONS = {
   open: { icon: MessageSquare, color: "text-blue-400" },
   "in-review": { icon: Clock, color: "text-yellow-400" },
-  planned: { icon: Clock, color: "text-purple-400" },
+  planned: { icon: Clock, color: "text-sky-400" },
   "in-progress": { icon: Clock, color: "text-orange-400" },
   completed: { icon: CheckCircle, color: "text-green-400" },
   declined: { icon: MessageSquare, color: "text-red-400" },

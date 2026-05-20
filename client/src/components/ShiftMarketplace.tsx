@@ -211,12 +211,12 @@ export function ShiftMarketplace() {
           </div>
           <p className="text-green-300 font-bold mt-2">Bonus Pool</p>
         </div>
-        <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 border border-purple-700/50 rounded-lg p-4">
+        <div className="bg-gradient-to-br from-sky-900/50 to-sky-800/30 border border-sky-700/50 rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <Bookmark className="w-6 h-6 text-purple-400" />
+            <Bookmark className="w-6 h-6 text-sky-400" />
             <span className="text-2xl font-bold text-white">{savedShifts.length}</span>
           </div>
-          <p className="text-purple-300 font-bold mt-2">Saved Shifts</p>
+          <p className="text-sky-300 font-bold mt-2">Saved Shifts</p>
         </div>
       </div>
 
@@ -297,7 +297,7 @@ export function ShiftMarketplace() {
                   data-testid={`button-save-${shift.id}`}
                 >
                   {savedShifts.includes(shift.id) ? (
-                    <Bookmark className="w-6 h-6 text-purple-400 fill-purple-400" />
+                    <Bookmark className="w-6 h-6 text-sky-400 fill-sky-400" />
                   ) : (
                     <Bookmark className="w-6 h-6 text-gray-600 hover:text-gray-500" />
                   )}

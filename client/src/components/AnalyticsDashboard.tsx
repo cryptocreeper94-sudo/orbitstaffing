@@ -159,7 +159,7 @@ export function AnalyticsDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Tablet className="w-4 h-4 text-purple-400" />
+              <Tablet className="w-4 h-4 text-sky-400" />
               <div className="flex-1">
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-slate-400">Tablet</span>
@@ -167,7 +167,7 @@ export function AnalyticsDashboard() {
                 </div>
                 <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-purple-500 rounded-full transition-all"
+                    className="h-full bg-sky-500 rounded-full transition-all"
                     style={{ width: `${devicePercent("tablet")}%` }}
                   />
                 </div>

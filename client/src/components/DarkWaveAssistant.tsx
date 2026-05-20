@@ -77,7 +77,7 @@ export function DarkWaveAssistant() {
             src={darkwaveSoundwave} 
             alt="DarkWave Assistant" 
             className="w-36 h-20 sm:w-48 sm:h-28 object-contain brightness-125 saturate-150"
-            style={{ filter: 'drop-shadow(0 0 30px rgba(168, 85, 247, 1)) drop-shadow(0 0 50px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))' }}
+            style={{ filter: 'drop-shadow(0 0 30px rgba(14,165,233, 1)) drop-shadow(0 0 50px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))' }}
           />
         </motion.button>
       </div>
@@ -89,12 +89,12 @@ export function DarkWaveAssistant() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-20 right-4 z-[9999] w-80 sm:w-96 max-h-[60vh] bg-gradient-to-br from-slate-900 via-purple-950/50 to-slate-900 rounded-2xl border border-purple-500/30 shadow-2xl shadow-purple-500/20 overflow-hidden flex flex-col"
+            className="fixed bottom-20 right-4 z-[9999] w-80 sm:w-96 max-h-[60vh] bg-gradient-to-br from-slate-900 via-sky-950/50 to-slate-900 rounded-2xl border border-sky-500/30 shadow-2xl shadow-sky-500/20 overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-pink-900/30">
+            <div className="flex items-center justify-between p-4 border-b border-sky-500/30 bg-gradient-to-r from-sky-900/50 to-pink-900/30">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-600 to-pink-600 flex items-center justify-center overflow-hidden">
                   <img 
                     src={darkwaveSoundwave} 
                     alt="Wave" 
@@ -103,15 +103,15 @@ export function DarkWaveAssistant() {
                 </div>
                 <div>
                   <h3 className="font-bold text-white text-sm">Wave</h3>
-                  <p className="text-xs text-purple-300">DarkWave Studios Assistant</p>
+                  <p className="text-xs text-sky-300">DarkWave Studios Assistant</p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 hover:bg-purple-500/20 rounded-lg transition"
+                className="p-2 hover:bg-sky-500/20 rounded-lg transition"
                 data-testid="button-close-darkwave-chat"
               >
-                <X className="w-5 h-5 text-purple-300" />
+                <X className="w-5 h-5 text-sky-300" />
               </button>
             </div>
 
@@ -125,8 +125,8 @@ export function DarkWaveAssistant() {
                   <div
                     className={`max-w-[80%] px-4 py-2 rounded-2xl text-sm ${
                       msg.role === 'user'
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
-                        : 'bg-slate-800/80 text-gray-200 border border-purple-500/20'
+                        ? 'bg-gradient-to-r from-sky-600 to-pink-600 text-white'
+                        : 'bg-slate-800/80 text-gray-200 border border-sky-500/20'
                     }`}
                   >
                     {msg.content}
@@ -136,7 +136,7 @@ export function DarkWaveAssistant() {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-purple-500/30 bg-slate-900/50">
+            <div className="p-4 border-t border-sky-500/30 bg-slate-900/50">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -144,12 +144,12 @@ export function DarkWaveAssistant() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask about our products..."
-                  className="flex-1 bg-slate-800/80 border border-purple-500/30 rounded-xl px-4 py-2 text-sm text-white placeholder-purple-300/50 focus:outline-none focus:border-purple-500"
+                  className="flex-1 bg-slate-800/80 border border-sky-500/30 rounded-xl px-4 py-2 text-sm text-white placeholder-sky-300/50 focus:outline-none focus:border-sky-500"
                   data-testid="input-darkwave-chat"
                 />
                 <button
                   onClick={handleSend}
-                  className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl hover:opacity-90 transition"
+                  className="p-2 bg-gradient-to-r from-sky-600 to-pink-600 rounded-xl hover:opacity-90 transition"
                   data-testid="button-send-darkwave"
                 >
                   <Send className="w-5 h-5 text-white" />

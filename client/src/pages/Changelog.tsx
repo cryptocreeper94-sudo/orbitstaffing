@@ -112,7 +112,7 @@ const getTypeIcon = (type: string) => {
   switch (type) {
     case "new": return <Sparkles className="w-3 h-3 text-green-400" />;
     case "fix": return <Bug className="w-3 h-3 text-amber-400" />;
-    case "security": return <Shield className="w-3 h-3 text-purple-400" />;
+    case "security": return <Shield className="w-3 h-3 text-sky-400" />;
     default: return <Zap className="w-3 h-3 text-cyan-400" />;
   }
 };

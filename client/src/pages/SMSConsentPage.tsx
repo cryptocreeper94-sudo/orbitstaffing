@@ -151,7 +151,7 @@ export function SMSConsentPage() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Bell className="w-4 h-4 text-purple-400" />
+                      <Bell className="w-4 h-4 text-sky-400" />
                       <label className="font-bold text-white cursor-pointer">App Push Notifications</label>
                     </div>
                     <p className="text-sm text-gray-400">

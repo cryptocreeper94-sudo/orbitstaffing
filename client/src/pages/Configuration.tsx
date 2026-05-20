@@ -34,7 +34,7 @@ const INDUSTRY_CONFIGS = {
   events: {
     name: "Event Staffing",
     icon: Calendar,
-    color: "bg-purple-500/20",
+    color: "bg-sky-500/20",
     description: "Event crew, security, hospitality",
     variables: [
       { key: "minMarkup", label: "Markup % (Events: 1.4x)", default: "1.4" },

@@ -152,7 +152,7 @@ export function DocumentOCR() {
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-2">
-            <Scan className="w-6 h-6 text-purple-400" />
+            <Scan className="w-6 h-6 text-sky-400" />
             <span className="text-sm font-bold text-gray-400">Avg Confidence</span>
           </div>
           <p className="text-2xl font-bold">
@@ -282,7 +282,7 @@ export function DocumentOCR() {
       </div>
 
       {/* OCR Features */}
-      <div className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 rounded-lg p-6">
+      <div className="bg-gradient-to-r from-cyan-500/10 to-sky-500/10 border border-cyan-500/30 rounded-lg p-6">
         <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
           <Scan className="w-5 h-5 text-cyan-400" />
           AI OCR Features

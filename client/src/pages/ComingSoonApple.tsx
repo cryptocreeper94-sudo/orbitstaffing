@@ -42,7 +42,7 @@ function NotifyForm() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-8 text-center mb-12">
+    <div className="bg-gradient-to-r from-blue-50 to-sky-50 border border-blue-200 rounded-lg p-8 text-center mb-12">
       <div className="flex justify-center mb-4">
         <Mail className="w-8 h-8 text-primary" />
       </div>
@@ -153,7 +153,7 @@ export default function ComingSoonApple() {
             <Card className="border-border/50">
               <CardContent className="pt-6">
                 <div className="flex gap-4">
-                  <ArrowRight className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+                  <ArrowRight className="w-6 h-6 text-sky-600 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-semibold mb-2">Complete Feature Parity</h3>
                     <p className="text-sm text-muted-foreground">

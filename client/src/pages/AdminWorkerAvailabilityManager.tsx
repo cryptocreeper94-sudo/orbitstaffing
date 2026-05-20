@@ -71,12 +71,12 @@ export function AdminWorkerAvailabilityManager() {
         <Card className="bg-card/50 border-border/50">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-purple-500" />
+              <Calendar className="w-4 h-4 text-sky-500" />
               Peak Hours
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-purple-500">12-5pm</p>
+            <p className="text-3xl font-bold text-sky-500">12-5pm</p>
           </CardContent>
         </Card>
       </div>

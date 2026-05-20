@@ -201,7 +201,7 @@ export function ISO20022Banner() {
                     </p>
                   </div>
                   <div className="bg-blue-950/40 rounded-xl p-4 border border-blue-500/20">
-                    <TrendingUp className="w-8 h-8 text-purple-400 mb-2" />
+                    <TrendingUp className="w-8 h-8 text-sky-400 mb-2" />
                     <h4 className="font-bold text-white text-sm mb-1">Fortune 500 Ready</h4>
                     <p className="text-xs text-gray-400">
                       Enterprise clients require ISO 20022 compliance. We're building this capability early.

@@ -159,7 +159,7 @@ export function InvoiceCustomization() {
             {!isEditing ? (
               <Button
                 onClick={() => setIsEditing(true)}
-                className="w-full bg-purple-600 hover:bg-purple-700 mb-4"
+                className="w-full bg-sky-600 hover:bg-sky-700 mb-4"
                 data-testid="button-edit-template"
               >
                 Edit Template

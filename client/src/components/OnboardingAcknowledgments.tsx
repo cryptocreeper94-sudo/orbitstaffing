@@ -206,7 +206,7 @@ export function OnboardingAcknowledgments({
       id: "companyPolicies",
       title: "Company Policies & Handbook",
       icon: <FileText className="w-5 h-5" />,
-      iconColor: "text-purple-400",
+      iconColor: "text-sky-400",
       content: (
         <div className="space-y-4 text-sm text-slate-300">
           <div className="space-y-2">
@@ -247,8 +247,8 @@ export function OnboardingAcknowledgments({
             </ul>
           </div>
 
-          <div className="p-3 rounded-lg bg-purple-950/30 border border-purple-500/20">
-            <p className="text-purple-300 text-xs">
+          <div className="p-3 rounded-lg bg-sky-950/30 border border-sky-500/20">
+            <p className="text-sky-300 text-xs">
               <strong>Note:</strong> A complete copy of the Employee Handbook will be provided to you. 
               You are responsible for reading and understanding all policies.
             </p>

@@ -80,7 +80,7 @@ const mockPerformanceData = {
   ]
 };
 
-const COLORS = ['#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444'];
+const COLORS = ['#06b6d4', '#0ea5e9', '#f59e0b', '#10b981', '#ef4444'];
 
 export function WorkerPerformanceDashboard() {
   const [timeRange, setTimeRange] = useState<'30d' | '90d' | '6m' | '1y'>('6m');
@@ -150,13 +150,13 @@ export function WorkerPerformanceDashboard() {
           <p className="text-xs text-yellow-400 mt-2">{mockPerformanceData.shiftsCompleted} reviews</p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 border border-purple-700/50 rounded-lg p-6">
+        <div className="bg-gradient-to-br from-sky-900/50 to-sky-800/30 border border-sky-700/50 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <Zap className="w-8 h-8 text-purple-400" />
+            <Zap className="w-8 h-8 text-sky-400" />
           </div>
           <p className="text-3xl font-bold text-white mb-1">{mockPerformanceData.currentStreak}</p>
-          <p className="text-purple-300 font-bold text-sm">Day Streak</p>
-          <p className="text-xs text-purple-400 mt-2">Longest: {mockPerformanceData.longestStreak} days</p>
+          <p className="text-sky-300 font-bold text-sm">Day Streak</p>
+          <p className="text-xs text-sky-400 mt-2">Longest: {mockPerformanceData.longestStreak} days</p>
         </div>
       </div>
 
@@ -271,16 +271,16 @@ export function WorkerPerformanceDashboard() {
       {/* Badges */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <Award className="w-6 h-6 text-purple-400" />
+          <Award className="w-6 h-6 text-sky-400" />
           Badges Earned ({mockPerformanceData.badges.length})
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {mockPerformanceData.badges.map((badge) => (
-            <div key={badge.id} className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 border border-purple-700/50 rounded-lg p-4 text-center">
+            <div key={badge.id} className="bg-gradient-to-br from-sky-900/50 to-sky-800/30 border border-sky-700/50 rounded-lg p-4 text-center">
               <div className="mb-2 flex justify-center"><Icon3D emoji={badge.icon} /></div>
               <p className="text-white font-bold mb-1">{badge.name}</p>
               <p className="text-xs text-gray-400 mb-2">{badge.description}</p>
-              <p className="text-xs text-purple-400">Earned {badge.earnedDate}</p>
+              <p className="text-xs text-sky-400">Earned {badge.earnedDate}</p>
             </div>
           ))}
         </div>

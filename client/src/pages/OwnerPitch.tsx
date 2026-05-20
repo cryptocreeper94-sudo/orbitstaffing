@@ -46,10 +46,10 @@ export default function OwnerPitch() {
           </CardContent>
         </Card>
 
-        <Card className="border-purple-700/50 bg-purple-900/10">
+        <Card className="border-sky-700/50 bg-sky-900/10">
           <CardContent className="p-4">
             <p className="text-xs text-gray-400 mb-1">Worker Retention</p>
-            <p className="text-2xl font-bold text-purple-300">+35%</p>
+            <p className="text-2xl font-bold text-sky-300">+35%</p>
             <p className="text-xs text-gray-500 mt-1">Better UX & loyalty</p>
           </CardContent>
         </Card>

@@ -206,7 +206,7 @@ export default function Features() {
 
   const getColorClasses = (color: string) => {
     const colorMap: Record<string, { bg: string; border: string; icon: string }> = {
-      purple: { bg: "from-purple-900/40 to-slate-900", border: "border-purple-500/30 hover:border-purple-500/60", icon: "text-purple-400" },
+      purple: { bg: "from-sky-900/40 to-slate-900", border: "border-sky-500/30 hover:border-sky-500/60", icon: "text-sky-400" },
       cyan: { bg: "from-cyan-900/40 to-slate-900", border: "border-cyan-500/30 hover:border-cyan-500/60", icon: "text-cyan-400" },
       green: { bg: "from-green-900/40 to-slate-900", border: "border-green-500/30 hover:border-green-500/60", icon: "text-green-400" },
       blue: { bg: "from-blue-900/40 to-slate-900", border: "border-blue-500/30 hover:border-blue-500/60", icon: "text-blue-400" },
@@ -214,7 +214,7 @@ export default function Features() {
       pink: { bg: "from-pink-900/40 to-slate-900", border: "border-pink-500/30 hover:border-pink-500/60", icon: "text-pink-400" },
       indigo: { bg: "from-indigo-900/40 to-slate-900", border: "border-indigo-500/30 hover:border-indigo-500/60", icon: "text-indigo-400" },
       emerald: { bg: "from-emerald-900/40 to-slate-900", border: "border-emerald-500/30 hover:border-emerald-500/60", icon: "text-emerald-400" },
-      violet: { bg: "from-violet-900/40 to-slate-900", border: "border-violet-500/30 hover:border-violet-500/60", icon: "text-violet-400" },
+      violet: { bg: "from-cyan-900/40 to-slate-900", border: "border-cyan-500/30 hover:border-cyan-500/60", icon: "text-cyan-400" },
       teal: { bg: "from-teal-900/40 to-slate-900", border: "border-teal-500/30 hover:border-teal-500/60", icon: "text-teal-400" },
       orange: { bg: "from-orange-900/40 to-slate-900", border: "border-orange-500/30 hover:border-orange-500/60", icon: "text-orange-400" },
       red: { bg: "from-red-900/40 to-slate-900", border: "border-red-500/30 hover:border-red-500/60", icon: "text-red-400" },

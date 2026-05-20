@@ -321,7 +321,7 @@ export default function AdminFinancialHub() {
             Payouts
           </TabsTrigger>
           {isOwner && (
-            <TabsTrigger value="treasury" className="data-[state=active]:bg-purple-500/20" data-testid="tab-treasury">
+            <TabsTrigger value="treasury" className="data-[state=active]:bg-sky-500/20" data-testid="tab-treasury">
               <Landmark className="w-4 h-4 mr-2" />
               Treasury
             </TabsTrigger>
@@ -494,7 +494,7 @@ export default function AdminFinancialHub() {
                   onClick={triggerTreasurySync}
                   disabled={syncingTreasury || !treasuryStatus?.configured}
                   size="sm"
-                  className="bg-purple-600 hover:bg-purple-700"
+                  className="bg-sky-600 hover:bg-sky-700"
                   data-testid="button-sync-treasury"
                 >
                   {syncingTreasury ? (
@@ -531,10 +531,10 @@ export default function AdminFinancialHub() {
                 </div>
 
                 {treasurySummary?.latestBalance && (
-                  <div className="p-6 bg-gradient-to-br from-purple-900/30 to-slate-800/50 rounded-lg border border-purple-500/30">
+                  <div className="p-6 bg-gradient-to-br from-sky-900/30 to-slate-800/50 rounded-lg border border-sky-500/30">
                     <div className="text-center mb-4">
                       <p className="text-slate-400 text-sm">Treasury Balance (DWC)</p>
-                      <p className="text-3xl font-bold text-purple-400 font-mono">
+                      <p className="text-3xl font-bold text-sky-400 font-mono">
                         {parseFloat(treasurySummary.latestBalance).toLocaleString()}
                       </p>
                       <p className="text-xs text-slate-500 mt-1">
@@ -566,7 +566,7 @@ export default function AdminFinancialHub() {
                     {treasurySummary.allocations.map((alloc) => (
                       <div key={alloc.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg" data-testid={`allocation-${alloc.category}`}>
                         <span className="text-white">{alloc.label}</span>
-                        <span className="text-purple-400 font-mono font-bold">{alloc.percentage}%</span>
+                        <span className="text-sky-400 font-mono font-bold">{alloc.percentage}%</span>
                       </div>
                     ))}
                   </div>

@@ -700,9 +700,9 @@ export default function EmployeeApp() {
                         />
                       </label>
                       <label className="flex-1">
-                        <div className="flex items-center justify-center gap-2 p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg cursor-pointer hover:bg-purple-500/20 transition-all">
-                          <Video className="w-5 h-5 text-purple-500" />
-                          <span className="text-sm text-purple-500 font-medium">Record Video</span>
+                        <div className="flex items-center justify-center gap-2 p-3 bg-sky-500/10 border border-sky-500/30 rounded-lg cursor-pointer hover:bg-sky-500/20 transition-all">
+                          <Video className="w-5 h-5 text-sky-500" />
+                          <span className="text-sm text-sky-500 font-medium">Record Video</span>
                         </div>
                         <input
                           type="file"
@@ -763,8 +763,8 @@ export default function EmployeeApp() {
                         ))}
                         {incidentVideos.map((video, index) => (
                           <div key={`video-${index}`} className="relative">
-                            <div className="w-full h-20 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                              <Video className="w-6 h-6 text-purple-500" />
+                            <div className="w-full h-20 bg-sky-500/20 rounded-lg flex items-center justify-center">
+                              <Video className="w-6 h-6 text-sky-500" />
                             </div>
                             <button
                               onClick={() => removeVideo(index)}
@@ -837,24 +837,24 @@ export default function EmployeeApp() {
             <Card className="bg-card/50 border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-purple-500" />
+                  <Star className="w-5 h-5 text-sky-500" />
                   Loyalty Score (12-Month)
                 </CardTitle>
                 <CardDescription>Your overall reliability & availability rating</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
+                <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg p-4">
                   <div className="text-center mb-4">
-                    <div className="text-5xl font-bold text-purple-500">96%</div>
+                    <div className="text-5xl font-bold text-sky-500">96%</div>
                     <p className="text-sm text-muted-foreground mt-1">Loyalty Score</p>
                   </div>
                   
                   <div className="w-full bg-background rounded-full h-2 mb-4 overflow-hidden">
-                    <div className="bg-purple-500 h-full" style={{width: "96%"}}></div>
+                    <div className="bg-sky-500 h-full" style={{width: "96%"}}></div>
                   </div>
 
                   <div className="bg-background/50 rounded-lg p-3 text-center">
-                    <div className="text-sm font-bold text-purple-600 mb-1">TIER 2 - GROWTH</div>
+                    <div className="text-sm font-bold text-sky-600 mb-1">TIER 2 - GROWTH</div>
                     <p className="text-xs text-muted-foreground">5 days paid time off</p>
                     <p className="text-xs text-muted-foreground">+$1,200-2,000 annual bonus</p>
                   </div>
@@ -903,7 +903,7 @@ export default function EmployeeApp() {
                   ].map((item, i) => (
                     <div key={i} className={`p-3 rounded-lg border transition-all ${
                       item.current 
-                        ? "bg-purple-500/10 border-purple-500/30" 
+                        ? "bg-sky-500/10 border-sky-500/30" 
                         : "bg-background/50 border-border/50 opacity-60"
                     }`}>
                       <div className="flex items-start justify-between">
@@ -912,7 +912,7 @@ export default function EmployeeApp() {
                           <div className="text-xs text-muted-foreground">{item.score}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-xs font-bold text-purple-500">{item.bonus}</div>
+                          <div className="text-xs font-bold text-sky-500">{item.bonus}</div>
                           {item.current && <Badge className="mt-1 bg-green-500/20 text-green-600">Current</Badge>}
                         </div>
                       </div>

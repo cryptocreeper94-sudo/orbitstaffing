@@ -360,18 +360,18 @@ export default function TaxDocuments() {
                 <Card className="bg-slate-800/50 border-slate-700/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-purple-400" />
+                      <Calendar className="w-5 h-5 text-sky-400" />
                       Upcoming Documents
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="p-4 rounded-lg bg-purple-900/20 border border-purple-500/30">
+                    <div className="p-4 rounded-lg bg-sky-900/20 border border-sky-500/30">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium">W-2 for 2024</p>
                           <p className="text-xs text-slate-400">Expected by January 31, 2025</p>
                         </div>
-                        <Badge className="bg-purple-600/20 text-purple-400">Pending</Badge>
+                        <Badge className="bg-sky-600/20 text-sky-400">Pending</Badge>
                       </div>
                     </div>
                   </CardContent>
@@ -514,7 +514,7 @@ export default function TaxDocuments() {
 
           {/* ORBIT PAY CARD TAB */}
           <TabsContent value="pay-card" className="space-y-4">
-            <Card className="bg-gradient-to-br from-cyan-900/30 via-slate-800/50 to-purple-900/30 border-cyan-500/30 overflow-hidden">
+            <Card className="bg-gradient-to-br from-cyan-900/30 via-slate-800/50 to-sky-900/30 border-cyan-500/30 overflow-hidden">
               <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
               <CardHeader className="relative">
                 <div className="flex items-center justify-between">
@@ -525,7 +525,7 @@ export default function TaxDocuments() {
                     </CardTitle>
                     <CardDescription className="text-base">Get paid instantly. No waiting. No fees.</CardDescription>
                   </div>
-                  <Badge className="bg-gradient-to-r from-cyan-600 to-purple-600 text-white border-0">
+                  <Badge className="bg-gradient-to-r from-cyan-600 to-sky-600 text-white border-0">
                     Powered by Stripe
                   </Badge>
                 </div>
@@ -535,7 +535,7 @@ export default function TaxDocuments() {
                   <div>
                     <div className="aspect-[1.586/1] max-w-sm rounded-2xl bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 p-6 border border-cyan-500/30 shadow-2xl relative overflow-hidden mb-6">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 rounded-full blur-2xl" />
-                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl" />
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-sky-500/20 rounded-full blur-2xl" />
                       <div className="relative h-full flex flex-col justify-between">
                         <div className="flex items-center justify-between">
                           <div className="w-12 h-8 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded" />
@@ -574,7 +574,7 @@ export default function TaxDocuments() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
-                        <Wallet className="w-5 h-5 text-purple-400" />
+                        <Wallet className="w-5 h-5 text-sky-400" />
                         <div>
                           <p className="font-medium">55,000+ Free ATMs</p>
                           <p className="text-xs text-slate-400">Nationwide ATM network access</p>
@@ -591,7 +591,7 @@ export default function TaxDocuments() {
                         We're awaiting final Stripe Issuing approval.
                       </p>
                       <div className="space-y-3">
-                        <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700" data-testid="button-join-waitlist">
+                        <Button className="w-full bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700" data-testid="button-join-waitlist">
                           <CreditCard className="w-4 h-4 mr-2" />
                           Join Waitlist
                         </Button>

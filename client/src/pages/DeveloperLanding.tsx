@@ -120,7 +120,7 @@ export default function DeveloperLanding() {
             subtitle={`Logged in as ${currentUser.firstName} (${currentUser.role})`}
             breadcrumb={
               <div className="flex items-center gap-2">
-                <Code className="w-6 h-6 text-purple-400" />
+                <Code className="w-6 h-6 text-sky-400" />
               </div>
             }
             actions={
@@ -191,7 +191,7 @@ export default function DeveloperLanding() {
         <div className="space-y-3 bg-slate-700/30 p-4 rounded mb-4">
           {features.map((feature, idx) => (
             <div key={idx} className="flex items-center gap-2 text-sm text-gray-300">
-              <span className={color === 'green' ? 'text-green-400' : 'text-purple-400'}>✓</span>
+              <span className={color === 'green' ? 'text-green-400' : 'text-sky-400'}>✓</span>
               {feature}
             </div>
           ))}
@@ -201,7 +201,7 @@ export default function DeveloperLanding() {
         <Button
           onClick={() => handleJoinSandbox(type)}
           disabled={loginMutation.isPending}
-          className={`w-full ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-purple-600 hover:bg-purple-700 glow-purple'} text-white py-2 text-base mb-2 font-bold`}
+          className={`w-full ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-sky-600 hover:bg-sky-700 glow-purple'} text-white py-2 text-base mb-2 font-bold`}
           data-testid={`button-join-${type}-sandbox`}
         >
           {loginMutation.isPending && selectedRole === type
@@ -265,7 +265,7 @@ export default function DeveloperLanding() {
       ) : !showInput ? (
         <Button
           onClick={() => setShowInput?.(true)}
-          className={`w-full ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-purple-600 hover:bg-purple-700 glow-purple'} text-white font-bold py-2 px-4`}
+          className={`w-full ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-sky-600 hover:bg-sky-700 glow-purple'} text-white font-bold py-2 px-4`}
           data-testid={`button-${type}-login-enable`}
         >
           Access Code
@@ -287,7 +287,7 @@ export default function DeveloperLanding() {
           <div className="flex gap-2">
             <Button
               onClick={onSubmit}
-              className={`flex-1 ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-purple-600 hover:bg-purple-700 glow-purple'} text-white font-bold text-sm py-2`}
+              className={`flex-1 ${color === 'green' ? 'bg-green-600 hover:bg-green-700 glow-green' : 'bg-sky-600 hover:bg-sky-700 glow-purple'} text-white font-bold text-sm py-2`}
               data-testid={`button-${type}-access-submit`}
             >
               Submit
@@ -318,7 +318,7 @@ export default function DeveloperLanding() {
           subtitle="Complete Staffing Platform Demo"
           breadcrumb={
             <div className="flex items-center justify-center w-full">
-              <Code className="w-10 h-10 text-purple-400" />
+              <Code className="w-10 h-10 text-sky-400" />
             </div>
           }
           className="text-center mb-8"
@@ -354,7 +354,7 @@ export default function DeveloperLanding() {
             <BentoTile>
               <SandboxCard 
                 type="employee" 
-                icon={<Users className="w-8 h-8 text-purple-400" />}
+                icon={<Users className="w-8 h-8 text-sky-400" />}
                 color="purple"
                 features={employeeFeatures}
               />
@@ -372,7 +372,7 @@ export default function DeveloperLanding() {
             />
             <SandboxCard 
               type="employee" 
-              icon={<Users className="w-8 h-8 text-purple-400" />}
+              icon={<Users className="w-8 h-8 text-sky-400" />}
               color="purple"
               features={employeeFeatures}
             />
@@ -404,7 +404,7 @@ export default function DeveloperLanding() {
             <BentoTile>
               <LoginCard
                 type="employee"
-                icon={<Users className="w-6 h-6 text-purple-400" />}
+                icon={<Users className="w-6 h-6 text-sky-400" />}
                 color="purple"
                 showInput={showEmployeeCodeInput}
                 setShowInput={setShowEmployeeCodeInput}
@@ -438,7 +438,7 @@ export default function DeveloperLanding() {
             />
             <LoginCard
               type="employee"
-              icon={<Users className="w-6 h-6 text-purple-400" />}
+              icon={<Users className="w-6 h-6 text-sky-400" />}
               color="purple"
               showInput={showEmployeeCodeInput}
               setShowInput={setShowEmployeeCodeInput}

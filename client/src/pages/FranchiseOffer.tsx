@@ -193,7 +193,7 @@ export default function FranchiseOffer() {
   const getTierGradient = (tierCode: string) => {
     switch (tierCode) {
       case 'standard': return 'from-blue-500 to-cyan-500';
-      case 'premium': return 'from-purple-500 to-pink-500';
+      case 'premium': return 'from-sky-500 to-pink-500';
       case 'enterprise': return 'from-amber-500 to-orange-500';
       default: return 'from-gray-500 to-gray-600';
     }
@@ -202,7 +202,7 @@ export default function FranchiseOffer() {
   const getTierBorder = (tierCode: string) => {
     switch (tierCode) {
       case 'standard': return 'border-cyan-500/50 hover:border-cyan-400';
-      case 'premium': return 'border-purple-500/50 hover:border-purple-400';
+      case 'premium': return 'border-sky-500/50 hover:border-sky-400';
       case 'enterprise': return 'border-amber-500/50 hover:border-amber-400';
       default: return 'border-gray-500/50';
     }
@@ -263,11 +263,11 @@ export default function FranchiseOffer() {
               </div>
             </OrbitCard>
           </BentoTile>
-          <BentoTile className="p-6 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 border-cyan-500/30">
+          <BentoTile className="p-6 bg-gradient-to-br from-cyan-500/10 to-sky-500/10 border-cyan-500/30">
             <OrbitCard variant="glass" hover={false} className="h-full border-0 bg-transparent p-0">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                  <Crown className="h-6 w-6 text-purple-400" />
+                <div className="p-3 rounded-lg bg-gradient-to-br from-sky-500/20 to-pink-500/20">
+                  <Crown className="h-6 w-6 text-sky-400" />
                 </div>
                 <div>
                   <OrbitCardTitle className="mb-2">Franchise Owned</OrbitCardTitle>
@@ -310,7 +310,7 @@ export default function FranchiseOffer() {
               >
                 {tier.tierCode === 'premium' && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0">
+                    <Badge className="bg-gradient-to-r from-sky-500 to-pink-500 text-white border-0">
                       Most Popular
                     </Badge>
                   </div>
@@ -366,7 +366,7 @@ export default function FranchiseOffer() {
                   </div>
                   
                   <Button 
-                    className={`w-full ${isSelected ? 'bg-gradient-to-r from-cyan-500 to-purple-500' : 'bg-gray-700 hover:bg-gray-600'}`}
+                    className={`w-full ${isSelected ? 'bg-gradient-to-r from-cyan-500 to-sky-500' : 'bg-gray-700 hover:bg-gray-600'}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedTier(tier);
@@ -638,7 +638,7 @@ export default function FranchiseOffer() {
                     </Button>
                     <Button 
                       type="submit"
-                      className="flex-1 bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600"
+                      className="flex-1 bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-600 hover:to-sky-600"
                       disabled={submitApplication.isPending}
                       data-testid="button-submit-application"
                     >
@@ -676,10 +676,10 @@ export default function FranchiseOffer() {
                 </OrbitCardDescription>
               </OrbitCardContent>
             </OrbitCard>
-            <OrbitCard variant="default" className="w-[280px] hover:border-purple-500/50">
+            <OrbitCard variant="default" className="w-[280px] hover:border-sky-500/50">
               <OrbitCardContent className="text-center py-2">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
-                  <Globe className="h-6 w-6 text-purple-400" />
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4">
+                  <Globe className="h-6 w-6 text-sky-400" />
                 </div>
                 <OrbitCardTitle className="mb-2">Your Brand, Your Platform</OrbitCardTitle>
                 <OrbitCardDescription>

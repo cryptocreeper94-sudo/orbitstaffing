@@ -108,7 +108,7 @@ export function V2SignupModal({ triggerAfterSeconds = 30 }: V2SignupModalProps) 
               <span>Worker Community</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">
-              <Globe className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <Globe className="w-4 h-4 text-sky-400 flex-shrink-0" />
               <span>Multi-Currency</span>
             </div>
             <div className="flex items-center gap-2 text-slate-300">

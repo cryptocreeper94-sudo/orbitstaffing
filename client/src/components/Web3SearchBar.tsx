@@ -138,7 +138,7 @@ export function Web3SearchBar() {
       case 'url':
         return <Globe className="w-4 h-4 text-cyan-400" />;
       case 'trustvault_wallet':
-        return <Wallet className="w-4 h-4 text-purple-400" />;
+        return <Wallet className="w-4 h-4 text-sky-400" />;
       case 'trustvault_token':
       case 'token_symbol':
         return <Coins className="w-4 h-4 text-amber-400" />;
@@ -218,13 +218,13 @@ export function Web3SearchBar() {
             {result.type === 'web_search' ? (
               <div className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-sky-500/20 flex items-center justify-center">
                     <Sparkles className="w-5 h-5 text-cyan-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-white font-medium text-sm">AI Research</span>
-                      <span className="px-1.5 py-0.5 bg-purple-500/20 text-purple-400 text-xs rounded">
+                      <span className="px-1.5 py-0.5 bg-sky-500/20 text-sky-400 text-xs rounded">
                         {result.result.source}
                       </span>
                     </div>

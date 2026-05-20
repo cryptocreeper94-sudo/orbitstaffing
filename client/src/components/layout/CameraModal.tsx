@@ -434,7 +434,7 @@ export function CameraModal({ isOpen, onClose }: CameraModalProps) {
                     {capturedPhotos.length > 0 && (
                       <Button
                         onClick={() => setShowPdfOptions(true)}
-                        className="flex-1 gap-2 bg-purple-600 hover:bg-purple-700"
+                        className="flex-1 gap-2 bg-sky-600 hover:bg-sky-700"
                         data-testid="button-convert-pdf"
                       >
                         <FileText className="w-4 h-4" />

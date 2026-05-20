@@ -416,7 +416,7 @@ export default function EmployeeHub() {
                   </OrbitCard>
 
                   <OrbitCard>
-                    <OrbitCardHeader icon={<TrendingUp className="w-5 h-5 text-purple-400" />}>
+                    <OrbitCardHeader icon={<TrendingUp className="w-5 h-5 text-sky-400" />}>
                       <OrbitCardTitle>Current Withholdings</OrbitCardTitle>
                     </OrbitCardHeader>
                     <OrbitCardContent>
@@ -496,7 +496,7 @@ export default function EmployeeHub() {
                     </OrbitCard>
 
                     <OrbitCard>
-                      <OrbitCardHeader icon={<Globe className="w-4 h-4 text-purple-400" />}>
+                      <OrbitCardHeader icon={<Globe className="w-4 h-4 text-sky-400" />}>
                         <OrbitCardTitle className="text-base">Vision Insurance</OrbitCardTitle>
                       </OrbitCardHeader>
                       <OrbitCardContent>
@@ -579,7 +579,7 @@ export default function EmployeeHub() {
                                   <Badge className={
                                     entry.status === "Approved" ? "bg-green-600/20 text-green-400 border-green-500/30" :
                                     entry.status === "Pending" ? "bg-amber-600/20 text-amber-400 border-amber-500/30" :
-                                    entry.status === "Holiday" ? "bg-purple-600/20 text-purple-400 border-purple-500/30" :
+                                    entry.status === "Holiday" ? "bg-sky-600/20 text-sky-400 border-sky-500/30" :
                                     "bg-slate-600/20 text-slate-400 border-slate-500/30"
                                   }>
                                     {entry.status}
@@ -647,7 +647,7 @@ export default function EmployeeHub() {
 
                       <div>
                         <h4 className="font-medium flex items-center gap-2 mb-3">
-                          <Timer className="w-4 h-4 text-purple-400" />
+                          <Timer className="w-4 h-4 text-sky-400" />
                           Overtime Rules
                         </h4>
                         <div className="p-4 rounded-lg bg-slate-900/50 border border-slate-700/50">

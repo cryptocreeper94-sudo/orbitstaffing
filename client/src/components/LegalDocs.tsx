@@ -69,8 +69,8 @@ export function LegalDocs() {
             </div>
 
             {/* Article III */}
-            <div className="border-l-4 border-purple-500 pl-4">
-              <h3 className="text-purple-300 font-bold mb-2">ARTICLE III - Profits, Losses and Distributions</h3>
+            <div className="border-l-4 border-sky-500 pl-4">
+              <h3 className="text-sky-300 font-bold mb-2">ARTICLE III - Profits, Losses and Distributions</h3>
               <div className="space-y-2 text-sm">
                 <p><strong>3.1 Profits/Losses:</strong> Determined annually for financial and tax purposes</p>
                 <p><strong>3.2 Distributions:</strong> Member determines distribution of available funds after expenses</p>
@@ -152,8 +152,8 @@ export function LegalDocs() {
               <h4 className="text-cyan-300 font-bold mb-1">🚀 ORBIT Staffing OS</h4>
               <p className="text-slate-400 text-sm">Universal marketplace platform for flexible labor/services with 100% automation</p>
             </div>
-            <div className="bg-gradient-to-r from-purple-950/40 to-blue-950/40 rounded-lg p-4 border border-purple-500/30">
-              <h4 className="text-purple-300 font-bold mb-1">🏢 Lot Ops Pro</h4>
+            <div className="bg-gradient-to-r from-sky-950/40 to-blue-950/40 rounded-lg p-4 border border-sky-500/30">
+              <h4 className="text-sky-300 font-bold mb-1">🏢 Lot Ops Pro</h4>
               <p className="text-slate-400 text-sm">Commercial property operations management platform</p>
             </div>
           </div>

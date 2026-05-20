@@ -1045,11 +1045,11 @@ function JasonsTodoList() {
                   {/* Notes */}
                   {task.notes.length > 0 && (
                     <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
-                      <h4 className="font-bold text-purple-400 mb-2">📝 Notes</h4>
+                      <h4 className="font-bold text-sky-400 mb-2">📝 Notes</h4>
                       <ul className="text-gray-300 text-sm space-y-1">
                         {task.notes.map((note, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <span className="text-purple-400 mt-1">•</span>
+                            <span className="text-sky-400 mt-1">•</span>
                             <span>{note}</span>
                           </li>
                         ))}
@@ -1149,9 +1149,9 @@ function SecretsManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-sky-900/30 to-sky-800/20 border border-sky-700/50 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-3">
-          <Key className="w-6 h-6 text-purple-400" />
+          <Key className="w-6 h-6 text-sky-400" />
           <h2 className="text-2xl font-bold text-white">Secrets Manager</h2>
         </div>
         <p className="text-gray-300">
@@ -1169,7 +1169,7 @@ function SecretsManager() {
         <select
           value={selectedProvider}
           onChange={(e) => setSelectedProvider(e.target.value)}
-          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-400"
+          className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-400"
           data-testid="select-oauth-provider"
         >
           <option value="">-- Select a provider --</option>
@@ -1207,7 +1207,7 @@ function SecretsManager() {
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Shield className="w-5 h-5 text-purple-400" />
+              <Shield className="w-5 h-5 text-sky-400" />
               {currentProvider.name} Credentials
             </h3>
             {isConfigured && (
@@ -1231,8 +1231,8 @@ function SecretsManager() {
             </span>
           </a>
 
-          <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4">
-            <p className="text-sm text-purple-200">
+          <div className="bg-sky-900/20 border border-sky-700/30 rounded-lg p-4">
+            <p className="text-sm text-sky-200">
               <strong>Setup Instructions:</strong>
               <br />1. Click the link above to open {currentProvider.name}'s developer portal
               <br />2. Create a new OAuth application called "ORBIT Staffing OS"
@@ -1253,9 +1253,9 @@ function SecretsManager() {
           </div>
 
           {/* Manual Instructions */}
-          <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4">
-            <h4 className="font-bold text-purple-300 mb-2">🔐 Add Secrets Manually:</h4>
-            <p className="text-sm text-purple-100 mb-3">
+          <div className="bg-sky-900/20 border border-sky-700/30 rounded-lg p-4">
+            <h4 className="font-bold text-sky-300 mb-2">🔐 Add Secrets Manually:</h4>
+            <p className="text-sm text-sky-100 mb-3">
               Open render's Secrets pane (Tools → Secrets) and add these two secrets:
             </p>
             <div className="bg-black/30 rounded p-3 font-mono text-xs text-green-400 space-y-1">
@@ -1503,9 +1503,9 @@ function LegalCSAManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-6">
+      <div className="bg-gradient-to-br from-sky-900/30 to-sky-800/20 border border-sky-700/50 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-3">
-          <Scale className="w-6 h-6 text-purple-400" />
+          <Scale className="w-6 h-6 text-sky-400" />
           <h2 className="text-2xl font-bold text-white">Legal / CSA Management</h2>
         </div>
         <p className="text-gray-300">
@@ -1896,7 +1896,7 @@ function BackgroundJobMonitoring() {
       {/* Recent Reassignments */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-purple-400" />
+          <BarChart3 className="w-5 h-5 text-sky-400" />
           Recent Auto-Reassignments (Last 24 Hours)
         </h3>
         {reassignments.length > 0 ? (
@@ -2258,7 +2258,7 @@ export default function DeveloperPanel() {
         </div>
         <div className="bg-slate-800 rounded-lg shadow-2xl p-8 max-w-md w-full border border-slate-700">
           <div className="flex items-center justify-center mb-6">
-            <Code className="w-8 h-8 text-purple-400 mr-3" />
+            <Code className="w-8 h-8 text-sky-400 mr-3" />
             <h1 className="text-2xl font-bold text-white">Developer Access</h1>
           </div>
 
@@ -2275,7 +2275,7 @@ export default function DeveloperPanel() {
                 onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                 maxLength={4}
                 placeholder="•••••••"
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-purple-400"
+                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white text-center text-2xl tracking-widest focus:outline-none focus:border-sky-400"
                 autoFocus
                 data-testid="input-developer-pin"
               />
@@ -2290,7 +2290,7 @@ export default function DeveloperPanel() {
 
             <Button
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 font-bold text-lg"
+              className="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 font-bold text-lg"
               data-testid="button-developer-login"
             >
               Access Developer Panel
@@ -2304,18 +2304,18 @@ export default function DeveloperPanel() {
           {/* Bypass Option Modal */}
           {showBypassOption && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-purple-500/50 p-6">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-sky-500/50 p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Lock className="w-6 h-6 text-purple-400" />
-                  <h2 className="text-xl font-bold text-purple-300">Device Bypass Setup</h2>
+                  <Lock className="w-6 h-6 text-sky-400" />
+                  <h2 className="text-xl font-bold text-sky-300">Device Bypass Setup</h2>
                 </div>
                 
                 <p className="text-gray-300 mb-6">
                   Enable complete bypass on this device? You'll go straight to the Developer tab without logging in again.
                 </p>
                 
-                <div className="bg-purple-900/20 border border-purple-600/30 rounded-lg p-3 mb-6">
-                  <p className="text-sm text-purple-200">
+                <div className="bg-sky-900/20 border border-sky-600/30 rounded-lg p-3 mb-6">
+                  <p className="text-sm text-sky-200">
                     ✓ You can always disable this in settings
                     <br />✓ Only works on this specific device/browser
                   </p>
@@ -2327,7 +2327,7 @@ export default function DeveloperPanel() {
                       enableBypassOnThisDevice();
                       setShowBypassOption(false);
                     }}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700"
+                    className="flex-1 bg-sky-600 hover:bg-sky-700"
                     data-testid="button-enable-bypass"
                   >
                     Enable Bypass
@@ -2439,7 +2439,7 @@ export default function DeveloperPanel() {
           }
           actions={
             <div className="flex items-center gap-2">
-              <Code className="w-6 h-6 text-purple-400" />
+              <Code className="w-6 h-6 text-sky-400" />
             </div>
           }
         />
@@ -2483,17 +2483,17 @@ export default function DeveloperPanel() {
             {/* Owner Hub Button */}
             <button
               onClick={() => navigateTo('/owner-hub')}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-violet-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/20 hover:scale-105 hover:-translate-y-1 group"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 border border-slate-600 hover:border-cyan-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-owner-hub"
             >
-              <Briefcase className="w-6 h-6 md:w-7 md:h-7 text-violet-400 group-hover:text-violet-300 transition-colors" />
+              <Briefcase className="w-6 h-6 md:w-7 md:h-7 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
               <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Owner</span>
             </button>
 
             {/* Marketing Hub Button */}
             <button
               onClick={() => navigateTo('/marketing')}
-              className="relative h-24 md:h-28 bg-gradient-to-br from-pink-700 to-purple-800 border border-pink-600 hover:border-pink-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105 hover:-translate-y-1 group"
+              className="relative h-24 md:h-28 bg-gradient-to-br from-pink-700 to-sky-800 border border-pink-600 hover:border-pink-400 rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 hover:scale-105 hover:-translate-y-1 group"
               data-testid="button-dev-marketing"
             >
               <Megaphone className="w-6 h-6 md:w-7 md:h-7 text-pink-400 group-hover:text-pink-300 transition-colors" />
@@ -2514,10 +2514,10 @@ export default function DeveloperPanel() {
             <BentoTile className="p-0">
               <button
                 onClick={() => setShowDeviceSettings(!showDeviceSettings)}
-                className="relative w-full h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 hover:border-purple-400 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 group"
+                className="relative w-full h-24 md:h-28 bg-gradient-to-br from-slate-700 to-slate-800 hover:border-sky-400 rounded-xl p-4 flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/20 group"
                 data-testid="button-device-settings"
               >
-                <Key className="w-6 h-6 md:w-7 md:h-7 text-purple-400 group-hover:text-purple-300 transition-colors" />
+                <Key className="w-6 h-6 md:w-7 md:h-7 text-sky-400 group-hover:text-sky-300 transition-colors" />
                 <span className="text-xs md:text-sm font-bold text-gray-300 group-hover:text-white transition-colors text-center leading-tight">Settings</span>
               </button>
             </BentoTile>
@@ -2798,7 +2798,7 @@ export default function DeveloperPanel() {
             <AccordionItem value="documents" className="border-b border-slate-700">
               <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors" data-testid="accordion-dev-documents">
                 <div className="flex items-center gap-3">
-                  <FileText className="w-5 h-5 text-purple-400" />
+                  <FileText className="w-5 h-5 text-sky-400" />
                   <span className="font-bold text-white">Documents</span>
                   <span className="text-xs text-gray-500 ml-2">(3)</span>
                 </div>
@@ -2896,7 +2896,7 @@ export default function DeveloperPanel() {
             </AccordionItem>
 
             <AccordionItem value="intelligence" className="border-b border-slate-700">
-              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-purple-900/20 to-cyan-900/20" data-testid="accordion-dev-intelligence">
+              <AccordionTrigger className="px-4 py-3 hover:bg-slate-700/50 transition-colors bg-gradient-to-r from-sky-900/20 to-cyan-900/20" data-testid="accordion-dev-intelligence">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-5 h-5 text-cyan-400" />
                   <span className="font-bold text-white">Business Intelligence & Valuation</span>
@@ -3001,7 +3001,7 @@ export default function DeveloperPanel() {
                 href="https://render.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="bg-gradient-to-br from-purple-600 to-purple-800 border border-purple-500 rounded-lg p-6 hover:border-purple-400 transition-all flex items-start gap-4"
+                className="bg-gradient-to-br from-sky-600 to-sky-800 border border-sky-500 rounded-lg p-6 hover:border-sky-400 transition-all flex items-start gap-4"
                 data-testid="link-render-ide"
               >
                 <div>
@@ -3009,9 +3009,9 @@ export default function DeveloperPanel() {
                     <Code className="w-5 h-5" />
                     render IDE
                   </h3>
-                  <p className="text-purple-100 text-sm">Open the development environment</p>
+                  <p className="text-sky-100 text-sm">Open the development environment</p>
                 </div>
-                <ExternalLink className="w-5 h-5 text-purple-200 flex-shrink-0 mt-1" />
+                <ExternalLink className="w-5 h-5 text-sky-200 flex-shrink-0 mt-1" />
               </a>
 
               {/* AI Agent Link */}
@@ -3051,9 +3051,9 @@ export default function DeveloperPanel() {
             </div>
 
             {/* Developer Access Info */}
-            <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-6">
+            <div className="bg-sky-900/20 border border-sky-700/50 rounded-lg p-6">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-purple-400" />
+                <Shield className="w-5 h-5 text-sky-400" />
                 Developer Access
               </h2>
               <p className="text-gray-300 mb-4">
@@ -3061,27 +3061,27 @@ export default function DeveloperPanel() {
               </p>
               <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
                   Full REST API documentation
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
                   WebSocket endpoints for real-time
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
                   Database schema reference
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
                   Authentication & rate limiting
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
                   Code examples (Node, Python, cURL)
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-purple-400" />
+                  <CheckCircle2 className="w-4 h-4 text-sky-400" />
                   Webhook configurations
                 </li>
               </ul>
@@ -3231,7 +3231,7 @@ export default function DeveloperPanel() {
               </div>
               <Button
                 onClick={() => copyToClipboard('curl example', 'api-example')}
-                className="bg-purple-600 hover:bg-purple-700 text-xs"
+                className="bg-sky-600 hover:bg-sky-700 text-xs"
               >
                 {copied === 'api-example' ? '✓ Copied' : 'Copy Example'}
               </Button>
@@ -3305,7 +3305,7 @@ export default function DeveloperPanel() {
 
             {/* Developer Business Card */}
             <OrbitCard variant="default">
-              <OrbitCardHeader icon={<Code className="w-5 h-5 text-purple-400" />}>
+              <OrbitCardHeader icon={<Code className="w-5 h-5 text-sky-400" />}>
                 <OrbitCardTitle>Developer Profile Card (ORBIT-0001)</OrbitCardTitle>
               </OrbitCardHeader>
               <OrbitCardContent>

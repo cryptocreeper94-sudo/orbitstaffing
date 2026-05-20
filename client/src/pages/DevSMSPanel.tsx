@@ -102,17 +102,17 @@ export function DevSMSPanel() {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-purple-400">SMS Developer Panel</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-sky-400">SMS Developer Panel</h1>
           <p className="text-xs sm:text-base text-gray-400">Test SMS messages and view Twilio logs</p>
         </div>
       </div>
 
       {/* Alert */}
-      <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4 flex gap-3">
-        <Code className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+      <div className="bg-sky-500/10 border border-sky-500/30 rounded-lg p-4 flex gap-3">
+        <Code className="w-5 h-5 text-sky-400 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-bold text-purple-300 text-sm">Requires: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER</p>
-          <p className="text-xs text-purple-200 mt-1">Add these secrets in the Secrets tab once you have Twilio credentials</p>
+          <p className="font-bold text-sky-300 text-sm">Requires: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER</p>
+          <p className="text-xs text-sky-200 mt-1">Add these secrets in the Secrets tab once you have Twilio credentials</p>
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export function DevSMSPanel() {
           onClick={() => setActiveTab("test")}
           className={`p-3 rounded-lg font-bold transition-colors ${
             activeTab === "test"
-              ? "bg-purple-600 text-white"
+              ? "bg-sky-600 text-white"
               : "bg-slate-800 text-gray-400 hover:text-gray-300"
           }`}
           data-testid="tab-test"
@@ -133,7 +133,7 @@ export function DevSMSPanel() {
           onClick={() => setActiveTab("templates")}
           className={`p-3 rounded-lg font-bold transition-colors text-sm ${
             activeTab === "templates"
-              ? "bg-purple-600 text-white"
+              ? "bg-sky-600 text-white"
               : "bg-slate-800 text-gray-400 hover:text-gray-300"
           }`}
           data-testid="tab-templates"
@@ -144,7 +144,7 @@ export function DevSMSPanel() {
           onClick={() => setActiveTab("logs")}
           className={`p-3 rounded-lg font-bold transition-colors text-sm ${
             activeTab === "logs"
-              ? "bg-purple-600 text-white"
+              ? "bg-sky-600 text-white"
               : "bg-slate-800 text-gray-400 hover:text-gray-300"
           }`}
           data-testid="tab-logs"
@@ -155,7 +155,7 @@ export function DevSMSPanel() {
 
       {/* Tab: Test Send */}
       {activeTab === "test" && (
-        <Card className="bg-slate-800/50 border-purple-500/30">
+        <Card className="bg-slate-800/50 border-sky-500/30">
           <CardHeader>
             <CardTitle className="text-lg">Send Test Message</CardTitle>
             <CardDescription>Test SMS delivery to any phone number</CardDescription>
@@ -188,7 +188,7 @@ export function DevSMSPanel() {
             <Button
               onClick={handleSendTest}
               disabled={sending || !phoneNumber || !messageContent}
-              className="w-full bg-purple-600 hover:bg-purple-700 min-h-[44px]"
+              className="w-full bg-sky-600 hover:bg-sky-700 min-h-[44px]"
               data-testid="button-send"
             >
               {sending ? "Sending..." : "Send Test SMS"}
@@ -216,7 +216,7 @@ export function DevSMSPanel() {
       {/* Tab: Templates */}
       {activeTab === "templates" && (
         <div className="space-y-4">
-          <Card className="bg-slate-800/50 border-purple-500/30">
+          <Card className="bg-slate-800/50 border-sky-500/30">
             <CardHeader>
               <CardTitle className="text-lg">Available Templates</CardTitle>
               <CardDescription>Pre-built message templates for common use cases</CardDescription>
@@ -225,7 +225,7 @@ export function DevSMSPanel() {
               {templates.map((template) => (
                 <div
                   key={template.id}
-                  className="p-3 border border-slate-700 rounded-lg hover:border-purple-500/50 cursor-pointer transition-colors"
+                  className="p-3 border border-slate-700 rounded-lg hover:border-sky-500/50 cursor-pointer transition-colors"
                   onClick={() => setSelectedTemplate(template.id)}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -235,7 +235,7 @@ export function DevSMSPanel() {
                     </div>
                     <Badge
                       variant="outline"
-                      className={selectedTemplate === template.id ? "bg-purple-600 text-white" : ""}
+                      className={selectedTemplate === template.id ? "bg-sky-600 text-white" : ""}
                     >
                       {selectedTemplate === template.id ? "Selected" : "Select"}
                     </Badge>
@@ -248,7 +248,7 @@ export function DevSMSPanel() {
           <Button
             onClick={handleApplyTemplate}
             disabled={!selectedTemplate}
-            className="w-full bg-purple-600 hover:bg-purple-700 min-h-[44px]"
+            className="w-full bg-sky-600 hover:bg-sky-700 min-h-[44px]"
             data-testid="button-apply-template"
           >
             Apply Selected Template
@@ -258,7 +258,7 @@ export function DevSMSPanel() {
 
       {/* Tab: Logs */}
       {activeTab === "logs" && (
-        <Card className="bg-slate-800/50 border-purple-500/30">
+        <Card className="bg-slate-800/50 border-sky-500/30">
           <CardHeader>
             <CardTitle className="text-lg">Recent SMS Logs</CardTitle>
             <CardDescription>Latest API calls and delivery statuses</CardDescription>

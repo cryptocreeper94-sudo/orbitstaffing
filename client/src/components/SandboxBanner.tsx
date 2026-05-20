@@ -123,7 +123,7 @@ export function SandboxToggle({ className = '', size = 'sm' }: SandboxToggleProp
       onClick={() => enterSandbox()}
       variant="outline"
       size={size}
-      className={`gap-2 border-purple-500/50 text-purple-400 hover:bg-purple-500/10 ${className}`}
+      className={`gap-2 border-sky-500/50 text-sky-400 hover:bg-sky-500/10 ${className}`}
       data-testid="button-enter-sandbox"
     >
       <FlaskConical className="w-4 h-4" />

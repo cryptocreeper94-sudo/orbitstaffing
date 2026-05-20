@@ -46,7 +46,7 @@ export function AdminSMSDashboard() {
     { name: "Alerts", value: 131 },
   ];
 
-  const COLORS = ["#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6"];
+  const COLORS = ["#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#0ea5e9"];
 
   const weeklyData = [
     { day: "Mon", sent: 340, success: 320, failed: 20 },

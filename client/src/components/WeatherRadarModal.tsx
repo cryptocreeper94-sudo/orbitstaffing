@@ -314,7 +314,7 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
                     </div>
                     
                     <div className="bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
-                      <div className="flex items-center gap-1 text-purple-400 mb-0.5">
+                      <div className="flex items-center gap-1 text-sky-400 mb-0.5">
                         <CloudRain className="w-3 h-3" />
                         <span className="text-[10px]">Precip</span>
                       </div>
@@ -499,7 +499,7 @@ export function WeatherRadarModal({ isOpen, onClose }: WeatherRadarModalProps) {
                     <div className="w-4 h-2 bg-yellow-500 rounded-sm" />
                     <div className="w-4 h-2 bg-orange-500 rounded-sm" />
                     <div className="w-4 h-2 bg-red-500 rounded-sm" />
-                    <div className="w-4 h-2 bg-purple-500 rounded-sm" />
+                    <div className="w-4 h-2 bg-sky-500 rounded-sm" />
                   </div>
                   <div className="flex justify-between text-[8px] text-slate-500 mt-0.5">
                     <span>Light</span>

@@ -96,15 +96,15 @@ export default function AdminAssignmentDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-purple-200 bg-purple-50">
+        <Card className="border-sky-200 bg-sky-50">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Users className="w-4 h-4 text-purple-600" />
+              <Users className="w-4 h-4 text-sky-600" />
               Assigned
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-purple-600">
+            <div className="text-3xl font-bold text-sky-600">
               {stats.assigned}
             </div>
           </CardContent>
@@ -151,7 +151,7 @@ export default function AdminAssignmentDashboard() {
                 <XAxis dataKey="status" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#8b5cf6" />
+                <Bar dataKey="count" fill="#0ea5e9" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

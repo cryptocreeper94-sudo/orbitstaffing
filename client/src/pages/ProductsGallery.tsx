@@ -62,7 +62,7 @@ export default function ProductsGallery() {
       tagline: 'Predictive AI Market Intelligence',
       hasPulseAnimation: true,
       description: 'AI-powered crypto market analysis using wave pattern recognition and predictive coding. Analyzes market trends to help traders understand what they\'re dealing with. Not financial advice - for informational purposes only.',
-      color: 'from-purple-500 to-pink-600',
+      color: 'from-sky-500 to-pink-600',
       glowColor: 'purple',
       slides: slideContent['DarkWave Pulse'],
       slideshowData: null,
@@ -258,7 +258,7 @@ export default function ProductsGallery() {
         {[...Array(15)].map((_, i) => (
           <div
             key={`purple-${i}`}
-            className="absolute w-1 h-1 bg-purple-400 rounded-full animate-twinkle"
+            className="absolute w-1 h-1 bg-sky-400 rounded-full animate-twinkle"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -275,7 +275,7 @@ export default function ProductsGallery() {
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div 
-            className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/30 rounded-full blur-3xl"
+            className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-sky-500/30 rounded-full blur-3xl"
             animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -287,7 +287,7 @@ export default function ProductsGallery() {
           <div className="flex items-center gap-3">
             <span className="text-sm sm:text-base font-medium text-slate-300">darkwavestudios.io</span>
             <span className="text-xs text-slate-500 font-mono hidden sm:inline">v2.7.0</span>
-            <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-purple-900/50 to-cyan-900/50 rounded-lg border border-purple-500/30">
+            <div className="flex items-center gap-2 px-2 py-1 bg-gradient-to-r from-sky-900/50 to-cyan-900/50 rounded-lg border border-sky-500/30">
               <div className="w-6 h-6 bg-white rounded p-0.5">
                 <QRCodeSVG 
                   value="https://darkwavestudios.io" 
@@ -367,12 +367,12 @@ export default function ProductsGallery() {
           <span 
             className="font-extralight tracking-[0.1em] sm:tracking-[0.3em] uppercase"
             style={{
-              background: 'linear-gradient(135deg, #4a5568 0%, #667eea 25%, #7c3aed 50%, #667eea 75%, #4a5568 100%)',
+              background: 'linear-gradient(135deg, #4a5568 0%, #667eea 25%, #0369a1 50%, #667eea 75%, #4a5568 100%)',
               backgroundSize: '200% 200%',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',
-              textShadow: '0 0 60px rgba(6, 182, 212, 0.8), 0 0 100px rgba(139, 92, 246, 0.6)',
+              textShadow: '0 0 60px rgba(6, 182, 212, 0.8), 0 0 100px rgba(14,165,233, 0.6)',
               animation: 'holographic 4s ease-in-out infinite',
             }}
           >

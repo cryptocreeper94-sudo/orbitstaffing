@@ -108,7 +108,7 @@ function getJobTypeBadgeColor(jobType: string): string {
   switch (jobType.toLowerCase()) {
     case "full-time": return "bg-cyan-600/20 text-cyan-300 border-cyan-500/30";
     case "part-time": return "bg-blue-600/20 text-blue-300 border-blue-500/30";
-    case "contract": return "bg-purple-600/20 text-purple-300 border-purple-500/30";
+    case "contract": return "bg-sky-600/20 text-sky-300 border-sky-500/30";
     case "temporary": return "bg-amber-600/20 text-amber-300 border-amber-500/30";
     case "seasonal": return "bg-green-600/20 text-green-300 border-green-500/30";
     default: return "bg-slate-600/20 text-slate-300 border-slate-500/30";

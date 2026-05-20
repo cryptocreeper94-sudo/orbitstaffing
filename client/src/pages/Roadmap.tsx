@@ -139,7 +139,7 @@ export default function Roadmap() {
 
         <OrbitCard 
           variant="action" 
-          className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30"
+          className="bg-gradient-to-r from-cyan-500/10 to-sky-500/10 border-cyan-500/30"
           data-testid="feature-request-card"
         >
           <OrbitCardHeader>

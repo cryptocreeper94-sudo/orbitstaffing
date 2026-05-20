@@ -87,7 +87,7 @@ export default function AdminPasswordReset({ canReset }: AdminPasswordResetProps
     return (
       <Button
         onClick={() => setShowForm(true)}
-        className="w-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center gap-2"
+        className="w-full bg-sky-600 hover:bg-sky-700 flex items-center justify-center gap-2"
         data-testid="button-reset-admin-password"
       >
         <Lock className="w-4 h-4" />
@@ -97,9 +97,9 @@ export default function AdminPasswordReset({ canReset }: AdminPasswordResetProps
   }
 
   return (
-    <Card className="bg-slate-800 border-purple-700">
-      <CardHeader className="bg-purple-900/30">
-        <CardTitle className="flex items-center gap-2 text-purple-300">
+    <Card className="bg-slate-800 border-sky-700">
+      <CardHeader className="bg-sky-900/30">
+        <CardTitle className="flex items-center gap-2 text-sky-300">
           <AlertTriangle className="w-5 h-5" />
           Reset Admin Password
         </CardTitle>
@@ -111,7 +111,7 @@ export default function AdminPasswordReset({ canReset }: AdminPasswordResetProps
           <select
             value={targetAdmin}
             onChange={(e) => setTargetAdmin(e.target.value)}
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-500"
             data-testid="select-target-admin"
           >
             <option value="">Choose admin...</option>
@@ -130,7 +130,7 @@ export default function AdminPasswordReset({ canReset }: AdminPasswordResetProps
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             placeholder="Minimum 8 characters"
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-500"
             data-testid="input-new-password"
           />
         </div>
@@ -142,7 +142,7 @@ export default function AdminPasswordReset({ canReset }: AdminPasswordResetProps
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter password"
-            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-purple-500"
+            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-500"
             data-testid="input-confirm-password"
           />
         </div>
@@ -168,7 +168,7 @@ export default function AdminPasswordReset({ canReset }: AdminPasswordResetProps
           <Button
             onClick={handleResetPassword}
             disabled={loading}
-            className="flex-1 bg-purple-600 hover:bg-purple-700"
+            className="flex-1 bg-sky-600 hover:bg-sky-700"
             data-testid="button-confirm-reset"
           >
             {loading ? 'Resetting...' : 'Reset Password'}

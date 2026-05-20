@@ -33,7 +33,7 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
     id: 3,
     title: "Step 2: Post Demand (1 minute)",
     description: "Someone needs a service? Create a posting. What's needed, rate offered, location, timing. Service providers see available work instantly. Done.",
-    icon: <Briefcase className="w-12 h-12 text-purple-400" />,
+    icon: <Briefcase className="w-12 h-12 text-sky-400" />,
     cta: "Post Demand",
     action: "demo_job",
   },

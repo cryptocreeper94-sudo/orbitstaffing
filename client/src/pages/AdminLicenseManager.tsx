@@ -147,7 +147,7 @@ const GlassLicenseCard = ({
     group
     min-w-[340px] md:min-w-0 md:w-full
   `} data-testid={`card-license-${license.id}`}>
-    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-transparent to-sky-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     
     <div className="relative z-10 p-5">
@@ -361,7 +361,7 @@ export default function AdminLicenseManager() {
     const badgeStyles = {
       draft: 'bg-slate-500/20 text-slate-300 border-slate-500/30 shadow-slate-500/20',
       sent: 'bg-blue-500/20 text-blue-300 border-blue-500/30 shadow-blue-500/20',
-      signed: 'bg-purple-500/20 text-purple-300 border-purple-500/30 shadow-purple-500/20',
+      signed: 'bg-sky-500/20 text-sky-300 border-sky-500/30 shadow-sky-500/20',
       active: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 shadow-emerald-500/20',
       expired: 'bg-amber-500/20 text-amber-300 border-amber-500/30 shadow-amber-500/20',
       cancelled: 'bg-red-500/20 text-red-300 border-red-500/30 shadow-red-500/20',
@@ -415,7 +415,7 @@ export default function AdminLicenseManager() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.08),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(168,85,247,0.05),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(14,165,233,0.05),transparent_50%)]" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 py-6">
         <div className="mb-6">
@@ -433,7 +433,7 @@ export default function AdminLicenseManager() {
 
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/20 backdrop-blur-sm">
+            <div className="p-3 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-sky-500/20 border border-cyan-500/20 backdrop-blur-sm">
               <FileText className="h-8 w-8 text-cyan-400" />
             </div>
             Software License Manager
@@ -475,8 +475,8 @@ export default function AdminLicenseManager() {
             <GlassStatCard
               label="License Revenue"
               value={formatCurrency(stats.revenue)}
-              icon={<TrendingUp className="h-5 w-5 text-purple-400" />}
-              gradient="from-purple-900/40 to-slate-900/80"
+              icon={<TrendingUp className="h-5 w-5 text-sky-400" />}
+              gradient="from-sky-900/40 to-slate-900/80"
             />
           </CarouselRailItem>
         </CarouselRail>
@@ -787,8 +787,8 @@ export default function AdminLicenseManager() {
           <DialogContent className="max-w-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border-slate-700/50 backdrop-blur-xl shadow-2xl">
             <DialogHeader>
               <DialogTitle className="text-white text-xl flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-purple-500/20 border border-purple-500/30">
-                  <Eye className="h-5 w-5 text-purple-400" />
+                <div className="p-2 rounded-xl bg-sky-500/20 border border-sky-500/30">
+                  <Eye className="h-5 w-5 text-sky-400" />
                 </div>
                 License Details
               </DialogTitle>

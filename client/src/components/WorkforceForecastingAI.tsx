@@ -82,7 +82,7 @@ export function WorkforceForecastingAI() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-          <Brain className="w-7 h-7 text-purple-400" />
+          <Brain className="w-7 h-7 text-sky-400" />
           AI Workforce Forecasting
         </h2>
         <p className="text-gray-400 text-sm">Predictive analytics to optimize staffing decisions</p>
@@ -110,8 +110,8 @@ export function WorkforceForecastingAI() {
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-2">
-            <Brain className="w-6 h-6 text-purple-400" />
-            <span className="text-sm font-bold text-purple-400">87%</span>
+            <Brain className="w-6 h-6 text-sky-400" />
+            <span className="text-sm font-bold text-sky-400">87%</span>
           </div>
           <p className="text-2xl font-bold">87%</p>
           <p className="text-xs text-gray-400 mt-1">Avg Forecast Confidence</p>
@@ -132,7 +132,7 @@ export function WorkforceForecastingAI() {
                 onClick={() => setForecastPeriod(period)}
                 className={`px-4 py-2 rounded-lg font-bold text-sm transition ${
                   forecastPeriod === period
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-sky-600 text-white'
                     : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
                 }`}
                 data-testid={`button-period-${period}`}
@@ -157,7 +157,7 @@ export function WorkforceForecastingAI() {
             />
             <Legend />
             <Line type="monotone" dataKey="historical" stroke="#6b7280" strokeWidth={2} name="Historical" />
-            <Line type="monotone" dataKey="predicted" stroke="#8b5cf6" strokeWidth={3} strokeDasharray="5 5" name="AI Forecast" />
+            <Line type="monotone" dataKey="predicted" stroke="#0ea5e9" strokeWidth={3} strokeDasharray="5 5" name="AI Forecast" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -165,7 +165,7 @@ export function WorkforceForecastingAI() {
       {/* AI Insights */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <Brain className="w-5 h-5 text-purple-400" />
+          <Brain className="w-5 h-5 text-sky-400" />
           AI-Powered Insights
         </h3>
         <div className="space-y-3">
@@ -215,7 +215,7 @@ export function WorkforceForecastingAI() {
                 </div>
                 <div>
                   <span className="text-gray-400">Predicted: </span>
-                  <span className="font-bold text-purple-400">{skill.predicted}</span>
+                  <span className="font-bold text-sky-400">{skill.predicted}</span>
                 </div>
               </div>
               <div className="mt-2 h-2 bg-slate-600 rounded-full overflow-hidden">

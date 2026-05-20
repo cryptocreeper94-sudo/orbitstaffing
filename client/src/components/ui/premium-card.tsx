@@ -123,7 +123,7 @@ export const PremiumButton = forwardRef<HTMLButtonElement, PremiumButtonProps>((
     primary: "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white shadow-lg shadow-cyan-500/25",
     secondary: "bg-slate-700 hover:bg-slate-600 text-white border border-slate-600",
     ghost: "bg-transparent hover:bg-slate-800 text-gray-300 hover:text-white",
-    glow: "bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white shadow-lg shadow-cyan-500/30 glow-border",
+    glow: "bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-white shadow-lg shadow-cyan-500/30 glow-border",
   };
 
   const sizeClasses = {

@@ -602,7 +602,7 @@ export default function PartnerDashboard() {
                 <p className="text-xs text-slate-400">Instant transfers</p>
               </div>
               <div className="p-3 bg-slate-800/30 rounded-lg text-center">
-                <CheckCircle2 className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                <CheckCircle2 className="w-6 h-6 text-sky-400 mx-auto mb-2" />
                 <p className="text-xs text-slate-400">Zero fees</p>
               </div>
             </div>

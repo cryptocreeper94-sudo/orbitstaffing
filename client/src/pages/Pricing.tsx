@@ -106,7 +106,7 @@ const STANDALONE_TOOLS: StandaloneTool[] = [
     price: 29,
     description: 'Job board & talent pool management',
     icon: Users,
-    color: 'from-purple-500 to-pink-600',
+    color: 'from-sky-500 to-pink-600',
     features: [
       'Unlimited job postings',
       'Talent pool database',
@@ -422,7 +422,7 @@ export default function Pricing() {
               <Button
                 onClick={() => handleCheckout(priceId, 'bundle', 'coinbase')}
                 variant="outline"
-                className="w-full border-violet-500/30 text-violet-400 hover:bg-violet-500/10"
+                className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
                 disabled={checkoutMutation.isPending}
                 data-testid={`button-crypto-${plan.id}`}
               >
@@ -445,9 +445,9 @@ export default function Pricing() {
       payroll: 'from-green-500 to-emerald-600',
       compliance: 'from-red-500 to-rose-600',
       pay_card: 'from-amber-500 to-orange-600',
-      talent_exchange: 'from-purple-500 to-pink-600',
+      talent_exchange: 'from-sky-500 to-pink-600',
       crm: 'from-cyan-500 to-blue-600',
-      blockchain: 'from-violet-500 to-purple-600',
+      blockchain: 'from-cyan-500 to-sky-600',
       ai_assistant: 'from-pink-500 to-rose-600',
     };
     const color = gradientColors[module.id] || 'from-cyan-500 to-blue-600';
@@ -944,23 +944,23 @@ export default function Pricing() {
                 </BentoTile>
 
                 <BentoTile className="p-0 border-0 bg-transparent">
-                  <OrbitCard className="text-center h-full bg-gradient-to-br from-purple-900/50 to-pink-900/30 border-purple-500/30 ring-2 ring-purple-500/20">
+                  <OrbitCard className="text-center h-full bg-gradient-to-br from-sky-900/50 to-pink-900/30 border-sky-500/30 ring-2 ring-sky-500/20">
                     <OrbitCardContent className="pt-6">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-sky-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
                         <Crown className="w-8 h-8 text-white" />
                       </div>
                       <h3 className="text-xl font-bold mb-2">Franchise Partner</h3>
-                      <div className="text-3xl font-bold text-purple-400 mb-1">$7.5K-$35K</div>
+                      <div className="text-3xl font-bold text-sky-400 mb-1">$7.5K-$35K</div>
                       <p className="text-xs text-slate-400 mb-2">One-time fee + royalties</p>
                       <p className="text-slate-400 text-sm mb-4">Own your territory forever</p>
                       <ul className="text-left text-sm text-slate-300 space-y-2 mb-6">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Exclusive territory rights</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Full white-label platform</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> NFT revenue share (70-90%)</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> All modules included</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> Exclusive territory rights</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> Full white-label platform</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> NFT revenue share (70-90%)</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> All modules included</li>
                       </ul>
                       <Link href="/franchise">
-                        <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" data-testid="button-join-franchise">
+                        <Button className="w-full bg-gradient-to-r from-sky-500 to-pink-500 hover:from-sky-600 hover:to-pink-600" data-testid="button-join-franchise">
                           View Franchise Tiers
                           <ChevronRight className="w-4 h-4 ml-2" />
                         </Button>
@@ -1024,23 +1024,23 @@ export default function Pricing() {
                 </CarouselRailItem>
 
                 <CarouselRailItem className="w-[280px]">
-                  <OrbitCard className="text-center h-full bg-gradient-to-br from-purple-900/50 to-pink-900/30 border-purple-500/30 ring-2 ring-purple-500/20">
+                  <OrbitCard className="text-center h-full bg-gradient-to-br from-sky-900/50 to-pink-900/30 border-sky-500/30 ring-2 ring-sky-500/20">
                     <OrbitCardContent className="pt-6">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-sky-500 to-pink-600 flex items-center justify-center mx-auto mb-4">
                         <Crown className="w-8 h-8 text-white" />
                       </div>
                       <h3 className="text-xl font-bold mb-2">Franchise Partner</h3>
-                      <div className="text-3xl font-bold text-purple-400 mb-1">$7.5K-$35K</div>
+                      <div className="text-3xl font-bold text-sky-400 mb-1">$7.5K-$35K</div>
                       <p className="text-xs text-slate-400 mb-2">One-time fee + royalties</p>
                       <p className="text-slate-400 text-sm mb-4">Own your territory forever</p>
                       <ul className="text-left text-sm text-slate-300 space-y-2 mb-6">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Exclusive territory rights</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> Full white-label platform</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> NFT revenue share (70-90%)</li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-purple-400" /> All modules included</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> Exclusive territory rights</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> Full white-label platform</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> NFT revenue share (70-90%)</li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-sky-400" /> All modules included</li>
                       </ul>
                       <Link href="/franchise">
-                        <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600" data-testid="button-join-franchise">
+                        <Button className="w-full bg-gradient-to-r from-sky-500 to-pink-500 hover:from-sky-600 hover:to-pink-600" data-testid="button-join-franchise">
                           View Franchise Tiers
                           <ChevronRight className="w-4 h-4 ml-2" />
                         </Button>
@@ -1086,7 +1086,7 @@ export default function Pricing() {
             </OrbitCard>
             <OrbitCard className="text-center h-full">
               <OrbitCardContent className="py-6">
-                <HelpCircle className="w-10 h-10 text-purple-400 mx-auto mb-3" />
+                <HelpCircle className="w-10 h-10 text-sky-400 mx-auto mb-3" />
                 <h3 className="font-bold text-white mb-2">Expert Support</h3>
                 <p className="text-sm text-slate-400">Live chat, phone, and email support from real humans.</p>
               </OrbitCardContent>

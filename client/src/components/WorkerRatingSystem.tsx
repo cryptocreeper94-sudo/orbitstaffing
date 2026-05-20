@@ -257,7 +257,7 @@ export function WorkerRatingSystem() {
             </div>
             <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
               <div className="flex items-center gap-3 mb-2">
-                <Award className="w-8 h-8 text-purple-400" />
+                <Award className="w-8 h-8 text-sky-400" />
                 <span className="text-3xl font-bold text-white">{mockWorkerStats.badges.length}</span>
               </div>
               <p className="text-gray-400 text-sm">Badges Earned</p>
@@ -327,13 +327,13 @@ export function WorkerRatingSystem() {
           {/* Badges */}
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
             <h3 className="text-xl font-bold mb-4 text-white flex items-center gap-2">
-              <Award className="w-6 h-6 text-purple-400" />
+              <Award className="w-6 h-6 text-sky-400" />
               Performance Badges
             </h3>
             <div className="flex gap-4">
               {mockWorkerStats.badges.map((badge, idx) => (
-                <div key={idx} className="bg-gradient-to-br from-purple-900/50 to-cyan-900/50 border border-purple-500/50 rounded-lg p-4 text-center">
-                  <Award className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div key={idx} className="bg-gradient-to-br from-sky-900/50 to-cyan-900/50 border border-sky-500/50 rounded-lg p-4 text-center">
+                  <Award className="w-8 h-8 text-sky-400 mx-auto mb-2" />
                   <p className="text-white font-bold text-sm">{badge}</p>
                 </div>
               ))}

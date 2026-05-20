@@ -114,7 +114,7 @@ export function MultiCurrencySupport() {
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-6 h-6 text-purple-400" />
+            <TrendingUp className="w-6 h-6 text-sky-400" />
             <span className="text-sm font-bold text-gray-400">Total (Converted)</span>
           </div>
           <p className="text-2xl font-bold">${totalInBaseCurrency.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>

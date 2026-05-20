@@ -122,8 +122,8 @@ export default function BenefitsEnrollment() {
     },
     {
       id: "vision",
-      icon: <Eye className="w-5 h-5 text-purple-400" />,
-      iconBg: "bg-purple-500/20",
+      icon: <Eye className="w-5 h-5 text-sky-400" />,
+      iconBg: "bg-sky-500/20",
       title: "Vision",
       provider: "VSP Vision Care",
       details: [
@@ -161,8 +161,8 @@ export default function BenefitsEnrollment() {
     },
     {
       id: "401k",
-      icon: <PiggyBank className="w-5 h-5 text-purple-400" />,
-      iconBg: "bg-purple-500/20",
+      icon: <PiggyBank className="w-5 h-5 text-sky-400" />,
+      iconBg: "bg-sky-500/20",
       title: "401(k)",
       provider: "Fidelity",
       details: [
@@ -258,7 +258,7 @@ export default function BenefitsEnrollment() {
                   <p className="text-2xl md:text-3xl font-bold text-white mt-1">{enrollments.retirement401k.contribution}%</p>
                   <p className="text-xs text-slate-400 mt-1">+ 3% employer match</p>
                 </div>
-                <PiggyBank className="w-5 h-5 text-purple-400" />
+                <PiggyBank className="w-5 h-5 text-sky-400" />
               </div>
             </OrbitCard>
           </BentoTile>
@@ -453,7 +453,7 @@ export default function BenefitsEnrollment() {
             <BentoGrid cols={2} gap="lg">
               <BentoTile className="p-0">
                 <OrbitCard className="border-0 h-full">
-                  <OrbitCardHeader icon={<PiggyBank className="w-5 h-5 text-purple-400" />}>
+                  <OrbitCardHeader icon={<PiggyBank className="w-5 h-5 text-sky-400" />}>
                     <OrbitCardTitle>401(k) Retirement Plan</OrbitCardTitle>
                     <OrbitCardDescription>Fidelity Investments</OrbitCardDescription>
                   </OrbitCardHeader>
@@ -488,7 +488,7 @@ export default function BenefitsEnrollment() {
                       <p className="text-xs text-green-400 mt-1">+12.5% YTD return</p>
                     </div>
 
-                    <Button className="w-full bg-purple-600 hover:bg-purple-700" data-testid="button-change-contribution">
+                    <Button className="w-full bg-sky-600 hover:bg-sky-700" data-testid="button-change-contribution">
                       Change Contribution Rate
                     </Button>
                   </OrbitCardContent>

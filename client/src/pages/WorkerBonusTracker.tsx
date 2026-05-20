@@ -117,7 +117,7 @@ export function WorkerBonusTracker() {
             <StatCard
               label="Hours Milestone"
               value={`$${currentBonus.hoursBonus.toFixed(2)}`}
-              icon={<TrendingUp className="w-6 h-6 text-purple-500" />}
+              icon={<TrendingUp className="w-6 h-6 text-sky-500" />}
               className="border-0 bg-transparent h-full"
             />
             <div className="px-4 pb-4 -mt-2">

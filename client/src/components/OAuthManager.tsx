@@ -455,7 +455,7 @@ export function OAuthManager() {
             
             <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/30">
               <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-purple-500/20 text-purple-400">POST</Badge>
+                <Badge className="bg-sky-500/20 text-sky-400">POST</Badge>
                 <code className="text-cyan-400">/oauth/introspect</code>
               </div>
               <p className="text-slate-400 text-xs">Token introspection (RFC 7662)</p>

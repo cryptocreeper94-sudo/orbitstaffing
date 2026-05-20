@@ -47,9 +47,9 @@ export default function SidonieAbilities({ sidonieName, assetNumber }: SidonieAb
   ];
 
   return (
-    <Card className="bg-gradient-to-br from-purple-900/30 to-cyan-900/30 border-2 border-purple-500">
+    <Card className="bg-gradient-to-br from-sky-900/30 to-cyan-900/30 border-2 border-sky-500">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-purple-300">
+        <CardTitle className="flex items-center gap-2 text-sky-300">
           <Shield className="w-6 h-6" />
           Your Admin Abilities
         </CardTitle>
@@ -66,18 +66,18 @@ export default function SidonieAbilities({ sidonieName, assetNumber }: SidonieAb
           return (
             <div
               key={ability.id}
-              className="p-3 bg-slate-800/50 border border-slate-700 rounded-lg hover:border-purple-500 transition-all cursor-pointer"
+              className="p-3 bg-slate-800/50 border border-slate-700 rounded-lg hover:border-sky-500 transition-all cursor-pointer"
               onClick={() => setExpandedAbility(isExpanded ? null : ability.id)}
               data-testid={`ability-${ability.id}`}
             >
               <div className="flex items-start gap-3">
-                <Icon className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                <Icon className="w-5 h-5 text-sky-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <h4 className="font-bold text-white">{ability.title}</h4>
                   <p className="text-sm text-gray-400">{ability.description}</p>
 
                   {isExpanded && (
-                    <div className="mt-2 p-2 bg-slate-900/50 border border-purple-500/30 rounded text-xs text-gray-300">
+                    <div className="mt-2 p-2 bg-slate-900/50 border border-sky-500/30 rounded text-xs text-gray-300">
                       {ability.details}
                     </div>
                   )}

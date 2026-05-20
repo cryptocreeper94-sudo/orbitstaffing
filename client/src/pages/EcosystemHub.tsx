@@ -272,7 +272,7 @@ export default function EcosystemHub() {
     <OrbitCard key={hub.id} className="min-w-[300px] md:min-w-0" data-testid={`hub-${hub.id}`}>
       <OrbitCardHeader
         icon={
-          <div className="h-12 w-12 bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg flex items-center justify-center">
+          <div className="h-12 w-12 bg-gradient-to-br from-sky-600 to-sky-800 rounded-lg flex items-center justify-center">
             <ExternalLink className="h-6 w-6 text-white" />
           </div>
         }
@@ -525,8 +525,8 @@ export default function EcosystemHub() {
             <StatCard
               label="External Hubs"
               value={(externalHubs as any[])?.length || 0}
-              icon={<Network className="h-8 w-8 text-purple-400" />}
-              className="[&_.text-cyan-400]:text-purple-400"
+              icon={<Network className="h-8 w-8 text-sky-400" />}
+              className="[&_.text-cyan-400]:text-sky-400"
             />
           </BentoTile>
         </BentoGrid>

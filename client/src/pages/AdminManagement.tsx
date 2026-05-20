@@ -90,7 +90,7 @@ export function AdminManagement() {
 
   const getRoleColor = (role: string) => {
     const colors: Record<string, string> = {
-      franchise_admin: 'bg-purple-900/20 border-purple-700 text-purple-300',
+      franchise_admin: 'bg-sky-900/20 border-sky-700 text-sky-300',
       customer_admin: 'bg-blue-900/20 border-blue-700 text-blue-300',
       staff_admin: 'bg-green-900/20 border-green-700 text-green-300',
       finance_admin: 'bg-yellow-900/20 border-yellow-700 text-yellow-300',

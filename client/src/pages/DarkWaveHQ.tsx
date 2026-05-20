@@ -87,7 +87,7 @@ const DARKWAVE_PRODUCTS = [
     url: 'https://getorby.io',
     internalPath: null,
     icon: Sparkles,
-    color: 'from-purple-600 to-purple-800',
+    color: 'from-sky-600 to-sky-800',
     status: 'pending',
     features: ['Chat Assistant', 'Brand Customization', 'Analytics', 'Integrations'],
   },
@@ -142,7 +142,7 @@ export default function DarkWaveHQ() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="h-10 w-10 bg-gradient-to-br from-cyan-500 to-sky-600 rounded-lg flex items-center justify-center">
                 <Network className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -216,7 +216,7 @@ export default function DarkWaveHQ() {
                   <p className="text-slate-400 text-sm">Code Snippets</p>
                   <p className="text-3xl font-bold text-white">{ecosystemStats?.totalSnippets || 0}</p>
                 </div>
-                <Code className="h-10 w-10 text-purple-400" />
+                <Code className="h-10 w-10 text-sky-400" />
               </div>
             </CardContent>
           </Card>
@@ -403,7 +403,7 @@ export default function DarkWaveHQ() {
           </TabsContent>
         </Tabs>
 
-        <Card className="bg-gradient-to-r from-cyan-950/50 to-purple-950/50 border-cyan-600/30">
+        <Card className="bg-gradient-to-r from-cyan-950/50 to-sky-950/50 border-cyan-600/30">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -418,7 +418,7 @@ export default function DarkWaveHQ() {
                   </Button>
                 </Link>
                 <Link href="/ecosystem-hub">
-                  <Button variant="outline" className="border-purple-600/30 text-purple-400 hover:bg-purple-950/30" data-testid="quick-register">
+                  <Button variant="outline" className="border-sky-600/30 text-sky-400 hover:bg-sky-950/30" data-testid="quick-register">
                     Register App
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>

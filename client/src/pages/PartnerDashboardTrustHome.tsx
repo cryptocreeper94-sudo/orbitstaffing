@@ -48,7 +48,7 @@ function StatCard({ label, value, icon: Icon, color }: { label: string; value: s
     green: "from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-300",
     amber: "from-amber-500/20 to-amber-600/10 border-amber-500/30 text-amber-300",
     blue: "from-blue-500/20 to-blue-600/10 border-blue-500/30 text-blue-300",
-    purple: "from-purple-500/20 to-purple-600/10 border-purple-500/30 text-purple-300",
+    purple: "from-sky-500/20 to-sky-600/10 border-sky-500/30 text-sky-300",
   };
 
   return (
@@ -76,13 +76,13 @@ function StripeConnectCard({ partnerName }: { partnerName: string }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-900/30 to-slate-900/80 border border-purple-500/30 rounded-xl p-5 backdrop-blur-sm" data-testid="card-stripe-connect">
+    <div className="bg-gradient-to-br from-sky-900/30 to-slate-900/80 border border-sky-500/30 rounded-xl p-5 backdrop-blur-sm" data-testid="card-stripe-connect">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
           <CreditCard className="w-5 h-5 text-white" />
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-bold text-purple-300 mb-1">Stripe Connect</h3>
+          <h3 className="text-sm font-bold text-sky-300 mb-1">Stripe Connect</h3>
           <p className="text-xs text-slate-400 mb-4">
             Connect your Stripe account to receive automatic equity payouts from ORBIT's Financial Hub.
           </p>
@@ -98,7 +98,7 @@ function StripeConnectCard({ partnerName }: { partnerName: string }) {
                 size="sm"
                 onClick={handleConnect}
                 disabled={connecting}
-                className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white text-xs shadow-lg shadow-purple-500/20"
+                className="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white text-xs shadow-lg shadow-sky-500/20"
                 data-testid="button-connect-stripe"
               >
                 {connecting ? (

@@ -160,8 +160,8 @@ export default function CSASigningPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="bg-gradient-to-br from-purple-900/30 to-purple-800/20 border border-purple-700/50 rounded-lg p-8 text-center">
-          <Scale className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+        <div className="bg-gradient-to-br from-sky-900/30 to-sky-800/20 border border-sky-700/50 rounded-lg p-8 text-center">
+          <Scale className="w-16 h-16 text-sky-400 mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-white mb-2">Client Service Agreement</h1>
           <p className="text-xl text-gray-300">ORBIT Staffing OS - Version {template.version}</p>
           <p className="text-sm text-gray-400 mt-2">Effective Date: {new Date(template.effectiveDate).toLocaleDateString()}</p>
@@ -196,9 +196,9 @@ export default function CSASigningPage() {
           </div>
           
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-            <FileText className="w-8 h-8 text-purple-400 mb-3" />
+            <FileText className="w-8 h-8 text-sky-400 mb-3" />
             <h4 className="font-bold text-white mb-2">Labor Markup</h4>
-            <p className="text-2xl font-bold text-purple-400 mb-2">{template.defaultMarkupMultiplier}x</p>
+            <p className="text-2xl font-bold text-sky-400 mb-2">{template.defaultMarkupMultiplier}x</p>
             <p className="text-sm text-gray-300">
               Transparent pricing: {template.defaultMarkupMultiplier}x worker pay rate covers insurance, compliance, and service
             </p>
@@ -332,8 +332,8 @@ export default function CSASigningPage() {
             </span>
           </label>
           
-          <div className="bg-purple-900/20 border border-purple-700/30 rounded-lg p-4 mb-6">
-            <p className="text-sm text-purple-200">
+          <div className="bg-sky-900/20 border border-sky-700/30 rounded-lg p-4 mb-6">
+            <p className="text-sm text-sky-200">
               <strong>🔒 Security Notice:</strong> Your signature will be captured along with timestamp, IP address, and device information for authentication and legal compliance.
             </p>
           </div>

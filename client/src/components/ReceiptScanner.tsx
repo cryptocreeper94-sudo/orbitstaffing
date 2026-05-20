@@ -232,7 +232,7 @@ export function ReceiptScanner() {
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle2 className="w-6 h-6 text-purple-400" />
+            <CheckCircle2 className="w-6 h-6 text-sky-400" />
             <span className="text-sm font-bold text-gray-400">Categories</span>
           </div>
           <p className="text-2xl font-bold">{Object.keys(categoryTotals).length}</p>
@@ -285,7 +285,7 @@ export function ReceiptScanner() {
           <Button
             onClick={() => setShowAddManual(!showAddManual)}
             variant="outline"
-            className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
+            className="border-sky-500 text-sky-400 hover:bg-sky-500/20"
             data-testid="button-manual-receipt"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -304,8 +304,8 @@ export function ReceiptScanner() {
         </div>
 
         {showAddManual && (
-          <div className="mt-4 p-4 bg-slate-900/50 rounded-lg border border-purple-500/30 space-y-4">
-            <h4 className="font-bold text-purple-400">Manual Entry</h4>
+          <div className="mt-4 p-4 bg-slate-900/50 rounded-lg border border-sky-500/30 space-y-4">
+            <h4 className="font-bold text-sky-400">Manual Entry</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm text-gray-400 mb-1">Vendor *</label>
@@ -366,7 +366,7 @@ export function ReceiptScanner() {
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleAddManual} className="bg-purple-600 hover:bg-purple-700" data-testid="button-save-manual">
+              <Button onClick={handleAddManual} className="bg-sky-600 hover:bg-sky-700" data-testid="button-save-manual">
                 Save Receipt
               </Button>
               <Button onClick={() => setShowAddManual(false)} variant="ghost" className="text-gray-400">

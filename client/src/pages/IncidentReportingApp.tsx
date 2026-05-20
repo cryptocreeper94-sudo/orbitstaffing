@@ -430,14 +430,14 @@ export default function IncidentReportingApp() {
               />
             </div>
 
-            <div className="bg-purple-900/10 border border-purple-700/50 rounded-lg p-4">
-              <h4 className="text-sm font-bold text-purple-300 mb-3">📸 Evidence Collection (Optional but Recommended)</h4>
+            <div className="bg-sky-900/10 border border-sky-700/50 rounded-lg p-4">
+              <h4 className="text-sm font-bold text-sky-300 mb-3">📸 Evidence Collection (Optional but Recommended)</h4>
               <div className="space-y-3">
                 <div>
                   <Button
                     onClick={handleCameraCapture}
                     variant="outline"
-                    className="w-full mb-2 text-purple-300 border-purple-700"
+                    className="w-full mb-2 text-sky-300 border-sky-700"
                     data-testid="button-camera-open"
                   >
                     <Camera className="w-4 h-4 mr-2" />
@@ -453,7 +453,7 @@ export default function IncidentReportingApp() {
                   {cameraStreamRef.current && (
                     <Button
                       onClick={handlePhotoCapture}
-                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      className="w-full bg-sky-600 hover:bg-sky-700"
                       data-testid="button-capture-photo"
                     >
                       <Camera className="w-4 h-4 mr-2" />

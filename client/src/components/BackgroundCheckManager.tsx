@@ -44,13 +44,13 @@ const STATUS_CONFIG: Record<string, { color: string; icon: React.ReactNode; labe
   clear: { color: 'bg-green-500/20 text-green-400 border-green-500/50', icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: 'Clear' },
   consider: { color: 'bg-orange-500/20 text-orange-400 border-orange-500/50', icon: <AlertCircle className="w-3.5 h-3.5" />, label: 'Consider' },
   suspended: { color: 'bg-red-500/20 text-red-400 border-red-500/50', icon: <XCircle className="w-3.5 h-3.5" />, label: 'Suspended' },
-  dispute: { color: 'bg-purple-500/20 text-purple-400 border-purple-500/50', icon: <AlertCircle className="w-3.5 h-3.5" />, label: 'Dispute' },
+  dispute: { color: 'bg-sky-500/20 text-sky-400 border-sky-500/50', icon: <AlertCircle className="w-3.5 h-3.5" />, label: 'Dispute' },
 };
 
 const PACKAGE_CONFIG: Record<string, { color: string; label: string }> = {
   basic: { color: 'bg-slate-600', label: 'Basic' },
   standard: { color: 'bg-blue-600', label: 'Standard' },
-  pro: { color: 'bg-purple-600', label: 'Professional' },
+  pro: { color: 'bg-sky-600', label: 'Professional' },
 };
 
 export function BackgroundCheckManager() {

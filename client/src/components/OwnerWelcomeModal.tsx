@@ -33,15 +33,15 @@ interface OwnerWelcomeModalProps {
 export function OwnerWelcomeModal({ isOpen, onClose, companyName = "Company" }: OwnerWelcomeModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-950 border border-purple-500/30">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-950 border border-sky-500/30">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-purple-300 flex items-center gap-2">Welcome to ORBIT, {companyName}! <Icon3D emoji="🚀" size="md" /></DialogTitle>
+          <DialogTitle className="text-2xl text-sky-300 flex items-center gap-2">Welcome to ORBIT, {companyName}! <Icon3D emoji="🚀" size="md" /></DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <Card className="bg-purple-950/40 border border-purple-500/30">
+          <Card className="bg-sky-950/40 border border-sky-500/30">
             <CardHeader>
-              <CardTitle className="text-purple-300 flex items-center gap-2">
+              <CardTitle className="text-sky-300 flex items-center gap-2">
                 <Users className="w-5 h-5" />
                 Build Your Workforce
               </CardTitle>
@@ -91,7 +91,7 @@ export function OwnerWelcomeModal({ isOpen, onClose, companyName = "Company" }: 
           </div>
         </div>
 
-        <Button onClick={onClose} className="w-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center gap-2" data-testid="button-owner-welcome-close">
+        <Button onClick={onClose} className="w-full bg-sky-600 hover:bg-sky-700 flex items-center justify-center gap-2" data-testid="button-owner-welcome-close">
           Start Managing <Icon3D emoji="📋" />
         </Button>
       </DialogContent>

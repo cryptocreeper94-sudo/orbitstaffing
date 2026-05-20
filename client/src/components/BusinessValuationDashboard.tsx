@@ -69,7 +69,7 @@ const VALUATION_TIERS: ValuationTier[] = [
     maxValue: 15000000,
     requirements: { franchises: 15, arr: 500000, workers: 200 },
     description: '15+ franchises, $500K ARR, regional expansion',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-sky-500 to-pink-500',
     icon: <Target className="w-5 h-5" />
   },
   {
@@ -205,7 +205,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
       data-testid={`section-${section}`}
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center text-cyan-400">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-sky-500/20 flex items-center justify-center text-cyan-400">
           {icon}
         </div>
         <span className="text-lg font-semibold text-white">{title}</span>
@@ -221,7 +221,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
   return (
     <div className="space-y-6" data-testid="business-valuation-dashboard">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-purple-900/20 to-slate-900 rounded-2xl p-6 border border-purple-500/30">
+      <div className="bg-gradient-to-r from-slate-900 via-sky-900/20 to-slate-900 rounded-2xl p-6 border border-sky-500/30">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -234,7 +234,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
           </div>
           <div className="text-right">
             <div className="text-sm text-gray-400">Estimated Valuation</div>
-            <div className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            <div className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent">
               {formatCurrency(estimatedValuation)}
             </div>
             <Badge className={`mt-1 bg-gradient-to-r ${currentTier.color} text-white border-0`}>
@@ -282,7 +282,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
                 <p className="text-2xl font-bold text-white">{metrics.activeWorkers}</p>
                 <p className="text-xs text-gray-500">on platform</p>
               </div>
-              <Users className="w-8 h-8 text-purple-400" />
+              <Users className="w-8 h-8 text-sky-400" />
             </div>
           </CardContent>
         </Card>
@@ -367,7 +367,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
                     key={tier.name}
                     className={`relative p-4 rounded-lg border transition-all ${
                       isCurrentTier 
-                        ? 'bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/50 shadow-lg shadow-cyan-500/10' 
+                        ? 'bg-gradient-to-r from-cyan-500/10 to-sky-500/10 border-cyan-500/50 shadow-lg shadow-cyan-500/10' 
                         : isCompleted 
                           ? 'bg-green-500/10 border-green-500/30' 
                           : 'bg-slate-800/30 border-slate-700/50'
@@ -467,7 +467,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
             </div>
 
             {/* Market Size */}
-            <div className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-lg p-4 border border-purple-500/30">
+            <div className="bg-gradient-to-r from-sky-500/10 to-cyan-500/10 rounded-lg p-4 border border-sky-500/30">
               <h4 className="font-semibold text-white mb-2">Total Addressable Market</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
@@ -483,7 +483,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
                   <p className="text-xs text-gray-400">CAGR</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-400">43%</div>
+                  <div className="text-2xl font-bold text-sky-400">43%</div>
                   <p className="text-xs text-gray-400">North America Share</p>
                 </div>
               </div>
@@ -582,7 +582,7 @@ export function BusinessValuationDashboard({ isPartnerView = false }: { isPartne
             <span className="text-white font-medium">TrustVault Network</span>
           </div>
           <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-purple-400" />
+            <Star className="w-4 h-4 text-sky-400" />
             <span className="text-gray-400">Version:</span>
             <span className="text-white font-medium">v2.7.0</span>
           </div>

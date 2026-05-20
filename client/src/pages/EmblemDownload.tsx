@@ -76,7 +76,7 @@ export default function EmblemDownload() {
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
-            <ImageIcon className="w-8 h-8 text-purple-400" />
+            <ImageIcon className="w-8 h-8 text-sky-400" />
             <h1 className="text-4xl font-bold">ORBIT Emblem Library</h1>
           </div>
           <p className="text-gray-400 text-lg">
@@ -132,7 +132,7 @@ export default function EmblemDownload() {
         {/* Vector Format Section */}
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 mb-12">
           <div className="flex items-center gap-3 mb-4">
-            <FileJson className="w-6 h-6 text-purple-400" />
+            <FileJson className="w-6 h-6 text-sky-400" />
             <h2 className="text-2xl font-bold">SVG Vector Format</h2>
           </div>
           <p className="text-gray-400 mb-4">
@@ -151,7 +151,7 @@ export default function EmblemDownload() {
               navigator.clipboard.writeText(svgFormat);
               alert('SVG code copied to clipboard!');
             }}
-            className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
+            className="bg-sky-600 hover:bg-sky-700 flex items-center gap-2"
           >
             <Copy className="w-4 h-4" />
             Copy SVG Code

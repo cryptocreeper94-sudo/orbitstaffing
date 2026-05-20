@@ -184,7 +184,7 @@ export function HealthDashboard() {
             <Card className="bg-slate-800/50 border-slate-700">
               <CardContent className="pt-6">
                 <p className="text-sm text-gray-400 mb-1">DB Latency</p>
-                <p className="text-2xl font-bold text-purple-400">{health.database.latency_ms}ms</p>
+                <p className="text-2xl font-bold text-sky-400">{health.database.latency_ms}ms</p>
                 <p className="text-xs text-gray-500 mt-2">Query response time</p>
               </CardContent>
             </Card>
